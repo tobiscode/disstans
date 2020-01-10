@@ -80,29 +80,74 @@ class Network():
         return net
 
     def fit(self, solver):
-        # initiate progress bar
-        pbar = tqdm(desc="Fitting stations", ascii=True, unit="station", total=len(self.stations.keys()))
-        return_values = {}
+        if "num_threads" in config.options("general"):
+            # run in parallel
+            # initiate progress bar
+            pbar = tqdm(desc="Fitting station models", ascii=True, unit="station", total=len(self.stations.keys()))
+            return_values = {}
 
-        # make sure the progress bar updates
-        def pbarupdate(arg):
-            pbar.update()
+            # make sure the progress bar updates
+            def pbarupdate(arg):
+                pbar.update()
 
-        # start multiprocessing pool
-        with Pool(2) as p:
-            for name, stat in self.stations.items():
-                return_values[name] = p.apply_async(stat.fit_models, [solver], callback=pbarupdate)
-            p.close()
-            p.join()
-        pbar.close()
+            # start multiprocessing pool
+            with Pool(config.getint("general", "num_threads")) as p:
+                for name, stat in self.stations.items():
+                    return_values[name] = p.apply_async(stat.fit_models, [solver], callback=pbarupdate)
+                p.close()
+                p.join()
+            pbar.close()
 
-        # check if there was an error
-        for name, r in return_values.items():
-            try:
-                r.get()
-            except BaseException as e:
-                print("Error at station", name)
-                raise e
+            # check if there was an error
+            for name, r in return_values.items():
+                try:
+                    r.get()
+                except BaseException as e:
+                    print("Error at station", name)
+                    raise e
+        else:
+            # run in serial
+            for name, stat in tqdm(self.stations.items(), desc="Fitting station models", ascii=True, unit="station"):
+                try:
+                    stat.fit_models(solver)
+                except BaseException as e:
+                    print("Error at station", name)
+                    raise e
+
+    def evaluate(self, timeseries=None):
+        if "num_threads" in config.options("general"):
+            # run in parallel
+            # initiate progress bar
+            pbar = tqdm(desc="Evaluating station models", ascii=True, unit="station", total=len(self.stations.keys()))
+            return_values = {}
+
+            # make sure the progress bar updates
+            def pbarupdate(arg):
+                pbar.update()
+
+            # start multiprocessing pool
+            with Pool(config.getint("general", "num_threads")) as p:
+                for name, stat in self.stations.items():
+                    return_values[name] = p.apply_async(stat.evaluate_models, [timeseries], callback=pbarupdate)
+                p.close()
+                p.join()
+            pbar.close()
+
+            # check if there was an error
+            for name, r in return_values.items():
+                try:
+                    r.get()
+                except BaseException as e:
+                    print("Error at station", name)
+                    raise e
+        else:
+            # run in serial
+            for name, stat in tqdm(self.stations.items(), desc="Evaluating station models", ascii=True, unit="station"):
+                try:
+                    stat.evaluate_models(timeseries)
+                except BaseException as e:
+                    print("Error at station", name)
+                    raise e
 
     def gui(self):
         # get location data and projections
@@ -301,7 +346,7 @@ class Model():
     def evaluate(self, timevector):
         if not self.is_fitted:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return self.get_mapping(timevector=timevector) @ self.parameters.reshape(-1, 1)
+        return self.get_mapping(timevector=timevector) @ self.parameters
 
 
 class Polynomial(Model):
@@ -437,4 +482,5 @@ def dmultr(mat, dvec):
 if __name__ == "__main__":
     net = Network.from_json(path="net_arch.json")
     net.fit("linear_least_squares")
-    net.gui()
+    net.evaluate()
+    # net.gui()
