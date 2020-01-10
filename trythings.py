@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cvxpy as cp
 from configparser import ConfigParser
+from tqdm import tqdm
+from multiprocessing import Pool
 from pandas.plotting import register_matplotlib_converters
-from itertools import product
 register_matplotlib_converters()
 
 # import defaults
@@ -62,14 +63,14 @@ class Network():
             for ts_cfg in station_cfg["timeseries"]:
                 ts = globals()[ts_cfg["type"]](**ts_cfg["kw_args"])
                 stat.add_timeseries(description=ts_cfg["description"], timeseries=ts)
-            # add default local models to station
-            for model_cfg in net_arch["default_local_models"]:
-                mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-                stat.add_local_model(description=model_cfg["description"], model=mdl)
-            # add specific local models to station
-            for model_cfg in station_cfg["models"]:
-                mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-                stat.add_local_model(description=model_cfg["description"], model=mdl)
+                # add default local models to station
+                for model_cfg in net_arch["default_local_models"]:
+                    mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
+                    stat.add_local_model(ts_description=ts_cfg["description"], model_description=model_cfg["description"], model=mdl)
+                # add specific local models to station
+                for model_cfg in station_cfg["models"]:
+                    mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
+                    stat.add_local_model(ts_description=ts_cfg["description"], model_description=model_cfg["description"], model=mdl)
             # add to network
             net.add_station(name=station_name, station=stat)
         # add global models
@@ -77,6 +78,23 @@ class Network():
             mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
             net.add_global_model(description=model_cfg["description"], model=mdl)
         return net
+
+    def fit(self, solver):
+        pbar = tqdm(desc="Fitting stations", ascii=True, unit="stat", total=len(self.stations.keys()))
+
+        def pbarupdate(arg):
+            pbar.update()
+
+        def pbarerror(error):
+            pbar.write(str(error))
+
+        with Pool(2) as p:
+            for stat in self.stations.values():
+                p.apply_async(stat.fit_models, [solver], callback=pbarupdate, error_callback=pbarerror)
+            p.close()
+            p.join()
+        # for stat in tqdm(self.stations.values(), ascii=True):
+        #     stat.fit_models("linear_least_squares")
 
     def gui(self):
         # get location data and projections
@@ -177,7 +195,7 @@ class Station():
         self.name = name
         self.location = location
         self.timeseries = {}
-        self.local_models = {}
+        self.models = {}
         self.fits = {}
 
     def add_timeseries(self, description, timeseries):
@@ -185,30 +203,36 @@ class Station():
             Warning("Overwriting time series {:s} at station {:s}".format(description, self.name))
         self.timeseries[description] = timeseries
         self.fits[description] = {}
+        self.models[description] = {}
 
-    def add_local_model(self, description, model):
-        if description in self.local_models:
-            Warning("Overwriting local model {:s} at station {:s}".format(description, self.name))
-        self.local_models[description] = model
+    def add_local_model(self, ts_description, model_description, model):
+        assert ts_description in self.timeseries, \
+            "Cannot find timeseries {:s} at station {:s}".format(ts_description, self.name)
+        if model_description in self.models[ts_description]:
+            Warning("Overwriting local model {:s} for timeseries {:s} at station {:s}".format(model_description, ts_description, self.name))
+        self.models[ts_description] = {model_description: model}
 
-    def add_fit(self, model_description, timeseries_description, fit):
-        assert model_description in self.local_models, \
-            "Fitted model must match a previously added local station model before being assigned as a fit."
-        assert timeseries_description in self.timeseries, \
+    def add_fit(self, ts_description, model_description, fit):
+        assert ts_description in self.timeseries, \
             "Fitted model must match a previously added local station time series before being assigned as a fit."
-        if model_description in self.fits[timeseries_description]:
-            Warning("Overwriting fit of {:s} model to {:s} timeseries at station {:s}".format(model_description, timeseries_description, self.name))
-        self.fits[timeseries_description].update({model_description: fit})
+        assert model_description in self.models[ts_description], \
+            "Fitted model must match a previously added local station model before being assigned as a fit."
+        if model_description in self.fits[ts_description]:
+            Warning("Overwriting fit of {:s} model to {:s} timeseries at station {:s}".format(model_description, ts_description, self.name))
+        self.fits[ts_description].update({model_description: fit})
 
     def fit_models(self, solver):
-        fitted_params = globals()[solver](self)
-        for model_description, params in fitted_params.items():
-            self.local_models[model_description].read_parameters(params)
+        for (ts_description, timeseries) in self.timeseries.items():
+            fitted_params = globals()[solver](timeseries, self.models[ts_description])
+            for model_description, (params, covs) in fitted_params.items():
+                self.models[ts_description][model_description].read_parameters(params, covs)
 
-    def evaluate_models(self):
-        for (timeseries_description, timeseries), (model_description, model) in product(self.timeseries.items(), self.local_models.items()):
-            if model.is_fitted:
-                fit = model.evaluate(timeseries.df['time'])
+    def evaluate_models(self, timeseries=None):
+        for ts_description, ts in self.timeseries.items():
+            for model_description, model in self.models[ts_description].items():
+                if model.is_fitted:
+                    fit = model.evaluate(ts.df['time']) if timeseries is None else model.evaluate(timeseries)
+                    self.add_fit(ts_description, model_description, fit)
 
 
 class Timeseries():
@@ -252,14 +276,18 @@ class Model():
         self.starttime = starttime
         self.timeunit = timeunit
         self.is_fitted = False
-        self.parameters = np.empty(self.num_parameters)
+        self.parameters = None
+        self.sigmas = None
 
     def get_mapping(self, timevector):
         raise NotImplementedError()
 
-    def read_parameters(self, parameters):
-        assert parameters.size == self.parameters.size, "Cannot change number of parameters after model initialization."
+    def read_parameters(self, parameters, sigmas):
+        assert parameters.shape[0] == self.num_parameters, "Cannot change number of parameters after model initialization."
         self.parameters = parameters
+        if sigmas is not None:
+            assert self.parameters.size == sigmas.size, "Uncertainty sigmas must have same number of entries than parameters."
+            self.sigmas = sigmas
         self.is_fitted = True
 
     def evaluate(self, timevector):
@@ -324,10 +352,36 @@ class Sinusoidal(Model):
         return np.arctan2(self.parameters[1], self.parameters[0])
 
 
-def linear_least_squares(station):
+def linear_least_squares(ts, models):
     """
     cvxpy wrapper for a linear least squares solver
     """
+    mapping_matrices = []
+    # get mapping matrices
+    for (model_desc, model) in models.items():
+        mapping_matrices.append(model.get_mapping(ts.df['time']))
+    mapping_matrices = np.hstack(mapping_matrices)
+    num_time, num_params = mapping_matrices.shape
+    num_components = len(ts.data_cols)
+    # create cvxpy problem and solve
+    params = cp.Variable((num_params, num_components))
+    cost = cp.sum_squares(mapping_matrices*params - ts.df[ts.data_cols].values)
+    problem = cp.Problem(cp.Minimize(cost))
+    problem.solve()
+    # estimate formal covariance (uncertainty) of parameters
+    cov = np.zeros((num_params, num_components))
+    for i in range(num_components):
+        if ts.sigma_cols[i] is None:
+            cov[:, i] = np.diag(mapping_matrices.T @ mapping_matrices)
+        else:
+            cov[:, i] = np.diag(dmultr(mapping_matrices.T, ts.df[ts.sigma_cols[i]].values) @ mapping_matrices)
+    # separate parameters back to models
+    i = 0
+    fitted_params = {}
+    for (model_desc, model) in models.items():
+        fitted_params[model_desc] = (params.value[i:i+model.num_parameters, :], cov[i:i+model.num_parameters, :])
+        i += model.num_parameters
+    return fitted_params
 
 
 def tvec_to_numpycol(timevector, starttime=None, timeunit='D'):
@@ -340,6 +394,39 @@ def tvec_to_numpycol(timevector, starttime=None, timeunit='D'):
     return ((timevector - starttime) / np.timedelta64(1, timeunit)).values.reshape(-1, 1)
 
 
+def dmultl(dvec, mat):
+    '''Left multiply with a diagonal matrix. Faster.
+
+    Args:
+
+        * dvec    -> Diagonal matrix represented as a vector
+        * mat     -> Matrix
+
+    Returns:
+
+        * res    -> dot (diag(dvec), mat)'''
+
+    res = (dvec*mat.T).T
+    return res
+
+
+def dmultr(mat, dvec):
+    '''Right multiply with a diagonal matrix. Faster.
+
+    Args:
+
+        * dvec    -> Diagonal matrix represented as a vector
+        * mat     -> Matrix
+
+    Returns:
+
+        * res     -> dot(mat, diag(dvec))'''
+
+    res = dvec*mat
+    return res
+
+
 if __name__ == "__main__":
     net = Network.from_json(path="net_arch.json")
-    net.gui()
+    net.fit("linear_least_squares")
+    # net.gui()
