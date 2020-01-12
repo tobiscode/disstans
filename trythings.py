@@ -3,7 +3,6 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
-import cvxpy as cp
 from configparser import ConfigParser
 from tqdm import tqdm
 from multiprocessing import Pool
@@ -81,73 +80,45 @@ class Network():
 
     def fit(self, solver):
         if "num_threads" in config.options("general"):
-            # run in parallel
-            # initiate progress bar
-            pbar = tqdm(desc="Fitting station models", ascii=True, unit="station", total=len(self.stations.keys()))
-            return_values = {}
-
-            # make sure the progress bar updates
-            def pbarupdate(arg):
-                pbar.update()
-
+            # collect station calls
+            iterable_inputs = [(stat, solver) for stat in self.stations.values()]
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                for name, stat in self.stations.items():
-                    return_values[name] = p.apply_async(stat.fit_models, [solver], callback=pbarupdate)
-                p.close()
-                p.join()
-            pbar.close()
-
-            # check if there was an error
-            for name, r in return_values.items():
-                try:
-                    r.get()
-                except BaseException as e:
-                    print("Error at station", name)
-                    raise e
+                fit_output = list(tqdm(p.imap(Station.fit_models, iterable_inputs), ascii=True, desc="Fitting station models", total=len(iterable_inputs), unit="station"))
+            # redistribute results
+            for i, stat in enumerate(self.stations.values()):
+                fitted_params = fit_output[i]
+                for ts_description, fitted_params in fit_output[i].items():
+                    for model_description, (params, covs) in fitted_params.items():
+                        stat.models[ts_description][model_description].read_parameters(params, covs)
         else:
             # run in serial
             for name, stat in tqdm(self.stations.items(), desc="Fitting station models", ascii=True, unit="station"):
-                try:
-                    stat.fit_models(solver)
-                except BaseException as e:
-                    print("Error at station", name)
-                    raise e
+                fit_output = Station.fit_models((stat, solver))
+                for ts_description, fitted_params in fit_output.items():
+                    for model_description, (params, covs) in fitted_params.items():
+                        stat.models[ts_description][model_description].read_parameters(params, covs)
 
     def evaluate(self, timeseries=None):
         if "num_threads" in config.options("general"):
-            # run in parallel
-            # initiate progress bar
-            pbar = tqdm(desc="Evaluating station models", ascii=True, unit="station", total=len(self.stations.keys()))
-            return_values = {}
-
-            # make sure the progress bar updates
-            def pbarupdate(arg):
-                pbar.update()
-
+            # collect station calls
+            iterable_inputs = [(stat, timeseries) for stat in self.stations.values()]
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                for name, stat in self.stations.items():
-                    return_values[name] = p.apply_async(stat.evaluate_models, [timeseries], callback=pbarupdate)
-                p.close()
-                p.join()
-            pbar.close()
-
-            # check if there was an error
-            for name, r in return_values.items():
-                try:
-                    r.get()
-                except BaseException as e:
-                    print("Error at station", name)
-                    raise e
+                eval_output = list(tqdm(p.imap(Station.evaluate_models, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(iterable_inputs), unit="station"))
+            # redistribute results
+            for i, stat in enumerate(self.stations.values()):
+                stat_fits = eval_output[i]
+                for ts_description in stat_fits.keys():
+                    for model_description, fit in stat_fits[ts_description].items():
+                        stat.add_fit(ts_description, model_description, fit)
         else:
             # run in serial
             for name, stat in tqdm(self.stations.items(), desc="Evaluating station models", ascii=True, unit="station"):
-                try:
-                    stat.evaluate_models(timeseries)
-                except BaseException as e:
-                    print("Error at station", name)
-                    raise e
+                stat_fits = Station.evaluate_models((stat, timeseries))
+                for ts_description in stat_fits.keys():
+                    for model_description, fit in stat_fits[ts_description].items():
+                        stat.add_fit(ts_description, model_description, fit)
 
     def gui(self):
         # get location data and projections
@@ -187,17 +158,25 @@ class Network():
             fig_ts.clear()
             icomp = 0
             ax_ts = []
-            for its, (description, ts) in enumerate(self.stations[station_name].timeseries.items()):
+            for its, (ts_description, ts) in enumerate(self.stations[station_name].timeseries.items()):
                 for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
+                    # add axis
                     ax = fig_ts.add_subplot(n_components, 1, icomp + 1, sharex=None if icomp == 0 else ax_ts[0])
                     # plot uncertainty
                     if sigma_col is not None and "plot_sigmas" in config.options("gui"):
                         ax.fill_between(ts.df['time'], ts.df[data_col] + config.getfloat("gui", "plot_sigmas") * ts.df[sigma_col],
-                                        ts.df[data_col] - config.getfloat("gui", "plot_sigmas") * ts.df[sigma_col], facecolor='b',
+                                        ts.df[data_col] - config.getfloat("gui", "plot_sigmas") * ts.df[sigma_col], facecolor='gray',
                                         alpha=config.getfloat("gui", "plot_sigmas_alpha"), linewidth=0)
                     # plot data
-                    ax.plot(ts.df['time'], ts.df[data_col], marker='.', color='b', label="Data")
-                    ax.set_ylabel("{:s}\n{:s} [{:s}]".format(description, data_col, ts.data_unit))
+                    ax.plot(ts.df['time'], ts.df[data_col], marker='.', color='k', label="Data")
+                    # overlay models
+                    for (mdl_description, fit) in self.stations[station_name].fits[ts_description].items():
+                        if fit['sigma'] is not None and "plot_sigmas" in config.options("gui"):
+                            ax.fill_between(fit['time'], fit['fit'][:, icol] + config.getfloat("gui", "plot_sigmas") * fit['sigma'][:, icol],
+                                            fit['fit'][:, icol] - config.getfloat("gui", "plot_sigmas") * fit['sigma'][:, icol],
+                                            alpha=config.getfloat("gui", "plot_sigmas_alpha"), linewidth=0)
+                        ax.plot(fit['time'], fit['fit'][:, icol], label=mdl_description)
+                    ax.set_ylabel("{:s}\n{:s} [{:s}]".format(ts_description, data_col, ts.data_unit))
                     ax.grid()
                     ax.legend()
                     ax_ts.append(ax)
@@ -263,7 +242,7 @@ class Station():
             "Cannot find timeseries {:s} at station {:s}".format(ts_description, self.name)
         if model_description in self.models[ts_description]:
             Warning("Overwriting local model {:s} for timeseries {:s} at station {:s}".format(model_description, ts_description, self.name))
-        self.models[ts_description] = {model_description: model}
+        self.models[ts_description].update({model_description: model})
 
     def add_fit(self, ts_description, model_description, fit):
         assert ts_description in self.timeseries, \
@@ -274,18 +253,28 @@ class Station():
             Warning("Overwriting fit of {:s} model to {:s} timeseries at station {:s}".format(model_description, ts_description, self.name))
         self.fits[ts_description].update({model_description: fit})
 
-    def fit_models(self, solver):
-        for (ts_description, timeseries) in self.timeseries.items():
-            fitted_params = globals()[solver](timeseries, self.models[ts_description])
-            for model_description, (params, covs) in fitted_params.items():
-                self.models[ts_description][model_description].read_parameters(params, covs)
+    @staticmethod
+    def fit_models(station_and_solver):
+        station, solver = station_and_solver
+        fitted_params = {}
+        for (ts_description, timeseries) in station.timeseries.items():
+            fitted_params[ts_description] = globals()[solver](timeseries, station.models[ts_description])
+        return fitted_params
 
-    def evaluate_models(self, timeseries=None):
-        for ts_description, ts in self.timeseries.items():
-            for model_description, model in self.models[ts_description].items():
+    @staticmethod
+    def evaluate_models(station_and_timeseries):
+        if len(station_and_timeseries) == 1:
+            station = station_and_timeseries
+            timeseries = None
+        else:
+            station, timeseries = station_and_timeseries
+        fit = {}
+        for ts_description, ts in station.timeseries.items():
+            fit[ts_description] = {}
+            for model_description, model in station.models[ts_description].items():
                 if model.is_fitted:
-                    fit = model.evaluate(ts.df['time']) if timeseries is None else model.evaluate(timeseries)
-                    self.add_fit(ts_description, model_description, fit)
+                    fit[ts_description][model_description] = model.evaluate(ts.df['time']) if timeseries is None else model.evaluate(timeseries)
+        return fit
 
 
 class Timeseries():
@@ -324,10 +313,9 @@ class Model():
     General class that defines what a model can have as an input and output.
     Defaults to a linear model.
     """
-    def __init__(self, num_parameters, starttime, timeunit):
+    def __init__(self, num_parameters, starttime):
         self.num_parameters = num_parameters
         self.starttime = starttime
-        self.timeunit = timeunit
         self.is_fitted = False
         self.parameters = None
         self.sigmas = None
@@ -346,19 +334,36 @@ class Model():
     def evaluate(self, timevector):
         if not self.is_fitted:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return self.get_mapping(timevector=timevector) @ self.parameters
+        mapping_matrix = self.get_mapping(timevector=timevector)
+        fit = mapping_matrix @ self.parameters
+        fit_sigma = mapping_matrix @ self.sigmas
+        return {"time": timevector, "fit": fit, "sigma": fit_sigma}
+
+
+class Step(Model):
+    """
+    Step function at a given time.
+    """
+    def __init__(self, starttime):
+        super().__init__(num_parameters=1, starttime=starttime)
+
+    def get_mapping(self, timevector):
+        coefs = np.zeros((timevector.size, 1))
+        coefs[pd.Timestamp(self.starttime) >= timevector, :] = 1
+        return coefs
 
 
 class Polynomial(Model):
     """
-    Polynomial of given order, single station.
+    Polynomial of given order.
 
     `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
     def __init__(self, order=1, starttime=None, timeunit='Y'):
         self.order = order
-        super().__init__(num_parameters=self.order + 1, starttime=starttime, timeunit=timeunit)
+        self.timeunit = timeunit
+        super().__init__(num_parameters=self.order + 1, starttime=starttime)
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -375,14 +380,15 @@ class Polynomial(Model):
 
 class Sinusoidal(Model):
     """
-    Sinusoidal of given frequency, single station. Estimates amplitude and phase.
+    Sinusoidal of given frequency. Estimates amplitude and phase.
 
     `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
     def __init__(self, period=1, starttime=None, timeunit='Y'):
         self.period = period
-        super().__init__(num_parameters=2, starttime=starttime, timeunit=timeunit)
+        self.timeunit = timeunit
+        super().__init__(num_parameters=2, starttime=starttime)
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -416,23 +422,24 @@ def linear_least_squares(ts, models):
     mapping_matrices = np.hstack(mapping_matrices)
     num_time, num_params = mapping_matrices.shape
     num_components = len(ts.data_cols)
-    # create cvxpy problem and solve
-    params = cp.Variable((num_params, num_components))
-    cost = cp.sum_squares(mapping_matrices*params - ts.df[ts.data_cols].values)
-    problem = cp.Problem(cp.Minimize(cost))
-    problem.solve()
-    # estimate formal covariance (uncertainty) of parameters
-    cov = np.zeros((num_params, num_components))
+    # perform fit and estimate formal covariance (uncertainty) of parameters
+    params = np.zeros((num_params, num_components))
+    sigmas = np.zeros((num_params, num_components))
     for i in range(num_components):
         if ts.sigma_cols[i] is None:
-            cov[:, i] = np.diag(mapping_matrices.T @ mapping_matrices)
+            GtWG = mapping_matrices.T @ mapping_matrices
+            GtWd = mapping_matrices.T @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
         else:
-            cov[:, i] = np.diag(dmultr(mapping_matrices.T, ts.df[ts.sigma_cols[i]].values) @ mapping_matrices)
+            GtW = dmultr(mapping_matrices.T, 1/ts.df[ts.sigma_cols[i]].values**2)
+            GtWG = GtW @ mapping_matrices
+            GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+        params[:, i] = np.linalg.lstsq(GtWG, GtWd, rcond=None)[0].squeeze()
+        sigmas[:, i] = np.sqrt(np.diag(np.linalg.pinv(GtWG)))
     # separate parameters back to models
     i = 0
     fitted_params = {}
     for (model_desc, model) in models.items():
-        fitted_params[model_desc] = (params.value[i:i+model.num_parameters, :], cov[i:i+model.num_parameters, :])
+        fitted_params[model_desc] = (params[i:i+model.num_parameters, :], sigmas[i:i+model.num_parameters, :])
         i += model.num_parameters
     return fitted_params
 
@@ -483,4 +490,4 @@ if __name__ == "__main__":
     net = Network.from_json(path="net_arch.json")
     net.fit("linear_least_squares")
     net.evaluate()
-    # net.gui()
+    net.gui()
