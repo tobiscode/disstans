@@ -313,9 +313,8 @@ class Model():
     General class that defines what a model can have as an input and output.
     Defaults to a linear model.
     """
-    def __init__(self, num_parameters, starttime):
+    def __init__(self, num_parameters):
         self.num_parameters = num_parameters
-        self.starttime = starttime
         self.is_fitted = False
         self.parameters = None
         self.sigmas = None
@@ -324,7 +323,7 @@ class Model():
         raise NotImplementedError()
 
     def read_parameters(self, parameters, sigmas):
-        assert parameters.shape[0] == self.num_parameters, "Cannot change number of parameters after model initialization."
+        assert parameters.shape[0] == self.num_parameters, "Read-in parameters have different size than the instantiated model."
         self.parameters = parameters
         if sigmas is not None:
             assert self.parameters.size == sigmas.size, "Uncertainty sigmas must have same number of entries than parameters."
@@ -342,14 +341,36 @@ class Model():
 
 class Step(Model):
     """
-    Step function at a given time.
+    Step functions at given times.
     """
-    def __init__(self, starttime):
-        super().__init__(num_parameters=1, starttime=starttime)
+    def __init__(self, steptimes):
+        self.timestamps = [pd.Timestamp(step) for step in steptimes]
+        super().__init__(num_parameters=len(self.timestamps))
+
+    def _update_num_parameters(self):
+        self.num_parameters = len(self.timestamps)
+        self.is_fitted = False
+        self.parameters = None
+        self.sigmas = None
+
+    def add_step(self, step):
+        timestamp = pd.Timestamp(step)
+        if timestamp in self.timestamps:
+            Warning("Step {:s} already present.".format(step))
+        else:
+            self.timestamps.append(timestamp)
+            self.timestamps.sort()
+            self._update_num_parameters()
+
+    def remove_step(self, step):
+        try:
+            self.timestamps.remove(pd.Timestamp(step))
+            self._update_num_parameters()
+        except ValueError:
+            Warning("Step {:s} not present.".format(step))
 
     def get_mapping(self, timevector):
-        coefs = np.zeros((timevector.size, 1))
-        coefs[pd.Timestamp(self.starttime) >= timevector, :] = 1
+        coefs = np.zeros(timevector.reshape(-1, 1) >= self.timestamps.reshape(1, -1), dtype=int)
         return coefs
 
 
@@ -362,8 +383,9 @@ class Polynomial(Model):
     """
     def __init__(self, order=1, starttime=None, timeunit='Y'):
         self.order = order
+        self.starttime = starttime
         self.timeunit = timeunit
-        super().__init__(num_parameters=self.order + 1, starttime=starttime)
+        super().__init__(num_parameters=self.order + 1)
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -387,8 +409,9 @@ class Sinusoidal(Model):
     """
     def __init__(self, period=1, starttime=None, timeunit='Y'):
         self.period = period
+        self.starttime = starttime
         self.timeunit = timeunit
-        super().__init__(num_parameters=2, starttime=starttime)
+        super().__init__(num_parameters=2)
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -413,7 +436,7 @@ class Sinusoidal(Model):
 
 def linear_least_squares(ts, models):
     """
-    cvxpy wrapper for a linear least squares solver
+    numpy.linalg wrapper for a linear least squares solver
     """
     mapping_matrices = []
     # get mapping matrices
