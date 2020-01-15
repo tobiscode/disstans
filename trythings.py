@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
+from copy import deepcopy
 from configparser import ConfigParser
 from tqdm import tqdm
 from multiprocessing import Pool
@@ -18,10 +19,12 @@ class Network():
     """
     A container object for multiple stations.
     """
-    def __init__(self, name):
+    def __init__(self, name, default_location_path=None):
         self.name = name
+        self._default_location_path = default_location_path
         self.stations = {}
         self.network_locations = {}
+        self._default_local_models = {}
         self.global_models = {}
 
     def add_station(self, name, station):
@@ -40,14 +43,16 @@ class Network():
         # load configuration
         net_arch = json.load(open(path, mode='r'))
         network_name = net_arch.get("name", "network_from_json")
-        # create Network instance
-        net = cls(network_name)
-        # load location information, if present
         network_locations_path = net_arch.get("locations")
+        # create Network instance
+        net = cls(name=network_name, default_location_path=network_locations_path)
+        # load location information, if present
         if network_locations_path is not None:
             with open(network_locations_path, mode='r') as locfile:
                 loclines = [line.strip() for line in locfile.readlines()]
             network_locations = {line.split()[0]: [float(lla) for lla in line.split()[1:]] for line in loclines}
+        # load default local models
+        net._default_local_models = net_arch["default_local_models"]
         # create stations
         for station_name, station_cfg in net_arch["stations"].items():
             if "location" in station_cfg:
@@ -59,24 +64,47 @@ class Network():
                 continue
             stat = Station(name=station_name, location=station_loc)
             # add timeseries to station
-            for ts_cfg in station_cfg["timeseries"]:
+            for ts_description, ts_cfg in station_cfg["timeseries"].items():
                 ts = globals()[ts_cfg["type"]](**ts_cfg["kw_args"])
-                stat.add_timeseries(description=ts_cfg["description"], timeseries=ts)
+                stat.add_timeseries(description=ts_description, timeseries=ts)
                 # add default local models to station
-                for model_cfg in net_arch["default_local_models"]:
-                    mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-                    stat.add_local_model(ts_description=ts_cfg["description"], model_description=model_cfg["description"], model=mdl)
+                for model_description, model_cfg in net._default_local_models.items():
+                    local_copy = deepcopy(model_cfg)
+                    mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
+                    stat.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
                 # add specific local models to station
-                for model_cfg in station_cfg["models"]:
+                for model_description, model_cfg in station_cfg["models"].items():
                     mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-                    stat.add_local_model(ts_description=ts_cfg["description"], model_description=model_cfg["description"], model=mdl)
+                    stat.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
             # add to network
             net.add_station(name=station_name, station=stat)
         # add global models
-        for model_cfg in net_arch["global_models"]:
+        for model_description, model_cfg in net_arch["global_models"].items():
             mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-            net.add_global_model(description=model_cfg["description"], model=mdl)
+            net.add_global_model(description=model_description, model=mdl)
         return net
+
+    def to_json(self, path):
+        # create new dictionary
+        net_arch = {"name": self.name,
+                    "locations": self._default_location_path,
+                    "stations": {},
+                    "default_local_models": self._default_local_models,
+                    "global_models": {}}
+        # add station representations
+        for stat_name, stat in self.stations.items():
+            stat_arch = stat.get_arch()
+            # need to remove all models that are actually default models
+            for mdl_description, mdl in self._default_local_models.items():
+                if (mdl_description in stat_arch["models"].keys()) and (mdl == stat_arch["models"][mdl_description]):
+                    del stat_arch["models"][mdl_description]
+            # now we can append it to the main json
+            net_arch["stations"].update({stat_name: stat_arch})
+        # add global model representations
+        for mdl_description, mdl in self.global_models.items():
+            net_arch["global_models"].update({mdl_description: mdl.get_arch()})
+        # write file
+        json.dump(net_arch, open(path, mode='w'), indent=2)
 
     def fit(self, solver):
         if "num_threads" in config.options("general"):
@@ -130,7 +158,8 @@ class Network():
         # create map figure
         fig_map = plt.figure()
         ax_map = fig_map.add_subplot(projection=proj_gui)
-        ax_map.plot(stat_lons, stat_lats, linestyle='None', marker='.', transform=proj_lla)
+        default_station_colors = ['b'] * len(self.network_locations.values())
+        stat_points = ax_map.scatter(stat_lons, stat_lats, linestyle='None', marker='.', transform=proj_lla, facecolor=default_station_colors)
         map_underlay = False
         if "wmts_server" in config.options("gui"):
             try:
@@ -150,6 +179,10 @@ class Network():
             click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata, src_crs=proj_gui)
             station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2 + (np.array(stat_lons) - click_lon)**2))
             station_name = list(self.network_locations.keys())[station_index]
+            highlight_station_colors = default_station_colors.copy()
+            highlight_station_colors[station_index] = 'r'
+            stat_points.set_facecolor(highlight_station_colors)
+            fig_map.canvas.draw_idle()
             # get components and check if they have uncertainties
             n_components = 0
             for ts in self.stations[station_name].timeseries.values():
@@ -230,6 +263,18 @@ class Station():
         self.models = {}
         self.fits = {}
 
+    def get_arch(self):
+        # create empty dictionary
+        stat_arch = {"timeseries": {},
+                     "models": {}}
+        # add each timeseries and model
+        for ts_description, ts in self.timeseries.items():
+            stat_arch["timeseries"].update({ts_description: ts.get_arch()})
+        # currently, all models are applied to all timeseries, therefore we can just export the last one
+        for mdl_description, mdl in self.models[ts_description].items():
+            stat_arch["models"].update({mdl_description: mdl.get_arch()})
+        return stat_arch
+
     def add_timeseries(self, description, timeseries):
         if description in self.timeseries:
             Warning("Overwriting time series {:s} at station {:s}".format(description, self.name))
@@ -295,17 +340,25 @@ class Timeseries():
                 "If only certain components have associated uncertainties, leave those list entries as None."
             self.sigma_cols = sigma_cols
 
+    def get_arch(self):
+        raise NotImplementedError()
+
 
 class GipsyTimeseries(Timeseries):
     """
     Timeseries subclass for GNSS measurements in JPL's Gipsy `.tseries` file format.
     """
     def __init__(self, path):
-        time = pd.to_datetime(pd.read_csv(path, delim_whitespace=True, header=0, usecols=[11, 12, 13, 14, 15, 16],
+        self._path = path
+        time = pd.to_datetime(pd.read_csv(self._path, delim_whitespace=True, header=0, usecols=[11, 12, 13, 14, 15, 16],
                                           names=['year', 'month', 'day', 'hour', 'minute', 'second'])).to_frame(name='time')
-        data = pd.read_csv(path, delim_whitespace=True, header=0, usecols=[1, 2, 3, 4, 5, 6], names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
+        data = pd.read_csv(self._path, delim_whitespace=True, header=0, usecols=[1, 2, 3, 4, 5, 6], names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
         super().__init__(dataframe=time.join(data), source='tseries', data_unit='m',
                          data_cols=['east', 'north', 'up'], sigma_cols=['east_sigma', 'north_sigma', 'up_sigma'])
+
+    def get_arch(self):
+        return {"type": "GipsyTimeseries",
+                "kw_args": {"path": self._path}}
 
 
 class Model():
@@ -318,6 +371,9 @@ class Model():
         self.is_fitted = False
         self.parameters = None
         self.sigmas = None
+
+    def get_arch(self):
+        raise NotImplementedError()
 
     def get_mapping(self, timevector):
         raise NotImplementedError()
@@ -344,33 +400,39 @@ class Step(Model):
     Step functions at given times.
     """
     def __init__(self, steptimes):
-        self.timestamps = [pd.Timestamp(step) for step in steptimes]
+        self._steptimes = steptimes
+        self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
+        self.timestamps.sort()
         super().__init__(num_parameters=len(self.timestamps))
 
-    def _update_num_parameters(self):
+    def get_arch(self):
+        return {"type": "Step",
+                "kw_args": {"steptimes": self._steptimes}}
+
+    def _update_from_steptimes(self):
+        self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
+        self.timestamps.sort()
         self.num_parameters = len(self.timestamps)
         self.is_fitted = False
         self.parameters = None
         self.sigmas = None
 
     def add_step(self, step):
-        timestamp = pd.Timestamp(step)
-        if timestamp in self.timestamps:
+        if step in self._steptimes:
             Warning("Step {:s} already present.".format(step))
         else:
-            self.timestamps.append(timestamp)
-            self.timestamps.sort()
-            self._update_num_parameters()
+            self._steptimes.append(step)
+            self._update_from_steptimes()
 
     def remove_step(self, step):
         try:
-            self.timestamps.remove(pd.Timestamp(step))
-            self._update_num_parameters()
+            self._steptimes.remove(step)
+            self._update_from_steptimes()
         except ValueError:
             Warning("Step {:s} not present.".format(step))
 
     def get_mapping(self, timevector):
-        coefs = np.zeros(timevector.reshape(-1, 1) >= self.timestamps.reshape(1, -1), dtype=int)
+        coefs = np.array(timevector.values.reshape(-1, 1) >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(1, -1), dtype=int)
         return coefs
 
 
@@ -386,6 +448,12 @@ class Polynomial(Model):
         self.starttime = starttime
         self.timeunit = timeunit
         super().__init__(num_parameters=self.order + 1)
+
+    def get_arch(self):
+        return {"type": "Polynomial",
+                "kw_args": {"order": self.order,
+                            "starttime": self.starttime,
+                            "timeunit": self.timeunit}}
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -412,6 +480,12 @@ class Sinusoidal(Model):
         self.starttime = starttime
         self.timeunit = timeunit
         super().__init__(num_parameters=2)
+
+    def get_arch(self):
+        return {"type": "Sinusoidal",
+                "kw_args": {"period": self.period,
+                            "starttime": self.starttime,
+                            "timeunit": self.timeunit}}
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -440,7 +514,7 @@ def linear_least_squares(ts, models):
     """
     mapping_matrices = []
     # get mapping matrices
-    for (model_desc, model) in models.items():
+    for (mdl_description, model) in models.items():
         mapping_matrices.append(model.get_mapping(ts.df['time']))
     mapping_matrices = np.hstack(mapping_matrices)
     num_time, num_params = mapping_matrices.shape
@@ -461,8 +535,8 @@ def linear_least_squares(ts, models):
     # separate parameters back to models
     i = 0
     fitted_params = {}
-    for (model_desc, model) in models.items():
-        fitted_params[model_desc] = (params[i:i+model.num_parameters, :], sigmas[i:i+model.num_parameters, :])
+    for (mdl_description, model) in models.items():
+        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], sigmas[i:i+model.num_parameters, :])
         i += model.num_parameters
     return fitted_params
 
@@ -511,6 +585,9 @@ def dmultr(mat, dvec):
 
 if __name__ == "__main__":
     net = Network.from_json(path="net_arch.json")
+    net.stations["0001"].models["GNSS"]["Maintenance"].add_step("2001-12-05")
+    net.stations["0002"].models["GNSS"]["Maintenance"].remove_step("2001-12-05")
     net.fit("linear_least_squares")
     net.evaluate()
+    net.to_json(path="arch_out.json")
     net.gui()
