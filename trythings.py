@@ -277,26 +277,52 @@ class Station():
 
     def add_timeseries(self, description, timeseries):
         if description in self.timeseries:
-            Warning("Overwriting time series {:s} at station {:s}".format(description, self.name))
+            Warning("Station {:s}: Overwriting time series {:s}".format(self.name, description))
         self.timeseries[description] = timeseries
         self.fits[description] = {}
         self.models[description] = {}
 
+    def remove_timeseries(self, description):
+        if description not in self.timeseries:
+            Warning("Station {:s}: Cannot find time series {:s}, couldn't delete".format(self.name, description))
+        else:
+            del self.timeseries[description]
+            del self.fits[description]
+            del self.models[description]
+
     def add_local_model(self, ts_description, model_description, model):
         assert ts_description in self.timeseries, \
-            "Cannot find timeseries {:s} at station {:s}".format(ts_description, self.name)
+            "Station {:s}: Cannot find timeseries {:s} to add local model {:s}".format(self.name, ts_description, model_description)
         if model_description in self.models[ts_description]:
-            Warning("Overwriting local model {:s} for timeseries {:s} at station {:s}".format(model_description, ts_description, self.name))
+            Warning("Station {:s}, timeseries {:s}: Overwriting local model {:s}".format(self.name, ts_description, model_description))
         self.models[ts_description].update({model_description: model})
+
+    def remove_local_model(self, ts_description, model_description):
+        if ts_description not in self.timeseries:
+            Warning("Station {:s}: Cannot find timeseries {:s}, couldn't delete local model {:s}".format(self.name, ts_description, model_description))
+        elif model_description not in self.models[ts_description]:
+            Warning("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete".format(self.name, ts_description, model_description))
+        else:
+            del self.models[ts_description][model_description]
 
     def add_fit(self, ts_description, model_description, fit):
         assert ts_description in self.timeseries, \
-            "Fitted model must match a previously added local station time series before being assigned as a fit."
+            "Station {:s}: Cannot find timeseries {:s} to add fit for model {:s}".format(self.name, ts_description, model_description)
         assert model_description in self.models[ts_description], \
-            "Fitted model must match a previously added local station model before being assigned as a fit."
+            "Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't add fit".format(self.name, ts_description, model_description)
         if model_description in self.fits[ts_description]:
-            Warning("Overwriting fit of {:s} model to {:s} timeseries at station {:s}".format(model_description, ts_description, self.name))
+            Warning("Station {:s}, timeseries {:s}: Overwriting fit of local model {:s}".format(self.name, ts_description, model_description))
         self.fits[ts_description].update({model_description: fit})
+
+    def remove_fit(self, ts_description, model_description, fit):
+        if ts_description not in self.timeseries:
+            Warning("Station {:s}: Cannot find timeseries {:s}, couldn't delete fit for model {:s}".format(self.name, ts_description, model_description))
+        elif model_description not in self.models[ts_description]:
+            Warning("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete fit".format(self.name, ts_description, model_description))
+        elif model_description not in self.fits[ts_description]:
+            Warning("Station {:s}, timeseries {:s}: Cannot find fit for local model {:s}, couldn't delete".format(self.name, ts_description, model_description))
+        else:
+            del self.fits[ts_description][model_description]
 
     @staticmethod
     def fit_models(station_and_solver):
@@ -508,7 +534,7 @@ class Sinusoidal(Model):
         return np.arctan2(self.parameters[1], self.parameters[0])
 
 
-def linear_least_squares(ts, models):
+def linear_regression(ts, models):
     """
     numpy.linalg wrapper for a linear least squares solver
     """
@@ -532,6 +558,46 @@ def linear_least_squares(ts, models):
             GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
         params[:, i] = np.linalg.lstsq(GtWG, GtWd, rcond=None)[0].squeeze()
         sigmas[:, i] = np.sqrt(np.diag(np.linalg.pinv(GtWG)))
+    # separate parameters back to models
+    i = 0
+    fitted_params = {}
+    for (mdl_description, model) in models.items():
+        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], sigmas[i:i+model.num_parameters, :])
+        i += model.num_parameters
+    return fitted_params
+
+
+def ridge_regression(ts, models, penalty, reg_indices=None):
+    """
+    numpy.linalg wrapper for a linear L2-regularized least squares solver
+    """
+    mapping_matrices = []
+    # get mapping matrices
+    for (mdl_description, model) in models.items():
+        mapping_matrices.append(model.get_mapping(ts.df['time']))
+    mapping_matrices = np.hstack(mapping_matrices)
+    num_time, num_params = mapping_matrices.shape
+    num_components = len(ts.data_cols)
+    # build regularization matrix
+    if reg_indices is None:
+        reg_mat = np.diag(np.ones(num_params) * penalty)
+    else:
+        reg_mat = np.zeros((num_params, num_params))
+        reg_mat[reg_indices, reg_indices] = penalty
+    # perform fit and estimate formal covariance (uncertainty) of parameters
+    params = np.zeros((num_params, num_components))
+    sigmas = np.zeros((num_params, num_components))
+    for i in range(num_components):
+        if ts.sigma_cols[i] is None:
+            GtWG = mapping_matrices.T @ mapping_matrices
+            GtWd = mapping_matrices.T @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+        else:
+            GtW = dmultr(mapping_matrices.T, 1/ts.df[ts.sigma_cols[i]].values**2)
+            GtWG = GtW @ mapping_matrices
+            GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+        GtWGreg = GtWG + reg_mat
+        params[:, i] = np.linalg.lstsq(GtWGreg, GtWd, rcond=None)[0].squeeze()
+        sigmas[:, i] = np.sqrt(np.diag(np.linalg.pinv(GtWGreg)))
     # separate parameters back to models
     i = 0
     fitted_params = {}
@@ -587,7 +653,7 @@ if __name__ == "__main__":
     net = Network.from_json(path="net_arch.json")
     net.stations["0001"].models["GNSS"]["Maintenance"].add_step("2001-12-05")
     net.stations["0002"].models["GNSS"]["Maintenance"].remove_step("2001-12-05")
-    net.fit("linear_least_squares")
+    net.fit("linear_regression")
     net.evaluate()
     net.to_json(path="arch_out.json")
     net.gui()
