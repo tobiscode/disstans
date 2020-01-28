@@ -26,6 +26,7 @@ class Network():
         self.network_locations = {}
         self._default_local_models = {}
         self.global_models = {}
+        self.global_priors = {}
 
     def add_station(self, name, station):
         if name in self.stations:
@@ -33,10 +34,34 @@ class Network():
         self.stations[name] = station
         self.network_locations[name] = station.location
 
+    def remove_station(self, name):
+        if name not in self.stations:
+            Warning("Cannot find station {:s}, couldn't delete".format(name))
+        else:
+            del self.stations[name]
+            del self.network_locations[name]
+
     def add_global_model(self, description, model):
         if description in self.global_models:
             Warning("Overwriting global model {:s}".format(description))
         self.global_models[description] = model
+
+    def remove_global_model(self, description):
+        if description not in self.global_models:
+            Warning("Cannot find global model {:s}, couldn't delete".format(description))
+        else:
+            del self.global_models[description]
+
+    def add_global_prior(self, description, prior):
+        if description in self.global_priors:
+            Warning("Overwriting global prior {:s}".format(description))
+        self.global_priors[description] = prior
+
+    def remove_global_prior(self, description):
+        if description not in self.global_priors:
+            Warning("Cannot find global prior {:s}, couldn't delete".format(description))
+        else:
+            del self.global_priors[description]
 
     @classmethod
     def from_json(cls, path):
@@ -392,8 +417,9 @@ class Model():
     General class that defines what a model can have as an input and output.
     Defaults to a linear model.
     """
-    def __init__(self, num_parameters):
+    def __init__(self, num_parameters, regularize=False):
         self.num_parameters = num_parameters
+        self.regularize = regularize
         self.is_fitted = False
         self.parameters = None
         self.sigmas = None
@@ -425,15 +451,16 @@ class Step(Model):
     """
     Step functions at given times.
     """
-    def __init__(self, steptimes):
+    def __init__(self, steptimes, regularize=False):
+        super().__init__(num_parameters=len(steptimes), regularize=regularize)
         self._steptimes = steptimes
         self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
         self.timestamps.sort()
-        super().__init__(num_parameters=len(self.timestamps))
 
     def get_arch(self):
         return {"type": "Step",
-                "kw_args": {"steptimes": self._steptimes}}
+                "kw_args": {"steptimes": self._steptimes,
+                            "regularize": self.regularize}}
 
     def _update_from_steptimes(self):
         self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
@@ -469,17 +496,18 @@ class Polynomial(Model):
     `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
-    def __init__(self, order=1, starttime=None, timeunit='Y'):
+    def __init__(self, order=1, starttime=None, timeunit='Y', regularize=False):
+        super().__init__(num_parameters=order + 1, regularize=regularize)
         self.order = order
         self.starttime = starttime
         self.timeunit = timeunit
-        super().__init__(num_parameters=self.order + 1)
 
     def get_arch(self):
         return {"type": "Polynomial",
                 "kw_args": {"order": self.order,
                             "starttime": self.starttime,
-                            "timeunit": self.timeunit}}
+                            "timeunit": self.timeunit,
+                            "regularize": self.regularize}}
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -501,17 +529,18 @@ class Sinusoidal(Model):
     `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
-    def __init__(self, period=1, starttime=None, timeunit='Y'):
+    def __init__(self, period=1, starttime=None, timeunit='Y', regularize=False):
+        super().__init__(num_parameters=2, regularize=regularize)
         self.period = period
         self.starttime = starttime
         self.timeunit = timeunit
-        super().__init__(num_parameters=2)
 
     def get_arch(self):
         return {"type": "Sinusoidal",
                 "kw_args": {"period": self.period,
                             "starttime": self.starttime,
-                            "timeunit": self.timeunit}}
+                            "timeunit": self.timeunit,
+                            "regularize": self.regularize}}
 
     def get_mapping(self, timevector):
         # timevector as a Numpy column vector relative to starttime in the desired unit
@@ -567,35 +596,33 @@ def linear_regression(ts, models):
     return fitted_params
 
 
-def ridge_regression(ts, models, penalty, reg_indices=None):
+def ridge_regression(ts, models, penalty):
     """
     numpy.linalg wrapper for a linear L2-regularized least squares solver
     """
+    from scipy.sparse import diags
     mapping_matrices = []
-    # get mapping matrices
+    reg_diag = []
+    # get mapping and regularization matrices
     for (mdl_description, model) in models.items():
         mapping_matrices.append(model.get_mapping(ts.df['time']))
-    mapping_matrices = np.hstack(mapping_matrices)
-    num_time, num_params = mapping_matrices.shape
+        reg_diag.extend([model.regularize for _ in range(model.num_parameters)])
+    G = np.hstack(mapping_matrices)
+    reg = diags(reg_diag, dtype=float) * penalty
+    num_time, num_params = G.shape
     num_components = len(ts.data_cols)
-    # build regularization matrix
-    if reg_indices is None:
-        reg_mat = np.diag(np.ones(num_params) * penalty)
-    else:
-        reg_mat = np.zeros((num_params, num_params))
-        reg_mat[reg_indices, reg_indices] = penalty
     # perform fit and estimate formal covariance (uncertainty) of parameters
     params = np.zeros((num_params, num_components))
     sigmas = np.zeros((num_params, num_components))
     for i in range(num_components):
         if ts.sigma_cols[i] is None:
-            GtWG = mapping_matrices.T @ mapping_matrices
-            GtWd = mapping_matrices.T @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+            GtWG = G.T @ G
+            GtWd = G.T @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
         else:
-            GtW = dmultr(mapping_matrices.T, 1/ts.df[ts.sigma_cols[i]].values**2)
-            GtWG = GtW @ mapping_matrices
+            GtW = dmultr(G.T, 1/ts.df[ts.sigma_cols[i]].values**2)
+            GtWG = GtW @ G
             GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
-        GtWGreg = GtWG + reg_mat
+        GtWGreg = GtWG + reg
         params[:, i] = np.linalg.lstsq(GtWGreg, GtWd, rcond=None)[0].squeeze()
         sigmas[:, i] = np.sqrt(np.diag(np.linalg.pinv(GtWGreg)))
     # separate parameters back to models
@@ -649,10 +676,81 @@ def dmultr(mat, dvec):
     return res
 
 
+def okada_prior(net, catalog_path):
+    # import okada
+    from okada_wrapper import dc3d0wrapper as dc3d0
+    # network locations are in net.station_locations
+    stations_lla = np.array([loc for loc in net.network_locations.values()])
+    # convert height from m to km
+    stations_lla[:, 2] /= 1000
+    # load earthquake catalog
+    catalog = pd.read_csv(catalog_path, header=0, parse_dates=[[0, 1]])
+    catalog = catalog.join(pd.read_csv(catalog_path, header=0, usecols=[2, 3, 4]))
+    eq_times = catalog['Date_Origin_Time(JST)'].values
+    eq_lla = catalog[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values
+    eq_lla[:, 2] *= -1
+    n_eq = eq_lla.shape[0]
+    # relative position in lla
+    stations_rel = [np.array(stations_lla - eq_lla[i, :].reshape(1, -1)) for i in range(n_eq)]
+    # transform to xyz space, coarse approximation, ignores z-component of stations
+    for i in range(n_eq):
+        stations_rel[i][:, 0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[i, 0]*np.pi/180)
+        stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
+        stations_rel[i][:, 2] = 0
+    # define inputs for the different earthquakes
+    eqs = [{'alpha': config.getfloat('catalog_prior', 'alpha'), 'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
+            'depth': -eq_lla[i, 2], 'strike': float(catalog['Strike'][i].split(';')[0]), 'dip': float(catalog['Dip'][i].split(';')[0]), 'potency': [catalog['Mo(Nm)'][i]/config.getfloat('catalog_prior', 'mu'), 0, 0, 0]} for i in range(n_eq)]
+    parameters = [(stations_rel[i], eqs[i]) for i in range(n_eq)]
+
+    # define function that calculates displacement for all stations
+    def get_displacements(parameters):
+        # unpack inputs
+        stations, eq = parameters
+        # rotate from relative lat, lon, alt to xyz
+        strike_rad = eq['strike']*np.pi/180
+        R = np.array([[np.cos(strike_rad),  np.sin(strike_rad), 0],
+                      [np.sin(strike_rad), -np.cos(strike_rad), 0],
+                      [0, 0, 1]])
+        stations = stations @ R
+        # get displacements in xyz-frame
+        disp = np.zeros_like(stations)
+        for i in range(stations.shape[0]):
+            success, u, grad_u = dc3d0(eq['alpha'], stations[i, :], eq['depth'], eq['dip'], eq['potency'])
+            if success == 0:
+                disp[i, :] = u / 10**12  # output is now in mm
+            else:
+                Warning("success = {:d} for station {:d}".format(success, i))
+        # transform back to lat, lon, alt
+        # yes this is the same matrix
+        disp = disp @ R
+        return disp
+
+    # compute
+    station_disp = np.zeros((n_eq, stations_lla.shape[0], 3))
+    if "num_threads" in config.options("general"):
+        with Pool(config.getint("general", "num_threads")) as p:
+            results = list(tqdm(p.imap(get_displacements, parameters), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"))
+        for i, r in enumerate(results):
+            station_disp[i, :, :] = r
+    else:
+        for i, param in tqdm(enumerate(parameters), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"):
+            station_disp[i, :, :] = get_displacements(param)
+
+    # add steps to station timeseries if they exceed the threshold
+    for istat, stat_name in enumerate(net.network_locations.keys()):
+        stat = net.stations[stat_name]
+        steptimes = []
+        for itime in range(len(stat.df['time']) - 1):
+            disp = station_disp[(eq_times > stat.df['time'].iloc[itime]) & (eq_times <= stat.df['time'].iloc[itime + 1]), istat, :]
+            cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
+            if cumdisp >= config.getfloat('catalog_prior', 'threshold'):
+                steptimes.append(str(stat.df['time'].iloc[itime + 1]))
+        stat.add_local_model(config.get('catalog_prior', 'timeseries'), config.get('catalog_prior', 'model'), Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
+
+
 if __name__ == "__main__":
     net = Network.from_json(path="net_arch.json")
-    net.stations["0001"].models["GNSS"]["Maintenance"].add_step("2001-12-05")
-    net.stations["0002"].models["GNSS"]["Maintenance"].remove_step("2001-12-05")
+    okada_prior(net, "data/nied_fnet_catalog.txt")
     net.fit("linear_regression")
     net.evaluate()
     net.to_json(path="arch_out.json")
