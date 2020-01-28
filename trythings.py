@@ -79,7 +79,7 @@ class Network():
         # load default local models
         net._default_local_models = net_arch["default_local_models"]
         # create stations
-        for station_name, station_cfg in net_arch["stations"].items():
+        for station_name, station_cfg in tqdm(net_arch["stations"].items(), ascii=True, desc="Building Network", unit="station"):
             if "location" in station_cfg:
                 station_loc = station_cfg["location"]
             elif station_name in network_locations:
@@ -131,15 +131,15 @@ class Network():
         # write file
         json.dump(net_arch, open(path, mode='w'), indent=2)
 
-    def fit(self, solver):
+    def fit(self, **kw_args):
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(stat, solver) for stat in self.stations.values()]
+            iterable_inputs = [(stat, kw_args) for stat in self.stations.values()]
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
                 fit_output = list(tqdm(p.imap(Station.fit_models, iterable_inputs), ascii=True, desc="Fitting station models", total=len(iterable_inputs), unit="station"))
             # redistribute results
-            for i, stat in enumerate(self.stations.values()):
+            for i, stat in tqdm(enumerate(self.stations.values()), ascii=True, desc="Distributing Fits", unit="station"):
                 fitted_params = fit_output[i]
                 for ts_description, fitted_params in fit_output[i].items():
                     for model_description, (params, covs) in fitted_params.items():
@@ -147,7 +147,7 @@ class Network():
         else:
             # run in serial
             for name, stat in tqdm(self.stations.items(), desc="Fitting station models", ascii=True, unit="station"):
-                fit_output = Station.fit_models((stat, solver))
+                fit_output = Station.fit_models((stat, kw_args))
                 for ts_description, fitted_params in fit_output.items():
                     for model_description, (params, covs) in fitted_params.items():
                         stat.models[ts_description][model_description].read_parameters(params, covs)
@@ -160,7 +160,7 @@ class Network():
             with Pool(config.getint("general", "num_threads")) as p:
                 eval_output = list(tqdm(p.imap(Station.evaluate_models, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(iterable_inputs), unit="station"))
             # redistribute results
-            for i, stat in enumerate(self.stations.values()):
+            for i, stat in tqdm(enumerate(self.stations.values()), ascii=True, desc="Distributing Fits", unit="station"):
                 stat_fits = eval_output[i]
                 for ts_description in stat_fits.keys():
                     for model_description, fit in stat_fits[ts_description].items():
@@ -350,11 +350,12 @@ class Station():
             del self.fits[ts_description][model_description]
 
     @staticmethod
-    def fit_models(station_and_solver):
-        station, solver = station_and_solver
+    def fit_models(station_and_solveargs):
+        station, kw_args = station_and_solveargs
+        solver = kw_args.pop('solver', config.get('fit', 'solver'))
         fitted_params = {}
         for (ts_description, timeseries) in station.timeseries.items():
-            fitted_params[ts_description] = globals()[solver](timeseries, station.models[ts_description])
+            fitted_params[ts_description] = globals()[solver](timeseries, station.models[ts_description], **kw_args)
         return fitted_params
 
     @staticmethod
@@ -422,7 +423,7 @@ class Model():
         self.regularize = regularize
         self.is_fitted = False
         self.parameters = None
-        self.sigmas = None
+        self.cov = None
 
     def get_arch(self):
         raise NotImplementedError()
@@ -430,12 +431,12 @@ class Model():
     def get_mapping(self, timevector):
         raise NotImplementedError()
 
-    def read_parameters(self, parameters, sigmas):
-        assert parameters.shape[0] == self.num_parameters, "Read-in parameters have different size than the instantiated model."
+    def read_parameters(self, parameters, cov):
+        assert self.num_parameters == parameters.shape[0], "Read-in parameters have different size than the instantiated model."
         self.parameters = parameters
-        if sigmas is not None:
-            assert self.parameters.size == sigmas.size, "Uncertainty sigmas must have same number of entries than parameters."
-            self.sigmas = sigmas
+        if cov is not None:
+            assert self.num_parameters == cov.shape[0] == cov.shape[1], "Covariance matrix must have same number of entries than parameters."
+            self.cov = cov
         self.is_fitted = True
 
     def evaluate(self, timevector):
@@ -443,7 +444,7 @@ class Model():
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         mapping_matrix = self.get_mapping(timevector=timevector)
         fit = mapping_matrix @ self.parameters
-        fit_sigma = mapping_matrix @ self.sigmas
+        fit_sigma = mapping_matrix @ np.sqrt(self.cov.diagonal(offset=0, axis1=0, axis2=1).T) if self.cov is not None else None
         return {"time": timevector, "fit": fit, "sigma": fit_sigma}
 
 
@@ -468,7 +469,7 @@ class Step(Model):
         self.num_parameters = len(self.timestamps)
         self.is_fitted = False
         self.parameters = None
-        self.sigmas = None
+        self.cov = None
 
     def add_step(self, step):
         if step in self._steptimes:
@@ -563,7 +564,7 @@ class Sinusoidal(Model):
         return np.arctan2(self.parameters[1], self.parameters[0])
 
 
-def linear_regression(ts, models):
+def linear_regression(ts, models, formal_covariance=config.getboolean('fit', 'formal_covariance', fallback=False)):
     """
     numpy.linalg wrapper for a linear least squares solver
     """
@@ -576,7 +577,8 @@ def linear_regression(ts, models):
     num_components = len(ts.data_cols)
     # perform fit and estimate formal covariance (uncertainty) of parameters
     params = np.zeros((num_params, num_components))
-    sigmas = np.zeros((num_params, num_components))
+    if formal_covariance:
+        cov = np.zeros((num_params, num_params, num_components))
     for i in range(num_components):
         if ts.sigma_cols[i] is None:
             GtWG = mapping_matrices.T @ mapping_matrices
@@ -586,17 +588,18 @@ def linear_regression(ts, models):
             GtWG = GtW @ mapping_matrices
             GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
         params[:, i] = np.linalg.lstsq(GtWG, GtWd, rcond=None)[0].squeeze()
-        sigmas[:, i] = np.sqrt(np.diag(np.linalg.pinv(GtWG)))
+        if formal_covariance:
+            cov[:, :, i] = np.linalg.pinv(GtWG)
     # separate parameters back to models
     i = 0
     fitted_params = {}
     for (mdl_description, model) in models.items():
-        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], sigmas[i:i+model.num_parameters, :])
+        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], cov[i:i+model.num_parameters, i:i+model.num_parameters, :] if formal_covariance else None)
         i += model.num_parameters
     return fitted_params
 
 
-def ridge_regression(ts, models, penalty):
+def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty'), formal_covariance=config.getboolean('fit', 'formal_covariance', fallback=False)):
     """
     numpy.linalg wrapper for a linear L2-regularized least squares solver
     """
@@ -613,7 +616,8 @@ def ridge_regression(ts, models, penalty):
     num_components = len(ts.data_cols)
     # perform fit and estimate formal covariance (uncertainty) of parameters
     params = np.zeros((num_params, num_components))
-    sigmas = np.zeros((num_params, num_components))
+    if formal_covariance:
+        cov = np.zeros((num_params, num_params, num_components))
     for i in range(num_components):
         if ts.sigma_cols[i] is None:
             GtWG = G.T @ G
@@ -624,12 +628,13 @@ def ridge_regression(ts, models, penalty):
             GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
         GtWGreg = GtWG + reg
         params[:, i] = np.linalg.lstsq(GtWGreg, GtWd, rcond=None)[0].squeeze()
-        sigmas[:, i] = np.sqrt(np.diag(np.linalg.pinv(GtWGreg)))
+        if formal_covariance:
+            cov[:, :, i] = np.linalg.pinv(GtWGreg)
     # separate parameters back to models
     i = 0
     fitted_params = {}
     for (mdl_description, model) in models.items():
-        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], sigmas[i:i+model.num_parameters, :])
+        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], cov[i:i+model.num_parameters, i:i+model.num_parameters, :] if formal_covariance else None)
         i += model.num_parameters
     return fitted_params
 
@@ -685,8 +690,7 @@ def okada_prior(net, catalog_path):
     stations_lla[:, 2] /= 1000
     # load earthquake catalog
     catalog = pd.read_csv(catalog_path, header=0, parse_dates=[[0, 1]])
-    catalog = catalog.join(pd.read_csv(catalog_path, header=0, usecols=[2, 3, 4]))
-    eq_times = catalog['Date_Origin_Time(JST)'].values
+    eq_times = catalog['Date_Origin_Time(JST)']
     eq_lla = catalog[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values
     eq_lla[:, 2] *= -1
     n_eq = eq_lla.shape[0]
@@ -738,20 +742,22 @@ def okada_prior(net, catalog_path):
 
     # add steps to station timeseries if they exceed the threshold
     for istat, stat_name in enumerate(net.network_locations.keys()):
-        stat = net.stations[stat_name]
+        stat_time = net.stations[stat_name].timeseries[config.get('catalog_prior', 'timeseries')].df['time']
         steptimes = []
-        for itime in range(len(stat.df['time']) - 1):
-            disp = station_disp[(eq_times > stat.df['time'].iloc[itime]) & (eq_times <= stat.df['time'].iloc[itime + 1]), istat, :]
+        for itime in range(len(stat_time) - 1):
+            disp = station_disp[(eq_times > stat_time.iloc[itime]) & (eq_times <= stat_time.iloc[itime + 1]), istat, :]
             cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
             if cumdisp >= config.getfloat('catalog_prior', 'threshold'):
-                steptimes.append(str(stat.df['time'].iloc[itime + 1]))
-        stat.add_local_model(config.get('catalog_prior', 'timeseries'), config.get('catalog_prior', 'model'), Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
+                steptimes.append(str(stat_time.iloc[itime + 1]))
+        net.stations[stat_name].add_local_model(config.get('catalog_prior', 'timeseries'), config.get('catalog_prior', 'model'), Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
 
 
 if __name__ == "__main__":
-    net = Network.from_json(path="net_arch.json")
-    okada_prior(net, "data/nied_fnet_catalog.txt")
-    net.fit("linear_regression")
+    # net = Network.from_json(path="net_arch.json")
+    net = Network.from_json(path="net_arch_catalog1mm.json")
+    # okada_prior(net, "data/nied_fnet_catalog.txt")
+    # net.fit()
+    net.fit(solver="ridge_regression")
     net.evaluate()
     net.to_json(path="arch_out.json")
     net.gui()
