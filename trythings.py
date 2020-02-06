@@ -28,7 +28,22 @@ class Network():
         self.global_models = {}
         self.global_priors = {}
 
+    def __getitem__(self, name):
+        if name not in self.stations:
+            raise KeyError("No station '{}' present.".format(name))
+        return self.stations[name]
+
+    def __setitem__(self, name, station):
+        self.add_station(name, station)
+
+    def __delitem__(self, name):
+        self.remove_station(name)
+
     def add_station(self, name, station):
+        if not isinstance(name, str):
+            raise TypeError("Cannot add new station: 'name' is not a string.")
+        if not isinstance(station, Station):
+            raise TypeError("Cannot add new station: 'station' is not a Station object.")
         if name in self.stations:
             Warning("Overwriting station {:s}".format(name))
         self.stations[name] = station
@@ -36,19 +51,21 @@ class Network():
 
     def remove_station(self, name):
         if name not in self.stations:
-            Warning("Cannot find station {:s}, couldn't delete".format(name))
+            Warning("Cannot find station {}, couldn't delete".format(name))
         else:
             del self.stations[name]
             del self.network_locations[name]
 
     def add_global_model(self, description, model):
+        if not isinstance(description, str):
+            raise TypeError("Cannot add new global model: 'description' is not a string.")
         if description in self.global_models:
             Warning("Overwriting global model {:s}".format(description))
         self.global_models[description] = model
 
     def remove_global_model(self, description):
         if description not in self.global_models:
-            Warning("Cannot find global model {:s}, couldn't delete".format(description))
+            Warning("Cannot find global model {}, couldn't delete".format(description))
         else:
             del self.global_models[description]
 
@@ -261,35 +278,6 @@ class Network():
         plt.show()
         fig_map.canvas.mpl_disconnect(cid)
 
-    # def aggregate_mappings(self):
-    #     data = pd.DataFrame()
-    #     uncertainty = pd.DataFrame()
-    #     mapping = pd.DataFrame()
-    #     for name, station in self.stations.items():
-    #         for description, timeseries in station.timeseries.items():
-    #             # collect data
-    #             temp = timeseries.df[['time'].extend(timeseries.data_cols)]
-    #             new_cols = ["{:s}_{:s}_{:s}".format(name, description, old_col) for old_col in timeseries.data_cols]
-    #             temp.rename(columns=dict(zip(timeseries.data_cols, new_cols)))
-    #             data.append(temp)
-    #             # if present, collect uncertainties
-    #             if timeseries.sigma_cols is not None:
-    #                 temp = timeseries.df[['time'].extend(timeseries.sigma_cols)]
-    #                 # match the name of the uncertainty column with the data column, now that they are in different dataframes
-    #                 new_cols = ["{:s}_{:s}_{:s}".format(name, description, old_col) for old_col in timeseries.data_cols]
-    #                 temp.rename(columns=dict(zip(timeseries.sigma_cols, new_cols)))
-    #                 uncertainty.append(temp)
-    #             # else, fill with default uncertainty or NaN
-    #             else:
-    #                 temp[new_cols] = np.NaN
-    #                 uncertainty.append(temp)
-    #             # generate mapping matrix for timeseries
-    #             for (model_description, model), component in product(station.models.items(), timeseries.data_cols):
-    #                 coefs = model.get_mapping(timevector=timeseries.df['time'])
-    #                 coef_names = ["{:s}_{:s}_{:s}_{:s}_{:d}".format(name, description, component, model_description, parameter) for parameter in model.num_parameters]
-    #                 temp = timeseries.df['time'].join(pd.DataFrame(data=coefs, columns=coef_names))
-    #                 mapping.append(temp)
-
 
 class Station():
     """
@@ -302,6 +290,10 @@ class Station():
         self.timeseries = {}
         self.models = {}
         self.fits = {}
+
+    @property
+    def ts(self):
+        return self.timeseries
 
     def get_arch(self):
         # create empty dictionary
@@ -316,6 +308,10 @@ class Station():
         return stat_arch
 
     def add_timeseries(self, description, timeseries):
+        if not isinstance(description, str):
+            raise TypeError("Cannot add new timeseries: 'description' is not a string.")
+        if not isinstance(timeseries, Timeseries):
+            raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
         if description in self.timeseries:
             Warning("Station {:s}: Overwriting time series {:s}".format(self.name, description))
         self.timeseries[description] = timeseries
@@ -331,6 +327,12 @@ class Station():
             del self.models[description]
 
     def add_local_model(self, ts_description, model_description, model):
+        if not isinstance(ts_description, str):
+            raise TypeError("Cannot add new local model: 'ts_description' is not a string.")
+        if not isinstance(model_description, str):
+            raise TypeError("Cannot add new local model: 'model_description' is not a string.")
+        if not isinstance(model, Model):
+            raise TypeError("Cannot add new local model: 'model' is not a Model object.")
         assert ts_description in self.timeseries, \
             "Station {:s}: Cannot find timeseries {:s} to add local model {:s}".format(self.name, ts_description, model_description)
         if model_description in self.models[ts_description]:
@@ -346,6 +348,10 @@ class Station():
             del self.models[ts_description][model_description]
 
     def add_fit(self, ts_description, model_description, fit):
+        if not isinstance(ts_description, str):
+            raise TypeError("Cannot add new fit: 'ts_description' is not a string.")
+        if not isinstance(model_description, str):
+            raise TypeError("Cannot add new fit: 'model_description' is not a string.")
         assert ts_description in self.timeseries, \
             "Station {:s}: Cannot find timeseries {:s} to add fit for model {:s}".format(self.name, ts_description, model_description)
         assert model_description in self.models[ts_description], \
@@ -386,9 +392,9 @@ class Timeseries():
             self.sigma_cols = sigma_cols
 
     def _prepare_math(self, other, operation):
-        # # check for same type
-        # if not isinstance(other, self.__class__):
-        #     raise TypeError("Unsupported operand type for {}: '{}' and '{}'".format(operation, self.__class__, type(other)))
+        # check for same type
+        if not isinstance(other, Timeseries):
+            raise TypeError("Unsupported operand type for {}: {} and {}".format(operation, Timeseries, type(other)))
         # check for same dimensions
         if len(self.data_cols) != len(other.data_cols):
             raise ValueError(("Timeseries math problem: conflicting number of data columns (" +
