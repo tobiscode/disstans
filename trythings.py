@@ -52,16 +52,16 @@ class Network():
         else:
             del self.global_models[description]
 
-    def add_global_prior(self, description, prior):
-        if description in self.global_priors:
-            Warning("Overwriting global prior {:s}".format(description))
-        self.global_priors[description] = prior
+    # def add_global_prior(self, description, prior):
+    #     if description in self.global_priors:
+    #         Warning("Overwriting global prior {:s}".format(description))
+    #     self.global_priors[description] = prior
 
-    def remove_global_prior(self, description):
-        if description not in self.global_priors:
-            Warning("Cannot find global prior {:s}, couldn't delete".format(description))
-        else:
-            del self.global_priors[description]
+    # def remove_global_prior(self, description):
+    #     if description not in self.global_priors:
+    #         Warning("Cannot find global prior {:s}, couldn't delete".format(description))
+    #     else:
+    #         del self.global_priors[description]
 
     @classmethod
     def from_json(cls, path):
@@ -131,47 +131,62 @@ class Network():
         # write file
         json.dump(net_arch, open(path, mode='w'), indent=2)
 
-    def fit(self, **kw_args):
+    def fit(self, ts_description, solver=config.get('fit', 'solver'), **kw_args):
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(stat, kw_args) for stat in self.stations.values()]
+            iterable_inputs = [(stat, ts_description, solver, kw_args) for stat in self.stations.values()]
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                fit_output = list(tqdm(p.imap(Station.fit_models, iterable_inputs), ascii=True, desc="Fitting station models", total=len(iterable_inputs), unit="station"))
+                fit_output = list(tqdm(p.imap(self._fit_single_station, iterable_inputs), ascii=True, desc="Fitting station models", total=len(iterable_inputs), unit="station"))
             # redistribute results
-            for i, stat in tqdm(enumerate(self.stations.values()), ascii=True, desc="Distributing Fits", unit="station"):
-                fitted_params = fit_output[i]
-                for ts_description, fitted_params in fit_output[i].items():
-                    for model_description, (params, covs) in fitted_params.items():
-                        stat.models[ts_description][model_description].read_parameters(params, covs)
+            for i, stat in tqdm(enumerate(self.stations.values()), ascii=True, desc="Distributing Fits", unit="station", total=len(self.stations)):
+                for model_description, (params, covs) in fit_output[i].items():
+                    stat.models[ts_description][model_description].read_parameters(params, covs)
         else:
             # run in serial
             for name, stat in tqdm(self.stations.items(), desc="Fitting station models", ascii=True, unit="station"):
-                fit_output = Station.fit_models((stat, kw_args))
-                for ts_description, fitted_params in fit_output.items():
-                    for model_description, (params, covs) in fitted_params.items():
-                        stat.models[ts_description][model_description].read_parameters(params, covs)
+                fit_output = self._fit_single_station((stat, ts_description, solver, kw_args))
+                for model_description, (params, covs) in fit_output.items():
+                    stat.models[ts_description][model_description].read_parameters(params, covs)
 
-    def evaluate(self, timeseries=None):
+    @staticmethod
+    def _fit_single_station(parameter_tuple):
+        station, ts_description, solver, kw_args = parameter_tuple
+        fitted_params = globals()[solver](station.timeseries[ts_description], station.models[ts_description], **kw_args)
+        return fitted_params
+
+    def evaluate(self, ts_description, timevector=None):
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(stat, timeseries) for stat in self.stations.values()]
+            iterable_inputs = [(stat, ts_description, timevector) for stat in self.stations.values()]
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                eval_output = list(tqdm(p.imap(Station.evaluate_models, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(iterable_inputs), unit="station"))
+                eval_output = list(tqdm(p.imap(self._evaluate_single_station, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(iterable_inputs), unit="station"))
             # redistribute results
-            for i, stat in tqdm(enumerate(self.stations.values()), ascii=True, desc="Distributing Fits", unit="station"):
+            for i, stat in tqdm(enumerate(self.stations.values()), ascii=True, desc="Distributing Fits", unit="station", total=len(self.stations)):
                 stat_fits = eval_output[i]
-                for ts_description in stat_fits.keys():
-                    for model_description, fit in stat_fits[ts_description].items():
-                        stat.add_fit(ts_description, model_description, fit)
+                for model_description, fit in stat_fits.items():
+                    stat.add_fit(ts_description, model_description, fit)
         else:
             # run in serial
             for name, stat in tqdm(self.stations.items(), desc="Evaluating station models", ascii=True, unit="station"):
-                stat_fits = Station.evaluate_models((stat, timeseries))
-                for ts_description in stat_fits.keys():
-                    for model_description, fit in stat_fits[ts_description].items():
-                        stat.add_fit(ts_description, model_description, fit)
+                stat_fits = self._evaluate_single_station((stat, ts_description, timevector))
+                for model_description, fit in stat_fits.items():
+                    stat.add_fit(ts_description, model_description, fit)
+
+    @staticmethod
+    def _evaluate_single_station(parameter_tuple):
+        if len(parameter_tuple) == 2:
+            station = parameter_tuple[0]
+            ts_description = parameter_tuple[1]
+            timevector = None
+        else:
+            station, ts_description, timevector = parameter_tuple
+        fit = {}
+        for model_description, model in station.models[ts_description].items():
+            if model.is_fitted:
+                fit[model_description] = model.evaluate(station.timeseries[ts_description].df['time']) if timevector is None else model.evaluate(timevector)
+        return fit
 
     def gui(self):
         # get location data and projections
@@ -337,7 +352,9 @@ class Station():
             "Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't add fit".format(self.name, ts_description, model_description)
         if model_description in self.fits[ts_description]:
             Warning("Station {:s}, timeseries {:s}: Overwriting fit of local model {:s}".format(self.name, ts_description, model_description))
-        self.fits[ts_description].update({model_description: fit})
+        data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
+        fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
+        self.fits[ts_description].update({model_description: fit_ts})
 
     def remove_fit(self, ts_description, model_description, fit):
         if ts_description not in self.timeseries:
@@ -348,30 +365,6 @@ class Station():
             Warning("Station {:s}, timeseries {:s}: Cannot find fit for local model {:s}, couldn't delete".format(self.name, ts_description, model_description))
         else:
             del self.fits[ts_description][model_description]
-
-    @staticmethod
-    def fit_models(station_and_solveargs):
-        station, kw_args = station_and_solveargs
-        solver = kw_args.pop('solver', config.get('fit', 'solver'))
-        fitted_params = {}
-        for (ts_description, timeseries) in station.timeseries.items():
-            fitted_params[ts_description] = globals()[solver](timeseries, station.models[ts_description], **kw_args)
-        return fitted_params
-
-    @staticmethod
-    def evaluate_models(station_and_timeseries):
-        if len(station_and_timeseries) == 1:
-            station = station_and_timeseries
-            timeseries = None
-        else:
-            station, timeseries = station_and_timeseries
-        fit = {}
-        for ts_description, ts in station.timeseries.items():
-            fit[ts_description] = {}
-            for model_description, model in station.models[ts_description].items():
-                if model.is_fitted:
-                    fit[ts_description][model_description] = model.evaluate(ts.df['time']) if timeseries is None else model.evaluate(timeseries)
-        return fit
 
 
 class Timeseries():
@@ -392,8 +385,72 @@ class Timeseries():
                 "If only certain components have associated uncertainties, leave those list entries as None."
             self.sigma_cols = sigma_cols
 
+    def _prepare_math(self, other, operation):
+        # # check for same type
+        # if not isinstance(other, self.__class__):
+        #     raise TypeError("Unsupported operand type for {}: '{}' and '{}'".format(operation, self.__class__, type(other)))
+        # check for same dimensions
+        if len(self.data_cols) != len(other.data_cols):
+            raise ValueError(("Timeseries math problem: conflicting number of data columns (" +
+                              "[ " + "'{}' "*len(self.data_cols) + "] and " +
+                              "[ " + "'{}' "*len(other.data_cols) + "])").format(*self.data_cols, *other.data_cols))
+        # check for same timestamps
+        if not (self.df["time"] == other.df["time"]).all(axis=None):
+            raise ValueError("Timeseries math problem: different time columns (sizes {:d} and {:d})".format(self.df["time"].size, other.df["time"].size))
+        # check compatible units (+-) or define new one (*/)
+        # define names of new src and data_cols
+        if operation in ["+", "-"]:
+            if self.data_unit != other.data_unit:
+                raise ValueError("Timeseries math problem: conflicting data units '{:s}' and '{:s}'".format(self.data_unit, other.data_unit))
+            else:
+                out_unit = self.data_unit
+                out_src = "{:s}{:s}{:s}".format(self.src, operation, other.src)
+                out_data_cols = ["{:s}{:s}{:s}".format(lcol, operation, rcol) for lcol, rcol in zip(self.data_cols, other.data_cols)]
+        elif operation in ["*", "/"]:
+            out_unit = "({:s}){:s}({:s})".format(self.data_unit, operation, other.data_unit)
+            out_src = "({:s}){:s}({:s})".format(self.src, operation, other.src)
+            out_data_cols = ["({:s}){:s}({:s})".format(lcol, operation, rcol) for lcol, rcol in zip(self.data_cols, other.data_cols)]
+        else:
+            raise NotImplementedError("Timeseries math problem: unknown operation {:s}".format(operation))
+        # return data unit and column names
+        out_dict = {"time": self.df["time"]}
+        return out_dict, out_src, out_unit, out_data_cols
+
+    def __add__(self, other):
+        out_dict, out_src, out_unit, out_data_cols = self._prepare_math(other, '+')
+        out_dict.update({newcol: self.df[lcol].values + other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)})
+        return Timeseries(pd.DataFrame(out_dict), out_src, out_unit, out_data_cols)
+
+    def __sub__(self, other):
+        out_dict, out_src, out_unit, out_data_cols = self._prepare_math(other, '-')
+        out_dict.update({newcol: self.df[lcol].values - other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)})
+        return Timeseries(pd.DataFrame(out_dict), out_src, out_unit, out_data_cols)
+
+    def __mul__(self, other):
+        out_dict, out_src, out_unit, out_data_cols = self._prepare_math(other, '*')
+        out_dict.update({newcol: self.df[lcol].values * other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)})
+        return Timeseries(pd.DataFrame(out_dict), out_src, out_unit, out_data_cols)
+
+    def __truediv__(self, other):
+        out_dict, out_src, out_unit, out_data_cols = self._prepare_math(other, '/')
+        out_dict.update({newcol: self.df[lcol].values / other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)})
+        return Timeseries(pd.DataFrame(out_dict), out_src, out_unit, out_data_cols)
+
     def get_arch(self):
         raise NotImplementedError()
+
+    @classmethod
+    def from_fit(cls, data_unit, data_cols, fit):
+        df_data = {"time": fit["time"]}
+        sigma_cols = None
+        for icol, dcol in enumerate(data_cols):
+            df_data[dcol] = fit["fit"][:, icol]
+        if fit["sigma"] is not None:
+            sigma_cols = [dcol + "_sigma" for dcol in data_cols]
+            for icol, scol in enumerate(sigma_cols):
+                df_data[scol] = fit["sigma"][:, icol]
+        df = pd.DataFrame(df_data)
+        return cls(df, "fitted", data_unit, data_cols, sigma_cols)
 
 
 class GipsyTimeseries(Timeseries):
@@ -757,7 +814,7 @@ if __name__ == "__main__":
     net = Network.from_json(path="net_arch_catalog1mm.json")
     # okada_prior(net, "data/nied_fnet_catalog.txt")
     # net.fit()
-    net.fit(solver="ridge_regression")
-    net.evaluate()
+    net.fit("GNSS", "ridge_regression", penalty=1e10)
+    net.evaluate("GNSS")
     net.to_json(path="arch_out.json")
     net.gui()
