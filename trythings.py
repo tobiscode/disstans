@@ -855,30 +855,26 @@ def common_mode(array, method, n_components=1):
     """
     Computes the common mode noise with the given method. Input should already be a residual.
     """
-    # make sure each timeseries is zero mean
-    column_mean = np.nanmean(array, axis=0, keepdims=True)
-    array -= column_mean
     # fill NaNs with white Gaussian noise
+    array_nanmean = np.nanmean(array, axis=0, keepdims=True)
     array_nansd = np.nanstd(array, axis=0)
     array_nanind = np.isnan(array)
     for icol in range(array.shape[1]):
-        array[array_nanind[:, icol], icol] = array_nansd[icol] * np.random.randn(array_nanind[:, icol].sum())
+        array[array_nanind[:, icol], icol] = array_nansd[icol] * np.random.randn(array_nanind[:, icol].sum()) + array_nanmean
     # decompose using the specified solver
     if method == 'pca':
         from sklearn.decomposition import PCA
-        decomposer = PCA(n_components=n_components, whiten=False)
-        temporal = decomposer.fit_transform(array)
-        spatial = decomposer.components_
+        decomposer = PCA(n_components=n_components, whiten=True)
     elif method == 'ica':
         from sklearn.decomposition import FastICA
         decomposer = FastICA(n_components=n_components, whiten=True)
-        temporal = decomposer.fit_transform(array)
-        spatial = decomposer.components_
     else:
         raise NotImplementedError(f"Cannot estimate the common mode error using the '{method}' method.")
-    # build model
-    model = temporal @ spatial + column_mean
-    # reduce to where original timeseries were not NaNs
+    # extract components and build model
+    temporal = decomposer.fit_transform(array)
+    # spatial = decomposer.components_
+    model = decomposer.inverse_transform(temporal)
+    # reduce to where original timeseries were not NaNs and return
     model[array_nanind] = np.NaN
     return model
 
