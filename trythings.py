@@ -785,20 +785,23 @@ def nanmedfilt2d(array, kernel_size):
         num_obs = array.shape[0]
         array = array.reshape(num_obs, 1 if array.ndim == 1 else -1)
         filtered = np.NaN * np.empty(array.shape)
-        # Beginning region
-        halfWindow = 0
-        for i in range(kernel_size // 2):
-            filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
-            halfWindow += 1
-        # Middle region
-        halfWindow = kernel_size // 2
-        for i in range(halfWindow, num_obs - halfWindow):
-            filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
-        # Ending region
-        halfWindow -= 1
-        for i in range(num_obs - halfWindow, num_obs):
-            filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
+        # Run filtering while suppressing warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', 'All-NaN slice encountered')
+            # Beginning region
+            halfWindow = 0
+            for i in range(kernel_size // 2):
+                filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
+                halfWindow += 1
+            # Middle region
+            halfWindow = kernel_size // 2
+            for i in range(halfWindow, num_obs - halfWindow):
+                filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
+            # Ending region
             halfWindow -= 1
+            for i in range(num_obs - halfWindow, num_obs):
+                filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
+                halfWindow -= 1
     return filtered
 
 
@@ -814,23 +817,20 @@ def median(data, kernel_size):
     else:
         was_dict = True
     filt = {}
-    # Run filtering while suppressing warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', 'All-NaN slice encountered')
-        # loop over components
-        for comp, ts in data.items():
-            if isinstance(ts, Timeseries):
-                array = ts.data.values
-            else:
-                array = ts.values
-            filtered = nanmedfilt2d(array, kernel_size)
-            # save results
-            if isinstance(ts, Timeseries):
-                filt[comp] = ts.copy(only_data=True)
-                filt[comp].data = filtered
-            else:
-                filt[comp] = ts.copy()
-                filt[comp] = filtered
+    # loop over components
+    for comp, ts in data.items():
+        if isinstance(ts, Timeseries):
+            array = ts.data.values
+        else:
+            array = ts.values
+        filtered = nanmedfilt2d(array, kernel_size)
+        # save results
+        if isinstance(ts, Timeseries):
+            filt[comp] = ts.copy(only_data=True)
+            filt[comp].data = filtered
+        else:
+            filt[comp] = ts.copy()
+            filt[comp] = filtered
     if not was_dict:
         filt = filt['ts']
     return filt
@@ -1071,8 +1071,7 @@ def okada_prior(net, catalog_path):
 if __name__ == "__main__":
     # net = Network.from_json(path="net_arch.json")
     # net = Network.from_json(path="net_arch_catalog1mm.json")
-    net = Network.from_json(path="net_arch_lite_small.json")
-    # net = Network.from_json(path="net_arch_lite.json")
+    net = Network.from_json(path="net_arch_lite.json")
     # okada_prior(net, "data/nied_fnet_catalog.txt")
     # net.fit()
     # net.fit("GNSS", solver="ridge_regression", penalty=1e10)
