@@ -8,6 +8,7 @@ from copy import deepcopy
 from configparser import ConfigParser
 from tqdm import tqdm
 from multiprocessing import Pool
+from functools import wraps
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -46,6 +47,10 @@ class Network():
 
     def __delitem__(self, name):
         self.remove_station(name)
+
+    def __iter__(self):
+        for station in self.stations.values():
+            yield station
 
     def export_network_ts(self, ts_description):
         """
@@ -242,38 +247,38 @@ class Network():
             fit[model_description] = model.evaluate(station.timeseries[ts_description].time) if timevector is None else model.evaluate(timevector)
         return fit
 
-    def call_func_ts_return(self, ts_in, func, ts_out=None, **kw_args):
+    def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(stat, ts_in, func, kw_args) for stat in self.stations.values()]
+            iterable_inputs = [(func, stat, ts_in, kw_args) for stat in self.stations.values()]
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                ts_return = list(tqdm(p.imap(self._single_call_func_ts_return, iterable_inputs), ascii=True, desc="Processing station timeseries with {:s}".format(func), total=len(iterable_inputs), unit="station"))
+                ts_return = list(tqdm(p.imap(self._single_call_func_ts_return, iterable_inputs), ascii=True, desc="Processing station timeseries with {:s}".format(func.__name__), total=len(iterable_inputs), unit="station"))
             # redistribute results
             for i, stat in enumerate(self.stations.values()):
                 stat.add_timeseries(ts_in if ts_out is None else ts_out, ts_return[i])
         else:
             # run in serial
-            for name, stat in tqdm(self.stations.items(), desc="Processing station timeseries with {:s}".format(func), ascii=True, unit="station"):
-                ts_return = self._single_call_func_ts_return((stat, ts_in, func, kw_args))
+            for name, stat in tqdm(self.stations.items(), desc="Processing station timeseries with {:s}".format(func.__name__), ascii=True, unit="station"):
+                ts_return = self._single_call_func_ts_return((func, stat, ts_in, kw_args))
                 stat.add_timeseries(ts_in if ts_out is None else ts_out, ts_return)
 
     @staticmethod
     def _single_call_func_ts_return(parameter_tuple):
-        station, ts_description, func, kw_args = parameter_tuple
-        ts_return = globals()[func](station.timeseries[ts_description], **kw_args)
+        func, station, ts_description, kw_args = parameter_tuple
+        ts_return = func(station.timeseries[ts_description], **kw_args)
         return ts_return
 
-    def call_netwide_func(self, ts_in, func, ts_out=None, **kw_args):
+    def call_netwide_func(self, func, ts_in, ts_out=None, **kw_args):
         net_in = self.export_network_ts(ts_in)
-        net_out = globals()[func](net_in, **kw_args)
+        net_out = func(net_in, **kw_args)
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
 
     def call_func_no_return(self, func, **kw_args):
-        for name, stat in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func), ascii=True, unit="station"):
-            globals()[func](stat, **kw_args)
+        for name, stat in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func.__name__), ascii=True, unit="station"):
+            func(stat, **kw_args)
 
-    def gui(self):
+    def gui(self, verbose=False):
         # get location data and projections
         stat_lats = [lla[0] for lla in self.network_locations.values()]
         stat_lons = [lla[1] for lla in self.network_locations.values()]
@@ -312,11 +317,15 @@ class Network():
             n_components = 0
             for ts in self.stations[station_name].timeseries.values():
                 n_components += len(ts.data_cols)
+            if verbose:
+                print(f"\nStation {station_name} selected, found {n_components} components in {len(self.stations[station_name].timeseries)} timeseries:")
             # clear figure and add data
             fig_ts.clear()
             icomp = 0
             ax_ts = []
             for its, (ts_description, ts) in enumerate(self.stations[station_name].timeseries.items()):
+                if verbose:
+                    print(ts)
                 for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
                     # add axis
                     ax = fig_ts.add_subplot(n_components, 1, icomp + 1, sharex=None if icomp == 0 else ax_ts[0])
@@ -467,9 +476,9 @@ class Timeseries():
     Container object that for a given time vector contains
     data points.
     """
-    def __init__(self, dataframe, source, data_unit, data_cols, sigma_cols=None):
+    def __init__(self, dataframe, src, data_unit, data_cols, sigma_cols=None):
         self.df = dataframe
-        self.src = source
+        self.src = src
         self.data_unit = data_unit
         self.data_cols = data_cols
         if sigma_cols is None:
@@ -523,11 +532,12 @@ class Timeseries():
     def time(self):
         return self.df.index
 
-    def copy(self, only_data=False):
+    def copy(self, only_data=False, src=None):
+        new_name = deepcopy(self.src) if src is None else src
         if not only_data:
-            return Timeseries(self.df.copy(), deepcopy(self.src), deepcopy(self.data_unit), deepcopy(self.data_cols), deepcopy(self.sigma_cols))
+            return Timeseries(self.df.copy(), new_name, deepcopy(self.data_unit), deepcopy(self.data_cols), deepcopy(self.sigma_cols))
         else:
-            return Timeseries(self.df[self.data_cols].copy(), deepcopy(self.src), deepcopy(self.data_unit), deepcopy(self.data_cols), None)
+            return Timeseries(self.df[self.data_cols].copy(), new_name, deepcopy(self.data_unit), deepcopy(self.data_cols), None)
 
     def mask_out(self, dcol):
         icol = self.data_cols.index(dcol)
@@ -547,11 +557,10 @@ class Timeseries():
             raise ValueError(("Timeseries math problem: conflicting number of data columns (" +
                               "[ " + "'{}' "*len(self.data_cols) + "] and " +
                               "[ " + "'{}' "*len(other.data_cols) + "])").format(*self.data_cols, *other.data_cols))
-        # check for same timestamps
-        if not (self.time == other.time).all():
-            raise ValueError("Timeseries math problem: different time columns (sizes {:d} and {:d})".format(self.time.size, other.time.size))
+        # get intersection of time indices
+        out_time = self.time.intersection(other.time, sort=None)
         # check compatible units (+-) or define new one (*/)
-        # define names of new src and data_cols
+        # define new src and data_cols
         if operation in ["+", "-"]:
             if self.data_unit != other.data_unit:
                 raise ValueError("Timeseries math problem: conflicting data units '{:s}' and '{:s}'".format(self.data_unit, other.data_unit))
@@ -566,27 +575,27 @@ class Timeseries():
         else:
             raise NotImplementedError("Timeseries math problem: unknown operation {:s}".format(operation))
         # return data unit and column names
-        return out_src, out_unit, out_data_cols
+        return out_src, out_unit, out_data_cols, out_time
 
     def __add__(self, other):
-        out_src, out_unit, out_data_cols = self._prepare_math(other, '+')
-        out_dict = {newcol: self.df[lcol].values + other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=self.time), out_src, out_unit, out_data_cols)
+        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '+')
+        out_dict = {newcol: self.df.loc[out_time, lcol].values + other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
+        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
 
     def __sub__(self, other):
-        out_src, out_unit, out_data_cols = self._prepare_math(other, '-')
-        out_dict = {newcol: self.df[lcol].values - other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=self.time), out_src, out_unit, out_data_cols)
+        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '-')
+        out_dict = {newcol: self.df.loc[out_time, lcol].values - other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
+        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
 
     def __mul__(self, other):
-        out_src, out_unit, out_data_cols = self._prepare_math(other, '*')
-        out_dict = {newcol: self.df[lcol].values * other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=self.time), out_src, out_unit, out_data_cols)
+        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '*')
+        out_dict = {newcol: self.df.loc[out_time, lcol].values * other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
+        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
 
     def __truediv__(self, other):
-        out_src, out_unit, out_data_cols = self._prepare_math(other, '/')
-        out_dict = {newcol: self.df[lcol].values / other.df[rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=self.time), out_src, out_unit, out_data_cols)
+        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '/')
+        out_dict = {newcol: self.df.loc[out_time, lcol].values / other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
+        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
 
     def get_arch(self):
         return {}
@@ -612,7 +621,7 @@ class GipsyTimeseries(Timeseries):
                                           names=['year', 'month', 'day', 'hour', 'minute', 'second'])).to_frame(name='time')
         data = pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[1, 2, 3, 4, 5, 6], names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
         df = time.join(data).drop_duplicates(subset='time').set_index('time')
-        super().__init__(dataframe=df, source='tseries', data_unit='m',
+        super().__init__(dataframe=df, src='.tseries', data_unit='m',
                          data_cols=['east', 'north', 'up'], sigma_cols=['east_sigma', 'north_sigma', 'up_sigma'])
 
     def get_arch(self):
@@ -772,6 +781,7 @@ class Sinusoidal(Model):
 
 
 def unwrap_dict_and_ts(func):
+    @wraps(func)
     def wrapper(data, *args, **kw_args):
         if not isinstance(data, dict):
             data = {'ts': data}
@@ -792,7 +802,7 @@ def unwrap_dict_and_ts(func):
             result = func(array, *args, **kw_args)
             # save results
             if isinstance(ts, Timeseries):
-                out[comp] = ts.copy(only_data=True)
+                out[comp] = ts.copy(only_data=True, src=func.__name__)
                 out[comp].data = result
             elif isinstance(ts, pd.DataFrame):
                 out[comp] = ts.copy()
@@ -840,7 +850,43 @@ def median(array, kernel_size):
     return filtered
 
 
-def clean(station, ts_in, reference, ts_out=None,
+@unwrap_dict_and_ts
+def common_mode(array, method, n_components=1):
+    """
+    Computes the common mode noise with the given method. Input should already be a residual.
+    """
+    # make sure each timeseries is zero mean
+    column_mean = np.nanmean(array, axis=0, keepdims=True)
+    array -= column_mean
+    # fill NaNs with white Gaussian noise
+    array_nansd = np.nanstd(array, axis=0)
+    array_nanind = np.isnan(array)
+    for icol in range(array.shape[1]):
+        array[array_nanind[:, icol], icol] = array_nansd[icol] * np.random.randn(array_nanind[:, icol].sum())
+    # decompose using the specified solver
+    if method == 'pca':
+        from sklearn.decomposition import PCA
+        decomposer = PCA(n_components=n_components, whiten=False)
+        temporal = decomposer.fit_transform(array)
+        spatial = decomposer.components_
+    elif method == 'ica':
+        from sklearn.decomposition import FastICA
+        decomposer = FastICA(n_components=n_components, whiten=True)
+        temporal = decomposer.fit_transform(array)
+        spatial = decomposer.components_
+    elif method == 'nmf':
+        from sklearn.decomposition import non_negative_factorization
+        temporal, spatial = non_negative_factorization(array, n_components=n_components)
+    else:
+        raise NotImplementedError(f"Cannot estimate the common mode error using the '{method}' method.")
+    # build model
+    model = temporal @ spatial + column_mean
+    # reduce to where original timeseries were not NaNs
+    model[array_nanind] = np.NaN
+    return model
+
+
+def clean(station, ts_in, reference, ts_out=None, residual_out=None,
           std_thresh=config.getfloat('clean', 'std_thresh', fallback=None),
           std_outlier=config.getfloat('clean', 'std_outlier', fallback=None),
           min_obs=config.getint('clean', 'min_obs', fallback=0),
@@ -849,14 +895,14 @@ def clean(station, ts_in, reference, ts_out=None,
     if ts_out is None:
         ts = station[ts_in]
     else:
-        ts = station[ts_in].copy(only_data=True)
+        ts = station[ts_in].copy(only_data=True, src='clean')
     # check if we have a reference time series or need to calculate one
     # in the latter case, the input is name of function to call
     if not isinstance(reference, Timeseries):
         if not isinstance(reference, str):
-            raise TypeError("'reference' has to either be a Timeseries object or the name of a function.")
+            raise TypeError("'reference' has to either be a the name of a timeseries in the station, or the name of a function.")
         # get reference time series
-        ts_ref = globals()[reference](ts, **kw_args)
+        ts_ref = station[reference]
     # check that both timeseries have the same data columns
     if not ts_ref.data_cols == ts.data_cols:
         raise ValueError(f"Reference time series has to have the same data columns as input time series, but got {ts_ref.data_cols} and {ts.data_cols}.")
@@ -871,7 +917,11 @@ def clean(station, ts_in, reference, ts_out=None,
             sd = np.nanstd(residual)
         # check for and remove outliers
         if std_outlier is not None:
-            ts[dcol][~np.isnan(residual)][np.abs(residual[~np.isnan(residual)]) > std_outlier*sd] = np.NaN
+            mask = ~np.isnan(residual)
+            mask[mask] &= np.abs(residual[mask]) > std_outlier * sd
+            ts[dcol][mask] = np.NaN
+            residual = ts[dcol].values - ts_ref[dcol].values
+            sd = np.nanstd(residual)
         # check for minimum number of clean observations
         if ts[dcol].count() < min_clean_obs:
             ts.mask_out(dcol)
@@ -1080,6 +1130,12 @@ if __name__ == "__main__":
     # net.fit()
     # net.fit("GNSS", solver="ridge_regression", penalty=1e10)
     # net.evaluate("GNSS")
+    net.call_func_ts_return(median, ts_in='GNSS', ts_out='filtered', kernel_size=7)
+    net.call_func_no_return(clean, ts_in='GNSS', reference='filtered', ts_out='clean')
+    for station in net:
+        station['residual'] = station['clean'] - station['filtered']
+    net.call_netwide_func(common_mode, ts_in='residual', ts_out='common', method='pca')
+    for station in net:
+        station['final'] = station['clean'] - station['common']
     # net.to_json(path="arch_out.json")
-    net.call_netwide_func('GNSS', 'median', ts_out='netwide', kernel_size=7)
-    net.gui()
+    net.gui(verbose=True)
