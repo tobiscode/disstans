@@ -874,9 +874,6 @@ def common_mode(array, method, n_components=1):
         decomposer = FastICA(n_components=n_components, whiten=True)
         temporal = decomposer.fit_transform(array)
         spatial = decomposer.components_
-    elif method == 'nmf':
-        from sklearn.decomposition import non_negative_factorization
-        temporal, spatial = non_negative_factorization(array, n_components=n_components)
     else:
         raise NotImplementedError(f"Cannot estimate the common mode error using the '{method}' method.")
     # build model
