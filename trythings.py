@@ -771,7 +771,42 @@ class Sinusoidal(Model):
         return np.arctan2(self.parameters[1], self.parameters[0])
 
 
-def nanmedfilt2d(array, kernel_size):
+def unwrap_dict_and_ts(func):
+    def wrapper(data, *args, **kw_args):
+        if not isinstance(data, dict):
+            data = {'ts': data}
+            was_dict = False
+        else:
+            was_dict = True
+        out = {}
+        # loop over components
+        for comp, ts in data.items():
+            if isinstance(ts, Timeseries):
+                array = ts.data.values
+            elif isinstance(ts, pd.DataFrame):
+                array = ts.values
+            elif isinstance(ts, np.ndarray):
+                array = ts
+            else:
+                raise TypeError(f"Cannot unwrap object of type {type(ts)}")
+            result = func(array, *args, **kw_args)
+            # save results
+            if isinstance(ts, Timeseries):
+                out[comp] = ts.copy(only_data=True)
+                out[comp].data = result
+            elif isinstance(ts, pd.DataFrame):
+                out[comp] = ts.copy()
+                out[comp].values = result
+            else:
+                out[comp] = result
+        if not was_dict:
+            out = out['ts']
+        return out
+    return wrapper
+
+
+@unwrap_dict_and_ts
+def median(array, kernel_size):
     """
     Computes the median filter (ignoring NaNs) column-wise,
     either by calling a Numpy function iteratively or by using
@@ -803,37 +838,6 @@ def nanmedfilt2d(array, kernel_size):
                 filtered[i, :] = np.nanmedian(array[i-halfWindow:i+halfWindow+1, :], axis=0)
                 halfWindow -= 1
     return filtered
-
-
-def median(data, kernel_size):
-    """
-    Perform a median filter with a sliding window. For edges, we shrink window.
-    Can operate on single timeseries as well as a network-wide dataframe.
-    """
-    assert kernel_size % 2 == 1, "kernel_size must be odd"
-    if not isinstance(data, dict):
-        data = {'ts': data}
-        was_dict = False
-    else:
-        was_dict = True
-    filt = {}
-    # loop over components
-    for comp, ts in data.items():
-        if isinstance(ts, Timeseries):
-            array = ts.data.values
-        else:
-            array = ts.values
-        filtered = nanmedfilt2d(array, kernel_size)
-        # save results
-        if isinstance(ts, Timeseries):
-            filt[comp] = ts.copy(only_data=True)
-            filt[comp].data = filtered
-        else:
-            filt[comp] = ts.copy()
-            filt[comp] = filtered
-    if not was_dict:
-        filt = filt['ts']
-    return filt
 
 
 def clean(station, ts_in, reference, ts_out=None,
