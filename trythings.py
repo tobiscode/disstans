@@ -21,14 +21,13 @@ class Network():
     """
     A container object for multiple stations.
     """
-    def __init__(self, name, default_location_path=None):
+    def __init__(self, name, default_location_path=None, default_local_models={}):
         self.name = name
-        self._default_location_path = default_location_path
+        self.default_location_path = default_location_path
+        self.default_local_models = default_local_models
         self.stations = {}
-        self.network_locations = {}
-        self._default_local_models = {}
         self.global_models = {}
-        self.global_priors = {}
+        # self.global_priors = {}
 
     def __repr__(self):
         info = f"Network {self.name}\n" + \
@@ -93,14 +92,12 @@ class Network():
         if name in self.stations:
             Warning("Overwriting station {:s}".format(name))
         self.stations[name] = station
-        self.network_locations[name] = station.location
 
     def remove_station(self, name):
         if name not in self.stations:
             Warning("Cannot find station {}, couldn't delete".format(name))
         else:
             del self.stations[name]
-            del self.network_locations[name]
 
     def add_global_model(self, description, model):
         if not isinstance(description, str):
@@ -127,20 +124,18 @@ class Network():
     #         del self.global_priors[description]
 
     @classmethod
-    def from_json(cls, path):
+    def from_json(cls, path, add_default_local_models=True):
         # load configuration
         net_arch = json.load(open(path, mode='r'))
         network_name = net_arch.get("name", "network_from_json")
         network_locations_path = net_arch.get("locations")
         # create Network instance
-        net = cls(name=network_name, default_location_path=network_locations_path)
+        net = cls(name=network_name, default_location_path=network_locations_path, default_local_models=net_arch["default_local_models"])
         # load location information, if present
         if network_locations_path is not None:
             with open(network_locations_path, mode='r') as locfile:
                 loclines = [line.strip() for line in locfile.readlines()]
             network_locations = {line.split()[0]: [float(lla) for lla in line.split()[1:]] for line in loclines}
-        # load default local models
-        net._default_local_models = net_arch["default_local_models"]
         # create stations
         for station_name, station_cfg in tqdm(net_arch["stations"].items(), ascii=True, desc="Building Network", unit="station"):
             if "location" in station_cfg:
@@ -156,10 +151,11 @@ class Network():
                 ts = globals()[ts_cfg["type"]](**ts_cfg["kw_args"])
                 stat.add_timeseries(description=ts_description, timeseries=ts)
                 # add default local models to station
-                for model_description, model_cfg in net._default_local_models.items():
-                    local_copy = deepcopy(model_cfg)
-                    mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
-                    stat.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+                if add_default_local_models:
+                    for model_description, model_cfg in net.default_local_models.items():
+                        local_copy = deepcopy(model_cfg)
+                        mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
+                        stat.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
                 # add specific local models to station
                 for model_description, model_cfg in station_cfg["models"].items():
                     mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
@@ -175,9 +171,9 @@ class Network():
     def to_json(self, path):
         # create new dictionary
         net_arch = {"name": self.name,
-                    "locations": self._default_location_path,
+                    "locations": self.default_location_path,
                     "stations": {},
-                    "default_local_models": self._default_local_models,
+                    "default_local_models": self.default_local_models,
                     "global_models": {}}
         # add station representations
         for stat_name, stat in self.stations.items():
@@ -185,7 +181,7 @@ class Network():
             if stat_arch == {}:
                 continue
             # need to remove all models that are actually default models
-            for mdl_description, mdl in self._default_local_models.items():
+            for mdl_description, mdl in self.default_local_models.items():
                 if (mdl_description in stat_arch["models"].keys()) and (mdl == stat_arch["models"][mdl_description]):
                     del stat_arch["models"][mdl_description]
             # now we can append it to the main json
@@ -250,7 +246,7 @@ class Network():
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(func, stat, ts_in, kw_args) for stat in self.stations.values()]
+            iterable_inputs = ((func, stat, ts_in, kw_args) for stat in self.stations.values())
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
                 ts_return = list(tqdm(p.imap(self._single_call_func_ts_return, iterable_inputs), ascii=True, desc="Processing station timeseries with {:s}".format(func.__name__), total=len(iterable_inputs), unit="station"))
@@ -278,18 +274,18 @@ class Network():
         for name, stat in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func.__name__), ascii=True, unit="station"):
             func(stat, **kw_args)
 
-    def gui(self, verbose=False):
+    def _create_map_figure(self):
         # get location data and projections
-        stat_lats = [lla[0] for lla in self.network_locations.values()]
-        stat_lons = [lla[1] for lla in self.network_locations.values()]
+        stat_lats = [station.location[0] for station in self]
+        stat_lons = [station.location[1] for station in self]
         proj_gui = getattr(ccrs, config.get("gui", "projection", fallback="Mercator"))()
-        proj_lla = ccrs.Geodetic()
-
-        # create map figure
+        proj_lla = ccrs.PlateCarree()
+        # create figure and plot stations
         fig_map = plt.figure()
         ax_map = fig_map.add_subplot(projection=proj_gui)
-        default_station_colors = ['b'] * len(self.network_locations.values())
+        default_station_colors = ['b'] * len(stat_lats)
         stat_points = ax_map.scatter(stat_lons, stat_lats, linestyle='None', marker='.', transform=proj_lla, facecolor=default_station_colors)
+        # create underlay
         map_underlay = False
         if "wmts_server" in config.options("gui"):
             try:
@@ -299,8 +295,51 @@ class Network():
                 print(exc)
         if "coastlines_resolution" in config.options("gui"):
             ax_map.coastlines(color="white" if map_underlay else "black", resolution=config.get("gui", "coastlines_resolution"))
+        return fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons
 
-        # create empty timeseries figure
+    def graphical_cme(self, ts_in, ts_out=None, **kw_args):
+        # get common mode and make sure to return spatial and temporal models
+        net_in = self.export_network_ts(ts_in)
+        comps = list(net_in.keys())
+        ndim = len(comps)
+        ndim_max2 = min(ndim, 2)
+        assert ndim > 0, f"No components found in {ts_in:s}"
+        kw_args.update({'plot': True})
+        model, temp_spat = common_mode(net_in, **kw_args)
+        temporal, spatial = {}, {}
+        for comp in model:
+            temporal[comp] = temp_spat[comp][0]
+            spatial[comp] = temp_spat[comp][1]
+        # assign model to network
+        ts_out = ts_in if ts_out is None else ts_out
+        self.import_network_ts(ts_out, model)
+        # extract spatial components
+        fitted_stations = model[comps[0]].data_cols
+        latlonenu = np.zeros((len(fitted_stations), 2 + ndim_max2))
+        for i, station_name in enumerate(fitted_stations):
+            latlonenu[i, :2] = self[station_name].location[:2]
+            for j in range(ndim_max2):
+                latlonenu[i, 2 + j] = spatial[comps[j]][0, i]
+        # make map for spatial component
+        fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons = self._create_map_figure()
+        if ndim == 1:
+            quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0], latlonenu[:, 2], np.zeros_like(latlonenu[:, 2]), units='xy', transform=proj_lla)
+        else:
+            quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0], latlonenu[:, 2], latlonenu[:, 3], units='xy', transform=proj_lla)
+        key_length = int(np.around(np.median(np.sqrt(np.sum(np.atleast_2d(latlonenu[:, 2:2 + ndim_max2]**2), axis=1)))))
+        ax_map.quiverkey(quiv, 0.9, 0.9, key_length, f"{key_length:d} {model[comps[0]].data_unit:s}")
+        # make timeseries figure
+        fig_ts, ax_ts = plt.subplots(nrows=len(temporal), sharex=True)
+        for icomp, (comp, ts) in enumerate(temporal.items()):
+            ax_ts[icomp].plot(model[comp].time, ts)
+            ax_ts[icomp].set_ylabel(f"{comp:s} [{model[comp].data_unit:s}]")
+            ax_ts[icomp].grid()
+        # show plot
+        plt.show()
+
+    def gui(self, verbose=False):
+        # create map and timeseries figures
+        fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons = self._create_map_figure()
         fig_ts = plt.figure()
 
         # define clicking function
@@ -308,7 +347,7 @@ class Network():
             if (event.xdata is None) or (event.ydata is None) or (event.inaxes is not ax_map): return
             click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata, src_crs=proj_gui)
             station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2 + (np.array(stat_lons) - click_lon)**2))
-            station_name = list(self.network_locations.keys())[station_index]
+            station_name = list(self.stations.keys())[station_index]
             highlight_station_colors = default_station_colors.copy()
             highlight_station_colors[station_index] = 'r'
             stat_points.set_facecolor(highlight_station_colors)
@@ -318,14 +357,12 @@ class Network():
             for ts in self.stations[station_name].timeseries.values():
                 n_components += len(ts.data_cols)
             if verbose:
-                print(f"\nStation {station_name} selected, found {n_components} components in {len(self.stations[station_name].timeseries)} timeseries:")
+                print(self.stations[station_name])
             # clear figure and add data
             fig_ts.clear()
             icomp = 0
             ax_ts = []
             for its, (ts_description, ts) in enumerate(self.stations[station_name].timeseries.items()):
-                if verbose:
-                    print(ts)
                 for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
                     # add axis
                     ax = fig_ts.add_subplot(n_components, 1, icomp + 1, sharex=None if icomp == 0 else ax_ts[0])
@@ -373,9 +410,11 @@ class Station():
         for ts_description, ts in self.timeseries.items():
             info += f"\n[{ts_description}]\n - Source: {ts.src}\n - Units: {ts.data_unit}\n" + \
                     f" - Data: {[key for key in ts.data_cols]}\n" + \
-                    f" - Uncertainties: {[key for key in ts.sigma_cols]}\n" + \
-                    f" - Models: {[key for key in self.models[ts_description]]}\n" + \
-                    f" - Fits: {[key for key in self.fits[ts_description]]}"
+                    f" - Uncertainties: {[key for key in ts.sigma_cols]}"
+            if len(self.models[ts_description]) > 0:
+                info += f"\n - Models: {[key for key in self.models[ts_description]]}"
+            if len(self.fits[ts_description]) > 0:
+                info += f"\n - Fits: {[key for key in self.fits[ts_description]]}"
         return info
 
     def __getitem__(self, description):
@@ -405,16 +444,29 @@ class Station():
             stat_arch["models"].update({mdl_description: mdl.get_arch()})
         return stat_arch
 
-    def add_timeseries(self, description, timeseries):
+    def add_timeseries(self, description, timeseries, override_src=None, override_data_unit=None, override_data_cols=None, override_sigma_cols=None, add_models=None):
         if not isinstance(description, str):
             raise TypeError("Cannot add new timeseries: 'description' is not a string.")
         if not isinstance(timeseries, Timeseries):
             raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
         if description in self.timeseries:
             Warning("Station {:s}: Overwriting time series {:s}".format(self.name, description))
+        if override_src is not None:
+            timeseries.src = override_src
+        if override_data_unit is not None:
+            timeseries.data_unit = override_data_unit
+        if override_data_cols is not None:
+            timeseries.data_cols = override_data_cols
+        if override_sigma_cols is not None:
+            timeseries.sigma_cols = override_sigma_cols
         self.timeseries[description] = timeseries
         self.fits[description] = {}
         self.models[description] = {}
+        if add_models is not None:
+            for model_description, model_cfg in add_models.items():
+                local_copy = deepcopy(model_cfg)
+                mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
+                self.add_local_model(ts_description=description, model_description=model_description, model=mdl)
 
     def remove_timeseries(self, description):
         if description not in self.timeseries:
@@ -477,17 +529,24 @@ class Timeseries():
     data points.
     """
     def __init__(self, dataframe, src, data_unit, data_cols, sigma_cols=None):
-        self.df = dataframe
-        self.src = src
-        self.data_unit = data_unit
-        self.data_cols = data_cols
+        assert isinstance(dataframe, pd.DataFrame)
+        assert isinstance(src, str)
+        assert isinstance(data_unit, str)
+        assert isinstance(data_cols, list) and all([isinstance(dcol, str) for dcol in data_cols])
+        assert all([dcol in dataframe.columns for dcol in data_cols])
+        self._df = dataframe
+        self._src = src
+        self._data_unit = data_unit
+        self._data_cols = data_cols
         if sigma_cols is None:
-            self.sigma_cols = [None] * len(self.data_cols)
+            self._sigma_cols = [None] * len(self._data_cols)
         else:
-            assert len(self.data_cols) == len(sigma_cols), \
+            assert isinstance(sigma_cols, list) and all([isinstance(scol, str) for scol in sigma_cols])
+            assert all([scol in dataframe.columns for scol in sigma_cols if scol is not None])
+            assert len(self._data_cols) == len(sigma_cols), \
                 "If passing uncertainty columns, the list needs to have the same length as the data columns one. " + \
                 "If only certain components have associated uncertainties, leave those list entries as None."
-            self.sigma_cols = sigma_cols
+            self._sigma_cols = sigma_cols
 
     def __repr__(self):
         info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}\n" + \
@@ -501,52 +560,98 @@ class Timeseries():
         return self.df[columns]
 
     @property
+    def src(self):
+        return self._src
+
+    @src.setter
+    def src(self, new_src):
+        if not isinstance(new_src, str):
+            raise TypeError(f"New 'src' attribute has to be a string, got {type(new_src)}.")
+        self._src = new_src
+
+    @property
+    def data_unit(self):
+        return self._data_unit
+
+    @data_unit.setter
+    def data_unit(self, new_data_unit):
+        if not isinstance(new_data_unit, str):
+            raise TypeError(f"New 'data_unit' attribute has to be a string, got {type(new_data_unit)}.")
+        self._data_unit = new_data_unit
+
+    @property
+    def data_cols(self):
+        return self._data_cols
+
+    @data_cols.setter
+    def data_cols(self, new_data_cols):
+        assert isinstance(new_data_cols, list) and all([isinstance(dcol, str) for dcol in new_data_cols]), \
+            f"New 'data_cols' attribute must be a list of strings of the same length as the current 'data_cols' ({len(self._data_cols)}), got {new_data_cols}."
+        self._df.rename(columns={old_col: new_col for old_col, new_col in zip(self._data_cols, new_data_cols)}, errors='raise', inplace=True)
+        self._data_cols = new_data_cols
+
+    @property
+    def sigma_cols(self):
+        return self._sigma_cols
+
+    @sigma_cols.setter
+    def sigma_cols(self, new_sigma_cols):
+        assert isinstance(new_sigma_cols, list) and all([(scol is None) or isinstance(scol, str) for scol in new_sigma_cols]), \
+            f"New 'sigma_cols' attribute must be a list of strings or Nones of the same length as the current 'sigma_cols' ({len(self._sigma_cols)}), got {new_sigma_cols}."
+        self._df.rename(columns={old_col: new_col for old_col, new_col in zip(self._sigma_cols, new_sigma_cols) if (old_col is not None) and (new_col is not None)}, errors='raise')
+        self._sigma_cols = new_sigma_cols
+
+    @property
     def num_components(self):
-        return len(self.data_cols)
+        return len(self._data_cols)
+
+    @property
+    def df(self):
+        return self._df
 
     @property
     def num_observations(self):
-        return self.df.shape[0]
+        return self._df.shape[0]
 
     @property
     def data(self):
-        return self.df.loc[:, self.data_cols]
+        return self._df.loc[:, self._data_cols]
 
     @data.setter
-    def data(self, newdata):
-        self.df.loc[:, self.data_cols] = newdata
+    def data(self, new_data):
+        self._df.loc[:, self._data_cols] = new_data
 
     @property
     def sigmas(self):
-        if not any(self.sigma_cols):
+        if not any(self._sigma_cols):
             raise ValueError("No uncertainty columns present to return.")
-        return self.df.loc[:, self.sigma_cols]
+        return self._df.loc[:, self._sigma_cols]
 
     @sigmas.setter
-    def sigmas(self, newsigmas):
-        if not any(self.sigma_cols):
+    def sigmas(self, new_sigma):
+        if not any(self._sigma_cols):
             raise ValueError("No uncertainty columns present to set.")
-        self.df.loc[:, self.sigma_cols] = newsigmas
+        self.df.loc[:, self._sigma_cols] = new_sigma
 
     @property
     def time(self):
-        return self.df.index
+        return self._df.index
 
     def copy(self, only_data=False, src=None):
-        new_name = deepcopy(self.src) if src is None else src
+        new_name = deepcopy(self._src) if src is None else src
         if not only_data:
-            return Timeseries(self.df.copy(), new_name, deepcopy(self.data_unit), deepcopy(self.data_cols), deepcopy(self.sigma_cols))
+            return Timeseries(self._df.copy(), new_name, deepcopy(self._data_unit), deepcopy(self._data_cols), deepcopy(self._sigma_cols))
         else:
-            return Timeseries(self.df[self.data_cols].copy(), new_name, deepcopy(self.data_unit), deepcopy(self.data_cols), None)
+            return Timeseries(self._df[self._data_cols].copy(), new_name, deepcopy(self._data_unit), deepcopy(self._data_cols), None)
 
     def mask_out(self, dcol):
-        icol = self.data_cols.index(dcol)
-        scol = self.sigma_cols[icol]
-        self.df[dcol] = np.NaN
-        self.df[dcol] = self.df[dcol].astype(pd.SparseDtype(dtype=float))
+        icol = self._data_cols.index(dcol)
+        scol = self._sigma_cols[icol]
+        self._df[dcol] = np.NaN
+        self._df[dcol] = self._df[dcol].astype(pd.SparseDtype(dtype=float))
         if scol is not None:
-            self.df[scol] = np.NaN
-            self.df[scol] = self.df[scol].astype(pd.SparseDtype(dtype=float))
+            self._df[scol] = np.NaN
+            self._df[scol] = self._df[scol].astype(pd.SparseDtype(dtype=float))
 
     def _prepare_math(self, other, operation):
         # check for same type
@@ -789,6 +894,7 @@ def unwrap_dict_and_ts(func):
         else:
             was_dict = True
         out = {}
+        additional_output = {}
         # loop over components
         for comp, ts in data.items():
             if isinstance(ts, Timeseries):
@@ -799,7 +905,16 @@ def unwrap_dict_and_ts(func):
                 array = ts
             else:
                 raise TypeError(f"Cannot unwrap object of type {type(ts)}")
-            result = func(array, *args, **kw_args)
+            func_output = func(array, *args, **kw_args)
+            if isinstance(func_output, tuple):
+                result = func_output[0]
+                try:
+                    additional_output[comp] = func_output[1:]
+                except IndexError:
+                    additional_output[comp] = None
+            else:
+                result = func_output
+                additional_output[comp] = None
             # save results
             if isinstance(ts, Timeseries):
                 out[comp] = ts.copy(only_data=True, src=func.__name__)
@@ -809,9 +924,14 @@ def unwrap_dict_and_ts(func):
                 out[comp].values = result
             else:
                 out[comp] = result
+        has_additional_output = False if all([elem is None for elem in additional_output.values()]) else True
         if not was_dict:
             out = out['ts']
-        return out
+            additional_output = additional_output['ts']
+        if has_additional_output:
+            return out, additional_output
+        else:
+            return out
     return wrapper
 
 
@@ -851,16 +971,16 @@ def median(array, kernel_size):
 
 
 @unwrap_dict_and_ts
-def common_mode(array, method, n_components=1):
+def common_mode(array, method, n_components=1, plot=False):
     """
     Computes the common mode noise with the given method. Input should already be a residual.
     """
     # fill NaNs with white Gaussian noise
-    array_nanmean = np.nanmean(array, axis=0, keepdims=True)
+    array_nanmean = np.nanmean(array, axis=0)
     array_nansd = np.nanstd(array, axis=0)
     array_nanind = np.isnan(array)
     for icol in range(array.shape[1]):
-        array[array_nanind[:, icol], icol] = array_nansd[icol] * np.random.randn(array_nanind[:, icol].sum()) + array_nanmean
+        array[array_nanind[:, icol], icol] = array_nansd[icol] * np.random.randn(array_nanind[:, icol].sum()) + array_nanmean[icol]
     # decompose using the specified solver
     if method == 'pca':
         from sklearn.decomposition import PCA
@@ -870,20 +990,23 @@ def common_mode(array, method, n_components=1):
         decomposer = FastICA(n_components=n_components, whiten=True)
     else:
         raise NotImplementedError(f"Cannot estimate the common mode error using the '{method}' method.")
-    # extract components and build model
+    # extract temporal component and build model
     temporal = decomposer.fit_transform(array)
-    # spatial = decomposer.components_
     model = decomposer.inverse_transform(temporal)
     # reduce to where original timeseries were not NaNs and return
     model[array_nanind] = np.NaN
-    return model
+    if plot:
+        spatial = decomposer.components_
+        return model, temporal, spatial
+    else:
+        return model
 
 
 def clean(station, ts_in, reference, ts_out=None, residual_out=None,
           std_thresh=config.getfloat('clean', 'std_thresh', fallback=None),
           std_outlier=config.getfloat('clean', 'std_outlier', fallback=None),
           min_obs=config.getint('clean', 'min_obs', fallback=0),
-          min_clean_obs=config.getint('clean', 'min_obs', fallback=0), **kw_args):
+          min_clean_obs=config.getint('clean', 'min_obs', fallback=0), **reference_callable_args):
     # check if we're modifying in-place or copying
     if ts_out is None:
         ts = station[ts_in]
@@ -891,11 +1014,13 @@ def clean(station, ts_in, reference, ts_out=None, residual_out=None,
         ts = station[ts_in].copy(only_data=True, src='clean')
     # check if we have a reference time series or need to calculate one
     # in the latter case, the input is name of function to call
-    if not isinstance(reference, Timeseries):
-        if not isinstance(reference, str):
-            raise TypeError("'reference' has to either be a the name of a timeseries in the station, or the name of a function.")
+    if not (isinstance(reference, Timeseries) or isinstance(reference, str) or callable(reference)):
+        raise TypeError(f"'reference' has to either be a the name of a timeseries in the station, or the name of a function, got {type(reference)}.")
+    if isinstance(reference, str):
         # get reference time series
         ts_ref = station[reference]
+    elif callable(reference):
+        ts_ref = reference(ts, **reference_callable_args)
     # check that both timeseries have the same data columns
     if not ts_ref.data_cols == ts.data_cols:
         raise ValueError(f"Reference time series has to have the same data columns as input time series, but got {ts_ref.data_cols} and {ts.data_cols}.")
@@ -1044,11 +1169,10 @@ def dmultr(mat, dvec):
     return res
 
 
-def okada_prior(net, catalog_path):
+def okada_prior(network, catalog_path, target_timeseries=None):
     # import okada
     from okada_wrapper import dc3d0wrapper as dc3d0
-    # network locations are in net.station_locations
-    stations_lla = np.array([loc for loc in net.network_locations.values()])
+    stations_lla = np.array([station.location for station in network])
     # convert height from m to km
     stations_lla[:, 2] /= 1000
     # load earthquake catalog
@@ -1065,14 +1189,16 @@ def okada_prior(net, catalog_path):
         stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
         stations_rel[i][:, 2] = 0
     # define inputs for the different earthquakes
-    eqs = [{'alpha': config.getfloat('catalog_prior', 'alpha'), 'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
-            'depth': -eq_lla[i, 2], 'strike': float(catalog['Strike'][i].split(';')[0]), 'dip': float(catalog['Dip'][i].split(';')[0]), 'potency': [catalog['Mo(Nm)'][i]/config.getfloat('catalog_prior', 'mu'), 0, 0, 0]} for i in range(n_eq)]
-    parameters = [(stations_rel[i], eqs[i]) for i in range(n_eq)]
+    parameters = ((stations_rel[i], {'alpha': config.getfloat('catalog_prior', 'alpha'), 'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
+                                     'depth': -eq_lla[i, 2], 'strike': float(catalog['Strike'][i].split(';')[0]),
+                                     'dip': float(catalog['Dip'][i].split(';')[0]),
+                                     'potency': [catalog['Mo(Nm)'][i]/config.getfloat('catalog_prior', 'mu'), 0, 0, 0]})
+                  for i in range(n_eq))
 
     # define function that calculates displacement for all stations
-    def get_displacements(parameters):
+    def get_displacements(station_and_parameters):
         # unpack inputs
-        stations, eq = parameters
+        stations, eq = station_and_parameters
         # rotate from relative lat, lon, alt to xyz
         strike_rad = eq['strike']*np.pi/180
         R = np.array([[np.cos(strike_rad),  np.sin(strike_rad), 0],
@@ -1104,31 +1230,36 @@ def okada_prior(net, catalog_path):
             station_disp[i, :, :] = get_displacements(param)
 
     # add steps to station timeseries if they exceed the threshold
-    for istat, stat_name in enumerate(net.network_locations.keys()):
-        stat_time = net.stations[stat_name].timeseries[config.get('catalog_prior', 'timeseries')].time.values
+    target_timeseries = config.get('catalog_prior', 'timeseries') if target_timeseries is None else target_timeseries
+    for istat, stat_name in tqdm(enumerate(network.stations.keys()), desc="Adding steps where necessary", ascii=True, unit='station', total=len(network.stations)):
+        stat_time = network.stations[stat_name].timeseries[target_timeseries].time.values
         steptimes = []
         for itime in range(len(stat_time) - 1):
             disp = station_disp[(eq_times > stat_time[itime]) & (eq_times <= stat_time[itime + 1]), istat, :]
             cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
             if cumdisp >= config.getfloat('catalog_prior', 'threshold'):
                 steptimes.append(str(stat_time[itime + 1]))
-        net.stations[stat_name].add_local_model(config.get('catalog_prior', 'timeseries'), config.get('catalog_prior', 'model'), Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
+        network.stations[stat_name].add_local_model(target_timeseries, config.get('catalog_prior', 'model'), Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
 
 
 if __name__ == "__main__":
-    # net = Network.from_json(path="net_arch.json")
+    net = Network.from_json(path="net_arch.json", add_default_local_models=False)
     # net = Network.from_json(path="net_arch_catalog1mm.json")
-    net = Network.from_json(path="net_arch_lite.json")
-    # okada_prior(net, "data/nied_fnet_catalog.txt")
-    # net.fit()
-    # net.fit("GNSS", solver="ridge_regression", penalty=1e10)
-    # net.evaluate("GNSS")
+    # net = Network.from_json(path="net_arch_lite.json")
     net.call_func_ts_return(median, ts_in='GNSS', ts_out='filtered', kernel_size=7)
     net.call_func_no_return(clean, ts_in='GNSS', reference='filtered', ts_out='clean')
     for station in net:
         station['residual'] = station['clean'] - station['filtered']
+        del station['filtered']
+    # net.graphical_cme(ts_in='residual', ts_out='common', method='pca')
     net.call_netwide_func(common_mode, ts_in='residual', ts_out='common', method='pca')
     for station in net:
-        station['final'] = station['clean'] - station['common']
-    # net.to_json(path="arch_out.json")
-    net.gui(verbose=True)
+        del station['residual']
+        station.add_timeseries('final', station['clean'] - station['common'],
+                               override_data_cols=['east', 'north', 'up'], add_models=net.default_local_models)
+        del station['common']
+    okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
+    net.fit("final", solver="ridge_regression", penalty=1e2, formal_covariance=False)
+    net.evaluate("final")
+    net.to_json(path="arch_out.json")
+    net.gui()
