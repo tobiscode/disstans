@@ -4,12 +4,15 @@ import json
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import warnings
+import multiprocessing
 from copy import deepcopy
 from configparser import ConfigParser
 from tqdm import tqdm
 from multiprocessing import Pool
 from functools import wraps
+from okada_wrapper import dc3d0wrapper as dc3d0
 from pandas.plotting import register_matplotlib_converters
+multiprocessing.set_start_method('spawn', True)
 register_matplotlib_converters()
 
 # import defaults
@@ -193,12 +196,16 @@ class Network():
         json.dump(net_arch, open(path, mode='w'), indent=2)
 
     def fit(self, ts_description, model_list=None, solver=config.get('fit', 'solver'), **kw_args):
+        if isinstance(solver, str):
+            solver = globals()[solver]
+        assert callable(solver)
+        # TODO check if bug has been resolved
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(stat, ts_description, model_list, solver, kw_args) for stat in self.stations.values()]
+            iterable_inputs = ((stat, ts_description, model_list, solver, kw_args) for stat in self.stations.values())
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                fit_output = list(tqdm(p.imap(self._fit_single_station, iterable_inputs), ascii=True, desc="Fitting station models", total=len(iterable_inputs), unit="station"))
+                fit_output = list(tqdm(p.imap(self._fit_single_station, iterable_inputs), ascii=True, desc="Fitting station models", total=len(self.stations), unit="station"))
             # redistribute results
             for i, stat in enumerate(self.stations.values()):
                 for model_description, (params, covs) in fit_output[i].items():
@@ -213,16 +220,17 @@ class Network():
     @staticmethod
     def _fit_single_station(parameter_tuple):
         station, ts_description, model_list, solver, kw_args = parameter_tuple
-        fitted_params = globals()[solver](station.timeseries[ts_description], station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list}, **kw_args)
+        fitted_params = solver(station.timeseries[ts_description], station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list}, **kw_args)
         return fitted_params
 
     def evaluate(self, ts_description, model_list=None, timevector=None):
+        # TODO check if bug has been resolved
         if "num_threads" in config.options("general"):
             # collect station calls
-            iterable_inputs = [(stat, ts_description, model_list, timevector) for stat in self.stations.values()]
+            iterable_inputs = ((stat, ts_description, model_list, timevector) for stat in self.stations.values())
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                eval_output = list(tqdm(p.imap(self._evaluate_single_station, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(iterable_inputs), unit="station"))
+                eval_output = list(tqdm(p.imap(self._evaluate_single_station, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(self.stations), unit="station"))
             # redistribute results
             for i, stat in enumerate(self.stations.values()):
                 stat_fits = eval_output[i]
@@ -249,7 +257,7 @@ class Network():
             iterable_inputs = ((func, stat, ts_in, kw_args) for stat in self.stations.values())
             # start multiprocessing pool
             with Pool(config.getint("general", "num_threads")) as p:
-                ts_return = list(tqdm(p.imap(self._single_call_func_ts_return, iterable_inputs), ascii=True, desc="Processing station timeseries with {:s}".format(func.__name__), total=len(iterable_inputs), unit="station"))
+                ts_return = list(tqdm(p.imap(self._single_call_func_ts_return, iterable_inputs), ascii=True, desc="Processing station timeseries with {:s}".format(func.__name__), total=len(self.stations), unit="station"))
             # redistribute results
             for i, stat in enumerate(self.stations.values()):
                 stat.add_timeseries(ts_in if ts_out is None else ts_out, ts_return[i])
@@ -1169,9 +1177,41 @@ def dmultr(mat, dvec):
     return res
 
 
+def _okada_get_displacements(station_and_parameters):
+    # unpack inputs
+    stations, eq = station_and_parameters
+    # rotate from relative lat, lon, alt to xyz
+    strike_rad = eq['strike']*np.pi/180
+    R = np.array([[np.cos(strike_rad),  np.sin(strike_rad), 0],
+                  [np.sin(strike_rad), -np.cos(strike_rad), 0],
+                  [0, 0, 1]])
+    stations = stations @ R
+    # get displacements in xyz-frame
+    disp = np.zeros_like(stations)
+    for i in range(stations.shape[0]):
+        success, u, grad_u = dc3d0(eq['alpha'], stations[i, :], eq['depth'], eq['dip'], eq['potency'])
+        if success == 0:
+            disp[i, :] = u / 10**12  # output is now in mm
+        else:
+            Warning("success = {:d} for station {:d}".format(success, i))
+    # transform back to lat, lon, alt
+    # yes this is the same matrix
+    disp = disp @ R
+    return disp
+
+
+def _okada_get_cumdisp(time_and_station):
+    eq_times, stat_time, station_disp = time_and_station
+    steptimes = []
+    for itime in range(len(stat_time) - 1):
+        disp = station_disp[(eq_times > stat_time[itime]) & (eq_times <= stat_time[itime + 1]), :]
+        cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
+        if cumdisp >= config.getfloat('catalog_prior', 'threshold'):
+            steptimes.append(str(stat_time[itime + 1]))
+    return steptimes
+
+
 def okada_prior(network, catalog_path, target_timeseries=None):
-    # import okada
-    from okada_wrapper import dc3d0wrapper as dc3d0
     stations_lla = np.array([station.location for station in network])
     # convert height from m to km
     stations_lla[:, 2] /= 1000
@@ -1195,57 +1235,40 @@ def okada_prior(network, catalog_path, target_timeseries=None):
                                      'potency': [catalog['Mo(Nm)'][i]/config.getfloat('catalog_prior', 'mu'), 0, 0, 0]})
                   for i in range(n_eq))
 
-    # define function that calculates displacement for all stations
-    def get_displacements(station_and_parameters):
-        # unpack inputs
-        stations, eq = station_and_parameters
-        # rotate from relative lat, lon, alt to xyz
-        strike_rad = eq['strike']*np.pi/180
-        R = np.array([[np.cos(strike_rad),  np.sin(strike_rad), 0],
-                      [np.sin(strike_rad), -np.cos(strike_rad), 0],
-                      [0, 0, 1]])
-        stations = stations @ R
-        # get displacements in xyz-frame
-        disp = np.zeros_like(stations)
-        for i in range(stations.shape[0]):
-            success, u, grad_u = dc3d0(eq['alpha'], stations[i, :], eq['depth'], eq['dip'], eq['potency'])
-            if success == 0:
-                disp[i, :] = u / 10**12  # output is now in mm
-            else:
-                Warning("success = {:d} for station {:d}".format(success, i))
-        # transform back to lat, lon, alt
-        # yes this is the same matrix
-        disp = disp @ R
-        return disp
-
     # compute
     station_disp = np.zeros((n_eq, stations_lla.shape[0], 3))
     if "num_threads" in config.options("general"):
         with Pool(config.getint("general", "num_threads")) as p:
-            results = list(tqdm(p.imap(get_displacements, parameters), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"))
+            results = list(tqdm(p.imap(_okada_get_displacements, parameters, 100), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"))
         for i, r in enumerate(results):
             station_disp[i, :, :] = r
     else:
         for i, param in tqdm(enumerate(parameters), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"):
-            station_disp[i, :, :] = get_displacements(param)
+            station_disp[i, :, :] = _okada_get_displacements(param)
 
     # add steps to station timeseries if they exceed the threshold
     target_timeseries = config.get('catalog_prior', 'timeseries') if target_timeseries is None else target_timeseries
-    for istat, stat_name in tqdm(enumerate(network.stations.keys()), desc="Adding steps where necessary", ascii=True, unit='station', total=len(network.stations)):
-        stat_time = network.stations[stat_name].timeseries[target_timeseries].time.values
-        steptimes = []
-        for itime in range(len(stat_time) - 1):
-            disp = station_disp[(eq_times > stat_time[itime]) & (eq_times <= stat_time[itime + 1]), istat, :]
-            cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
-            if cumdisp >= config.getfloat('catalog_prior', 'threshold'):
-                steptimes.append(str(stat_time[itime + 1]))
-        network.stations[stat_name].add_local_model(target_timeseries, config.get('catalog_prior', 'model'), Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
+    cumdisp_parameters = ((eq_times, network.stations[stat_name].timeseries[target_timeseries].time.values, station_disp[:, istat, :])
+                          for istat, stat_name in enumerate(network.stations.keys()))
+    if "num_threads" in config.options("general"):
+        with Pool(config.getint("general", "num_threads")) as p:
+            results = list(tqdm(p.imap(_okada_get_cumdisp, cumdisp_parameters), ascii=True, total=len(network.stations), desc="Adding steps where necessary", unit="station"))
+        for i, r in enumerate(results):
+            stat_name = list(network.stations.keys())[i]
+            network.stations[stat_name].add_local_model(target_timeseries, config.get('catalog_prior', 'model'),
+                                                        Step(steptimes=r, regularize=config.getboolean('catalog_prior', 'regularize')))
+    else:
+        for i, param in tqdm(enumerate(cumdisp_parameters), desc="Adding steps where necessary", ascii=True, unit='station', total=len(network.stations)):
+            stat_name = list(network.stations.keys())[i]
+            steptimes = _okada_get_cumdisp(param)
+            network.stations[stat_name].add_local_model(target_timeseries, config.get('catalog_prior', 'model'),
+                                                        Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
 
 
 if __name__ == "__main__":
-    net = Network.from_json(path="net_arch.json", add_default_local_models=False)
+    # net = Network.from_json(path="net_arch.json", add_default_local_models=False)
     # net = Network.from_json(path="net_arch_catalog1mm.json")
-    # net = Network.from_json(path="net_arch_lite.json")
+    net = Network.from_json(path="net_arch_boso.json")
     net.call_func_ts_return(median, ts_in='GNSS', ts_out='filtered', kernel_size=7)
     net.call_func_no_return(clean, ts_in='GNSS', reference='filtered', ts_out='clean')
     for station in net:
