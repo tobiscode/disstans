@@ -148,23 +148,23 @@ class Network():
             else:
                 Warning("Skipped station {:s} because location information is missing.".format(station_name))
                 continue
-            stat = Station(name=station_name, location=station_loc)
+            station = Station(name=station_name, location=station_loc)
             # add timeseries to station
             for ts_description, ts_cfg in station_cfg["timeseries"].items():
                 ts = globals()[ts_cfg["type"]](**ts_cfg["kw_args"])
-                stat.add_timeseries(description=ts_description, timeseries=ts)
+                station.add_timeseries(description=ts_description, timeseries=ts)
                 # add default local models to station
                 if add_default_local_models:
                     for model_description, model_cfg in net.default_local_models.items():
                         local_copy = deepcopy(model_cfg)
                         mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
-                        stat.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+                        station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
                 # add specific local models to station
                 for model_description, model_cfg in station_cfg["models"].items():
                     mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-                    stat.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+                    station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
             # add to network
-            net.add_station(name=station_name, station=stat)
+            net.add_station(name=station_name, station=station)
         # add global models
         for model_description, model_cfg in net_arch["global_models"].items():
             mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
@@ -179,8 +179,8 @@ class Network():
                     "default_local_models": self.default_local_models,
                     "global_models": {}}
         # add station representations
-        for stat_name, stat in self.stations.items():
-            stat_arch = stat.get_arch()
+        for stat_name, station in self.stations.items():
+            stat_arch = station.get_arch()
             if stat_arch == {}:
                 continue
             # need to remove all models that are actually default models
@@ -196,76 +196,56 @@ class Network():
         json.dump(net_arch, open(path, mode='w'), indent=2)
 
     def fit(self, ts_description, model_list=None, solver=config.get('fit', 'solver'), **kw_args):
+        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}"
         if isinstance(solver, str):
             solver = globals()[solver]
-        assert callable(solver)
-        # TODO check if bug has been resolved
-        if "num_threads" in config.options("general"):
-            # collect station calls
-            iterable_inputs = ((stat, ts_description, model_list, solver, kw_args) for stat in self.stations.values())
-            # start multiprocessing pool
-            with Pool(config.getint("general", "num_threads")) as p:
-                fit_output = list(tqdm(p.imap(self._fit_single_station, iterable_inputs), ascii=True, desc="Fitting station models", total=len(self.stations), unit="station"))
-            # redistribute results
-            for i, stat in enumerate(self.stations.values()):
-                for model_description, (params, covs) in fit_output[i].items():
-                    stat.models[ts_description][model_description].read_parameters(params, covs)
-        else:
-            # run in serial
-            for name, stat in tqdm(self.stations.items(), desc="Fitting station models", ascii=True, unit="station"):
-                fit_output = self._fit_single_station((stat, ts_description, model_list, solver, kw_args))
-                for model_description, (params, covs) in fit_output.items():
-                    stat.models[ts_description][model_description].read_parameters(params, covs)
+        assert callable(solver), f"'solver' must be a callable function, got {type(solver)}"
+        iterable_inputs = ((station.timeseries[ts_description],
+                            station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list},
+                            solver, kw_args) for station in self.stations.values())
+        station_names = list(self.stations.keys())
+        for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
+                                        desc="Fitting station models", total=len(self.stations), ascii=True, unit="station")):
+            for model_description, (params, covs) in result.items():
+                self[station_names[i]].models[ts_description][model_description].read_parameters(params, covs)
 
     @staticmethod
     def _fit_single_station(parameter_tuple):
-        station, ts_description, model_list, solver, kw_args = parameter_tuple
-        fitted_params = solver(station.timeseries[ts_description], station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list}, **kw_args)
+        station_time, station_models, solver, kw_args = parameter_tuple
+        fitted_params = solver(station_time, station_models, **kw_args)
         return fitted_params
 
     def evaluate(self, ts_description, model_list=None, timevector=None):
-        # TODO check if bug has been resolved
-        if "num_threads" in config.options("general"):
-            # collect station calls
-            iterable_inputs = ((stat, ts_description, model_list, timevector) for stat in self.stations.values())
-            # start multiprocessing pool
-            with Pool(config.getint("general", "num_threads")) as p:
-                eval_output = list(tqdm(p.imap(self._evaluate_single_station, iterable_inputs), ascii=True, desc="Evaluating station models", total=len(self.stations), unit="station"))
-            # redistribute results
-            for i, stat in enumerate(self.stations.values()):
-                stat_fits = eval_output[i]
-                for model_description, fit in stat_fits.items():
-                    stat.add_fit(ts_description, model_description, fit)
-        else:
-            # run in serial
-            for name, stat in tqdm(self.stations.items(), desc="Evaluating station models", ascii=True, unit="station"):
-                stat_fits = self._evaluate_single_station((stat, ts_description, model_list, timevector))
-                for model_description, fit in stat_fits.items():
-                    stat.add_fit(ts_description, model_description, fit)
+        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}"
+        iterable_inputs = ((station.timeseries[ts_description].time if timevector is None else timevector,
+                            station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list})
+                           for station in self.stations.values())
+        station_names = list(self.stations.keys())
+        for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station, iterable_inputs),
+                                        desc="Evaluating station models", total=len(self.stations), ascii=True, unit="station")):
+            for model_description, fit in result.items():
+                self[station_names[i]].add_fit(ts_description, model_description, fit)
 
     @staticmethod
     def _evaluate_single_station(parameter_tuple):
-        station, ts_description, model_list, timevector = parameter_tuple
+        station_time, station_models = parameter_tuple
         fit = {}
-        for model_description, model in station.models[ts_description].items() if model_list is None else {m: station.models[ts_description][m] for m in model_list}.items():
-            fit[model_description] = model.evaluate(station.timeseries[ts_description].time) if timevector is None else model.evaluate(timevector)
+        for model_description, model in station_models.items():
+            fit[model_description] = model.evaluate(station_time)
         return fit
 
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
-        if "num_threads" in config.options("general"):
-            # collect station calls
-            iterable_inputs = ((func, stat, ts_in, kw_args) for stat in self.stations.values())
-            # start multiprocessing pool
-            with Pool(config.getint("general", "num_threads")) as p:
-                ts_return = list(tqdm(p.imap(self._single_call_func_ts_return, iterable_inputs), ascii=True, desc="Processing station timeseries with {:s}".format(func.__name__), total=len(self.stations), unit="station"))
-            # redistribute results
-            for i, stat in enumerate(self.stations.values()):
-                stat.add_timeseries(ts_in if ts_out is None else ts_out, ts_return[i])
+        assert callable(func), f"'func' must be a callable function, got {type(func)}"
+        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}"
+        if ts_out is None:
+            ts_out = ts_in
         else:
-            # run in serial
-            for name, stat in tqdm(self.stations.items(), desc="Processing station timeseries with {:s}".format(func.__name__), ascii=True, unit="station"):
-                ts_return = self._single_call_func_ts_return((func, stat, ts_in, kw_args))
-                stat.add_timeseries(ts_in if ts_out is None else ts_out, ts_return)
+            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}"
+        iterable_inputs = ((func, station, ts_in, kw_args) for station in self.stations.values())
+        station_names = list(self.stations.keys())
+        for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return, iterable_inputs),
+                                        desc="Processing station timeseries with {:s}".format(func.__name__), total=len(self.stations), ascii=True, unit="station")):
+            self[station_names[i]].add_timeseries(ts_out, result)
 
     @staticmethod
     def _single_call_func_ts_return(parameter_tuple):
@@ -274,13 +254,20 @@ class Network():
         return ts_return
 
     def call_netwide_func(self, func, ts_in, ts_out=None, **kw_args):
+        assert callable(func), f"'func' must be a callable function, got {type(func)}"
+        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}"
+        if ts_out is None:
+            ts_out = ts_in
+        else:
+            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}"
         net_in = self.export_network_ts(ts_in)
         net_out = func(net_in, **kw_args)
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
 
     def call_func_no_return(self, func, **kw_args):
-        for name, stat in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func.__name__), ascii=True, unit="station"):
-            func(stat, **kw_args)
+        assert callable(func), f"'func' must be a callable function, got {type(func)}"
+        for name, station in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func.__name__), ascii=True, unit="station"):
+            func(station, **kw_args)
 
     def _create_map_figure(self):
         # get location data and projections
@@ -1177,6 +1164,18 @@ def dmultr(mat, dvec):
     return res
 
 
+def parallelize(func, iterable, num_threads=None, chunksize=1):
+    if num_threads is None:
+        num_threads = config.getint("general", "num_threads", fallback=0)
+    if num_threads > 0:
+        with Pool(num_threads) as p:
+            for result in p.imap(func, iterable, chunksize):
+                yield result
+    else:
+        for parameter in iterable:
+            yield func(parameter)
+
+
 def _okada_get_displacements(station_and_parameters):
     # unpack inputs
     stations, eq = station_and_parameters
@@ -1228,41 +1227,27 @@ def okada_prior(network, catalog_path, target_timeseries=None):
         stations_rel[i][:, 0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[i, 0]*np.pi/180)
         stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
         stations_rel[i][:, 2] = 0
-    # define inputs for the different earthquakes
+
+    # compute station displacements
     parameters = ((stations_rel[i], {'alpha': config.getfloat('catalog_prior', 'alpha'), 'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
                                      'depth': -eq_lla[i, 2], 'strike': float(catalog['Strike'][i].split(';')[0]),
                                      'dip': float(catalog['Dip'][i].split(';')[0]),
                                      'potency': [catalog['Mo(Nm)'][i]/config.getfloat('catalog_prior', 'mu'), 0, 0, 0]})
                   for i in range(n_eq))
-
-    # compute
     station_disp = np.zeros((n_eq, stations_lla.shape[0], 3))
-    if "num_threads" in config.options("general"):
-        with Pool(config.getint("general", "num_threads")) as p:
-            results = list(tqdm(p.imap(_okada_get_displacements, parameters, 100), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"))
-        for i, r in enumerate(results):
-            station_disp[i, :, :] = r
-    else:
-        for i, param in tqdm(enumerate(parameters), ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq"):
-            station_disp[i, :, :] = _okada_get_displacements(param)
+    for i, result in enumerate(tqdm(parallelize(_okada_get_displacements, parameters, chunksize=100),
+                                    ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq")):
+        station_disp[i, :, :] = result
 
     # add steps to station timeseries if they exceed the threshold
     target_timeseries = config.get('catalog_prior', 'timeseries') if target_timeseries is None else target_timeseries
+    station_names = list(network.stations.keys())
     cumdisp_parameters = ((eq_times, network.stations[stat_name].timeseries[target_timeseries].time.values, station_disp[:, istat, :])
-                          for istat, stat_name in enumerate(network.stations.keys()))
-    if "num_threads" in config.options("general"):
-        with Pool(config.getint("general", "num_threads")) as p:
-            results = list(tqdm(p.imap(_okada_get_cumdisp, cumdisp_parameters), ascii=True, total=len(network.stations), desc="Adding steps where necessary", unit="station"))
-        for i, r in enumerate(results):
-            stat_name = list(network.stations.keys())[i]
-            network.stations[stat_name].add_local_model(target_timeseries, config.get('catalog_prior', 'model'),
-                                                        Step(steptimes=r, regularize=config.getboolean('catalog_prior', 'regularize')))
-    else:
-        for i, param in tqdm(enumerate(cumdisp_parameters), desc="Adding steps where necessary", ascii=True, unit='station', total=len(network.stations)):
-            stat_name = list(network.stations.keys())[i]
-            steptimes = _okada_get_cumdisp(param)
-            network.stations[stat_name].add_local_model(target_timeseries, config.get('catalog_prior', 'model'),
-                                                        Step(steptimes=steptimes, regularize=config.getboolean('catalog_prior', 'regularize')))
+                          for istat, stat_name in enumerate(station_names))
+    for i, result in enumerate(tqdm(parallelize(_okada_get_cumdisp, cumdisp_parameters),
+                                    ascii=True, total=len(network.stations), desc="Adding steps where necessary", unit="station")):
+        network.stations[station_names[i]].add_local_model(target_timeseries, config.get('catalog_prior', 'model'),
+                                                           Step(steptimes=result, regularize=config.getboolean('catalog_prior', 'regularize')))
 
 
 if __name__ == "__main__":
