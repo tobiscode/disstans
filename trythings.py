@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import warnings
 import multiprocessing
+import scipy.sparse as sparse
 from copy import deepcopy
 from configparser import ConfigParser
 from tqdm import tqdm
@@ -12,6 +13,17 @@ from multiprocessing import Pool
 from functools import wraps
 from okada_wrapper import dc3d0wrapper as dc3d0
 from pandas.plotting import register_matplotlib_converters
+from sklearn.decomposition import PCA, FastICA
+
+# see if we have compiled_utils
+try:
+    from compiled_utils import maskedmedfilt2d
+except ImportError:
+    COMPILED_UTILS = False
+else:
+    COMPILED_UTILS = True
+
+# preparational steps
 multiprocessing.set_start_method('spawn', True)
 register_matplotlib_converters()
 
@@ -824,18 +836,94 @@ class Model():
     General class that defines what a model can have as an input and output.
     Defaults to a linear model.
     """
-    def __init__(self, num_parameters, regularize=False):
+    def __init__(self, num_parameters, regularize=False, time_unit=None, t_start=None, t_end=None, t_reference=None, zero_before=True, zero_after=True):
         self.num_parameters = num_parameters
-        self.regularize = regularize
         self.is_fitted = False
         self.parameters = None
         self.cov = None
+        self.regularize = regularize
+        self.time_unit = time_unit
+        self._t_start = t_start
+        self._t_end = t_end
+        self._t_reference = t_reference
+        self.t_start = None if t_start is None else pd.Timestamp(t_start)
+        self.t_end = None if t_end is None else pd.Timestamp(t_end)
+        self.t_reference = None if t_reference is None else pd.Timestamp(t_reference)
+        self.zero_before = zero_before
+        self.zero_after = zero_after
 
     def get_arch(self):
-        raise NotImplementedError()
+        # make base architecture
+        arch = {"type": "Model",
+                "num_parameters": self.num_parameters,
+                "kw_args": {"regularize": self.regularize,
+                            "time_unit": self.time_unit,
+                            "t_start": self._t_start,
+                            "t_end": self._t_end,
+                            "t_reference": self._t_reference,
+                            "zero_before": self.zero_before,
+                            "zero_after": self.zero_after}}
+        # get subclass-specific architecture
+        instance_arch = self._get_arch()
+        # update non-dictionary values
+        arch.update({arg: value for arg, value in instance_arch.items() if arg != "kw_args"})
+        # update keyword dictionary
+        arch["kw_args"].update(instance_arch["kw_args"])
+        return arch
+
+    def _get_arch(self):
+        raise NotImplementedError(f"Instantiated model was not subclassed or it does not overwrite the '_get_arch' method.")
 
     def get_mapping(self, timevector):
-        raise NotImplementedError()
+        # get active period and initialize coefficient matrix
+        active, first, last = self._get_active_period(timevector)
+        # if there isn't any active period, return csr-sparse matrix
+        if (first is None) and (last is None):  # this is equivalent to not active.any()
+            mapping = sparse.bsr_matrix((timevector.size, self.num_parameters))
+        # otherwise, build coefficient matrix
+        else:
+            # build dense sub-matrix
+            coefs = self._get_mapping(timevector[active], np.zeros((last - first + 1, self.num_parameters)))
+            # build before- and after-matrices
+            # either use zeros or the values at the active boundaries for padding
+            if self.zero_before:
+                before = sparse.csr_matrix((first, self.num_parameters))
+            else:
+                before = sparse.csr_matrix(np.ones((first, self.num_parameters)) * coefs[0, :].reshape(1, -1))
+            if self.zero_after:
+                after = sparse.csr_matrix((timevector.size - last - 1, self.num_parameters))
+            else:
+                after = sparse.csr_matrix(np.ones((timevector.size - last - 1, self.num_parameters)) * coefs[-1, :].reshape(1, -1))
+            # stack them (they can have 0 in the first dimension, no problem for sparse.vstack)
+            # I think it's faster if to stack them if they're all already csr format
+            mapping = sparse.vstack((before, sparse.csr_matrix(coefs), after), format='bsr')
+        return mapping
+
+    def _get_mapping(self, timevector, coefs):
+        raise NotImplementedError("'Model' needs to be subclassed and its child needs to implement a '_get_mapping' function for the active period.")
+
+    def _get_active_period(self, timevector):
+        if (self.t_start is None) and (self.t_end is None):
+            active = np.ones_like(timevector, dtype=bool)
+        elif self.t_start is None:
+            active = timevector <= self.t_end
+        elif self.t_end is None:
+            active = timevector >= self.t_start
+        else:
+            active = np.all((timevector >= self.t_start, timevector <= self.t_end), axis=0)
+        if active.any():
+            first, last = int(np.argwhere(active)[0]), int(np.argwhere(active)[-1])
+        else:
+            first, last = None, None
+        return active, first, last
+
+    def tvec_to_numpycol(self, timevector):
+        """ Convenience wrapper for tvec_to_numpycol for Model objects that have self.time_unit and self.t_reference attributes. """
+        if self.t_reference is None:
+            raise ValueError(f"Can't call 'tvec_to_numpycol' because no reference time was specified in the model.")
+        if self.time_unit is None:
+            raise ValueError(f"Can't call 'tvec_to_numpycol' because no time unit was specified in the model.")
+        return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
     def read_parameters(self, parameters, cov):
         assert self.num_parameters == parameters.shape[0], "Read-in parameters have different size than the instantiated model."
@@ -858,16 +946,16 @@ class Step(Model):
     """
     Step functions at given times.
     """
-    def __init__(self, steptimes, regularize=False):
-        super().__init__(num_parameters=len(steptimes), regularize=regularize)
+    def __init__(self, steptimes, zero_after=False, **model_kw_args):
+        super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
         self._steptimes = steptimes
         self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
         self.timestamps.sort()
 
-    def get_arch(self):
-        return {"type": "Step",
-                "kw_args": {"steptimes": self._steptimes,
-                            "regularize": self.regularize}}
+    def _get_arch(self):
+        arch = {"type": "Step",
+                "kw_args": {"steptimes": self._steptimes}}
+        return arch
 
     def _update_from_steptimes(self):
         self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
@@ -891,8 +979,8 @@ class Step(Model):
         except ValueError:
             Warning("Step {:s} not present.".format(step))
 
-    def get_mapping(self, timevector):
-        coefs = np.array(timevector.values.reshape(-1, 1) >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(1, -1), dtype=int)
+    def _get_mapping(self, timevector, coefs):
+        coefs = np.array(timevector.values.reshape(-1, 1) >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(1, -1), dtype=float)
         return coefs
 
 
@@ -900,32 +988,27 @@ class Polynomial(Model):
     """
     Polynomial of given order.
 
-    `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
+    `time_unit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
-    def __init__(self, order, starttime=None, timeunit='Y', regularize=False):
-        super().__init__(num_parameters=order + 1, regularize=regularize)
+    def __init__(self, order, zero_before=False, zero_after=False, **model_kw_args):
+        super().__init__(num_parameters=order + 1, zero_before=zero_before, zero_after=zero_after, **model_kw_args)
         self.order = order
-        self.starttime = starttime
-        self.timeunit = timeunit
 
-    def get_arch(self):
-        return {"type": "Polynomial",
-                "kw_args": {"order": self.order,
-                            "starttime": self.starttime,
-                            "timeunit": self.timeunit,
-                            "regularize": self.regularize}}
+    def _get_arch(self):
+        arch = {"type": "Polynomial",
+                "kw_args": {"order": self.order}}
+        return arch
 
-    def get_mapping(self, timevector):
-        # timevector as a Numpy column vector relative to starttime in the desired unit
-        dt = tvec_to_numpycol(timevector, starttime=self.starttime, timeunit=self.timeunit)
-        # create Numpy-style 2-D array of coefficients
-        coefs = np.ones((timevector.size, self.order + 1))
+    def _get_mapping(self, timevector, coefs):
+        coefs[:, 0] = 1
         if self.order >= 1:
+            # now we actually need the time
+            dt = self.tvec_to_numpycol(timevector)
             # the exponents increase by column
-            exponents = np.arange(1, self.order + 1).reshape(1, -1)
+            exponents = np.arange(1, self.order + 1)
             # broadcast to all coefficients
-            coefs[:, 1:] = dt ** exponents
+            coefs[:, 1:] = dt.reshape(-1, 1) ** exponents.reshape(1, -1)
         return coefs
 
 
@@ -933,28 +1016,23 @@ class Sinusoidal(Model):
     """
     Sinusoidal of given frequency. Estimates amplitude and phase.
 
-    `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
+    `time_unit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
-    def __init__(self, period, starttime=None, timeunit='Y', regularize=False):
-        super().__init__(num_parameters=2, regularize=regularize)
+    def __init__(self, period, **model_kw_args):
+        super().__init__(num_parameters=2, **model_kw_args)
         self.period = period
-        self.starttime = starttime
-        self.timeunit = timeunit
 
-    def get_arch(self):
-        return {"type": "Sinusoidal",
-                "kw_args": {"period": self.period,
-                            "starttime": self.starttime,
-                            "timeunit": self.timeunit,
-                            "regularize": self.regularize}}
+    def _get_arch(self):
+        arch = {"type": "Sinusoidal",
+                "kw_args": {"period": self.period}}
+        return arch
 
-    def get_mapping(self, timevector):
-        # timevector as a Numpy column vector relative to starttime in the desired unit
-        dt = tvec_to_numpycol(timevector, starttime=self.starttime, timeunit=self.timeunit)
-        # create Numpy-style 2-D array of coefficients
+    def _get_mapping(self, timevector, coefs):
+        dt = self.tvec_to_numpycol(timevector)
         phase = 2*np.pi * dt / self.period
-        coefs = np.concatenate([np.sin(phase), np.cos(phase)], axis=1)
+        coefs[:, 0] = np.sin(phase)
+        coefs[:, 1] = np.cos(phase)
         return coefs
 
     @property
@@ -972,33 +1050,31 @@ class Sinusoidal(Model):
 
 class Logarithmic(Model):
     """
-    Geophiscal logarithmic `ln(1 + dt/tau)` with a given time constant and time window.
+    Geophysical logarithmic `ln(1 + dt/tau)` with a given time constant and time window.
     """
-    def __init__(self, tau, starttime=None, endtime=None, timeunit='Y', regularize=False):
-        super().__init__(num_parameters=1, regularize=regularize)
+    def __init__(self, tau, **model_kw_args):
+        super().__init__(num_parameters=1, **model_kw_args)
+        if self.t_reference is None:
+            Warning("No 't_reference' set for Logarithmic model, using 't_start' for it.")
+            self._t_reference = self._t_start
+            self.t_reference = self.t_start
+        elif self.t_start is None:
+            Warning("No 't_start' set for Logarithmic model, using 't_reference' for it.")
+            self._t_start = self._t_reference
+            self.t_start = self.t_reference
+        else:
+            assert self.t_reference <= self.t_start, \
+                f"Logarithmic model has to have valid bounds, but the reference time {self._t_reference} is after the start time {self._t_start}."
         self.tau = tau
-        self.starttime = starttime
-        self.endtime = endtime
-        self.timeunit = timeunit
 
-    def get_arch(self):
-        return {"type": "Logarithmic",
-                "kw_args": {"tau": self.tau,
-                            "starttime": self.starttime,
-                            "endtime": self.endtime,
-                            "timeunit": self.timeunit,
-                            "regularize": self.regularize}}
+    def _get_arch(self):
+        arch = {"type": "Logarithmic",
+                "kw_args": {"tau": self.tau}}
+        return arch
 
-    def get_mapping(self, timevector):
-        dt = tvec_to_numpycol(timevector, starttime=self.starttime, timeunit=self.timeunit)
-        endtime = timevector[-1] if self.endtime is None else pd.Timestamp(self.endtime)
-        slice_middle = np.all((dt.squeeze() > 0, timevector < endtime), axis=0)
-        slice_end = np.all((dt.squeeze() > 0, timevector >= endtime), axis=0)
-        coefs = np.zeros_like(dt)
-        if slice_middle.any():
-            coefs[slice_middle] = np.log1p(dt[slice_middle] / self.tau)
-        if slice_end.any():
-            coefs[slice_end] = np.log1p(dt[slice_end][0] / self.tau)
+    def _get_mapping(self, timevector, coefs):
+        dt = self.tvec_to_numpycol(timevector)
+        coefs[:, 0] = np.log1p(dt / self.tau)
         return coefs
 
 
@@ -1059,11 +1135,10 @@ def median(array, kernel_size):
     either by calling a Numpy function iteratively or by using
     the precompiled Fortran code.
     """
-    try:
-        from compiled_utils import maskedmedfilt2d
+    if COMPILED_UTILS:
         filtered = maskedmedfilt2d(array, ~np.isnan(array), kernel_size)
         filtered[np.isnan(array)] = np.NaN
-    except ImportError:
+    else:
         num_obs = array.shape[0]
         array = array.reshape(num_obs, 1 if array.ndim == 1 else -1)
         filtered = np.NaN * np.empty(array.shape)
@@ -1100,10 +1175,8 @@ def common_mode(array, method, n_components=1, plot=False):
         array[array_nanind[:, icol], icol] = array_nansd[icol] * np.random.randn(array_nanind[:, icol].sum()) + array_nanmean[icol]
     # decompose using the specified solver
     if method == 'pca':
-        from sklearn.decomposition import PCA
         decomposer = PCA(n_components=n_components, whiten=True)
     elif method == 'ica':
-        from sklearn.decomposition import FastICA
         decomposer = FastICA(n_components=n_components, whiten=True)
     else:
         raise NotImplementedError(f"Cannot estimate the common mode error using the '{method}' method.")
@@ -1177,22 +1250,23 @@ def linear_regression(ts, models, formal_covariance=config.getboolean('fit', 'fo
     # get mapping matrices
     for (mdl_description, model) in models.items():
         mapping_matrices.append(model.get_mapping(ts.time))
-    mapping_matrices = np.hstack(mapping_matrices)
-    num_time, num_params = mapping_matrices.shape
+    G = sparse.hstack(mapping_matrices)
+    num_time, num_params = G.shape
     num_components = len(ts.data_cols)
     # perform fit and estimate formal covariance (uncertainty) of parameters
     params = np.zeros((num_params, num_components))
     if formal_covariance:
         cov = np.zeros((num_params, num_params, num_components))
     for i in range(num_components):
+        d = sparse.csc_matrix(ts.df[ts.data_cols[i]].values.reshape(-1, 1))
         if ts.sigma_cols[i] is None:
-            GtWG = mapping_matrices.T @ mapping_matrices
-            GtWd = mapping_matrices.T @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+            GtWG = G.T @ G
+            GtWd = G.T @ d
         else:
-            GtW = dmultr(mapping_matrices.T, 1/ts.df[ts.sigma_cols[i]].values**2)
-            GtWG = GtW @ mapping_matrices
-            GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
-        params[:, i] = np.linalg.lstsq(GtWG, GtWd, rcond=None)[0].squeeze()
+            GtW = G.T @ sparse.diags(1/ts.df[ts.sigma_cols[i]].values**2)
+            GtWG = GtW @ G
+            GtWd = GtW @ d
+        params[:, i] = sparse.linalg.lsqr(GtWG, GtWd.toarray().squeeze())[0].squeeze()
         if formal_covariance:
             cov[:, :, i] = np.linalg.pinv(GtWG)
     # separate parameters back to models
@@ -1208,15 +1282,14 @@ def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty'), f
     """
     numpy.linalg wrapper for a linear L2-regularized least squares solver
     """
-    from scipy.sparse import diags
     mapping_matrices = []
     reg_diag = []
     # get mapping and regularization matrices
     for (mdl_description, model) in models.items():
         mapping_matrices.append(model.get_mapping(ts.time))
         reg_diag.extend([model.regularize for _ in range(model.num_parameters)])
-    G = np.hstack(mapping_matrices)
-    reg = diags(reg_diag, dtype=float) * penalty
+    G = sparse.hstack(mapping_matrices, format='bsr')
+    reg = sparse.diags(reg_diag, dtype=float) * penalty
     num_time, num_params = G.shape
     num_components = len(ts.data_cols)
     # perform fit and estimate formal covariance (uncertainty) of parameters
@@ -1224,17 +1297,18 @@ def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty'), f
     if formal_covariance:
         cov = np.zeros((num_params, num_params, num_components))
     for i in range(num_components):
+        d = sparse.csc_matrix(ts.df[ts.data_cols[i]].values.reshape(-1, 1))
         if ts.sigma_cols[i] is None:
             GtWG = G.T @ G
-            GtWd = G.T @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+            GtWd = G.T @ d
         else:
-            GtW = dmultr(G.T, 1/ts.df[ts.sigma_cols[i]].values**2)
+            GtW = G.T @ sparse.diags(1/ts.df[ts.sigma_cols[i]].values**2)
             GtWG = GtW @ G
-            GtWd = GtW @ ts.df[ts.data_cols[i]].values.reshape(-1, 1)
+            GtWd = GtW @ d
         GtWGreg = GtWG + reg
-        params[:, i] = np.linalg.lstsq(GtWGreg, GtWd, rcond=None)[0].squeeze()
+        params[:, i] = sparse.linalg.lsqr(GtWGreg, GtWd.toarray().squeeze())[0].squeeze()
         if formal_covariance:
-            cov[:, :, i] = np.linalg.pinv(GtWGreg)
+            cov[:, :, i] = np.linalg.pinv(GtWGreg.toarray())
     # separate parameters back to models
     i = 0
     fitted_params = {}
@@ -1244,14 +1318,14 @@ def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty'), f
     return fitted_params
 
 
-def tvec_to_numpycol(timevector, starttime=None, timeunit='D'):
+def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     # get reference time
-    if starttime is None:
-        starttime = timevector[0]
+    if t_reference is None:
+        t_reference = timevector[0]
     else:
-        starttime = pd.Timestamp(starttime)
-    # return Numpy column vector
-    return ((timevector - starttime) / np.timedelta64(1, timeunit)).values.reshape(-1, 1)
+        assert isinstance(t_reference, pd.Timestamp), f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
+    # return Numpy array
+    return ((timevector - t_reference) / np.timedelta64(1, time_unit)).values
 
 
 def dmultl(dvec, mat):
@@ -1391,7 +1465,7 @@ if __name__ == "__main__":
     net.add_default_local_models('final')
     # okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
     net.add_unused_local_models('final')
-    net.fit("final", solver="ridge_regression", penalty=10, formal_covariance=False)
+    net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
     net.evaluate("final", output_description="model")
     for i, station in enumerate(net):
         station.add_timeseries('residual', station['final'] - station['model'],
