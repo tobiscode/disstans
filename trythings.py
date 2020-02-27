@@ -159,10 +159,14 @@ class Network():
                         local_copy = deepcopy(model_cfg)
                         mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
                         station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
-                # add specific local models to station
-                for model_description, model_cfg in station_cfg["models"].items():
-                    mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
-                    station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+            # add specific local models to station and timeseries
+            for ts_description, ts_model_dict in station_cfg["models"].items():
+                if ts_description in station.timeseries:
+                    for model_description, model_cfg in ts_model_dict.items():
+                        mdl = globals()[model_cfg["type"]](**model_cfg["kw_args"])
+                        station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+                else:
+                    station._unused_models.update({ts_description: ts_model_dict})
             # add to network
             net.add_station(name=station_name, station=station)
         # add global models
@@ -185,21 +189,59 @@ class Network():
                 continue
             # need to remove all models that are actually default models
             for mdl_description, mdl in self.default_local_models.items():
-                if (mdl_description in stat_arch["models"].keys()) and (mdl == stat_arch["models"][mdl_description]):
-                    del stat_arch["models"][mdl_description]
+                for ts_description in stat_arch["models"]:
+                    if (mdl_description in stat_arch["models"][ts_description].keys()) and (mdl == stat_arch["models"][ts_description][mdl_description]):
+                        del stat_arch["models"][ts_description][mdl_description]
             # now we can append it to the main json
             net_arch["stations"].update({stat_name: stat_arch})
         # add global model representations
         for mdl_description, mdl in self.global_models.items():
             net_arch["global_models"].update({mdl_description: mdl.get_arch()})
         # write file
-        json.dump(net_arch, open(path, mode='w'), indent=2)
+        json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
+
+    def add_default_local_models(self, ts_description, models=None):
+        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
+        if models is None:
+            local_models_subset = net.default_local_models
+        else:
+            if not isinstance(models, str) or not (isinstance(models, list) and all([isinstance(m, str) for m in models])):
+                raise ValueError(f"'models' must be None, a string or a list of strings, got {models}.")
+            if isinstance(models, str):
+                models = [models]
+            local_models_subset = {name: model for name, model in net.default_local_models.items() if name in models}
+        for station in self:
+            for model_description, model_cfg in local_models_subset.items():
+                local_copy = deepcopy(model_cfg)
+                mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
+                station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+
+    def add_unused_local_models(self, target_ts, hidden_ts=None, models=None):
+        assert isinstance(target_ts, str), f"'target_ts' must be string, got {type(target_ts)}."
+        if hidden_ts is None:
+            hidden_ts = target_ts
+        else:
+            assert isinstance(hidden_ts, str), f"'hidden_ts' must be None or a string, got {type(hidden_ts)}."
+        assert models is None or isinstance(models, str) or (isinstance(models, list) and all([isinstance(m, str) for m in models])), \
+            f"'models' must be None, a string or a list of strings, got {models}."
+        if isinstance(models, str):
+            models = [models]
+        for station in self:
+            if hidden_ts in station._unused_models:
+                if models is None:
+                    local_models_subset = station._unused_models[hidden_ts]
+                else:
+                    local_models_subset = {name: model for name, model in net.default_local_models.items() if name in models}
+                for model_description, model_cfg in local_models_subset.items():
+                    local_copy = deepcopy(model_cfg)
+                    mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
+                    station.add_local_model(ts_description=target_ts, model_description=model_description, model=mdl)
 
     def fit(self, ts_description, model_list=None, solver=config.get('fit', 'solver'), **kw_args):
-        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}"
+        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if isinstance(solver, str):
             solver = globals()[solver]
-        assert callable(solver), f"'solver' must be a callable function, got {type(solver)}"
+        assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
         iterable_inputs = ((station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list},
                             solver, kw_args) for station in self.stations.values())
@@ -216,7 +258,7 @@ class Network():
         return fitted_params
 
     def evaluate(self, ts_description, model_list=None, timevector=None):
-        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}"
+        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         iterable_inputs = ((station.timeseries[ts_description].time if timevector is None else timevector,
                             station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list})
                            for station in self.stations.values())
@@ -235,12 +277,12 @@ class Network():
         return fit
 
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
-        assert callable(func), f"'func' must be a callable function, got {type(func)}"
-        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}"
+        assert callable(func), f"'func' must be a callable function, got {type(func)}."
+        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}."
         if ts_out is None:
             ts_out = ts_in
         else:
-            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}"
+            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}."
         iterable_inputs = ((func, station, ts_in, kw_args) for station in self.stations.values())
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return, iterable_inputs),
@@ -254,18 +296,18 @@ class Network():
         return ts_return
 
     def call_netwide_func(self, func, ts_in, ts_out=None, **kw_args):
-        assert callable(func), f"'func' must be a callable function, got {type(func)}"
-        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}"
+        assert callable(func), f"'func' must be a callable function, got {type(func)}."
+        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}."
         if ts_out is None:
             ts_out = ts_in
         else:
-            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}"
+            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}."
         net_in = self.export_network_ts(ts_in)
         net_out = func(net_in, **kw_args)
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
 
     def call_func_no_return(self, func, **kw_args):
-        assert callable(func), f"'func' must be a callable function, got {type(func)}"
+        assert callable(func), f"'func' must be a callable function, got {type(func)}."
         for name, station in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func.__name__), ascii=True, unit="station"):
             func(station, **kw_args)
 
@@ -332,7 +374,7 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, verbose=False):
+    def gui(self, timeseries=None, verbose=False):
         # create map and timeseries figures
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons = self._create_map_figure()
         fig_ts = plt.figure()
@@ -343,21 +385,23 @@ class Network():
             click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata, src_crs=proj_gui)
             station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2 + (np.array(stat_lons) - click_lon)**2))
             station_name = list(self.stations.keys())[station_index]
+            if verbose:
+                print(self.stations[station_name])
             highlight_station_colors = default_station_colors.copy()
             highlight_station_colors[station_index] = 'r'
             stat_points.set_facecolor(highlight_station_colors)
             fig_map.canvas.draw_idle()
-            # get components and check if they have uncertainties
+            # get components
+            ts_to_plot = {ts_description: ts for ts_description, ts in self.stations[station_name].timeseries.items()
+                          if (timeseries is None) or (ts_description in timeseries)}
             n_components = 0
-            for ts in self.stations[station_name].timeseries.values():
+            for ts in ts_to_plot.values():
                 n_components += len(ts.data_cols)
-            if verbose:
-                print(self.stations[station_name])
             # clear figure and add data
             fig_ts.clear()
             icomp = 0
             ax_ts = []
-            for its, (ts_description, ts) in enumerate(self.stations[station_name].timeseries.items()):
+            for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
                 for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
                     # add axis
                     ax = fig_ts.add_subplot(n_components, 1, icomp + 1, sharex=None if icomp == 0 else ax_ts[0])
@@ -398,6 +442,7 @@ class Station():
         self.location = location
         self.timeseries = {}
         self.models = {}
+        self._unused_models = {}
         self.fits = {}
 
     def __repr__(self):
@@ -429,14 +474,18 @@ class Station():
 
     def get_arch(self):
         # create empty dictionary
-        stat_arch = {"timeseries": {},
+        stat_arch = {"location": self.location,
+                     "timeseries": {},
                      "models": {}}
         # add each timeseries and model
         for ts_description, ts in self.timeseries.items():
-            stat_arch["timeseries"].update({ts_description: ts.get_arch()})
-        # currently, all models are applied to all timeseries, therefore we can just export the last one
-        for mdl_description, mdl in self.models[ts_description].items():
-            stat_arch["models"].update({mdl_description: mdl.get_arch()})
+            ts_arch = ts.get_arch()
+            if ts_arch != {}:
+                stat_arch["timeseries"].update({ts_description: ts_arch})
+            if len(self.models[ts_description]) > 0:
+                stat_arch["models"][ts_description] = {}
+                for mdl_description, mdl in self.models[ts_description].items():
+                    stat_arch["models"][ts_description].update({mdl_description: mdl.get_arch()})
         return stat_arch
 
     def add_timeseries(self, description, timeseries, override_src=None, override_data_unit=None, override_data_cols=None, override_sigma_cols=None, add_models=None):
@@ -813,7 +862,7 @@ class Polynomial(Model):
     `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
-    def __init__(self, order=1, starttime=None, timeunit='Y', regularize=False):
+    def __init__(self, order, starttime=None, timeunit='Y', regularize=False):
         super().__init__(num_parameters=order + 1, regularize=regularize)
         self.order = order
         self.starttime = starttime
@@ -846,7 +895,7 @@ class Sinusoidal(Model):
     `timeunit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
         `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
     """
-    def __init__(self, period=1, starttime=None, timeunit='Y', regularize=False):
+    def __init__(self, period, starttime=None, timeunit='Y', regularize=False):
         super().__init__(num_parameters=2, regularize=regularize)
         self.period = period
         self.starttime = starttime
@@ -878,6 +927,38 @@ class Sinusoidal(Model):
         if not self.is_fitted:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         return np.arctan2(self.parameters[1], self.parameters[0])
+
+
+class Logarithmic(Model):
+    """
+    Geophiscal logarithmic `ln(1 + dt/tau)` with a given time constant and time window.
+    """
+    def __init__(self, tau, starttime=None, endtime=None, timeunit='Y', regularize=False):
+        super().__init__(num_parameters=1, regularize=regularize)
+        self.tau = tau
+        self.starttime = starttime
+        self.endtime = endtime
+        self.timeunit = timeunit
+
+    def get_arch(self):
+        return {"type": "Logarithmic",
+                "kw_args": {"tau": self.tau,
+                            "starttime": self.starttime,
+                            "endtime": self.endtime,
+                            "timeunit": self.timeunit,
+                            "regularize": self.regularize}}
+
+    def get_mapping(self, timevector):
+        dt = tvec_to_numpycol(timevector, starttime=self.starttime, timeunit=self.timeunit)
+        endtime = timevector[-1] if self.endtime is None else pd.Timestamp(self.endtime)
+        slice_middle = np.all((dt.squeeze() > 0, timevector < endtime), axis=0)
+        slice_end = np.all((dt.squeeze() > 0, timevector >= endtime), axis=0)
+        coefs = np.zeros_like(dt)
+        if slice_middle.any():
+            coefs[slice_middle] = np.log1p(dt[slice_middle] / self.tau)
+        if slice_end.any():
+            coefs[slice_end] = np.log1p(dt[slice_end][0] / self.tau)
+        return coefs
 
 
 def unwrap_dict_and_ts(func):
@@ -1206,7 +1287,7 @@ def _okada_get_cumdisp(time_and_station):
         disp = station_disp[(eq_times > stat_time[itime]) & (eq_times <= stat_time[itime + 1]), :]
         cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
         if cumdisp >= config.getfloat('catalog_prior', 'threshold'):
-            steptimes.append(str(stat_time[itime + 1]))
+            steptimes.append(str(stat_time[itime]))
     return steptimes
 
 
@@ -1253,7 +1334,7 @@ def okada_prior(network, catalog_path, target_timeseries=None):
 if __name__ == "__main__":
     # net = Network.from_json(path="net_arch.json", add_default_local_models=False)
     # net = Network.from_json(path="net_arch_catalog1mm.json")
-    net = Network.from_json(path="net_arch_boso.json")
+    net = Network.from_json(path="net_arch_boso_okada3mm.json", add_default_local_models=False)
     net.call_func_ts_return(median, ts_in='GNSS', ts_out='filtered', kernel_size=7)
     net.call_func_no_return(clean, ts_in='GNSS', reference='filtered', ts_out='clean')
     for station in net:
@@ -1266,8 +1347,10 @@ if __name__ == "__main__":
         station.add_timeseries('final', station['clean'] - station['common'],
                                override_data_cols=['east', 'north', 'up'], add_models=net.default_local_models)
         del station['common']
-    okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
-    net.fit("final", solver="ridge_regression", penalty=1e2, formal_covariance=False)
+    net.add_default_local_models('final')
+    # okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
+    net.add_unused_local_models('final')
+    net.fit("final", solver="ridge_regression", penalty=10, formal_covariance=False)
     net.evaluate("final")
     net.to_json(path="arch_out.json")
     net.gui()
