@@ -244,7 +244,7 @@ class Network():
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
         iterable_inputs = ((station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list},
-                            solver, kw_args) for station in self.stations.values())
+                            solver, kw_args) for station in self)
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
                                         desc="Fitting station models", total=len(self.stations), ascii=True, unit="station")):
@@ -257,16 +257,29 @@ class Network():
         fitted_params = solver(station_time, station_models, **kw_args)
         return fitted_params
 
-    def evaluate(self, ts_description, model_list=None, timevector=None):
+    def evaluate(self, ts_description, model_list=None, timevector=None, output_description=None):
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
+        if output_description is not None:
+            assert isinstance(output_description, str), f"'output_description' must be a string, got {type(output_description)}."
         iterable_inputs = ((station.timeseries[ts_description].time if timevector is None else timevector,
                             station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list})
-                           for station in self.stations.values())
+                           for station in self)
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station, iterable_inputs),
                                         desc="Evaluating station models", total=len(self.stations), ascii=True, unit="station")):
-            for model_description, fit in result.items():
-                self[station_names[i]].add_fit(ts_description, model_description, fit)
+            station = station_names[i]
+            if output_description is None:
+                for model_description, fit in result.items():
+                    self[station].add_fit(ts_description, model_description, fit)
+            else:
+                ts_list = []
+                for model_description, fit in result.items():
+                    ts = self[station].add_fit(ts_description, model_description, fit)
+                    ts_list.append(ts)
+                output_ts = ts_list[0]
+                for its in range(1, len(ts_list)):
+                    output_ts = output_ts + ts_list[its]
+                self[station].add_timeseries(output_description, output_ts, override_src='model', override_data_cols=self[station][ts_description].data_cols)
 
     @staticmethod
     def _evaluate_single_station(parameter_tuple):
@@ -283,7 +296,7 @@ class Network():
             ts_out = ts_in
         else:
             assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}."
-        iterable_inputs = ((func, station, ts_in, kw_args) for station in self.stations.values())
+        iterable_inputs = ((func, station, ts_in, kw_args) for station in self)
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return, iterable_inputs),
                                         desc="Processing station timeseries with {:s}".format(func.__name__), total=len(self.stations), ascii=True, unit="station")):
@@ -321,7 +334,7 @@ class Network():
         fig_map = plt.figure()
         ax_map = fig_map.add_subplot(projection=proj_gui)
         default_station_colors = ['b'] * len(stat_lats)
-        stat_points = ax_map.scatter(stat_lons, stat_lats, linestyle='None', marker='.', transform=proj_lla, facecolor=default_station_colors)
+        stat_points = ax_map.scatter(stat_lons, stat_lats, linestyle='None', marker='.', transform=proj_lla, facecolor=default_station_colors, zorder=1000)
         # create underlay
         map_underlay = False
         if "wmts_server" in config.options("gui"):
@@ -363,8 +376,8 @@ class Network():
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0], latlonenu[:, 2], np.zeros_like(latlonenu[:, 2]), units='xy', transform=proj_lla)
         else:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0], latlonenu[:, 2], latlonenu[:, 3], units='xy', transform=proj_lla)
-        key_length = int(np.around(np.median(np.sqrt(np.sum(np.atleast_2d(latlonenu[:, 2:2 + ndim_max2]**2), axis=1)))))
-        ax_map.quiverkey(quiv, 0.9, 0.9, key_length, f"{key_length:d} {model[comps[0]].data_unit:s}")
+        key_length = np.median(np.sqrt(np.sum(np.atleast_2d(latlonenu[:, 2:2 + ndim_max2]**2), axis=1)))
+        ax_map.quiverkey(quiv, 0.9, 0.9, key_length, f"{key_length:.2e} {model[comps[0]].data_unit:s}", coordinates="figure")
         # make timeseries figure
         fig_ts, ax_ts = plt.subplots(nrows=len(temporal), sharex=True)
         for icomp, (comp, ts) in enumerate(temporal.items()):
@@ -374,7 +387,7 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, timeseries=None, verbose=False):
+    def gui(self, timeseries=None, verbose=False, **analyze_kw_args):
         # create map and timeseries figures
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons = self._create_map_figure()
         fig_ts = plt.figure()
@@ -392,11 +405,13 @@ class Network():
             stat_points.set_facecolor(highlight_station_colors)
             fig_map.canvas.draw_idle()
             # get components
-            ts_to_plot = {ts_description: ts for ts_description, ts in self.stations[station_name].timeseries.items()
+            ts_to_plot = {ts_description: ts for ts_description, ts in self[station_name].timeseries.items()
                           if (timeseries is None) or (ts_description in timeseries)}
             n_components = 0
-            for ts in ts_to_plot.values():
-                n_components += len(ts.data_cols)
+            for ts_desc, ts in ts_to_plot.items():
+                n_components += ts.num_components
+                if len(analyze_kw_args) > 0:
+                    self.stations[station_name].analyze_residuals(ts_desc, **analyze_kw_args)
             # clear figure and add data
             fig_ts.clear()
             icomp = 0
@@ -411,9 +426,9 @@ class Network():
                                         ts.df[data_col] - config.getfloat("gui", "plot_sigmas") * ts.df[sigma_col], facecolor='gray',
                                         alpha=config.getfloat("gui", "plot_sigmas_alpha"), linewidth=0)
                     # plot data
-                    ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data")
+                    ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data" if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
-                    for (mdl_description, fit) in self.stations[station_name].fits[ts_description].items():
+                    for (mdl_description, fit) in self[station_name].fits[ts_description].items():
                         if fit.sigma_cols[icol] is not None and "plot_sigmas" in config.options("gui"):
                             ax.fill_between(fit.time, fit.df[fit.data_cols[icol]] + config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
                                             fit.df[fit.data_cols[icol]] - config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
@@ -421,7 +436,8 @@ class Network():
                         ax.plot(fit.time, fit.df[fit.data_cols[icol]], label=mdl_description)
                     ax.set_ylabel("{:s}\n{:s} [{:s}]".format(ts_description, data_col, ts.data_unit))
                     ax.grid()
-                    ax.legend()
+                    if len(self[station_name].fits[ts_description]) > 0:
+                        ax.legend()
                     ax_ts.append(ax)
                     icomp += 1
             ax_ts[0].set_title(station_name)
@@ -467,6 +483,10 @@ class Station():
 
     def __delitem__(self, description):
         self.remove_timeseries(description)
+
+    def __iter__(self):
+        for ts in self.timeseries.values():
+            yield ts
 
     @property
     def ts(self):
@@ -555,6 +575,7 @@ class Station():
         data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
         self.fits[ts_description].update({model_description: fit_ts})
+        return fit_ts
 
     def remove_fit(self, ts_description, model_description, fit):
         if ts_description not in self.timeseries:
@@ -565,6 +586,26 @@ class Station():
             Warning("Station {:s}, timeseries {:s}: Cannot find fit for local model {:s}, couldn't delete".format(self.name, ts_description, model_description))
         else:
             del self.fits[ts_description][model_description]
+
+    def analyze_residuals(self, ts_description, mean=False, std=False, n_observations=False, std_outlier=0):
+        assert isinstance(ts_description, str), f"Station {self.name}: 'ts_description' needs to be a string, got {type(ts_description)}."
+        assert ts_description in self.timeseries, f"Station {self.name}: Can't find {ts_description} to analyze."
+        print()
+        results = {}
+        if mean:
+            results["Mean"] = self[ts_description].data.mean(axis=0, skipna=True, numeric_only=True).values
+        if std:
+            results["Standard Deviation"] = self[ts_description].data.std(axis=0, skipna=True, numeric_only=True).values
+        if n_observations:
+            results["Observations"] = self[ts_description].data.count(axis=0, numeric_only=True).values
+            results["Gaps"] = self[ts_description].num_observations - results["Observations"]
+        if std_outlier > 0:
+            temp = self[ts_description].data.values
+            temp[np.isnan(temp)] = 0
+            temp -= np.mean(temp, axis=0, keepdims=True)
+            temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
+            results["Outliers"] = np.sum(temp, axis=0, dtype=int)
+        print(pd.DataFrame(data=results, index=self[ts_description].data_cols).rename_axis(f"{self.name}: {ts_description}", axis=1))
 
 
 class Timeseries():
@@ -1345,12 +1386,15 @@ if __name__ == "__main__":
     for station in net:
         del station['residual']
         station.add_timeseries('final', station['clean'] - station['common'],
-                               override_data_cols=['east', 'north', 'up'], add_models=net.default_local_models)
+                               override_data_cols=station['GNSS'].data_cols, add_models=net.default_local_models)
         del station['common']
     net.add_default_local_models('final')
     # okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
     net.add_unused_local_models('final')
     net.fit("final", solver="ridge_regression", penalty=10, formal_covariance=False)
-    net.evaluate("final")
+    net.evaluate("final", output_description="model")
+    for i, station in enumerate(net):
+        station.add_timeseries('residual', station['final'] - station['model'],
+                               override_data_cols=station['GNSS'].data_cols)
     net.to_json(path="arch_out.json")
-    net.gui()
+    net.gui(timeseries=['final', 'residual'], mean=True, std=True, n_observations=True, std_outlier=5)
