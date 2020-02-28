@@ -14,6 +14,7 @@ from functools import wraps
 from okada_wrapper import dc3d0wrapper as dc3d0
 from pandas.plotting import register_matplotlib_converters
 from sklearn.decomposition import PCA, FastICA
+from warnings import warn
 
 # see if we have compiled_utils
 try:
@@ -105,12 +106,12 @@ class Network():
         if not isinstance(station, Station):
             raise TypeError("Cannot add new station: 'station' is not a Station object.")
         if name in self.stations:
-            Warning("Overwriting station {:s}".format(name))
+            warn("Overwriting station {:s}".format(name), category=RuntimeWarning)
         self.stations[name] = station
 
     def remove_station(self, name):
         if name not in self.stations:
-            Warning("Cannot find station {}, couldn't delete".format(name))
+            warn("Cannot find station {}, couldn't delete".format(name), category=RuntimeWarning)
         else:
             del self.stations[name]
 
@@ -118,23 +119,23 @@ class Network():
         if not isinstance(description, str):
             raise TypeError("Cannot add new global model: 'description' is not a string.")
         if description in self.global_models:
-            Warning("Overwriting global model {:s}".format(description))
+            warn("Overwriting global model {:s}".format(description), category=RuntimeWarning)
         self.global_models[description] = model
 
     def remove_global_model(self, description):
         if description not in self.global_models:
-            Warning("Cannot find global model {}, couldn't delete".format(description))
+            warn("Cannot find global model {}, couldn't delete".format(description), category=RuntimeWarning)
         else:
             del self.global_models[description]
 
     # def add_global_prior(self, description, prior):
     #     if description in self.global_priors:
-    #         Warning("Overwriting global prior {:s}".format(description))
+    #         warn("Overwriting global prior {:s}".format(description), category=RuntimeWarning)
     #     self.global_priors[description] = prior
 
     # def remove_global_prior(self, description):
     #     if description not in self.global_priors:
-    #         Warning("Cannot find global prior {:s}, couldn't delete".format(description))
+    #         warn("Cannot find global prior {:s}, couldn't delete".format(description), category=RuntimeWarning)
     #     else:
     #         del self.global_priors[description]
 
@@ -158,7 +159,7 @@ class Network():
             elif station_name in network_locations:
                 station_loc = network_locations[station_name]
             else:
-                Warning("Skipped station {:s} because location information is missing.".format(station_name))
+                warn("Skipped station {:s} because location information is missing.".format(station_name))
                 continue
             station = Station(name=station_name, location=station_loc)
             # add timeseries to station
@@ -197,8 +198,6 @@ class Network():
         # add station representations
         for stat_name, station in self.stations.items():
             stat_arch = station.get_arch()
-            if stat_arch == {}:
-                continue
             # need to remove all models that are actually default models
             for mdl_description, mdl in self.default_local_models.items():
                 for ts_description in stat_arch["models"]:
@@ -243,7 +242,7 @@ class Network():
                 if models is None:
                     local_models_subset = station._unused_models[hidden_ts]
                 else:
-                    local_models_subset = {name: model for name, model in net.default_local_models.items() if name in models}
+                    local_models_subset = {name: model for name, model in station._unused_models[hidden_ts].items() if name in models}
                 for model_description, model_cfg in local_models_subset.items():
                     local_copy = deepcopy(model_cfg)
                     mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
@@ -526,7 +525,7 @@ class Station():
         if not isinstance(timeseries, Timeseries):
             raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
         if description in self.timeseries:
-            Warning("Station {:s}: Overwriting time series {:s}".format(self.name, description))
+            warn("Station {:s}: Overwriting time series {:s}".format(self.name, description), category=RuntimeWarning)
         if override_src is not None:
             timeseries.src = override_src
         if override_data_unit is not None:
@@ -546,7 +545,7 @@ class Station():
 
     def remove_timeseries(self, description):
         if description not in self.timeseries:
-            Warning("Station {:s}: Cannot find time series {:s}, couldn't delete".format(self.name, description))
+            warn("Station {:s}: Cannot find time series {:s}, couldn't delete".format(self.name, description), category=RuntimeWarning)
         else:
             del self.timeseries[description]
             del self.fits[description]
@@ -562,14 +561,14 @@ class Station():
         assert ts_description in self.timeseries, \
             "Station {:s}: Cannot find timeseries {:s} to add local model {:s}".format(self.name, ts_description, model_description)
         if model_description in self.models[ts_description]:
-            Warning("Station {:s}, timeseries {:s}: Overwriting local model {:s}".format(self.name, ts_description, model_description))
+            warn("Station {:s}, timeseries {:s}: Overwriting local model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
         self.models[ts_description].update({model_description: model})
 
     def remove_local_model(self, ts_description, model_description):
         if ts_description not in self.timeseries:
-            Warning("Station {:s}: Cannot find timeseries {:s}, couldn't delete local model {:s}".format(self.name, ts_description, model_description))
+            warn("Station {:s}: Cannot find timeseries {:s}, couldn't delete local model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
-            Warning("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete".format(self.name, ts_description, model_description))
+            warn("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete".format(self.name, ts_description, model_description), category=RuntimeWarning)
         else:
             del self.models[ts_description][model_description]
 
@@ -583,7 +582,7 @@ class Station():
         assert model_description in self.models[ts_description], \
             "Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't add fit".format(self.name, ts_description, model_description)
         if model_description in self.fits[ts_description]:
-            Warning("Station {:s}, timeseries {:s}: Overwriting fit of local model {:s}".format(self.name, ts_description, model_description))
+            warn("Station {:s}, timeseries {:s}: Overwriting fit of local model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
         data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
         self.fits[ts_description].update({model_description: fit_ts})
@@ -591,11 +590,11 @@ class Station():
 
     def remove_fit(self, ts_description, model_description, fit):
         if ts_description not in self.timeseries:
-            Warning("Station {:s}: Cannot find timeseries {:s}, couldn't delete fit for model {:s}".format(self.name, ts_description, model_description))
+            warn("Station {:s}: Cannot find timeseries {:s}, couldn't delete fit for model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
-            Warning("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete fit".format(self.name, ts_description, model_description))
+            warn("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete fit".format(self.name, ts_description, model_description), category=RuntimeWarning)
         elif model_description not in self.fits[ts_description]:
-            Warning("Station {:s}, timeseries {:s}: Cannot find fit for local model {:s}, couldn't delete".format(self.name, ts_description, model_description))
+            warn("Station {:s}, timeseries {:s}: Cannot find fit for local model {:s}, couldn't delete".format(self.name, ts_description, model_description), category=RuntimeWarning)
         else:
             del self.fits[ts_description][model_description]
 
@@ -967,7 +966,7 @@ class Step(Model):
 
     def add_step(self, step):
         if step in self._steptimes:
-            Warning("Step {:s} already present.".format(step))
+            warn("Step {:s} already present.".format(step), category=RuntimeWarning)
         else:
             self._steptimes.append(step)
             self._update_from_steptimes()
@@ -977,7 +976,7 @@ class Step(Model):
             self._steptimes.remove(step)
             self._update_from_steptimes()
         except ValueError:
-            Warning("Step {:s} not present.".format(step))
+            warn("Step {:s} not present.".format(step), category=RuntimeWarning)
 
     def _get_mapping(self, timevector, coefs):
         coefs = np.array(timevector.values.reshape(-1, 1) >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(1, -1), dtype=float)
@@ -1055,11 +1054,11 @@ class Logarithmic(Model):
     def __init__(self, tau, **model_kw_args):
         super().__init__(num_parameters=1, **model_kw_args)
         if self.t_reference is None:
-            Warning("No 't_reference' set for Logarithmic model, using 't_start' for it.")
+            warn("No 't_reference' set for Logarithmic model, using 't_start' for it.")
             self._t_reference = self._t_start
             self.t_reference = self.t_start
         elif self.t_start is None:
-            Warning("No 't_start' set for Logarithmic model, using 't_reference' for it.")
+            warn("No 't_start' set for Logarithmic model, using 't_reference' for it.")
             self._t_start = self._t_reference
             self.t_start = self.t_reference
         else:
@@ -1388,7 +1387,7 @@ def _okada_get_displacements(station_and_parameters):
         if success == 0:
             disp[i, :] = u / 10**12  # output is now in mm
         else:
-            Warning("success = {:d} for station {:d}".format(success, i))
+            warn("success = {:d} for station {:d}".format(success, i), category=RuntimeWarning)
     # transform back to lat, lon, alt
     # yes this is the same matrix
     disp = disp @ R
@@ -1460,11 +1459,11 @@ if __name__ == "__main__":
     for station in net:
         del station['residual']
         station.add_timeseries('final', station['clean'] - station['common'],
-                               override_data_cols=station['GNSS'].data_cols, add_models=net.default_local_models)
+                               override_data_cols=station['GNSS'].data_cols)
         del station['common']
     net.add_default_local_models('final')
     # okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
-    net.add_unused_local_models('final')
+    net.add_unused_local_models('final', models="Catalog")
     net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
     net.evaluate("final", output_description="model")
     for i, station in enumerate(net):
