@@ -43,18 +43,16 @@ class Network():
         self.default_local_models = default_local_models
         self.stations = {}
         self.global_models = {}
-        # self.global_priors = {}
 
     def __repr__(self):
         info = f"Network {self.name}\n" + \
                f"Stations:\n{[key for key in self.stations]}\n" + \
-               f"Global Models:\n{[key for key in self.global_models]}\n" + \
-               f"Global Priors:\n{[key for key in self.global_priors]}"
+               f"Global Models:\n{[key for key in self.global_models]}"
         return info
 
     def __getitem__(self, name):
         if name not in self.stations:
-            raise KeyError("No station '{}' present.".format(name))
+            raise KeyError(f"No station '{name}' present.")
         return self.stations[name]
 
     def __setitem__(self, name, station):
@@ -80,7 +78,7 @@ class Network():
                     network_unit = station[ts_description].data_unit
                 df_dict.update({name: station[ts_description].data.astype(pd.SparseDtype())})
         if df_dict == {}:
-            raise ValueError("No data found in network {:s} for timeseries {:s}".format(self.name, ts_description))
+            raise ValueError(f"No data found in network '{self.name}' for timeseries '{ts_description}'.")
         network_df = pd.concat(df_dict, axis=1)
         network_df.columns = network_df.columns.swaplevel(0, 1)
         network_df.sort_index(level=0, axis=1, inplace=True)
@@ -106,12 +104,12 @@ class Network():
         if not isinstance(station, Station):
             raise TypeError("Cannot add new station: 'station' is not a Station object.")
         if name in self.stations:
-            warn("Overwriting station {:s}".format(name), category=RuntimeWarning)
+            warn(f"Overwriting station '{name}'.", category=RuntimeWarning)
         self.stations[name] = station
 
     def remove_station(self, name):
         if name not in self.stations:
-            warn("Cannot find station {}, couldn't delete".format(name), category=RuntimeWarning)
+            warn(f"Cannot find station '{name}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.stations[name]
 
@@ -119,25 +117,14 @@ class Network():
         if not isinstance(description, str):
             raise TypeError("Cannot add new global model: 'description' is not a string.")
         if description in self.global_models:
-            warn("Overwriting global model {:s}".format(description), category=RuntimeWarning)
+            warn(f"Overwriting global model '{description}'.", category=RuntimeWarning)
         self.global_models[description] = model
 
     def remove_global_model(self, description):
         if description not in self.global_models:
-            warn("Cannot find global model {}, couldn't delete".format(description), category=RuntimeWarning)
+            warn(f"Cannot find global model '{description}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.global_models[description]
-
-    # def add_global_prior(self, description, prior):
-    #     if description in self.global_priors:
-    #         warn("Overwriting global prior {:s}".format(description), category=RuntimeWarning)
-    #     self.global_priors[description] = prior
-
-    # def remove_global_prior(self, description):
-    #     if description not in self.global_priors:
-    #         warn("Cannot find global prior {:s}, couldn't delete".format(description), category=RuntimeWarning)
-    #     else:
-    #         del self.global_priors[description]
 
     @classmethod
     def from_json(cls, path, add_default_local_models=True):
@@ -159,7 +146,7 @@ class Network():
             elif station_name in network_locations:
                 station_loc = network_locations[station_name]
             else:
-                warn("Skipped station {:s} because location information is missing.".format(station_name))
+                warn(f"Skipped station '{station_name}' because location information is missing.")
                 continue
             station = Station(name=station_name, location=station_loc)
             # add timeseries to station
@@ -212,7 +199,7 @@ class Network():
         json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
 
     def add_default_local_models(self, ts_description, models=None):
-        assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
+        assert isinstance(ts_description, str), f"'ts_description' must be a string, got {type(ts_description)}."
         if models is None:
             local_models_subset = net.default_local_models
         else:
@@ -310,7 +297,7 @@ class Network():
         iterable_inputs = ((func, station, ts_in, kw_args) for station in self)
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return, iterable_inputs),
-                                        desc="Processing station timeseries with {:s}".format(func.__name__), total=len(self.stations), ascii=True, unit="station")):
+                                        desc=f"Processing station timeseries with '{func.__name__}'", total=len(self.stations), ascii=True, unit="station")):
             self[station_names[i]].add_timeseries(ts_out, result)
 
     @staticmethod
@@ -332,7 +319,7 @@ class Network():
 
     def call_func_no_return(self, func, **kw_args):
         assert callable(func), f"'func' must be a callable function, got {type(func)}."
-        for name, station in tqdm(self.stations.items(), desc="Calling function {:s} on stations".format(func.__name__), ascii=True, unit="station"):
+        for name, station in tqdm(self.stations.items(), desc=f"Calling function '{func.__name__}' on stations", ascii=True, unit="station"):
             func(station, **kw_args)
 
     def _create_map_figure(self):
@@ -364,7 +351,7 @@ class Network():
         comps = list(net_in.keys())
         ndim = len(comps)
         ndim_max2 = min(ndim, 2)
-        assert ndim > 0, f"No components found in {ts_in:s}"
+        assert ndim > 0, f"No components found in '{ts_in}'."
         kw_args.update({'plot': True})
         model, temp_spat = common_mode(net_in, **kw_args)
         temporal, spatial = {}, {}
@@ -419,10 +406,10 @@ class Network():
             ts_to_plot = {ts_description: ts for ts_description, ts in self[station_name].timeseries.items()
                           if (timeseries is None) or (ts_description in timeseries)}
             n_components = 0
-            for ts_desc, ts in ts_to_plot.items():
+            for ts_description, ts in ts_to_plot.items():
                 n_components += ts.num_components
                 if len(analyze_kw_args) > 0:
-                    self.stations[station_name].analyze_residuals(ts_desc, **analyze_kw_args)
+                    self.stations[station_name].analyze_residuals(ts_description, **analyze_kw_args)
             # clear figure and add data
             fig_ts.clear()
             icomp = 0
@@ -445,7 +432,7 @@ class Network():
                                             fit.df[fit.data_cols[icol]] - config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
                                             alpha=config.getfloat("gui", "plot_sigmas_alpha"), linewidth=0)
                         ax.plot(fit.time, fit.df[fit.data_cols[icol]], label=mdl_description)
-                    ax.set_ylabel("{:s}\n{:s} [{:s}]".format(ts_description, data_col, ts.data_unit))
+                    ax.set_ylabel(f"{ts_description}\n{data_col} [{ts.data_unit}]")
                     ax.grid()
                     if len(self[station_name].fits[ts_description]) > 0:
                         ax.legend()
@@ -486,7 +473,7 @@ class Station():
 
     def __getitem__(self, description):
         if description not in self.timeseries:
-            raise KeyError("Station {:s}: No timeseries '{}' present.".format(self.name, description))
+            raise KeyError(f"Station {self.name}: No timeseries '{description}' present.")
         return self.timeseries[description]
 
     def __setitem__(self, description, timeseries):
@@ -525,7 +512,7 @@ class Station():
         if not isinstance(timeseries, Timeseries):
             raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
         if description in self.timeseries:
-            warn("Station {:s}: Overwriting time series {:s}".format(self.name, description), category=RuntimeWarning)
+            warn(f"Station {self.name}: Overwriting time series '{description}'.", category=RuntimeWarning)
         if override_src is not None:
             timeseries.src = override_src
         if override_data_unit is not None:
@@ -545,7 +532,7 @@ class Station():
 
     def remove_timeseries(self, description):
         if description not in self.timeseries:
-            warn("Station {:s}: Cannot find time series {:s}, couldn't delete".format(self.name, description), category=RuntimeWarning)
+            warn(f"Station {self.name}: Cannot find time series '{description}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.timeseries[description]
             del self.fits[description]
@@ -559,16 +546,16 @@ class Station():
         if not isinstance(model, Model):
             raise TypeError("Cannot add new local model: 'model' is not a Model object.")
         assert ts_description in self.timeseries, \
-            "Station {:s}: Cannot find timeseries {:s} to add local model {:s}".format(self.name, ts_description, model_description)
+            f"Station {self.name}: Cannot find timeseries '{ts_description}' to add local model '{model_description}'."
         if model_description in self.models[ts_description]:
-            warn("Station {:s}, timeseries {:s}: Overwriting local model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting local model '{model_description}'.", category=RuntimeWarning)
         self.models[ts_description].update({model_description: model})
 
     def remove_local_model(self, ts_description, model_description):
         if ts_description not in self.timeseries:
-            warn("Station {:s}: Cannot find timeseries {:s}, couldn't delete local model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', couldn't delete local model '{model_description}'.", category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
-            warn("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.models[ts_description][model_description]
 
@@ -578,11 +565,11 @@ class Station():
         if not isinstance(model_description, str):
             raise TypeError("Cannot add new fit: 'model_description' is not a string.")
         assert ts_description in self.timeseries, \
-            "Station {:s}: Cannot find timeseries {:s} to add fit for model {:s}".format(self.name, ts_description, model_description)
+            f"Station {self.name}: Cannot find timeseries '{ts_description}' to add fit for model '{model_description}'."
         assert model_description in self.models[ts_description], \
-            "Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't add fit".format(self.name, ts_description, model_description)
+            f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't add fit."
         if model_description in self.fits[ts_description]:
-            warn("Station {:s}, timeseries {:s}: Overwriting fit of local model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting fit of local model '{model_description}'.", category=RuntimeWarning)
         data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
         self.fits[ts_description].update({model_description: fit_ts})
@@ -590,17 +577,17 @@ class Station():
 
     def remove_fit(self, ts_description, model_description, fit):
         if ts_description not in self.timeseries:
-            warn("Station {:s}: Cannot find timeseries {:s}, couldn't delete fit for model {:s}".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', couldn't delete fit for model '{model_description}'.", category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
-            warn("Station {:s}, timeseries {:s}: Cannot find local model {:s}, couldn't delete fit".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't delete fit.", category=RuntimeWarning)
         elif model_description not in self.fits[ts_description]:
-            warn("Station {:s}, timeseries {:s}: Cannot find fit for local model {:s}, couldn't delete".format(self.name, ts_description, model_description), category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Cannot find fit for local model '{model_description}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.fits[ts_description][model_description]
 
     def analyze_residuals(self, ts_description, mean=False, std=False, n_observations=False, std_outlier=0):
         assert isinstance(ts_description, str), f"Station {self.name}: 'ts_description' needs to be a string, got {type(ts_description)}."
-        assert ts_description in self.timeseries, f"Station {self.name}: Can't find {ts_description} to analyze."
+        assert ts_description in self.timeseries, f"Station {self.name}: Can't find '{ts_description}' to analyze."
         print()
         results = {}
         if mean:
@@ -752,29 +739,27 @@ class Timeseries():
     def _prepare_math(self, other, operation):
         # check for same type
         if not isinstance(other, Timeseries):
-            raise TypeError("Unsupported operand type for {}: {} and {}".format(operation, Timeseries, type(other)))
+            raise TypeError(f"Unsupported operand type for '{operation}': '{Timeseries}' and '{type(other)}'.")
         # check for same dimensions
         if len(self.data_cols) != len(other.data_cols):
-            raise ValueError(("Timeseries math problem: conflicting number of data columns (" +
-                              "[ " + "'{}' "*len(self.data_cols) + "] and " +
-                              "[ " + "'{}' "*len(other.data_cols) + "])").format(*self.data_cols, *other.data_cols))
+            raise ValueError(f"Timeseries math problem: conflicting number of data columns ({self.data_cols} and {other.data_cols}).")
         # get intersection of time indices
         out_time = self.time.intersection(other.time, sort=None)
         # check compatible units (+-) or define new one (*/)
         # define new src and data_cols
         if operation in ["+", "-"]:
             if self.data_unit != other.data_unit:
-                raise ValueError("Timeseries math problem: conflicting data units '{:s}' and '{:s}'".format(self.data_unit, other.data_unit))
+                raise ValueError(f"Timeseries math problem: conflicting data units '{self.data_unit}' and '{other.data_unit}'.")
             else:
                 out_unit = self.data_unit
-                out_src = "{:s}{:s}{:s}".format(self.src, operation, other.src)
-                out_data_cols = ["{:s}{:s}{:s}".format(lcol, operation, rcol) for lcol, rcol in zip(self.data_cols, other.data_cols)]
+                out_src = f"{self.src}{operation}{other.src}"
+                out_data_cols = [f"{lcol}{operation}{rcol}" for lcol, rcol in zip(self.data_cols, other.data_cols)]
         elif operation in ["*", "/"]:
-            out_unit = "({:s}){:s}({:s})".format(self.data_unit, operation, other.data_unit)
-            out_src = "({:s}){:s}({:s})".format(self.src, operation, other.src)
-            out_data_cols = ["({:s}){:s}({:s})".format(lcol, operation, rcol) for lcol, rcol in zip(self.data_cols, other.data_cols)]
+            out_unit = f"({self.data_unit}){operation}({other.data_unit})"
+            out_src = f"({self.src}){operation}({other.src})"
+            out_data_cols = [f"({lcol}){operation}({rcol})" for lcol, rcol in zip(self.data_cols, other.data_cols)]
         else:
-            raise NotImplementedError("Timeseries math problem: unknown operation {:s}".format(operation))
+            raise NotImplementedError(f"Timeseries math problem: unknown operation '{operation}'.")
         # return data unit and column names
         return out_src, out_unit, out_data_cols, out_time
 
@@ -871,7 +856,7 @@ class Model():
         return arch
 
     def _get_arch(self):
-        raise NotImplementedError(f"Instantiated model was not subclassed or it does not overwrite the '_get_arch' method.")
+        raise NotImplementedError("Instantiated model was not subclassed or it does not overwrite the '_get_arch' method.")
 
     def get_mapping(self, timevector):
         # get active period and initialize coefficient matrix
@@ -919,9 +904,9 @@ class Model():
     def tvec_to_numpycol(self, timevector):
         """ Convenience wrapper for tvec_to_numpycol for Model objects that have self.time_unit and self.t_reference attributes. """
         if self.t_reference is None:
-            raise ValueError(f"Can't call 'tvec_to_numpycol' because no reference time was specified in the model.")
+            raise ValueError("Can't call 'tvec_to_numpycol' because no reference time was specified in the model.")
         if self.time_unit is None:
-            raise ValueError(f"Can't call 'tvec_to_numpycol' because no time unit was specified in the model.")
+            raise ValueError("Can't call 'tvec_to_numpycol' because no time unit was specified in the model.")
         return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
     def read_parameters(self, parameters, cov):
@@ -966,7 +951,7 @@ class Step(Model):
 
     def add_step(self, step):
         if step in self._steptimes:
-            warn("Step {:s} already present.".format(step), category=RuntimeWarning)
+            warn(f"Step '{step}' already present.", category=RuntimeWarning)
         else:
             self._steptimes.append(step)
             self._update_from_steptimes()
@@ -976,7 +961,7 @@ class Step(Model):
             self._steptimes.remove(step)
             self._update_from_steptimes()
         except ValueError:
-            warn("Step {:s} not present.".format(step), category=RuntimeWarning)
+            warn(f"Step '{step}' not present.", category=RuntimeWarning)
 
     def _get_mapping(self, timevector, coefs):
         coefs = np.array(timevector.values.reshape(-1, 1) >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(1, -1), dtype=float)
@@ -1096,7 +1081,7 @@ def unwrap_dict_and_ts(func):
             elif isinstance(ts, np.ndarray):
                 array = ts
             else:
-                raise TypeError(f"Cannot unwrap object of type {type(ts)}")
+                raise TypeError(f"Cannot unwrap object of type {type(ts)}.")
             func_output = func(array, *args, **kw_args)
             if isinstance(func_output, tuple):
                 result = func_output[0]
@@ -1387,7 +1372,7 @@ def _okada_get_displacements(station_and_parameters):
         if success == 0:
             disp[i, :] = u / 10**12  # output is now in mm
         else:
-            warn("success = {:d} for station {:d}".format(success, i), category=RuntimeWarning)
+            warn(f"Success = {success} for station {i}!", category=RuntimeWarning)
     # transform back to lat, lon, alt
     # yes this is the same matrix
     disp = disp @ R
@@ -1446,28 +1431,38 @@ def okada_prior(network, catalog_path, target_timeseries=None):
 
 
 if __name__ == "__main__":
-    # net = Network.from_json(path="net_arch.json", add_default_local_models=False)
-    # net = Network.from_json(path="net_arch_catalog1mm.json")
+    # initialize network from an architecture .json file
+    # net = Network.from_json(path="net_arch_boso.json", add_default_local_models=False)
     net = Network.from_json(path="net_arch_boso_okada3mm.json", add_default_local_models=False)
+    # low-pass filter using a median function, then clean the timeseries (using the settings in the config file)
     net.call_func_ts_return(median, ts_in='GNSS', ts_out='filtered', kernel_size=7)
     net.call_func_no_return(clean, ts_in='GNSS', reference='filtered', ts_out='clean')
+    # get the residual for each station, delete the intermediate product
     for station in net:
         station['residual'] = station['clean'] - station['filtered']
         del station['filtered']
+    # estimate the common mode, either with a visualization of the result or not (same underlying function)
     # net.graphical_cme(ts_in='residual', ts_out='common', method='pca')
     net.call_netwide_func(common_mode, ts_in='residual', ts_out='common', method='pca')
+    # now remove the common mode, call it the 'final' timeseries, and delete intermediate products
     for station in net:
         del station['residual']
         station.add_timeseries('final', station['clean'] - station['common'],
                                override_data_cols=station['GNSS'].data_cols)
         del station['common']
+    # add the default models from the architecture .json file that weren't needed before
     net.add_default_local_models('final')
+    # either use okada_prior to get time for steps at stations
     # okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
+    # or after that, load them into the cleaned timeseries
     net.add_unused_local_models('final', models="Catalog")
+    # fit the models and evaluate
     net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
     net.evaluate("final", output_description="model")
-    for i, station in enumerate(net):
+    # calculate the residual between the best-fit model and the clean ('final') timeseries
+    for station in net:
         station.add_timeseries('residual', station['final'] - station['model'],
                                override_data_cols=station['GNSS'].data_cols)
+    # save the network architecture as a .json file and show the results in a GUI
     net.to_json(path="arch_out.json")
     net.gui(timeseries=['final', 'residual'], mean=True, std=True, n_observations=True, std_outlier=5)
