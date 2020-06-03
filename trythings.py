@@ -15,6 +15,7 @@ from okada_wrapper import dc3d0wrapper as dc3d0
 from pandas.plotting import register_matplotlib_converters
 from sklearn.decomposition import PCA, FastICA
 from warnings import warn
+from scipy.special import comb, factorial
 
 # see if we have compiled_utils
 try:
@@ -821,20 +822,21 @@ class Model():
     Defaults to a linear model.
     """
     def __init__(self, num_parameters, regularize=False, time_unit=None, t_start=None, t_end=None, t_reference=None, zero_before=True, zero_after=True):
-        self.num_parameters = num_parameters
+        self.num_parameters = int(num_parameters)
+        assert self.num_parameters > 0, f"'num_parameters' must be an integer greater or equal to one, got {self.num_parameters}."
         self.is_fitted = False
         self.parameters = None
         self.cov = None
-        self.regularize = regularize
-        self.time_unit = time_unit
-        self._t_start = t_start
-        self._t_end = t_end
-        self._t_reference = t_reference
+        self.regularize = bool(regularize)
+        self.time_unit = str(time_unit)
+        self._t_start = None if t_start is None else str(t_start)
+        self._t_end = None if t_start is None else str(t_end)
+        self._t_reference = None if t_start is None else str(t_reference)
         self.t_start = None if t_start is None else pd.Timestamp(t_start)
         self.t_end = None if t_end is None else pd.Timestamp(t_end)
         self.t_reference = None if t_reference is None else pd.Timestamp(t_reference)
-        self.zero_before = zero_before
-        self.zero_after = zero_after
+        self.zero_before = bool(zero_before)
+        self.zero_after = bool(zero_after)
 
     def get_arch(self):
         # make base architecture
@@ -867,7 +869,10 @@ class Model():
         # otherwise, build coefficient matrix
         else:
             # build dense sub-matrix
-            coefs = self._get_mapping(timevector[active], np.zeros((last - first + 1, self.num_parameters)))
+            coefs = self._get_mapping(timevector[active])
+            assert coefs.shape[1] == self.num_parameters, \
+                f"The child function '_get_mapping' of model {type(self).__name__} returned an invalid shape. " \
+                f"Expected was ({last-first+1}, {self.num_parameters}), got {coefs.shape}."
             # build before- and after-matrices
             # either use zeros or the values at the active boundaries for padding
             if self.zero_before:
@@ -883,7 +888,7 @@ class Model():
             mapping = sparse.vstack((before, sparse.csr_matrix(coefs), after), format='bsr')
         return mapping
 
-    def _get_mapping(self, timevector, coefs):
+    def _get_mapping(self, timevector):
         raise NotImplementedError("'Model' needs to be subclassed and its child needs to implement a '_get_mapping' function for the active period.")
 
     def _get_active_period(self, timevector):
@@ -963,7 +968,7 @@ class Step(Model):
         except ValueError:
             warn(f"Step '{step}' not present.", category=RuntimeWarning)
 
-    def _get_mapping(self, timevector, coefs):
+    def _get_mapping(self, timevector):
         coefs = np.array(timevector.values.reshape(-1, 1) >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(1, -1), dtype=float)
         return coefs
 
@@ -972,20 +977,22 @@ class Polynomial(Model):
     """
     Polynomial of given order.
 
-    `time_unit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
-        `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
+    `time_unit` can be the following (see https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_timedelta.html):
+        `W`, `D`, `days`, `day`, `hours`, hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
+        `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
+        `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
     """
     def __init__(self, order, zero_before=False, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=order + 1, zero_before=zero_before, zero_after=zero_after, **model_kw_args)
-        self.order = order
+        self.order = int(order)
 
     def _get_arch(self):
         arch = {"type": "Polynomial",
                 "kw_args": {"order": self.order}}
         return arch
 
-    def _get_mapping(self, timevector, coefs):
-        coefs[:, 0] = 1
+    def _get_mapping(self, timevector):
+        coefs = np.ones((timevector.size, self.num_parameters))
         if self.order >= 1:
             # now we actually need the time
             dt = self.tvec_to_numpycol(timevector)
@@ -996,27 +1003,169 @@ class Polynomial(Model):
         return coefs
 
 
+class BSpline(Model):
+    """
+    Cardinal, centralized B-Splines of certain order/degree and time scale.
+    Used for transient temporary signals that return to zero after a given time span.
+
+    Compare the analytic representation of the B-Splines:
+    Butzer, P., Schmidt, M., & Stark, E. (1988). Observations on the History of Central B-Splines.
+    Archive for History of Exact Sciences, 39(2), 137-156. Retrieved May 14, 2020, from https://www.jstor.org/stable/41133848
+    or
+    Schoenberg, I. J. (1973). Cardinal Spline Interpolation.
+    Society for Industrial and Applied Mathematics. https://doi.org/10.1137/1.9781611970555
+    and some examples on https://bsplines.org/flavors-and-types-of-b-splines/.
+
+    It is important to note that the function will be non-zero on the interval
+    -(p+1)/2 < x < (p+1)/2
+    where p is the degree of the cardinal B-spline (and the degree of the resulting polynomial).
+    The order n is related to the degree by the relation n = p + 1.
+    The scale determines the width of the spline in the time domain, and corresponds to the interval [0, 1] of the B-Spline.
+    The full non-zero time span of the spline is therefore scale * (p+1) = scale * n.
+
+    num_splines will increase the number of splines by shifting the reference point (num_splines - 1)
+    times by the spacing (which must be given in the same units as the scale).
+
+    If no spacing is given but multiple splines are requested, the scale will be used as the spacing.
+
+    `time_unit` can be the following (see https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_timedelta.html):
+        `W`, `D`, `days`, `day`, `hours`, hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
+        `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
+        `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
+    """
+    def __init__(self, degree, scale, num_splines=1, spacing=None, **model_kw_args):
+        super().__init__(num_parameters=num_splines, **model_kw_args)
+        self.degree = int(degree)
+        self.order = self.degree + 1
+        self.scale = float(scale)
+        if spacing is not None:
+            self.spacing = float(spacing)
+            assert abs(self.spacing) > 0, f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
+            if self.num_parameters == 1:
+                warn(f"'spacing' ({self.spacing} {self.time_unit}) is given, but 'num_splines' = 1 splines are requested.")
+        elif self.num_parameters > 1:
+            self.spacing = self.scale
+        else:
+            self.spacing = None
+
+    def _get_arch(self):
+        arch = {"type": "BSpline",
+                "kw_args": {"degree": self.degree,
+                            "scale": self.scale,
+                            "num_splines": self.num_parameters,
+                            "spacing": self.spacing}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        trel = self.tvec_to_numpycol(timevector).reshape(-1, 1, 1) - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
+        tnorm = trel / self.scale
+        krange = np.arange(self.order + 1).reshape(1, 1, -1)
+        in_power = tnorm + self.order/2 - krange
+        in_sum = (-1)**krange * comb(self.order, krange) * (in_power)**(self.degree) * (in_power >= 0)
+        coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
+        return coefs
+
+
+class ISpline(Model):
+    """
+    Integral of cardinal, centralized B-Splines of certain order/degree and time scale.
+    The degree p given in the initialization is the degree of the spline *before* the integration, i.e.
+    the resulting IBSpline is a piecewise polynomial of degree p + 1.
+    Used for transient permanent signals that stay at their maximum value after a given time span.
+
+    See the full documentation in the BSpline class.
+    """
+    def __init__(self, degree, scale, num_splines=1, spacing=None, zero_after=False, **model_kw_args):
+        super().__init__(num_parameters=num_splines, zero_after=zero_after, **model_kw_args)
+        self.degree = int(degree)
+        self.order = self.degree + 1
+        self.scale = float(scale)
+        if spacing is not None:
+            self.spacing = float(spacing)
+            assert abs(self.spacing) > 0, f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
+            if self.num_parameters == 1:
+                warn(f"'spacing' ({self.spacing} {self.time_unit}) is given, but 'num_splines' = 1 splines are requested.")
+        elif self.num_parameters > 1:
+            self.spacing = self.scale
+        else:
+            self.spacing = None
+
+    def _get_arch(self):
+        arch = {"type": "ISpline",
+                "kw_args": {"degree": self.degree,
+                            "scale": self.scale,
+                            "num_splines": self.num_parameters,
+                            "spacing": self.spacing}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        trel = self.tvec_to_numpycol(timevector).reshape(-1, 1, 1) - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
+        tnorm = trel / self.scale
+        krange = np.arange(self.order + 1).reshape(1, 1, -1)
+        in_power = tnorm + self.order/2 - krange
+        in_sum = (-1)**krange * comb(self.order, krange) * (in_power)**(self.degree + 1) * (in_power >= 0)
+        coefs = np.sum(in_sum, axis=2) / factorial(self.degree + 1)
+        return coefs
+
+
+def build_splineset(degree, t_start, t_end, time_unit, splineclass=ISpline, list_scales=None, list_num_knots=None, complete=True):
+    """
+    Return a list of splines that share a common degree, but different center times and scales.
+
+    The set is constructed from a time span (t_start and t_end) and numbers of centerpoints or length scales.
+    The number of splines for each scale will then be chosen such that the resulting set of splines will be complete.
+    This means it will contain all splines that are non-zero at least somewhere in the time span.
+    """
+    assert np.logical_xor(list_scales is None, list_num_knots is None), \
+        f"To construct a set of BSplines, only pass one of 'list_scales' and 'list_num_knots' " \
+        f"(got {list_scales} and {list_num_knots})."
+    relevant_list = list_scales if list_num_knots is None else list_num_knots
+    # get time range
+    t_start_tstamp, t_end_tstamp = pd.Timestamp(t_start), pd.Timestamp(t_end)
+    t_range_tdelta = t_end_tstamp - t_start_tstamp
+    # if a complete set is requested, we need to find the number of overlaps given the degree
+    num_overlaps = int(degree / 2) if complete else 0
+    # for each scale, make a BSplines object
+    splset = []
+    for elem in relevant_list:
+        # Calculate the scale as float and Timedelta depending on the function call
+        if list_scales is not None:
+            scale_float = elem
+            scale_tdelta = pd.Timedelta(scale_float, time_unit)
+        else:
+            scale_tdelta = t_range_tdelta / elem
+            scale_float = scale_tdelta / np.timedelta64(1, time_unit)
+        # find the number of center points between t_start and t_end, plus the overlapping ones
+        num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
+        # shift the reference to be the first spline
+        t_ref = t_start_tstamp - num_overlaps*scale_tdelta
+        # create model and append
+        splset.append(splineclass(degree, scale_float, num_splines=num_centerpoints, t_reference=t_ref, time_unit=time_unit))
+    return splset
+
+
 class Sinusoidal(Model):
     """
     Sinusoidal of given frequency. Estimates amplitude and phase.
 
-    `time_unit` can be the following (see https://docs.scipy.org/doc/numpy/reference/arrays.datetime.html#datetime-units):
-        `Y`, `M`, `W`, `D`, `h`, `m`, `s`, `ms`, `us`, `ns`, `ps`, `fs`, `as`
+    `time_unit` can be the following (see https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_timedelta.html):
+        `W`, `D`, `days`, `day`, `hours`, hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
+        `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
+        `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
     """
     def __init__(self, period, **model_kw_args):
         super().__init__(num_parameters=2, **model_kw_args)
-        self.period = period
+        self.period = float(period)
 
     def _get_arch(self):
         arch = {"type": "Sinusoidal",
                 "kw_args": {"period": self.period}}
         return arch
 
-    def _get_mapping(self, timevector, coefs):
+    def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
         phase = 2*np.pi * dt / self.period
-        coefs[:, 0] = np.sin(phase)
-        coefs[:, 1] = np.cos(phase)
+        coefs = np.stack([np.cos(phase), np.sin(phase)], axis=1)
         return coefs
 
     @property
@@ -1049,16 +1198,16 @@ class Logarithmic(Model):
         else:
             assert self.t_reference <= self.t_start, \
                 f"Logarithmic model has to have valid bounds, but the reference time {self._t_reference} is after the start time {self._t_start}."
-        self.tau = tau
+        self.tau = float(tau)
 
     def _get_arch(self):
         arch = {"type": "Logarithmic",
                 "kw_args": {"tau": self.tau}}
         return arch
 
-    def _get_mapping(self, timevector, coefs):
+    def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
-        coefs[:, 0] = np.log1p(dt / self.tau)
+        coefs = np.log1p(dt / self.tau).reshape(-1, 1)
         return coefs
 
 
@@ -1307,7 +1456,8 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     if t_reference is None:
         t_reference = timevector[0]
     else:
-        assert isinstance(t_reference, pd.Timestamp), f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
+        t_reference = pd.Timestamp(t_reference)
+    assert isinstance(t_reference, pd.Timestamp), f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
     # return Numpy array
     return ((timevector - t_reference) / np.timedelta64(1, time_unit)).values
 
