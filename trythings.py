@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import json
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import warnings
@@ -24,6 +25,19 @@ except ImportError:
     COMPILED_UTILS = False
 else:
     COMPILED_UTILS = True
+
+# load scientific colormaps
+CMAPS = {"rainbow": None, "seismic": None, "topography": None}
+for cm_type, scm6_name, mpl_name in zip(CMAPS.keys(),
+                                        ["batlow", "roma", "oleron"],  # from Scientific Colour Maps
+                                        ["rainbow", "seismic", "terrain"]):  # matplotlib defaults
+    cmap_path = f"/home/tkoehne/downloads/ScientificColourMaps6/{scm6_name}/{scm6_name}.txt"
+    try:
+        CMAPS[cm_type] = mpl.colors.LinearSegmentedColormap.from_list(scm6_name, np.loadtxt(cmap_path))
+    except FileNotFoundError:
+        warn(f"Scientific Colour Maps file {cmap_path} not found, defaulting to {mpl_name}.")
+        CMAPS[cm_type] = plt.get_cmap(mpl_name)
+del cmap_path
 
 # preparational steps
 multiprocessing.set_start_method('spawn', True)
@@ -1115,6 +1129,8 @@ def build_splineset(degree, t_start, t_end, time_unit, splineclass=ISpline, list
     The set is constructed from a time span (t_start and t_end) and numbers of centerpoints or length scales.
     The number of splines for each scale will then be chosen such that the resulting set of splines will be complete.
     This means it will contain all splines that are non-zero at least somewhere in the time span.
+
+    This function also sets the spacing equal to the scale.
     """
     assert np.logical_xor(list_scales is None, list_num_knots is None), \
         f"To construct a set of BSplines, only pass one of 'list_scales' and 'list_num_knots' " \
@@ -1123,8 +1139,8 @@ def build_splineset(degree, t_start, t_end, time_unit, splineclass=ISpline, list
     # get time range
     t_start_tstamp, t_end_tstamp = pd.Timestamp(t_start), pd.Timestamp(t_end)
     t_range_tdelta = t_end_tstamp - t_start_tstamp
-    # if a complete set is requested, we need to find the number of overlaps given the degree
-    num_overlaps = int(degree / 2) if complete else 0
+    # if a complete set is requested, we need to find the number of overlaps given the degree on a single side
+    num_overlaps = degree if complete else 0
     # for each scale, make a BSplines object
     splset = []
     for elem in relevant_list:
@@ -1142,6 +1158,53 @@ def build_splineset(degree, t_start, t_end, time_unit, splineclass=ISpline, list
         # create model and append
         splset.append(splineclass(degree, scale_float, num_splines=num_centerpoints, t_reference=t_ref, time_unit=time_unit))
     return splset
+
+
+def make_scalogram(list_of_splines, t_left, t_right, cmaprange=None, resolution=1000):
+    # check input
+    assert isinstance(list_of_splines, list) and all([isinstance(model, Model) for model in list_of_splines]), \
+        f"'list_of_splines' needs to be a list of spline models, got {list_of_splines}."
+    assert all([model.is_fitted for model in list_of_splines]), \
+        f"All models in 'list_of_splines' need to have already been fitted."
+    # determine dimensions
+    num_scales = len(list_of_splines)
+    dy_scale = 1/num_scales
+    t_plot = np.array([tstamp for tstamp in pd.date_range(start=t_left, end=t_right, periods=resolution)])
+    # get range of values (if not provided)
+    if cmaprange is not None:
+        assert isinstance(cmaprange, int) or isinstance(cmaprange, float), \
+            f"'cmaprange' must be a single float or integer of the one-sided color range of the scalogram, got {cmaprange}."
+    else:
+        cmaprange = np.ceil(np.max(np.abs(np.array([model.parameters for model in list_of_splines]).ravel())))
+    cmap = mpl.cm.ScalarMappable(cmap=CMAPS["seismic"], norm=mpl.colors.Normalize(vmin=-cmaprange, vmax=cmaprange))
+    # start plotting
+    fig, ax = plt.subplots()
+    for i, model in enumerate(list_of_splines):
+        # where to put this scale
+        y_off = 1 - (i + 1)*dy_scale
+        # get normalized values
+        mdl_mapping = model.get_mapping(t_plot)
+        mdl_sum = np.sum(mdl_mapping, axis=1, keepdims=True)
+        mdl_sum[mdl_sum == 0] = 1
+        y_norm = np.hstack([np.zeros((t_plot.size, 1)), np.cumsum(mdl_mapping / mdl_sum, axis=1)])
+        # plot cell
+        for j in range(model.num_parameters):
+            ax.fill_between(t_plot, y_off + y_norm[:, j]*dy_scale, y_off + y_norm[:, j+1]*dy_scale, facecolor=cmap.to_rgba(model.parameters[j]))
+        # plot vertical lines at centerpoints
+        for j in range(model.num_parameters):
+            ax.axvline(model.t_reference + pd.Timedelta(j*model.spacing, model.time_unit), y_off, y_off + dy_scale, c='0.7')
+    # finish plot by adding relevant gridlines and labels
+    for i in range(1, num_scales):
+        ax.axhline(i*dy_scale, c='0.7')
+    ax.set_xlim(t_left, t_right)
+    ax.set_ylim(0, 1)
+    ax.set_yticks([i*dy_scale for i in range(num_scales + 1)])
+    ax.set_yticks([(i + 0.5)*dy_scale for i in range(num_scales)], minor=True)
+    ax.set_yticklabels([f"{model.scale:.3g} {model.time_unit}" for model in list_of_splines], minor=True)
+    ax.tick_params(axis='both', labelleft=False, direction='out')
+    ax.tick_params(axis='y', left=False, which='minor')
+    fig.colorbar(cmap, orientation='horizontal', fraction=0.1, pad=0.1, label='Coefficient Value')
+    return fig, ax
 
 
 class Sinusoidal(Model):
