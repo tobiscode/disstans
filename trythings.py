@@ -821,7 +821,11 @@ class GipsyTimeseries(Timeseries):
         time = pd.to_datetime(pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[11, 12, 13, 14, 15, 16],
                                           names=['year', 'month', 'day', 'hour', 'minute', 'second'])).to_frame(name='time')
         data = pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[1, 2, 3, 4, 5, 6], names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
-        df = time.join(data).drop_duplicates(subset='time').set_index('time')
+        df = time.join(data)
+        num_duplicates = int(df.duplicated(subset='time').sum())
+        if num_duplicates > 0:
+            warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. Keeping first occurrences.")
+        df = df.drop_duplicates(subset='time').set_index('time')
         super().__init__(dataframe=df, src='.tseries', data_unit='m',
                          data_cols=['east', 'north', 'up'], sigma_cols=['east_sigma', 'north_sigma', 'up_sigma'])
 
