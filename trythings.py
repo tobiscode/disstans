@@ -17,6 +17,7 @@ from pandas.plotting import register_matplotlib_converters
 from sklearn.decomposition import PCA, FastICA
 from warnings import warn
 from scipy.special import comb, factorial
+from itertools import product
 
 # see if we have compiled_utils
 try:
@@ -400,10 +401,18 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, timeseries=None, verbose=False, **analyze_kw_args):
+    def gui(self, timeseries=None, scalogram=None, verbose=False, **analyze_kw_args):
         # create map and timeseries figures
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons = self._create_map_figure()
         fig_ts = plt.figure()
+        if scalogram is not None:
+            assert isinstance(scalogram, dict) and all([key in scalogram for key in ['ts', 'model']]) \
+                and all([isinstance(scalogram[key], str) for key in ['ts', 'model']]), \
+                "If a scalogram plot is requested, 'scalogram' must be a dictionary with 'ts' and 'model' keys " \
+                f"with string values of where to find the SplineSet model, got {scalogram}."
+            scalo_ts = scalogram.pop('ts')
+            scalo_model = scalogram.pop('model')
+            fig_scalo = plt.figure()
 
         # define clicking function
         def update_timeseries(event):
@@ -429,6 +438,9 @@ class Network():
             fig_ts.clear()
             icomp = 0
             ax_ts = []
+            if scalogram is not None:
+                nonlocal fig_scalo
+                t_left, t_right = None, None
             for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
                 for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
                     # add axis
@@ -453,8 +465,22 @@ class Network():
                         ax.legend()
                     ax_ts.append(ax)
                     icomp += 1
+                    if scalogram is not None:
+                        t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
+                        t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
             ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
+            # get scalogram
+            if scalogram is not None:
+                try:
+                    splset = self[station_name].models[scalo_ts][scalo_model]
+                    if isinstance(fig_scalo, plt.Figure):
+                        plt.close(fig_scalo)
+                    fig_scalo, ax_scalo = make_scalogram(splset, t_left, t_right, **scalogram)
+                    fig_scalo.show()
+                except KeyError as e:
+                    raise KeyError(f"Could not find scalogram model {scalo_model} in timeseries {scalo_ts} "
+                                   f"for station {station_name}.").with_traceback(e.__traceback__) from e
 
         cid = fig_map.canvas.mpl_connect("button_press_event", update_timeseries)
         plt.show()
@@ -1051,20 +1077,26 @@ class BSpline(Model):
         `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
         `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
     """
-    def __init__(self, degree, scale, num_splines=1, spacing=None, **model_kw_args):
-        super().__init__(num_parameters=num_splines, **model_kw_args)
+    def __init__(self, degree, scale, t_reference, time_unit, num_splines=1, spacing=None, **model_kw_args):
         self.degree = int(degree)
         self.order = self.degree + 1
         self.scale = float(scale)
         if spacing is not None:
             self.spacing = float(spacing)
             assert abs(self.spacing) > 0, f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
-            if self.num_parameters == 1:
-                warn(f"'spacing' ({self.spacing} {self.time_unit}) is given, but 'num_splines' = 1 splines are requested.")
-        elif self.num_parameters > 1:
+            if num_splines == 1:
+                warn(f"'spacing' ({self.spacing} {time_unit}) is given, but 'num_splines' = 1 splines are requested.")
+        elif num_splines > 1:
             self.spacing = self.scale
         else:
             self.spacing = None
+        if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
+            model_kw_args["t_start"] = (pd.Timestamp(t_reference) - pd.Timedelta(self.scale, time_unit) * (self.degree + 1)/2).isoformat()
+        if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
+            model_kw_args["t_end"] = (pd.Timestamp(t_reference)
+                                      + pd.Timedelta(self.spacing, time_unit) * num_splines
+                                      + pd.Timedelta(self.scale, time_unit) * (self.degree + 1)/2).isoformat()
+        super().__init__(num_parameters=num_splines, t_reference=t_reference, time_unit=time_unit, **model_kw_args)
 
     def _get_arch(self):
         arch = {"type": "BSpline",
@@ -1093,20 +1125,26 @@ class ISpline(Model):
 
     See the full documentation in the BSpline class.
     """
-    def __init__(self, degree, scale, num_splines=1, spacing=None, zero_after=False, **model_kw_args):
-        super().__init__(num_parameters=num_splines, zero_after=zero_after, **model_kw_args)
+    def __init__(self, degree, scale, t_reference, time_unit, num_splines=1, spacing=None, zero_after=False, **model_kw_args):
         self.degree = int(degree)
         self.order = self.degree + 1
         self.scale = float(scale)
         if spacing is not None:
             self.spacing = float(spacing)
             assert abs(self.spacing) > 0, f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
-            if self.num_parameters == 1:
-                warn(f"'spacing' ({self.spacing} {self.time_unit}) is given, but 'num_splines' = 1 splines are requested.")
-        elif self.num_parameters > 1:
+            if num_splines == 1:
+                warn(f"'spacing' ({self.spacing} {time_unit}) is given, but 'num_splines' = 1 splines are requested.")
+        elif num_splines > 1:
             self.spacing = self.scale
         else:
             self.spacing = None
+        if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
+            model_kw_args["t_start"] = (pd.Timestamp(t_reference) - pd.Timedelta(self.scale, time_unit) * (self.degree + 1)/2).isoformat()
+        if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
+            model_kw_args["t_end"] = (pd.Timestamp(t_reference)
+                                      + pd.Timedelta(self.spacing, time_unit) * num_splines
+                                      + pd.Timedelta(self.scale, time_unit) * (self.degree + 1)/2).isoformat()
+        super().__init__(num_parameters=num_splines, t_reference=t_reference, time_unit=time_unit, zero_after=zero_after, **model_kw_args)
 
     def _get_arch(self):
         arch = {"type": "ISpline",
@@ -1126,87 +1164,136 @@ class ISpline(Model):
         return coefs
 
 
-def build_splineset(degree, t_start, t_end, time_unit, splineclass=ISpline, list_scales=None, list_num_knots=None, complete=True):
+class SplineSet(Model):
     """
-    Return a list of splines that share a common degree, but different center times and scales.
+    Contains a list of splines that share a common degree, but different center times and scales.
 
-    The set is constructed from a time span (t_start and t_end) and numbers of centerpoints or length scales.
+    The set is constructed from a time span (t_center_start and t_center_end) and numbers of centerpoints or length scales.
     The number of splines for each scale will then be chosen such that the resulting set of splines will be complete.
     This means it will contain all splines that are non-zero at least somewhere in the time span.
 
-    This function also sets the spacing equal to the scale.
+    This class also sets the spacing equal to the scale.
     """
-    assert np.logical_xor(list_scales is None, list_num_knots is None), \
-        f"To construct a set of BSplines, only pass one of 'list_scales' and 'list_num_knots' " \
-        f"(got {list_scales} and {list_num_knots})."
-    relevant_list = list_scales if list_num_knots is None else list_num_knots
-    # get time range
-    t_start_tstamp, t_end_tstamp = pd.Timestamp(t_start), pd.Timestamp(t_end)
-    t_range_tdelta = t_end_tstamp - t_start_tstamp
-    # if a complete set is requested, we need to find the number of overlaps given the degree on a single side
-    num_overlaps = degree if complete else 0
-    # for each scale, make a BSplines object
-    splset = []
-    for elem in relevant_list:
-        # Calculate the scale as float and Timedelta depending on the function call
-        if list_scales is not None:
-            scale_float = elem
-            scale_tdelta = pd.Timedelta(scale_float, time_unit)
-        else:
-            scale_tdelta = t_range_tdelta / elem
-            scale_float = scale_tdelta / np.timedelta64(1, time_unit)
-        # find the number of center points between t_start and t_end, plus the overlapping ones
-        num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
-        # shift the reference to be the first spline
-        t_ref = t_start_tstamp - num_overlaps*scale_tdelta
-        # create model and append
-        splset.append(splineclass(degree, scale_float, num_splines=num_centerpoints, t_reference=t_ref, time_unit=time_unit))
-    return splset
+    def __init__(self, degree, t_center_start, t_center_end, time_unit, splineclass=ISpline,
+                 list_scales=None, list_num_knots=None, complete=True, **model_kw_args):
+        assert np.logical_xor(list_scales is None, list_num_knots is None), \
+            f"To construct a set of Splines, only pass one of 'list_scales' and 'list_num_knots' " \
+            f"(got {list_scales} and {list_num_knots})."
+        relevant_list = list_scales if list_num_knots is None else list_num_knots
+        try:
+            if isinstance(splineclass, str):
+                splineclass = globals()[splineclass]
+            assert issubclass(splineclass, Model)
+        except BaseException as e:
+            raise LookupError(f"When trying to create the SplineSet, couldn't find the model '{splineclass}' "
+                              "(expected Model type argument or string representation of a loaded Model).").with_traceback(e.__traceback__) from e
+        # get time range
+        t_center_start_tstamp, t_center_end_tstamp = pd.Timestamp(t_center_start), pd.Timestamp(t_center_end)
+        t_range_tdelta = t_center_end_tstamp - t_center_start_tstamp
+        # if a complete set is requested, we need to find the number of overlaps given the degree on a single side
+        num_overlaps = degree if complete else 0
+        # for each scale, make a BSplines object
+        splset = []
+        num_parameters = 0
+        for elem in relevant_list:
+            # Calculate the scale as float and Timedelta depending on the function call
+            if list_scales is not None:
+                scale_float = elem
+                scale_tdelta = pd.Timedelta(scale_float, time_unit)
+            else:
+                scale_tdelta = t_range_tdelta / elem
+                scale_float = scale_tdelta / pd.to_timedelta(1, time_unit)
+            # find the number of center points between t_center_start and t_center_end, plus the overlapping ones
+            num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
+            num_parameters += num_centerpoints
+            # shift the reference to be the first spline
+            t_ref = t_center_start_tstamp - num_overlaps*scale_tdelta
+            # create model and append
+            splset.append(splineclass(degree, scale_float, num_splines=num_centerpoints, t_reference=t_ref, time_unit=time_unit))
+        # create the actual Model object
+        super().__init__(num_parameters=num_parameters, time_unit=time_unit,
+                         zero_after=False if splineclass == ISpline else True, **model_kw_args)
+        self.degree = degree
+        self.t_center_start = t_center_start
+        self.t_center_end = t_center_end
+        self.splineclass = splineclass
+        self.list_scales = list_scales
+        self.list_num_knots = list_num_knots
+        self.complete = complete
+        self.splines = splset
+
+    def _get_arch(self):
+        arch = {"type": "SplineSet",
+                "kw_args": {"degree": self.degree,
+                            "t_center_start": self.t_center_start,
+                            "t_center_end": self.t_center_end,
+                            "splineclass": self.splineclass.__name__,
+                            "list_scales": self.list_scales,
+                            "list_num_knots": self.list_num_knots,
+                            "complete": self.complete}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        coefs = np.empty((timevector.size, self.num_parameters))
+        ix_coefs = 0
+        for i, model in enumerate(self.splines):
+            temp = model.get_mapping(timevector).toarray().squeeze()
+            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp
+            ix_coefs += model.num_parameters
+        return coefs
+
+    def read_parameters(self, parameters, cov):
+        super().read_parameters(parameters, cov)
+        ix_params = 0
+        for i, model in enumerate(self.splines):
+            cov_model = None if cov is None else cov[ix_params:ix_params + model.num_parameters, ix_params:ix_params + model.num_parameters]
+            model.read_parameters(parameters[ix_params:ix_params + model.num_parameters], cov_model)
+            ix_params += model.num_parameters
 
 
-def make_scalogram(list_of_splines, t_left, t_right, cmaprange=None, resolution=1000):
+def make_scalogram(splineset, t_left, t_right, cmaprange=None, resolution=1000):
     # check input
-    assert isinstance(list_of_splines, list) and all([isinstance(model, Model) for model in list_of_splines]), \
-        f"'list_of_splines' needs to be a list of spline models, got {list_of_splines}."
-    assert all([model.is_fitted for model in list_of_splines]), \
-        f"All models in 'list_of_splines' need to have already been fitted."
+    assert isinstance(splineset, SplineSet), f"'splineset' needs to be an instance of SplineSet, got {type(splineset)}."
+    assert splineset.is_fitted, f"'splineset' needs to have already been fitted."
     # determine dimensions
-    num_scales = len(list_of_splines)
+    num_components = splineset.parameters.shape[1]
+    num_scales = len(splineset.splines)
     dy_scale = 1/num_scales
-    t_plot = np.array([tstamp for tstamp in pd.date_range(start=t_left, end=t_right, periods=resolution)])
+    t_plot = pd.Series([tstamp for tstamp in pd.date_range(start=t_left, end=t_right, periods=resolution)])
     # get range of values (if not provided)
     if cmaprange is not None:
         assert isinstance(cmaprange, int) or isinstance(cmaprange, float), \
-            f"'cmaprange' must be a single float or integer of the one-sided color range of the scalogram, got {cmaprange}."
+            f"'cmaprange' must be None or a single float or integer of the one-sided color range of the scalogram, got {cmaprange}."
     else:
-        cmaprange = np.ceil(np.max(np.abs(np.array([model.parameters for model in list_of_splines]).ravel())))
+        cmaprange = np.max(np.concatenate([np.abs(model.parameters) for model in splineset.splines], axis=0))
     cmap = mpl.cm.ScalarMappable(cmap=CMAPS["seismic"], norm=mpl.colors.Normalize(vmin=-cmaprange, vmax=cmaprange))
     # start plotting
-    fig, ax = plt.subplots()
-    for i, model in enumerate(list_of_splines):
+    fig, ax = plt.subplots(nrows=3, sharex=True)
+    for i, model in enumerate(splineset.splines):
         # where to put this scale
         y_off = 1 - (i + 1)*dy_scale
         # get normalized values
-        mdl_mapping = model.get_mapping(t_plot)
+        mdl_mapping = model.get_mapping(t_plot).toarray()
         mdl_sum = np.sum(mdl_mapping, axis=1, keepdims=True)
         mdl_sum[mdl_sum == 0] = 1
         y_norm = np.hstack([np.zeros((t_plot.size, 1)), np.cumsum(mdl_mapping / mdl_sum, axis=1)])
         # plot cell
-        for j in range(model.num_parameters):
-            ax.fill_between(t_plot, y_off + y_norm[:, j]*dy_scale, y_off + y_norm[:, j+1]*dy_scale, facecolor=cmap.to_rgba(model.parameters[j]))
+        for j, k in product(range(model.num_parameters), range(num_components)):
+            ax[k].fill_between(t_plot, y_off + y_norm[:, j]*dy_scale, y_off + y_norm[:, j+1]*dy_scale, facecolor=cmap.to_rgba(model.parameters[j, k]))
         # plot vertical lines at centerpoints
-        for j in range(model.num_parameters):
-            ax.axvline(model.t_reference + pd.Timedelta(j*model.spacing, model.time_unit), y_off, y_off + dy_scale, c='0.7')
+        for j, k in product(range(model.num_parameters), range(num_components)):
+            ax[k].axvline(model.t_reference + pd.Timedelta(j*model.spacing, model.time_unit), y_off, y_off + dy_scale, c='0.7')
     # finish plot by adding relevant gridlines and labels
-    for i in range(1, num_scales):
-        ax.axhline(i*dy_scale, c='0.7')
-    ax.set_xlim(t_left, t_right)
-    ax.set_ylim(0, 1)
-    ax.set_yticks([i*dy_scale for i in range(num_scales + 1)])
-    ax.set_yticks([(i + 0.5)*dy_scale for i in range(num_scales)], minor=True)
-    ax.set_yticklabels([f"{model.scale:.3g} {model.time_unit}" for model in list_of_splines], minor=True)
-    ax.tick_params(axis='both', labelleft=False, direction='out')
-    ax.tick_params(axis='y', left=False, which='minor')
+    for k in range(num_components):
+        for i in range(1, num_scales):
+            ax[k].axhline(i*dy_scale, c='0.7')
+        ax[k].set_xlim(t_left, t_right)
+        ax[k].set_ylim(0, 1)
+        ax[k].set_yticks([i*dy_scale for i in range(num_scales + 1)])
+        ax[k].set_yticks([(i + 0.5)*dy_scale for i in range(num_scales)], minor=True)
+        ax[k].set_yticklabels(reversed([f"{model.scale:.4g} {model.time_unit}" for model in splineset.splines]), minor=True)
+        ax[k].tick_params(axis='both', labelleft=False, direction='out')
+        ax[k].tick_params(axis='y', left=False, which='minor')
     fig.colorbar(cmap, orientation='horizontal', fraction=0.1, pad=0.1, label='Coefficient Value')
     return fig, ax
 
@@ -1526,7 +1613,7 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
         t_reference = pd.Timestamp(t_reference)
     assert isinstance(t_reference, pd.Timestamp), f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
     # return Numpy array
-    return ((timevector - t_reference) / np.timedelta64(1, time_unit)).values
+    return ((timevector - t_reference) / pd.to_timedelta(1, time_unit)).values
 
 
 def dmultl(dvec, mat):
@@ -1673,13 +1760,22 @@ if __name__ == "__main__":
     # okada_prior(net, "data/nied_fnet_catalog.txt", target_timeseries='final')
     # or after that, load them into the cleaned timeseries
     net.add_unused_local_models('final', models="Catalog")
+    # add some splines to fit leftover transients
+    for station in net:
+        station.add_local_model('final', 'Transient', SplineSet(2, '1996-01-01', '2017-01-01', time_unit='D', list_num_knots=[4, 8, 16, 32, 64, 128, 256]))
     # fit the models and evaluate
     net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
+    # net.fit("final", solver="linear_regression", formal_covariance=False)
     net.evaluate("final", output_description="model")
-    # calculate the residual between the best-fit model and the clean ('final') timeseries
+    net.evaluate("final", ["Annual", "Biannual", "Catalog", "Linear", "Tohoku"], output_description="modelnotransients")
     for station in net:
+        # get transient timeseries
+        station.add_timeseries('onlytransients', station['final'] - station['modelnotransients'],
+                               override_data_cols=station['GNSS'].data_cols)
+        del station['modelnotransients']
+        # calculate the residual between the best-fit model and the clean ('final') timeseries
         station.add_timeseries('residual', station['final'] - station['model'],
                                override_data_cols=station['GNSS'].data_cols)
     # save the network architecture as a .json file and show the results in a GUI
     net.to_json(path="arch_out.json")
-    net.gui(timeseries=['final', 'residual'], mean=True, std=True, n_observations=True, std_outlier=5)
+    net.gui(timeseries=['final', 'onlytransients', 'residual'], scalogram={'ts': 'final', 'model': 'Transient'}, mean=True, std=True, n_observations=True, std_outlier=5)
