@@ -143,7 +143,7 @@ class Network():
             del self.global_models[description]
 
     @classmethod
-    def from_json(cls, path, add_default_local_models=True):
+    def from_json(cls, path, add_default_local_models=True, station_kw_args={}, timeseries_kw_args={}):
         # load configuration
         net_arch = json.load(open(path, mode='r'))
         network_name = net_arch.get("name", "network_from_json")
@@ -164,10 +164,10 @@ class Network():
             else:
                 warn(f"Skipped station '{station_name}' because location information is missing.")
                 continue
-            station = Station(name=station_name, location=station_loc)
+            station = Station(name=station_name, location=station_loc, **station_kw_args)
             # add timeseries to station
             for ts_description, ts_cfg in station_cfg["timeseries"].items():
-                ts = globals()[ts_cfg["type"]](**ts_cfg["kw_args"])
+                ts = globals()[ts_cfg["type"]](**ts_cfg["kw_args"], **timeseries_kw_args)
                 station.add_timeseries(description=ts_description, timeseries=ts)
                 # add default local models to station
                 if add_default_local_models:
@@ -271,7 +271,7 @@ class Network():
         fitted_params = solver(station_time, station_models, **kw_args)
         return fitted_params
 
-    def evaluate(self, ts_description, model_list=None, timevector=None, output_description=None):
+    def evaluate(self, ts_description, model_list=None, timevector=None, output_description=None, reuse=False):
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if output_description is not None:
             assert isinstance(output_description, str), f"'output_description' must be a string, got {type(output_description)}."
@@ -282,18 +282,22 @@ class Network():
         for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station, iterable_inputs),
                                         desc="Evaluating station models", total=len(self.stations), ascii=True, unit="station")):
             station = station_names[i]
-            if output_description is None:
-                for model_description, fit in result.items():
-                    self[station].add_fit(ts_description, model_description, fit)
-            else:
-                ts_list = []
-                for model_description, fit in result.items():
+            for imodel, (model_description, fit) in enumerate(result.items()):
+                if not reuse:
                     ts = self[station].add_fit(ts_description, model_description, fit)
-                    ts_list.append(ts)
-                output_ts = ts_list[0]
-                for its in range(1, len(ts_list)):
-                    output_ts = output_ts + ts_list[its]
-                self[station].add_timeseries(output_description, output_ts, override_src='model', override_data_cols=self[station][ts_description].data_cols)
+                else:
+                    try:
+                        ts = self[station].fits[ts_description][model_description]
+                    except KeyError as e:
+                        raise KeyError(f"Station {station}, Timeseries '{ts_description}' or Model '{model_description}': "
+                                       "Fit not found, cannout evaluate.").with_traceback(e.__traceback__) from e
+                if output_description is not None:
+                    if imodel == 0:
+                        model_aggregate = ts
+                    else:
+                        model_aggregate += ts
+            if output_description is not None:
+                self[station].add_timeseries(output_description, model_aggregate, override_src='model', override_data_cols=self[station][ts_description].data_cols)
 
     @staticmethod
     def _evaluate_single_station(parameter_tuple):
@@ -842,14 +846,14 @@ class GipsyTimeseries(Timeseries):
     """
     Timeseries subclass for GNSS measurements in JPL's Gipsy `.tseries` file format.
     """
-    def __init__(self, path):
+    def __init__(self, path, show_warnings=True):
         self._path = path
         time = pd.to_datetime(pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[11, 12, 13, 14, 15, 16],
                                           names=['year', 'month', 'day', 'hour', 'minute', 'second'])).to_frame(name='time')
         data = pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[1, 2, 3, 4, 5, 6], names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
         df = time.join(data)
         num_duplicates = int(df.duplicated(subset='time').sum())
-        if num_duplicates > 0:
+        if (num_duplicates > 0) and show_warnings:
             warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. Keeping first occurrences.")
         df = df.drop_duplicates(subset='time').set_index('time')
         super().__init__(dataframe=df, src='.tseries', data_unit='m',
@@ -1737,7 +1741,7 @@ def okada_prior(network, catalog_path, target_timeseries=None):
 if __name__ == "__main__":
     # initialize network from an architecture .json file
     # net = Network.from_json(path="net_arch_boso.json", add_default_local_models=False)
-    net = Network.from_json(path="net_arch_boso_okada3mm.json", add_default_local_models=False)
+    net = Network.from_json(path="net_arch_boso_okada3mm.json", add_default_local_models=False, timeseries_kw_args={"show_warnings": False})
     # low-pass filter using a median function, then clean the timeseries (using the settings in the config file)
     net.call_func_ts_return(median, ts_in='GNSS', ts_out='filtered', kernel_size=7)
     net.call_func_no_return(clean, ts_in='GNSS', reference='filtered', ts_out='clean')
@@ -1767,7 +1771,7 @@ if __name__ == "__main__":
     net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
     # net.fit("final", solver="linear_regression", formal_covariance=False)
     net.evaluate("final", output_description="model")
-    net.evaluate("final", ["Annual", "Biannual", "Catalog", "Linear", "Tohoku"], output_description="modelnotransients")
+    net.evaluate("final", ["Annual", "Biannual", "Catalog", "Linear", "Tohoku"], output_description="modelnotransients", reuse=True)
     for station in net:
         # get transient timeseries
         station.add_timeseries('onlytransients', station['final'] - station['modelnotransients'],
