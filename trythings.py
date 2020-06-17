@@ -7,6 +7,7 @@ import cartopy.crs as ccrs
 import warnings
 import multiprocessing
 import scipy.sparse as sparse
+import cvxpy as cp
 from copy import deepcopy
 from configparser import ConfigParser
 from tqdm import tqdm
@@ -251,7 +252,7 @@ class Network():
                     mdl = globals()[local_copy["type"]](**local_copy["kw_args"])
                     station.add_local_model(ts_description=target_ts, model_description=model_description, model=mdl)
 
-    def fit(self, ts_description, model_list=None, solver=config.get('fit', 'solver'), **kw_args):
+    def fit(self, ts_description, model_list=None, solver=config.get('fit', 'solver', fallback='linear_regression'), **kw_args):
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if isinstance(solver, str):
             solver = globals()[solver]
@@ -405,7 +406,7 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, timeseries=None, scalogram=None, verbose=False, **analyze_kw_args):
+    def gui(self, timeseries=None, sum_models=True, scalogram=None, verbose=False, **analyze_kw_args):
         # create map and timeseries figures
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons = self._create_map_figure()
         fig_ts = plt.figure()
@@ -457,12 +458,27 @@ class Network():
                     # plot data
                     ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data" if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
-                    for (mdl_description, fit) in self[station_name].fits[ts_description].items():
-                        if fit.sigma_cols[icol] is not None and "plot_sigmas" in config.options("gui"):
-                            ax.fill_between(fit.time, fit.df[fit.data_cols[icol]] + config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
-                                            fit.df[fit.data_cols[icol]] - config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
+                    if sum_models:
+                        fit_sum = np.zeros(ts.time.size)
+                        fit_sum_sigma = np.zeros(ts.time.size)
+                        for (mdl_description, fit) in self[station_name].fits[ts_description].items():
+                            fit_sum += fit.df[fit.data_cols[icol]].values
+                            if fit.sigma_cols[icol] is not None and "plot_sigmas" in config.options("gui"):
+                                fit_sum_sigma += (fit.df[fit.sigma_cols[icol]].values)**2
+                        if fit_sum_sigma.sum() > 0:
+                            fit_sum_sigma = np.sqrt(fit_sum_sigma)
+                            ax.fill_between(fit.time, fit_sum + config.getfloat("gui", "plot_sigmas") * fit_sum_sigma,
+                                            fit_sum - config.getfloat("gui", "plot_sigmas") * fit_sum_sigma,
                                             alpha=config.getfloat("gui", "plot_sigmas_alpha"), linewidth=0)
-                        ax.plot(fit.time, fit.df[fit.data_cols[icol]], label=mdl_description)
+                        if np.abs(fit_sum).sum() > 0:
+                            ax.plot(fit.time, fit_sum, label="Model")
+                    else:
+                        for (mdl_description, fit) in self[station_name].fits[ts_description].items():
+                            if fit.sigma_cols[icol] is not None and "plot_sigmas" in config.options("gui"):
+                                ax.fill_between(fit.time, fit.df[fit.data_cols[icol]] + config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
+                                                fit.df[fit.data_cols[icol]] - config.getfloat("gui", "plot_sigmas") * fit.df[fit.sigma_cols[icol]],
+                                                alpha=config.getfloat("gui", "plot_sigmas_alpha"), linewidth=0)
+                            ax.plot(fit.time, fit.df[fit.data_cols[icol]], label=mdl_description)
                     ax.set_ylabel(f"{ts_description}\n{data_col} [{ts.data_unit}]")
                     ax.grid()
                     if len(self[station_name].fits[ts_description]) > 0:
@@ -482,9 +498,9 @@ class Network():
                         plt.close(fig_scalo)
                     fig_scalo, ax_scalo = make_scalogram(splset, t_left, t_right, **scalogram)
                     fig_scalo.show()
-                except KeyError as e:
-                    raise KeyError(f"Could not find scalogram model {scalo_model} in timeseries {scalo_ts} "
-                                   f"for station {station_name}.").with_traceback(e.__traceback__) from e
+                except KeyError:
+                    warn(f"Could not find scalogram model {scalo_model} in timeseries {scalo_ts} "
+                         f"for station {station_name}.", category=RuntimeWarning)
 
         cid = fig_map.canvas.mpl_connect("button_press_event", update_timeseries)
         plt.show()
@@ -1119,6 +1135,11 @@ class BSpline(Model):
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
         return coefs
 
+    def get_transient_period(self, timevector):
+        trel = self.tvec_to_numpycol(timevector).reshape(-1, 1) - self.scale * np.arange(self.num_parameters).reshape(1, -1)
+        transient = np.abs(trel) <= self.scale * self.order
+        return transient
+
 
 class ISpline(Model):
     """
@@ -1166,6 +1187,11 @@ class ISpline(Model):
         in_sum = (-1)**krange * comb(self.order, krange) * (in_power)**(self.degree + 1) * (in_power >= 0)
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree + 1)
         return coefs
+
+    def get_transient_period(self, timevector):
+        trel = self.tvec_to_numpycol(timevector).reshape(-1, 1) - self.scale * np.arange(self.num_parameters).reshape(1, -1)
+        transient = np.abs(trel) <= self.scale * self.order
+        return transient
 
 
 class SplineSet(Model):
@@ -1269,7 +1295,7 @@ def make_scalogram(splineset, t_left, t_right, cmaprange=None, resolution=1000):
         assert isinstance(cmaprange, int) or isinstance(cmaprange, float), \
             f"'cmaprange' must be None or a single float or integer of the one-sided color range of the scalogram, got {cmaprange}."
     else:
-        cmaprange = np.max(np.concatenate([np.abs(model.parameters) for model in splineset.splines], axis=0))
+        cmaprange = np.percentile(np.concatenate([np.abs(model.parameters) for model in splineset.splines], axis=0).ravel(), 95)
     cmap = mpl.cm.ScalarMappable(cmap=CMAPS["seismic"], norm=mpl.colors.Normalize(vmin=-cmaprange, vmax=cmaprange))
     # start plotting
     fig, ax = plt.subplots(nrows=3, sharex=True)
@@ -1277,7 +1303,12 @@ def make_scalogram(splineset, t_left, t_right, cmaprange=None, resolution=1000):
         # where to put this scale
         y_off = 1 - (i + 1)*dy_scale
         # get normalized values
-        mdl_mapping = model.get_mapping(t_plot).toarray()
+        if splineset.splineclass == BSpline:
+            mdl_mapping = model.get_mapping(t_plot).toarray()
+        elif splineset.splineclass == ISpline:
+            mdl_mapping = np.gradient(model.get_mapping(t_plot).toarray(), axis=0)
+        else:
+            raise NotImplementedError(f"GUI does not know how to make a scalogram for a SplineSet of class {splineset.splineclass.__name__}.")
         mdl_sum = np.sum(mdl_mapping, axis=1, keepdims=True)
         mdl_sum[mdl_sum == 0] = 1
         y_norm = np.hstack([np.zeros((t_plot.size, 1)), np.cumsum(mdl_mapping / mdl_sum, axis=1)])
@@ -1286,11 +1317,11 @@ def make_scalogram(splineset, t_left, t_right, cmaprange=None, resolution=1000):
             ax[k].fill_between(t_plot, y_off + y_norm[:, j]*dy_scale, y_off + y_norm[:, j+1]*dy_scale, facecolor=cmap.to_rgba(model.parameters[j, k]))
         # plot vertical lines at centerpoints
         for j, k in product(range(model.num_parameters), range(num_components)):
-            ax[k].axvline(model.t_reference + pd.Timedelta(j*model.spacing, model.time_unit), y_off, y_off + dy_scale, c='0.7')
+            ax[k].axvline(model.t_reference + pd.Timedelta(j*model.spacing, model.time_unit), y_off, y_off + dy_scale, c='0.5', lw=0.5)
     # finish plot by adding relevant gridlines and labels
     for k in range(num_components):
         for i in range(1, num_scales):
-            ax[k].axhline(i*dy_scale, c='0.7')
+            ax[k].axhline(i*dy_scale, c='0.5', lw=0.5)
         ax[k].set_xlim(t_left, t_right)
         ax[k].set_ylim(0, 1)
         ax[k].set_yticks([i*dy_scale for i in range(num_scales + 1)])
@@ -1343,8 +1374,8 @@ class Logarithmic(Model):
     """
     Geophysical logarithmic `ln(1 + dt/tau)` with a given time constant and time window.
     """
-    def __init__(self, tau, **model_kw_args):
-        super().__init__(num_parameters=1, **model_kw_args)
+    def __init__(self, tau, zero_after=False, **model_kw_args):
+        super().__init__(num_parameters=1, zero_after=zero_after, **model_kw_args)
         if self.t_reference is None:
             warn("No 't_reference' set for Logarithmic model, using 't_start' for it.")
             self._t_reference = self._t_start
@@ -1535,7 +1566,7 @@ def clean(station, ts_in, reference, ts_out=None, residual_out=None,
 
 def linear_regression(ts, models, formal_covariance=config.getboolean('fit', 'formal_covariance', fallback=False)):
     """
-    numpy.linalg wrapper for a linear least squares solver
+    scipy.sparse.linalg wrapper for a linear least squares solver
     """
     mapping_matrices = []
     # get mapping matrices
@@ -1559,7 +1590,7 @@ def linear_regression(ts, models, formal_covariance=config.getboolean('fit', 'fo
             GtWd = GtW @ d
         params[:, i] = sparse.linalg.lsqr(GtWG, GtWd.toarray().squeeze())[0].squeeze()
         if formal_covariance:
-            cov[:, :, i] = np.linalg.pinv(GtWG)
+            cov[:, :, i] = np.linalg.pinv(GtWG.toarray())
     # separate parameters back to models
     i = 0
     fitted_params = {}
@@ -1569,10 +1600,13 @@ def linear_regression(ts, models, formal_covariance=config.getboolean('fit', 'fo
     return fitted_params
 
 
-def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty'), formal_covariance=config.getboolean('fit', 'formal_covariance', fallback=False)):
+def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty', fallback=0.0),
+                     formal_covariance=config.getboolean('fit', 'formal_covariance', fallback=False)):
     """
-    numpy.linalg wrapper for a linear L2-regularized least squares solver
+    scipy.sparse.linalg wrapper for a linear L2-regularized least squares solver
     """
+    if penalty == 0.0:
+        warn(f"Ridge Regression (L2-regularized) solver got a penalty of {penalty}, which effectively removes the regularization.")
     mapping_matrices = []
     reg_diag = []
     # get mapping and regularization matrices
@@ -1600,6 +1634,73 @@ def ridge_regression(ts, models, penalty=config.getfloat('fit', 'l2_penalty'), f
         params[:, i] = sparse.linalg.lsqr(GtWGreg, GtWd.toarray().squeeze())[0].squeeze()
         if formal_covariance:
             cov[:, :, i] = np.linalg.pinv(GtWGreg.toarray())
+    # separate parameters back to models
+    i = 0
+    fitted_params = {}
+    for (mdl_description, model) in models.items():
+        fitted_params[mdl_description] = (params[i:i+model.num_parameters, :], cov[i:i+model.num_parameters, i:i+model.num_parameters, :] if formal_covariance else None)
+        i += model.num_parameters
+    return fitted_params
+
+
+def lasso_regression(ts, models, penalty=config.getfloat('fit', 'l1_penalty', fallback=0.0),
+                     formal_covariance=config.getboolean('fit', 'formal_covariance', fallback=False)):
+    """
+    cvxpy wrapper for a linear L1-regularized least squares solver
+    """
+    if penalty == 0.0:
+        warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, which effectively removes the regularization.")
+    mapping_matrices = []
+    reg_diag = []
+
+    # get mapping and regularization matrices
+    for (mdl_description, model) in models.items():
+        mapping_matrices.append(model.get_mapping(ts.time))
+        reg_diag.extend([model.regularize for _ in range(model.num_parameters)])
+    G = sparse.hstack(mapping_matrices, format='bsr')
+    # reg = sparse.diags(reg_diag, dtype=float) * penalty
+    reg_diag = np.array(reg_diag)
+    num_time, num_params = G.shape
+    num_components = len(ts.data_cols)
+
+    # define cvxpy helper expressions and functions
+    beta = cp.Variable(num_params)
+    lambd = cp.Parameter(nonneg=True)
+    lambd.value = penalty
+
+    def objective_fn(X, Y, beta, lambd, reg):
+        return cp.norm2(X @ beta - Y)**2 + lambd * cp.norm1(beta * reg)
+
+    # perform fit and estimate formal covariance (uncertainty) of parameters
+    params = np.zeros((num_params, num_components))
+    if formal_covariance:
+        cov = np.zeros((num_params, num_params, num_components))
+    for i in range(num_components):
+        d = sparse.csc_matrix(ts.df[ts.data_cols[i]].values.reshape(-1, 1))
+        if ts.sigma_cols[i] is None:
+            GtWG = G.T @ G
+            GtWd = G.T @ d
+        else:
+            GtW = G.T @ sparse.diags(1/ts.df[ts.sigma_cols[i]].values**2)
+            GtWG = GtW @ G
+            GtWd = GtW @ d
+
+        # solve cvxpy problem
+        problem = cp.Problem(cp.Minimize(objective_fn(GtWG, GtWd.toarray().squeeze(), beta, lambd, reg_diag)))
+        problem.solve()
+        params[:, i] = beta.value
+
+        # estimate formal covariance
+        if formal_covariance:
+            best_ind = np.nonzero(beta.value)
+            Gsub = G[:, best_ind]
+            if ts.sigma_cols[i] is None:
+                GtWG = Gsub.T @ Gsub
+            else:
+                GtW = Gsub.T @ sparse.diags(1/ts.df[ts.sigma_cols[i]].values**2)
+                GtWG = GtW @ Gsub
+            cov[best_ind, best_ind, i] = np.linalg.pinv(GtWG.toarray())
+
     # separate parameters back to models
     i = 0
     fitted_params = {}
@@ -1766,9 +1867,11 @@ if __name__ == "__main__":
     net.add_unused_local_models('final', models="Catalog")
     # add some splines to fit leftover transients
     for station in net:
-        station.add_local_model('final', 'Transient', SplineSet(2, '1996-01-01', '2017-01-01', time_unit='D', list_num_knots=[4, 8, 16, 32, 64, 128, 256]))
+        station.add_local_model('final', 'Transient', SplineSet(2, '1996-01-01', '2017-01-01', time_unit='D',
+                                                                list_num_knots=[4, 8, 16, 32, 64, 128, 256], regularize=True))
     # fit the models and evaluate
-    net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
+    net.fit("final", solver="lasso_regression", penalty=1e6, formal_covariance=False)
+    # net.fit("final", solver="ridge_regression", penalty=1e3, formal_covariance=False)
     # net.fit("final", solver="linear_regression", formal_covariance=False)
     net.evaluate("final", output_description="model")
     net.evaluate("final", ["Annual", "Biannual", "Catalog", "Linear", "Tohoku"], output_description="modelnotransients", reuse=True)
