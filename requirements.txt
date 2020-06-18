@@ -1,0 +1,9 @@
+python>=3
+numpy
+scipy
+matplotlib
+cartopy
+pandas>=1
+tqdm
+cvxpy
+okada_wrapper @ git+https://github.com/tbenthompson/okada_wrapper.git

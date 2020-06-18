@@ -1,3 +1,3 @@
-# network-analysis
+# GeoNAT
 
-Playground to code up a GNSS network spatiotemporal analysis software
+Package repository for the **Geo**detic **N**etwork **A**nalysis **T**ools.
