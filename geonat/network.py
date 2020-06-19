@@ -352,7 +352,7 @@ class Network():
             except Exception as exc:
                 print(exc)
         if gui_settings["coastlines_show"]:
-            ax_map.coastlines(color="white" if map_underlay else "black", resolution=gui_settings["coastlines_resolution"])
+            ax_map.coastlines(color="white" if map_underlay else "black", resolution=gui_settings["coastlines_res"])
         return fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons
 
     def graphical_cme(self, ts_in, ts_out=None, gui_kw_args={}, **cme_kw_args):

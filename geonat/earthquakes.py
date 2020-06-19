@@ -48,7 +48,7 @@ def _okada_get_cumdisp(time_station_settings):
 
 
 def okada_prior(network, catalog_path, target_timeseries, target_model, target_model_regularize=False, catalog_prior_kw_args={}):
-    catalog_prior_settings = defaults["catalog_prior"].copy()
+    catalog_prior_settings = defaults["prior"].copy()
     catalog_prior_settings.update(catalog_prior_kw_args)
     stations_lla = np.array([station.location for station in network])
     # convert height from m to km
