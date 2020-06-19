@@ -15,7 +15,7 @@ defaults["general"] = {"num_threads": None}
 # GUI
 defaults["gui"] = {"projection": "Mercator",
                    "coastlines_show": True,
-                   "coastlines_resolution": "50m",
+                   "coastlines_res": "50m",
                    "wmts_show": False,
                    "wmts_server": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/WMTS/1.0.0/WMTSCapabilities.xml",
                    "wmts_layer": "World_Imagery",
@@ -28,6 +28,6 @@ defaults["clean"] = {"std_thresh": 100,
                      "min_obs": 100,
                      "min_clean_obs": 100}
 # priors from earthquake catalogs
-defaults["catalog_prior"] = {"alpha": 10,
-                             "mu": 30,
-                             "threshold": 3}
+defaults["prior"] = {"alpha": 10,
+                     "mu": 30,
+                     "threshold": 3}
