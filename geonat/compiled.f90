@@ -1,4 +1,4 @@
-! file compiled_utils.f90
+! file compiled.f90
 ! contains subroutines that speed up some tasks if they are precompiled
 
 SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
@@ -31,7 +31,8 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
             IF ( masksum.gt.0 ) THEN
                 ! can proceed with median calculation
-                subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), mask_in(i-halfwindow:i+halfwindow, j))
+                subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), &
+                                         mask_in(i-halfwindow:i+halfwindow, j))
                 CALL median(subvec(1:masksum), masksum, medians(i, j))
             END IF
             halfwindow = halfwindow + 1
@@ -43,7 +44,8 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
             IF ( masksum.gt.0 ) THEN
                 ! can proceed with median calculation
-                subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), mask_in(i-halfwindow:i+halfwindow, j))
+                subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), &
+                                         mask_in(i-halfwindow:i+halfwindow, j))
                 CALL median(subvec(1:masksum), masksum, medians(i, j))
             END IF
         END DO
@@ -54,7 +56,8 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
             IF ( masksum.gt.0 ) THEN
                 ! can proceed with median calculation
-                subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), mask_in(i-halfwindow:i+halfwindow, j))
+                subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), &
+                                         mask_in(i-halfwindow:i+halfwindow, j))
                 CALL median(subvec(1:masksum), masksum, medians(i, j))
             END IF
             halfwindow = halfwindow - 1

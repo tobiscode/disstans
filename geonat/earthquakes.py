@@ -22,8 +22,12 @@ def _okada_get_displacements(station_and_parameters):
     disp = np.zeros_like(stations)
     for i in range(stations.shape[0]):
         success, u, grad_u = dc3d0(eq['alpha'], stations[i, :], eq['depth'], eq['dip'], eq['potency'])
+        # unit for u is [unit of potency] / [unit of station location & depth]^2
+        # unit for grad_u is [unit of potency] / [unit of station location & depth]^3
+        # assume potency is Nm/GPa = 1e-9 m^3 and locations are in km,
+        # then u is in [1e-15 m] and grad_u in [1e-18 m]
         if success == 0:
-            disp[i, :] = u / 10**12  # output is now in mm
+            disp[i, :] = u * 10**12  # output is now in mm
         else:
             warn(f"Success = {success} for station {i}!", category=RuntimeWarning)
     # transform back to lat, lon, alt
@@ -62,6 +66,7 @@ def okada_prior(network, catalog_path, target_timeseries, target_model, target_m
         stations_rel[i][:, 0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[i, 0]*np.pi/180)
         stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
         stations_rel[i][:, 2] = 0
+    # stations_rel is now in km, just like depth
 
     # compute station displacements
     parameters = ((stations_rel[i], {'alpha': catalog_prior_settings["alpha"], 'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
