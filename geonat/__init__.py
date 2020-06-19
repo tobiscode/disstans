@@ -1,4 +1,3 @@
-import os
 import multiprocessing
 from pandas.plotting import register_matplotlib_converters
 
@@ -12,7 +11,7 @@ register_matplotlib_converters()
 # set global defaults that can be overriden by the user
 defaults = {}
 # general
-defaults["general"] = {"num_threads": int(len(os.sched_getaffinity(0)) // 2)}
+defaults["general"] = {"num_threads": None}
 # GUI
 defaults["gui"] = {"projection": "Mercator",
                    "coastlines_show": True,

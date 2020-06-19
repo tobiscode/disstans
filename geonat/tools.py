@@ -1,7 +1,10 @@
+import os
 import pandas as pd
 from multiprocessing import Pool
 
+# set default number of threads to use
 from . import defaults
+defaults["general"]["num_threads"] = int(len(os.sched_getaffinity(0)) // 2)
 
 
 def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
