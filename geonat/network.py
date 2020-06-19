@@ -151,7 +151,7 @@ class Network():
                         mdl = getattr(geonat_models, model_cfg["type"])(**model_cfg["kw_args"])
                         station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
                 else:
-                    station._unused_models.update({ts_description: ts_model_dict})
+                    station.unused_models.update({ts_description: ts_model_dict})
             # add to network
             net.add_station(name=station_name, station=station)
         # add global models
@@ -210,11 +210,11 @@ class Network():
         if isinstance(models, str):
             models = [models]
         for station in self:
-            if hidden_ts in station._unused_models:
+            if hidden_ts in station.unused_models:
                 if models is None:
-                    local_models_subset = station._unused_models[hidden_ts]
+                    local_models_subset = station.unused_models[hidden_ts]
                 else:
-                    local_models_subset = {name: model for name, model in station._unused_models[hidden_ts].items() if name in models}
+                    local_models_subset = {name: model for name, model in station.unused_models[hidden_ts].items() if name in models}
                 for model_description, model_cfg in local_models_subset.items():
                     local_copy = deepcopy(model_cfg)
                     mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])

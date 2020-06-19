@@ -24,9 +24,9 @@ class Model():
         self.cov = None
         self.regularize = bool(regularize)
         self.time_unit = str(time_unit)
-        self._t_start = None if t_start is None else str(t_start)
-        self._t_end = None if t_start is None else str(t_end)
-        self._t_reference = None if t_start is None else str(t_reference)
+        self.t_start_str = None if t_start is None else str(t_start)
+        self.t_end_str = None if t_start is None else str(t_end)
+        self.t_reference_str = None if t_start is None else str(t_reference)
         self.t_start = None if t_start is None else pd.Timestamp(t_start)
         self.t_end = None if t_end is None else pd.Timestamp(t_end)
         self.t_reference = None if t_reference is None else pd.Timestamp(t_reference)
@@ -39,9 +39,9 @@ class Model():
                 "num_parameters": self.num_parameters,
                 "kw_args": {"regularize": self.regularize,
                             "time_unit": self.time_unit,
-                            "t_start": self._t_start,
-                            "t_end": self._t_end,
-                            "t_reference": self._t_reference,
+                            "t_start": self.t_start_str,
+                            "t_end": self.t_end_str,
+                            "t_reference": self.t_reference_str,
                             "zero_before": self.zero_before,
                             "zero_after": self.zero_after}}
         # get subclass-specific architecture
@@ -132,17 +132,17 @@ class Step(Model):
     """
     def __init__(self, steptimes, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
-        self._steptimes = steptimes
-        self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
+        self.steptimes_str = steptimes
+        self.timestamps = [pd.Timestamp(step) for step in self.steptimes_str]
         self.timestamps.sort()
 
     def _get_arch(self):
         arch = {"type": "Step",
-                "kw_args": {"steptimes": self._steptimes}}
+                "kw_args": {"steptimes": self.steptimes_str}}
         return arch
 
     def _update_from_steptimes(self):
-        self.timestamps = [pd.Timestamp(step) for step in self._steptimes]
+        self.timestamps = [pd.Timestamp(step) for step in self.steptimes_str]
         self.timestamps.sort()
         self.num_parameters = len(self.timestamps)
         self.is_fitted = False
@@ -150,15 +150,15 @@ class Step(Model):
         self.cov = None
 
     def add_step(self, step):
-        if step in self._steptimes:
+        if step in self.steptimes_str:
             warn(f"Step '{step}' already present.", category=RuntimeWarning)
         else:
-            self._steptimes.append(step)
+            self.steptimes_str.append(step)
             self._update_from_steptimes()
 
     def remove_step(self, step):
         try:
-            self._steptimes.remove(step)
+            self.steptimes_str.remove(step)
             self._update_from_steptimes()
         except ValueError:
             warn(f"Step '{step}' not present.", category=RuntimeWarning)
@@ -173,7 +173,7 @@ class Polynomial(Model):
     Polynomial of given order.
 
     `time_unit` can be the following (see https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_timedelta.html):
-        `W`, `D`, `days`, `day`, `hours`, hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
+        `W`, `D`, `days`, `day`, `hours`, `hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
         `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
         `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
     """
@@ -199,7 +199,7 @@ class Polynomial(Model):
 
 
 class BSpline(Model):
-    """
+    r"""
     Cardinal, centralized B-Splines of certain order/degree and time scale.
     Used for transient temporary signals that return to zero after a given time span.
 
@@ -212,7 +212,7 @@ class BSpline(Model):
     and some examples on https://bsplines.org/flavors-and-types-of-b-splines/.
 
     It is important to note that the function will be non-zero on the interval
-    -(p+1)/2 < x < (p+1)/2
+    \( -(p+1)/2 < x < (p+1)/2 \)
     where p is the degree of the cardinal B-spline (and the degree of the resulting polynomial).
     The order n is related to the degree by the relation n = p + 1.
     The scale determines the width of the spline in the time domain, and corresponds to the interval [0, 1] of the B-Spline.
@@ -224,7 +224,7 @@ class BSpline(Model):
     If no spacing is given but multiple splines are requested, the scale will be used as the spacing.
 
     `time_unit` can be the following (see https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_timedelta.html):
-        `W`, `D`, `days`, `day`, `hours`, hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
+        `W`, `D`, `days`, `day`, `hours`, `hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
         `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
         `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
     """
@@ -467,7 +467,7 @@ class Sinusoidal(Model):
     Sinusoidal of given frequency. Estimates amplitude and phase.
 
     `time_unit` can be the following (see https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_timedelta.html):
-        `W`, `D`, `days`, `day`, `hours`, hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
+        `W`, `D`, `days`, `day`, `hours`, `hour`, `hr`, `h`, `m`, `minute`, `min`, `minutes`, `T`,
         `S`, `seconds`, `sec`, `second`, `ms`, `milliseconds`, `millisecond`, `milli`, `millis`, `L`,
         `us`, `microseconds`, `microsecond`, `micro`, `micros`, `U`, `ns`, `nanoseconds`, `nano`, `nanos`, `nanosecond`, `N`
     """
@@ -507,15 +507,15 @@ class Logarithmic(Model):
         super().__init__(num_parameters=1, zero_after=zero_after, **model_kw_args)
         if self.t_reference is None:
             warn("No 't_reference' set for Logarithmic model, using 't_start' for it.")
-            self._t_reference = self._t_start
+            self.t_reference_str = self.t_start_str
             self.t_reference = self.t_start
         elif self.t_start is None:
             warn("No 't_start' set for Logarithmic model, using 't_reference' for it.")
-            self._t_start = self._t_reference
+            self.t_start_str = self.t_reference_str
             self.t_start = self.t_reference
         else:
             assert self.t_reference <= self.t_start, \
-                f"Logarithmic model has to have valid bounds, but the reference time {self._t_reference} is after the start time {self._t_start}."
+                f"Logarithmic model has to have valid bounds, but the reference time {self.t_reference_str} is after the start time {self.t_start_str}."
         self.tau = float(tau)
 
     def _get_arch(self):

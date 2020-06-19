@@ -18,7 +18,7 @@ class Station():
         self.location = location
         self.timeseries = {}
         self.models = {}
-        self._unused_models = {}
+        self.unused_models = {}
         self.fits = {}
 
     def __repr__(self):
