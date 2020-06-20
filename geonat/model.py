@@ -109,7 +109,7 @@ class Model():
             raise ValueError("Can't call 'tvec_to_numpycol' because no time unit was specified in the model.")
         return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
-    def read_parameters(self, parameters, cov):
+    def read_parameters(self, parameters, cov=None):
         assert self.num_parameters == parameters.shape[0], "Read-in parameters have different size than the instantiated model."
         self.parameters = parameters
         if cov is not None:
@@ -403,7 +403,7 @@ class SplineSet(Model):
             ix_coefs += model.num_parameters
         return coefs
 
-    def read_parameters(self, parameters, cov):
+    def read_parameters(self, parameters, cov=None):
         super().read_parameters(parameters, cov)
         ix_params = 0
         for i, model in enumerate(self.splines):
