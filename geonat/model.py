@@ -57,7 +57,7 @@ class Model():
 
     def get_mapping(self, timevector):
         # get active period and initialize coefficient matrix
-        active, first, last = self._get_active_period(timevector)
+        active, first, last = self.get_active_period(timevector)
         # if there isn't any active period, return csr-sparse matrix
         if (first is None) and (last is None):  # this is equivalent to not active.any()
             mapping = sparse.bsr_matrix((timevector.size, self.num_parameters))
@@ -86,7 +86,7 @@ class Model():
     def _get_mapping(self, timevector):
         raise NotImplementedError("'Model' needs to be subclassed and its child needs to implement a '_get_mapping' function for the active period.")
 
-    def _get_active_period(self, timevector):
+    def get_active_period(self, timevector):
         if (self.t_start is None) and (self.t_end is None):
             active = np.ones_like(timevector, dtype=bool)
         elif self.t_start is None:
