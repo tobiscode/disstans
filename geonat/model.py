@@ -132,33 +132,34 @@ class Step(Model):
     """
     def __init__(self, steptimes, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
-        self.steptimes_str = steptimes
-        self.timestamps = [pd.Timestamp(step) for step in self.steptimes_str]
+        self.timestamps = [pd.Timestamp(step) for step in steptimes]
         self.timestamps.sort()
+        self.steptimes = [step.isoformat() for step in self.timestamps]
 
     def _get_arch(self):
         arch = {"type": "Step",
-                "kw_args": {"steptimes": self.steptimes_str}}
+                "kw_args": {"steptimes": self.steptimes}}
         return arch
 
     def _update_from_steptimes(self):
-        self.timestamps = [pd.Timestamp(step) for step in self.steptimes_str]
+        self.timestamps = [pd.Timestamp(step) for step in self.steptimes]
         self.timestamps.sort()
+        self.steptimes = [step.isoformat() for step in self.timestamps]
         self.num_parameters = len(self.timestamps)
         self.is_fitted = False
         self.parameters = None
         self.cov = None
 
     def add_step(self, step):
-        if step in self.steptimes_str:
+        if step in self.steptimes:
             warn(f"Step '{step}' already present.", category=RuntimeWarning)
         else:
-            self.steptimes_str.append(step)
+            self.steptimes.append(step)
             self._update_from_steptimes()
 
     def remove_step(self, step):
         try:
-            self.steptimes_str.remove(step)
+            self.steptimes.remove(step)
             self._update_from_steptimes()
         except ValueError:
             warn(f"Step '{step}' not present.", category=RuntimeWarning)
