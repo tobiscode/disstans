@@ -351,6 +351,7 @@ class SplineSet(Model):
                               "(expected Model type argument or string representation of a loaded Model).").with_traceback(e.__traceback__) from e
         # get time range
         t_center_start_tstamp, t_center_end_tstamp = pd.Timestamp(t_center_start), pd.Timestamp(t_center_end)
+        t_center_start, t_center_end = t_center_start_tstamp.isoformat(), t_center_end_tstamp.isoformat()
         t_range_tdelta = t_center_end_tstamp - t_center_start_tstamp
         # if a complete set is requested, we need to find the number of overlaps given the degree on a single side
         num_overlaps = degree if complete else 0
