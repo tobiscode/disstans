@@ -336,10 +336,10 @@ class SplineSet(Model):
 
     This class also sets the spacing equal to the scale.
     """
-    def __init__(self, degree, t_center_start, t_center_end, time_unit, splineclass=ISpline,
-                 list_scales=None, list_num_knots=None, complete=True, **model_kw_args):
+    def __init__(self, degree, t_center_start, t_center_end, time_unit, list_scales=None, list_num_knots=None,
+                 splineclass=ISpline, complete=True, **model_kw_args):
         assert np.logical_xor(list_scales is None, list_num_knots is None), \
-            f"To construct a set of Splines, only pass one of 'list_scales' and 'list_num_knots' " \
+            f"To construct a set of Splines, pass exactly one of 'list_scales' and 'list_num_knots' " \
             f"(got {list_scales} and {list_num_knots})."
         relevant_list = list_scales if list_num_knots is None else list_num_knots
         try:
