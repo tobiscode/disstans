@@ -171,15 +171,15 @@ class Network():
         for stat_name, station in self.stations.items():
             stat_arch = station.get_arch()
             # need to remove all models that are actually default models
-            for mdl_description, mdl in self.default_local_models.items():
+            for model_description, mdl in self.default_local_models.items():
                 for ts_description in stat_arch["models"]:
-                    if (mdl_description in stat_arch["models"][ts_description].keys()) and (mdl == stat_arch["models"][ts_description][mdl_description]):
-                        del stat_arch["models"][ts_description][mdl_description]
+                    if (model_description in stat_arch["models"][ts_description].keys()) and (mdl == stat_arch["models"][ts_description][model_description]):
+                        del stat_arch["models"][ts_description][model_description]
             # now we can append it to the main json
             net_arch["stations"].update({stat_name: stat_arch})
         # add global model representations
-        for mdl_description, mdl in self.global_models.items():
-            net_arch["global_models"].update({mdl_description: mdl.get_arch()})
+        for model_description, mdl in self.global_models.items():
+            net_arch["global_models"].update({model_description: mdl.get_arch()})
         # write file
         json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
 
@@ -414,7 +414,8 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, timeseries=None, sum_models=True, scalogram=None, verbose=False, analyze_kw_args={}, gui_kw_args={}):
+    def gui(self, timeseries=None, model_list=None, sum_models=True, scalogram=None,
+            verbose=False, analyze_kw_args={}, gui_kw_args={}):
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
@@ -469,10 +470,12 @@ class Network():
                     # plot data
                     ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data" if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
+                    fits_to_plot = {model_description: fit for model_description, fit in self[station_name].fits[ts_description].items()
+                                    if (model_list is None) or (model_description in model_list)}
                     if sum_models:
                         fit_sum = np.zeros(ts.time.size)
                         fit_sum_sigma = np.zeros(ts.time.size)
-                        for (mdl_description, fit) in self[station_name].fits[ts_description].items():
+                        for model_description, fit in fits_to_plot.items():
                             fit_sum += fit.df[fit.data_cols[icol]].values
                             if (fit.sigma_cols[icol] is not None) and (gui_settings["plot_sigmas"] > 0):
                                 fit_sum_sigma += (fit.df[fit.sigma_cols[icol]].values)**2
@@ -484,12 +487,12 @@ class Network():
                         if np.abs(fit_sum).sum() > 0:
                             ax.plot(fit.time, fit_sum, label="Model")
                     else:
-                        for (mdl_description, fit) in self[station_name].fits[ts_description].items():
+                        for model_description, fit in fits_to_plot.items():
                             if (fit.sigma_cols[icol] is not None) and (gui_settings["plot_sigmas"] > 0):
                                 ax.fill_between(fit.time, fit.df[fit.data_cols[icol]] + gui_settings["plot_sigmas"] * fit.df[fit.sigma_cols[icol]],
                                                 fit.df[fit.data_cols[icol]] - gui_settings["plot_sigmas"] * fit.df[fit.sigma_cols[icol]],
                                                 alpha=gui_settings["plot_sigmas_alpha"], linewidth=0)
-                            ax.plot(fit.time, fit.df[fit.data_cols[icol]], label=mdl_description)
+                            ax.plot(fit.time, fit.df[fit.data_cols[icol]], label=model_description)
                     ax.set_ylabel(f"{ts_description}\n{data_col} [{ts.data_unit}]")
                     ax.grid()
                     if len(self[station_name].fits[ts_description]) > 0:
