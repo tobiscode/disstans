@@ -302,11 +302,11 @@ class Network():
                     raise AttributeError(f"'{func}' can not be found as a function in geonat.processing.").with_traceback(e.__traceback__) from e
             else:
                 raise RuntimeError(f"'{func}' needs to be a function or a string representation thereof (if loaded from geonat.processing).")
-        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}."
+        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(ts_in)}."
         if ts_out is None:
             ts_out = ts_in
         else:
-            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}."
+            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(ts_out)}."
         iterable_inputs = ((func, station, ts_in, kw_args) for station in self)
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return, iterable_inputs),
