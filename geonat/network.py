@@ -388,8 +388,8 @@ class Network():
             temporal[comp] = temp_spat[comp][0]
             spatial[comp] = temp_spat[comp][1]
         # assign model to network
-        ts_out = ts_in if ts_out is None else ts_out
-        self.import_network_ts(ts_out, model)
+        if ts_out is not None:
+            self.import_network_ts(ts_out, model)
         # extract spatial components
         fitted_stations = model[comps[0]].data_cols
         latlonenu = np.zeros((len(fitted_stations), 2 + ndim_max2))
