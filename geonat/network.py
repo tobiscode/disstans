@@ -459,6 +459,9 @@ class Network():
                 nonlocal fig_scalo
                 t_left, t_right = None, None
             for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
+                # get model subset
+                fits_to_plot = {model_description: fit for model_description, fit in self[station_name].fits[ts_description].items()
+                                if (model_list is None) or (model_description in model_list)}
                 for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
                     # add axis
                     ax = fig_ts.add_subplot(n_components, 1, icomp + 1, sharex=None if icomp == 0 else ax_ts[0])
@@ -470,8 +473,6 @@ class Network():
                     # plot data
                     ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data" if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
-                    fits_to_plot = {model_description: fit for model_description, fit in self[station_name].fits[ts_description].items()
-                                    if (model_list is None) or (model_description in model_list)}
                     if sum_models:
                         fit_sum = np.zeros(ts.time.size)
                         fit_sum_sigma = np.zeros(ts.time.size)
