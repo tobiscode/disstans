@@ -328,11 +328,11 @@ class Network():
                     raise AttributeError(f"'{func}' can not be found as a function in geonat.processing.").with_traceback(e.__traceback__) from e
             else:
                 raise RuntimeError(f"'{func}' needs to be a function or a string representation thereof (if loaded from geonat.processing).")
-        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(func)}."
+        assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(ts_in)}."
         if ts_out is None:
             ts_out = ts_in
         else:
-            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(func)}."
+            assert isinstance(ts_out, str), f"'ts_out' must be None or a string, got {type(ts_out)}."
         net_in = self.export_network_ts(ts_in)
         net_out = func(net_in, **kw_args)
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
