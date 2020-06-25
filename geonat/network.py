@@ -244,29 +244,46 @@ class Network():
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if output_description is not None:
             assert isinstance(output_description, str), f"'output_description' must be a string, got {type(output_description)}."
-        iterable_inputs = ((station.timeseries[ts_description].time if timevector is None else timevector,
-                            station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list})
-                           for station in self)
-        station_names = list(self.stations.keys())
-        for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station, iterable_inputs),
-                                        desc="Evaluating station models", total=len(self.stations), ascii=True, unit="station")):
-            station = station_names[i]
-            for imodel, (model_description, fit) in enumerate(result.items()):
-                if not reuse:
-                    ts = self[station].add_fit(ts_description, model_description, fit)
-                else:
+        if reuse:
+            assert output_description is not None, "When reusing a previous model evaluation, 'output_description' " \
+                                                   "must be set (otherwise nothing would happen)."
+        # should directly use fit from station timeseries, skip evaluation.
+        # can only be used if the timeseries' timevector is used
+        # (and wouldn't do anything if output_description is None)
+        if reuse:
+            assert timevector is None, "When reusing a previous model evaluation, 'timevector' has to be None"
+            for station in self:
+                stat_subset_models = station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list}
+                for imodel, model_description in enumerate(stat_subset_models):
                     try:
-                        ts = self[station].fits[ts_description][model_description]
+                        ts = station.fits[ts_description][model_description]
                     except KeyError as e:
                         raise KeyError(f"Station {station}, Timeseries '{ts_description}' or Model '{model_description}': "
                                        "Fit not found, cannout evaluate.").with_traceback(e.__traceback__) from e
-                if output_description is not None:
                     if imodel == 0:
                         model_aggregate = ts
                     else:
                         model_aggregate += ts
-            if output_description is not None:
-                self[station].add_timeseries(output_description, model_aggregate, override_src='model', override_data_cols=self[station][ts_description].data_cols)
+                station.add_timeseries(output_description, model_aggregate, override_src='model', override_data_cols=station[ts_description].data_cols)
+        # if not reusing, have to evaluate the models and add to timeseries' fit
+        # and optionally add the aggregate timeseries to the station
+        else:
+            iterable_inputs = ((station.timeseries[ts_description].time if timevector is None else timevector,
+                                station.models[ts_description] if model_list is None else {m: station.models[ts_description][m] for m in model_list})
+                               for station in self)
+            station_names = list(self.stations.keys())
+            for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station, iterable_inputs),
+                                            desc="Evaluating station models", total=len(self.stations), ascii=True, unit="station")):
+                stat_name = station_names[i]
+                for imodel, (model_description, fit) in enumerate(result.items()):
+                    ts = self[stat_name].add_fit(ts_description, model_description, fit)
+                    if output_description is not None:
+                        if imodel == 0:
+                            model_aggregate = ts
+                        else:
+                            model_aggregate += ts
+                if output_description is not None:
+                    self[stat_name].add_timeseries(output_description, model_aggregate, override_src='model', override_data_cols=self[stat_name][ts_description].data_cols)
 
     @staticmethod
     def _evaluate_single_station(parameter_tuple):
