@@ -150,7 +150,6 @@ class Station():
     def analyze_residuals(self, ts_description, mean=False, std=False, n_observations=False, std_outlier=0):
         assert isinstance(ts_description, str), f"Station {self.name}: 'ts_description' needs to be a string, got {type(ts_description)}."
         assert ts_description in self.timeseries, f"Station {self.name}: Can't find '{ts_description}' to analyze."
-        print()
         results = {}
         if mean:
             results["Mean"] = self[ts_description].data.mean(axis=0, skipna=True, numeric_only=True).values
@@ -165,4 +164,6 @@ class Station():
             temp -= np.mean(temp, axis=0, keepdims=True)
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
-        print(pd.DataFrame(data=results, index=self[ts_description].data_cols).rename_axis(f"{self.name}: {ts_description}", axis=1))
+        if results:  # only print if any statistic was recorded
+            print()
+            print(pd.DataFrame(data=results, index=self[ts_description].data_cols).rename_axis(f"{self.name}: {ts_description}", axis=1))
