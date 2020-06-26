@@ -123,7 +123,7 @@ def common_mode(array, method, n_components=1, plot=False):
         return model
 
 
-def clean(station, ts_in, reference, ts_out=None, residual_out=None, clean_kw_args={}, reference_callable_args={}):
+def clean(station, ts_in, reference, ts_out=None, clean_kw_args={}, reference_callable_args={}):
     clean_settings = defaults["clean"].copy()
     clean_settings.update(clean_kw_args)
     # check if we're modifying in-place or copying
