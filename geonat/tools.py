@@ -18,38 +18,6 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     return ((timevector - t_reference) / pd.to_timedelta(1, time_unit)).values
 
 
-def dmultl(dvec, mat):
-    '''Left multiply with a diagonal matrix. Faster.
-
-    Args:
-
-        * dvec    -> Diagonal matrix represented as a vector
-        * mat     -> Matrix
-
-    Returns:
-
-        * res    -> dot (diag(dvec), mat)'''
-
-    res = (dvec*mat.T).T
-    return res
-
-
-def dmultr(mat, dvec):
-    '''Right multiply with a diagonal matrix. Faster.
-
-    Args:
-
-        * dvec    -> Diagonal matrix represented as a vector
-        * mat     -> Matrix
-
-    Returns:
-
-        * res     -> dot(mat, diag(dvec))'''
-
-    res = dvec*mat
-    return res
-
-
 def parallelize(func, iterable, num_threads=None, chunksize=1):
     if num_threads is None:
         num_threads = defaults["general"]["num_threads"]
