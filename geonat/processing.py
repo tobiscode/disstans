@@ -134,8 +134,10 @@ def clean(station, ts_in, reference, ts_out=None, residual_out=None, clean_kw_ar
     # check if we have a reference time series or need to calculate one
     # in the latter case, the input is name of function to call
     if not (isinstance(reference, Timeseries) or isinstance(reference, str) or callable(reference)):
-        raise TypeError(f"'reference' has to either be a the name of a timeseries in the station, or the name of a function, got {type(reference)}.")
-    if isinstance(reference, str):
+        raise TypeError(f"'reference' has to either be a Timeseries, the name of one, or a function, got {type(reference)}.")
+    if isinstance(reference, Timeseries):
+        ts_ref = reference
+    elif isinstance(reference, str):
         # get reference time series
         ts_ref = station[reference]
     elif callable(reference):
