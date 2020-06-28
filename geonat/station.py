@@ -68,13 +68,15 @@ class Station():
                     stat_arch["models"][ts_description].update({mdl_description: mdl.get_arch()})
         return stat_arch
 
-    def add_timeseries(self, description, timeseries, override_src=None, override_data_unit=None, override_data_cols=None, override_sigma_cols=None, add_models=None):
+    def add_timeseries(self, description, timeseries, override_src=None, override_data_unit=None,
+                       override_data_cols=None, override_sigma_cols=None, add_models=None):
         if not isinstance(description, str):
             raise TypeError("Cannot add new timeseries: 'description' is not a string.")
         if not isinstance(timeseries, Timeseries):
             raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
         if description in self.timeseries:
-            warn(f"Station {self.name}: Overwriting time series '{description}'.", category=RuntimeWarning)
+            warn(f"Station {self.name}: Overwriting time series '{description}'.",
+                 category=RuntimeWarning)
         if override_src is not None:
             timeseries.src = override_src
         if override_data_unit is not None:
@@ -94,7 +96,8 @@ class Station():
 
     def remove_timeseries(self, description):
         if description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find time series '{description}', couldn't delete.", category=RuntimeWarning)
+            warn(f"Station {self.name}: Cannot find time series '{description}', couldn't delete.",
+                 category=RuntimeWarning)
         else:
             del self.timeseries[description]
             del self.fits[description]
@@ -110,14 +113,17 @@ class Station():
         assert ts_description in self.timeseries, \
             f"Station {self.name}: Cannot find timeseries '{ts_description}' to add local model '{model_description}'."
         if model_description in self.models[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting local model '{model_description}'.", category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting local model '{model_description}'.",
+                 category=RuntimeWarning)
         self.models[ts_description].update({model_description: model})
 
     def remove_local_model(self, ts_description, model_description):
         if ts_description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', couldn't delete local model '{model_description}'.", category=RuntimeWarning)
+            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
+                 f"couldn't delete local model '{model_description}'.", category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't delete.", category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: "
+                 f"Cannot find local model '{model_description}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.models[ts_description][model_description]
 
@@ -131,7 +137,8 @@ class Station():
         assert model_description in self.models[ts_description], \
             f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't add fit."
         if model_description in self.fits[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting fit of local model '{model_description}'.", category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting fit of local model '{model_description}'.",
+                 category=RuntimeWarning)
         data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
         self.fits[ts_description].update({model_description: fit_ts})
@@ -139,16 +146,20 @@ class Station():
 
     def remove_fit(self, ts_description, model_description, fit):
         if ts_description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', couldn't delete fit for model '{model_description}'.", category=RuntimeWarning)
+            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
+                 f"couldn't delete fit for model '{model_description}'.", category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't delete fit.", category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: "
+                 f"Cannot find local model '{model_description}', couldn't delete fit.", category=RuntimeWarning)
         elif model_description not in self.fits[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Cannot find fit for local model '{model_description}', couldn't delete.", category=RuntimeWarning)
+            warn(f"Station {self.name}, timeseries {ts_description}: "
+                 f"Cannot find fit for local model '{model_description}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.fits[ts_description][model_description]
 
     def analyze_residuals(self, ts_description, mean=False, std=False, n_observations=False, std_outlier=0):
-        assert isinstance(ts_description, str), f"Station {self.name}: 'ts_description' needs to be a string, got {type(ts_description)}."
+        assert isinstance(ts_description, str), \
+            f"Station {self.name}: 'ts_description' needs to be a string, got {type(ts_description)}."
         assert ts_description in self.timeseries, f"Station {self.name}: Can't find '{ts_description}' to analyze."
         results = {}
         if mean:
