@@ -36,7 +36,7 @@ def _okada_get_displacements(station_and_parameters):
         # assume potency is Nm/GPa = 1e-9 m^3 and locations are in km,
         # then u is in [1e-15 m] and grad_u in [1e-18 m]
         if success == 0:
-            disp[i, :] = u * 10**12  # output is now in mm
+            disp[i, :] = u / 10**12  # output is now in mm
         else:
             warn(f"Success = {success} for station {i}!", category=RuntimeWarning)
     # transform back to lat, lon, alt
