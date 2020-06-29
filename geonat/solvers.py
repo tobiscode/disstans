@@ -1,3 +1,8 @@
+"""
+This module contains solver routines for fitting models to the timeseries
+of stations.
+"""
+
 import numpy as np
 import scipy.sparse as sparse
 import cvxpy as cp
@@ -5,8 +10,32 @@ from warnings import warn
 
 
 def linear_regression(ts, models, formal_covariance=False):
-    """
-    scipy.sparse.linalg wrapper for a linear least squares solver
+    r"""
+    Performs linear, unregularized least squares using :mod:`~scipy.sparse.linalg`.
+
+    The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
+    matrices are stacked together to form a single, sparse mapping matrix
+    :math:`\mathbf{G}`. The solver then computes the model parameters
+    :math:`\mathbf{m}` that minimize the cost function
+
+    .. math:: f(\mathbf{m}) = \left\| \mathbf{Gm} - \mathbf{d} \right\|_2^2
+
+    where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual.
+
+    The formal model covariance is defined as the pseudo-inverse
+
+    .. math:: \mathbf{C}_m = \left( \mathbf{G}^T \mathbf{C}_d \mathbf{G} \right)^g
+
+    where :math:`\mathbf{C}_d` is the timeseries' data covariance.
+
+    Parameters
+    ----------
+    ts : geonat.timeseries.Timeseries
+        Timeseries to fit.
+    models : dict
+        Dictionary of :class:`~geonat.model.Model` instances used for fitting.
+    formal_covariance : bool, optional
+        If ``True``, also calculate the formal covariance.
     """
     mapping_matrices = []
     # get mapping matrices
@@ -41,8 +70,40 @@ def linear_regression(ts, models, formal_covariance=False):
 
 
 def ridge_regression(ts, models, penalty, formal_covariance=False):
-    """
-    scipy.sparse.linalg wrapper for a linear L2-regularized least squares solver
+    r"""
+    Performs linear, L2-regularized least squares using :mod:`~scipy.sparse.linalg`.
+
+    The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
+    matrices are stacked together to form a single, sparse mapping matrix
+    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver then
+    computes the model parameters :math:`\mathbf{m}` that minimize the cost function
+
+    .. math:: f(\mathbf{m}) = \left\| \mathbf{Gm} - \mathbf{d} \right\|_2^2
+              + \lambda \left\| \mathbf{m}_\text{reg} \right\|_2^2
+
+    where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual
+    and the subscript :math:`_\text{reg}` masks to zero the model parameters
+    not designated to be regularized (see :attr:`~geonat.model.Model.regularize`).
+
+    The formal model covariance is defined as the pseudo-inverse
+
+    .. math:: \mathbf{C}_m = \left( \mathbf{G}^T \mathbf{C}_d \mathbf{G}
+                                    + \lambda \mathbf{I}_\text{reg} \right)^g
+
+    where :math:`\mathbf{C}_d` is the timeseries' data covariance and the subscript
+    :math:`_\text{reg}` masks to zero the entries corresponding to non-regularized
+    model parameters.
+
+    Parameters
+    ----------
+    ts : geonat.timeseries.Timeseries
+        Timeseries to fit.
+    models : dict
+        Dictionary of :class:`~geonat.model.Model` instances used for fitting.
+    penalty : float
+        Penalty hyperparameter :math:`\lambda`.
+    formal_covariance : bool, optional
+        If ``True``, also calculate the formal covariance.
     """
     if penalty == 0.0:
         warn(f"Ridge Regression (L2-regularized) solver got a penalty of {penalty}, which effectively removes the regularization.")
@@ -83,8 +144,37 @@ def ridge_regression(ts, models, penalty, formal_covariance=False):
 
 
 def lasso_regression(ts, models, penalty, formal_covariance=False):
-    """
-    cvxpy wrapper for a linear L1-regularized least squares solver
+    r"""
+    Performs linear, L1-regularized least squares using
+    `CVXPY <https://www.cvxpy.org/index.html>`_.
+
+    The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
+    matrices are stacked together to form a single, sparse mapping matrix
+    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver then
+    computes the model parameters :math:`\mathbf{m}` that minimize the cost function
+
+    .. math:: f(\mathbf{m}) = \left\| \mathbf{Gm} - \mathbf{d} \right\|_2^2
+              + \lambda \left\| \mathbf{m}_\text{reg} \right\|_1
+
+    where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual
+    and the subscript :math:`_\text{reg}` masks to zero the model parameters
+    not designated to be regularized (see :attr:`~geonat.model.Model.regularize`).
+
+    The formal model covariance :math:`\mathbf{C}_m` is defined as being zero except in
+    the rows and columns corresponding to non-zero parameters, where it is defined
+    exactly as the unregularized version (see :func:`~geonat.solvers.linear_regression`),
+    restricted to those same rows and columns.
+
+    Parameters
+    ----------
+    ts : geonat.timeseries.Timeseries
+        Timeseries to fit.
+    models : dict
+        Dictionary of :class:`~geonat.model.Model` instances used for fitting.
+    penalty : float
+        Penalty hyperparameter :math:`\lambda`.
+    formal_covariance : bool, optional
+        If ``True``, also calculate the formal covariance.
     """
     if penalty == 0.0:
         warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, which effectively removes the regularization.")

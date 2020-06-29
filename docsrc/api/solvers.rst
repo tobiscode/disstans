@@ -1,0 +1,4 @@
+Solvers
+=======
+
+.. automodule:: geonat.solvers

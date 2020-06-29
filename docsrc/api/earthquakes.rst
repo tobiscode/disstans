@@ -1,0 +1,4 @@
+Earthquakes
+===========
+
+.. automodule:: geonat.earthquakes

@@ -1,0 +1,4 @@
+Timeseries
+==========
+
+.. automodule:: geonat.timeseries

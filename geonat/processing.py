@@ -1,3 +1,11 @@
+"""
+This module contains some processing functions that while not belonging
+to a specific class, require them to already be loaded and GeoNAT to
+be initialized.
+
+For general helper functions, see :mod:`~geonat.tools`.
+"""
+
 import numpy as np
 import pandas as pd
 import warnings
@@ -10,6 +18,33 @@ from .timeseries import Timeseries
 
 
 def unwrap_dict_and_ts(func):
+    """
+    A wrapper decorator that aims at simplifying the coding of processing functions.
+    Ideally, a new function that doesn't need to know if its input is a
+    :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame`,
+    :class:`~numpy.ndarray` or a dictionary containing them, should not need to reimplement
+    a check and conversion for all of these because they just represent a data
+    array of some form. So, by providing this function decorator, a wrapped function
+    only needs to be able to work for a single array (plus some optional keyword arguments).
+    The wrapping will extract the data of the input types and convert the returned
+    array from ``func`` into the original format.
+
+    Example
+    -------
+    A basic function of the form::
+
+        def func(in_array, **kw_args):
+            # do some things
+            return out_array
+
+    that takes and returns a NumPy array can be wrapped as follows
+    to be able to also take and return all the other data forms::
+
+        @unwrap_dict_and_ts
+        def func(in_array, **kw_args):
+            # do some things
+            return out_array
+    """
     @wraps(func)
     def wrapper(data, *args, **kw_args):
         if not isinstance(data, dict):
@@ -62,9 +97,24 @@ def unwrap_dict_and_ts(func):
 @unwrap_dict_and_ts
 def median(array, kernel_size):
     """
-    Computes the median filter (ignoring NaNs) column-wise,
-    either by calling a Numpy function iteratively or by using
-    the precompiled Fortran code.
+    Computes the median filter (ignoring NaNs) column-wise, either by calling
+    :func:`~numpy.nanmedian` iteratively or by using the precompiled Fortran
+    function :func:`~geonat.compiled.maskedmedfilt2d`.
+
+    Parameters
+    ----------
+    array : numpy.ndarray
+        2D input array (can contain NaNs).
+        Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept
+        :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
+        dictionaries of them as input.
+    kernel_size : int
+        Kernel size (length of moving window to compute the median over).
+
+    Returns
+    -------
+    filtered : numpy.ndarray
+        2D filtered array (may still contain NaNs).
     """
     try:
         filtered = maskedmedfilt2d(array, ~np.isnan(array), kernel_size)
@@ -95,8 +145,57 @@ def median(array, kernel_size):
 
 @unwrap_dict_and_ts
 def common_mode(array, method, n_components=1, plot=False):
-    """
-    Computes the common mode noise with the given method. Input should already be a residual.
+    r"""
+    Computes the Common Mode Error (CME) with the given method.
+    The input array should already be a residual.
+
+    Parameters
+    ----------
+    array : numpy.ndarray
+        Input array of shape :math:`(\text{n_observations},\text{n_stations})`
+        (can contain NaNs).
+        Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept
+        :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
+        dictionaries of them as input.
+    method : {'pca', 'ica'}
+        Method to use to decompose the array.
+        ``'pca'`` uses `Principal Component Analysis`_ (motivated by [dong06]_), whereas
+        ``'ica'`` uses `Independent Component Analysis`_ (motivated by [huang12]_).
+    n_components : int, optional
+        Number of CME bases to estimate. Defaults to ``1``.
+    plot : bool, optional
+        If ``True``, include not only the modeled CME, but also the components
+        themselves in space and time. Defaults to ``False``.
+
+    Returns
+    -------
+    model : numpy.ndarray
+        Modeled CME of shape :math:`(\text{n_observations},\text{n_stations})`.
+    temporal : numpy.ndarray
+        (Only if ``plot=True``.) CME in time of shape
+        :math:`(\text{n_observations},\text{n_components})`.
+    spatial : numpy.ndarray
+        (Only if ``plot=True``.) CME in space of shape
+        :math:`(\text{n_components},\text{n_stations})`.
+
+
+    References
+    ----------
+
+    .. [dong06] Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L., Kedar,
+       S., and Jamason, P. (2006), *Spatiotemporal filtering using principal component
+       analysis and Karhunen‐Loeve expansion approaches for regional GPS network analysis*,
+       J. Geophys. Res., 111, B03405, doi:`10.1029/2005JB003806
+       <https://doi.org/10.1029/2005JB003806>`_.
+    .. [huang12] Huang, D. W., Dai, W. J., & Luo, F. X. (2012),
+       *ICA spatiotemporal filtering method and its application in GPS deformation monitoring*,
+       Applied Mechanics and Materials, 204-208, 2806, doi:`10.4028/www.scientific.net/AMM.204-208.2806
+       <http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_
+
+    .. _Principal Component Analysis:
+       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
+    .. _Independent Component Analysis:
+       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.FastICA.html
     """
     # fill NaNs with white Gaussian noise
     array_nanmean = np.nanmean(array, axis=0)
@@ -124,6 +223,38 @@ def common_mode(array, method, n_components=1, plot=False):
 
 
 def clean(station, ts_in, reference, ts_out=None, clean_kw_args={}, reference_callable_args={}):
+    """
+    Function operating on a single station's timeseries to clean it from outliers,
+    and mask it out if the data is not good enough. The criteria are set by
+    :attr:`~geonat.defaults` but can be overriden by providing ``clean_kw_args``.
+
+    Parameters
+    ----------
+    station : geonat.station.Station
+        Station to operate on.
+    ts_in : str
+        Description of the timeseries to clean.
+    reference : str, geonat.timeseries.Timeseries, function
+        Reference timeseries.
+        If string, checks for a timeseries with that description in the ``station``.
+        If a :class:`~geonat.timeseries.Timeseries` instance, use it directly.
+        If a function, the reference timeseries will be calculated as
+        ``t_ref = reference(ts_in, **reference_callable_args)``.
+    ts_out : str, optional
+        If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``
+        and clean the copy (to preserve the raw timeseries).
+    clean_kw_args : dict
+        Override the default cleaning criteria in :attr:`~geonat.defaults`.
+    reference_callable_args : dict
+        If ``reference`` is a function, ``reference_callable_args`` can be used
+        to pass additional keyword arguments to the former when calculating
+        the reference timeseries.
+
+    Warning
+    -------
+    By default, this function operates *in-place*. If you don't wish to overwrite
+    the raw input timeseries, specify ``ts_out``.
+    """
     clean_settings = defaults["clean"].copy()
     clean_settings.update(clean_kw_args)
     # check if we're modifying in-place or copying

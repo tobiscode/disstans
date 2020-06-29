@@ -1,3 +1,8 @@
+"""
+This module contains functions relating to the processing and representation
+of earthquakes.
+"""
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -10,6 +15,10 @@ from .model import Step
 
 
 def _okada_get_displacements(station_and_parameters):
+    """
+    Parallelizable sub-function of okada_prior that for a single earthquake
+    source calculates the displacement response for many locations.
+    """
     # unpack inputs
     stations, eq = station_and_parameters
     # rotate from relative lat, lon, alt to xyz
@@ -37,6 +46,11 @@ def _okada_get_displacements(station_and_parameters):
 
 
 def _okada_get_cumdisp(time_station_settings):
+    """
+    Parallelizable sub-function of okada_prior that for a single station
+    calculates the cumulative displacements at the timestamps contained
+    in the timeseries of that station.
+    """
     eq_times, stat_time, station_disp, threshold = time_station_settings
     steptimes = []
     for itime in range(len(stat_time) - 1):
@@ -48,6 +62,60 @@ def _okada_get_cumdisp(time_station_settings):
 
 
 def okada_prior(network, catalog_path, target_timeseries, target_model, target_model_regularize=False, catalog_prior_kw_args={}):
+    r"""
+    Given a catalog of earthquakes (including moment tensors), calculate an approximate
+    displacement for each of the stations in the network, and add a step model to
+    the target timeseries.
+
+    This function operates on the network instance directly.
+
+    Parameters
+    ---------
+    network : Network
+        Network instance whose stations should be used.
+    catalog_path : str
+        File name of the earthquake catalog to load. Currently, only the Japanese
+        NIED's F-net earthquake mechanism catalog format is supported.
+    target_timeseries : str
+        Name of the timeseries to add the model to.
+    target_model : str
+        Name of the earthquake model added to ``target_timeseries``.
+    target_model_regularize : bool, optional
+        Whether to mark the model for regularization or not.
+    catalog_prior_kw_args : dict, optional
+        A dictionary fine-tuning the displacement calculation and modeling, see
+        :attr:`~geonat.defaults` for explanations and defaults.
+
+    Notes
+    -----
+    This function uses Okada's [okada92]_ dislocation calculation subroutines coded in
+    Fortran and wrapped by the Python package `okada_wrapper`_.
+
+    The catalog format needs to have the following named columns:
+    *Date,Origin_Time(JST),Latitude(°),Longitude(°),JMA_Depth(km),JMA_Magnitude(Mj),*
+    *Region_Name,Strike,Dip,Rake,Mo(Nm),MT_Depth(km),MT_Magnitude(Mw),Var._Red.,*
+    *mxx,mxy,mxz,myy,myz,mzz,Unit(Nm),Number_of_Stations*
+
+    The keywords in ``catalog_prior_kw_args`` are:
+
+    ============= ====== ==============================================================
+    Keyword       Units  Description
+    ============= ====== ==============================================================
+    ``mu``        GPa    Shear modulus μ of the elastic half space
+    ``alpha``     \-     Medium constant α=(λ+μ)/(λ+2μ), where λ is the first Lamé
+                         parameter and μ the second one (shear modulus)
+    ``threshold`` mm     Minimum amount of calculated displacement that a station needs
+                         to surpass in order for a step to be added to the model.
+    ============= ====== ==============================================================
+
+    References
+    ----------
+
+    .. _`okada_wrapper`: https://github.com/tbenthompson/okada_wrapper
+    .. [okada92] Yoshimitsu Okada (1992),
+       *Internal deformation due to shear and tensile faults in a half-space*.
+       Bulletin of the Seismological Society of America, 82 (2): 1018–1040.
+    """
     catalog_prior_settings = defaults["prior"].copy()
     catalog_prior_settings.update(catalog_prior_kw_args)
     stations_lla = np.array([station.location for station in network])

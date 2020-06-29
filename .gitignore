@@ -26,3 +26,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Documentation
+docsrc/_build/

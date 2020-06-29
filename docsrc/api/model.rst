@@ -1,0 +1,4 @@
+Model
+=====
+
+.. automodule:: geonat.model

@@ -1,3 +1,8 @@
+"""
+This module contains the :class:`~geonat.network.Network` class, which is the
+highest-level container object in GeoNAT.
+"""
+
 import numpy as np
 import pandas as pd
 import json
@@ -20,39 +25,143 @@ from .tools import parallelize
 
 class Network():
     """
-    A container object for multiple stations.
+    Main class of GeoNAT. Contains information about the network, defines defaults, contains
+    global models, and most improtantly, contains a dictionary of all stations in the network.
+
+    Parameters
+    ----------
+    name : str
+        Name of the network.
+    default_location_path : str, optional
+        If station locations aren't given directly, check for a file with this path for the
+        station's location.
+    default_local_models : dict
+        Add a default selection of models for the stations.
     """
     def __init__(self, name, default_location_path=None, default_local_models={}):
         self.name = name
+        """ Network name. """
         self.default_location_path = default_location_path
+        """ Fallback path for station locations. """
         self.default_local_models = default_local_models
+        """
+        Dictionary of default station timeseries models, where the keys are their string descriptions
+        and the values are their :class:`~geonat.model.Model` objects.
+        """
         self.stations = {}
+        """
+        Dictionary of network stations, where the keys are their string names
+        and the values are their :class:`~geonat.station.Station` objects. """
         self.global_models = {}
+        """
+        Dictionary of network-wide models, where the keys are string descriptions
+        and the values are their :class:`~geonat.model.Model` objects.
+        """
 
     def __repr__(self):
+        """
+        Special function that returns a readable summary of the network.
+        Accessed, for example, by Python's ``print()`` built-in function.
+
+        Returns
+        -------
+        info : str
+            Network summary.
+        """
         info = f"Network {self.name}\n" + \
                f"Stations:\n{[key for key in self.stations]}\n" + \
                f"Global Models:\n{[key for key in self.global_models]}"
         return info
 
     def __getitem__(self, name):
+        """
+        Convenience special function that provides a shorthand notation
+        to access the network's stations.
+
+        Parameters
+        ----------
+        name : str
+            Name of the station.
+
+        Returns
+        -------
+        geonat.station.Station
+            Station in network.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance and ``name`` the name of a station,
+        the following two are equivalent::
+
+            net.stations[name]
+            net[name]
+        """
         if name not in self.stations:
             raise KeyError(f"No station '{name}' present.")
         return self.stations[name]
 
     def __setitem__(self, name, station):
+        """
+        Convenience special function that allows a dictionary-like adding of stations to
+        the network by wrapping :meth:`~add_station`.
+
+        See Also
+        --------
+        add_station : Add a station to the network instance.
+        """
         self.add_station(name, station)
 
     def __delitem__(self, name):
+        """
+        Convenience special function that allows a dictionary-like removing of stations from
+        the network by wrapping :meth:`~remove_station`.
+
+        See Also
+        --------
+        remove_station : Remove a station from the network instance.
+        """
         self.remove_station(name)
 
     def __iter__(self):
+        """
+        Convenience special function that allows for a shorthand notation to quickly
+        iterate over all stations.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, then the following two loops are equivalent::
+
+            # long version
+            for station in net.stations.values():
+                pass
+            # shorthand
+            for station in net:
+                pass
+        """
         for station in self.stations.values():
             yield station
 
     def export_network_ts(self, ts_description):
         """
-        Return the timeseries of all stations as a dictionary of Timeseries.
+        Collects a specific timeseries from all stations and returns them in a dictionary
+        of network-wide :class:`~geonat.timeseries.Timeseries` objects.
+
+        Parameters
+        ----------
+        ts_description : str
+            :class:`~geonat.timeseries.Timeseries` description that will be collected
+            from all stations in the network.
+
+        Returns
+        -------
+        network_df : dict
+            Dictionary with the data components of the ``ts_description`` timeseries
+            as keys and :class:`~geonat.timeseries.Timeseries` objects as values
+            (which will have in turn the station names as column names).
+
+        See Also
+        --------
+        import_network_ts : Inverse function.
         """
         df_dict = {}
         for name, station in self.stations.items():
@@ -72,7 +181,21 @@ class Network():
 
     def import_network_ts(self, ts_description, dict_of_timeseries):
         """
-        Set the timeseries of all stations as a dictionary of Timeseries.
+        Distributes a dictionary of network-wide :class:`~geonat.timeseries.Timeseries` objects
+        onto the network stations.
+
+        Parameters
+        ----------
+        ts_description : str
+            :class:`~geonat.timeseries.Timeseries` description that the data will be copied into.
+        dict_of_timeseries : dict
+            Dictionary with the data components of the ``ts_description`` timeseries
+            as keys and :class:`~geonat.timeseries.Timeseries` objects as values
+            (which will have in turn the station names as column names).
+
+        See Also
+        --------
+        export_network_ts : Inverse function.
         """
         network_df = pd.concat({name: ts.data for name, ts in dict_of_timeseries.items()}, axis=1)
         network_df.columns = network_df.columns.swaplevel(0, 1)
@@ -84,6 +207,28 @@ class Network():
             self.stations[name].add_timeseries(ts_description, Timeseries(network_df[name].dropna(), src, data_unit, data_cols))
 
     def add_station(self, name, station):
+        """
+        Add a station to the network.
+
+        Parameters
+        ----------
+        name : str
+            Name of the station.
+        station : geonat.station.Station
+            Station object to add.
+
+        See Also
+        --------
+        __setitem__ : Shorthand notation wrapper.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, ``name`` the name of a new station,
+        and ``station`` a :class:`~geonat.station.Station` instance, then the following two are equivalent::
+
+            net.add_station(name, station)
+            net[name] = station
+        """
         if not isinstance(name, str):
             raise TypeError("Cannot add new station: 'name' is not a string.")
         if not isinstance(station, Station):
@@ -93,12 +238,46 @@ class Network():
         self.stations[name] = station
 
     def remove_station(self, name):
+        """
+        Remove a station from the network.
+
+        Parameters
+        ----------
+        name : str
+            Name of the station.
+
+        See Also
+        --------
+        __delitem__ : Shorthand notation wrapper.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance and ``name`` is the name of an existing station,
+        then the following two are equivalent::
+
+            net.remove_station(name)
+            del net[name]
+        """
         if name not in self.stations:
             warn(f"Cannot find station '{name}', couldn't delete.", category=RuntimeWarning)
         else:
             del self.stations[name]
 
     def add_global_model(self, description, model):
+        """
+        Add a global model to the network.
+
+        Parameters
+        ----------
+        description : str
+            Description of the model.
+        model : geonat.model.Model
+            Model object to add.
+
+        Warning
+        -------
+        Global models have not been implemented yet.
+        """
         if not isinstance(description, str):
             raise TypeError("Cannot add new global model: 'description' is not a string.")
         if description in self.global_models:
@@ -106,6 +285,18 @@ class Network():
         self.global_models[description] = model
 
     def remove_global_model(self, description):
+        """
+        Remove a global model from the network.
+
+        Parameters
+        ----------
+        description : str
+            Description of the model.
+
+        Warning
+        -------
+        Global models have not been implemented yet.
+        """
         if description not in self.global_models:
             warn(f"Cannot find global model '{description}', couldn't delete.", category=RuntimeWarning)
         else:
@@ -113,6 +304,29 @@ class Network():
 
     @classmethod
     def from_json(cls, path, add_default_local_models=True, station_kw_args={}, timeseries_kw_args={}):
+        """
+        Create a :class:`~geonat.network.Network` instance from a JSON configuration file.
+
+        Parameters
+        ----------
+        path : str
+            Path of input JSON file.
+        add_default_local_models : bool, optional
+            If false, skip the adding of any default local model found in a station.
+        station_kw_args : dict, optional
+            Additional keyword arguments passed on to the :class:`~geonat.station.Station` constructor.
+        timeseries_kw_args : dict, optional
+            Additional keyword arguments passed on to the :class:`~geonat.timeseries.Timeseries` constructor.
+
+        Returns
+        -------
+        net : geonat.network.Network
+            Network instance.
+
+        See Also
+        --------
+        to_json : Export a network configuration to a JSON file.
+        """
         # load configuration
         net_arch = json.load(open(path, mode='r'))
         network_name = net_arch.get("name", "network_from_json")
@@ -161,6 +375,18 @@ class Network():
         return net
 
     def to_json(self, path):
+        """
+        Export network configuration to a JSON file.
+
+        Parameters
+        ----------
+        path : str
+            Path of output JSON file.
+
+        See Also
+        --------
+        from_json : Create a :class:`~geonat.network.Network` instance from a JSON configuration file.
+        """
         # create new dictionary
         net_arch = {"name": self.name,
                     "locations": self.default_location_path,
@@ -184,6 +410,24 @@ class Network():
         json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
 
     def add_default_local_models(self, ts_description, models=None):
+        """
+        Add the network's default local models (or a subset thereof) to all stations.
+
+        For example, this method can be used when instantiating a new network object from a JSON file
+        using :meth:`~from_json` but skipping the adding of local models at that stage.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries description to add the models to.
+        models : list, optional
+            List of strings containing the model names of the subset of the default local models
+            to add. Defaults to all local models.
+
+        See Also
+        --------
+        :attr:`~default_local_models` : The network's default list of models.
+        """
         assert isinstance(ts_description, str), f"'ts_description' must be a string, got {type(ts_description)}."
         if models is None:
             local_models_subset = self.default_local_models
@@ -200,6 +444,24 @@ class Network():
                 station.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
 
     def add_unused_local_models(self, target_ts, hidden_ts=None, models=None):
+        """
+        Add a station's unused models (or subset thereof) to a target timeseries.
+
+        Unused models are models that have been defined for a specific timeseries at the import
+        of a JSON file, but there is no associated information for that timeseries itself.
+        Usually, this happens when after the network is loaded, the target timeseries
+        still needs to be added.
+
+        Parameters
+        ----------
+        target_ts : str
+            Timeseries description to add the models to.
+        hidden_ts : str, optional
+            Description of the timeseries that contains the unused model. Defaults to ``target_ts``.
+        models : list, optional
+            List of strings containing the model names of the subset of the default local models
+            to add. Defaults to all hidden models.
+        """
         assert isinstance(target_ts, str), f"'target_ts' must be string, got {type(target_ts)}."
         if hidden_ts is None:
             hidden_ts = target_ts
@@ -221,6 +483,51 @@ class Network():
                     station.add_local_model(ts_description=target_ts, model_description=model_description, model=mdl)
 
     def fit(self, ts_description, model_list=None, solver='linear_regression', **kw_args):
+        """
+        Fit the models (or a subset thereof) for a specific timeseries at all stations.
+        Also provides a progress bar.
+        Will automatically use multiprocessing if parallelization has been enabled in
+        the configuration (defaults to parallelization if possible).
+
+        Parameters
+        ----------
+        ts_description : str
+            Description of the timeseries to fit.
+        model_list : list, optional
+            List of strings containing the model names of the subset of the models
+            to fit. Defaults to all models.
+        solver : str, function, optional
+            Solver function to use. If given a string, will look for a solver with that name
+            in :mod:`~geonat.solvers`, otherwise will use the passed function as a solver
+            (which needs to adhere to the same input/output structure as the included solver
+            functions). Defaults to standard linear least squares.
+        **kw_args : dict
+            Additional keyword arguments that are passed onto the solver function.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, ``'mydata'`` is the timeseries
+        to fit, and ``mysolver`` is the solver to use, then the following two are equivalent::
+
+            # long version, not parallelized, defaulting to all models
+            for station in net:
+                station_ts = station.timeseries['mydata']
+                station_models = station.models['mydata']
+                # a subset list of models would need to be collected here
+                fitted_params = mysolver(station_ts, station_models, **kw_args)
+                for model_description, (params, covs) in fitted_params.items():
+                    station.models['mydata'][model_description].read_parameters(params, covs)
+            # short version, automatically parallelizes according to geonat.defaults
+            net.fit('mydata', solver=mysolver, **kw_args)
+            # also allows for easy subsetting models and skipping the import of geonat.solvers
+            net.fit('mydata', model_list=['onlythisone'], solver='lasso_regression', **kw_args)
+
+        See Also
+        --------
+        evaluate : Evaluate the fitted models at all stations.
+        :attr:`~geonat.defaults` : Dictionary of settings, including parallelization.
+        parallelize : Automatically execute a function in parallel or serial.
+        """
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if isinstance(solver, str):
             solver = getattr(geonat_solvers, solver)
@@ -241,6 +548,59 @@ class Network():
         return fitted_params
 
     def evaluate(self, ts_description, model_list=None, timevector=None, output_description=None, reuse=False):
+        """
+        Evaluate a timeseries' models (or a subset thereof) at all stations and add them
+        as a fit to the timeseries. Can optionally add the aggregate model as an independent
+        timeseries to the station as well.
+        Also provides a progress bar.
+        Will automatically use multiprocessing if parallelization has been enabled in
+        the configuration (defaults to parallelization if possible).
+
+        Parameters
+        ----------
+        ts_description : str
+            Description of the timeseries to evaluate.
+        model_list : list, optional
+            List of strings containing the model names of the subset of the models
+            to be evaluated. Defaults to all models.
+        timevector : pandas.Series, optional
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+            Defaults to the timestamps of the timeseries itself.
+        output_description : str, optional
+            If provided, add the sum of the evaluated models as a new timeseries
+            to each station with the provided description (instead of only adding
+            each individual model as a fit *to* the timeseries).
+        reuse : bool, optional
+            If ``timevector`` is ``None`` and ``output_description`` is set, this flag can
+            be used to skip the actual evaluation of the models if they have already been
+            added as fits, and instead use those fitted timeseries instead.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, ``'mydata'`` is the timeseries
+        to evaluate the models for, and ``mysolver`` is the solver to use, then the following two are equivalent::
+
+            # long version, not parallelized, defaulting to all models,
+            # not reusing fits, and not creating a new independent timeseries
+            for station in net:
+                station_ts = station.timeseries['mydata']
+                station_models = station.models['mydata']
+                # a subset list of models would need to be collected here
+                for imodel, (model_description, model) in enumerate(station_models.items()):
+                    fit = model.evaluate(station_ts)
+                    station.add_fit('mydata', model_description, fit)
+            # short version, automatically parallelizes according to geonat.defaults
+            net.evaluate('mydata')
+            # the short version also allows for easy subsetting models, creating a new timeseries
+            # and saving time by reusing the previous fit
+            net.evaluate('mydata', model_list=['onlythisone'], output_description='evaluated', reuse=True)
+
+        See Also
+        --------
+        fit : Fit models at all stations.
+        :attr:`~geonat.defaults` : Dictionary of settings, including parallelization.
+        parallelize : Automatically execute a function in parallel or serial.
+        """
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if output_description is not None:
             assert isinstance(output_description, str), f"'output_description' must be a string, got {type(output_description)}."
@@ -294,6 +654,48 @@ class Network():
         return fit
 
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
+        """
+        A convenience wrapper that for each station in the network, calls a given function which
+        takes timeseries as input and returns a timeseries (which is then added to the station).
+        Also provides a progress bar.
+        Will automatically use multiprocessing if parallelization has been enabled in
+        the configuration (defaults to parallelization if possible).
+
+        Parameters
+        ----------
+        func : str, function
+            Function to use. If provided with a string, will check for that function in
+            :mod:`~geonat.processing`, otherwise the function will be assumed to adhere to the
+            same input and output format than the included ones.
+        ts_in : str
+            Name of the timeseries to use as input to ``func``.
+        ts_out : str, optional
+            Name of the timeseries that the output of ``func`` should be assigned to.
+            Defaults to overwriting ``ts_in``.
+        **kw_args : dict
+            Additional keyword arguments to be passed onto ``func``.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, ``'input'`` and ``'output'`` are the names
+        of the input and output timeseries, respectively, and ``func`` is the function to use,
+        then the following two are equivalent::
+
+            # long version, not parallelized
+            for station in net:
+                ts_in = station.timeseries['input']
+                ts_out = func(ts_in, **kw_args)
+                station.add_timeseries('output', ts_out)
+            # short version, automatically parallelizes according to geonat.defaults
+            net.call_func_ts_return(func, 'input', ts_out='output', **kw_args)
+            # if using a geonat.processing function, no need to previously import that function
+            net.call_func_ts_return('clean', 'input', ts_out='output', **kw_args)
+
+        See Also
+        --------
+        :attr:`~geonat.defaults` : Dictionary of settings, including parallelization.
+        parallelize : Automatically execute a function in parallel or serial.
+        """
         if not callable(func):
             if isinstance(func, str):
                 try:
@@ -320,6 +722,44 @@ class Network():
         return ts_return
 
     def call_netwide_func(self, func, ts_in, ts_out=None, **kw_args):
+        """
+        A convenience wrapper for functions that operate on an entire network's timeseries
+        at once.
+
+        Parameters
+        ----------
+        func : str, function
+            Function to use. If provided with a string, will check for that function in
+            :mod:`~geonat.processing`, otherwise the function will be assumed to adhere to the
+            same input and output format than the included ones.
+        ts_in : str
+            Name of the timeseries to use as input to ``func``.
+        ts_out : str, optional
+            Name of the timeseries that the output of ``func`` should be assigned to.
+            Defaults to overwriting ``ts_in``.
+        **kw_args : dict
+            Additional keyword arguments to be passed onto ``func``.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, ``'input'`` and ``'output'`` are the names
+        of the input and output timeseries, respectively, and ``func`` is the function to use,
+        then the following two are equivalent::
+
+            # long version
+            net_in = net.export_network_ts('input')
+            net_out = func(net_in, **kw_args)
+            net.import_network_ts('output', net_out)
+            # short version
+            net.call_netwide_func(func, ts_in='input, ts_out='output', **kw_args)
+            # the short version also knows about the functions in geonat.processing
+            net.call_netwide_func('common_mode', ts_in='input, ts_out='output', **kw_args)
+
+        See Also
+        --------
+        export_network_ts : Export the timeseries of all stations in the network.
+        import_network_ts : Import an entire netwrok's timeseries and distribute to stations.
+        """
         if not callable(func):
             if isinstance(func, str):
                 try:
@@ -338,6 +778,32 @@ class Network():
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
 
     def call_func_no_return(self, func, **kw_args):
+        """
+        A convenience wrapper that for each station in the network, calls a given function on
+        each station. Also provides a progress bar.
+
+        Parameters
+        ----------
+        func : str, function
+            Function to use. If provided with a string, will check for that function in
+            :mod:`~geonat.processing`, otherwise the function will be assumed to adhere to the
+            same input format than the included ones.
+        **kw_args : dict
+            Additional keyword arguments to be passed onto ``func``.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, and ``func`` is the function to use,
+        then the following two are equivalent::
+
+            # long version
+            for station in net:
+                func(station, **kw_args)
+            # shorter version
+            net.call_func_no_return(func, **kw_args)
+            # shorter version, no need to import a geonat.processing function first
+            net.call_func_no_return('clean', **kw_args)
+        """
         if not callable(func):
             if isinstance(func, str):
                 try:
@@ -373,6 +839,26 @@ class Network():
         return fig_map, ax_map, proj_gui, proj_lla, default_station_colors, stat_points, stat_lats, stat_lons
 
     def graphical_cme(self, ts_in, ts_out=None, gui_kw_args={}, **cme_kw_args):
+        """
+        Calculates the Common Mode Error (CME) of the network and shows its spatial
+        and temporal pattern. Optionally saves the model for each station.
+
+        Parameters
+        ----------
+        ts_in : str
+            Name of the timeseries to analyze.
+        ts_out : str, optional
+            If provided, save the model as a timeseries called ``ts_out`` to
+            the stations in the network.
+        gui_kw_args : dict
+            Override default GUI settings of :attr:`~geonat.defaults`.
+        **cme_kw_args : dict
+            Additional keyword arguments passed to :func:`~geonat.processing.common_mode`.
+
+        See Also
+        --------
+        geonat.processing.common_mode : CME calculation function.
+        """
         # get common mode and make sure to return spatial and temporal models
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
@@ -416,6 +902,50 @@ class Network():
 
     def gui(self, timeseries=None, model_list=None, sum_models=True, scalogram=None,
             verbose=False, analyze_kw_args={}, gui_kw_args={}):
+        """
+        Provides a Graphical User Interface (GUI) to visualize the network and all of its different
+        stations, timeseries, and models.
+
+        In its base form, this function will show
+
+        - a window with a map of all stations, underlain optionally with coastlines and/or imagery, and
+        - another window which will show a station's timeseries including all fitted models.
+
+        Stations are selected by clicking on their markers on the map.
+        Optionally, this function can
+
+        - show only a subset of fitted models,
+        - sum the models to an aggregate one,
+        - show a scalogram (Model class permitting),
+        - print statistics of residuals, and
+        - print station information.
+
+        Parameters
+        ----------
+        timeseries : list, optional
+            List of strings with the descriptions of the timeseries to plot.
+            Defaults to all timeseries.
+        model_list : list, optional
+            List of strings containing the model names of the subset of the models
+            to be evaluated. Defaults to all fitted models.
+        sum_models : bool, optional
+            If ``True``, plot the sum of all selected models instead of every
+            model individually. Defaults to ``False``.
+        scalogram : dict, optional
+            A dictionary with ``'ts'`` and ``'model'`` keys. The string values
+            are the names of the timeseries and associated model that are of the
+            :class:`~geonat.model.SplineSet` class, and therefore have a
+            :meth:`~geonat.model.SplineSet.make_scalogram` method.
+            Defaults to no scalogram shown.
+        verbose : bool, optional
+            If ``True``, when clicking on a station, print its details (see
+            :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
+        analyze_kw_args : dict, optional
+            If provided and non-empty, call :meth:`~geonat.station.Station.analyze_residuals`
+            and pass the dictionary on as keyword arguments. Defaults to no residual analysis.
+        gui_kw_args : dict
+            Override default GUI settings of :attr:`~geonat.defaults`.
+        """
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
