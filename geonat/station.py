@@ -33,16 +33,16 @@ class Station():
                 info += f"\n - Fits: {[key for key in self.fits[ts_description]]}"
         return info
 
-    def __getitem__(self, description):
-        if description not in self.timeseries:
-            raise KeyError(f"Station {self.name}: No timeseries '{description}' present.")
-        return self.timeseries[description]
+    def __getitem__(self, ts_description):
+        if ts_description not in self.timeseries:
+            raise KeyError(f"Station {self.name}: No timeseries '{ts_description}' present.")
+        return self.timeseries[ts_description]
 
-    def __setitem__(self, description, timeseries):
-        self.add_timeseries(description, timeseries)
+    def __setitem__(self, ts_description, timeseries):
+        self.add_timeseries(ts_description, timeseries)
 
-    def __delitem__(self, description):
-        self.remove_timeseries(description)
+    def __delitem__(self, ts_description):
+        self.remove_timeseries(ts_description)
 
     def __iter__(self):
         for ts in self.timeseries.values():
@@ -68,14 +68,14 @@ class Station():
                     stat_arch["models"][ts_description].update({mdl_description: mdl.get_arch()})
         return stat_arch
 
-    def add_timeseries(self, description, timeseries, override_src=None, override_data_unit=None,
+    def add_timeseries(self, ts_description, timeseries, override_src=None, override_data_unit=None,
                        override_data_cols=None, override_sigma_cols=None, add_models=None):
-        if not isinstance(description, str):
-            raise TypeError("Cannot add new timeseries: 'description' is not a string.")
+        if not isinstance(ts_description, str):
+            raise TypeError("Cannot add new timeseries: 'ts_description' is not a string.")
         if not isinstance(timeseries, Timeseries):
             raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
-        if description in self.timeseries:
-            warn(f"Station {self.name}: Overwriting time series '{description}'.",
+        if ts_description in self.timeseries:
+            warn(f"Station {self.name}: Overwriting time series '{ts_description}'.",
                  category=RuntimeWarning)
         if override_src is not None:
             timeseries.src = override_src
@@ -85,23 +85,23 @@ class Station():
             timeseries.data_cols = override_data_cols
         if override_sigma_cols is not None:
             timeseries.sigma_cols = override_sigma_cols
-        self.timeseries[description] = timeseries
-        self.fits[description] = {}
-        self.models[description] = {}
+        self.timeseries[ts_description] = timeseries
+        self.fits[ts_description] = {}
+        self.models[ts_description] = {}
         if add_models is not None:
             for model_description, model_cfg in add_models.items():
                 local_copy = deepcopy(model_cfg)
                 mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
-                self.add_local_model(ts_description=description, model_description=model_description, model=mdl)
+                self.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
 
-    def remove_timeseries(self, description):
-        if description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find time series '{description}', couldn't delete.",
+    def remove_timeseries(self, ts_description):
+        if ts_description not in self.timeseries:
+            warn(f"Station {self.name}: Cannot find time series '{ts_description}', couldn't delete.",
                  category=RuntimeWarning)
         else:
-            del self.timeseries[description]
-            del self.fits[description]
-            del self.models[description]
+            del self.timeseries[ts_description]
+            del self.fits[ts_description]
+            del self.models[ts_description]
 
     def add_local_model(self, ts_description, model_description, model):
         if not isinstance(ts_description, str):
