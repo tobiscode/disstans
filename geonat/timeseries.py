@@ -359,13 +359,20 @@ class Timeseries():
 
     def get_arch(self):
         """
-        Returns an empty dictionary since without subclassing, it is unknown how to recreate
-        a Timeseries object from just a JSON-compatible dictionary.
+        Build a dictionary describing the architecture of this timeseries,
+        to be used when creating a network JSON configuration file.
 
-        Returns
-        -------
-        dict
-            Empty dictionary.
+        Without subclassing :class:`~Timeseries`, this function will return an
+        empty dictionary by default, since it is unknown how to recreate
+        a general Timeseries object from just a JSON-compatible dictionary.
+
+        See Also
+        --------
+        geonat.network.Network.to_json : Export the Network configuration as a JSON file.
+        geonat.timeseries.Timeseries.get_arch
+            Get the architecture dictionary of a :class:`~geonat.timeseries.Timeseries` instance.
+        geonat.model.Model.get_arch
+            Get the architecture dictionary of a :class:`~geonat.model.Model` instance.
         """
         return {}
 
@@ -405,6 +412,8 @@ class Timeseries():
 
 class GipsyTimeseries(Timeseries):
     """
+    Subclasses :class:`~Timeseries`.
+
     Timeseries subclass for GNSS measurements in JPL's Gipsy ``.tseries`` file format.
 
     Parameters
@@ -437,6 +446,10 @@ class GipsyTimeseries(Timeseries):
         -------
         dict
             JSON-compatible dictionary sufficient to recreate the GipsyTimeseries instance.
+
+        See Also
+        --------
+        Timeseries.get_arch : For further information.
         """
         return {"type": "GipsyTimeseries",
                 "kw_args": {"path": self._path}}
