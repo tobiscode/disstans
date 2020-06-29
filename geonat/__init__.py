@@ -7,7 +7,7 @@ import multiprocessing
 from pandas.plotting import register_matplotlib_converters
 
 # package version
-__version__ = '0.1.1'
+__version__ = '0.2'
 
 # preparational steps
 multiprocessing.set_start_method('spawn', True)
