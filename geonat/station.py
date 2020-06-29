@@ -144,7 +144,7 @@ class Station():
         self.fits[ts_description].update({model_description: fit_ts})
         return fit_ts
 
-    def remove_fit(self, ts_description, model_description, fit):
+    def remove_fit(self, ts_description, model_description):
         if ts_description not in self.timeseries:
             warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
                  f"couldn't delete fit for model '{model_description}'.", category=RuntimeWarning)
