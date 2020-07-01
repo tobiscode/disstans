@@ -230,37 +230,139 @@ class Timeseries():
             self._df[scol] = np.NaN
             self._df[scol] = self._df[scol].astype(pd.SparseDtype(dtype=float))
 
-    def _prepare_math(self, other, operation):
-        # check for same type
-        if not isinstance(other, Timeseries):
-            raise TypeError(f"Unsupported operand type for '{operation}': '{Timeseries}' and '{type(other)}'.")
-        # check for same dimensions
-        if len(self.data_cols) != len(other.data_cols):
-            raise ValueError(f"Timeseries math problem: conflicting number of data columns ({self.data_cols} and {other.data_cols}).")
-        # get intersection of time indices
-        out_time = self.time.intersection(other.time, sort=None)
-        # check compatible units (+-) or define new one (*/)
-        # define new src and data_cols
-        if operation in ["+", "-"]:
-            if self.data_unit != other.data_unit:
-                raise ValueError(f"Timeseries math problem: conflicting data units '{self.data_unit}' and '{other.data_unit}'.")
-            else:
-                out_unit = self.data_unit
-                out_src = f"{self.src}{operation}{other.src}"
-                out_data_cols = [f"{lcol}{operation}{rcol}" for lcol, rcol in zip(self.data_cols, other.data_cols)]
-        elif operation in ["*", "/"]:
-            out_unit = f"({self.data_unit}){operation}({other.data_unit})"
-            out_src = f"({self.src}){operation}({other.src})"
-            out_data_cols = [f"({lcol}){operation}({rcol})" for lcol, rcol in zip(self.data_cols, other.data_cols)]
-        else:
+    @staticmethod
+    def prepare_math(left, right, operation):
+        r"""
+        Tests two timeseries' ability to be cast together in a mathematical operation,
+        and returns output characteristics.
+        Currently, only addition, subtraction, multiplication, and division are supported.
+
+        All uncertainty information is lost during mathematical operations.
+
+        One of the objects can be a NumPy array. In this case, the array has to have
+        the exact same shape as the data in the Timeseries instance.
+        Furthermore, the resulting Timeseries object will have the same :attr:`~src`,
+        :attr:`~data_unit` and :attr:`~data_cols` attributes (instead of a combination
+        of both).
+
+        Warning
+        -------
+        This method is called under-the-hood whenever a mathematical operation is
+        performed, and should not need to be used by normal users.
+
+        Parameters
+        ----------
+        left : Timeseries or numpy.ndarray
+            Left term of the operation.
+        right : Timeseries or numpy.ndarray
+            Right term of the operation.
+        operation : {'+', '-', '*', '/'}
+            Operation to perform.
+
+        Returns
+        -------
+        left_data : numpy.ndarray
+            View of the 2D left data array of the operation
+            with shape (``len(out_time)``, :attr:`~num_components`).
+        right_data : numpy.ndarray
+            View of the 2D right data array of the operation
+            with shape (``len(out_time)``, :attr:`~num_components`).
+        out_src : str
+            Combines the sources of each object to a new string.
+        out_data_unit : str
+            Combines the data units of each object into a new unit.
+        out_data_cols : list
+            List of strings containing the new data column names.
+        out_time : pandas.Index
+            Index object containing the indices of all timestamps common to both.
+
+        Raises
+        ------
+        TypeError
+            If one of the operands is not a :class:`~Timeseries` or :class:`~numpy.ndarray`,
+            or if both are :class:`~numpy.ndarray` (since then this function would never be
+            called anyway).
+        ValueError
+            If the number of data columns is not equal between the two operands,
+            or if the data units are not the same adding or subtracting.
+        AssertionError
+            If one of the operands is a NumPy array but does not have the same number of
+            rows as the other operand.
+
+        See Also
+        --------
+        __add__ : Addition for two Timeseries or a Timeseries and a NumPy array
+        __radd__ : Addition for a NumPy array and a Timeseries.
+        __sub__ : Subtraction for two Timeseries or a Timeseries and a NumPy array
+        __rsub__ : Subtraction for a NumPy array and a Timeseries.
+        __mul__ : Multiplication for two Timeseries or a Timeseries and a NumPy array
+        __rmul__ : Multiplication for a NumPy array and a Timeseries.
+        __truediv__ : Division for two Timeseries or a Timeseries and a NumPy array
+        __rtruediv__ : Division for a NumPy array and a Timeseries.
+        """
+        # check for valid operator
+        if operation not in ["+", "-", "*", "/"]:
             raise NotImplementedError(f"Timeseries math problem: unknown operation '{operation}'.")
+        # check for compatible types
+        for operand, position in zip([left, right], ["Left", "Right"]):
+            if (not isinstance(operand, Timeseries)) and (not isinstance(operand, np.ndarray)):
+                raise TypeError(f"{position} operand has to be either a '{Timeseries}' or '{np.ndarray}' "
+                                f"object, got {type(operand)}")
+        if all([isinstance(operand, np.ndarray) for operand in [left, right]]):
+            raise TypeError(f"At least one of the operands has to be a '{Timeseries}' object, "
+                            f"got two '{np.ndarray}' objects.")
+        # check for same dimensions
+        len_left_data_cols = left.num_components if isinstance(left, Timeseries) else left.shape[1]
+        len_right_data_cols = right.num_components if isinstance(right, Timeseries) else right.shape[1]
+        if len_left_data_cols != len_right_data_cols:
+            raise ValueError("Timeseries math problem: conflicting number of data columns "
+                             f"({len_left_data_cols} and {len_right_data_cols}).")
+        # get output attributes
+        if isinstance(left, np.ndarray):
+            assert left.shape[0] == right.num_observations, \
+                "Timeseries math problem: conflicting number of observation " + \
+                f"({left.shape[0]} and {right.num_observations})."
+            out_time = right.time
+            out_src = right.src
+            out_data_unit = right.data_unit
+            out_data_cols = right.data_cols
+            left_data = left
+            right_data = right.data.loc[out_time, :].values
+        elif isinstance(right, np.ndarray):
+            assert left.num_observations == right.shape[0], \
+                "Timeseries math problem: conflicting number of observation " + \
+                f"({left.num_observations} and {right.shape[0]})."
+            out_time = left.time
+            out_src = left.src
+            out_data_unit = left.data_unit
+            out_data_cols = left.data_cols
+            left_data = left.data.loc[out_time, :].values
+            right_data = right
+        else:
+            # time index is the intersection
+            out_time = left.time.intersection(right.time, sort=None)
+            # check compatible units (+-) or define new one (*/)
+            # define new src and data_cols
+            if operation in ["+", "-"]:
+                if left.data_unit != right.data_unit:
+                    raise ValueError(f"Timeseries math problem: conflicting data units '{left.data_unit}' and '{right.data_unit}'.")
+                else:
+                    out_data_unit = left.data_unit
+                    out_src = f"{left.src}{operation}{right.src}"
+                    out_data_cols = [f"{lcol}{operation}{rcol}" for lcol, rcol in zip(left.data_cols, right.data_cols)]
+            elif operation in ["*", "/"]:
+                out_data_unit = f"({left.data_unit}){operation}({right.data_unit})"
+                out_src = f"({left.src}){operation}({right.src})"
+                out_data_cols = [f"({lcol}){operation}({rcol})" for lcol, rcol in zip(left.data_cols, right.data_cols)]
+            left_data = left.data.loc[out_time, :].values
+            right_data = right.data.loc[out_time, :].values
         # return data unit and column names
-        return out_src, out_unit, out_data_cols, out_time
+        return left_data, right_data, out_src, out_data_unit, out_data_cols, out_time
 
     def __add__(self, other):
         """
-        Special function that allows two timeseries instances to be added together element-wise.
-        Uncertainty information is lost.
+        Special function that allows two timeseries instances (or a timeseries and an equivalently
+        shaped NumPy array) to be added together element-wise.
 
         Parameters
         ----------
@@ -272,20 +374,34 @@ class Timeseries():
         Timeseries
             New timeseries object containing the sum of the two timeseries.
 
+        See Also
+        --------
+        prepare_math
+            Prepares the two instances for the mathematical operation. Refer to it for more details
+            about how the two objects are cast together.
+
         Example
         -------
-        Add two timeseries ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Add two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
 
             ts3 = ts1 + ts2
         """
-        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '+')
-        out_dict = {newcol: self.df.loc[out_time, lcol].values + other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '+')
+        return Timeseries(pd.DataFrame(left_data + right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
+
+    def __radd__(self, other):
+        """
+        Reflected operation of :meth:`~__add__` (necessary if first operand is a NumPy array).
+        """
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '+')
+        return Timeseries(pd.DataFrame(left_data + right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
 
     def __sub__(self, other):
         """
-        Special function that allows a timeseries instance to be subtracted from another element-wise.
-        Uncertainty information is lost.
+        Special function that allows a timeseries instance (or a timeseries and an equivalently
+        shaped NumPy array) to be subtracted from another element-wise.
 
         Parameters
         ----------
@@ -297,20 +413,34 @@ class Timeseries():
         Timeseries
             New timeseries object containing the difference of the two timeseries.
 
+        See Also
+        --------
+        prepare_math
+            Prepares the two instances for the mathematical operation. Refer to it for more details
+            about how the two objects are cast together.
+
         Example
         -------
-        Add two timeseries ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Subtract two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
 
             ts3 = ts1 - ts2
         """
-        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '-')
-        out_dict = {newcol: self.df.loc[out_time, lcol].values - other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '-')
+        return Timeseries(pd.DataFrame(left_data - right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
+
+    def __rsub__(self, other):
+        """
+        Reflected operation of :meth:`~__sub__` (necessary if first operand is a NumPy array).
+        """
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '-')
+        return Timeseries(pd.DataFrame(left_data - right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
 
     def __mul__(self, other):
         """
-        Special function that allows two timeseries instances to be multiplied together element-wise.
-        Uncertainty information is lost.
+        Special function that allows two timeseries instances (or a timeseries and an equivalently
+        shaped NumPy array) to be multiplied together element-wise.
 
         Parameters
         ----------
@@ -322,20 +452,34 @@ class Timeseries():
         Timeseries
             New timeseries object containing the product of the two timeseries.
 
+        See Also
+        --------
+        prepare_math
+            Prepares the two instances for the mathematical operation. Refer to it for more details
+            about how the two objects are cast together.
+
         Example
         -------
-        Add two timeseries ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Multiply two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
 
             ts3 = ts1 * ts2
         """
-        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '*')
-        out_dict = {newcol: self.df.loc[out_time, lcol].values * other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '*')
+        return Timeseries(pd.DataFrame(left_data * right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
+
+    def __rmul__(self, other):
+        """
+        Reflected operation of :meth:`~__mul__` (necessary if first operand is a NumPy array).
+        """
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '*')
+        return Timeseries(pd.DataFrame(left_data * right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
 
     def __truediv__(self, other):
         """
-        Special function that allows a timeseries instances to be divided by another element-wise.
-        Uncertainty information is lost.
+        Special function that allows a timeseries instances (or a timeseries and an equivalently
+        shaped NumPy array) to be divided by another element-wise.
 
         Parameters
         ----------
@@ -347,15 +491,29 @@ class Timeseries():
         Timeseries
             New timeseries object containing the quotient of the two timeseries.
 
+        See Also
+        --------
+        prepare_math
+            Prepares the two instances for the mathematical operation. Refer to it for more details
+            about how the two objects are cast together.
+
         Example
         -------
-        Add two timeseries ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Divide two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
 
             ts3 = ts1 / ts2
         """
-        out_src, out_unit, out_data_cols, out_time = self._prepare_math(other, '/')
-        out_dict = {newcol: self.df.loc[out_time, lcol].values / other.df.loc[out_time, rcol].values for newcol, lcol, rcol in zip(out_data_cols, self.data_cols, other.data_cols)}
-        return Timeseries(pd.DataFrame(data=out_dict, index=out_time), out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '/')
+        return Timeseries(pd.DataFrame(left_data / right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
+
+    def __rtruediv__(self, other):
+        """
+        Reflected operation of :meth:`~__truediv__` (necessary if first operand is a NumPy array).
+        """
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '/')
+        return Timeseries(pd.DataFrame(left_data / right_data, index=out_time, columns=out_data_cols),
+                          out_src, out_unit, out_data_cols)
 
     def get_arch(self):
         """
