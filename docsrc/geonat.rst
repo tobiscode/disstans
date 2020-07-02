@@ -1,11 +1,11 @@
-API Documentation
-=================
+GeoNAT
+======
 
 .. toctree::
     :glob:
     :hidden:
-    :maxdepth: 1
 
-    api/*
+    geonat/*
+
 
 .. automodule:: geonat

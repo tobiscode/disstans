@@ -1,16 +1,20 @@
 Welcome to GeoNAT's documentation!
 ==================================
 
-Contents
---------
 
 .. toctree::
-   :includehidden:
-   :maxdepth: 2
+   :caption: User Guide
 
    installation
    tutorial
-   api
+
+
+.. toctree::
+   :caption: API Documentation
+   :includehidden:
+   :titlesonly:
+
+   geonat
 
 
 
