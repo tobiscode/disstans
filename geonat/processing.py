@@ -110,6 +110,7 @@ def median(array, kernel_size):
         dictionaries of them as input.
     kernel_size : int
         Kernel size (length of moving window to compute the median over).
+        Has to be an odd number.
 
     Returns
     -------

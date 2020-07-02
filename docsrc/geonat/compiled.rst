@@ -16,7 +16,7 @@ is computed column-wise with a specified kernel size.
 * *mask_in* is a NumPy array of the same size, which is 1 (or True)
   everywhere except where there are NaNs in the original array
   (where it should be 0 or False)
-* *kernel* is the integer kernel window size
+* *kernel* is the (odd) integer kernel window size
 
 .. autofunction:: geonat.compiled.maskedmedfilt2d
 

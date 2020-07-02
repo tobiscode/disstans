@@ -263,13 +263,13 @@ class Network():
         else:
             del self.stations[name]
 
-    def add_global_model(self, description, model):
+    def add_global_model(self, mdl_description, model):
         """
         Add a global model to the network.
 
         Parameters
         ----------
-        description : str
+        mdl_description : str
             Description of the model.
         model : geonat.model.Model
             Model object to add.
@@ -278,29 +278,29 @@ class Network():
         -------
         Global models have not been implemented yet.
         """
-        if not isinstance(description, str):
-            raise TypeError("Cannot add new global model: 'description' is not a string.")
-        if description in self.global_models:
-            warn(f"Overwriting global model '{description}'.", category=RuntimeWarning)
-        self.global_models[description] = model
+        if not isinstance(mdl_description, str):
+            raise TypeError("Cannot add new global model: 'mdl_description' is not a string.")
+        if mdl_description in self.global_models:
+            warn(f"Overwriting global model '{mdl_description}'.", category=RuntimeWarning)
+        self.global_models[mdl_description] = model
 
-    def remove_global_model(self, description):
+    def remove_global_model(self, mdl_description):
         """
         Remove a global model from the network.
 
         Parameters
         ----------
-        description : str
+        mdl_description : str
             Description of the model.
 
         Warning
         -------
         Global models have not been implemented yet.
         """
-        if description not in self.global_models:
-            warn(f"Cannot find global model '{description}', couldn't delete.", category=RuntimeWarning)
+        if mdl_description not in self.global_models:
+            warn(f"Cannot find global model '{mdl_description}', couldn't delete.", category=RuntimeWarning)
         else:
-            del self.global_models[description]
+            del self.global_models[mdl_description]
 
     @classmethod
     def from_json(cls, path, add_default_local_models=True, station_kw_args={}, timeseries_kw_args={}):
@@ -351,7 +351,7 @@ class Network():
             # add timeseries to station
             for ts_description, ts_cfg in station_cfg["timeseries"].items():
                 ts = getattr(geonat_ts, ts_cfg["type"])(**ts_cfg["kw_args"], **timeseries_kw_args)
-                station.add_timeseries(description=ts_description, timeseries=ts)
+                station.add_timeseries(ts_description=ts_description, timeseries=ts)
                 # add default local models to station
                 if add_default_local_models:
                     for model_description, model_cfg in net.default_local_models.items():
@@ -371,7 +371,7 @@ class Network():
         # add global models
         for model_description, model_cfg in net_arch["global_models"].items():
             mdl = getattr(geonat_models, model_cfg["type"])(**model_cfg["kw_args"])
-            net.add_global_model(description=model_description, model=mdl)
+            net.add_global_model(mdl_description=model_description, model=mdl)
         return net
 
     def to_json(self, path):
