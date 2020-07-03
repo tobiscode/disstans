@@ -14,7 +14,7 @@ from warnings import warn
 
 from . import defaults, Timeseries, Station
 from . import timeseries as geonat_ts
-from . import model as geonat_models
+from . import models as geonat_models
 from . import solvers as geonat_solvers
 from . import processing as geonat_processing
 from .processing import common_mode

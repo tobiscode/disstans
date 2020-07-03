@@ -11,7 +11,7 @@ from warnings import warn
 
 from . import defaults
 from .tools import parallelize
-from .model import Step
+from .models import Step
 
 
 def _okada_get_displacements(station_and_parameters):

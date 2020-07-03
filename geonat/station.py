@@ -11,8 +11,8 @@ from copy import deepcopy
 from warnings import warn
 
 from . import Timeseries
-from . import model as geonat_models
-from .model import Model
+from . import models as geonat_models
+from .models import Model
 
 
 class Station():
