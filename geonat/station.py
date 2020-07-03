@@ -398,6 +398,43 @@ class Station():
         else:
             del self.fits[ts_description][model_description]
 
+    def sum_fits(self, ts_description, model_list=None):
+        r"""
+        Method to quickly sum fits of a timeseries.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries whose fits to sum.
+        model_list : list, optional
+            List of strings containing the model names of the subset of the fitted models
+            to be summed. Defaults to all fitted models.
+
+        Returns
+        -------
+        fit_sum : numpy.ndarray
+            2D array of shape :math:`(\text{n_observations},\text{n_components})`
+        fit_sum_sigma : numpy.ndarray or None
+            2D array of shape :math:`(\text{n_observations},\text{n_components})`.
+            Returns ``None`` if no uncertainty columns are available.
+        """
+        # shorthand for timeseries
+        ts = self[ts_description]
+        # get model subset
+        fits_to_sum = {model_description: fit for model_description, fit in self.fits[ts_description].items()
+                       if (model_list is None) or (model_description in model_list)}
+        # sum models and uncertainties
+        i_sigma_cols = [i for i, val in enumerate(ts.sigma_cols) if val is not None]
+        fit_sum = np.zeros((ts.num_observations, ts.num_components))
+        fit_sum_sigma = np.zeros_like(fit_sum) if len(i_sigma_cols) > 0 else None
+        for model_description, fit in fits_to_sum.items():
+            fit_sum += fit.data.values
+            if fit_sum_sigma is not None:
+                fit_sum_sigma += fit.sigmas.values**2
+        if fit_sum_sigma is not None:
+            fit_sum_sigma = np.sqrt(fit_sum_sigma)
+        return fit_sum, fit_sum_sigma
+
     def analyze_residuals(self, ts_description, mean=False, std=False, n_observations=False, std_outlier=0):
         """
         Analyze, print and return the residuals of a station's timeseries according
