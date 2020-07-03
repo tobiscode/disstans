@@ -31,8 +31,8 @@ class Timeseries():
         List of strings with the names of the columns of ``dataframe`` that
         contain the data.
     sigma_cols : list, optional
-        List of strings with the names of the columns of ``dataframe`` that
-        contain the data's uncertainty. Must have the same length as ``data_cols``.
+        List of strings with the names of the columns of ``dataframe`` that contain the
+        data's uncertainty (as standard deviations). Must have the same length as ``data_cols``.
         If only certain data columns have uncertainties, set the respective entry
         to ``None``.
         Defaults to no data uncertainty columns.
@@ -566,6 +566,58 @@ class Timeseries():
             df_data.update({scol: fit["sigma"][:, icol] for icol, scol in enumerate(sigma_cols)})
         df = pd.DataFrame(data=df_data, index=fit["time"])
         return cls(df, "fitted", data_unit, data_cols, sigma_cols)
+
+    @classmethod
+    def from_array(cls, timevector, data, src, data_unit, data_cols, sigma=None, sigma_cols=None):
+        r"""
+        Constructor method to create a :class:`~Timeseries` instance from a NumPy
+        :class:`~numpy.ndarray`.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+        data : numpy.ndarray
+            2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
+            containing the data.
+        src : str
+            Source description.
+        data_unit : str
+            Data unit.
+        data_cols : list
+            List of strings with the names of the columns of ``data``.
+        sigma : numpy.ndarray, optional
+            2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
+            containing the data uncertainty (standard deviations).
+            Defaults to no data uncertainty.
+        sigma_cols : list, optional
+            List of strings with the names of the columns of ``data`` that contain the
+            data's uncertainty (as standard deviations). Must have the same length as ``data_cols``.
+            If only certain data columns have uncertainties, set the respective entry
+            to ``None``.
+            If ``sigma`` is given but ``sigma_cols`` is not, it defaults to appending
+            ``'_sigma'`` to ``data_cols``.
+
+        See Also
+        --------
+        pandas.date_range : Quick function to generate a timevector.
+        """
+        assert len(timevector) == data.shape[0], \
+            f"length of 'timevector' has to match the number of rows in 'data', got {len(timevector)} and {data.shape}."
+        df_data = {dcol: data[:, icol] for icol, dcol in enumerate(data_cols)}
+        if sigma is None:
+            sigma_cols = None
+        else:
+            assert data.shape == sigma.shape, \
+                f"'data' and 'sigma' need to have the same shape, got {data.shape} and {sigma.shape}."
+            if sigma_cols is None:
+                sigma_cols = [dcol + "_sigma" for dcol in data_cols]
+            else:
+                assert len(sigma_cols) == sigma.shape[1]
+            df_data.update({scol: sigma[:, icol] for icol, scol in enumerate(sigma_cols) if scol is not None})
+        df = pd.DataFrame(data=df_data, index=timevector)
+        return cls(df, src, data_unit, data_cols, sigma_cols)
 
 
 class GipsyTimeseries(Timeseries):

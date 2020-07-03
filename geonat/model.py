@@ -172,8 +172,9 @@ class Model():
 
         Parameters
         ----------
-        timevector : pandas.Series
-            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
 
         Returns
         -------
@@ -221,8 +222,9 @@ class Model():
 
         Parameters
         ----------
-        timevector : pandas.Series
-            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
 
         Returns
         ----------
@@ -288,8 +290,9 @@ class Model():
 
         Parameters
         ----------
-        timevector : pandas.Series
-            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
 
         Returns
         -------
@@ -522,8 +525,9 @@ class BSpline(Model):
 
         Parameters
         ----------
-        timevector : pandas.Series
-            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
 
         Returns
         -------
@@ -596,8 +600,9 @@ class ISpline(Model):
 
         Parameters
         ----------
-        timevector : pandas.Series
-            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
 
         Returns
         -------
@@ -784,7 +789,7 @@ class SplineSet(Model):
         num_components = self.parameters.shape[1]
         num_scales = len(self.splines)
         dy_scale = 1/num_scales
-        t_plot = pd.Series([tstamp for tstamp in pd.date_range(start=t_left, end=t_right, periods=resolution)])
+        t_plot = pd.Series(pd.date_range(start=t_left, end=t_right, periods=resolution))
         # get range of values (if not provided)
         if cmaprange is not None:
             assert isinstance(cmaprange, int) or isinstance(cmaprange, float), \

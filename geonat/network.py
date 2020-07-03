@@ -563,8 +563,9 @@ class Network():
         model_list : list, optional
             List of strings containing the model names of the subset of the models
             to be evaluated. Defaults to all models.
-        timevector : pandas.Series, optional
-            :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+        timevector : pandas.Series, pandas.DatetimeIndex, optional
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` of when to evaluate the model.
             Defaults to the timestamps of the timeseries itself.
         output_description : str, optional
             If provided, add the sum of the evaluated models as a new timeseries

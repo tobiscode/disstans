@@ -21,8 +21,9 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
 
     Parameters
     ----------
-    timevector : pandas.Series
-        :class:`~pandas.Series` of :class:`~pandas.Timestamp`.
+    timevector : pandas.Series, pandas.DatetimeIndex
+        :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+        :class:`~pandas.DatetimeIndex` of when to evaluate the model.
     t_reference : str or pandas.Timestamp, optional
         Reference :class:`~pandas.Timestamp` or datetime-like string that can be converted to one.
         Defaults to the first element of ``timevector``.
