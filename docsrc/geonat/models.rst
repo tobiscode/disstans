@@ -1,4 +1,4 @@
-Model
-=====
+Models
+======
 
-.. automodule:: geonat.model
+.. automodule:: geonat.models

@@ -316,7 +316,7 @@ class Model():
 
 class Step(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Model that introduces steps at discrete times.
 
@@ -327,7 +327,7 @@ class Step(Model):
         Length of it equals the number of model parameters.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, steptimes, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
@@ -388,7 +388,7 @@ class Step(Model):
 
 class Polynomial(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Polynomial model of given order.
 
@@ -399,7 +399,7 @@ class Polynomial(Model):
         equals ``order + 1``.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, order, zero_before=False, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=order + 1, zero_before=zero_before, zero_after=zero_after, **model_kw_args)
@@ -424,7 +424,7 @@ class Polynomial(Model):
 
 class BSpline(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Model defined by cardinal, centralized B-Splines of certain order/degree and time scale.
     Used for transient temporary signals that return to zero after a given time span.
@@ -446,7 +446,7 @@ class BSpline(Model):
         Defaults to ``scale``.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
 
     Notes
     -----
@@ -541,7 +541,7 @@ class BSpline(Model):
 
 class ISpline(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Integral of cardinal, centralized B-Splines of certain order/degree and time scale.
     The degree :math:`p` given in the initialization is the degree of the spline *before* the integration, i.e.
@@ -550,7 +550,7 @@ class ISpline(Model):
 
     See Also
     --------
-    geonat.model.Bspline : More details about B-Splines.
+    geonat.models.Bspline : More details about B-Splines.
     """
     def __init__(self, degree, scale, t_reference, time_unit, num_splines=1, spacing=None, zero_after=False, **model_kw_args):
         self.degree = int(degree)
@@ -616,7 +616,7 @@ class ISpline(Model):
 
 class SplineSet(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Contains a list of splines that share a common degree, but different center times and scales.
 
@@ -645,12 +645,12 @@ class SplineSet(Model):
         List of number of knots to divide the time span into for each of the sub-splines.
         Mutually exclusive to setting ``list_scales``.
     splineclass : Model, optional
-        Model class to use for the splines. Defaults to :class:`~geonat.model.ISpline`.
+        Model class to use for the splines. Defaults to :class:`~geonat.models.ISpline`.
     complete : bool, optional
         See usage description above. Defaults to ``True``.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, degree, t_center_start, t_center_end, time_unit, list_scales=None, list_num_knots=None,
                  splineclass=ISpline, complete=True, **model_kw_args):
@@ -835,7 +835,7 @@ class SplineSet(Model):
 
 class Sinusoidal(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     This model provides a sinusoidal of a fixed period, with amplitude and phase
     to be fitted.
@@ -843,10 +843,10 @@ class Sinusoidal(Model):
     Parameters
     ----------
     period : float
-        Period length in :attr:`~geonat.model.Model.time_unit` units.
+        Period length in :attr:`~geonat.models.Model.time_unit` units.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
 
     Notes
     -----
@@ -893,7 +893,7 @@ class Sinusoidal(Model):
 
 class Logarithmic(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     This model provides the 'geophysical' logarithmic :math:`\ln(1 + \mathbf{t}/\tau)`
     with a given time constant and zero for :math:`\mathbf{t} < 0`.
@@ -904,7 +904,7 @@ class Logarithmic(Model):
         Logarithmic time constant :math:`\tau`.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=1, zero_after=zero_after, **model_kw_args)
