@@ -324,6 +324,10 @@ class Model():
         mapping_matrix = self.get_mapping(timevector=timevector)
         fit = mapping_matrix @ self.parameters
         fit_sigma = mapping_matrix @ np.sqrt(self.cov.diagonal(offset=0, axis1=0, axis2=1).T) if self.cov is not None else None
+        if fit.ndim == 1:
+            fit = fit.reshape(-1, 1)
+            if fit_sigma is not None:
+                fit_sigma = fit_sigma.reshape(-1, 1)
         return {"time": timevector, "fit": fit, "sigma": fit_sigma}
 
 
