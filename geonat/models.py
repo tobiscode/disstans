@@ -76,8 +76,18 @@ class Model():
     zero_after : bool, optional
         Defines whether the model is zero after ``t_end``, or
         if the boundary value should be used (attribute :attr:`~zero_after`).
+    parameters : numpy.ndarray, optional
+        If provided, already save the model parameters.
+    cov : numpy.ndarray, optional
+        If provided (and ``parameters`` is provided as well), already save the
+        model parameter covariance.
+
+    See Also
+    --------
+    read_parameters : Function used to read in the model parameters.
     """
-    def __init__(self, num_parameters, regularize=False, time_unit=None, t_start=None, t_end=None, t_reference=None, zero_before=True, zero_after=True):
+    def __init__(self, num_parameters, regularize=False, time_unit=None, t_start=None, t_end=None, t_reference=None,
+                 zero_before=True, zero_after=True, parameters=None, cov=None):
         self.num_parameters = int(num_parameters)
         """ Number of parameters that define the model and can be solved for. """
         assert self.num_parameters > 0, f"'num_parameters' must be an integer greater or equal to one, got {self.num_parameters}."
@@ -118,6 +128,9 @@ class Model():
         If ``True``, model will evaluate to zero after the end time, otherwise the
         model value at the end time will be used for all times after that.
         """
+        # read in parameters if they were passed to constructor
+        if parameters is not None:
+            self.read_parameters(parameters, cov)
 
     def get_arch(self):
         """
