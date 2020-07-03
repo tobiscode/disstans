@@ -367,9 +367,6 @@ class Station():
             f"Station {self.name}: Cannot find timeseries '{ts_description}' to add fit for model '{model_description}'."
         assert model_description in self.models[ts_description], \
             f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't add fit."
-        if model_description in self.fits[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting fit of local model '{model_description}'.",
-                 category=RuntimeWarning)
         data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
         self.fits[ts_description].update({model_description: fit_ts})
