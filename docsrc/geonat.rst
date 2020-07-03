@@ -1,11 +1,12 @@
 GeoNAT
 ======
 
-.. toctree::
-    :glob:
-    :hidden:
-
-    geonat/*
-
-
 .. automodule:: geonat
+
+
+.. toctree::
+   :caption: Submodules
+   :glob:
+   :titlesonly:
+
+   geonat/*

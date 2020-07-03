@@ -10,9 +10,9 @@ import pandas as pd
 from copy import deepcopy
 from warnings import warn
 
+from . import Timeseries
 from . import model as geonat_models
 from .model import Model
-from .timeseries import Timeseries
 
 
 class Station():

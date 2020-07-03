@@ -12,9 +12,8 @@ import warnings
 from functools import wraps
 from sklearn.decomposition import PCA, FastICA
 
-from . import defaults
+from . import defaults, Timeseries
 from .compiled import maskedmedfilt2d
-from .timeseries import Timeseries
 
 
 def unwrap_dict_and_ts(func):
