@@ -188,6 +188,14 @@ class Timeseries():
         """ Timestamps of the timeseries (index of :attr:`~df`). """
         return self._df.index
 
+    @property
+    def shape(self):
+        r"""
+        Returns the shape tuple (similar to NumPy) of the timeseries, which is of shape
+        :math:`(\text{n_observations},\text{n_components})`.
+        """
+        return (self.num_observations, self.num_components)
+
     def copy(self, only_data=False, src=None):
         """
         Return a deep copy of the timeseries instance.
