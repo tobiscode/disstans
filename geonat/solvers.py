@@ -117,6 +117,8 @@ def ridge_regression(ts, models, penalty, formal_covariance=False):
     reg = sparse.diags(reg_diag, dtype=float) * penalty
     num_time, num_params = G.shape
     num_components = len(ts.data_cols)
+    if np.sum(reg_diag) == 0:
+        warn(f"Ridge Regression (L2-regularized) solver got no models to regularize.")
     # perform fit and estimate formal covariance (uncertainty) of parameters
     params = np.zeros((num_params, num_components))
     if formal_covariance:
@@ -189,6 +191,8 @@ def lasso_regression(ts, models, penalty, formal_covariance=False):
     reg_diag = np.array(reg_diag)
     num_time, num_params = G.shape
     num_components = len(ts.data_cols)
+    if np.sum(reg_diag) == 0:
+        warn(f"Lasso Regression (L1-regularized) solver got no models to regularize.")
 
     # define cvxpy helper expressions and functions
     beta = cp.Variable(num_params)
