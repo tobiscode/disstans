@@ -7,6 +7,6 @@ GeoNAT
 .. toctree::
    :caption: Submodules
    :glob:
-   :titlesonly:
+   :maxdepth: 2
 
    geonat/*

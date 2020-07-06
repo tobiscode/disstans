@@ -69,7 +69,7 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
         arguments that ``func`` should be called with.
     num_threads : int, optional
         Number of threads to use. Set to ``0`` if no parallelization is desired.
-        Defaults to the value in :attr:`~geonat.defaults`.
+        Defaults to the value in :attr:`~geonat.config.defaults`.
     chunksize : int, optional
         Chunk size used in the parallelization pool, see
         :meth:`~python.multiprocessing.Pool.imap`.

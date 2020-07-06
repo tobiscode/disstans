@@ -186,7 +186,6 @@ def lasso_regression(ts, models, penalty, formal_covariance=False):
         mapping_matrices.append(model.get_mapping(ts.time))
         reg_diag.extend([model.regularize for _ in range(model.num_parameters)])
     G = sparse.hstack(mapping_matrices, format='bsr')
-    # reg = sparse.diags(reg_diag, dtype=float) * penalty
     reg_diag = np.array(reg_diag)
     num_time, num_params = G.shape
     num_components = len(ts.data_cols)

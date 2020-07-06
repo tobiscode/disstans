@@ -1,4 +1,4 @@
 Station
 =======
 
-.. automodule:: geonat.station
+.. autoclass:: geonat.station.Station

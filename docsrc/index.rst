@@ -4,6 +4,7 @@ Welcome to GeoNAT's documentation!
 
 .. toctree::
    :caption: User Guide
+   :maxdepth: 2
 
    installation
    tutorial
@@ -12,7 +13,7 @@ Welcome to GeoNAT's documentation!
 .. toctree::
    :caption: API Documentation
    :includehidden:
-   :titlesonly:
+   :maxdepth: 2
 
    geonat
 

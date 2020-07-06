@@ -523,8 +523,8 @@ class Network():
         See Also
         --------
         evaluate : Evaluate the fitted models at all stations.
-        :attr:`~geonat.defaults` : Dictionary of settings, including parallelization.
-        parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
+        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if isinstance(solver, str):
@@ -597,8 +597,8 @@ class Network():
         See Also
         --------
         fit : Fit models at all stations.
-        :attr:`~geonat.defaults` : Dictionary of settings, including parallelization.
-        parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
+        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         assert isinstance(ts_description, str), f"'ts_description' must be string, got {type(ts_description)}."
         if output_description is not None:
@@ -692,8 +692,8 @@ class Network():
 
         See Also
         --------
-        :attr:`~geonat.defaults` : Dictionary of settings, including parallelization.
-        parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
+        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         if not callable(func):
             if isinstance(func, str):
@@ -850,7 +850,7 @@ class Network():
             If provided, save the model as a timeseries called ``ts_out`` to
             the stations in the network.
         gui_kw_args : dict
-            Override default GUI settings of :attr:`~geonat.defaults`.
+            Override default GUI settings of :attr:`~geonat.config.defaults`.
         **cme_kw_args : dict
             Additional keyword arguments passed to :func:`~geonat.processing.common_mode`.
 
@@ -943,7 +943,7 @@ class Network():
             If provided and non-empty, call :meth:`~geonat.station.Station.analyze_residuals`
             and pass the dictionary on as keyword arguments. Defaults to no residual analysis.
         gui_kw_args : dict
-            Override default GUI settings of :attr:`~geonat.defaults`.
+            Override default GUI settings of :attr:`~geonat.config.defaults`.
         """
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()

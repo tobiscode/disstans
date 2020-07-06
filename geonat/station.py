@@ -483,6 +483,5 @@ class Station():
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
         if results:  # only print if any statistic was recorded
-            print()
             print(pd.DataFrame(data=results, index=self[ts_description].data_cols).rename_axis(f"{self.name}: {ts_description}", axis=1))
         return results

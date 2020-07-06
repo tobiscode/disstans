@@ -226,7 +226,7 @@ def clean(station, ts_in, reference, ts_out=None, clean_kw_args={}, reference_ca
     """
     Function operating on a single station's timeseries to clean it from outliers,
     and mask it out if the data is not good enough. The criteria are set by
-    :attr:`~geonat.defaults` but can be overriden by providing ``clean_kw_args``.
+    :attr:`~geonat.config.defaults` but can be overriden by providing ``clean_kw_args``.
 
     Parameters
     ----------
@@ -244,7 +244,7 @@ def clean(station, ts_in, reference, ts_out=None, clean_kw_args={}, reference_ca
         If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``
         and clean the copy (to preserve the raw timeseries).
     clean_kw_args : dict
-        Override the default cleaning criteria in :attr:`~geonat.defaults`.
+        Override the default cleaning criteria in :attr:`~geonat.config.defaults`.
     reference_callable_args : dict
         If ``reference`` is a function, ``reference_callable_args`` can be used
         to pass additional keyword arguments to the former when calculating

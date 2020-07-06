@@ -84,7 +84,7 @@ def okada_prior(network, catalog_path, target_timeseries, target_model, target_m
         Whether to mark the model for regularization or not.
     catalog_prior_kw_args : dict, optional
         A dictionary fine-tuning the displacement calculation and modeling, see
-        :attr:`~geonat.defaults` for explanations and defaults.
+        :attr:`~geonat.config.defaults` for explanations and defaults.
 
     Notes
     -----
