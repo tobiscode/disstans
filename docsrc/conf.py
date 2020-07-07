@@ -60,14 +60,20 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # -- Other settings ------------------------------------------------
+# autodoc settings
 # add_module_names = False
 autodoc_default_options = {'members': True,
                            'undoc-members': True,
                            'special-members': True,
                            'exclude-members': '__init__, __module__, __dict__, __weakref__',
                            'member-order': 'groupwise'}
+# intersphinx settings
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None)}
+# ReadTheDocs theme settings
 html_theme_options = {'collapse_navigation': False}
+# add copybutton.js (https://github.com/readthedocs/sphinx_rtd_theme/issues/167)
+def setup(app):  # noqa: E302
+    app.add_js_file('copybutton.js')
