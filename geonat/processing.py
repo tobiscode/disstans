@@ -190,7 +190,7 @@ def common_mode(array, method, n_components=1, plot=False):
     .. [huang12] Huang, D. W., Dai, W. J., & Luo, F. X. (2012),
        *ICA spatiotemporal filtering method and its application in GPS deformation monitoring*,
        Applied Mechanics and Materials, 204-208, 2806, doi:`10.4028/www.scientific.net/AMM.204-208.2806
-       <http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_
+       <http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_.
 
     .. _Principal Component Analysis:
        https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html

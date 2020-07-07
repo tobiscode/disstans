@@ -6,6 +6,7 @@ For more specialized processing functions, see :mod:`~geonat.processing`.
 """
 
 import os
+import numpy as np
 import pandas as pd
 from multiprocessing import Pool
 
@@ -113,3 +114,57 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
     else:
         for parameter in iterable:
             yield func(parameter)
+
+
+def create_powerlaw_noise(size, exponent):
+    """
+    Creates synthetic noise according to a Power Law model [langbein04]_.
+
+    Parameters
+    ----------
+    size : int
+        Number of (equally-spaced) noise samples of the output noise array.
+    exponent : int
+        Exponent of the power law noise model.
+
+    Returns
+    -------
+    numpy.ndarray
+        Noise output array.
+
+    Notes
+    -----
+    This function uses Timmer and König's [timmerkoenig95]_ approach to
+    generate the noise, and is informed by Felix Patzelt's `colorednoise`_ package.
+
+    References
+    ----------
+
+    .. [langbein04] Langbein, J. (2004),
+       *Noise in two‐color electronic distance meter measurements revisited*,
+       J. Geophys. Res., 109, B04406,
+       doi:`10.1029/2003JB002819 <https://doi.org/10.1029/2003JB002819>`_.
+    .. [timmerkoenig95] Timmer, J.; König, M. (1995),
+       *On generating power law noise*,
+       Astronomy and Astrophysics, v.300, p.707.
+    .. _`colorednoise`: https://github.com/felixpatzelt/colorednoise
+    """
+    halfsize = int(size // 2 + 1)
+    # step 1-2
+    # get Fourier frequencies
+    freqs = np.fft.rfftfreq(size)
+    # the scaling later can't handle zero frequency, so we need to set it
+    # to the minimum frequency possible
+    freqs[0] = 1/size
+    # draw one or two sets of Gaussian distributed random numbers
+    # (one if size is even), then multiply them by a
+    # frequency-dependent scaling factor
+    rng = np.random.default_rng()
+    fourier_noise = rng.standard_normal(halfsize) * freqs**(-exponent/2)
+    if (size % 2) != 0:
+        imag_part = rng.standard_normal(halfsize) * freqs**(-exponent/2)
+        fourier_noise = fourier_noise + imag_part * 1j
+    # step 3
+    # transform from frequency to time domain
+    noise = np.fft.irfft(fourier_noise, n=size)
+    return noise
