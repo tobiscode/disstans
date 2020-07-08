@@ -116,7 +116,7 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
             yield func(parameter)
 
 
-def create_powerlaw_noise(size, exponent):
+def create_powerlaw_noise(size, exponent, seed=None):
     """
     Creates synthetic noise according to a Power Law model [langbein04]_.
 
@@ -126,6 +126,8 @@ def create_powerlaw_noise(size, exponent):
         Number of (equally-spaced) noise samples of the output noise array.
     exponent : int
         Exponent of the power law noise model.
+    seed : int, optional
+        Pass an initial seed to the random number generator.
 
     Returns
     -------
@@ -159,7 +161,7 @@ def create_powerlaw_noise(size, exponent):
     # draw one or two sets of Gaussian distributed random numbers
     # (one if size is even), then multiply them by a
     # frequency-dependent scaling factor
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed)
     fourier_noise = rng.standard_normal(halfsize) * freqs**(-exponent/2)
     if (size % 2) != 0:
         imag_part = rng.standard_normal(halfsize) * freqs**(-exponent/2)
