@@ -1009,6 +1009,8 @@ class Logarithmic(Model):
     ----------
     tau : float
         Logarithmic time constant :math:`\tau`.
+        It represents the time at which, after zero-crossing at the reference
+        time, the logarithm reaches the value 1 (before model scaling).
 
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
@@ -1019,7 +1021,7 @@ class Logarithmic(Model):
             t_start = t_reference
         super().__init__(num_parameters=1, t_reference=t_reference, t_start=t_start,
                          time_unit=time_unit, zero_after=zero_after, **model_kw_args)
-            assert self.t_reference <= self.t_start, \
+        assert self.t_reference <= self.t_start, \
             "Logarithmic model has to have valid bounds, but the reference time " + \
             f"{self.t_reference_str} is after the start time {self.t_start_str}."
         self.tau = float(tau)
@@ -1033,4 +1035,45 @@ class Logarithmic(Model):
     def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
         coefs = np.log1p(dt / self.tau).reshape(-1, 1)
+        return coefs
+
+
+class Arctangent(Model):
+    r"""
+    Subclasses :class:`~geonat.model.Model`.
+
+    This model provides the arctangent :math:`\arctan(\mathbf{t}/\tau)`,
+    stretched with a given time constant.
+
+    Because this model is always transient, it is recommended not to
+    use it in the estimation of parameters, even when using ``t_start``
+    and ``t_end`` to cut off the tails (since that introduces high-frequency
+    artifacts).
+
+    Parameters
+    ----------
+    tau : float
+        Arctangent time constant :math:`\tau`.
+        It represents the time at which, after zero-crossing at the reference
+        time, the arctangent reaches the value :math:`\pi/4` (before model scaling),
+        i.e. half of the one-sided amplitude.
+
+
+    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    """
+    def __init__(self, tau, t_reference, time_unit,
+                 zero_before=False, zero_after=False, **model_kw_args):
+        super().__init__(num_parameters=1, t_reference=t_reference, time_unit=time_unit,
+                         zero_before=zero_before, zero_after=zero_after, **model_kw_args)
+        self.tau = float(tau)
+        """ Arctangent time constant. """
+
+    def _get_arch(self):
+        arch = {"type": "Arctangent",
+                "kw_args": {"tau": self.tau}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        dt = self.tvec_to_numpycol(timevector)
+        coefs = np.atan(dt / self.tau).reshape(-1, 1)
         return coefs

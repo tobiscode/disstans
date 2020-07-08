@@ -192,7 +192,8 @@ And we can plot it like before::
 .. note::
 
     This is very simple plotting. The :class:`~geonat.network.Network` class provides
-    some better plotting tools to use with larger stations which we will explore later.
+    some better plotting tools to use with larger networks or stations with more
+    timeseries which we will explore later.
 
 
 A single station, advanced models

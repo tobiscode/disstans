@@ -9,6 +9,11 @@ Model (Parent Class)
 Basic Models
 ------------
 
+Arctangent
+..........
+
+.. autoclass:: geonat.models.Arctangent
+
 Logarithmic
 ...........
 
