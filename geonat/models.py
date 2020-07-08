@@ -95,7 +95,8 @@ class Model():
         self.num_parameters = int(num_parameters)
         """ Number of parameters that define the model and can be solved for. """
         assert self.num_parameters > 0, \
-            f"'num_parameters' must be an integer greater or equal to one, got {self.num_parameters}."
+            "'num_parameters' must be an integer greater or equal to one, " \
+            f"got {self.num_parameters}."
         self.is_fitted = False
         """
         Tracks whether the model has its parameters set (either by fitting or direct)
@@ -440,8 +441,8 @@ class Polynomial(Model):
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, order, t_reference, time_unit,
-                 zero_before=False, zero_after=False, **model_kw_args):
+    def __init__(self, order, t_reference,
+                 time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=order + 1, t_reference=t_reference, time_unit=time_unit,
                          zero_before=zero_before, zero_after=zero_after, **model_kw_args)
         self.order = int(order)
@@ -523,8 +524,8 @@ class BSpline(Model):
        Society for Industrial and Applied Mathematics.
        doi:`10.1137/1.9781611970555 <https://doi.org/10.1137/1.9781611970555>`_
     """
-    def __init__(self, degree, scale, t_reference, time_unit,
-                 num_splines=1, spacing=None, **model_kw_args):
+    def __init__(self, degree, scale, t_reference,
+                 time_unit="D",num_splines=1, spacing=None, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         self.order = self.degree + 1
@@ -612,8 +613,8 @@ class ISpline(Model):
     --------
     geonat.model.Bspline : More details about B-Splines.
     """
-    def __init__(self, degree, scale, t_reference, time_unit,
-                 num_splines=1, spacing=None, zero_after=False, **model_kw_args):
+    def __init__(self, degree, scale, t_reference,
+                 time_unit="D", num_splines=1, spacing=None, zero_after=False, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         self.order = self.degree + 1
@@ -666,7 +667,8 @@ class ISpline(Model):
 
     def get_transient_period(self, timevector):
         """
-        Returns a mask-like array of where each spline is currently transient (not staying constant).
+        Returns a mask-like array of where each spline is currently transient
+        (not staying constant).
 
         Parameters
         ----------
@@ -726,8 +728,8 @@ class SplineSet(Model):
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, degree, t_center_start, t_center_end, time_unit,
-                 list_scales=None, list_num_knots=None,
+    def __init__(self, degree, t_center_start, t_center_end,
+                 time_unit="D", list_scales=None, list_num_knots=None,
                  splineclass=ISpline, complete=True, **model_kw_args):
         assert np.logical_xor(list_scales is None, list_num_knots is None), \
             "To construct a set of Splines, pass exactly one of " \
@@ -966,7 +968,7 @@ class Sinusoidal(Model):
     with :attr:`~period` :math:`T`, :attr:`~phase` :math:`\phi=\text{atan2}(b,a)`
     and :attr:`~amplitude` :math:`A=\sqrt{a^2 + b^2}`.
     """
-    def __init__(self, period, t_reference, time_unit, **model_kw_args):
+    def __init__(self, period, t_reference, time_unit="D", **model_kw_args):
         super().__init__(num_parameters=2, t_reference=t_reference,
                          time_unit=time_unit, **model_kw_args)
         self.period = float(period)
@@ -1015,8 +1017,8 @@ class Logarithmic(Model):
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, tau, t_reference, time_unit,
-                 t_start=None, zero_after=False, **model_kw_args):
+    def __init__(self, tau, t_reference,
+                 time_unit="D", t_start=None, zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
         super().__init__(num_parameters=1, t_reference=t_reference, t_start=t_start,
@@ -1061,8 +1063,8 @@ class Arctangent(Model):
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, tau, t_reference, time_unit,
-                 zero_before=False, zero_after=False, **model_kw_args):
+    def __init__(self, tau, t_reference,
+                 time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=1, t_reference=t_reference, time_unit=time_unit,
                          zero_before=zero_before, zero_after=zero_after, **model_kw_args)
         self.tau = float(tau)
