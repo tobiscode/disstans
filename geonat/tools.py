@@ -137,7 +137,8 @@ def create_powerlaw_noise(size, exponent, seed=None):
     Notes
     -----
     This function uses Timmer and König's [timmerkoenig95]_ approach to
-    generate the noise, and is informed by Felix Patzelt's `colorednoise`_ package.
+    generate the noise, and Felix Patzelt's `colorednoise`_ code to calculate
+    the theoretical standard deviation.
 
     References
     ----------
@@ -158,15 +159,28 @@ def create_powerlaw_noise(size, exponent, seed=None):
     # the scaling later can't handle zero frequency, so we need to set it
     # to the minimum frequency possible
     freqs[0] = 1/size
-    # draw one or two sets of Gaussian distributed random numbers
-    # (one if size is even), then multiply them by a
-    # frequency-dependent scaling factor
+    # scale the frequencies
+    freqs_scaled = freqs**(-exponent/2)
+    # draw two sets of Gaussian distributed random numbers
     rng = np.random.default_rng(seed)
-    fourier_noise = rng.standard_normal(halfsize) * freqs**(-exponent/2)
-    if (size % 2) != 0:
-        imag_part = rng.standard_normal(halfsize) * freqs**(-exponent/2)
-        fourier_noise = fourier_noise + imag_part * 1j
+    real_part = rng.standard_normal(halfsize) * freqs_scaled
+    imag_part = rng.standard_normal(halfsize) * freqs_scaled
+    # for real signals, there is no imaginary component at the zero frequency
+    imag_part[0] = 0
+    # for even length signals, the last component (Nyquist frequency)
+    # also has to be real because of symmetry properties
+    if (size % 2) == 0:
+        imag_part[-1] = 0
+    # combine the two parts
+    fourier_noise = real_part + imag_part * 1j
     # step 3
     # transform from frequency to time domain
     noise = np.fft.irfft(fourier_noise, n=size)
+    # additional step: normalize to unit standard deviation
+    # estimate the standard deviation
+    freqs_sigma_est = freqs_scaled[1:].copy()
+    freqs_sigma_est[-1] *= (1 + (size % 2)) / 2
+    sigma = 2 * np.sqrt(np.sum(freqs_sigma_est**2)) / size
+    # normalize
+    noise /= sigma
     return noise

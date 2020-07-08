@@ -524,7 +524,7 @@ class BSpline(Model):
        Society for Industrial and Applied Mathematics.
        doi:`10.1137/1.9781611970555 <https://doi.org/10.1137/1.9781611970555>`_
     """
-    def __init__(self, degree, scale, t_reference,
+    def __init__(self, degree, scale, t_reference, regularize=True,
                  time_unit="D",num_splines=1, spacing=None, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
@@ -555,7 +555,7 @@ class BSpline(Model):
                                       + pd.Timedelta(self.scale, time_unit)
                                       * (self.degree + 1)/2).isoformat()
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
-                         time_unit=time_unit, **model_kw_args)
+                         time_unit=time_unit, regularize=regularize, **model_kw_args)
 
     def _get_arch(self):
         arch = {"type": "BSpline",
@@ -613,7 +613,7 @@ class ISpline(Model):
     --------
     geonat.model.Bspline : More details about B-Splines.
     """
-    def __init__(self, degree, scale, t_reference,
+    def __init__(self, degree, scale, t_reference, regularize=True,
                  time_unit="D", num_splines=1, spacing=None, zero_after=False, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
@@ -644,7 +644,8 @@ class ISpline(Model):
                                       + pd.Timedelta(self.scale, time_unit)
                                       * (self.degree + 1)/2).isoformat()
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
-                         time_unit=time_unit, zero_after=zero_after, **model_kw_args)
+                         time_unit=time_unit, zero_after=zero_after,
+                         regularize=regularize, **model_kw_args)
 
     def _get_arch(self):
         arch = {"type": "ISpline",
@@ -730,7 +731,7 @@ class SplineSet(Model):
     """
     def __init__(self, degree, t_center_start, t_center_end,
                  time_unit="D", list_scales=None, list_num_knots=None,
-                 splineclass=ISpline, complete=True, **model_kw_args):
+                 splineclass=ISpline, complete=True, regularize=True, **model_kw_args):
         assert np.logical_xor(list_scales is None, list_num_knots is None), \
             "To construct a set of Splines, pass exactly one of " \
             "'list_scales' and 'list_num_knots' " \
@@ -773,10 +774,11 @@ class SplineSet(Model):
             t_ref = t_center_start_tstamp - num_overlaps*scale_tdelta
             # create model and append
             splset.append(splineclass(degree, scale_float, num_splines=num_centerpoints,
-                          t_reference=t_ref, time_unit=time_unit))
+                          t_reference=t_ref, time_unit=time_unit, regularize=regularize))
         # create the actual Model object
         super().__init__(num_parameters=num_parameters, time_unit=time_unit,
-                         zero_after=False if splineclass == ISpline else True, **model_kw_args)
+                         zero_after=False if splineclass == ISpline else True,
+                         regularize=regularize, **model_kw_args)
         self.degree = degree
         """ Degree of the splines. """
         self.t_center_start = t_center_start
@@ -890,14 +892,16 @@ class SplineSet(Model):
                 "'cmaprange' must be None or a single float or integer of the " \
                 f"one-sided color range of the scalogram, got {cmaprange}."
         else:
-            cmaprange = np.percentile(np.concatenate([np.abs(model.parameters)
-                                                      for model in self.splines],
-                                                     axis=0).ravel(), 95)
+            cmaprange = np.max(np.concatenate([np.abs(model.parameters)
+                                               for model in self.splines],
+                                              axis=0).ravel())
         cmap = mpl.cm.ScalarMappable(cmap=scm.seismic,
                                      norm=mpl.colors.Normalize(vmin=-cmaprange,
                                                                vmax=cmaprange))
         # start plotting
-        fig, ax = plt.subplots(nrows=3, sharex=True)
+        fig, ax = plt.subplots(nrows=num_components, sharex=True)
+        if num_components == 1:
+            ax = [ax]
         for i, model in enumerate(self.splines):
             # where to put this scale
             y_off = 1 - (i + 1)*dy_scale
@@ -1045,7 +1049,8 @@ class Arctangent(Model):
     Subclasses :class:`~geonat.model.Model`.
 
     This model provides the arctangent :math:`\arctan(\mathbf{t}/\tau)`,
-    stretched with a given time constant.
+    stretched with a given time constant and normalized to approach
+    :math:`\pm 1` at the limits.
 
     Because this model is always transient, it is recommended not to
     use it in the estimation of parameters, even when using ``t_start``
@@ -1077,5 +1082,5 @@ class Arctangent(Model):
 
     def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
-        coefs = np.atan(dt / self.tau).reshape(-1, 1)
+        coefs = np.arctan(dt / self.tau).reshape(-1, 1) / (np.pi/2)
         return coefs

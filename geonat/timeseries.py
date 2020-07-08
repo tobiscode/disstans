@@ -612,7 +612,9 @@ class Timeseries():
         pandas.date_range : Quick function to generate a timevector.
         """
         assert len(timevector) == data.shape[0], \
-            f"length of 'timevector' has to match the number of rows in 'data', got {len(timevector)} and {data.shape}."
+            f"Length of 'timevector' has to match the number of rows in 'data', got {len(timevector)} and {data.shape}."
+        assert isinstance(data_cols, list) and all([isinstance(dcol, str) for dcol in data_cols]), \
+            f"'data_cols' has to be a list of strings, got {data_cols}."
         df_data = {dcol: data[:, icol] for icol, dcol in enumerate(data_cols)}
         if sigma is None:
             sigma_cols = None

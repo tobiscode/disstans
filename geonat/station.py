@@ -85,7 +85,9 @@ class Station():
         """
         info = f"Station {self.name} at {self.location} with timeseries"
         for ts_description, ts in self.timeseries.items():
-            info += f"\n[{ts_description}]\n - Source: {ts.src}\n - Units: {ts.data_unit}\n" + \
+            info += f"\n[{ts_description}]\n" \
+                    f" - Source: {ts.src}\n" \
+                    f" - Units: {ts.data_unit}\n" + \
                     f" - Data: {[key for key in ts.data_cols]}\n" + \
                     f" - Uncertainties: {[key for key in ts.sigma_cols]}"
             if len(self.models[ts_description]) > 0:
@@ -150,7 +152,8 @@ class Station():
 
         Example
         -------
-        If ``stat`` is a :class:`~Station` instance, then the following two loops are equivalent::
+        If ``stat`` is a :class:`~Station` instance,then the following two loops
+        are equivalent::
 
             # long version
             for ts in stat.timeseries.values():
@@ -176,11 +179,14 @@ class Station():
 
         See Also
         --------
-        geonat.network.Network.to_json : Export the Network configuration as a JSON file.
+        geonat.network.Network.to_json
+            Export the Network configuration as a JSON file.
         geonat.timeseries.Timeseries.get_arch
-            Get the architecture dictionary of a :class:`~geonat.timeseries.Timeseries` instance.
+            Get the architecture dictionary of a
+            :class:`~geonat.timeseries.Timeseries` instance.
         geonat.model.Model.get_arch
-            Get the architecture dictionary of a :class:`~geonat.model.Model` instance.
+            Get the architecture dictionary of a
+            :class:`~geonat.model.Model` instance.
         """
         # create empty dictionary
         stat_arch = {"location": self.location,
@@ -193,11 +199,12 @@ class Station():
                 stat_arch["timeseries"].update({ts_description: ts_arch})
             if len(self.models[ts_description]) > 0:
                 stat_arch["models"][ts_description] = {}
-                for mdl_description, mdl in self.models[ts_description].items():
-                    stat_arch["models"][ts_description].update({mdl_description: mdl.get_arch()})
+                for mdl_desc, mdl in self.models[ts_description].items():
+                    stat_arch["models"][ts_description].update({mdl_desc: mdl.get_arch()})
         return stat_arch
 
-    def add_timeseries(self, ts_description, timeseries, override_src=None, override_data_unit=None,
+    def add_timeseries(self, ts_description, timeseries,
+                       override_src=None, override_data_unit=None,
                        override_data_cols=None, override_sigma_cols=None, add_models=None):
         """
         Add a timeseries to the station.
@@ -212,16 +219,20 @@ class Station():
         timeseries : geonat.timeseries.Timeseries
             Timeseries object to add.
         override_src : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.src` attribute of ``timeseries``.
+            Override the :attr:`~geonat.timeseries.Timeseries.src`
+            attribute of ``timeseries``.
         override_data_unit : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.data_unit` attribute of ``timeseries``.
+            Override the :attr:`~geonat.timeseries.Timeseries.data_unit`
+            attribute of ``timeseries``.
         override_data_cols : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.data_cols` attribute of ``timeseries``.
+            Override the :attr:`~geonat.timeseries.Timeseries.data_cols`
+            attribute of ``timeseries``.
         override_sigma_cols : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.sigma_cols` attribute of ``timeseries``.
+            Override the :attr:`~geonat.timeseries.Timeseries.sigma_cols`
+            attribute of ``timeseries``.
         add_models : dict, optional
-            Dictionary of models to add to the timeseries, where the keys are the model description
-            and the values are :class:`~geonat.model.Model` objects.
+            Dictionary of models to add to the timeseries, where the keys are the
+            model description and the values are :class:`~geonat.model.Model` objects.
 
         See Also
         --------
@@ -229,16 +240,19 @@ class Station():
 
         Example
         -------
-        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description of a new timeseries,
-        and ``ts`` a :class:`~geonat.timeseries.Timeseries` instance, then the following two are equivalent::
+        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description
+        of a new timeseries, and ``ts`` a :class:`~geonat.timeseries.Timeseries` instance,
+        then the following two are equivalent::
 
             stat.add_timeseries(ts_description, timeseries)
             stat[ts_description] = timeseries
         """
         if not isinstance(ts_description, str):
-            raise TypeError("Cannot add new timeseries: 'ts_description' is not a string.")
+            raise TypeError("Cannot add new timeseries: "
+                            "'ts_description' is not a string.")
         if not isinstance(timeseries, Timeseries):
-            raise TypeError("Cannot add new timeseries: 'timeseries' is not a Timeseries object.")
+            raise TypeError("Cannot add new timeseries: "
+                            "'timeseries' is not a Timeseries object.")
         if ts_description in self.timeseries:
             warn(f"Station {self.name}: Overwriting time series '{ts_description}'.",
                  category=RuntimeWarning)
@@ -257,7 +271,8 @@ class Station():
             for model_description, model_cfg in add_models.items():
                 local_copy = deepcopy(model_cfg)
                 mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
-                self.add_local_model(ts_description=ts_description, model_description=model_description, model=mdl)
+                self.add_local_model(ts_description=ts_description,
+                                     model_description=model_description, model=mdl)
 
     def remove_timeseries(self, ts_description):
         """
@@ -274,14 +289,15 @@ class Station():
 
         Example
         -------
-        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description of the timeseries
-        to remove, then the following two are equivalent::
+        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description
+        of the timeseries to remove, then the following two are equivalent::
 
             stat.remove_timeseries(ts_description)
             del stat[ts_description]
         """
         if ts_description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find time series '{ts_description}', couldn't delete.",
+            warn(f"Station {self.name}: "
+                 f"Cannot find time series '{ts_description}', couldn't delete.",
                  category=RuntimeWarning)
         else:
             del self.timeseries[ts_description]
@@ -309,31 +325,61 @@ class Station():
         if not isinstance(model, Model):
             raise TypeError("Cannot add new local model: 'model' is not a Model object.")
         assert ts_description in self.timeseries, \
-            f"Station {self.name}: Cannot find timeseries '{ts_description}' to add local model '{model_description}'."
+            f"Station {self.name}: " \
+            f"Cannot find timeseries '{ts_description}' to add local model '{model_description}'."
         if model_description in self.models[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: Overwriting local model '{model_description}'.",
+            warn(f"Station {self.name}, timeseries {ts_description}: "
+                 f"Overwriting local model '{model_description}'.",
                  category=RuntimeWarning)
         self.models[ts_description].update({model_description: model})
 
-    def remove_local_model(self, ts_description, model_description):
+    def add_local_model_dict(self, ts_description, model_dict):
         """
-        Remove a model from a timeseries.
+        Add a dictionary of models to a timeseries (overwrites the models if they have already
+        been added with the same description).
+
+        Wraps :meth:`~add_local_model`.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries to add the model to.
+        model_dict : dict
+            Dictionary of ``{model_description: model}`` key-value pairs to add.
+        """
+        assert isinstance(model_dict, dict), \
+            f"'model_dict' needs to be a dictionary, got {type(model_dict)}."
+        for mdl_desc, mdl in model_dict.items():
+            self.add_local_model(ts_description, mdl_desc, mdl)
+
+    def remove_local_models(self, ts_description, model_descriptions):
+        """
+        Remove models from a timeseries.
 
         Parameters
         ----------
         ts_description : str
             Timeseries to remove the model from.
-        model_description : str
-            Model description.
+        model_descriptions : str or list
+            Model description(s).
         """
-        if ts_description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
-                 f"couldn't delete local model '{model_description}'.", category=RuntimeWarning)
-        elif model_description not in self.models[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: "
-                 f"Cannot find local model '{model_description}', couldn't delete.", category=RuntimeWarning)
+        # unpack list
+        if isinstance(model_descriptions, str):
+            model_list = [model_descriptions]
         else:
-            del self.models[ts_description][model_description]
+            model_list = model_descriptions
+        # iterate removal
+        for mdl_desc in model_list:
+            if ts_description not in self.timeseries:
+                warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
+                     f"couldn't delete local model '{mdl_desc}'.",
+                     category=RuntimeWarning)
+            elif mdl_desc not in self.models[ts_description]:
+                warn(f"Station {self.name}, timeseries {ts_description}: "
+                     f"Cannot find local model '{mdl_desc}', couldn't delete.",
+                     category=RuntimeWarning)
+            else:
+                del self.models[ts_description][mdl_desc]
 
     def add_fit(self, ts_description, model_description, fit):
         """
@@ -364,10 +410,13 @@ class Station():
         if not isinstance(model_description, str):
             raise TypeError("Cannot add new fit: 'model_description' is not a string.")
         assert ts_description in self.timeseries, \
-            f"Station {self.name}: Cannot find timeseries '{ts_description}' to add fit for model '{model_description}'."
+            f"Station {self.name}: Cannot find timeseries '{ts_description}' " \
+            f"to add fit for model '{model_description}'."
         assert model_description in self.models[ts_description], \
-            f"Station {self.name}, timeseries {ts_description}: Cannot find local model '{model_description}', couldn't add fit."
-        data_cols = [ts_description + "_" + model_description + "_" + dcol for dcol in self.timeseries[ts_description].data_cols]
+            f"Station {self.name}, timeseries {ts_description}: " \
+            f"Cannot find local model '{model_description}', couldn't add fit."
+        data_cols = [ts_description + "_" + model_description + "_" + dcol
+                     for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
         self.fits[ts_description].update({model_description: fit_ts})
         return fit_ts
@@ -385,13 +434,16 @@ class Station():
         """
         if ts_description not in self.timeseries:
             warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
-                 f"couldn't delete fit for model '{model_description}'.", category=RuntimeWarning)
+                 f"couldn't delete fit for model '{model_description}'.",
+                 category=RuntimeWarning)
         elif model_description not in self.models[ts_description]:
             warn(f"Station {self.name}, timeseries {ts_description}: "
-                 f"Cannot find local model '{model_description}', couldn't delete fit.", category=RuntimeWarning)
+                 f"Cannot find local model '{model_description}', couldn't delete fit.",
+                 category=RuntimeWarning)
         elif model_description not in self.fits[ts_description]:
             warn(f"Station {self.name}, timeseries {ts_description}: "
-                 f"Cannot find fit for local model '{model_description}', couldn't delete.", category=RuntimeWarning)
+                 f"Cannot find fit for local model '{model_description}', couldn't delete.",
+                 category=RuntimeWarning)
         else:
             del self.fits[ts_description][model_description]
 
@@ -418,7 +470,8 @@ class Station():
         # shorthand for timeseries
         ts = self[ts_description]
         # get model subset
-        fits_to_sum = {model_description: fit for model_description, fit in self.fits[ts_description].items()
+        fits_to_sum = {model_description: fit
+                       for model_description, fit in self.fits[ts_description].items()
                        if (model_list is None) or (model_description in model_list)}
         # sum models and uncertainties
         i_sigma_cols = [i for i, val in enumerate(ts.sigma_cols) if val is not None]
@@ -432,7 +485,8 @@ class Station():
             fit_sum_sigma = np.sqrt(fit_sum_sigma)
         return fit_sum, fit_sum_sigma
 
-    def analyze_residuals(self, ts_description, mean=False, std=False, n_observations=False, std_outlier=0):
+    def analyze_residuals(self, ts_description, verbose=False,
+                          mean=False, std=False, n_observations=False, std_outlier=0):
         """
         Analyze, print and return the residuals of a station's timeseries according
         to certain metrics defined in the arguments.
@@ -441,6 +495,8 @@ class Station():
         ----------
         ts_description : str
             Timeseries to analyze. Method assumes it already is a residual.
+        verbose : bool, optional
+            If True, additionally print the results. Defaults to ``False``.
         mean : bool, optional
             If ``True``, calculate the mean of the timeseries.
             Adds the key ``'Mean'`` to the output dictionary.
@@ -466,22 +522,28 @@ class Station():
             Empty by default.
         """
         assert isinstance(ts_description, str), \
-            f"Station {self.name}: 'ts_description' needs to be a string, got {type(ts_description)}."
-        assert ts_description in self.timeseries, f"Station {self.name}: Can't find '{ts_description}' to analyze."
+            f"Station {self.name}: " \
+            f"'ts_description' needs to be a string, got {type(ts_description)}."
+        assert ts_description in self.timeseries, \
+            f"Station {self.name}: Can't find '{ts_description}' to analyze."
         results = {}
         if mean:
-            results["Mean"] = self[ts_description].data.mean(axis=0, skipna=True, numeric_only=True).values
+            mean = self[ts_description].data.mean(axis=0, skipna=True, numeric_only=True).values
+            results["Mean"] = mean
         if std:
-            results["Standard Deviation"] = self[ts_description].data.std(axis=0, skipna=True, numeric_only=True).values
+            sd = self[ts_description].data.std(axis=0, skipna=True, numeric_only=True).values
+            results["Standard Deviation"] = sd
         if n_observations:
-            results["Observations"] = self[ts_description].data.count(axis=0, numeric_only=True).values
-            results["Gaps"] = self[ts_description].num_observations - results["Observations"]
+            n_obs = self[ts_description].data.count(axis=0, numeric_only=True).values
+            results["Observations"] = n_obs
+            results["Gaps"] = self[ts_description].num_observations - n_obs
         if std_outlier > 0:
             temp = self[ts_description].data.values
             temp[np.isnan(temp)] = 0
             temp -= np.mean(temp, axis=0, keepdims=True)
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
-        if results:  # only print if any statistic was recorded
-            print(pd.DataFrame(data=results, index=self[ts_description].data_cols).rename_axis(f"{self.name}: {ts_description}", axis=1))
+        if verbose and results:  # only print if any statistic was recorded
+            print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
+            print(print_df.rename_axis(f"{self.name}: {ts_description}", axis=1))
         return results
