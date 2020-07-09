@@ -36,6 +36,13 @@ def linear_regression(ts, models, formal_covariance=False):
         Dictionary of :class:`~geonat.model.Model` instances used for fitting.
     formal_covariance : bool, optional
         If ``True``, also calculate the formal covariance.
+
+    Returns
+    -------
+    fitted_params : dict
+        Dictionary of form ``{"model_description": (parameters, covariance), ...}``
+        which for every model that was fitted, contains a tuple of the best-fit
+        parameters and the formal covariance (or ``None``, if not calculated).
     """
     mapping_matrices = []
     # get mapping matrices
@@ -104,6 +111,13 @@ def ridge_regression(ts, models, penalty, formal_covariance=False):
         Penalty hyperparameter :math:`\lambda`.
     formal_covariance : bool, optional
         If ``True``, also calculate the formal covariance.
+
+    Returns
+    -------
+    fitted_params : dict
+        Dictionary of form ``{"model_description": (parameters, covariance), ...}``
+        which for every model that was fitted, contains a tuple of the best-fit
+        parameters and the formal covariance (or ``None``, if not calculated).
     """
     if penalty == 0.0:
         warn(f"Ridge Regression (L2-regularized) solver got a penalty of {penalty}, which effectively removes the regularization.")
@@ -177,6 +191,13 @@ def lasso_regression(ts, models, penalty, formal_covariance=False):
         Penalty hyperparameter :math:`\lambda`.
     formal_covariance : bool, optional
         If ``True``, also calculate the formal covariance.
+
+    Returns
+    -------
+    fitted_params : dict
+        Dictionary of form ``{"model_description": (parameters, covariance), ...}``
+        which for every model that was fitted, contains a tuple of the best-fit
+        parameters and the formal covariance (or ``None``, if not calculated).
     """
     if penalty == 0.0:
         warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, which effectively removes the regularization.")
