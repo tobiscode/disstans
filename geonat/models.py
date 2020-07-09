@@ -895,7 +895,7 @@ class SplineSet(Model):
             cmaprange = np.max(np.concatenate([np.abs(model.parameters)
                                                for model in self.splines],
                                               axis=0).ravel())
-        cmap = mpl.cm.ScalarMappable(cmap=scm.seismic,
+        cmap = mpl.cm.ScalarMappable(cmap=scm.roma_r,
                                      norm=mpl.colors.Normalize(vmin=-cmaprange,
                                                                vmax=cmaprange))
         # start plotting
