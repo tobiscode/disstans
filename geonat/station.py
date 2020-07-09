@@ -7,12 +7,14 @@ associated fits.
 
 import numpy as np
 import pandas as pd
+import scipy.sparse as sparse
 from copy import deepcopy
 from warnings import warn
 
 from . import Timeseries
 from . import models as geonat_models
 from .models import Model
+from .tools import tvec_to_numpycol
 
 
 class Station():
@@ -473,6 +475,8 @@ class Station():
         fits_to_sum = {model_description: fit
                        for model_description, fit in self.fits[ts_description].items()
                        if (model_list is None) or (model_description in model_list)}
+        assert fits_to_sum, \
+            f"Station {self.name}, timeseries {ts_description}: Can't find fits for models."
         # sum models and uncertainties
         i_sigma_cols = [i for i, val in enumerate(ts.sigma_cols) if val is not None]
         fit_sum = np.zeros((ts.num_observations, ts.num_components))
@@ -547,3 +551,85 @@ class Station():
             print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
             print(print_df.rename_axis(f"{self.name}: {ts_description}", axis=1))
         return results
+
+    def get_trend(self, ts_description, model_list=None, components=None, total=False,
+                  t_start=None, t_end=None, time_unit="D"):
+        r"""
+        Calculates a linear trend through the desired model fits and over some time span.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries whose fits to use.
+        model_list : list, optional
+            List of strings containing the model names of the subset of the fitted models
+            to be used. Defaults to all fitted models.
+        components : list, optional
+            List of the numerical indices of which components of the timeseries to use.
+            Defaults to all components.
+        total : bool, optional
+            By default (``Fals``), the function will return the trend per ``time_unit``.
+            If ``True``, the function will instead give the total difference over the
+            entire timespan.
+        t_start : str or pandas.Timestamp, optional
+            Timestamp-convertible string of the start time.
+            Defaults to the first timestamp present in the timeseries.
+        t_end : str or pandas.Timestamp, optional
+            Timestamp-convertible string of the end time.
+            Defaults to the last timestamp present in the timeseries.
+        time_unit : str, optional
+            Time unit for output (only required if ``total=False``).
+
+        Returns
+        -------
+        trend : numpy.ndarray
+            1D array of size ``len(components)`` containing the trends.
+        trend_sigma : numpy.ndarray or None
+            1D array of size ``len(components)`` containing the standard deviation of
+            the trend estimate. Returns ``None`` if no uncertainty columns are available.
+        """
+        assert isinstance(ts_description, str), \
+            f"Station {self.name}: " \
+            f"'ts_description' needs to be a string, got {type(ts_description)}."
+        assert ts_description in self.timeseries, \
+            f"Station {self.name}: Can't find '{ts_description}' to calculate a trend for."
+        assert self.models[ts_description], \
+            f"Station {self.name}, timeseries {ts_description}: Can't find any models."
+        ts = self[ts_description]
+        if components is None:
+            components = list(range(ts.num_components))
+        else:
+            assert max(components) < ts.num_components, \
+                f"Station {self.name}, timeseries {ts_description}: " \
+                "Requesting non-existent components."
+        n_comps = len(components)
+        # get time span
+        t_start = pd.Timestamp(t_start) if t_start is not None else ts.time[0]
+        t_end = pd.Timestamp(t_end) if t_end is not None else ts.time[-1]
+        inside = np.all((ts.time >= t_start, ts.time <= t_end), axis=0)
+        if inside.any():
+            t_span = ts.time[inside]
+        else:
+            return None
+        # get fit sums
+        fit_sum, fit_sum_sigma = self.sum_fits(ts_description, model_list)
+        # initialize fitting
+        G = np.ones((t_span.size, 2))
+        G[:, 1] = tvec_to_numpycol(t_span, time_unit=time_unit)
+        if total:
+            G[:, 1] /= G[-1, 1]
+        trend = np.zeros(n_comps)
+        trend_sigma = np.zeros(n_comps)
+        # fit components
+        for icomp in components:
+            if fit_sum_sigma:
+                GtW = G.T @ sparse.diags(1/fit_sum_sigma[inside, icomp]**2)
+                GtWG = GtW @ G
+                GtWd = GtW @ fit_sum[inside, icomp]
+            else:
+                GtWG = G.T @ G
+                GtWd = G.T @ fit_sum[inside, icomp]
+            trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
+            if fit_sum_sigma:
+                trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG.toarray())[1, 1])
+        return trend, trend_sigma if fit_sum_sigma else None

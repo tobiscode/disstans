@@ -587,8 +587,8 @@ the noise we used).
 Comparing specific parameters
 .............................
 
-Lastly, let's just print some differences between the ground truth and our L1-fitted
-model:
+Before we finish up, let's just print some differences between the ground truth and our
+L1-fitted model:
 
 .. doctest:: tut2
 
@@ -616,7 +616,21 @@ model:
     Absolute Error Semi-Annual Phase:    -0.015828 rad
 
 Apart from the trade-off between the constant and linear trend, which can be expected,
-we got pretty close to our ground truth.
+we got pretty close to our ground truth. Let's finish up by calculating an average
+velocity of the station using :meth:`~geonat.station.Station.get_trend` around the
+time when it's rapidly moving (around the middle of 2002). We don't want a normal
+trend through the data, since that is also influenced by the secular velocity, the
+noise, etc., so we choose to only fit our transient model:
+
+.. doctest:: tut2
+
+    >>> trend, _ = stat.get_trend("Displacement", model_list=["Transient"],
+    ...                           t_start="2002-06-01", t_end="2002-08-01")
+    >>> print(f"Transient Velocity: {trend[0]:f} {ts.data_unit}/D")
+    Transient Velocity: 0.231593 mm/D
+
+We can use average velocities like these when we want to create velocity maps for
+certain episodes.
 
 3. Saving and Loading a network
 -------------------------------
