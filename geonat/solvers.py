@@ -159,7 +159,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False):
     return fitted_params
 
 
-def lasso_regression(ts, models, penalty, formal_covariance=False):
+def lasso_regression(ts, models, penalty, formal_covariance=False, cvxpy_kw_args={}):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -191,6 +191,8 @@ def lasso_regression(ts, models, penalty, formal_covariance=False):
         Penalty hyperparameter :math:`\lambda`.
     formal_covariance : bool, optional
         If ``True``, also calculate the formal covariance.
+    cvxpy_kw_args : dict
+        Additional keyword arguments passed on to CVXPY's ``solve()`` function.
 
     Returns
     -------
@@ -220,8 +222,8 @@ def lasso_regression(ts, models, penalty, formal_covariance=False):
     lambd = cp.Parameter(nonneg=True)
     lambd.value = penalty
 
-    def objective_fn(X, Y, beta, lambd, reg):
-        return cp.norm2(X @ beta - Y)**2 + lambd * cp.norm1(beta * reg)
+    def objective_fn(X, Y, beta, lambd, reg_diag):
+        return cp.norm2(X @ beta - Y)**2 + lambd * cp.norm1(beta[reg_diag])
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     params = np.zeros((num_params, num_components))
@@ -239,7 +241,7 @@ def lasso_regression(ts, models, penalty, formal_covariance=False):
 
         # solve cvxpy problem
         problem = cp.Problem(cp.Minimize(objective_fn(GtWG, GtWd.toarray().squeeze(), beta, lambd, reg_diag)))
-        problem.solve()
+        problem.solve(**cvxpy_kw_args)
         params[:, i] = beta.value
 
         # estimate formal covariance
