@@ -105,9 +105,16 @@ class Model():
         it to ``False``. Prevents model to be evaluated if ``False``.
         """
         self.parameters = None
-        """ Attribute that contains the parameters as a NumPy array. """
+        r"""
+        Attribute of shape :math:`(\text{num_parameters}, \text{num_components})`
+        that contains the parameters as a NumPy array.
+        """
         self.cov = None
-        """ Attribute that contains the parameter's covariance as a NumPy array. """
+        r"""
+        Attribute of shape
+        :math:`(\text{num_parameters}, \text{num_parameters}, \text{num_components})`
+        that contains the parameter's covariance as a NumPy array.
+        """
         self.regularize = bool(regularize)
         """ Indicate to solvers to regularize this model (``True``) or not. """
         self.time_unit = str(time_unit)
@@ -306,11 +313,11 @@ class Model():
         """
         assert self.num_parameters == parameters.shape[0], \
             "Read-in parameters have different size than the instantiated model."
-        self.parameters = parameters
+        self.parameters = parameters.reshape([self.num_parameters, -1])
         if cov is not None:
             assert self.num_parameters == cov.shape[0] == cov.shape[1], \
                 "Covariance matrix must have same number of entries than parameters."
-            self.cov = cov
+            self.cov = cov.reshape([self.num_parameters, self.num_parameters, -1])
         self.is_fitted = True
 
     def evaluate(self, timevector):
@@ -557,6 +564,12 @@ class BSpline(Model):
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
                          time_unit=time_unit, regularize=regularize, **model_kw_args)
 
+    @property
+    def centertimes(self):
+        """ Returns a :class:`~pandas.Series` with all center times. """
+        return pd.Series([self.t_reference + pd.Timedelta(self.spacing, self.time_unit) * spl
+                          for spl in range(self.num_parameters)])
+
     def _get_arch(self):
         arch = {"type": "BSpline",
                 "kw_args": {"degree": self.degree,
@@ -594,7 +607,7 @@ class BSpline(Model):
             ``False`` otherwise.
         """
         trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1)
-                - self.scale * np.arange(self.num_parameters).reshape(1, -1))
+                - self.spacing * np.arange(self.num_parameters).reshape(1, -1))
         transient = np.abs(trel) <= self.scale * self.order
         return transient
 
@@ -647,6 +660,12 @@ class ISpline(Model):
                          time_unit=time_unit, zero_after=zero_after,
                          regularize=regularize, **model_kw_args)
 
+    @property
+    def centertimes(self):
+        """ Returns a :class:`~pandas.Series` with all center times. """
+        return pd.Series([self.t_reference + pd.Timedelta(self.spacing, self.time_unit) * spl
+                          for spl in range(self.num_parameters)])
+
     def _get_arch(self):
         arch = {"type": "ISpline",
                 "kw_args": {"degree": self.degree,
@@ -683,7 +702,7 @@ class ISpline(Model):
             NumPy array with ``True`` when a spline is currently transient, ``False`` otherwise.
         """
         trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1)
-                - self.scale * np.arange(self.num_parameters).reshape(1, -1))
+                - self.spacing * np.arange(self.num_parameters).reshape(1, -1))
         transient = np.abs(trel) <= self.scale * self.order
         return transient
 
@@ -705,6 +724,13 @@ class SplineSet(Model):
 
     This class also sets the spacing equal to the scale.
 
+    Lastly, in order to influence the tradeoff between splines of different timescales,
+    the mapping matrix of each spline is scaled by its own time scale to promote using
+    fewer components. Without this, there would be anambiguity for the solver as to
+    whether fit the signal using many smaller scales or with one large scale, as the
+    fit would be almost identical. This behavior can be disabled by setting
+    ``internal_scaling=False``.
+
     Parameters
     ----------
     degree : int
@@ -724,7 +750,9 @@ class SplineSet(Model):
     splineclass : Model, optional
         Model class to use for the splines. Defaults to :class:`~geonat.model.ISpline`.
     complete : bool, optional
-        See usage description above. Defaults to ``True``.
+        See usage description. Defaults to ``True``.
+    internal_scaling : bool, optional
+        See usage description. Defaults to ``True``.
 
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
@@ -764,7 +792,7 @@ class SplineSet(Model):
                 scale_float = elem
                 scale_tdelta = pd.Timedelta(scale_float, time_unit)
             else:
-                scale_tdelta = t_range_tdelta / elem
+                scale_tdelta = t_range_tdelta / (elem - 1)
                 scale_float = scale_tdelta / pd.to_timedelta(1, time_unit)
             # find the number of center points between t_center_start and t_center_end,
             # plus the overlapping ones
@@ -817,7 +845,7 @@ class SplineSet(Model):
         ix_coefs = 0
         for i, model in enumerate(self.splines):
             temp = model.get_mapping(timevector).toarray().squeeze()
-            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp
+            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp * model.scale
             ix_coefs += model.num_parameters
         return coefs
 
@@ -837,11 +865,12 @@ class SplineSet(Model):
         super().read_parameters(parameters, cov)
         ix_params = 0
         for i, model in enumerate(self.splines):
+            param_model = parameters[ix_params:ix_params + model.num_parameters] \
+                          * model.scale
             cov_model = None if cov is None else \
                 cov[ix_params:ix_params + model.num_parameters,
-                    ix_params:ix_params + model.num_parameters]
-            model.read_parameters(parameters[ix_params:ix_params + model.num_parameters],
-                                  cov_model)
+                    ix_params:ix_params + model.num_parameters] * model.scale**2
+            model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 
     def make_scalogram(self, t_left, t_right, cmaprange=None, resolution=1000):
@@ -1001,7 +1030,7 @@ class Sinusoidal(Model):
         """ Phase of the sinusoid. """
         if not self.is_fitted:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return np.arctan2(self.parameters[1], self.parameters[0])
+        return np.arctan2(self.parameters[1], self.parameters[0])[0]
 
 
 class Logarithmic(Model):
