@@ -20,7 +20,7 @@ from .station import Station  # noqa: W0611
 from .network import Network  # noqa: W0611
 
 # package version
-__version__ = '0.2'
+__version__ = '0.3'
 
 # preparational steps
 multiprocessing.set_start_method('spawn', True)
