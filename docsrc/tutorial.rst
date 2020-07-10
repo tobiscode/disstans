@@ -476,8 +476,9 @@ What do our fit and residuals look like compared to the data and noise, respecti
 
 .. image:: img/tutorial_2b.png
 
-We can use a scalogram to visualize the coefficient values of our spline collection,
-and see that without regularization, the set is quite heavily populated::
+We can use a scalogram (see :meth:`~geonat.models.SplineSet.make_scalogram`) to visualize
+the coefficient values of our spline collection, and quickly understand that without
+regularization, the set is quite heavily populated::
 
     >>> fig, ax = stat.models["Displacement"]["Transient"].make_scalogram(t_left=t_start_str,
     ...                                                                   t_right=t_end_str,
