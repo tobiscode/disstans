@@ -553,7 +553,7 @@ class Station():
         return results
 
     def get_trend(self, ts_description, model_list=None, components=None, total=False,
-                  t_start=None, t_end=None, time_unit="D"):
+                  t_start=None, t_end=None, include_sigma=False, time_unit="D"):
         r"""
         Calculates a linear trend through the desired model fits and over some time span.
 
@@ -568,7 +568,7 @@ class Station():
             List of the numerical indices of which components of the timeseries to use.
             Defaults to all components.
         total : bool, optional
-            By default (``Fals``), the function will return the trend per ``time_unit``.
+            By default (``False``), the function will return the trend per ``time_unit``.
             If ``True``, the function will instead give the total difference over the
             entire timespan.
         t_start : str or pandas.Timestamp, optional
@@ -577,6 +577,9 @@ class Station():
         t_end : str or pandas.Timestamp, optional
             Timestamp-convertible string of the end time.
             Defaults to the last timestamp present in the timeseries.
+        include_sigma : bool, optional
+            If ``True``, also calculate the formal uncertainty on the trend estimate.
+            Defaults to ``False``.
         time_unit : str, optional
             Time unit for output (only required if ``total=False``).
 
@@ -610,7 +613,7 @@ class Station():
         if inside.any():
             t_span = ts.time[inside]
         else:
-            return None
+            return None, None
         # get fit sums
         fit_sum, fit_sum_sigma = self.sum_fits(ts_description, model_list)
         # initialize fitting
@@ -619,7 +622,8 @@ class Station():
         if total:
             G[:, 1] /= G[-1, 1]
         trend = np.zeros(n_comps)
-        trend_sigma = np.zeros(n_comps)
+        if include_sigma:
+            trend_sigma = np.zeros(n_comps)
         # fit components
         for icomp in components:
             if fit_sum_sigma:
@@ -630,6 +634,6 @@ class Station():
                 GtWG = G.T @ G
                 GtWd = G.T @ fit_sum[inside, icomp]
             trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
-            if fit_sum_sigma:
+            if include_sigma and fit_sum_sigma:
                 trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG.toarray())[1, 1])
-        return trend, trend_sigma if fit_sum_sigma else None
+        return trend, trend_sigma if (include_sigma and fit_sum_sigma) else None

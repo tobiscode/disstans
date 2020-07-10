@@ -57,6 +57,11 @@ class Network():
         and the values are their :class:`~geonat.model.Model` objects.
         """
 
+    @property
+    def num_stations(self):
+        """ Number of stations present in the network. """
+        return len(self.stations.keys())
+
     def __repr__(self):
         """
         Special function that returns a readable summary of the network.
@@ -981,8 +986,8 @@ class Network():
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
         if ndim == 1:
-            quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0], latlonenu[:, 2],
-                                 np.zeros_like(latlonenu[:, 2]),
+            quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
+                                 np.zeros_like(latlonenu[:, 2]), latlonenu[:, 2],
                                  units='xy', transform=proj_lla)
         else:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
@@ -1002,8 +1007,8 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, timeseries=None, model_list=None, sum_models=True, scalogram=None,
-            verbose=False, analyze_kw_args={}, gui_kw_args={}):
+    def gui(self, timeseries=None, model_list=None, sum_models=True, verbose=False,
+            scalogram_kw_args={}, trend_kw_args={}, analyze_kw_args={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -1034,15 +1039,25 @@ class Network():
         sum_models : bool, optional
             If ``True``, plot the sum of all selected models instead of every
             model individually. Defaults to ``False``.
-        scalogram : dict, optional
-            A dictionary with ``'ts'`` and ``'model'`` keys. The string values
-            are the names of the timeseries and associated model that are of the
-            :class:`~geonat.model.SplineSet` class, and therefore have a
-            :meth:`~geonat.model.SplineSet.make_scalogram` method.
-            Defaults to no scalogram shown.
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
             :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
+        scalogram_kw_args : dict, optional
+            If passed, also plot a scalogram. Defaults to no scalogram shown.
+            The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
+            are the names of the timeseries and associated model that are of the
+            :class:`~geonat.model.SplineSet` class, and therefore have a
+            :meth:`~geonat.model.SplineSet.make_scalogram` method.
+        trend_kw_args : dict, optional
+            If passed, also plot velocity trends on the station map.
+            Defaults to no velocity arrows shown.
+            The dictionary can contain all the keywords that are passed to
+            :meth:`~geonat.station.Station.get_trend`, but has at least has to contain
+            the ``ts_description``. If no ``model_list`` is included, the ``model_list``
+            passed to ``gui()`` will be used instead. If the number of components available
+            is 3 or more, only the first two will be used. If two components are plotted,
+            they correspond to the East and North components. If only one component is plotted
+            (for example for vertical motion), it will be plotted as the North component.
         analyze_kw_args : dict, optional
             If provided and non-empty, call :meth:`~geonat.station.Station.analyze_residuals`
             and pass the dictionary on as keyword arguments. Defaults to no residual analysis.
@@ -1055,16 +1070,67 @@ class Network():
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
         fig_ts = plt.figure()
-        if scalogram is not None:
-            assert isinstance(scalogram, dict) \
-                and all([key in scalogram for key in ['ts', 'model']]) \
-                and all([isinstance(scalogram[key], str) for key in ['ts', 'model']]), \
+        if scalogram_kw_args is not None:
+            assert isinstance(scalogram_kw_args, dict) \
+                and all([key in scalogram_kw_args for key in ['ts', 'model']]) \
+                and all([isinstance(scalogram_kw_args[key], str)
+                         for key in ['ts', 'model']]), \
                 "If a scalogram plot is requested, 'scalogram' must be a dictionary " \
                 "with 'ts' and 'model' keys with string values of where to find the " \
-                f"SplineSet model, got {scalogram}."
-            scalo_ts = scalogram.pop('ts')
-            scalo_model = scalogram.pop('model')
+                f"SplineSet model, got {scalogram_kw_args}."
+            scalo_ts = scalogram_kw_args.pop('ts')
+            scalo_model = scalogram_kw_args.pop('model')
             fig_scalo = plt.figure()
+
+        # add velocity map
+        if trend_kw_args:
+            assert "ts_description" in trend_kw_args, \
+                f"'trend_kw_args' dictionary has to include a 'ts_description' keyword."
+            if "model_list" not in trend_kw_args:
+                trend_kw_args["model_list"] = model_list
+            # loop over stations
+            trend = np.zeros((self.num_stations, 2))
+            trend_sigma = np.zeros_like(trend)
+            for i, station in enumerate(self):
+                # need to check the data and time units once
+                if i == 0:
+                    if ("total" not in trend_kw_args) or (not trend_kw_args["total"]):
+                        if "time_unit" in trend_kw_args:
+                            tunit = trend_kw_args["time_unit"]
+                        else:
+                            tunit = "D"
+                    else:
+                        tunit = None
+                    trend_unit = station[trend_kw_args["ts_description"]].data_unit
+                    if tunit is not None:
+                        trend_unit += f"/{tunit}"
+                # calculate trend
+                stat_trend, stat_trend_sigma = station.get_trend(**trend_kw_args)
+                # save trend
+                if stat_trend is not None:
+                    if stat_trend.size == 1:
+                        trend[i, 1] = stat_trend
+                    else:
+                        trend[i, :] = stat_trend[:2]
+                else:
+                    trend[i, :] = np.NaN
+                # save uncertainty
+                if stat_trend_sigma is not None:
+                    if stat_trend_sigma.size == 1:
+                        trend_sigma[i, 1] = stat_trend_sigma
+                    else:
+                        trend_sigma[i, :] = stat_trend_sigma[:2]
+                else:
+                    trend_sigma[i, :] = np.NaN
+            # plot arrows
+            quiv = ax_map.quiver(np.array(stat_lons), np.array(stat_lats),
+                                 trend[:, 0], trend[:, 1],
+                                 units='xy', transform=proj_lla)
+            key_length = np.median(np.sqrt(np.sum(trend**2, axis=1)))
+            ax_map.quiverkey(quiv, 0.9, 0.9, key_length,
+                             f"{key_length:.2e} {trend_unit:s}",
+                             coordinates="figure")
+            # TODO: plot uncertainty ellipses
 
         # define clicking function
         def update_timeseries(event):
@@ -1097,7 +1163,7 @@ class Network():
             fig_ts.clear()
             icomp = 0
             ax_ts = []
-            if scalogram is not None:
+            if scalogram_kw_args is not None:
                 nonlocal fig_scalo
                 t_left, t_right = None, None
             for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
@@ -1157,18 +1223,19 @@ class Network():
                         ax.legend()
                     ax_ts.append(ax)
                     icomp += 1
-                    if scalogram is not None:
+                    if scalogram_kw_args is not None:
                         t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
                         t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
             ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
             # get scalogram
-            if scalogram is not None:
+            if scalogram_kw_args is not None:
                 try:
                     splset = self[station_name].models[scalo_ts][scalo_model]
                     if isinstance(fig_scalo, plt.Figure):
                         plt.close(fig_scalo)
-                    fig_scalo, ax_scalo = splset.make_scalogram(t_left, t_right, **scalogram)
+                    fig_scalo, ax_scalo = splset.make_scalogram(t_left, t_right,
+                                                                **scalogram_kw_args)
                     fig_scalo.show()
                 except KeyError:
                     warn(f"Could not find scalogram model {scalo_model} "
