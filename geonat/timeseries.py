@@ -32,7 +32,8 @@ class Timeseries():
         contain the data.
     sigma_cols : list, optional
         List of strings with the names of the columns of ``dataframe`` that contain the
-        data's uncertainty (as standard deviations). Must have the same length as ``data_cols``.
+        data's uncertainty (as standard deviations).
+        Must have the same length as ``data_cols``.
         If only certain data columns have uncertainties, set the respective entry
         to ``None``.
         Defaults to no data uncertainty columns.
@@ -50,11 +51,14 @@ class Timeseries():
         if sigma_cols is None:
             self._sigma_cols = [None] * len(self._data_cols)
         else:
-            assert isinstance(sigma_cols, list) and all([isinstance(scol, str) for scol in sigma_cols])
-            assert all([scol in dataframe.columns for scol in sigma_cols if scol is not None])
+            assert isinstance(sigma_cols, list) and \
+                   all([isinstance(scol, str) for scol in sigma_cols])
+            assert all([scol in dataframe.columns
+                        for scol in sigma_cols if scol is not None])
             assert len(self._data_cols) == len(sigma_cols), \
-                "If passing uncertainty columns, the list needs to have the same length as the data columns one. " + \
-                "If only certain components have associated uncertainties, leave those list entries as None."
+                "If passing uncertainty columns, the list needs to have the same " \
+                "length as the data columns one. If only certain components have " \
+                "associated uncertainties, leave those list entries as None."
             self._sigma_cols = sigma_cols
 
     def __repr__(self):
@@ -67,8 +71,8 @@ class Timeseries():
         info : str
             Timeseries summary.
         """
-        info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}\n" + \
-               f" - Data: {[key for key in self.data_cols]}\n" + \
+        info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}\n" \
+               f" - Data: {[key for key in self.data_cols]}\n" \
                f" - Uncertainties: {[key for key in self.sigma_cols]}"
         return info
 
@@ -96,8 +100,11 @@ class Timeseries():
             ts.df[columns]
             ts[ts_description]
         """
-        if not isinstance(columns, str) and (not isinstance(columns, list) or not all([isinstance(col, str) for col in columns])):
-            raise KeyError(f"Error when accessing data in timeseries: 'column' must be a string or list of strings, given was {columns}.")
+        if not isinstance(columns, str) and \
+           (not isinstance(columns, list) or
+           not all([isinstance(col, str) for col in columns])):
+            raise KeyError("Error when accessing data in timeseries: 'column' must be a "
+                           f"string or list of strings, given was {columns}.")
         return self.df[columns]
 
     @property
@@ -119,7 +126,8 @@ class Timeseries():
     @data_unit.setter
     def data_unit(self, new_data_unit):
         if not isinstance(new_data_unit, str):
-            raise TypeError(f"New 'data_unit' attribute has to be a string, got {type(new_data_unit)}.")
+            raise TypeError("New 'data_unit' attribute has to be a string, "
+                            f"got {type(new_data_unit)}.")
         self._data_unit = new_data_unit
 
     @property
@@ -129,9 +137,13 @@ class Timeseries():
 
     @data_cols.setter
     def data_cols(self, new_data_cols):
-        assert isinstance(new_data_cols, list) and all([isinstance(dcol, str) for dcol in new_data_cols]), \
-            f"New 'data_cols' attribute must be a list of strings of the same length as the current 'data_cols' ({len(self._data_cols)}), got {new_data_cols}."
-        self._df.rename(columns={old_col: new_col for old_col, new_col in zip(self._data_cols, new_data_cols)}, errors='raise', inplace=True)
+        assert isinstance(new_data_cols, list) and \
+            all([isinstance(dcol, str) for dcol in new_data_cols]), \
+            "New 'data_cols' attribute must be a list of strings of the same length as the " \
+            f"current 'data_cols' ({len(self._data_cols)}), got {new_data_cols}."
+        self._df.rename(columns={old_col: new_col for old_col, new_col
+                                 in zip(self._data_cols, new_data_cols)},
+                        errors='raise', inplace=True)
         self._data_cols = new_data_cols
 
     @property
@@ -141,9 +153,14 @@ class Timeseries():
 
     @sigma_cols.setter
     def sigma_cols(self, new_sigma_cols):
-        assert isinstance(new_sigma_cols, list) and all([(scol is None) or isinstance(scol, str) for scol in new_sigma_cols]), \
-            f"New 'sigma_cols' attribute must be a list of strings or Nones of the same length as the current 'sigma_cols' ({len(self._sigma_cols)}), got {new_sigma_cols}."
-        self._df.rename(columns={old_col: new_col for old_col, new_col in zip(self._sigma_cols, new_sigma_cols) if (old_col is not None) and (new_col is not None)}, errors='raise')
+        assert isinstance(new_sigma_cols, list) and \
+            all([(scol is None) or isinstance(scol, str) for scol in new_sigma_cols]), \
+            "New 'sigma_cols' attribute must be a list of strings or Nones of the same length " \
+            f"as the current 'sigma_cols' ({len(self._sigma_cols)}), got {new_sigma_cols}."
+        self._df.rename(columns={old_col: new_col for old_col, new_col
+                                 in zip(self._sigma_cols, new_sigma_cols)
+                                 if (old_col is not None) and (new_col is not None)},
+                        errors='raise')
         self._sigma_cols = new_sigma_cols
 
     @property
@@ -216,9 +233,11 @@ class Timeseries():
         """
         new_name = deepcopy(self._src) if src is None else src
         if not only_data:
-            return Timeseries(self._df.copy(), new_name, deepcopy(self._data_unit), deepcopy(self._data_cols), deepcopy(self._sigma_cols))
+            return Timeseries(self._df.copy(), new_name, deepcopy(self._data_unit),
+                              deepcopy(self._data_cols), deepcopy(self._sigma_cols))
         else:
-            return Timeseries(self._df[self._data_cols].copy(), new_name, deepcopy(self._data_unit), deepcopy(self._data_cols), None)
+            return Timeseries(self._df[self._data_cols].copy(), new_name,
+                              deepcopy(self._data_unit), deepcopy(self._data_cols), None)
 
     def mask_out(self, dcol):
         """
@@ -310,18 +329,25 @@ class Timeseries():
         """
         # check for valid operator
         if operation not in ["+", "-", "*", "/"]:
-            raise NotImplementedError(f"Timeseries math problem: unknown operation '{operation}'.")
+            raise NotImplementedError("Timeseries math problem: "
+                                      f"unknown operation '{operation}'.")
         # check for compatible types
         for operand, position in zip([left, right], ["Left", "Right"]):
             if (not isinstance(operand, Timeseries)) and (not isinstance(operand, np.ndarray)):
-                raise TypeError(f"{position} operand has to be either a '{Timeseries}' or '{np.ndarray}' "
-                                f"object, got {type(operand)}")
+                raise TypeError(f"{position} operand has to be either a '{Timeseries}' or "
+                                f"'{np.ndarray}' object, got {type(operand)}")
         if all([isinstance(operand, np.ndarray) for operand in [left, right]]):
             raise TypeError(f"At least one of the operands has to be a '{Timeseries}' object, "
                             f"got two '{np.ndarray}' objects.")
         # check for same dimensions
-        len_left_data_cols = left.num_components if isinstance(left, Timeseries) else left.shape[1]
-        len_right_data_cols = right.num_components if isinstance(right, Timeseries) else right.shape[1]
+        if isinstance(left, Timeseries):
+            len_left_data_cols = left.num_components
+        else:
+            len_left_data_cols = left.shape[1]
+        if isinstance(right, Timeseries):
+            len_right_data_cols = right.num_components
+        else:
+            len_right_data_cols = right.shape[1]
         if len_left_data_cols != len_right_data_cols:
             raise ValueError("Timeseries math problem: conflicting number of data columns "
                              f"({len_left_data_cols} and {len_right_data_cols}).")
@@ -353,15 +379,18 @@ class Timeseries():
             # define new src and data_cols
             if operation in ["+", "-"]:
                 if left.data_unit != right.data_unit:
-                    raise ValueError(f"Timeseries math problem: conflicting data units '{left.data_unit}' and '{right.data_unit}'.")
+                    raise ValueError("Timeseries math problem: conflicting data units "
+                                     f"'{left.data_unit}' and '{right.data_unit}'.")
                 else:
                     out_data_unit = left.data_unit
                     out_src = f"{left.src}{operation}{right.src}"
-                    out_data_cols = [f"{lcol}{operation}{rcol}" for lcol, rcol in zip(left.data_cols, right.data_cols)]
+                    out_data_cols = [f"{lcol}{operation}{rcol}" for lcol, rcol
+                                     in zip(left.data_cols, right.data_cols)]
             elif operation in ["*", "/"]:
                 out_data_unit = f"({left.data_unit}){operation}({right.data_unit})"
                 out_src = f"({left.src}){operation}({right.src})"
-                out_data_cols = [f"({lcol}){operation}({rcol})" for lcol, rcol in zip(left.data_cols, right.data_cols)]
+                out_data_cols = [f"({lcol}){operation}({rcol})" for lcol, rcol
+                                 in zip(left.data_cols, right.data_cols)]
             left_data = left.data.loc[out_time, :].values
             right_data = right.data.loc[out_time, :].values
         # return data unit and column names
@@ -369,8 +398,8 @@ class Timeseries():
 
     def __add__(self, other):
         """
-        Special function that allows two timeseries instances (or a timeseries and an equivalently
-        shaped NumPy array) to be added together element-wise.
+        Special function that allows two timeseries instances (or a timeseries and
+        an equivalently shaped NumPy array) to be added together element-wise.
 
         Parameters
         ----------
@@ -385,8 +414,8 @@ class Timeseries():
         See Also
         --------
         prepare_math
-            Prepares the two instances for the mathematical operation. Refer to it for more details
-            about how the two objects are cast together.
+            Prepares the two instances for the mathematical operation. Refer to it
+            for more details about how the two objects are cast together.
 
         Example
         -------
@@ -394,22 +423,26 @@ class Timeseries():
 
             ts3 = ts1 + ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '+')
-        return Timeseries(pd.DataFrame(left_data + right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(self, other, '+')
+        return Timeseries(pd.DataFrame(left_data + right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __radd__(self, other):
         """
         Reflected operation of :meth:`~__add__` (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '+')
-        return Timeseries(pd.DataFrame(left_data + right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(other, self, '+')
+        return Timeseries(pd.DataFrame(left_data + right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __sub__(self, other):
         """
-        Special function that allows a timeseries instance (or a timeseries and an equivalently
-        shaped NumPy array) to be subtracted from another element-wise.
+        Special function that allows a timeseries instance (or a timeseries and
+        an equivalently shaped NumPy array) to be subtracted from another element-wise.
 
         Parameters
         ----------
@@ -424,8 +457,8 @@ class Timeseries():
         See Also
         --------
         prepare_math
-            Prepares the two instances for the mathematical operation. Refer to it for more details
-            about how the two objects are cast together.
+            Prepares the two instances for the mathematical operation. Refer to it
+            for more details about how the two objects are cast together.
 
         Example
         -------
@@ -433,22 +466,26 @@ class Timeseries():
 
             ts3 = ts1 - ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '-')
-        return Timeseries(pd.DataFrame(left_data - right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(self, other, '-')
+        return Timeseries(pd.DataFrame(left_data - right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __rsub__(self, other):
         """
         Reflected operation of :meth:`~__sub__` (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '-')
-        return Timeseries(pd.DataFrame(left_data - right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(other, self, '-')
+        return Timeseries(pd.DataFrame(left_data - right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __mul__(self, other):
         """
-        Special function that allows two timeseries instances (or a timeseries and an equivalently
-        shaped NumPy array) to be multiplied together element-wise.
+        Special function that allows two timeseries instances (or a timeseries and
+        an equivalently shaped NumPy array) to be multiplied together element-wise.
 
         Parameters
         ----------
@@ -463,8 +500,8 @@ class Timeseries():
         See Also
         --------
         prepare_math
-            Prepares the two instances for the mathematical operation. Refer to it for more details
-            about how the two objects are cast together.
+            Prepares the two instances for the mathematical operation. Refer to it
+            for more details about how the two objects are cast together.
 
         Example
         -------
@@ -472,22 +509,26 @@ class Timeseries():
 
             ts3 = ts1 * ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '*')
-        return Timeseries(pd.DataFrame(left_data * right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(self, other, '*')
+        return Timeseries(pd.DataFrame(left_data * right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __rmul__(self, other):
         """
         Reflected operation of :meth:`~__mul__` (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '*')
-        return Timeseries(pd.DataFrame(left_data * right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(other, self, '*')
+        return Timeseries(pd.DataFrame(left_data * right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __truediv__(self, other):
         """
-        Special function that allows a timeseries instances (or a timeseries and an equivalently
-        shaped NumPy array) to be divided by another element-wise.
+        Special function that allows a timeseries instances (or a timeseries and
+        an equivalently shaped NumPy array) to be divided by another element-wise.
 
         Parameters
         ----------
@@ -502,8 +543,8 @@ class Timeseries():
         See Also
         --------
         prepare_math
-            Prepares the two instances for the mathematical operation. Refer to it for more details
-            about how the two objects are cast together.
+            Prepares the two instances for the mathematical operation. Refer to it
+            for more details about how the two objects are cast together.
 
         Example
         -------
@@ -511,16 +552,20 @@ class Timeseries():
 
             ts3 = ts1 / ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(self, other, '/')
-        return Timeseries(pd.DataFrame(left_data / right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(self, other, '/')
+        return Timeseries(pd.DataFrame(left_data / right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def __rtruediv__(self, other):
         """
         Reflected operation of :meth:`~__truediv__` (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = Timeseries.prepare_math(other, self, '/')
-        return Timeseries(pd.DataFrame(left_data / right_data, index=out_time, columns=out_data_cols),
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
+            Timeseries.prepare_math(other, self, '/')
+        return Timeseries(pd.DataFrame(left_data / right_data,
+                                       index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
     def get_arch(self):
@@ -601,7 +646,8 @@ class Timeseries():
             Defaults to no data uncertainty.
         sigma_cols : list, optional
             List of strings with the names of the columns of ``data`` that contain the
-            data's uncertainty (as standard deviations). Must have the same length as ``data_cols``.
+            data's uncertainty (as standard deviations).
+            Must have the same length as ``data_cols``.
             If only certain data columns have uncertainties, set the respective entry
             to ``None``.
             If ``sigma`` is given but ``sigma_cols`` is not, it defaults to appending
@@ -612,20 +658,24 @@ class Timeseries():
         pandas.date_range : Quick function to generate a timevector.
         """
         assert len(timevector) == data.shape[0], \
-            f"Length of 'timevector' has to match the number of rows in 'data', got {len(timevector)} and {data.shape}."
-        assert isinstance(data_cols, list) and all([isinstance(dcol, str) for dcol in data_cols]), \
+            "Length of 'timevector' has to match the number of rows in 'data', " \
+            f"got {len(timevector)} and {data.shape}."
+        assert isinstance(data_cols, list) and \
+            all([isinstance(dcol, str) for dcol in data_cols]), \
             f"'data_cols' has to be a list of strings, got {data_cols}."
         df_data = {dcol: data[:, icol] for icol, dcol in enumerate(data_cols)}
         if sigma is None:
             sigma_cols = None
         else:
             assert data.shape == sigma.shape, \
-                f"'data' and 'sigma' need to have the same shape, got {data.shape} and {sigma.shape}."
+                "'data' and 'sigma' need to have the same shape, got " \
+                f"{data.shape} and {sigma.shape}."
             if sigma_cols is None:
                 sigma_cols = [dcol + "_sigma" for dcol in data_cols]
             else:
                 assert len(sigma_cols) == sigma.shape[1]
-            df_data.update({scol: sigma[:, icol] for icol, scol in enumerate(sigma_cols) if scol is not None})
+            df_data.update({scol: sigma[:, icol] for icol, scol
+                            in enumerate(sigma_cols) if scol is not None})
         df = pd.DataFrame(data=df_data, index=timevector)
         return cls(df, src, data_unit, data_cols, sigma_cols)
 
@@ -646,16 +696,22 @@ class GipsyTimeseries(Timeseries):
     """
     def __init__(self, path, show_warnings=True):
         self._path = path
-        time = pd.to_datetime(pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[11, 12, 13, 14, 15, 16],
-                                          names=['year', 'month', 'day', 'hour', 'minute', 'second'])).to_frame(name='time')
-        data = pd.read_csv(self._path, delim_whitespace=True, header=None, usecols=[1, 2, 3, 4, 5, 6], names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
+        time = pd.read_csv(self._path, delim_whitespace=True, header=None,
+                           usecols=[11, 12, 13, 14, 15, 16],
+                           names=['year', 'month', 'day', 'hour', 'minute', 'second'])
+        time = pd.to_datetime(time).to_frame(name='time')
+        data = pd.read_csv(self._path, delim_whitespace=True, header=None,
+                           usecols=[1, 2, 3, 4, 5, 6],
+                           names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
         df = time.join(data)
         num_duplicates = int(df.duplicated(subset='time').sum())
         if (num_duplicates > 0) and show_warnings:
-            warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. Keeping first occurrences.")
+            warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. "
+                 "Keeping first occurrences.")
         df = df.drop_duplicates(subset='time').set_index('time')
         super().__init__(dataframe=df, src='.tseries', data_unit='m',
-                         data_cols=['east', 'north', 'up'], sigma_cols=['east_sigma', 'north_sigma', 'up_sigma'])
+                         data_cols=['east', 'north', 'up'],
+                         sigma_cols=['east_sigma', 'north_sigma', 'up_sigma'])
 
     def get_arch(self):
         """
