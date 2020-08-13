@@ -916,7 +916,7 @@ class Timeseries():
             # if variances are given, can also check for covariances
             if cov is None:
                 cov_cols = None
-        else:
+            else:
                 assert data.shape == cov.shape, \
                     "'data' and 'cov' need to have the same shape, got " \
                     f"{data.shape} and {cov.shape}."
@@ -926,7 +926,7 @@ class Timeseries():
                     for i1 in range(num_components):
                         for i2 in range(i1 + 1, num_components):
                             cov_cols.append(f"{data_cols[i1]}_{data_cols[i2]}_cov")
-            else:
+                else:
                     assert len(cov_cols) == cov.shape[1]
                 df_data.update({ccol: cov[:, icol] for icol, ccol in enumerate(cov_cols)})
         df = pd.DataFrame(data=df_data, index=timevector)
@@ -946,16 +946,48 @@ class GipsyTimeseries(Timeseries):
     show_warnings : bool, optional
         If ``True``, warn if there are data inconsistencies encountered while loading.
         Defaults to ``True``.
+
+    Notes
+    -----
+
+    The column format is described on `JPL's website`_:
+
+    +---------------+-----------------------------------------------+
+    | Columns       | Description                                   |
+    +===============+===============================================+
+    | Column 1      | Decimal_YR computed with 365.25 days/yr       |
+    +---------------+-----------------------------------------------+
+    | Columns 2-4   | East(m) North(m) Vert(m)                      |
+    +---------------+-----------------------------------------------+
+    | Columns 5-7   | East_sig(m) North_sig(m) Vert_sig(m)          |
+    +---------------+-----------------------------------------------+
+    | Columns 8-10  | East_North_cov, East_Vert_cov, North_Vert_cov |
+    +---------------+-----------------------------------------------+
+    | Column 11     | Time in Seconds past J2000                    |
+    +---------------+-----------------------------------------------+
+    | Columns 12-17 | Time in YEAR MM DD HR MN SS                   |
+    +---------------+-----------------------------------------------+
+
+    Time is GPS time, and the time series are relative to each station's first epoch.
+
+    .. _JPL's website: https://sideshow.jpl.nasa.gov/pub/JPL_GPS_Timeseries/\
+repro2018a/raw/position/envseries/0000_README.format
+
     """
     def __init__(self, path, show_warnings=True):
         self._path = path
+        data_cols = ['east', 'north', 'up']
+        var_cols = ['east_var', 'north_var', 'up_var']
+        cov_cols = ['east_north_cov', 'east_up_cov', 'north_up_cov']
+        all_cols = data_cols + var_cols + cov_cols
         time = pd.read_csv(self._path, delim_whitespace=True, header=None,
                            usecols=[11, 12, 13, 14, 15, 16],
                            names=['year', 'month', 'day', 'hour', 'minute', 'second'])
         time = pd.to_datetime(time).to_frame(name='time')
         data = pd.read_csv(self._path, delim_whitespace=True, header=None,
-                           usecols=[1, 2, 3, 4, 5, 6],
-                           names=['east', 'north', 'up', 'east_sigma', 'north_sigma', 'up_sigma'])
+                           usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
+                           names=all_cols)
+        data.loc[:, var_cols] *= data.loc[:, var_cols]  # original data is in s.d.
         df = time.join(data)
         num_duplicates = int(df.duplicated(subset='time').sum())
         if (num_duplicates > 0) and show_warnings:
@@ -963,8 +995,7 @@ class GipsyTimeseries(Timeseries):
                  "Keeping first occurrences.")
         df = df.drop_duplicates(subset='time').set_index('time')
         super().__init__(dataframe=df, src='.tseries', data_unit='m',
-                         data_cols=['east', 'north', 'up'],
-                         sigma_cols=['east_sigma', 'north_sigma', 'up_sigma'])
+                         data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols)
 
     def get_arch(self):
         """
