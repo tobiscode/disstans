@@ -184,3 +184,84 @@ def create_powerlaw_noise(size, exponent, seed=None):
     # normalize
     noise /= sigma
     return noise
+
+
+def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, delimiter=',',
+                            codecol=None, exclude_codes=None):
+    """
+    Function that loads a maintenance table from a .csv file (or similar) and returns
+    a list of step times for each station. It also provides an interface to ignore
+    certain maintenance codes (if present), and modify the site names when loading.
+
+    Parameters
+    ----------
+    csvpath : str
+        Path of the file to load.
+    sitecol : int
+        Column index of the station names.
+    datecols : list
+        List of indices that contain the ingredients to convert the input to a valid
+        :class:`~pandas.Timestamp`. It should fail gracefully, i.e. return a string
+        if Pandas cannot interpret the column(s) appropriately.
+    siteformatter : function, optional
+        Function that will be called element-wise on the loaded station names to
+        produce the output station names.
+    delimiter : str, optional
+        Delimiter character for the input file.
+    codecol : int, optional
+        Column index of the maintenance code.
+    exclude_codes : list, optional
+        List of strings that will lead to a maintenance record being ignored if there
+        is an exact match.
+        ``codecol`` and ``exclude_cols`` always have to be set both to work.
+
+    Returns
+    -------
+    dict
+        Dictionary of that maps the station names to a list of steptimes.
+
+    Notes
+    -----
+    If running into problems, also consult the Pandas :func:`~pandas.read_csv`
+    function (used to load the ``csvpath`` file) and :class:`~pandas.DataFrame`
+    (object on which the filtering happens).
+    """
+    # load codes and tables
+    if (codecol is not None) and (exclude_codes is not None):
+        assert isinstance(codecol, int), \
+            f"'codecol' needs to be an integer, got {codecol}."
+        assert (isinstance(exclude_codes, list) and
+                all([isinstance(ecode, str) for ecode in exclude_codes])), \
+            f"'exclude_codes' needs to be a list of strings, got {exclude_codes}."
+        table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol, codecol])
+        # because we don't know the column names, we need to make sure that the site will
+        # always be in the first column for later
+        if codecol < sitecol:
+            table = table.iloc[:, [1, 0]]
+        # save code column name for later
+        codecolname = table.columns[1]
+    else:
+        table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol])
+    # get site column name
+    sitecolname = table.columns[0]
+    # load and parse time
+    time = pd.read_csv(csvpath, delimiter=delimiter, usecols=datecols, squeeze=True,
+                       parse_dates=[list(range(len(datecols)))] if len(datecols) > 1 else True)
+    timecolname = time.name
+    # connect time and data
+    table = table.join(time)
+    # process site name column with siteformatter and make sure we're not combining stations
+    if siteformatter is not None:
+        assert callable(siteformatter), \
+            f"'siteformatter' needs to be a callable, got {siteformatter}."
+        unique_pre = len(table[sitecolname].unique())
+        table[sitecolname] = table[sitecolname].apply(siteformatter)
+        unique_post = len(table[sitecolname].unique())
+        assert unique_pre == unique_post, "While applying siteformatter, stations were merged."
+    # now drop all columns where code is exactly one of the elements in exclude_codes
+    if (codecol is not None) and (exclude_codes is not None):
+        droprows = table[codecolname].isin(exclude_codes)
+        print(f"Dropping {droprows.sum()} rows because of exclude_codes={exclude_codes}.")
+        table = table[~droprows]
+    # now produce a dictionary that maps sites to a list of step dates: {site: [steptimes]}
+    return dict(table.groupby(sitecolname)[timecolname].apply(list))
