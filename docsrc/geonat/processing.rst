@@ -23,3 +23,11 @@ median
 ......
 
 .. autofunction:: geonat.processing.median
+
+Classes
+-------
+
+StepDetector
+............
+
+.. autoclass:: geonat.processing.StepDetector

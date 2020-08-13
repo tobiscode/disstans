@@ -15,3 +15,8 @@ create_powerlaw_noise
 ---------------------
 
 .. autofunction:: geonat.tools.create_powerlaw_noise
+
+parse_maintenance_table
+-----------------------
+
+.. autofunction:: geonat.tools.parse_maintenance_table
