@@ -30,7 +30,8 @@ def _okada_get_displacements(station_and_parameters):
     # get displacements in xyz-frame
     disp = np.zeros_like(stations)
     for i in range(stations.shape[0]):
-        success, u, grad_u = dc3d0(eq['alpha'], stations[i, :], eq['depth'], eq['dip'], eq['potency'])
+        success, u, grad_u = dc3d0(eq['alpha'], stations[i, :],
+                                   eq['depth'], eq['dip'], eq['potency'])
         # unit for u is [unit of potency] / [unit of station location & depth]^2
         # unit for grad_u is [unit of potency] / [unit of station location & depth]^3
         # assume potency is Nm/GPa = 1e-9 m^3 and locations are in km,
@@ -54,14 +55,16 @@ def _okada_get_cumdisp(time_station_settings):
     eq_times, stat_time, station_disp, threshold = time_station_settings
     steptimes = []
     for itime in range(len(stat_time) - 1):
-        disp = station_disp[(eq_times > stat_time[itime]) & (eq_times <= stat_time[itime + 1]), :]
+        disp = station_disp[(eq_times > stat_time[itime])
+                            & (eq_times <= stat_time[itime + 1]), :]
         cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
         if cumdisp >= threshold:
             steptimes.append(str(stat_time[itime]))
     return steptimes
 
 
-def okada_prior(network, catalog_path, target_timeseries, target_model, target_model_regularize=False, catalog_prior_kw_args={}):
+def okada_prior(network, catalog_path, target_timeseries, target_model,
+                target_model_regularize=False, catalog_prior_kw_args={}):
     r"""
     Given a catalog of earthquakes (including moment tensors), calculate an approximate
     displacement for each of the stations in the network, and add a step model to
@@ -137,22 +140,30 @@ def okada_prior(network, catalog_path, target_timeseries, target_model, target_m
     # stations_rel is now in km, just like depth
 
     # compute station displacements
-    parameters = ((stations_rel[i], {'alpha': catalog_prior_settings["alpha"], 'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
-                                     'depth': -eq_lla[i, 2], 'strike': float(catalog['Strike'][i].split(';')[0]),
+    parameters = ((stations_rel[i], {'alpha': catalog_prior_settings["alpha"],
+                                     'lat': eq_lla[i, 0], 'lon': eq_lla[i, 1],
+                                     'depth': -eq_lla[i, 2],
+                                     'strike': float(catalog['Strike'][i].split(';')[0]),
                                      'dip': float(catalog['Dip'][i].split(';')[0]),
-                                     'potency': [catalog['Mo(Nm)'][i]/catalog_prior_settings["mu"], 0, 0, 0]})
+                                     'potency': [catalog['Mo(Nm)'][i]
+                                                 / catalog_prior_settings["mu"], 0, 0, 0]})
                   for i in range(n_eq))
     station_disp = np.zeros((n_eq, stations_lla.shape[0], 3))
-    for i, result in enumerate(tqdm(parallelize(_okada_get_displacements, parameters, chunksize=100),
-                                    ascii=True, total=n_eq, desc="Simulating Earthquake Displacements", unit="eq")):
+    for i, result in enumerate(tqdm(parallelize(_okada_get_displacements,
+                                                parameters, chunksize=100),
+                                    ascii=True, total=n_eq, unit="eq",
+                                    desc="Simulating Earthquake Displacements")):
         station_disp[i, :, :] = result
 
     # add steps to station timeseries if they exceed the threshold
     station_names = list(network.stations.keys())
-    cumdisp_parameters = ((eq_times, network.stations[stat_name].timeseries[target_timeseries].time.values,
+    cumdisp_parameters = ((eq_times,
+                           network.stations[stat_name].timeseries[target_timeseries].time.values,
                            station_disp[:, istat, :], catalog_prior_settings["threshold"])
                           for istat, stat_name in enumerate(station_names))
     for i, result in enumerate(tqdm(parallelize(_okada_get_cumdisp, cumdisp_parameters),
-                                    ascii=True, total=len(network.stations), desc="Adding steps where necessary", unit="station")):
+                                    ascii=True, total=len(network.stations),
+                                    desc="Adding steps where necessary", unit="station")):
+        stepmodel = Step(steptimes=result, regularize=target_model_regularize)
         network.stations[station_names[i]].add_local_model(target_timeseries, target_model,
-                                                           Step(steptimes=result, regularize=target_model_regularize))
+                                                           stepmodel)
