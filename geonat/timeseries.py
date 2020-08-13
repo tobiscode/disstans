@@ -317,6 +317,104 @@ class Timeseries():
         """
         return (self.num_observations, self.num_components)
 
+    def add_uncertainties(self, timeseries=None,
+                          var_data=None, var_cols=None, cov_data=None, cov_cols=None):
+        """
+        Add variance and covariance data and column names to the timeseries.
+
+        Parameters
+        ----------
+        timeseries : geonat.timeseries.Timeseries
+            Another timeseries object that contains uncertainty information.
+            If set, the function will ignore the rest of the arguments.
+        var_data : numpy.ndarray, optional
+            New data variance.
+        var_cols : list, optional
+            List of variance column names.
+        cov_data : numpy.ndarray, optional
+            New data covariance.
+            Setting this but not ``var_data`` requires there to already be data variance.
+        cov_cols : list, optional
+            List of covariance column names.
+
+        Notes
+        -----
+        If ``ts`` is a :class:`~geonat.timeseries.Timeseries`` instance, just using::
+
+            ts.vars = new_variance
+            ts.covs = new_covariance
+
+        will only work when the respective columns already exist in the dataframe.
+        (This is them same behavior for renaming variance columns that do not exist.)
+        If they do not exist, the calls will results in an error because no column names exist,
+        in an effort to make the inner workings more transparent and rigorous.
+
+        This function allows to override the default behavior, and can also generate column
+        names by itself if none are specified.
+        """
+        # check if input is a Timeseries, override rest of input arguments
+        if timeseries is not None:
+            if not isinstance(timeseries, Timeseries):
+                raise TypeError("Cannot use uncertainty data: "
+                                "'timeseries' is not a Timeseries object.")
+            # get variance data and description
+            if timeseries.var_cols is not None:
+                var_data = timeseries.vars[timeseries.time.isin(self.time)].values
+                var_cols = timeseries.var_cols
+            else:
+                var_data = None
+                var_cols = None
+            # get covariance data and description
+            if timeseries.cov_cols is not None:
+                cov_data = timeseries.covs[timeseries.time.isin(self.time)].values
+                cov_cols = timeseries.cov_cols
+            else:
+                cov_data = None
+                cov_cols = None
+        # add variance
+        if var_data is not None:
+            assert isinstance(var_data, np.ndarray) and var_data.shape == self.shape, \
+                   "'var_data' must be a NumPy array of the same shape as the data " \
+                   f"{self.shape}, got " \
+                   f"{var_data.shape if isinstance(var_data, np.ndarray) else var_data}."
+            if var_cols is None:
+                var_cols = [dcol + "_sigma" for dcol in self.data_cols]
+            else:
+                assert (isinstance(var_cols, list) and len(var_cols) == self.num_components and
+                        all([isinstance(vcol, str) for vcol in var_cols])), \
+                       "New 'var_cols' attribute must be a list of strings of the same length " \
+                       f"as the current 'data_cols' ({len(self._data_cols)}), got {var_cols}."
+            for ivcol, vcol in enumerate(var_cols):
+                self._df[vcol] = var_data[:, ivcol]
+            self._var_cols = var_cols
+        # add covariance, check for variance
+        if cov_data is not None:
+            assert self._var_cols is not None, \
+                "Cannot set covariance data without first adding variance data."
+            cov_dims = int((self.num_components * (self.num_components - 1)) / 2)
+            assert (isinstance(cov_data, np.ndarray)
+                    and cov_data.shape[0] == self.num_observations
+                    and cov_data.shape[1] == cov_dims), \
+                "'cov_data' must be a NumPy array of the same length as the data " \
+                "and width corresponding to all possible covariances. Expected shape " \
+                f"({self.num_observations}, {cov_dims}), got " \
+                f"{cov_data.shape if isinstance(cov_data, np.ndarray) else cov_data}."
+            if cov_cols is None:
+                cov_cols = []
+                for i1 in range(self.num_components):
+                    for i2 in range(i1 + 1, self.num_components):
+                        cov_cols.append(f"{self.data_cols[i1]}_{self.data_cols[i2]}_cov")
+            else:
+                assert (isinstance(cov_cols, list) and len(cov_cols) == cov_dims and
+                        all([isinstance(vcol, str) for vcol in cov_cols])), \
+                    "New 'cov_cols' attribute must be a list of strings of length " \
+                    "corresponding to all possible covariances " \
+                    f"( expected {cov_dims}, got {len(cov_cols)}."
+            for iccol, ccol in enumerate(cov_cols):
+                self._df[ccol] = cov_data[:, iccol]
+            self._make_index_map()
+            self._cov_cols = cov_cols
+
     def copy(self, only_data=False, src=None):
         """
         Return a deep copy of the timeseries instance.

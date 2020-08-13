@@ -87,11 +87,7 @@ class Station():
         """
         info = f"Station {self.name} at {self.location} with timeseries"
         for ts_description, ts in self.timeseries.items():
-            info += f"\n[{ts_description}]\n" \
-                    f" - Source: {ts.src}\n" \
-                    f" - Units: {ts.data_unit}\n" + \
-                    f" - Data: {[key for key in ts.data_cols]}\n" + \
-                    f" - Uncertainties: {[key for key in ts.sigma_cols]}"
+            info += ts.__repr__().replace("Timeseries", f"\n{ts_description}")
             if len(self.models[ts_description]) > 0:
                 info += f"\n - Models: {[key for key in self.models[ts_description]]}"
             if len(self.fits[ts_description]) > 0:
