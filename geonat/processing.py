@@ -11,6 +11,7 @@ import pandas as pd
 import warnings
 from functools import wraps
 from sklearn.decomposition import PCA, FastICA
+from scipy.signal import find_peaks
 
 from . import defaults, Timeseries
 from .compiled import maskedmedfilt2d
@@ -331,3 +332,313 @@ def clean(station, ts_in, reference, ts_out=None,
     # if we made a copy, add it to the station, otherwise we're already done
     if ts_out is not None:
         station.add_timeseries(ts_out, ts)
+
+
+class StepDetector():
+    r"""
+    This class implements a step detector based on the Akaike Information Criterion (AIC).
+
+    A window is moved over the input data, and two linear models are fit in the
+    method :meth:`~search`: one containing only a linear polynomial, and one containing an
+    additional step in the middle of the window. Then, using the AIC, the relative
+    probabilities are calculated, and saved for each timestep.
+
+    In the final step, one can threshold these relative probabilities with the method
+    :meth:`~steps`, and look for local maxima, which will correspond to probable steps.
+
+    If the class is constructed with ``kernel_size``, ``x`` and ``y`` passed, it automatically
+    calls its method :meth:`~search`, otherwise, :meth:`~search` needs to be called manually.
+    Running the method again with a different ``kernel_size``, ``x`` or ``y`` will overwrite
+    previous results.
+
+    Parameters
+    ----------
+    kernel_size : int, optional
+        Window size of the detector. Must be odd.
+    x : numpy.ndarray, optional
+        Input array of shape :math:`(\text{num_observations},)`.
+        Should not contain NaNs.
+    y : numpy.ndarray, optional
+        Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
+        Can contain NaNs.
+    """
+    def __init__(self, kernel_size=None, x=None, y=None):
+        self.probabilities = None
+        r"""
+        Contains the probability array from the last :meth:`~search` function call.
+        Has shape :math:`(\text{num_observations}, \text{num_components})`.
+        """
+        self.kernel_size = kernel_size
+        if (x is not None) and (y is not None) and (kernel_size is not None):
+            self.search(x, y, kernel_size)
+
+    # @property
+    # def x(self):
+    #     r""" Hash of the ``x`` array (to check whether it changed). """
+    #     if self._x is None:
+    #         raise ValueError(f"'x' has not yet been set.")
+    #     return self._x
+
+    # @x.setter
+    # def x(self, x):
+    #     if x is not None:
+    #         assert isinstance(x, np.ndarray) and (x.ndim == 1), \
+    #             f"'x' must be a one-dimensional NumPy array."
+    #         self._x = hash(x.tostring())
+    #     else:
+    #         self._x = None
+
+    # @property
+    # def y(self):
+    #     r""" Hash of the ``y`` array (to check whether it changed). """
+    #     if self._y is None:
+    #         raise ValueError(f"'y' has not yet been set.")
+    #     return self._x
+
+    # @y.setter
+    # def y(self, y):
+    #     if y is not None:
+    #         assert isinstance(y, np.ndarray) and (y.ndim == 2), \
+    #             f"'y' must be a two-dimensional NumPy array."
+    #         self._y = hash(y.tostring())
+    #     else:
+    #         self._y = None
+
+    @property
+    def kernel_size(self):
+        """ Kernel (window) size of the detector. """
+        if self._kernel_size is None:
+            raise ValueError(f"'kernel_size' has not yet been set.")
+        return self._kernel_size
+
+    @kernel_size.setter
+    def kernel_size(self, kernel_size):
+        if kernel_size is not None:
+            assert isinstance(kernel_size, int) and (kernel_size % 2 == 1), \
+                f"'kernel_size' must be an odd integer or None, got {kernel_size}."
+        self._kernel_size = kernel_size
+
+    @staticmethod
+    def AIC_c(rss, n, K):
+        r"""
+        Calculates the Akaike Information Criterion for small samples for Least Squares
+        regression results. Implementation is based on [burnhamanderson02]_ (ch. 2).
+
+        Parameters
+        ----------
+        rss : float
+            Residual sum of squares.
+        n : int
+            Number of samples.
+        K : int
+            Degrees of freedom. If the Least Squares model has :math:`\text{num_parameters}`
+            parameters (including the mean), then the degrees of freedom are
+            :math:`K = \text{num_parameters} + 1`
+
+        Returns
+        -------
+        float
+            The Small Sample AIC for Least Squares :math:`\text{AIC}_c`.
+
+        References
+        ----------
+
+        .. [burnhamanderson02] (2002) *Information and Likelihood Theory:*
+           *A Basis for Model Selection and Inference.* In: Burnham K.P., Anderson D.R. (eds)
+           Model Selection and Multimodel Inference. Springer, New York, NY.
+           doi:`10.1007/978-0-387-22456-5_2 <https://doi.org/10.1007/978-0-387-22456-5_2>`_.
+        """
+        # input checkk
+        if n - K - 1 <= 0:
+            # can't return meaningful statistic, hypothesis unlikely
+            return np.NaN
+        # calculate AIC for LS
+        AIC = n * np.log(rss / n) + 2*K
+        # apply small sample size correction
+        correction = 2 * K * (K + 1) / (n - K - 1)
+        return AIC + correction
+
+    @staticmethod
+    def test_single(xwindow, ywindow, valid=None, maxdel=10):
+        r"""
+        For a single window (of arbitrary, but odd length), perform the AIC hypothesis test
+        whether a step is likely present (H1) or not (H0) in the ``y`` data given
+        ``x`` coordinates.
+
+        Parameters
+        ----------
+        xwindow : numpy.ndarray
+            Time array of shape :math:`(\text{num_window},)`.
+            Should not contain NaNs.
+        ywindow : numpy.ndarray
+            Data array of shape :math:`(\text{num_window},)`.
+            Should not contain NaNs.
+        valid : numpy.ndarray, optional
+            Mask array of the data of shape :math:`(\text{num_window},)`,
+            with ``1`` where the ``ywindow`` is finite (not NaN or infinity).
+            If not passed to the function, it is calculated internally, which will slow
+            down the computation.
+        maxdel : float, optional
+            Difference in AIC that should be considered not significantly better.
+            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
+
+        Returns
+        -------
+        int
+            Best hypothesis (``0`` for no step, ``1`` for step).
+        float
+            If H1 is the best hypothesis (and suffices ``maxdel``), its relative probability,
+            otherwise the relative probability of H0 (which therefore can be 0 if H0 is also
+            the best hypothesis in general).
+        """
+        # do some checks
+        assert xwindow.shape[0] == ywindow.shape[0], \
+            "'xwindow' and 'ywindow' have to have the same length in the first dimensions, " \
+            f"got {xwindow.shape} and {ywindow.shape}."
+        assert (xwindow.shape[0] % 2 == 1), \
+            "'xwindow' and 'ywindow' must have an odd number of entries, " \
+            f"got {xwindow.shape[0]}."
+        if valid is None:
+            valid = np.isfinite(ywindow)
+        else:
+            assert ywindow.shape == valid.shape, \
+                "'ywindow' and 'valid' have to have the same shape, " \
+                f"got {ywindow.shape} and {valid.shape}."
+        # get number of valid observations
+        i_mid = int(xwindow.shape[0] // 2)
+        n_pre = valid[:i_mid].sum()
+        n_post = valid[i_mid:].sum()
+        n_total = n_pre + n_post
+        # return with 0, 0 if we will not be able to get an estimate because of not enough data
+        if (n_pre < 2) or (n_post < 2):
+            return 0, 0
+        xfinite = xwindow[valid]
+        yfinite = ywindow[valid]
+        # build mapping matrix for model H1
+        G1 = np.zeros((n_total, 3))
+        # first column is mean
+        G1[:, 0] = 1
+        # second column is slope
+        G1[:, 1] = xfinite - xfinite[0]
+        # third column is the additional step
+        G1[n_pre:, 2] = 1
+        # without the step it's just the first two columns
+        G0 = G1[:, :2]
+        # fit for H1 first
+        # (since if that one doesn't converge, we have to go with H0 anyway)
+        try:
+            rss1 = np.linalg.lstsq(G1, yfinite, rcond=None)[1]
+        except np.linalg.LinAlgError:
+            return 0, 0
+        # now we can fit for H0, and again just go with that if there is no solution
+        try:
+            rss0 = np.linalg.lstsq(G0, yfinite, rcond=None)[1]
+        except np.linalg.LinAlgError:
+            return 0, 0
+        # now that both models produce results, let's get the AIC_c values
+        # we'll again return the H0 if not both models have a valid AIC_c value
+        aic = [StepDetector.AIC_c(rss, n_total, dof) for (rss, dof)
+               in zip([rss0, rss1], [3, 4])]
+        if np.isnan(aic).sum() > 0:
+            return 0, 0
+        # let's check the difference between the two as a measure of evidence
+        best_hyp = aic.index(min(aic))
+        Delta_best = [a - aic[best_hyp] for a in aic]
+        # we will only recommend H1 if it has the both the minimum AIC_c, and
+        # the difference to H0 is larger than maxdel
+        if (best_hyp == 1) and (Delta_best[0] > maxdel):
+            return 1, Delta_best[0]
+        else:
+            return 0, Delta_best[best_hyp]
+
+    def search(self, x, y, kernel_size=None, maxdel=10):
+        r"""
+        Function that will search for steps in the data.
+        Upon successful completion, it will save the step probabilities in
+        :attr:`~probabilities`, and set the.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            Input array of shape :math:`(\text{num_observations},)`.
+            Should not contain NaNs.
+        y : numpy.ndarray
+            Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
+            Can contain NaNs.
+        kernel_size : int, optional
+            Window size of the detector. Must be odd.
+            If ``None``, use the previously set :attr:`~kernel_size`
+        maxdel : float, optional
+            Difference in AIC that should be considered not significantly better.
+            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
+        """
+        # some checks
+        assert isinstance(x, np.ndarray) and isinstance(y, np.ndarray), \
+            f"'x' and 'y' need to be NumPy arrays, got {type(x)} and {type(y)}."
+        # check whether to update kernel_size
+        if kernel_size is not None:
+            self.kernel_size = kernel_size
+        # get sizes
+        num_observations = x.shape[0]
+        y = y.reshape(num_observations, 1 if y.ndim == 1 else -1)
+        num_components = y.shape[1]
+        # get valid array
+        valid = np.isfinite(y)
+        # make output array
+        probs = np.empty((num_observations, num_components))
+        probs[:] = np.NaN
+        # loop over all columns
+        for icomp in range(num_components):
+            # loop through all rows, starting with a shrunken kernel at the edges
+            # Beginning region
+            halfwindow = 0
+            for i in range(self.kernel_size // 2):
+                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                                    y[i-halfwindow:i+halfwindow+1, icomp],
+                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
+                                                    maxdel=maxdel)
+                if hyp == 1:
+                    probs[i, icomp] = Del
+                halfwindow += 1
+            # Middle region
+            halfwindow = self.kernel_size // 2
+            for i in range(halfwindow, num_observations - halfwindow):
+                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                                    y[i-halfwindow:i+halfwindow+1, icomp],
+                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
+                                                    maxdel=maxdel)
+                if hyp == 1:
+                    probs[i, icomp] = Del
+            # Ending region
+            halfwindow -= 1
+            for i in range(num_observations - halfwindow, num_observations):
+                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                                    y[i-halfwindow:i+halfwindow+1, icomp],
+                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
+                                                    maxdel=maxdel)
+                if hyp == 1:
+                    probs[i, icomp] = Del
+                halfwindow -= 1
+        self.probabilities = probs
+
+    def steps(self, threshold=2):
+        """
+        Threshold the saved probabilities to return a list of steps.
+
+        Parameters
+        ----------
+        threshold : float
+            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
+
+        Returns
+        -------
+        list
+            Returns a list of :class:`~numpy.ndarray` arrays that contain the indices of steps
+            for each component.
+        """
+        assert self.probabilities is not None, \
+            f"'probabilities' has not been set yet, run StepDetector.search() first."
+        probs = self.probabilities
+        probs[np.isnan(probs)] = -1
+        return [find_peaks(probs[:, icomp], height=threshold)[0]
+                for icomp in range(probs.shape[1])]
