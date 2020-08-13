@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
+import matplotlib.path as mplpath
 import cartopy.crs as ccrs
 from copy import deepcopy
 from tqdm import tqdm
@@ -22,7 +23,7 @@ from .tools import parallelize
 
 
 class Network():
-    """
+    r"""
     Main class of GeoNAT. Contains information about the network, defines defaults,
     contains global models, and most improtantly, contains a dictionary of all
     stations in the network.
@@ -34,19 +35,49 @@ class Network():
     default_location_path : str, optional
         If station locations aren't given directly, check for a file with this path for the
         station's location.
-    default_local_models : dict
+        It needs to be a four-column, space-separated text file with the entries
+        ``name latitude[°] longitude[°] altitude[m]`` (without headers).
+    auto_add : bool, optional
+        If true, instatiation will automatically add all stations found in
+        ``default_location_path``.
+        If ``default_location_path`` is not set, this option is ignored.
+    auto_add_filter : numpy.ndarray, optional
+        If passed alongside ``default_location_path`` and ``auto_add``, network instantiation
+        will only add stations within the latitude, longitude polygon defined by
+        ``auto_add_filter`` (shape :math:`(\text{num_points}, \text{2})`).
+    default_local_models : dict, optional
         Add a default selection of models for the stations.
     """
-    def __init__(self, name, default_location_path=None, default_local_models={}):
-        self.name = name
+    def __init__(self, name, default_location_path=None, auto_add=False, auto_add_filter=None,
+                 default_local_models={}):
+        self.name = str(name)
         """ Network name. """
-        self.default_location_path = default_location_path
+        self.default_location_path = str(default_location_path)
         """ Fallback path for station locations. """
-        self.default_local_models = default_local_models
+        self.default_local_models = {}
         """
-        Dictionary of default station timeseries models, where the keys are their string
-        descriptions and the values are their :class:`~geonat.model.Model` objects.
+        Dictionary of default station timeseries models of structure
+        ``{model_name: {"type": modelclass, "kw_args": {**kw_args}}}`` that contains
+        the names, types and necessary keyword arguments to create each model object.
+
+        These models can be added easily to all stations with :meth:`~add_default_local_models`,
+        and will make the JSON export file cleaner.
+
+        Using :meth:`~update_default_local_models` to update the dictionary will perform
+        input checks.
+
+        Example
+        -------
+
+        If ``net`` is a Network instance, the following adds an annual
+        :class:`~geonat.models.Sinusoidal` model::
+
+            >>> models = {"Annual": {"type": "Sinusoidal",
+            ...                      "kw_args": {"period": 365.25,
+            ...                                  "t_reference": "2000-01-01"}}}
+            >>> net.update_default_local_models(models)
         """
+        self.update_default_local_models(default_local_models)
         self.stations = {}
         """
         Dictionary of network stations, where the keys are their string names
@@ -56,6 +87,34 @@ class Network():
         Dictionary of network-wide models, where the keys are string descriptions
         and the values are their :class:`~geonat.model.Model` objects.
         """
+        # try to preload the location data
+        # it's a private attribute because there's no guarantee this will be kept
+        # up to date over the lifetime of the Network instance (yet)
+        if self.default_location_path is None:
+            self._network_locations = []
+        else:
+            with open(self.default_location_path, mode='r') as locfile:
+                loclines = [line.strip() for line in locfile.readlines()]
+            self._network_locations = {line.split()[0]:
+                                       [float(lla) for lla in line.split()[1:]]
+                                       for line in loclines}
+            # check if the stations should also be added
+            if auto_add:
+                # check if there is a filter
+                if auto_add_filter is not None:
+                    assert (isinstance(auto_add_filter, np.ndarray) and
+                            auto_add_filter.shape[1] == 2), \
+                        "'auto_add_filter' needs to be a (num_points, 2)-shaped " \
+                        f"NumPy array, got {auto_add_filter}."
+                    net_poly = mplpath.Path(auto_add_filter)
+                    stat_dict = {stat: loc for stat, loc in self._network_locations.items()
+                                 if net_poly.contains_point(loc[:2])}
+                else:
+                    stat_dict = self._network_locations
+                # now add stations
+                for stat in stat_dict:
+                    # location will automatically come from self._network_locations
+                    self.create_station(stat)
 
     @property
     def num_stations(self):
@@ -249,6 +308,35 @@ class Network():
             warn(f"Overwriting station '{name}'.", category=RuntimeWarning)
         self.stations[name] = station
 
+    def create_station(self, name, location=None):
+        """
+        Create a station and add it to the network.
+
+        Parameters
+        ----------
+        name : str
+            Name of the station.
+        location : tuple, list, numpy.ndarray, optional
+            Location (Latitude [°], Longitude [°], Altitude [m]) of the station.
+            If ``None``, the location information needs to be provided in
+            :attr:`~default_location_path`.
+
+        Raises
+        ------
+        ValueError
+            If no location data is passed or found in :attr:`~default_location_path`.
+        """
+        if location is not None:
+            assert isinstance(location, list) and all([isinstance(l, float) for l in location]), \
+                "'location' needs to be a list of latitude, longitude and altitude floats, " \
+                f"go {location}."
+        elif name in self._network_locations:
+            location = self._network_locations[name]
+        else:
+            raise ValueError(f"'location' was not passed to create_station, and {name} could "
+                             "not be found in the default network locations, either.")
+        self.stations[name] = Station(name, location)
+
     def remove_station(self, name):
         """
         Remove a station from the network.
@@ -351,19 +439,13 @@ class Network():
         net = cls(name=network_name,
                   default_location_path=network_locations_path,
                   default_local_models=net_arch["default_local_models"])
-        # load location information, if present
-        if network_locations_path is not None:
-            with open(network_locations_path, mode='r') as locfile:
-                loclines = [line.strip() for line in locfile.readlines()]
-            network_locations = {line.split()[0]: [float(lla) for lla in line.split()[1:]]
-                                 for line in loclines}
         # create stations
         for station_name, station_cfg in tqdm(net_arch["stations"].items(), ascii=True,
                                               desc="Building Network", unit="station"):
             if "location" in station_cfg:
                 station_loc = station_cfg["location"]
-            elif station_name in network_locations:
-                station_loc = network_locations[station_name]
+            elif station_name in net._network_locations:
+                station_loc = net._network_locations[station_name]
             else:
                 warn(f"Skipped station '{station_name}' "
                      "because location information is missing.")
@@ -440,6 +522,34 @@ class Network():
         # write file
         json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
 
+    def update_default_local_models(self, models):
+        """
+        Perform input checks for the structure of ``models`` and if successful,
+        update :attr:`~default_local_models`.
+
+        Parameters
+        ----------
+        models : dict
+            Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
+            {**kw_args}}}`` that contains the names, types and necessary keyword arguments
+            to create each model object.
+        """
+        assert all([isinstance(mdl_name, str) for mdl_name in models.keys()]), \
+            f"Model names need to be strings, got {models.keys()}."
+        assert all([isinstance(mdl_cfg, dict) for mdl_cfg in models.values()]), \
+            f"Model configurations need to be dictionaries, got {models.keys()}."
+        for mdl_name, mdl_config in models.items():
+            assert all([key in mdl_config.keys() for key in ["type", "kw_args"]]), \
+                f"The configuration dictionary for '{mdl_name}' needs to contain " \
+                f"the keys 'type' and 'kw_args', got {mdl_config.keys()}."
+            assert isinstance(mdl_config["type"], str), \
+                f"'type' in configuration dictionary for '{mdl_name}' needs to be " \
+                f"a string, got {mdl_config['type']}."
+            assert isinstance(mdl_config["kw_args"], dict), \
+                f"'kw_args' in configuration dictionary for '{mdl_name}' needs to be " \
+                f"a dictionary, got {mdl_config['kw_args']}."
+        self.default_local_models.update(models)
+
     def add_default_local_models(self, ts_description, models=None):
         """
         Add the network's default local models (or a subset thereof) to all stations.
@@ -465,7 +575,7 @@ class Network():
         if models is None:
             local_models_subset = self.default_local_models
         else:
-            if not isinstance(models, str) or not \
+            if not isinstance(models, str) and not \
                (isinstance(models, list) and all([isinstance(m, str) for m in models])):
                 raise ValueError("'models' must be None, a string or a list of strings, "
                                  f"got {models}.")
@@ -528,6 +638,36 @@ class Network():
                     station.add_local_model(ts_description=target_ts,
                                             model_description=model_description,
                                             model=mdl)
+
+    def load_maintenance_dict(self, maint_dict, ts_description, model_description):
+        """
+        Convenience wrapper to add :class:`~geonat.models.Step` models to the stations
+        in the network where they experienced maitenance and therefore likely a jump
+        in station coordinates.
+
+        Parameters
+        ----------
+        maint_dict : dict
+            Dictionary of structure ``{station_name: [steptimes]}`` where ``station_name``
+            is the station name as present in the Network object, and ``steptimes`` is a list
+            of either datetime-like strings or :class:`~pandas.Timestamp`.
+        ts_description : str
+            Timeseries to add the steps to.
+        model_description : str
+            Name for the step models.
+
+        See Also
+        --------
+        :class:`~geonat.models.Step` : Model used to add steps.
+        """
+        assert all([isinstance(station, str) for station in maint_dict.keys()]), \
+            f"Keys in 'maint_dict' must be strings, got {maint_dict.keys()}."
+        assert all([isinstance(steptimes, list) for steptimes in maint_dict.values()]), \
+            f"Values in 'maint_dict' must be lists, got {maint_dict.values()}."
+        for station, steptimes in maint_dict.items():
+            if station in self.stations:
+                self[station].add_local_model(ts_description, model_description,
+                                              geonat_models.Step(steptimes))
 
     def fit(self, ts_description, model_list=None, solver='linear_regression', **kw_args):
         """
@@ -1007,7 +1147,7 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, timeseries=None, model_list=None, sum_models=True, verbose=False,
+    def gui(self, station=None, timeseries=None, model_list=None, sum_models=True, verbose=False,
             scalogram_kw_args={}, trend_kw_args={}, analyze_kw_args={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
@@ -1022,6 +1162,7 @@ class Network():
         Stations are selected by clicking on their markers on the map.
         Optionally, this function can
 
+        - start with a station pre-selected,
         - show only a subset of fitted models,
         - sum the models to an aggregate one,
         - show a scalogram (Model class permitting),
@@ -1070,7 +1211,7 @@ class Network():
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
         fig_ts = plt.figure()
-        if scalogram_kw_args is not None:
+        if scalogram_kw_args:
             assert isinstance(scalogram_kw_args, dict) \
                 and all([key in scalogram_kw_args for key in ['ts', 'model']]) \
                 and all([isinstance(scalogram_kw_args[key], str)
@@ -1133,8 +1274,9 @@ class Network():
             # TODO: plot uncertainty ellipses
 
         # define clicking function
-        def update_timeseries(event):
+        def update_timeseries(event, station_name=None):
             nonlocal analyze_kw_args, gui_settings
+            if station_name is None:
             if (event.xdata is None) \
                or (event.ydata is None) \
                or (event.inaxes is not ax_map): return
@@ -1143,8 +1285,10 @@ class Network():
             station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
                                               + (np.array(stat_lons) - click_lon)**2))
             station_name = list(self.stations.keys())[station_index]
+            else:
+                station_index = list(self.stations.keys()).index(station_name)
             if verbose:
-                print(self.stations[station_name])
+                print(self[station_name])
             highlight_station_colors = default_station_colors.copy()
             highlight_station_colors[station_index] = 'r'
             stat_points.set_facecolor(highlight_station_colors)
@@ -1157,13 +1301,12 @@ class Network():
             for ts_description, ts in ts_to_plot.items():
                 n_components += ts.num_components
                 if len(analyze_kw_args) > 0:
-                    self.stations[station_name].analyze_residuals(ts_description,
-                                                                  **analyze_kw_args)
+                    self[station_name].analyze_residuals(ts_description, **analyze_kw_args)
             # clear figure and add data
             fig_ts.clear()
             icomp = 0
             ax_ts = []
-            if scalogram_kw_args is not None:
+            if scalogram_kw_args:
                 nonlocal fig_scalo
                 t_left, t_right = None, None
             for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
@@ -1223,13 +1366,14 @@ class Network():
                         ax.legend()
                     ax_ts.append(ax)
                     icomp += 1
-                    if scalogram_kw_args is not None:
+                    if scalogram_kw_args:
                         t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
                         t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
+            if len(ax_ts) > 0:  # only call this if there was a timeseries to plot
             ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
             # get scalogram
-            if scalogram_kw_args is not None:
+            if scalogram_kw_args:
                 try:
                     splset = self[station_name].models[scalo_ts][scalo_model]
                     if isinstance(fig_scalo, plt.Figure):
@@ -1243,5 +1387,7 @@ class Network():
                          category=RuntimeWarning)
 
         cid = fig_map.canvas.mpl_connect("button_press_event", update_timeseries)
+        if station is not None:
+            update_timeseries(None, station)
         plt.show()
         fig_map.canvas.mpl_disconnect(cid)
