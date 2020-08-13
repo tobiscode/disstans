@@ -81,9 +81,9 @@ class Model():
         if the boundary value should be used (attribute :attr:`~zero_after`).
     parameters : numpy.ndarray, optional
         If provided, already save the model parameters.
-    cov : numpy.ndarray, optional
+    variances : numpy.ndarray, optional
         If provided (and ``parameters`` is provided as well), already save the
-        model parameter covariance.
+        model parameter covariances.
 
     See Also
     --------
@@ -91,7 +91,7 @@ class Model():
     """
     def __init__(self, num_parameters, regularize=False, time_unit=None,
                  t_start=None, t_end=None, t_reference=None,
-                 zero_before=True, zero_after=True, parameters=None, cov=None):
+                 zero_before=True, zero_after=True, parameters=None, variances=None):
         self.num_parameters = int(num_parameters)
         """ Number of parameters that define the model and can be solved for. """
         assert self.num_parameters > 0, \
@@ -109,11 +109,11 @@ class Model():
         Attribute of shape :math:`(\text{num_parameters}, \text{num_components})`
         that contains the parameters as a NumPy array.
         """
-        self.cov = None
+        self.var = None
         r"""
         Attribute of shape
-        :math:`(\text{num_parameters}, \text{num_parameters}, \text{num_components})`
-        that contains the parameter's covariance as a NumPy array.
+        :math:`(\text{num_parameters}, \text{num_components})`
+        that contains the parameter's variances as a NumPy array.
         """
         self.regularize = bool(regularize)
         """ Indicate to solvers to regularize this model (``True``) or not. """
@@ -143,7 +143,7 @@ class Model():
         """
         # read in parameters if they were passed to constructor
         if parameters is not None:
-            self.read_parameters(parameters, cov)
+            self.read_parameters(parameters, variances)
 
     def get_arch(self):
         """
@@ -298,7 +298,7 @@ class Model():
                              "was specified in the model.")
         return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
-    def read_parameters(self, parameters, cov=None):
+    def read_parameters(self, parameters, variances=None):
         r"""
         Reads in the parameters :math:`\mathbf{m}` (optionally also their covariance)
         and stores them in the instance attributes.
@@ -306,24 +306,28 @@ class Model():
         Parameters
         ----------
         parameters : numpy.ndarray
-            Model parameters of shape :math:`(\text{num_parameters},)`.
-        cov : numpy.ndarray, optional
-            Model parameter covariance of shape
-            :math:`(\text{num_parameters}, \text{num_parameters})`.
+            Model parameters of shape
+            :math:`(\text{num_parameters}, \text{num_components})`.
+        variances : numpy.ndarray, optional
+            Model parameter variances of shape
+            :math:`(\text{num_parameters}, \text{num_components})`.
         """
         assert self.num_parameters == parameters.shape[0], \
             "Read-in parameters have different size than the instantiated model."
         self.parameters = parameters.reshape([self.num_parameters, -1])
-        if cov is not None:
-            assert self.num_parameters == cov.shape[0] == cov.shape[1], \
-                "Covariance matrix must have same number of entries than parameters."
-            self.cov = cov.reshape([self.num_parameters, self.num_parameters, -1])
+        if variances is not None:
+            try:
+                self.var = variances.reshape(self.parameters.shape)
+            except ValueError as e:
+                raise ValueError("Variance matrix must have same shape as parameters "
+                                 f"(expected {self.parameters.shape}, got "
+                                 f"{variances.shape}).").with_traceback(e.__traceback__) from e
         self.is_fitted = True
 
     def evaluate(self, timevector):
         r"""
         Evaluate the model given a time vector (calculates :math:`\mathbf{d}`
-        and its uncertainty, if applicable).
+        and its variance, if applicable).
 
         Parameters
         ----------
@@ -335,8 +339,8 @@ class Model():
         -------
         dict
             Dictionary with the keys ``time`` containing the input time vector,
-            ``fit`` containing :math:`\mathbf{d}`, and ``sigma`` containing
-            the formal uncertainty (square root of the covariance diagonals).
+            ``fit`` containing :math:`\mathbf{d}`, and ``var`` containing
+            the formal variance (or ``None``, if not present).
 
         Raises
         ------
@@ -347,15 +351,15 @@ class Model():
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         mapping_matrix = self.get_mapping(timevector=timevector)
         fit = mapping_matrix @ self.parameters
-        if self.cov is not None:
-            fit_sigma = mapping_matrix @ np.sqrt(self.cov.diagonal(offset=0, axis1=0, axis2=1).T)
+        if self.var is not None:
+            fit_var = mapping_matrix @ self.var
         else:
-            fit_sigma = None
+            fit_var = None
         if fit.ndim == 1:
             fit = fit.reshape(-1, 1)
-            if fit_sigma is not None:
-                fit_sigma = fit_sigma.reshape(-1, 1)
-        return {"time": timevector, "fit": fit, "sigma": fit_sigma}
+            if fit_var is not None:
+                fit_var = fit_var.reshape(-1, 1)
+        return {"time": timevector, "fit": fit, "var": fit_var}
 
 
 class Step(Model):
@@ -393,7 +397,7 @@ class Step(Model):
         self.num_parameters = len(self.timestamps)
         self.is_fitted = False
         self.parameters = None
-        self.cov = None
+        self.var = None
 
     def add_step(self, step):
         """
@@ -849,27 +853,28 @@ class SplineSet(Model):
             ix_coefs += model.num_parameters
         return coefs
 
-    def read_parameters(self, parameters, cov=None):
+    def read_parameters(self, parameters, variances=None):
         r"""
-        Reads in the parameters :math:`\mathbf{m}` (optionally also their covariance)
+        Reads in the parameters :math:`\mathbf{m}` (optionally also their variances)
         of all the sub-splines and stores them in the respective attributes.
 
         Parameters
         ----------
         parameters : numpy.ndarray
-            Model parameters of shape :math:`(\text{num_parameters},)`.
-        cov : numpy.ndarray, optional
-            Model parameter covariance of shape
-            :math:`(\text{num_parameters}, \text{num_parameters})`.
+            Model parameters of shape
+            :math:`(\text{num_parameters}, \text{num_components})`.
+        variances : numpy.ndarray, optional
+            Model parameter variances of shape
+            :math:`(\text{num_parameters}, \text{num_components})`.
         """
-        super().read_parameters(parameters, cov)
+        super().read_parameters(parameters, variances)
         ix_params = 0
         for i, model in enumerate(self.splines):
-            param_model = parameters[ix_params:ix_params + model.num_parameters] \
-                          * model.scale
-            cov_model = None if cov is None else \
-                cov[ix_params:ix_params + model.num_parameters,
-                    ix_params:ix_params + model.num_parameters] * model.scale**2
+            param_model = (self.parameters[ix_params:ix_params + model.num_parameters, :]
+                           * model.scale)
+            cov_model = (None if self.var is None else
+                         self.var[ix_params:ix_params + model.num_parameters, :]
+                         * model.scale**2)
             model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 

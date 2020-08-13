@@ -205,9 +205,9 @@ class Station():
                     stat_arch["models"][ts_description].update({mdl_desc: mdl.get_arch()})
         return stat_arch
 
-    def add_timeseries(self, ts_description, timeseries,
-                       override_src=None, override_data_unit=None,
-                       override_data_cols=None, override_sigma_cols=None, add_models=None):
+    def add_timeseries(self, ts_description, timeseries, uncertainties_from=None,
+                       override_src=None, override_data_unit=None, override_data_cols=None,
+                       override_var_cols=None, override_cov_cols=None, add_models=None):
         """
         Add a timeseries to the station.
 
@@ -220,6 +220,9 @@ class Station():
             Description of the timeseries.
         timeseries : geonat.timeseries.Timeseries
             Timeseries object to add.
+        uncertainties_from : geonat.timeseries.Timeseries, optional
+            If the variance and covariance data should come from another timeseries,
+            specify the source timeseries here.
         override_src : str, optional
             Override the :attr:`~geonat.timeseries.Timeseries.src`
             attribute of ``timeseries``.
@@ -229,8 +232,11 @@ class Station():
         override_data_cols : str, optional
             Override the :attr:`~geonat.timeseries.Timeseries.data_cols`
             attribute of ``timeseries``.
-        override_sigma_cols : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.sigma_cols`
+        override_var_cols : str, optional
+            Override the :attr:`~geonat.timeseries.Timeseries.var_cols`
+            attribute of ``timeseries``.
+        override_cov_cols : str, optional
+            Override the :attr:`~geonat.timeseries.Timeseries.cov_cols`
             attribute of ``timeseries``.
         add_models : dict, optional
             Dictionary of models to add to the timeseries, where the keys are the
@@ -258,14 +264,18 @@ class Station():
         if ts_description in self.timeseries:
             warn(f"Station {self.name}: Overwriting time series '{ts_description}'.",
                  category=RuntimeWarning)
+        if uncertainties_from is not None:
+            timeseries.add_uncertainties(ts=uncertainties_from)
         if override_src is not None:
             timeseries.src = override_src
         if override_data_unit is not None:
             timeseries.data_unit = override_data_unit
         if override_data_cols is not None:
             timeseries.data_cols = override_data_cols
-        if override_sigma_cols is not None:
-            timeseries.sigma_cols = override_sigma_cols
+        if override_var_cols is not None:
+            timeseries.var_cols = override_var_cols
+        if override_cov_cols is not None:
+            timeseries.var_cols = override_cov_cols
         self.timeseries[ts_description] = timeseries
         self.fits[ts_description] = {}
         self.models[ts_description] = {}
@@ -395,7 +405,7 @@ class Station():
         model_description : str
             Model description the fit applies to.
         fit : dict
-            Dictionary with the keys ``'time'``, ``'fit'`` and ``'sigma'``.
+            Dictionary with the keys ``'time'``, ``'fit'`` and ``'var'``.
 
         Returns
         -------
@@ -465,9 +475,9 @@ class Station():
         -------
         fit_sum : numpy.ndarray
             2D array of shape :math:`(\text{n_observations},\text{n_components})`
-        fit_sum_sigma : numpy.ndarray or None
+        fit_sum_var : numpy.ndarray or None
             2D array of shape :math:`(\text{n_observations},\text{n_components})`.
-            Returns ``None`` if no uncertainty columns are available.
+            Returns ``None`` if no standard deviations are available.
         """
         # shorthand for timeseries
         ts = self[ts_description]
@@ -478,16 +488,13 @@ class Station():
         assert fits_to_sum, \
             f"Station {self.name}, timeseries {ts_description}: Can't find fits for models."
         # sum models and uncertainties
-        i_sigma_cols = [i for i, val in enumerate(ts.sigma_cols) if val is not None]
         fit_sum = np.zeros((ts.num_observations, ts.num_components))
-        fit_sum_sigma = np.zeros_like(fit_sum) if len(i_sigma_cols) > 0 else None
+        fit_sum_var = np.zeros_like(fit_sum) if ts.var_cols is not None else None
         for model_description, fit in fits_to_sum.items():
             fit_sum += fit.data.values
-            if fit_sum_sigma is not None:
-                fit_sum_sigma += fit.sigmas.values**2
-        if fit_sum_sigma is not None:
-            fit_sum_sigma = np.sqrt(fit_sum_sigma)
-        return fit_sum, fit_sum_sigma
+            if fit_sum_var is not None:
+                fit_sum_var += fit.vars.values
+        return fit_sum, fit_sum_var
 
     def analyze_residuals(self, ts_description, verbose=False,
                           mean=False, std=False, n_observations=False, std_outlier=0):
@@ -578,7 +585,7 @@ class Station():
             Timestamp-convertible string of the end time.
             Defaults to the last timestamp present in the timeseries.
         include_sigma : bool, optional
-            If ``True``, also calculate the formal uncertainty on the trend estimate.
+            If ``True``, also calculate the formal standard deviation on the trend estimate.
             Defaults to ``False``.
         time_unit : str, optional
             Time unit for output (only required if ``total=False``).
@@ -589,7 +596,7 @@ class Station():
             1D array of size ``len(components)`` containing the trends.
         trend_sigma : numpy.ndarray or None
             1D array of size ``len(components)`` containing the standard deviation of
-            the trend estimate. Returns ``None`` if no uncertainty columns are available.
+            the trend estimate. Returns ``None`` if no standard deviations are available.
         """
         assert isinstance(ts_description, str), \
             f"Station {self.name}: " \
@@ -615,7 +622,7 @@ class Station():
         else:
             return None, None
         # get fit sums
-        fit_sum, fit_sum_sigma = self.sum_fits(ts_description, model_list)
+        fit_sum, fit_sum_var = self.sum_fits(ts_description, model_list)
         # initialize fitting
         G = np.ones((t_span.size, 2))
         G[:, 1] = tvec_to_numpycol(t_span, time_unit=time_unit)
@@ -626,14 +633,14 @@ class Station():
             trend_sigma = np.zeros(n_comps)
         # fit components
         for icomp in components:
-            if fit_sum_sigma:
-                GtW = G.T @ sparse.diags(1/fit_sum_sigma[inside, icomp]**2)
+            if fit_sum_var:
+                GtW = G.T @ sparse.diags(1/fit_sum_var[inside, icomp])
                 GtWG = GtW @ G
                 GtWd = GtW @ fit_sum[inside, icomp]
             else:
                 GtWG = G.T @ G
                 GtWd = G.T @ fit_sum[inside, icomp]
             trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
-            if include_sigma and fit_sum_sigma:
+            if include_sigma and fit_sum_var:
                 trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG.toarray())[1, 1])
-        return trend, trend_sigma if (include_sigma and fit_sum_sigma) else None
+        return trend, trend_sigma if (include_sigma and fit_sum_var) else None

@@ -30,15 +30,37 @@ class Timeseries():
     data_cols : list
         List of strings with the names of the columns of ``dataframe`` that
         contain the data.
-    sigma_cols : list, optional
+        The length cooresponds to the number of components :attr:`~num_components`.
+    var_cols : list, optional
         List of strings with the names of the columns of ``dataframe`` that contain the
-        data's uncertainty (as standard deviations).
+        data's variance.
         Must have the same length as ``data_cols``.
-        If only certain data columns have uncertainties, set the respective entry
-        to ``None``.
-        Defaults to no data uncertainty columns.
+        Defaults to no data variance columns.
+    cov_cols : list, optional
+        List of strings with the names of the columns of ``dataframe`` that contain
+        the data's covariance.
+        Must have length ``(num_components * (num_components - 1)) / 2``, where
+        the order of the elements is determined by their row-by-row, sequential
+        position in the covariance matrix (see Notes).
+        Defaults to no covariance columns.
+
+    Notes
+    -----
+
+    In terms of mapping the covariance matrix of observations into the format
+    for the :class:`~Timeseries` class, consider this example for observations with
+    three components:
+
+    +-------------------+-------------------+-------------------+
+    | ``var_cols[0]``   | ``cov_cols[0]``   | ``cov_cols[1]``   |
+    +-------------------+-------------------+-------------------+
+    | (symmetric)       | ``var_cols[1]``   | ``cov_cols[2]``   |
+    +-------------------+-------------------+-------------------+
+    | (symmetric)       | (symmetric)       | ``var_cols[2]``   |
+    +-------------------+-------------------+-------------------+
     """
-    def __init__(self, dataframe, src, data_unit, data_cols, sigma_cols=None):
+    def __init__(self, dataframe, src, data_unit, data_cols,
+                 var_cols=None, cov_cols=None):
         assert isinstance(dataframe, pd.DataFrame)
         assert isinstance(src, str)
         assert isinstance(data_unit, str)
@@ -48,18 +70,33 @@ class Timeseries():
         self._src = src
         self._data_unit = data_unit
         self._data_cols = data_cols
-        if sigma_cols is None:
-            self._sigma_cols = [None] * len(self._data_cols)
-        else:
-            assert isinstance(sigma_cols, list) and \
-                   all([isinstance(scol, str) for scol in sigma_cols])
-            assert all([scol in dataframe.columns
-                        for scol in sigma_cols if scol is not None])
-            assert len(self._data_cols) == len(sigma_cols), \
-                "If passing uncertainty columns, the list needs to have the same " \
-                "length as the data columns one. If only certain components have " \
-                "associated uncertainties, leave those list entries as None."
-            self._sigma_cols = sigma_cols
+        if var_cols is not None:
+            assert isinstance(var_cols, list) and \
+                all([isinstance(vcol, str) for vcol in var_cols]), \
+                f"If not None, 'var_cols' must be a list of strings, got {var_cols}."
+            assert all([vcol in dataframe.columns for vcol in var_cols]), \
+                "All entries in 'var_cols' must be present in the dataframe."
+            assert len(self._data_cols) == len(var_cols), \
+                "If passing variance columns, " \
+                "the list needs to have the same length as the data columns one."
+        self._var_cols = var_cols
+        if cov_cols is not None:
+            assert self.num_components > 1, \
+                "In order to set covariances, the timeseries needs at least 2 components."
+            assert cov_cols is not None, \
+                "If setting covariances, the standard deviations must also be set."
+            assert isinstance(cov_cols, list) and \
+                all([isinstance(ccol, str) for ccol in cov_cols]), \
+                f"If not None, 'cov_cols' must be a list of strings, got {cov_cols}."
+            assert all([ccol in dataframe.columns for ccol in cov_cols]), \
+                "All entries in 'cov_cols' must be present in the dataframe."
+            cov_dims = int((self.num_components * (self.num_components - 1)) / 2)
+            assert len(cov_cols) == cov_dims, \
+                "If passing covariance columns, the list needs to have the appropriate " \
+                "length given the data columns length. " \
+                f"Expected {cov_dims}, got {len(cov_cols)}."
+            self._make_index_map()
+        self._cov_cols = cov_cols
 
     def __repr__(self):
         """
@@ -71,9 +108,12 @@ class Timeseries():
         info : str
             Timeseries summary.
         """
-        info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}\n" \
-               f" - Data: {[key for key in self.data_cols]}\n" \
-               f" - Uncertainties: {[key for key in self.sigma_cols]}"
+        info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}" \
+               f"\n - Shape: {self.shape}\n - Data: {[key for key in self.data_cols]}"
+        if self.var_cols is not None:
+            info += f"\n - Variances: {[key for key in self.var_cols]}"
+        if self.cov_cols is not None:
+            info += f"\n - Covariances: {[key for key in self.cov_cols]}"
         return info
 
     def __getitem__(self, columns):
@@ -147,21 +187,46 @@ class Timeseries():
         self._data_cols = new_data_cols
 
     @property
-    def sigma_cols(self):
-        """ List of the column names in :attr:`~df` that contain data uncertainties. """
-        return self._sigma_cols
+    def var_cols(self):
+        """ List of the column names in :attr:`~df` that contain data variance. """
+        return self._var_cols
 
-    @sigma_cols.setter
-    def sigma_cols(self, new_sigma_cols):
-        assert isinstance(new_sigma_cols, list) and \
-            all([(scol is None) or isinstance(scol, str) for scol in new_sigma_cols]), \
-            "New 'sigma_cols' attribute must be a list of strings or Nones of the same length " \
-            f"as the current 'sigma_cols' ({len(self._sigma_cols)}), got {new_sigma_cols}."
+    @var_cols.setter
+    def var_cols(self, new_var_cols):
+        assert self._var_cols is not None, \
+            "No variance columns found that can be renamed."
+        assert isinstance(new_var_cols, list) and \
+            all([(vcol is None) or isinstance(vcol, str) for vcol in new_var_cols]), \
+            "New 'var_cols' attribute must be a list of strings or Nones of the same length " \
+            f"as the current 'var_cols' ({len(self._var_cols)}), got {new_var_cols}."
+        for ivcol, vcol in enumerate(new_var_cols):
+            if vcol is None:
+                new_var_cols[ivcol] = self._var_cols[ivcol]
         self._df.rename(columns={old_col: new_col for old_col, new_col
-                                 in zip(self._sigma_cols, new_sigma_cols)
-                                 if (old_col is not None) and (new_col is not None)},
+                                 in zip(self._var_cols, new_var_cols)},
                         errors='raise')
-        self._sigma_cols = new_sigma_cols
+        self._var_cols = new_var_cols
+
+    @property
+    def cov_cols(self):
+        """ List of the column names in :attr:`~df` that contain data covariances. """
+        return self._cov_cols
+
+    @cov_cols.setter
+    def cov_cols(self, new_cov_cols):
+        assert self._cov_cols is not None, \
+            "No covariance columns found that can be renamed."
+        assert isinstance(new_cov_cols, list) and \
+            all([(ccol is None) or isinstance(ccol, str) for ccol in new_cov_cols]), \
+            "New 'cov_cols' attribute must be a list of strings or Nones of the same length " \
+            f"as the current 'cov_cols' ({len(self._cov_cols)}), got {new_cov_cols}."
+        for iccol, ccol in enumerate(new_cov_cols):
+            if ccol is None:
+                new_cov_cols[iccol] = self._cov_cols[iccol]
+        self._df.rename(columns={old_col: new_col for old_col, new_col
+                                 in zip(self._cov_cols, new_cov_cols)},
+                        errors='raise')
+        self._cov_cols = new_cov_cols
 
     @property
     def num_components(self):
@@ -189,16 +254,55 @@ class Timeseries():
 
     @property
     def sigmas(self):
-        """ View of only the data uncertainty columns in :attr:`~df`. """
-        if not any(self._sigma_cols):
-            raise ValueError("No uncertainty columns present to return.")
-        return self._df.loc[:, self._sigma_cols]
+        """ View of only the data standard deviation columns in :attr:`~df`. """
+        return self.vars ** (1/2)
 
     @sigmas.setter
     def sigmas(self, new_sigma):
-        if not any(self._sigma_cols):
-            raise ValueError("No uncertainty columns present to set.")
-        self.df.loc[:, self._sigma_cols] = new_sigma
+        self.vars = new_sigma ** 2
+
+    @property
+    def vars(self):
+        """ Returns the variances from :attr:`~df`. """
+        if self._var_cols is None:
+            raise ValueError("No variance columns present to return.")
+        return self._df.loc[:, self._var_cols]
+
+    @vars.setter
+    def vars(self, new_var):
+        if self._var_cols is None:
+            raise ValueError("No variance columns present to set.")
+        self.df.loc[:, self._var_cols] = new_var
+
+    @property
+    def covs(self):
+        """ Returns the covariances from :attr:`~df`. """
+        if self._cov_cols is None:
+            raise ValueError("No covariance columns present to return.")
+        return self._df.loc[:, self._cov_cols]
+
+    @covs.setter
+    def covs(self, new_cov):
+        if self._cov_cols is None:
+            raise ValueError("No covariance columns present to set.")
+        self.df.loc[:, self._cov_cols] = new_cov
+
+    @property
+    def var_cov(self):
+        """ Retuns the variance as well as covariance columns from :attr:`~df`. """
+        if self._var_cols is None:
+            raise ValueError("No variance columns present to return.")
+        if self._cov_cols is None:
+            raise ValueError("No covariance columns present to set.")
+        return self._df.loc[:, self._var_cols + self._cov_cols]
+
+    @var_cov.setter
+    def var_cov(self, new_var_cov):
+        assert new_var_cov.shape[1] == self.num_components * 2, \
+            "Setting 'var_cov' requires a column for each variance (first half of array) " \
+            "and covariance (second half)."
+        self.vars = new_var_cov[:, :self.num_components]
+        self.covs = new_var_cov[:, self.num_components:]
 
     @property
     def time(self):
@@ -234,10 +338,11 @@ class Timeseries():
         new_name = deepcopy(self._src) if src is None else src
         if not only_data:
             return Timeseries(self._df.copy(), new_name, deepcopy(self._data_unit),
-                              deepcopy(self._data_cols), deepcopy(self._sigma_cols))
+                              deepcopy(self._data_cols), deepcopy(self._var_cols),
+                              deepcopy(self._cov_cols))
         else:
             return Timeseries(self._df[self._data_cols].copy(), new_name,
-                              deepcopy(self._data_unit), deepcopy(self._data_cols), None)
+                              deepcopy(self._data_unit), deepcopy(self._data_cols), None, None)
 
     def mask_out(self, dcol):
         """
@@ -249,13 +354,37 @@ class Timeseries():
         dcol : str
             Name of the data column to mask out.
         """
-        icol = self._data_cols.index(dcol)
-        scol = self._sigma_cols[icol]
+        icomp = self._data_cols.index(dcol)
         self._df[dcol] = np.NaN
         self._df[dcol] = self._df[dcol].astype(pd.SparseDtype(dtype=float))
-        if scol is not None:
-            self._df[scol] = np.NaN
-            self._df[scol] = self._df[scol].astype(pd.SparseDtype(dtype=float))
+        if self._var_cols is not None:
+            vcol = self._var_cols[icomp]
+            self._df[vcol] = np.NaN
+            self._df[vcol] = self._df[vcol].astype(pd.SparseDtype(dtype=float))
+            if self._cov_cols is not None:
+                for iccol in self._get_cov_indices(icomp):
+                    ccol = self._cov_cols[iccol]
+                    self._df[ccol] = np.NaN
+                    self._df[ccol] = self._df[ccol].astype(pd.SparseDtype(dtype=float))
+
+    def _make_index_map(self):
+        index_map = np.zeros((self.num_components, self.num_components))
+        index_map[:] = np.NaN
+        seq_ix = 0
+        for irow in range(self.num_components):
+            for icol in range(irow + 1, self.num_components):
+                index_map[irow, icol] = seq_ix
+                seq_ix += 1
+        var_cov_map = (np.triu(index_map + self.num_components, 1) +
+                       np.triu(index_map + self.num_components, 1).T)
+        self.index_map = index_map
+        self.var_cov_map = (var_cov_map + np.diag(np.arange(self.num_components))
+                            ).astype(int).ravel()
+
+    def _get_cov_indices(self, icomp):
+        from_row = self.index_map[icomp, :]
+        from_col = self.index_map[:, icomp]
+        return [i for i in from_row if i != np.NaN] + [i for i in from_col if i != np.NaN]
 
     @staticmethod
     def prepare_math(left, right, operation):
@@ -600,7 +729,7 @@ class Timeseries():
             List of strings containing the data column names.
             Uncertainty column names are generated by adding a '_sigma'.
         fit : dict
-            Dictionary with the keys ``'time'``, ``'fit'`` and ``'sigma'``.
+            Dictionary with the keys ``'time'``, ``'fit'`` and ``'var'``.
 
         Returns
         -------
@@ -613,15 +742,16 @@ class Timeseries():
             Evaluating a model produces the fit dictionary.
         """
         df_data = {dcol: fit["fit"][:, icol] for icol, dcol in enumerate(data_cols)}
-        sigma_cols = None
-        if fit["sigma"] is not None:
-            sigma_cols = [dcol + "_sigma" for dcol in data_cols]
-            df_data.update({scol: fit["sigma"][:, icol] for icol, scol in enumerate(sigma_cols)})
+        var_cols = None
+        if fit["var"] is not None:
+            var_cols = [dcol + "_var" for dcol in data_cols]
+            df_data.update({vcol: fit["var"][:, icol] for icol, vcol in enumerate(var_cols)})
         df = pd.DataFrame(data=df_data, index=fit["time"])
-        return cls(df, "fitted", data_unit, data_cols, sigma_cols)
+        return cls(df, "fitted", data_unit, data_cols, var_cols)
 
     @classmethod
-    def from_array(cls, timevector, data, src, data_unit, data_cols, sigma=None, sigma_cols=None):
+    def from_array(cls, timevector, data, src, data_unit, data_cols,
+                   var=None, var_cols=None, cov=None, cov_cols=None):
         r"""
         Constructor method to create a :class:`~Timeseries` instance from a NumPy
         :class:`~numpy.ndarray`.
@@ -640,18 +770,26 @@ class Timeseries():
             Data unit.
         data_cols : list
             List of strings with the names of the columns of ``data``.
-        sigma : numpy.ndarray, optional
+        var : numpy.ndarray, optional
             2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
-            containing the data uncertainty (standard deviations).
+            containing the data variances.
             Defaults to no data uncertainty.
-        sigma_cols : list, optional
+        var_cols : list, optional
             List of strings with the names of the columns of ``data`` that contain the
-            data's uncertainty (as standard deviations).
+            data's variance.
             Must have the same length as ``data_cols``.
-            If only certain data columns have uncertainties, set the respective entry
-            to ``None``.
-            If ``sigma`` is given but ``sigma_cols`` is not, it defaults to appending
-            ``'_sigma'`` to ``data_cols``.
+            If ``var`` is given but ``var_cols`` is not, it defaults to appending
+            ``'_var'`` to ``data_cols``.
+        cov : numpy.ndarray, optional
+            2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
+            containing the data covariances (as defined in :class:`~Timeseries`).
+            Defaults to no data uncertainty.
+        cov_cols : list, optional
+            List of strings with the names of the columns of ``data`` that contain the
+            data's covariance.
+            Must have the same length as ``data_cols``.
+            If ``cov`` is given but ``cov_cols`` is not, it defaults to appending
+            ``'_cov'`` to the two respective entries of ``data_cols``.
 
         See Also
         --------
@@ -663,21 +801,38 @@ class Timeseries():
         assert isinstance(data_cols, list) and \
             all([isinstance(dcol, str) for dcol in data_cols]), \
             f"'data_cols' has to be a list of strings, got {data_cols}."
+        # create dataframe with data
         df_data = {dcol: data[:, icol] for icol, dcol in enumerate(data_cols)}
-        if sigma is None:
-            sigma_cols = None
+        # add variances
+        if var is None:
+            var_cols = None
         else:
-            assert data.shape == sigma.shape, \
-                "'data' and 'sigma' need to have the same shape, got " \
-                f"{data.shape} and {sigma.shape}."
-            if sigma_cols is None:
-                sigma_cols = [dcol + "_sigma" for dcol in data_cols]
+            assert data.shape == var.shape, \
+                "'data' and 'var' need to have the same shape, got " \
+                f"{data.shape} and {var.shape}."
+            if var_cols is None:
+                var_cols = [dcol + "_var" for dcol in data_cols]
             else:
-                assert len(sigma_cols) == sigma.shape[1]
-            df_data.update({scol: sigma[:, icol] for icol, scol
-                            in enumerate(sigma_cols) if scol is not None})
+                assert len(var_cols) == var.shape[1]
+            df_data.update({vcol: var[:, icol] for icol, vcol in enumerate(var_cols)})
+            # if variances are given, can also check for covariances
+            if cov is None:
+                cov_cols = None
+        else:
+                assert data.shape == cov.shape, \
+                    "'data' and 'cov' need to have the same shape, got " \
+                    f"{data.shape} and {cov.shape}."
+                if cov_cols is None:
+                    cov_cols = []
+                    num_components = len(data_cols)
+                    for i1 in range(num_components):
+                        for i2 in range(i1 + 1, num_components):
+                            cov_cols.append(f"{data_cols[i1]}_{data_cols[i2]}_cov")
+            else:
+                    assert len(cov_cols) == cov.shape[1]
+                df_data.update({ccol: cov[:, icol] for icol, ccol in enumerate(cov_cols)})
         df = pd.DataFrame(data=df_data, index=timevector)
-        return cls(df, src, data_unit, data_cols, sigma_cols)
+        return cls(df, src, data_unit, data_cols, var_cols, cov_cols)
 
 
 class GipsyTimeseries(Timeseries):

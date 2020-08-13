@@ -701,8 +701,8 @@ class Network():
                 station_ts = station.timeseries['mydata']
                 station_models = station.models['mydata']
                 # a subset list of models would need to be collected here
-                fitted_params = mysolver(station_ts, station_models, **kw_args)
-                for model_description, (params, covs) in fitted_params.items():
+                model_params_var = mysolver(station_ts, station_models, **kw_args)
+                for model_description, (params, covs) in model_params_var.items():
                     station.models['mydata'][model_description].read_parameters(params, covs)
             # short version, automatically parallelizes according to geonat.defaults
             net.fit('mydata', solver=mysolver, **kw_args)
@@ -730,15 +730,19 @@ class Network():
                                         desc="Fitting station models",
                                         total=len(self.stations),
                                         ascii=True, unit="station")):
-            for model_description, (params, covs) in result.items():
-                stat = self[station_names[i]]
-                stat.models[ts_description][model_description].read_parameters(params, covs)
+            stat = self[station_names[i]]
+            # print warning if the solver didn't converge
+            if any([np.isnan(params_var[0]).sum() > 0 for params_var in result.values()]):
+                warn(f"Fitting did not converge for timeseries {ts_description} "
+                     f"at {station_names[i]}", category=RuntimeWarning)
+            for model_description, (params, var) in result.items():
+                stat.models[ts_description][model_description].read_parameters(params, var)
 
     @staticmethod
     def _fit_single_station(parameter_tuple):
         station_time, station_models, solver, kw_args = parameter_tuple
-        fitted_params = solver(station_time, station_models, **kw_args)
-        return fitted_params
+        model_params_var = solver(station_time, station_models, **kw_args)
+        return model_params_var
 
     def evaluate(self, ts_description, model_list=None, timevector=None,
                  output_description=None, reuse=False):
@@ -1277,14 +1281,14 @@ class Network():
         def update_timeseries(event, station_name=None):
             nonlocal analyze_kw_args, gui_settings
             if station_name is None:
-            if (event.xdata is None) \
-               or (event.ydata is None) \
-               or (event.inaxes is not ax_map): return
-            click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata,
-                                                            src_crs=proj_gui)
-            station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
-                                              + (np.array(stat_lons) - click_lon)**2))
-            station_name = list(self.stations.keys())[station_index]
+                if (event.xdata is None) \
+                   or (event.ydata is None) \
+                   or (event.inaxes is not ax_map): return
+                click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata,
+                                                                src_crs=proj_gui)
+                station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
+                                                  + (np.array(stat_lons) - click_lon)**2))
+                station_name = list(self.stations.keys())[station_index]
             else:
                 station_index = list(self.stations.keys()).index(station_name)
             if verbose:
@@ -1314,16 +1318,19 @@ class Network():
                 fits_to_plot = {model_description: fit for model_description, fit
                                 in self[station_name].fits[ts_description].items()
                                 if (model_list is None) or (model_description in model_list)}
-                for icol, (data_col, sigma_col) in enumerate(zip(ts.data_cols, ts.sigma_cols)):
+                for icol, (data_col, var_col) in enumerate(zip(ts.data_cols,
+                                                               [None] * len(ts.data_cols)
+                                                               if ts.var_cols is None
+                                                               else ts.var_cols)):
                     # add axis
                     ax = fig_ts.add_subplot(n_components, 1, icomp + 1,
                                             sharex=None if icomp == 0 else ax_ts[0])
                     # plot uncertainty
-                    if (sigma_col is not None) and (gui_settings["plot_sigmas"] > 0):
+                    if (var_col is not None) and (gui_settings["plot_sigmas"] > 0):
                         fill_upper = ts.df[data_col] \
-                            + gui_settings["plot_sigmas"] * ts.df[sigma_col]
+                            + gui_settings["plot_sigmas"] * (ts.df[var_col] ** 0.5)
                         fill_lower = ts.df[data_col] \
-                            - gui_settings["plot_sigmas"] * ts.df[sigma_col]
+                            - gui_settings["plot_sigmas"] * (ts.df[var_col] ** 0.5)
                         ax.fill_between(ts.time, fill_upper, fill_lower, facecolor='gray',
                                         alpha=gui_settings["plot_sigmas_alpha"], linewidth=0)
                     # plot data
@@ -1335,9 +1342,9 @@ class Network():
                         fit_sum_sigma = np.zeros(ts.time.size)
                         for model_description, fit in fits_to_plot.items():
                             fit_sum += fit.df[fit.data_cols[icol]].values
-                            if (fit.sigma_cols[icol] is not None) \
+                            if (fit.var_cols is not None) \
                                and (gui_settings["plot_sigmas"] > 0):
-                                fit_sum_sigma += (fit.df[fit.sigma_cols[icol]].values)**2
+                                fit_sum_sigma += fit.df[fit.var_cols[icol]].values
                         if fit_sum_sigma.sum() > 0:
                             fit_sum_sigma = np.sqrt(fit_sum_sigma)
                             fill_upper = fit_sum + gui_settings["plot_sigmas"] * fit_sum_sigma
@@ -1349,12 +1356,12 @@ class Network():
                             ax.plot(fit.time, fit_sum, label="Model")
                     else:
                         for model_description, fit in fits_to_plot.items():
-                            if (fit.sigma_cols[icol] is not None) \
+                            if (fit.var_cols is not None) \
                                and (gui_settings["plot_sigmas"] > 0):
                                 fill_upper = fit.df[fit.data_cols[icol]] \
-                                    + gui_settings["plot_sigmas"] * fit.df[fit.sigma_cols[icol]]
+                                    + gui_settings["plot_sigmas"] * (fit.df[fit.var_cols[icol]] ** 0.5)
                                 fill_lower = fit.df[fit.data_cols[icol]] \
-                                    - gui_settings["plot_sigmas"] * fit.df[fit.sigma_cols[icol]]
+                                    - gui_settings["plot_sigmas"] * (fit.df[fit.var_cols[icol]] ** 0.5)
                                 ax.fill_between(fit.time, fill_upper, fill_lower,
                                                 alpha=gui_settings["plot_sigmas_alpha"],
                                                 linewidth=0)
@@ -1370,7 +1377,7 @@ class Network():
                         t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
                         t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
             if len(ax_ts) > 0:  # only call this if there was a timeseries to plot
-            ax_ts[0].set_title(station_name)
+                ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
             # get scalogram
             if scalogram_kw_args:
