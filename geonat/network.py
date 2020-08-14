@@ -52,7 +52,8 @@ class Network():
                  default_local_models={}):
         self.name = str(name)
         """ Network name. """
-        self.default_location_path = str(default_location_path)
+        self.default_location_path = str(default_location_path) \
+            if default_location_path is not None else None
         """ Fallback path for station locations. """
         self.default_local_models = {}
         """

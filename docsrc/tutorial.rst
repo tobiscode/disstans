@@ -216,7 +216,7 @@ Timeseries object that can be added to the station.
     >>> stats_dict = synth_stat.analyze_residuals(ts_description="Residual",
     ...                                           mean=True, std=True, verbose=True)
     TUT: Residual      Mean  Standard Deviation
-    total-total   -0.000016            0.013432
+    total-total   -0.010102            0.131602
 
 And we can plot it like before::
 
@@ -451,8 +451,8 @@ residuals and print some statistics:
     >>> stat["Res_noreg"] = stat["Displacement"] - stat["Fit_noreg"]
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_noreg     Mean  Standard Deviation
-    Total-Total    -0.00001            4.131451
+    TUT: Res_noreg      Mean  Standard Deviation
+    Total-Total    -0.000058            5.492932
 
 Advanced plotting
 .................
@@ -501,8 +501,8 @@ solver:
     >>> stat["Res_L2"] = stat["Fit_L2"] - stat["Truth"]
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_L2     Mean  Standard Deviation
-    Total-Total  0.08191            3.817761
+    TUT: Res_L2      Mean  Standard Deviation
+    Total-Total  0.082051            5.292588
 
 ::
 
@@ -550,7 +550,7 @@ Aaaand once more because it was so much fun, the same with a lasso regression
     >>> _ = stat.analyze_residuals(ts_description="Res_L1",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1     Mean  Standard Deviation
-    Total-Total  0.08194            1.490117
+    Total-Total  0.08194            1.489682
 
 ::
 
@@ -609,12 +609,12 @@ L1-fitted model:
     ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: %}\n"
     ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: f} rad\n"
     ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: f} rad")
-    Percent Error Constant:              -56.696315%
-    Percent Error Linear:                -2.253222%
-    Percent Error Annual Amplitude:       0.613159%
-    Percent Error Semi-Annual Amplitude: -0.230307%
-    Absolute Error Annual Phase:          0.002536 rad
-    Absolute Error Semi-Annual Phase:    -0.015828 rad
+    Percent Error Constant:              -54.570401%
+    Percent Error Linear:                -3.145957%
+    Percent Error Annual Amplitude:       0.885484%
+    Percent Error Semi-Annual Amplitude: -0.257911%
+    Absolute Error Annual Phase:          0.002316 rad
+    Absolute Error Semi-Annual Phase:    -0.014732 rad
 
 Apart from the trade-off between the constant and linear trend, which can be expected,
 we got pretty close to our ground truth. Let's finish up by calculating an average
@@ -628,7 +628,7 @@ noise, etc., so we choose to only fit our transient model:
     >>> trend, _ = stat.get_trend("Displacement", model_list=["Transient"],
     ...                           t_start="2002-06-01", t_end="2002-08-01")
     >>> print(f"Transient Velocity: {trend[0]:f} {ts.data_unit}/D")
-    Transient Velocity: 0.231593 mm/D
+    Transient Velocity: 0.231396 mm/D
 
 We can use average velocities like these when we want to create velocity maps for
 certain episodes.
