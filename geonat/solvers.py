@@ -116,7 +116,14 @@ def linear_regression(ts, models, formal_variance=False, lsmr_kw_args={}):
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
     :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),
-    this data will be used.
+    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`
+    are replaced by their weighted versions
+
+    .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}
+
+    and
+
+    .. math:: \mathbf{d} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{d}
 
     The formal model covariance is defined as the pseudo-inverse
 
@@ -181,11 +188,18 @@ def ridge_regression(ts, models, penalty, formal_variance=False, lsmr_kw_args={}
 
     where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual
     and the subscript :math:`_\text{reg}` masks to zero the model parameters
-    not designated to be regularized (see :attr:`~geonat.model.Model.regularize`).
+    not designated to be regularized (see :attr:`~geonat.models.Model.regularize`).
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
     :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),
-    this data will be used.
+    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`
+    are replaced by their weighted versions
+
+    .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}
+
+    and
+
+    .. math:: \mathbf{d} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{d}
 
     The formal model covariance is defined as the pseudo-inverse
 
@@ -266,11 +280,22 @@ def lasso_regression(ts, models, penalty, formal_variance=False, cvxpy_kw_args={
 
     where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual
     and the subscript :math:`_\text{reg}` masks to zero the model parameters
-    not designated to be regularized (see :attr:`~geonat.model.Model.regularize`).
+    not designated to be regularized (see :attr:`~geonat.models.Model.regularize`).
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
     :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),
-    this data will be used.
+    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`
+    are replaced by their weighted versions
+
+    .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}
+
+    and
+
+    .. math:: \mathbf{d} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{d}
+
+    If ``reweight_max_iters`` is specified, sparsity of the solution parameters is promoted
+    by iteratively reweighting the penalty parameter for each regularized parameter based
+    on its current value, approximating the L0 norm rather than the L1 norm (see Notes).
 
     The formal model covariance :math:`\mathbf{C}_m` is defined as being zero except in
     the rows and columns corresponding to non-zero parameters, where it is defined

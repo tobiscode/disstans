@@ -938,6 +938,7 @@ class GipsyTimeseries(Timeseries):
     Subclasses :class:`~Timeseries`.
 
     Timeseries subclass for GNSS measurements in JPL's Gipsy ``.tseries`` file format.
+    The data and (co)variances are converted into millimeters (squared).
 
     Parameters
     ----------
@@ -988,13 +989,15 @@ repro2018a/raw/position/envseries/0000_README.format
                            usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
                            names=all_cols)
         data.loc[:, var_cols] *= data.loc[:, var_cols]  # original data is in s.d.
+        data.loc[:, data_cols] *= 1e3  # now in mm
+        data.loc[:, var_cols + cov_cols] *= 1e6  # now in mm^2
         df = time.join(data)
         num_duplicates = int(df.duplicated(subset='time').sum())
         if (num_duplicates > 0) and show_warnings:
             warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. "
                  "Keeping first occurrences.")
         df = df.drop_duplicates(subset='time').set_index('time')
-        super().__init__(dataframe=df, src='.tseries', data_unit='m',
+        super().__init__(dataframe=df, src='.tseries', data_unit='mm',
                          data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols)
 
     def get_arch(self):

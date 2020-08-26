@@ -640,7 +640,8 @@ class Network():
                                             model_description=model_description,
                                             model=mdl)
 
-    def load_maintenance_dict(self, maint_dict, ts_description, model_description):
+    def load_maintenance_dict(self, maint_dict, ts_description, model_description,
+                              only_active=True):
         """
         Convenience wrapper to add :class:`~geonat.models.Step` models to the stations
         in the network where they experienced maitenance and therefore likely a jump
@@ -656,6 +657,9 @@ class Network():
             Timeseries to add the steps to.
         model_description : str
             Name for the step models.
+        only_active : bool, optional
+            If ``True`` (default), will check for the active time period of the timeseries,
+            and only add steps that fall inside it.
 
         See Also
         --------
@@ -667,8 +671,15 @@ class Network():
             f"Values in 'maint_dict' must be lists, got {maint_dict.values()}."
         for station, steptimes in maint_dict.items():
             if station in self.stations:
+                if only_active:
+                    tmin = self[station][ts_description].time.min()
+                    tmax = self[station][ts_description].time.max()
+                    localsteps = [st for st in steptimes if
+                                  ((pd.Timestamp(st) >= tmin) and (pd.Timestamp(st) <= tmax))]
+                else:
+                    localsteps = steptimes
                 self[station].add_local_model(ts_description, model_description,
-                                              geonat_models.Step(steptimes))
+                                              geonat_models.Step(localsteps))
 
     def fit(self, ts_description, model_list=None, solver='linear_regression', **kw_args):
         """
@@ -1237,7 +1248,7 @@ class Network():
             # loop over stations
             trend = np.zeros((self.num_stations, 2))
             trend_sigma = np.zeros_like(trend)
-            for i, station in enumerate(self):
+            for i, stat in enumerate(self):
                 # need to check the data and time units once
                 if i == 0:
                     if ("total" not in trend_kw_args) or (not trend_kw_args["total"]):
@@ -1247,11 +1258,11 @@ class Network():
                             tunit = "D"
                     else:
                         tunit = None
-                    trend_unit = station[trend_kw_args["ts_description"]].data_unit
+                    trend_unit = stat[trend_kw_args["ts_description"]].data_unit
                     if tunit is not None:
                         trend_unit += f"/{tunit}"
                 # calculate trend
-                stat_trend, stat_trend_sigma = station.get_trend(**trend_kw_args)
+                stat_trend, stat_trend_sigma = stat.get_trend(**trend_kw_args)
                 # save trend
                 if stat_trend is not None:
                     if stat_trend.size == 1:
