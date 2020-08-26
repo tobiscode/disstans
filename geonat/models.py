@@ -145,6 +145,53 @@ class Model():
         if parameters is not None:
             self.read_parameters(parameters, variances)
 
+    def __repr__(self):
+        """
+        Special function that returns a readable summary of the Model.
+        Accessed, for example, by Python's ``print()`` built-in function.
+
+        Returns
+        -------
+        info : str
+            Model summary.
+        """
+        arch = self.get_arch()
+        info = f"{arch['type']} model ({self.num_parameters} parameters)"
+        for k, v in arch["kw_args"].items():
+            info += f"\n  {k+':':<15}{v}"
+        return info
+
+    def __eq__(self, other):
+        """
+        Special function that allows for the comparison of models based on their
+        type and architecture, regardless of model parameters.
+
+        Parameters
+        ----------
+        other : geonat.models.Model
+            Model to compare to.
+
+        Example
+        -------
+
+        >>> from geonat.models import Step, Sinusoidal
+        >>> step1, step2 = Step(["2020-01-01"]), Step(["2020-01-02"])
+        >>> sin1, sin2 = Sinusoidal(1, "2020-01-01"), Sinusoidal(1, "2020-01-01")
+        >>> step1 == step2
+        False
+        >>> sin1 == sin2
+        True
+
+        Note that obviously, the objects themselves are still different:
+
+        >>> step1 is step1
+        True
+        >>> step1 is step2
+        False
+
+        """
+        return self.get_arch() == other.get_arch()
+
     def get_arch(self):
         """
         Get a dictionary that describes the model fully and allows it to be recreated.
