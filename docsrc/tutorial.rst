@@ -128,13 +128,13 @@ in. To this end, we must first associate our models with the timeseries at the s
     >>> for model_description, model in collection.items():
     ...     synth_stat.add_local_model("Data", model_description, model)
 
-For the fitting, we first import a solver function from the :mod:`~geonat.solvers` module,
-and then call it to give us a dictionary of the fitted parameters. We will start with
-basic, linear, non-regularized least-squares:
+For the fitting, we first import a solver function from the :doc:`Solvers <geonat/solvers>`
+module, and then call it to give us a dictionary of the fitted parameters. We will start
+with basic, linear, non-regularized least-squares:
 
 .. doctest:: tut1
 
-    >>> from geonat.solvers import linear_regression  # noqa: E402
+    >>> from geonat.solvers import linear_regression
     >>> fitted_params = linear_regression(ts=synth_stat["Data"],
     ...                                   models=synth_stat.models["Data"])
 
@@ -147,9 +147,9 @@ basic, linear, non-regularized least-squares:
 With the solver finished, we want to do multiple things for all models:
 
 1. Give the models their best-fit parameters as returned by the solver using the
-   :meth:`~geonat.model.Model.read_parameters` method.
+   :meth:`~geonat.models.Model.read_parameters` method.
 2. Calculate the clean trajectory for that model given the best-fit parameters using the
-   :meth:`~geonat.model.Model.evaluate` method.
+   :meth:`~geonat.models.Model.evaluate` method.
 3. Add the evaluated trajectory to the station as a "fit" using the
    :meth:`~geonat.station.Station.add_fit` method.
 
@@ -201,8 +201,7 @@ function already created a new timeseries object on the way, which we can now pl
     >>> plt.savefig("tutorial_1b.png")
     >>> plt.close()
 
-As we can see, the model matches the data pretty well, but we can see some trade-off
-happening between two of our added steps:
+As we can see, the model matches the data pretty well:
 
 .. image:: img/tutorial_1b.png
 
@@ -215,8 +214,8 @@ Timeseries object that can be added to the station.
     >>> synth_stat["Residual"] = synth_stat["Data"] - synth_stat["Modeled"]
     >>> stats_dict = synth_stat.analyze_residuals(ts_description="Residual",
     ...                                           mean=True, std=True, verbose=True)
-    TUT: Residual      Mean  Standard Deviation
-    total-total   -0.010102            0.131602
+    TUT: Residual          Mean  Standard Deviation
+    total-total   -6.785812e-15            0.009595
 
 And we can plot it like before::
 
@@ -253,7 +252,7 @@ Let's start with creating the timestamps for our synthetic data:
 
 .. doctest:: tut2
 
-    >>> import pandas as pd  # noqa: E402
+    >>> import pandas as pd
     >>> t_start_str = "2000-01-01"
     >>> t_end_str = "2020-01-01"
     >>> timevector = pd.date_range(start=t_start_str, end=t_end_str, freq="1D")
@@ -264,7 +263,7 @@ If you have any question about this, please refer to the previous tutorial.
 
 .. doctest:: tut2
 
-    >>> from geonat.models import Arctangent, Polynomial, Sinusoidal  # noqa: E402
+    >>> from geonat.models import Arctangent, Polynomial, Sinusoidal
     >>> mdl_secular = Polynomial(order=1, t_reference=t_start_str)
     >>> mdl_annual = Sinusoidal(period=365.25, t_reference=t_start_str)
     >>> mdl_semiannual = Sinusoidal(period=365.25/2, t_reference=t_start_str)
@@ -285,7 +284,7 @@ is hard, we'll omit them here, and try to approximate them with other models lat
 
 .. doctest:: tut2
 
-    >>> from copy import deepcopy  # noqa: E402
+    >>> from copy import deepcopy
     >>> mdl_coll = deepcopy({"Secular": mdl_secular,
     ...                      "Annual": mdl_annual,
     ...                      "Semi-Annual": mdl_semiannual})
@@ -294,7 +293,7 @@ Now that we have a copy for safekeeping, we can add the "true" parameters to the
 
 .. doctest:: tut2
 
-    >>> import numpy as np  # noqa: E402
+    >>> import numpy as np
     >>> mdl_secular.read_parameters(np.array([-20, 200/(20*365.25)]))
     >>> mdl_annual.read_parameters(np.array([-5, 0]))
     >>> mdl_semiannual.read_parameters(np.array([0, 5]))
@@ -320,7 +319,7 @@ GeoNAT's :func:`~geonat.tools.create_powerlaw_noise` function:
 
 .. doctest:: tut2
 
-    >>> from geonat.tools import create_powerlaw_noise  # noqa: E402
+    >>> from geonat.tools import create_powerlaw_noise
     >>> rng = np.random.default_rng(0)
     >>> white_noise = rng.normal(scale=2, size=timevector.size)
     >>> colored_noise = create_powerlaw_noise(size=timevector.size,
@@ -336,8 +335,8 @@ and the total noise ``sum_noise``:
 
 Let's have a look what we fabricated::
 
-    >>> import matplotlib.pyplot as plt  # noqa: E402
-    >>> from pandas.plotting import register_matplotlib_converters  # noqa: E402
+    >>> import matplotlib.pyplot as plt
+    >>> from pandas.plotting import register_matplotlib_converters
     >>> register_matplotlib_converters()  # improve how time data looks
     >>> plt.plot(timevector, sum_seas_sec, c='C1', label="Seasonal + Secular")
     >>> plt.plot(timevector, sum_transient, c='k', label="Transient")
@@ -368,11 +367,11 @@ model collection from before:
 
 .. doctest:: tut2
 
-    >>> from geonat.models import ISpline, SplineSet  # noqa: E402
+    >>> from geonat.models import ISpline, SplineSet
     >>> mdl_coll["Transient"] = SplineSet(degree=2,
     ...                                   t_center_start=t_start_str,
     ...                                   t_center_end=t_end_str,
-    ...                                   list_num_knots=[4, 8, 16, 32, 32, 64],
+    ...                                   list_num_knots=[4, 8, 16, 32, 64, 128],
     ...                                   splineclass=ISpline)
 
 It creates sets of integrated B-Splines of degree 2, with the timespan
@@ -390,7 +389,7 @@ we'll also assign it to a :class:`~geonat.network.Network` object:
 
 .. doctest:: tut2
 
-    >>> from geonat import Network, Station, Timeseries  # noqa: E402
+    >>> from geonat import Network, Station, Timeseries
     >>> net_name = "TutorialLand"
     >>> stat_name = "TUT"
     >>> caltech_lla = (34.1375, -118.125, 263)
@@ -451,8 +450,8 @@ residuals and print some statistics:
     >>> stat["Res_noreg"] = stat["Displacement"] - stat["Fit_noreg"]
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_noreg      Mean  Standard Deviation
-    Total-Total    -0.000058            5.492932
+    TUT: Res_noreg          Mean  Standard Deviation
+    Total-Total    -6.178836e-10            2.027383
 
 Advanced plotting
 .................
@@ -478,7 +477,7 @@ What do our fit and residuals look like compared to the data and noise, respecti
 
 We can use a scalogram (see :meth:`~geonat.models.SplineSet.make_scalogram`) to visualize
 the coefficient values of our spline collection, and quickly understand that without
-regularization, the set is quite heavily populated::
+regularization, the set is quite heavily populated in order to minimize the residuals::
 
     >>> fig, ax = stat.models["Displacement"]["Transient"].make_scalogram(t_left=t_start_str,
     ...                                                                   t_right=t_end_str,
@@ -501,8 +500,8 @@ solver:
     >>> stat["Res_L2"] = stat["Fit_L2"] - stat["Truth"]
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_L2      Mean  Standard Deviation
-    Total-Total  0.082051            5.292588
+    TUT: Res_L2     Mean  Standard Deviation
+    Total-Total  0.08194            1.550079
 
 ::
 
@@ -532,15 +531,16 @@ solver:
 
 .. image:: img/tutorial_2e.png
 
-We can see that L2 regularization has still not really improved our results. A better
+We can see that L2 regularization has  improved our fit to the noise better (it's now
+following the mean of the noise), but the dictionary is still densely populated. A better
 penalty parameter might help, but determining a better one is outside the scope of this
 tutorial.
 
 Repeat with L1 regularization
 .............................
 
-Aaaand once more because it was so much fun, the same with a lasso regression
-(L1-regularized) solver:
+Using L1-regularized lasso regression, we finally hope to get rid of large signals in the
+transient dictionary:
 
 .. doctest:: tut2
 
@@ -549,8 +549,8 @@ Aaaand once more because it was so much fun, the same with a lasso regression
     >>> stat["Res_L1"] = stat["Fit_L1"] - stat["Truth"]
     >>> _ = stat.analyze_residuals(ts_description="Res_L1",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_L1     Mean  Standard Deviation
-    Total-Total  0.08194            1.489682
+    TUT: Res_L1      Mean  Standard Deviation
+    Total-Total  0.081941            1.542697
 
 ::
 
@@ -581,15 +581,83 @@ Aaaand once more because it was so much fun, the same with a lasso regression
 .. image:: img/tutorial_2g.png
 
 This looks much better - the scalogram now shows us that we only select splines around
-where we put the Arctangent models, and is close to zero otherwise. Also notice how
-the variance of the residual has considerably decreased (in fact, to the level of
-the noise we used).
+where we put the Arctangent models, and is close to zero otherwise.
+
+Adding reweighting iterations
+.............................
+
+Okay, one last thing about fitting, I promise. L1 regularization aims to penalize the sum of
+the absolute values of our model parameters. However, that's also not actually what we want.
+In fact, transient signals in the real world have no constraint to be as small as possible.
+However, the *number* of transients should be the one that is minimized. That is what is
+mathematically referred to as L0 regularization, but is sadly not an easy problem to solve
+rigorously.
+
+However, by modifiying an additional weight of each regularized parameter, that drives small
+values even closer to zero, but leaves significant values unperturbed, one can approximate
+such an L0 regularization by iteratively solving the L1-regularized problem. That is exactly
+what the option ``reweight_max_iters`` does. Let's try it:
+
+.. doctest:: tut2
+
+    >>> net.fit(ts_description="Displacement", solver="lasso_regression",
+    ...         penalty=10, reweight_max_iters=5)
+    >>> net.evaluate(ts_description="Displacement", output_description="Fit_L1R")
+    >>> stat["Res_L1R"] = stat["Fit_L1R"] - stat["Truth"]
+    >>> _ = stat.analyze_residuals(ts_description="Res_L1R",
+    ...                            mean=True, std=True, verbose=True)
+    TUT: Res_L1R      Mean  Standard Deviation
+    Total-Total   0.081941            1.500508
+
+::
+
+    >>> fig, ax = plt.subplots(nrows=2, sharex=True)
+    >>> ax[0].plot(stat["Displacement"].data, label="Synthetic")
+    >>> ax[0].plot(stat["Fit_L1R"].data, label="Fit")
+    >>> ax[0].set_ylabel("Displacement [mm]")
+    >>> ax[0].legend(loc="upper left")
+    >>> ax[0].set_title("Reweighted L1 Regularization")
+    >>> ax[1].plot(stat["Displacement"].time, sum_noise, c='0.3', ls='none',
+    ...            marker='.', markersize=0.5, label="Noise")
+    >>> ax[1].plot(stat["Res_L1R"].data, c="C1", label="Residual")
+    >>> ax[1].set_ylim(-15, 15)
+    >>> ax[1].set_ylabel("Error [mm]")
+    >>> ax[1].legend(loc="lower left")
+    >>> fig.savefig("tutorial_2h.png")
+
+.. image:: img/tutorial_2h.png
+
+::
+
+    >>> fig, ax = stat.models["Displacement"]["Transient"].make_scalogram(t_left=t_start_str,
+    ...                                                                   t_right=t_end_str,
+    ...                                                                   cmaprange=30)
+    >>> ax[0].set_title("Reweighted L1 Regularization")
+    >>> fig.savefig("tutorial_2i.png")
+
+.. image:: img/tutorial_2i.png
+
+As you can see, the significant components of the splines have now been emphasized when
+compared to the previous scalogram, and all the values that were small but not really
+zero in the previous case are now *really* close to zero.
+
+.. note::
+    If you run this example by yourself, you might get a CVXPY warning about how the
+    solution may be inaccurate. This is (probably) because our problem is very
+    ill-conditioned, and we have noise in our data. Unless CVXPY outright fails, this
+    is therefore probablty okay for us, even though you always want to check your
+    results for plausibility.
+
+    You can always filter out ``UserWarning`` appearances if you don't want to see them,
+    or increase the CVXPY solver tolerance using the ``cvxpy_kw_args`` argument in
+    :func:`~geonat.solvers.lasso_regression` (although that might require a balancing act
+    to ensure you're actually not worsening the solution you get).
 
 Comparing specific parameters
 .............................
 
 Before we finish up, let's just print some differences between the ground truth and our
-L1-fitted model:
+L1R-fitted model:
 
 .. doctest:: tut2
 
@@ -609,26 +677,26 @@ L1-fitted model:
     ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: %}\n"
     ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: f} rad\n"
     ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: f} rad")
-    Percent Error Constant:              -54.570401%
-    Percent Error Linear:                -3.145957%
-    Percent Error Annual Amplitude:       0.885484%
-    Percent Error Semi-Annual Amplitude: -0.257911%
-    Absolute Error Annual Phase:          0.002316 rad
-    Absolute Error Semi-Annual Phase:    -0.014732 rad
+    Percent Error Constant:              -40.699837%
+    Percent Error Linear:                -28.560247%
+    Percent Error Annual Amplitude:       0.051154%
+    Percent Error Semi-Annual Amplitude:  1.597074%
+    Absolute Error Annual Phase:          6.227154 rad
+    Absolute Error Semi-Annual Phase:     0.000231 rad
 
-Apart from the trade-off between the constant and linear trend, which can be expected,
-we got pretty close to our ground truth. Let's finish up by calculating an average
-velocity of the station using :meth:`~geonat.station.Station.get_trend` around the
-time when it's rapidly moving (around the middle of 2002). We don't want a normal
-trend through the data, since that is also influenced by the secular velocity, the
-noise, etc., so we choose to only fit our transient model:
+Apart from the trade-off between the polynomial trend and long-term splines, which can be
+expected, we got pretty close to our ground truth. Let's finish up by calculating an average
+velocity of the station using :meth:`~geonat.station.Station.get_trend` around the time when
+it's rapidly moving (around the middle of 2002). We don't want a normal trend through the
+data, since that is also influenced by the secular velocity, the noise, etc., so we choose
+to only fit our transient model:
 
 .. doctest:: tut2
 
     >>> trend, _ = stat.get_trend("Displacement", model_list=["Transient"],
     ...                           t_start="2002-06-01", t_end="2002-08-01")
     >>> print(f"Transient Velocity: {trend[0]:f} {ts.data_unit}/D")
-    Transient Velocity: 0.231396 mm/D
+    Transient Velocity: 0.241203 mm/D
 
 We can use average velocities like these when we want to create velocity maps for
 certain episodes.
