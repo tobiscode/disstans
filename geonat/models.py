@@ -800,9 +800,9 @@ class SplineSet(Model):
 
     See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, degree, t_center_start, t_center_end,
-                 time_unit="D", list_scales=None, list_num_knots=None,
-                 splineclass=ISpline, complete=True, regularize=True, **model_kw_args):
+    def __init__(self, degree, t_center_start, t_center_end, time_unit="D",
+                 list_scales=None, list_num_knots=None, splineclass=ISpline, complete=True,
+                 internal_scaling=True, regularize=True, **model_kw_args):
         assert np.logical_xor(list_scales is None, list_num_knots is None), \
             "To construct a set of Splines, pass exactly one of " \
             "'list_scales' and 'list_num_knots' " \
@@ -871,6 +871,8 @@ class SplineSet(Model):
         """
         self.splines = splset
         """ List of spline object contained within the SplineSet. """
+        self.internal_scaling = bool(internal_scaling)
+        """ Trackes whether to scale the sub-splines relative to their lengths. """
 
     def _get_arch(self):
         arch = {"type": "SplineSet",
@@ -880,15 +882,17 @@ class SplineSet(Model):
                             "splineclass": self.splineclass.__name__,
                             "list_scales": self.list_scales,
                             "list_num_knots": self.list_num_knots,
-                            "complete": self.complete}}
+                            "complete": self.complete,
+                            "internal_scaling": self.internal_scaling}}
         return arch
 
     def _get_mapping(self, timevector):
         coefs = np.empty((timevector.size, self.num_parameters))
         ix_coefs = 0
         for i, model in enumerate(self.splines):
-            temp = model.get_mapping(timevector).toarray().squeeze()
-            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp * model.scale
+            internal_scale = model.scale if self.internal_scaling else 1
+            temp = model.get_mapping(timevector).A.squeeze()
+            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp * internal_scale
             ix_coefs += model.num_parameters
         return coefs
 
