@@ -913,11 +913,12 @@ class SplineSet(Model):
         super().read_parameters(parameters, variances)
         ix_params = 0
         for i, model in enumerate(self.splines):
+            internal_scale = model.scale if self.internal_scaling else 1
             param_model = (self.parameters[ix_params:ix_params + model.num_parameters, :]
-                           * model.scale)
+                           * internal_scale)
             cov_model = (None if self.var is None else
                          self.var[ix_params:ix_params + model.num_parameters, :]
-                         * model.scale**2)
+                         * internal_scale**2)
             model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 
