@@ -1078,6 +1078,50 @@ class Logarithmic(Model):
         return coefs
 
 
+class Exponential(Model):
+    r"""
+    Subclasses :class:`~geonat.model.Model`.
+
+    This model provides the "geophysical" exponential :math:`1-\exp(-\mathbf{t}/\tau)`
+    with a given time constant, zero for :math:`\mathbf{t} < 0`, and approaching
+    one asymptotically.
+
+    Parameters
+    ----------
+    tau : float
+        Exponential time constant :math:`\tau`.
+        It represents the amount of time that it takes for the (general) exponential
+        function's value to be multiplied by :math:`e`.
+        Applied to this model, for a given relative amplitude :math:`a` (so :math:`0 < a < 1`,
+        before model scaling) to be reached at given :math:`\Delta t` past ``t_start``,
+        :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
+
+
+    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    """
+    def __init__(self, tau, t_reference,
+                 time_unit="D", t_start=None, zero_after=False, **model_kw_args):
+        if t_start is None:
+            t_start = t_reference
+        super().__init__(num_parameters=1, t_reference=t_reference, t_start=t_start,
+                         time_unit=time_unit, zero_after=zero_after, **model_kw_args)
+        assert self.t_reference <= self.t_start, \
+            "Exponential model has to have valid bounds, but the reference time " + \
+            f"{self.t_reference_str} is after the start time {self.t_start_str}."
+        self.tau = float(tau)
+        """ Exponential time constant. """
+
+    def _get_arch(self):
+        arch = {"type": "Exponential",
+                "kw_args": {"tau": self.tau}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        dt = self.tvec_to_numpycol(timevector)
+        coefs = (1 - np.exp(-dt / self.tau)).reshape(-1, 1)
+        return coefs
+
+
 class Arctangent(Model):
     r"""
     Subclasses :class:`~geonat.model.Model`.

@@ -14,6 +14,11 @@ Arctangent
 
 .. autoclass:: geonat.models.Arctangent
 
+Exponential
+...........
+
+.. autoclass:: geonat.models.Exponential
+
 Logarithmic
 ...........
 
