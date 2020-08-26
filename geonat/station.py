@@ -485,7 +485,11 @@ class Station():
             f"Station {self.name}, timeseries {ts_description}: Can't find fits for models."
         # sum models and uncertainties
         fit_sum = np.zeros((ts.num_observations, ts.num_components))
-        fit_sum_var = np.zeros_like(fit_sum) if ts.var_cols is not None else None
+        if (ts.var_cols is not None) and all([fit.var_cols is not None
+                                              for fit in fits_to_sum.values()]):
+            fit_sum_var = np.zeros_like(fit_sum)
+        else:
+            fit_sum_var = None
         for model_description, fit in fits_to_sum.items():
             fit_sum += fit.data.values
             if fit_sum_var is not None:
@@ -629,7 +633,7 @@ class Station():
             trend_sigma = np.zeros(n_comps)
         # fit components
         for icomp in components:
-            if fit_sum_var:
+            if fit_sum_var is not None:
                 GtW = G.T @ sparse.diags(1/fit_sum_var[inside, icomp])
                 GtWG = GtW @ G
                 GtWd = GtW @ fit_sum[inside, icomp]
@@ -637,6 +641,6 @@ class Station():
                 GtWG = G.T @ G
                 GtWd = G.T @ fit_sum[inside, icomp]
             trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
-            if include_sigma and fit_sum_var:
-                trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG.toarray())[1, 1])
+            if include_sigma and (fit_sum_var is not None):
+                trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG)[1, 1])
         return trend, trend_sigma if (include_sigma and fit_sum_var) else None
