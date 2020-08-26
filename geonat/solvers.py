@@ -195,7 +195,7 @@ def linear_regression(ts, models, formal_variance=False, cached_mapping=None,
     ts : geonat.timeseries.Timeseries
         Timeseries to fit.
     models : dict
-        Dictionary of :class:`~geonat.model.Model` instances used for fitting.
+        Dictionary of :class:`~geonat.models.Model` instances used for fitting.
     formal_variance : bool, optional
         If ``True``, also calculate the formal variance (diagonals of the covariance
         matrix).
@@ -287,7 +287,7 @@ def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=
     ts : geonat.timeseries.Timeseries
         Timeseries to fit.
     models : dict
-        Dictionary of :class:`~geonat.model.Model` instances used for fitting.
+        Dictionary of :class:`~geonat.models.Model` instances used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
     formal_variance : bool, optional
@@ -391,7 +391,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     ts : geonat.timeseries.Timeseries
         Timeseries to fit.
     models : dict
-        Dictionary of :class:`~geonat.model.Model` instances used for fitting.
+        Dictionary of :class:`~geonat.models.Model` instances used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
     reweight_max_iters : int, optional

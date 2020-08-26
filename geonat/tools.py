@@ -87,7 +87,7 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
         Defaults to the value in :attr:`~geonat.config.defaults`.
     chunksize : int, optional
         Chunk size used in the parallelization pool, see
-        :meth:`~python.multiprocessing.Pool.imap`.
+        :meth:`~multiprocessing.pool.Pool.imap`.
 
     Yields
     ------

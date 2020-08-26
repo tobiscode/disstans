@@ -46,6 +46,11 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# complain about broken links, check every once in a while
+# nitpicky = True
+# nitpick_ignore = [('py:class', 'optional'), ('py:class', 'function'),
+#                   ('py:class', 'iterable')]
+
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -62,9 +67,7 @@ html_static_path = ['_static']
 # -- Other settings ------------------------------------------------
 # autodoc settings
 # add_module_names = False
-autodoc_default_options = {'members': True,
-                           'undoc-members': True,
-                           'special-members': True,
+autodoc_default_options = {'undoc-members': True,
                            'exclude-members': '__init__, __module__, __dict__, __weakref__',
                            'member-order': 'groupwise'}
 # intersphinx settings

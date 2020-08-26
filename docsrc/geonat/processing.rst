@@ -1,6 +1,8 @@
 Processing
 ==========
 
+.. automodule:: geonat.processing
+
 unwrap_dict_and_ts
 ------------------
 
@@ -31,3 +33,5 @@ StepDetector
 ............
 
 .. autoclass:: geonat.processing.StepDetector
+   :members:
+   :special-members:

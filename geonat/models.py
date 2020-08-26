@@ -187,7 +187,7 @@ class Model():
     def get_arch(self):
         """
         Get a dictionary that describes the model fully and allows it to be recreated.
-        Requires the model to be subclassed and implement a :meth:`~_get_arch` method
+        Requires the model to be subclassed and implement a :meth:`_get_arch` method
         that expands the base model keywords to the subclassed model details.
 
         Returns
@@ -219,6 +219,16 @@ class Model():
         return arch
 
     def _get_arch(self):
+        """
+        Subclass-specific model keyword dictionary.
+        Must have keys ``'type'`` and ``'kw_args'``, the latter having another
+        dictionary as value.
+
+        Returns
+        -------
+        arch : dict
+            Model keyword dictionary.
+        """
         raise NotImplementedError("Instantiated model was not subclassed or "
                                   "it does not overwrite the '_get_arch' method.")
 
@@ -306,6 +316,23 @@ class Model():
             return mapping
 
     def _get_mapping(self, timevector):
+        r"""
+        Build the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`
+        for the active period. Called inside :meth:`~get_mapping`.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            It can be assumed that only timestamps that are valid (i.e., defined by the model's
+            :attr:`~zero_before` and :attr:`~zero_after`).
+
+        Returns
+        -------
+        numpy.ndarray : Mapping matrix with the same number of rows as ``timevector`` and
+            :attr:`~num_parameters` columns.
+        """
         raise NotImplementedError("'Model' needs to be subclassed and its child needs to "
                                   "implement a '_get_mapping' function for the active period.")
 
@@ -344,7 +371,7 @@ class Model():
 
     def tvec_to_numpycol(self, timevector):
         """
-        Convenience wrapper for :func:`~tools.tvec_to_numpycol` for Model objects that have the
+        Convenience wrapper for :func:`~geonat.tools.tvec_to_numpycol` for Model objects that have the
         :attr:`~time_unit` and :attr:`~t_reference` attributes set.
 
         See Also
@@ -425,7 +452,7 @@ class Model():
 
 class Step(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Model that introduces steps at discrete times.
 
@@ -436,7 +463,7 @@ class Step(Model):
         Length of it equals the number of model parameters.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, steptimes, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
@@ -500,7 +527,7 @@ class Step(Model):
 
 class Polynomial(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Polynomial model of given order.
 
@@ -511,7 +538,7 @@ class Polynomial(Model):
         equals ``order + 1``.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, order, t_reference,
                  time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
@@ -538,7 +565,7 @@ class Polynomial(Model):
 
 class BSpline(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Model defined by cardinal, centralized B-Splines of certain order/degree and time scale.
     Used for transient temporary signals that return to zero after a given time span.
@@ -560,7 +587,7 @@ class BSpline(Model):
         Defaults to ``scale``.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
 
     Notes
     -----
@@ -578,7 +605,7 @@ class BSpline(Model):
     and corresponds to the interval [0, 1] of the B-Spline. The full non-zero time span
     of the spline is therefore :math:`\text{scale} * (p+1) = \text{scale} * n`.
 
-    :attr:`~num_splines` will increase the number of splines by shifting the reference
+    ``num_splines`` will increase the number of splines by shifting the reference
     point :math:`(\text{num_splines} - 1)` times by the spacing (which must be given
     in the same units as the scale).
 
@@ -597,7 +624,7 @@ class BSpline(Model):
        doi:`10.1137/1.9781611970555 <https://doi.org/10.1137/1.9781611970555>`_
     """
     def __init__(self, degree, scale, t_reference, regularize=True,
-                 time_unit="D",num_splines=1, spacing=None, **model_kw_args):
+                 time_unit="D", num_splines=1, spacing=None, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         self.order = self.degree + 1
@@ -679,7 +706,7 @@ class BSpline(Model):
 
 class ISpline(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Integral of cardinal, centralized B-Splines of certain order/degree and time scale.
     The degree :math:`p` given in the initialization is the degree of the spline
@@ -689,7 +716,7 @@ class ISpline(Model):
 
     See Also
     --------
-    geonat.model.Bspline : More details about B-Splines.
+    geonat.models.BSpline : More details about B-Splines.
     """
     def __init__(self, degree, scale, t_reference, regularize=True,
                  time_unit="D", num_splines=1, spacing=None, zero_after=False, **model_kw_args):
@@ -774,7 +801,7 @@ class ISpline(Model):
 
 class SplineSet(Model):
     """
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     Contains a list of splines that share a common degree, but different center
     times and scales.
@@ -813,14 +840,14 @@ class SplineSet(Model):
         List of number of knots to divide the time span into for each of the sub-splines.
         Mutually exclusive to setting ``list_scales``.
     splineclass : Model, optional
-        Model class to use for the splines. Defaults to :class:`~geonat.model.ISpline`.
+        Model class to use for the splines. Defaults to :class:`~geonat.models.ISpline`.
     complete : bool, optional
         See usage description. Defaults to ``True``.
     internal_scaling : bool, optional
         See usage description. Defaults to ``True``.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, degree, t_center_start, t_center_end, time_unit="D",
                  list_scales=None, list_num_knots=None, splineclass=ISpline, complete=True,
@@ -1047,7 +1074,7 @@ class SplineSet(Model):
 
 class Sinusoidal(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     This model provides a sinusoidal of a fixed period, with amplitude and phase
     to be fitted.
@@ -1055,10 +1082,10 @@ class Sinusoidal(Model):
     Parameters
     ----------
     period : float
-        Period length in :attr:`~geonat.model.Model.time_unit` units.
+        Period length in :attr:`~geonat.models.Model.time_unit` units.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
 
     Notes
     -----
@@ -1106,7 +1133,7 @@ class Sinusoidal(Model):
 
 class Logarithmic(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     This model provides the "geophysical" logarithmic :math:`\ln(1 + \mathbf{t}/\tau)`
     with a given time constant and zero for :math:`\mathbf{t} < 0`.
@@ -1119,7 +1146,7 @@ class Logarithmic(Model):
         time, the logarithm reaches the value 1 (before model scaling).
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, t_reference,
                  time_unit="D", t_start=None, zero_after=False, **model_kw_args):
@@ -1146,7 +1173,7 @@ class Logarithmic(Model):
 
 class Exponential(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     This model provides the "geophysical" exponential :math:`1-\exp(-\mathbf{t}/\tau)`
     with a given time constant, zero for :math:`\mathbf{t} < 0`, and approaching
@@ -1163,7 +1190,7 @@ class Exponential(Model):
         :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, t_reference,
                  time_unit="D", t_start=None, zero_after=False, **model_kw_args):
@@ -1190,7 +1217,7 @@ class Exponential(Model):
 
 class Arctangent(Model):
     r"""
-    Subclasses :class:`~geonat.model.Model`.
+    Subclasses :class:`~geonat.models.Model`.
 
     This model provides the arctangent :math:`\arctan(\mathbf{t}/\tau)`,
     stretched with a given time constant and normalized to approach
@@ -1210,7 +1237,7 @@ class Arctangent(Model):
         i.e. half of the one-sided amplitude.
 
 
-    See :class:`~geonat.model.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, t_reference,
                  time_unit="D", zero_before=False, zero_after=False, **model_kw_args):

@@ -162,8 +162,8 @@ def common_mode(array, method, num_components=1, plot=False):
         Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept
         :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
         dictionaries of them as input.
-    method : {'pca', 'ica'}
-        Method to use to decompose the array.
+    method : str
+        Method to use to decompose the array. Possible values are ``'pca'`` and ``'ica'}.
         ``'pca'`` uses `Principal Component Analysis`_ (motivated by [dong06]_), whereas
         ``'ica'`` uses `Independent Component Analysis`_ (motivated by [huang12]_).
     num_components : int, optional

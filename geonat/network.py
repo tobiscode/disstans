@@ -86,7 +86,7 @@ class Network():
         self.global_models = {}
         """
         Dictionary of network-wide models, where the keys are string descriptions
-        and the values are their :class:`~geonat.model.Model` objects.
+        and the values are their :class:`~geonat.models.Model` objects.
         """
         # try to preload the location data
         # it's a private attribute because there's no guarantee this will be kept
@@ -372,7 +372,7 @@ class Network():
         ----------
         mdl_description : str
             Description of the model.
-        model : geonat.model.Model
+        model : geonat.models.Model
             Model object to add.
 
         Warning
@@ -498,7 +498,7 @@ class Network():
         See Also
         --------
         from_json : Create a :class:`~geonat.network.Network` instance
-        from a JSON configuration file.
+            from a JSON configuration file.
         """
         # create new dictionary
         net_arch = {"name": self.name,
@@ -1249,8 +1249,8 @@ class Network():
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
             are the names of the timeseries and associated model that are of the
-            :class:`~geonat.model.SplineSet` class, and therefore have a
-            :meth:`~geonat.model.SplineSet.make_scalogram` method.
+            :class:`~geonat.models.SplineSet` class, and therefore have a
+            :meth:`~geonat.models.SplineSet.make_scalogram` method.
         trend_kw_args : dict, optional
             If passed, also plot velocity trends on the station map.
             Defaults to no velocity arrows shown.

@@ -339,7 +339,7 @@ class Timeseries():
 
         Notes
         -----
-        If ``ts`` is a :class:`~geonat.timeseries.Timeseries`` instance, just using::
+        If ``ts`` is a :class:`~geonat.timeseries.Timeseries` instance, just using::
 
             ts.vars = new_variance
             ts.covs = new_covariance
@@ -510,8 +510,9 @@ class Timeseries():
             Left term of the operation.
         right : Timeseries or numpy.ndarray
             Right term of the operation.
-        operation : {'+', '-', '*', '/'}
+        operation : str
             Operation to perform.
+            Possible values are ``'+'``, ``'-'``, ``'*'`` and ``'/'``.
 
         Returns
         -------
@@ -809,8 +810,8 @@ class Timeseries():
         geonat.network.Network.to_json : Export the Network configuration as a JSON file.
         geonat.timeseries.Timeseries.get_arch
             Get the architecture dictionary of a :class:`~geonat.timeseries.Timeseries` instance.
-        geonat.model.Model.get_arch
-            Get the architecture dictionary of a :class:`~geonat.model.Model` instance.
+        geonat.models.Model.get_arch
+            Get the architecture dictionary of a :class:`~geonat.models.Model` instance.
         """
         return {}
 
@@ -836,7 +837,7 @@ class Timeseries():
 
         See Also
         --------
-        geonat.model.Model.evaluate
+        geonat.models.Model.evaluate
             Evaluating a model produces the fit dictionary.
         """
         df_data = {dcol: fit["fit"][:, icol] for icol, dcol in enumerate(data_cols)}
@@ -891,7 +892,7 @@ class Timeseries():
 
         See Also
         --------
-        pandas.date_range : Quick function to generate a timevector.
+        :func:`~pandas.date_range` : Quick function to generate a timevector.
         """
         assert len(timevector) == data.shape[0], \
             "Length of 'timevector' has to match the number of rows in 'data', " \

@@ -1,6 +1,15 @@
 Tools
 =====
 
+.. automodule:: geonat.tools
+
+Timedelta
+---------
+
+.. autoclass:: geonat.tools.Timedelta
+   :members:
+   :special-members:
+
 parallelize
 -----------
 

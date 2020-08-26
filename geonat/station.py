@@ -1,7 +1,7 @@
 """
 This module contains the :class:`~Station` class, which is the main
 component of a :class:`~geonat.network.Network` and contains
-:class:`~geonat.timeseries.Timeseries`, :class:`~geonat.model.Model` and
+:class:`~geonat.timeseries.Timeseries`, :class:`~geonat.models.Model` and
 associated fits.
 """
 
@@ -23,7 +23,7 @@ class Station():
     such as location as well as timeseries, models and fits.
 
     Timeseries are saved in the :attr:`~timeseries` dictionary, and their associated
-    models and fits are saved in the :attr:`~models~ and :attr:~~fits`
+    models and fits are saved in the :attr:`~models` and :attr:`~fits`
     dictionaries, respectively.
 
     Parameters
@@ -45,7 +45,7 @@ class Station():
         """
         self.models = {}
         """
-        Dictionary of dictionaries of :class:`~geonat.model.Model` associated
+        Dictionary of dictionaries of :class:`~geonat.models.Model` associated
         to a timeseries saved in :attr:`~location`.
 
         Example
@@ -182,9 +182,9 @@ class Station():
         geonat.timeseries.Timeseries.get_arch
             Get the architecture dictionary of a
             :class:`~geonat.timeseries.Timeseries` instance.
-        geonat.model.Model.get_arch
+        geonat.models.Model.get_arch
             Get the architecture dictionary of a
-            :class:`~geonat.model.Model` instance.
+            :class:`~geonat.models.Model` instance.
         """
         # create empty dictionary
         stat_arch = {"location": self.location,
@@ -236,7 +236,7 @@ class Station():
             attribute of ``timeseries``.
         add_models : dict, optional
             Dictionary of models to add to the timeseries, where the keys are the
-            model description and the values are :class:`~geonat.model.Model` objects.
+            model description and the values are :class:`~geonat.models.Model` objects.
 
         See Also
         --------
@@ -323,7 +323,7 @@ class Station():
             Timeseries to add the model to.
         model_description : str
             Model description.
-        model : geonat.model.Model
+        model : geonat.models.Model
             Model object.
         """
         if not isinstance(ts_description, str):

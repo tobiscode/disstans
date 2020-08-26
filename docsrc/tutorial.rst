@@ -128,7 +128,7 @@ in. To this end, we must first associate our models with the timeseries at the s
     >>> for model_description, model in collection.items():
     ...     synth_stat.add_local_model("Data", model_description, model)
 
-For the fitting, we first import a solver function from the :doc:`Solvers <geonat/solvers>`
+For the fitting, we first import a solver function from the :mod:`~geonat.solvers`
 module, and then call it to give us a dictionary of the fitted parameters. We will start
 with basic, linear, non-regularized least-squares:
 

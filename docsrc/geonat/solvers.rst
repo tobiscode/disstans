@@ -1,6 +1,8 @@
 Solvers
 =======
 
+.. automodule:: geonat.solvers
+
 Linear Regression
 -----------------
 
