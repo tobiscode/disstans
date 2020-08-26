@@ -13,7 +13,7 @@ from scipy.special import comb, factorial
 from itertools import product
 
 from . import scm
-from .tools import tvec_to_numpycol
+from .tools import tvec_to_numpycol, Timedelta
 
 
 class Model():
@@ -56,16 +56,8 @@ class Model():
         If ``True``, regularization-capable solvers will regularize the
         parameters of this model.
     time_unit : str, optional
-        Time unit for parameters. Possible values are:
-
-        ``W``, ``D``, ``days``, ``day``, ``hours``, ``hour``, ``hr``, ``h``,
-        ``m``, ``minute``, ``min``, ``minutes``, ``T``,
-        ``S``, ``seconds``, ``sec``, ``second``,
-        ``ms``, ``milliseconds``, ``millisecond``, ``milli``, ``millis``, ``L``,
-        ``us``, ``microseconds``, ``microsecond``, ``micro``, ``micros``, ``U``,
-        ``ns``, ``nanoseconds``, ``nano``, ``nanos``, ``nanosecond``, ``N``
-
-        Refer to :func:`~pandas.to_timedelta` for more details.
+        Time unit for parameters.
+        Refer to :class:`~geonat.tools.Timedelta` for more details.
     t_start : str, pandas.Timestamp or None, optional
         Sets the model start time (attributes :attr:`~t_start` and :attr:`t_start_str`).
     t_end : str, pandas.Timestamp or None, optional
@@ -604,13 +596,13 @@ class BSpline(Model):
             self.spacing = None
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
             model_kw_args["t_start"] = (pd.Timestamp(t_reference)
-                                        - pd.Timedelta(self.scale, time_unit)
+                                        - Timedelta(self.scale, time_unit)
                                         * (self.degree + 1)/2).isoformat()
         if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
             model_kw_args["t_end"] = (pd.Timestamp(t_reference)
-                                      + pd.Timedelta(self.spacing, time_unit)
+                                      + Timedelta(self.spacing, time_unit)
                                       * num_splines
-                                      + pd.Timedelta(self.scale, time_unit)
+                                      + Timedelta(self.scale, time_unit)
                                       * (self.degree + 1)/2).isoformat()
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
                          time_unit=time_unit, regularize=regularize, **model_kw_args)
@@ -618,7 +610,7 @@ class BSpline(Model):
     @property
     def centertimes(self):
         """ Returns a :class:`~pandas.Series` with all center times. """
-        return pd.Series([self.t_reference + pd.Timedelta(self.spacing, self.time_unit) * spl
+        return pd.Series([self.t_reference + Timedelta(self.spacing, self.time_unit) * spl
                           for spl in range(self.num_parameters)])
 
     def _get_arch(self):
@@ -699,13 +691,13 @@ class ISpline(Model):
             self.spacing = None
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
             model_kw_args["t_start"] = (pd.Timestamp(t_reference)
-                                        - pd.Timedelta(self.scale, time_unit)
+                                        - Timedelta(self.scale, time_unit)
                                         * (self.degree + 1)/2).isoformat()
         if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
             model_kw_args["t_end"] = (pd.Timestamp(t_reference)
-                                      + pd.Timedelta(self.spacing, time_unit)
+                                      + Timedelta(self.spacing, time_unit)
                                       * num_splines
-                                      + pd.Timedelta(self.scale, time_unit)
+                                      + Timedelta(self.scale, time_unit)
                                       * (self.degree + 1)/2).isoformat()
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
                          time_unit=time_unit, zero_after=zero_after,
@@ -714,7 +706,7 @@ class ISpline(Model):
     @property
     def centertimes(self):
         """ Returns a :class:`~pandas.Series` with all center times. """
-        return pd.Series([self.t_reference + pd.Timedelta(self.spacing, self.time_unit) * spl
+        return pd.Series([self.t_reference + Timedelta(self.spacing, self.time_unit) * spl
                           for spl in range(self.num_parameters)])
 
     def _get_arch(self):
@@ -777,7 +769,7 @@ class SplineSet(Model):
 
     Lastly, in order to influence the tradeoff between splines of different timescales,
     the mapping matrix of each spline is scaled by its own time scale to promote using
-    fewer components. Without this, there would be anambiguity for the solver as to
+    fewer components. Without this, there would be an ambiguity for the solver as to
     whether fit the signal using many smaller scales or with one large scale, as the
     fit would be almost identical. This behavior can be disabled by setting
     ``internal_scaling=False``.
@@ -841,10 +833,10 @@ class SplineSet(Model):
             # Calculate the scale as float and Timedelta depending on the function call
             if list_scales is not None:
                 scale_float = elem
-                scale_tdelta = pd.Timedelta(scale_float, time_unit)
+                scale_tdelta = Timedelta(scale_float, time_unit)
             else:
                 scale_tdelta = t_range_tdelta / (elem - 1)
-                scale_float = scale_tdelta / pd.to_timedelta(1, time_unit)
+                scale_float = scale_tdelta / Timedelta(1, time_unit)
             # find the number of center points between t_center_start and t_center_end,
             # plus the overlapping ones
             num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
@@ -1007,7 +999,7 @@ class SplineSet(Model):
             # plot vertical lines at centerpoints
             for j, k in product(range(model.num_parameters), range(num_components)):
                 ax[k].axvline(model.t_reference
-                              + pd.Timedelta(j*model.spacing, model.time_unit),
+                              + Timedelta(j*model.spacing, model.time_unit),
                               y_off, y_off + dy_scale, c='0.5', lw=0.5)
         # finish plot by adding relevant gridlines and labels
         for k in range(num_components):

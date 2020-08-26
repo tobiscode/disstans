@@ -15,6 +15,25 @@ from . import defaults
 defaults["general"]["num_threads"] = int(len(os.sched_getaffinity(0)) // 2)
 
 
+class Timedelta(pd.Timedelta):
+    def __new__(cls, *args, **kwargs):
+        """
+        GeoNAT Timedelta subclassed from :class:`~pandas.Timedelta` but with support
+        for the ``'Y'`` year time unit, defined as always exactly 365.25 days.
+        Other possible values are:
+
+        ``W``, ``D``, ``days``, ``day``, ``hours``, ``hour``, ``hr``, ``h``,
+        ``m``, ``minute``, ``min``, ``minutes``, ``T``,
+        ``S``, ``seconds``, ``sec``, ``second``,
+        ``ms``, ``milliseconds``, ``millisecond``, ``milli``, ``millis``, ``L``,
+        ``us``, ``microseconds``, ``microsecond``, ``micro``, ``micros``, ``U``,
+        ``ns``, ``nanoseconds``, ``nano``, ``nanos``, ``nanosecond``, ``N``
+        """
+        if (len(args) == 2) and (args[1].upper() == "Y"):
+            args = (args[0] * 365.25, "D")
+        return super().__new__(cls, *args, **kwargs)
+
+
 def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     """
     Converts a Pandas timestamp series into a NumPy array of relative
@@ -26,18 +45,12 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
         :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
         :class:`~pandas.DatetimeIndex` of when to evaluate the model.
     t_reference : str or pandas.Timestamp, optional
-        Reference :class:`~pandas.Timestamp` or datetime-like string that can be converted to one.
+        Reference :class:`~pandas.Timestamp` or datetime-like string
+        that can be converted to one.
         Defaults to the first element of ``timevector``.
     time_unit : str, optional
-        Time unit for parameters. Possible values are:
-
-        ``W``, ``D``, ``days``, ``day``, ``hours``, ``hour``, ``hr``, ``h``,
-        ``m``, ``minute``, ``min``, ``minutes``, ``T``, ``S``, ``seconds``, ``sec``, ``second``,
-        ``ms``, ``milliseconds``, ``millisecond``, ``milli``, ``millis``, ``L``,
-        ``us``, ``microseconds``, ``microsecond``, ``micro``, ``micros``, ``U``,
-        ``ns``, ``nanoseconds``, ``nano``, ``nanos``, ``nanosecond``, ``N``
-
-        Refer to :func:`~pandas.to_timedelta` for more details.
+        Time unit for parameters.
+        Refer to :class:`~geonat.tools.Timedelta` for more details.
         Defaults to ``D``.
 
     Returns
@@ -50,9 +63,10 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
         t_reference = timevector[0]
     else:
         t_reference = pd.Timestamp(t_reference)
-    assert isinstance(t_reference, pd.Timestamp), f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
+    assert isinstance(t_reference, pd.Timestamp), \
+        f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
     # return Numpy array
-    return ((timevector - t_reference) / pd.to_timedelta(1, time_unit)).values
+    return ((timevector - t_reference) / Timedelta(1, time_unit)).values
 
 
 def parallelize(func, iterable, num_threads=None, chunksize=1):
