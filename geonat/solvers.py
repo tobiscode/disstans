@@ -439,28 +439,28 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     and iterating between solving the L1-regularized problem, and using a reweighting
     function on those weights:
 
-        1.  Initialize :math:`\mathbf{w}^{(0)} = \mathbf{1}`
-        2.  Solve the modified weighted L1-regularized problem minimizing:
-            :math:`f(\mathbf{m}^{(i)}) = \left\| \mathbf{Gm}^{(i)} -
-                   \mathbf{d} \right\|_2^2 + \lambda \left\| \mathbf{w}^{(i)} \circ
-                   \mathbf{m}^{(i)}_\text{reg} \right\|_1`
-            where :math:`\circ` is the element-wise multiplication and :math:`i` is
-            the iteration step.
-        3.  Update the weights element-wise using a predefined reweighting function
-            :math:`g`.
-        4.  Repeat from step 2 until ``reweight_max_iters`` iterations are reached
-            or the root sum of squares of the difference between the last and current
-            solution is less than ``reweight_max_rss``.
+    1.  Initialize :math:`\mathbf{w}^{(0)} = \mathbf{1}`
+    2.  Solve the modified weighted L1-regularized problem minimizing
+        :math:`f(\mathbf{m}^{(i)}) = \left\| \mathbf{Gm}^{(i)} -
+        \mathbf{d} \right\|_2^2 + \lambda \left\| \mathbf{w}^{(i)} \circ
+        \mathbf{m}^{(i)}_\text{reg} \right\|_1`
+        where :math:`\circ` is the element-wise multiplication and :math:`i` is
+        the iteration step.
+    3.  Update the weights element-wise using a predefined reweighting function
+        :math:`\mathbf{w}^{(i+1)} = w(\mathbf{m}^{(i)}_\text{reg})`.
+    4.  Repeat from step 2 until ``reweight_max_iters`` iterations are reached
+        or the root sum of squares of the difference between the last and current
+        solution is less than ``reweight_max_rss``.
 
     The reweighting function is set in the :attr:`~geonat.config.defaults` dictionary
     using the ``reweight_func`` key (along with a stabilizing parameter
     ``reweight_eps`` that should not need tuning). Possible values are:
 
-    +==============+=========================================================+
-    | ``'inv'``    | :math:` w(i+1) = \frac{1}{|x| + \text{eps}} ` (default) |
-    +==============+=========================================================+
-    | ``'inv_sq'`` | :math:` w(i+1) = \frac{1}{x^2 + \text{eps}^2} `         |
-    +==============+=========================================================+
+    +--------------+-------------------------------------------------------+
+    | ``'inv'``    | :math:`w(m) = \frac{1}{\|m\| + \text{eps}}` (default) |
+    +--------------+-------------------------------------------------------+
+    | ``'inv_sq'`` | :math:`w(m) = \frac{1}{m^2 + \text{eps}^2}`           |
+    +--------------+-------------------------------------------------------+
 
     References
     ----------
