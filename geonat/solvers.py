@@ -4,38 +4,59 @@ of stations.
 """
 
 import numpy as np
+import scipy as sp
 import scipy.sparse as sparse
 import cvxpy as cp
 from warnings import warn
 
+from . import defaults
 
-def _combine_mappings(ts, models, reg_indices=False):
+
+def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):
     """
     Quick helper function that concatenates the mapping matrices of the
     models given the timevector in ts, and returns the relevant sizes.
     If reg_indices = True, also return an array indicating which model
     is set to be regularized.
+    It also makes sure that G only contains columns that contain at least
+    one non-zero element, and correspond to parameters that are therefore
+    observable.
     """
     mapping_matrices = []
+    obs_indices = []
     if reg_indices:
         reg_diag = []
     for (mdl_description, model) in models.items():
-        mapping_matrices.append(model.get_mapping(ts.time))
+        if cached_mapping and mdl_description in cached_mapping:
+            mapping = cached_mapping[mdl_description].loc[ts.time].values
+            observable = np.any(mapping != 0, axis=0)
+            if reg_indices and model.regularize:
+                nunique = (~np.isclose(np.diff(mapping, axis=0), 0)).sum(axis=0) + 1
+                observable = np.logical_and(observable, nunique > 1)
+            mapping = sparse.csc_matrix(mapping[:, observable])
+        else:
+            mapping, observable = model.get_mapping(ts.time, return_observability=True)
+            mapping = mapping[:, observable]
+        mapping_matrices.append(mapping)
+        obs_indices.append(observable)
         if reg_indices:
-            reg_diag.extend([model.regularize for _ in range(model.num_parameters)])
-    G = sparse.hstack(mapping_matrices, format='csr')
+            reg_diag.extend([model.regularize for _ in range(observable.sum())])
+    G = sparse.hstack(mapping_matrices, format='csc')
+    obs_indices = np.concatenate(obs_indices)
     num_time, num_params = G.shape
+    assert num_params > 0, f"Mapping matrix is empty, has shape {G.shape}."
     num_comps = ts.num_components
     if reg_indices:
         reg_diag = np.array(reg_diag)
-        if reg_diag.sum() == 0:
+        num_reg = reg_diag.sum()
+        if num_reg == 0:
             warn(f"Regularized solver got no models to regularize.")
-        return G, reg_diag, num_time, num_params, num_comps
+        return G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag
     else:
-        return G, num_time, num_params, num_comps
+        return G, obs_indices, num_time, num_params, num_comps
 
 
-def _build_LS(ts, G, icomp=None, return_W_G=False):
+def _build_LS(ts, G, icomp=None, return_W_G=False, use_data_var=True, use_data_cov=True):
     """
     Quick helper function that given a multi-component data vector in ts,
     broadcasts the per-component matrices G and W to joint G and W matrices,
@@ -48,60 +69,100 @@ def _build_LS(ts, G, icomp=None, return_W_G=False):
         assert isinstance(icomp, int) and icomp in list(range(num_comps)), \
             "'icomp' must be a valid integer component index (between 0 and " \
             f"{num_comps-1}), got {icomp}."
-        d = sparse.csc_matrix(ts.df[ts.data_cols[icomp]].values.reshape(-1, 1))
-        Gout = G
-        if ts.var_cols is not None:
-            W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values)
+        # d and G are dense
+        d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
+        dnotnan = ~np.isnan(d).squeeze()
+        Gout = G.A[dnotnan, :]
+        # W is sparse
+        if (ts.var_cols is not None) and use_data_var:
+            W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
         else:
-            W = sparse.eye(d.size)
+            W = sparse.eye(dnotnan.sum())
     else:
-        d = sparse.csc_matrix(ts.data.values.reshape(-1, 1))
+        # d is dense, G and W are sparse
+        d = ts.data.values.reshape(-1, 1)
+        dnotnan = ~np.isnan(d).squeeze()
         Gout = sparse.kron(G, sparse.eye(num_comps), format='csr')
-        if ts.cov_cols is not None:
-            Wblocks = [1/ts.var_cov.values[iobs, ts.var_cov_map].reshape(num_comps, num_comps)
+        if dnotnan.sum() < dnotnan.size:
+            Gout = Gout[dnotnan, :]
+        if (ts.cov_cols is not None) and use_data_var and use_data_cov:
+            Wblocks = [np.linalg.inv(np.reshape(ts.var_cov.values[iobs, ts.var_cov_map],
+                                                (num_comps, num_comps)))
                        for iobs in range(ts.num_observations)]
-            W = sparse.block_diag(Wblocks, format='dia')
-        elif ts.var_cols is not None:
+            offsets = list(range(-num_comps, num_comps + 1))
+            diags = [np.concatenate([np.concatenate([np.diag(Welem, k), np.zeros(np.abs(k))])
+                                     for Welem in Wblocks]) for k in offsets]
+            Wn = len(Wblocks) * num_comps
+            W = sparse.diags(diags, offsets, shape=(Wn, Wn), format='csr')
+            W.eliminate_zeros()
+            if dnotnan.sum() < dnotnan.size:
+                W = W[dnotnan, :].tocsc()[:, dnotnan]
+        elif (ts.var_cols is not None) and use_data_var:
             W = sparse.diags(1/ts.vars.values.reshape(-1, 1))
         else:
-            W = sparse.eye(d.size)
-    dnan = np.isnan(d.A)
-    if dnan.sum() > 0:
-        dnotnan = ~dnan.squeeze()
-        d = d[dnotnan]
-        # csr-sparse matrices can be easily slices by rows
-        Gout = Gout[dnotnan, :]
-        # the same is not (yet?) possible for dia-matrices,
-        # so in order not to have to create a dense matrix, this is the simplest way:
-        W = W.tocsr()[dnotnan, :].tocsc()[:, dnotnan].todia()
+            W = sparse.eye(dnotnan.sum())
+    if dnotnan.sum() < dnotnan.size:
         # double-check
         if np.any(np.isnan(Gout.data)) or np.any(np.isnan(W.data)):
             raise ValueError("Still NaNs in G or W, unexpected error!")
+    # everything here will be dense, except GtW when using data covariance
+    d = d[dnotnan]
     GtW = Gout.T @ W
     GtWG = GtW @ Gout
-    GtWd = (GtW @ d).toarray().squeeze()
+    GtWd = (GtW @ d).squeeze()
+    if isinstance(GtWG, sparse.spmatrix):
+        GtWG = GtWG.A
     if return_W_G:
         return Gout, W, GtWG, GtWd
     else:
         return GtWG, GtWd
 
 
-def _pack_params_var(models, params, var):
+def _pack_params_var(models, params, var, obs_indices):
     """
     Quick helper function that distributes the parameters (and variances)
     of the input matrices into the respective models.
+    obs_indices indicates whether only certain columns (parameters) were estimated.
     """
-    i = 0
+    ix_model = 0
+    ix_sol = 0
+    num_components = params.shape[1]
     model_params_var = {}
     for (mdl_description, model) in models.items():
-        model_params_var[mdl_description] = (params[i:i+model.num_parameters, :],
-                                             None if var is None
-                                             else var[i:i+model.num_parameters, :])
-        i += model.num_parameters
+        mask = obs_indices[ix_model:ix_model+model.num_parameters]
+        num_solved = mask.sum()
+        p = np.zeros((model.num_parameters, num_components))
+        p[mask, :] = params[ix_sol:ix_sol+num_solved, :]
+        if var is None:
+            v = None
+        else:
+            v = np.zeros((model.num_parameters, num_components))
+            v[mask, :] = var[ix_sol:ix_sol+num_solved, :]
+        model_params_var[mdl_description] = (p, v)
+        ix_model += model.num_parameters
+        ix_sol += num_solved
     return model_params_var
 
 
-def linear_regression(ts, models, formal_variance=False, lsmr_kw_args={}):
+def _get_reweighting_function():
+    """
+    Collection of reweighting functions that can be used by lasso_regression.
+    """
+    name = defaults["solvers"]["reweight_func"]
+    eps = defaults["solvers"]["reweight_eps"]
+    if name == 'inv':
+        def rw_func(x):
+            return 1/(np.abs(x) + eps)
+    elif name == 'invsq':
+        def rw_func(x):
+            return 1/(x**2 + eps**2)
+    else:
+        raise NotImplementedError(f"'{name}' is an unrecognized reweighting function.")
+    return rw_func
+
+
+def linear_regression(ts, models, formal_variance=False, cached_mapping=None,
+                      use_data_variance=True, use_data_covariance=True):
     r"""
     Performs linear, unregularized least squares using :mod:`~scipy.sparse.linalg`.
 
@@ -138,9 +199,16 @@ def linear_regression(ts, models, formal_variance=False, lsmr_kw_args={}):
     formal_variance : bool, optional
         If ``True``, also calculate the formal variance (diagonals of the covariance
         matrix).
-    lsmr_kw_args : dict
-        Additional keyword arguments passed on to SciPys's
-        :func:`~scipy.sparse.linalg.lsmr` function.
+    cached_mapping : dict, optional
+        If passed, a dictionary containing the mapping matrices as Pandas DataFrames
+        for a subset of models and for all timestamps present in ``ts``.
+        Mapping matrices not in ``cached_mapping`` will have to be recalculated.
+    use_data_variance : bool, optional
+        If ``True`` (default) and ``ts`` contains variance information, this
+        uncertainty information will be used.
+    use_data_covariance : bool, optional
+        If ``True`` (default), ``ts`` contains variance and covariance information, and
+        ``use_data_variance`` is also ``True``, this uncertainty information will be used.
 
     Returns
     -------
@@ -149,32 +217,37 @@ def linear_regression(ts, models, formal_variance=False, lsmr_kw_args={}):
         which for every model that was fitted, contains a tuple of the best-fit
         parameters and the formal variance (or ``None``, if not calculated).
     """
+
     # get mapping matrix and sizes
-    G, num_time, num_params, num_comps = _combine_mappings(ts, models)
+    G, obs_indices, num_time, num_params, num_comps = \
+        _combine_mappings(ts, models, cached_mapping=cached_mapping)
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
-    if ts.cov_cols is None:
+    if (ts.cov_cols is None) or (not use_data_covariance):
         params = np.zeros((num_params, num_comps))
         if formal_variance:
             var = np.zeros((num_params, num_comps))
         for i in range(num_comps):
-            GtWG, GtWd = _build_LS(ts, G, icomp=i)
-            params[:, i] = sparse.linalg.lsmr(GtWG, GtWd, **lsmr_kw_args)[0].squeeze()
+            GtWG, GtWd = _build_LS(ts, G, icomp=i, use_data_var=use_data_variance)
+            params[:, i] = sp.linalg.lstsq(GtWG, GtWd)[0].squeeze()
             if formal_variance:
-                var[:, i] = np.diag(np.linalg.pinv(GtWG.toarray()))
+                var[:, i] = np.diag(np.linalg.pinv(GtWG))
     else:
-        GtWG, GtWd = _build_LS(ts, G)
-        params = sparse.linalg.lsmr(GtWG, GtWd, **lsmr_kw_args)[0].reshape(num_params, num_comps)
+        GtWG, GtWd = _build_LS(ts, G, use_data_var=use_data_variance,
+                               use_data_cov=use_data_covariance)
+        params = sp.linalg.lstsq(GtWG, GtWd)[0].reshape(num_params, num_comps)
         if formal_variance:
-            var = np.diag(np.linalg.pinv(GtWG.toarray())).reshape(num_params, num_comps)
+            var = np.diag(np.linalg.pinv(GtWG)).reshape(num_params, num_comps)
 
     # separate parameters back to models
-    model_params_var = _pack_params_var(models, params, var if formal_variance else None)
+    model_params_var = _pack_params_var(models, params, var if formal_variance else None,
+                                        obs_indices)
     return model_params_var
 
 
-def ridge_regression(ts, models, penalty, formal_variance=False, lsmr_kw_args={}):
+def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=None,
+                     use_data_variance=True, use_data_covariance=True):
     r"""
     Performs linear, L2-regularized least squares using :mod:`~scipy.sparse.linalg`.
 
@@ -220,9 +293,16 @@ def ridge_regression(ts, models, penalty, formal_variance=False, lsmr_kw_args={}
     formal_variance : bool, optional
         If ``True``, also calculate the formal variance (diagonals of the covariance
         matrix).
-    lsmr_kw_args : dict
-        Additional keyword arguments passed on to SciPys's
-        :func:`~scipy.sparse.linalg.lsmr` function.
+    cached_mapping : dict, optional
+        If passed, a dictionary containing the mapping matrices as Pandas DataFrames
+        for a subset of models and for all timestamps present in ``ts``.
+        Mapping matrices not in ``cached_mapping`` will have to be recalculated.
+    use_data_variance : bool, optional
+        If ``True`` (default) and ``ts`` contains variance information, this
+        uncertainty information will be used.
+    use_data_covariance : bool, optional
+        If ``True`` (default), ``ts`` contains variance and covariance information, and
+        ``use_data_variance`` is also ``True``, this uncertainty information will be used.
 
     Returns
     -------
@@ -236,36 +316,40 @@ def ridge_regression(ts, models, penalty, formal_variance=False, lsmr_kw_args={}
              "which effectively removes the regularization.")
 
     # get mapping and regularization matrix and sizes
-    G, reg_diag, num_time, num_params, num_comps = _combine_mappings(ts, models,
-                                                                     reg_indices=True)
+    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag = \
+        _combine_mappings(ts, models, reg_indices=True, cached_mapping=cached_mapping)
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
-    if ts.cov_cols is None:
-        reg = sparse.diags(reg_diag, dtype=float) * penalty
+    if (ts.cov_cols is None) or (not use_data_covariance):
+        reg = np.diag(reg_diag) * penalty
         params = np.zeros((num_params, num_comps))
         if formal_variance:
             var = np.zeros((num_params, num_comps))
         for i in range(num_comps):
-            GtWG, GtWd = _build_LS(ts, G, icomp=i)
+            GtWG, GtWd = _build_LS(ts, G, icomp=i, use_data_var=use_data_variance)
             GtWGreg = GtWG + reg
-            params[:, i] = sparse.linalg.lsmr(GtWGreg, GtWd, **lsmr_kw_args)[0].squeeze()
+            params[:, i] = sp.linalg.lstsq(GtWGreg, GtWd)[0].squeeze()
             if formal_variance:
-                var[:, i] = np.diag(np.linalg.pinv(GtWGreg.toarray()))
+                var[:, i] = np.diag(np.linalg.pinv(GtWGreg))
     else:
-        GtWG, GtWd = _build_LS(ts, G)
-        reg = sparse.diags(np.repeat(reg_diag, num_comps), dtype=float) * penalty
+        GtWG, GtWd = _build_LS(ts, G, use_data_var=use_data_variance,
+                               use_data_cov=use_data_covariance)
+        reg = np.diag(np.repeat(reg_diag, num_comps)) * penalty
         GtWGreg = GtWG + reg
-        params = sparse.linalg.lsmr(GtWGreg, GtWd, **lsmr_kw_args)[0].reshape(num_params, num_comps)
+        params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_params, num_comps)
         if formal_variance:
-            var = np.diag(np.linalg.pinv(GtWGreg.toarray())).reshape(num_params, num_comps)
+            var = np.diag(np.linalg.pinv(GtWGreg)).reshape(num_params, num_comps)
 
     # separate parameters back to models
-    model_params_var = _pack_params_var(models, params, var if formal_variance else None)
+    model_params_var = _pack_params_var(models, params, var if formal_variance else None,
+                                        obs_indices)
     return model_params_var
 
 
-def lasso_regression(ts, models, penalty, formal_variance=False, cvxpy_kw_args={}):
+def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss=1e-10,
+                     formal_variance=False, cached_mapping=None, use_data_variance=True,
+                     use_data_covariance=True, cvxpy_kw_args={}):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -310,9 +394,28 @@ def lasso_regression(ts, models, penalty, formal_variance=False, cvxpy_kw_args={
         Dictionary of :class:`~geonat.model.Model` instances used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
+    reweight_max_iters : int, optional
+        If greater than zero, include additional solver calls after reweighting
+        the regularization parameters (see Notes).
+        Defaults to no reweighting (``0``).
+    reweight_max_rss : float, optional
+        When reweighting is active and the maximum number of iterations has not yet
+        been reached, let the iteration stop early if the solutions do not change much
+        anymore (see Notes).
+        Defaults to ``1e-10``. Set to ``0`` to deactivate eraly stopping.
     formal_variance : bool, optional
         If ``True``, also calculate the formal variance (diagonals of the covariance
         matrix).
+    cached_mapping : dict, optional
+        If passed, a dictionary containing the mapping matrices as Pandas DataFrames
+        for a subset of models and for all timestamps present in ``ts``.
+        Mapping matrices not in ``cached_mapping`` will have to be recalculated.
+    use_data_variance : bool, optional
+        If ``True`` (default) and ``ts`` contains variance information, this
+        uncertainty information will be used.
+    use_data_covariance : bool, optional
+        If ``True`` (default), ``ts`` contains variance and covariance information, and
+        ``use_data_variance`` is also ``True``, this uncertainty information will be used.
     cvxpy_kw_args : dict
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
 
@@ -322,80 +425,158 @@ def lasso_regression(ts, models, penalty, formal_variance=False, cvxpy_kw_args={
         Dictionary of form ``{"model_description": (parameters, variance), ...}``
         which for every model that was fitted, contains a tuple of the best-fit
         parameters and the formal variance (or ``None``, if not calculated).
+
+    Notes
+    -----
+
+    The L0-regularization approximation used by setting ``reweight_max_iters > 0`` is based
+    on [candes08]_. The idea here is to iteratively reduce the cost (before multiplication
+    with :math:`\lambda`) of regularized, but significant parameters to 1, and iteratively
+    increasing the cost of a regularized, but small parameter to a much larger value.
+
+    This is achieved by introducing an additional parameter vector :math:`\mathbf{w}`
+    of the same shape as the regularized parameters, inserting it into the L1 cost,
+    and iterating between solving the L1-regularized problem, and using a reweighting
+    function on those weights:
+
+        1.  Initialize :math:`\mathbf{w}^{(0)} = \mathbf{1}`
+        2.  Solve the modified weighted L1-regularized problem minimizing:
+            :math:`f(\mathbf{m}^{(i)}) = \left\| \mathbf{Gm}^{(i)} -
+                   \mathbf{d} \right\|_2^2 + \lambda \left\| \mathbf{w}^{(i)} \circ
+                   \mathbf{m}^{(i)}_\text{reg} \right\|_1`
+            where :math:`\circ` is the element-wise multiplication and :math:`i` is
+            the iteration step.
+        3.  Update the weights element-wise using a predefined reweighting function
+            :math:`g`.
+        4.  Repeat from step 2 until ``reweight_max_iters`` iterations are reached
+            or the root sum of squares of the difference between the last and current
+            solution is less than ``reweight_max_rss``.
+
+    The reweighting function is set in the :attr:`~geonat.config.defaults` dictionary
+    using the ``reweight_func`` key (along with a stabilizing parameter
+    ``reweight_eps`` that should not need tuning). Possible values are:
+
+    +==============+=========================================================+
+    | ``'inv'``    | :math:` w(i+1) = \frac{1}{|x| + \text{eps}} ` (default) |
+    +==============+=========================================================+
+    | ``'inv_sq'`` | :math:` w(i+1) = \frac{1}{x^2 + \text{eps}^2} `         |
+    +==============+=========================================================+
+
+    References
+    ----------
+    .. [candes08] Candès, E. J., Wakin, M. B., & Boyd, S. P. (2008).
+       *Enhancing Sparsity by Reweighted ℓ1 Minimization.*
+       Journal of Fourier Analysis and Applications, 14(5), 877–905.
+       doi:`10.1007/s00041-008-9045-x <https://doi.org/10.1007/s00041-008-9045-x>`_.
     """
-    if penalty == 0.0:
+    if penalty == 0:
         warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, "
-             "which effectively removes the regularization.")
+             "which removes the regularization.")
 
     # get mapping and regularization matrix
-    G, reg_diag, num_time, num_params, num_comps = _combine_mappings(ts, models,
-                                                                     reg_indices=True)
+    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag = \
+        _combine_mappings(ts, models, reg_indices=True, cached_mapping=cached_mapping)
+    regularize = (num_reg > 0) and (penalty > 0)
 
-    def objective_fn(X, Y, beta, reg_diag):
-        return cp.norm2(X @ beta - Y) + penalty * cp.norm1(beta[reg_diag])
+    # solve CVXPY problem while checking for convergence
+    def solve_problem(GtWG, GtWd, reg_diag):
+        # build objective function
+        m = cp.Variable(GtWd.size)
+        objective = cp.norm2(GtWG @ m - GtWd)
+        constraints = None
+        if regularize:
+            lambd = cp.Parameter(value=penalty, pos=True)
+            if reweight_max_iters > 0:
+                rw_func = _get_reweighting_function()
+                weights = cp.Parameter(shape=num_reg*num_comps,
+                                       value=np.ones(num_reg*num_comps), pos=True)
+                z = cp.Variable(shape=num_reg*num_comps)
+                objective = objective + lambd * cp.norm1(z)
+                constraints = [z == cp.multiply(weights, m[reg_diag])]
+                old_m = np.zeros(m.shape)
+            else:
+                objective = objective + lambd * cp.norm1(m[reg_diag])
+        # define problem
+        problem = cp.Problem(cp.Minimize(objective), constraints)
+        # solve
+        for i in range(reweight_max_iters + 1):  # always solve at least once
+            try:
+                problem.solve(enforce_dpp=True, **cvxpy_kw_args)
+            except cp.error.SolverError as e:
+                # no solution found, but actually a more serious problem
+                warn(str(e))
+                converged = False
+                break
+            else:
+                if m.value is None:  # no solution found
+                    converged = False
+                    break
+                # solved
+                converged = True
+                # if iterating, extra tasks
+                if regularize and (i < reweight_max_iters):
+                    # check if the solution changed to previous iteration
+                    rss = np.sqrt(np.sum((old_m - m.value)**2))  # root sum of squares
+                    if (i > 0) and (rss < reweight_max_rss):
+                        break
+                    # update weights
+                    weights.value = rw_func(m.value[reg_diag])
+                    old_m[:] = m.value[:]
+        # return
+        return m.value if converged else None
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
-    if ts.cov_cols is None:
-        beta = cp.Variable(num_params)
+    if (ts.cov_cols is None) or (not use_data_covariance):
+        # initialize output
         params = np.zeros((num_params, num_comps))
         if formal_variance:
             var = np.zeros((num_params, num_comps))
+        # loop over components
         for i in range(num_comps):
-            Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, icomp=i, return_W_G=True)
-
-            # solve cvxpy problem
-            problem = cp.Problem(cp.Minimize(objective_fn(GtWG, GtWd, beta, reg_diag)))
-            try:
-                problem.solve(**cvxpy_kw_args)
-            except cp.error.SolverError as e:
-                warn(f"CVXPY SolverError encountered: {str(e)}")
-                converged = False
-            else:
-                converged = True
-
-            # check for convergence
-            if (not converged) or (beta.value is None):
+            # build and solve problem
+            Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, icomp=i, return_W_G=True,
+                                                   use_data_var=use_data_variance)
+            solution = solve_problem(GtWG, GtWd, reg_diag)
+            # store results
+            if solution is None:
                 params[:, i] = np.NaN
                 if formal_variance:
                     var[:, i] = np.NaN
             else:
-                params[:, i] = beta.value
+                params[:, i] = solution
+                # if desired, estimate formal variance here
                 if formal_variance:
-                    best_ind = np.nonzero(beta.value)
+                    best_ind = np.nonzero(solution)
                     Gsub = Gnonan[:, best_ind]
-                    Wsub = Wnonan[:, best_ind]
-                    GtWG = (Gsub.T @ Wsub @ Gsub).toarray()
+                    GtWG = Gsub.T @ Wnonan @ Gsub
                     var[best_ind, i] = np.diag(np.linalg.pinv(GtWG))
     else:
-        Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, return_W_G=True)
+        # build stacked problem and solve
+        Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, return_W_G=True,
+                                               use_data_var=use_data_variance,
+                                               use_data_cov=use_data_covariance)
         reg_diag = np.repeat(reg_diag, num_comps)
-        beta = cp.Variable(num_params*num_comps)
-        problem = cp.Problem(cp.Minimize(objective_fn(GtWG, GtWd, beta, reg_diag)))
-        try:
-            problem.solve(**cvxpy_kw_args)
-        except cp.error.SolverError as e:
-            warn(f"CVXPY SolverError encountered: {str(e)}")
-            converged = False
-        else:
-            converged = True
-        if (not converged) or (beta.value is None):  # couldn't converge
+        solution = solve_problem(GtWG, GtWd, reg_diag)
+        # store results
+        if solution is None:
             params = np.empty((num_params, num_comps))
             params[:] = np.NaN
             if formal_variance:
                 var = np.empty((num_params, num_comps))
                 var[:] = np.NaN
         else:
-            params = beta.value.reshape(num_params, num_comps)
+            params = solution.reshape(num_params, num_comps)
+            # if desired, estimate formal variance here
             if formal_variance:
                 var = np.zeros(num_params * num_comps)
-                best_ind = np.nonzero(beta.value)
-                Gsub = Gnonan[:, best_ind]
-                Wsub = Wnonan[:, best_ind]
-                GtWG = (Gsub.T @ Wsub @ Gsub).toarray()
+                best_ind = np.nonzero(solution)
+                Gsub = Gnonan.tocsc()[:, best_ind]
+                GtWG = Gsub.T @ Wnonan @ Gsub
                 var[best_ind, :] = np.diag(np.linalg.pinv(GtWG))
                 var = var.reshape(num_params, num_comps)
 
     # separate parameters back to models
-    model_params_var = _pack_params_var(models, params, var if formal_variance else None)
+    model_params_var = _pack_params_var(models, params, var if formal_variance else None,
+                                        obs_indices)
     return model_params_var

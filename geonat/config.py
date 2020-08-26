@@ -64,6 +64,10 @@ and explained as follows:
 |             |                        | that a station needs to surpass in order for a    |
 |             |                        | step to be added to the model.                    |
 +-------------+------------------------+---------------------------------------------------+
+| ``solvers`` | ``reweight_func``      | Specifies the reweighting function.               |
++-------------+------------------------+---------------------------------------------------+
+|             | ``reweight_eps``       | A small number used to stabilize the reweighting. |
++-------------+------------------------+---------------------------------------------------+
 
 For more about the WMTS background imagery, see `Cartopy's documentation <WMTS_>`_.
 
@@ -93,3 +97,6 @@ defaults["clean"] = {"min_obs": 100,
 defaults["prior"] = {"mu": 48,
                      "alpha": 2/3,
                      "threshold": 3}
+# for iterative reweighting L1-regularized solver
+defaults["solvers"] = {"reweight_func": "invsq",
+                       "reweight_eps": 1e-3}

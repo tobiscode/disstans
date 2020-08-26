@@ -222,7 +222,7 @@ class Model():
         raise NotImplementedError("Instantiated model was not subclassed or "
                                   "it does not overwrite the '_get_arch' method.")
 
-    def get_mapping(self, timevector):
+    def get_mapping(self, timevector, return_observability=False):
         r"""
         Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`.
         Requires the model to be subclassed and implement a :meth:`~_get_mapping` method.
@@ -241,11 +241,19 @@ class Model():
         timevector : pandas.Series, pandas.DatetimeIndex
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+        return_observability : bool, optional
+            If true, the function will check if there are any all-zero columns, which
+            would point to unobservable parameters, and return a boolean mask with the
+            valid indices.
 
         Returns
         -------
-        mapping : scipy.sparse.bsr_matrix
+        mapping : scipy.sparse.csc_matrix
             Sparse mapping matrix.
+        observable : numpy.ndarray
+            Returned if ``return_observability=True``.
+            A boolean NumPy array of the same length as ``mapping`` has columns.
+            ``False`` indicates all-zero columns (unobservable parameters).
 
         Raises
         ------
@@ -254,9 +262,11 @@ class Model():
         """
         # get active period and initialize coefficient matrix
         active, first, last = self.get_active_period(timevector)
-        # if there isn't any active period, return csr-sparse matrix
+        # if there isn't any active period, return csc-sparse matrix
         if (first is None) and (last is None):  # this is equivalent to not active.any()
-            mapping = sparse.bsr_matrix((timevector.size, self.num_parameters))
+            mapping = sparse.csc_matrix((timevector.size, self.num_parameters))
+            if return_observability:
+                observable = np.zeros(self.num_parameters, dtype=bool)
         # otherwise, build coefficient matrix
         else:
             # build dense sub-matrix
@@ -265,23 +275,35 @@ class Model():
                 f"The child function '_get_mapping' of model {type(self).__name__} " \
                 f"returned an invalid shape. " \
                 f"Expected was ({last-first+1}, {self.num_parameters}), got {coefs.shape}."
+            if return_observability:
+                observable = np.any(coefs, axis=0)
+                # for regularized models, also skip all columns with just a single value,
+                # as this would just map into another constant offset, which should
+                # be taken care of by a non-regularized polynomial
+                if self.regularize:
+                    nunique = (~np.isclose(np.diff(coefs, axis=0), 0)).sum(axis=0) + 1
+                    observable = np.logical_and(observable, nunique > 1)
             # build before- and after-matrices
             # either use zeros or the values at the active boundaries for padding
             if self.zero_before:
-                before = sparse.csr_matrix((first, self.num_parameters))
+                before = sparse.csc_matrix((first, self.num_parameters))
             else:
-                before = sparse.csr_matrix(np.ones((first, self.num_parameters))
+                before = sparse.csc_matrix(np.ones((first, self.num_parameters))
                                            * coefs[0, :].reshape(1, -1))
             if self.zero_after:
-                after = sparse.csr_matrix((timevector.size - last - 1, self.num_parameters))
+                after = sparse.csc_matrix((timevector.size - last - 1, self.num_parameters))
             else:
-                after = sparse.csr_matrix(np.ones((timevector.size - last - 1,
+                after = sparse.csc_matrix(np.ones((timevector.size - last - 1,
                                                    self.num_parameters))
                                           * coefs[-1, :].reshape(1, -1))
             # stack them (they can have 0 in the first dimension, no problem for sparse.vstack)
-            # I think it's faster if to stack them if they're all already csr format
-            mapping = sparse.vstack((before, sparse.csr_matrix(coefs), after), format='bsr')
-        return mapping
+            # I think it's faster if to stack them if they're all already csc format
+            mapping = sparse.vstack((before, sparse.csc_matrix(coefs), after), format='csc')
+        # return
+        if return_observability:
+            return mapping, observable
+        else:
+            return mapping
 
     def _get_mapping(self, timevector):
         raise NotImplementedError("'Model' needs to be subclassed and its child needs to "
@@ -985,9 +1007,9 @@ class SplineSet(Model):
             y_off = 1 - (i + 1)*dy_scale
             # get normalized values
             if self.splineclass == BSpline:
-                mdl_mapping = model.get_mapping(t_plot).toarray()
+                mdl_mapping = model.get_mapping(t_plot).A
             elif self.splineclass == ISpline:
-                mdl_mapping = np.gradient(model.get_mapping(t_plot).toarray(), axis=0)
+                mdl_mapping = np.gradient(model.get_mapping(t_plot).A, axis=0)
             else:
                 raise NotImplementedError("Scalogram undefined for a SplineSet of class "
                                           f"{self.splineclass.__name__}.")

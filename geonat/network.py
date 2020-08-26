@@ -681,7 +681,43 @@ class Network():
                 self[station].add_local_model(ts_description, model_description,
                                               geonat_models.Step(localsteps))
 
-    def fit(self, ts_description, model_list=None, solver='linear_regression', **kw_args):
+    def common_mapping(self, ts_description):
+        """
+        Return the mapping matrix for all models that are common to a given timeseries
+        over all stations, for all the timestamps present in the timeseries.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries to check models for.
+
+        Returns
+        -------
+        common_mapping : dict
+            A dictionary that for every model description contains a
+            :class:`~pandas.DataFrame` with a timestamp index and columns for
+            each model parameter.
+        """
+        times = None
+        models = None
+        for station in self:
+            if ts_description in station.timeseries:
+                if times is None:
+                    times = station[ts_description].time
+                else:
+                    times = times.union(station[ts_description].time)
+                if models is None:
+                    models = station.models[ts_description]
+                else:
+                    models = {mdl_desc: mdl for mdl_desc, mdl in models.items()
+                              if (mdl_desc in station.models[ts_description]
+                                  and mdl == station.models[ts_description][mdl_desc])}
+        common_mapping = {mdl_desc: pd.DataFrame(data=mdl.get_mapping(times).A, index=times)
+                          for mdl_desc, mdl in models.items()}
+        return common_mapping
+
+    def fit(self, ts_description, model_list=None, solver='linear_regression',
+            cached_mapping=True, **kw_args):
         """
         Fit the models (or a subset thereof) for a specific timeseries at all stations.
         Also provides a progress bar.
@@ -700,6 +736,12 @@ class Network():
             name in :mod:`~geonat.solvers`, otherwise will use the passed function as a
             solver (which needs to adhere to the same input/output structure as the
             included solver functions). Defaults to standard linear least squares.
+        cache_mapping : bool, optional
+            If ``True``, the mapping matrices for all models that are common to all stations
+            is calculated and inserted into ``kw_args`` as ``'cached_mapping'``, such that
+            redundant work is reduced.
+            This is mostly impactful for serial processing, but does not have a noticeable
+            drawback for parallel processing, which is why it defaults to ``True``.
         **kw_args : dict
             Additional keyword arguments that are passed onto the solver function.
 
@@ -727,12 +769,16 @@ class Network():
         evaluate : Evaluate the fitted models at all stations.
         :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
         geonat.tools.parallelize : Automatically execute a function in parallel or serial.
+        common_mapping : Used when ``cache_mapping`` is ``True``.
         """
         assert isinstance(ts_description, str), \
             f"'ts_description' must be string, got {type(ts_description)}."
         if isinstance(solver, str):
             solver = getattr(geonat_solvers, solver)
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
+        # get common mapping matrices
+        if cached_mapping:
+            kw_args["cached_mapping"] = self.common_mapping(ts_description)
         iterable_inputs = ((station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None
                             else {m: station.models[ts_description][m] for m in model_list},
