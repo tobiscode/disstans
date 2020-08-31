@@ -348,8 +348,8 @@ def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=
 
 
 def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss=1e-10,
-                     formal_variance=False, cached_mapping=None, use_data_variance=True,
-                     use_data_covariance=True, cvxpy_kw_args={}):
+                     init_reweights=None, formal_variance=False, cached_mapping=None,
+                     use_data_variance=True, use_data_covariance=True, cvxpy_kw_args={}):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -403,6 +403,12 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
         been reached, let the iteration stop early if the solutions do not change much
         anymore (see Notes).
         Defaults to ``1e-10``. Set to ``0`` to deactivate eraly stopping.
+    init_reweights : numpy.ndarray, optional
+        When reweighting is active, use this array to initialize the weights.
+        It has to have size :math:`\text{num_components} \cdot \text{num_reg}`, where
+        :math:`\text{num_components}=1` if covariances are not used (and the actual
+        number of timeseries components otherwise) and :math:`\text{num_reg}` is the
+        number of regularized model parameters.
     formal_variance : bool, optional
         If ``True``, also calculate the formal variance (diagonals of the covariance
         matrix).
@@ -440,6 +446,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     function on those weights:
 
     1.  Initialize :math:`\mathbf{w}^{(0)} = \mathbf{1}`
+        (or use the array from ``init_reweights``).
     2.  Solve the modified weighted L1-regularized problem minimizing
         :math:`f(\mathbf{m}^{(i)}) = \left\| \mathbf{Gm}^{(i)} -
         \mathbf{d} \right\|_2^2 + \lambda \left\| \mathbf{w}^{(i)} \circ
@@ -488,8 +495,10 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
             lambd = cp.Parameter(value=penalty, pos=True)
             if reweight_max_iters > 0:
                 rw_func = _get_reweighting_function()
+                if init_reweights is None:
+                    init_weights = np.ones(num_reg*num_comps)
                 weights = cp.Parameter(shape=num_reg*num_comps,
-                                       value=np.ones(num_reg*num_comps), pos=True)
+                                       value=init_weights, pos=True)
                 z = cp.Variable(shape=num_reg*num_comps)
                 objective = objective + lambd * cp.norm1(z)
                 constraints = [z == cp.multiply(weights, m[reg_diag])]
