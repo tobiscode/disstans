@@ -20,7 +20,7 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
     REAL :: subvec(kernel)
 
     ! check for odd kernel size
-    if ( MOD(kernel, 2).eq.0 ) STOP "even"
+    IF ( MOD(kernel, 2).eq.0 ) STOP "even"
 
     ! process columns individually
     DO j = 1, n
@@ -29,7 +29,7 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
         halfwindow = 0
         DO i = 1, (kernel - 1) / 2
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
-            IF ( masksum.gt.0 ) THEN
+            IF ( masksum .gt. 0 ) THEN
                 ! can proceed with median calculation
                 subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), &
                                          mask_in(i-halfwindow:i+halfwindow, j))
@@ -43,7 +43,7 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
         ! center of the column, can use full kernel
         DO i = halfwindow + 1, m - halfwindow
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
-            IF ( masksum.gt.0 ) THEN
+            IF ( masksum .gt. 0 ) THEN
                 ! can proceed with median calculation
                 subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), &
                                          mask_in(i-halfwindow:i+halfwindow, j))
@@ -55,7 +55,7 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
         DO i = m - halfwindow + 1, m
             halfwindow = halfwindow - 1
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
-            IF ( masksum.gt.0 ) THEN
+            IF ( masksum .gt. 0 ) THEN
                 ! can proceed with median calculation
                 subvec(1:masksum) = PACK(array(i-halfwindow:i+halfwindow, j), &
                                          mask_in(i-halfwindow:i+halfwindow, j))

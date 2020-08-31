@@ -447,7 +447,7 @@ class StepDetector():
            Model Selection and Multimodel Inference. Springer, New York, NY.
            doi:`10.1007/978-0-387-22456-5_2 <https://doi.org/10.1007/978-0-387-22456-5_2>`_.
         """
-        # input checkk
+        # input check
         if n - K - 1 <= 0:
             # can't return meaningful statistic, hypothesis unlikely
             return np.NaN
@@ -526,12 +526,12 @@ class StepDetector():
         # fit for H1 first
         # (since if that one doesn't converge, we have to go with H0 anyway)
         try:
-            rss1 = np.linalg.lstsq(G1, yfinite, rcond=None)[1]
+            rss1 = float(np.linalg.lstsq(G1, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
             return 0, 0
         # now we can fit for H0, and again just go with that if there is no solution
         try:
-            rss0 = np.linalg.lstsq(G0, yfinite, rcond=None)[1]
+            rss0 = float(np.linalg.lstsq(G0, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
             return 0, 0
         # now that both models produce results, let's get the AIC_c values
@@ -554,7 +554,7 @@ class StepDetector():
         r"""
         Function that will search for steps in the data.
         Upon successful completion, it will save the step probabilities in
-        :attr:`~probabilities`, and set the.
+        :attr:`~probabilities`.
 
         Parameters
         ----------

@@ -479,7 +479,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     regularize = (num_reg > 0) and (penalty > 0)
 
     # solve CVXPY problem while checking for convergence
-    def solve_problem(GtWG, GtWd, reg_diag):
+    def solve_problem(GtWG, GtWd, reg_diag, num_comps=num_comps):
         # build objective function
         m = cp.Variable(GtWd.size)
         objective = cp.norm2(GtWG @ m - GtWd)
@@ -537,7 +537,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
             # build and solve problem
             Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, icomp=i, return_W_G=True,
                                                    use_data_var=use_data_variance)
-            solution = solve_problem(GtWG, GtWd, reg_diag)
+            solution = solve_problem(GtWG, GtWd, reg_diag, num_comps=1)
             # store results
             if solution is None:
                 params[:, i] = np.NaN
