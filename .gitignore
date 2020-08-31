@@ -29,3 +29,6 @@ var/
 
 # Documentation
 docsrc/_build/
+
+# NFS mounted files
+.nfs*
