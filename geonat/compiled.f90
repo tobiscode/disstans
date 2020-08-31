@@ -38,8 +38,9 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
             halfwindow = halfwindow + 1
         END DO
 
+        ! bug check
+        IF ( halfwindow .ne. (kernel - 1) / 2 ) STOP "bug"
         ! center of the column, can use full kernel
-        halfwindow = (kernel - 1) / 2
         DO i = halfwindow + 1, m - halfwindow
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
             IF ( masksum.gt.0 ) THEN
@@ -51,8 +52,8 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
         END DO
 
         ! end of column, need to shrink kernel window successively
-        halfwindow = halfwindow - 1
-        DO i = m - halfwindow, m
+        DO i = m - halfwindow + 1, m
+            halfwindow = halfwindow - 1
             masksum = COUNT(mask_in(i-halfwindow:i+halfwindow, j))
             IF ( masksum.gt.0 ) THEN
                 ! can proceed with median calculation
@@ -60,7 +61,6 @@ SUBROUTINE maskedmedfilt2d(array, mask_in, m, n, kernel, medians)
                                          mask_in(i-halfwindow:i+halfwindow, j))
                 CALL median(subvec(1:masksum), masksum, medians(i, j))
             END IF
-            halfwindow = halfwindow - 1
         END DO
 
     END DO

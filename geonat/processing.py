@@ -137,14 +137,13 @@ def median(array, kernel_size):
                 filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
                 halfwindow += 1
             # Middle region
-            halfwindow = kernel_size // 2
+            assert halfwindow == kernel_size // 2
             for i in range(halfwindow, num_obs - halfwindow):
                 filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
             # Ending region
-            halfwindow -= 1
             for i in range(num_obs - halfwindow, num_obs):
-                filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
                 halfwindow -= 1
+                filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
     return filtered
 
 
@@ -601,7 +600,7 @@ class StepDetector():
                     probs[i, icomp] = Del
                 halfwindow += 1
             # Middle region
-            halfwindow = self.kernel_size // 2
+            assert halfwindow == self.kernel_size // 2
             for i in range(halfwindow, num_observations - halfwindow):
                 hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
                                                     y[i-halfwindow:i+halfwindow+1, icomp],
@@ -610,15 +609,14 @@ class StepDetector():
                 if hyp == 1:
                     probs[i, icomp] = Del
             # Ending region
-            halfwindow -= 1
             for i in range(num_observations - halfwindow, num_observations):
+                halfwindow -= 1
                 hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
                                                     y[i-halfwindow:i+halfwindow+1, icomp],
                                                     valid[i-halfwindow:i+halfwindow+1, icomp],
                                                     maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
-                halfwindow -= 1
         self.probabilities = probs
 
     def steps(self, threshold=2):
