@@ -619,7 +619,7 @@ class StepDetector():
                     probs[i, icomp] = Del
         self.probabilities = probs
 
-    def steps(self, threshold=2):
+    def steps(self, threshold=2, maxsteps=10, verbose=True):
         """
         Threshold the saved probabilities to return a list of steps.
 
@@ -627,6 +627,9 @@ class StepDetector():
         ----------
         threshold : float
             Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
+        maxsteps : int, optional
+            Return at most ``maxsteps`` number of steps. Can be useful if a good value for
+            ``threshold`` has not been found yet.
 
         Returns
         -------
@@ -638,5 +641,14 @@ class StepDetector():
             f"'probabilities' has not been set yet, run StepDetector.search() first."
         probs = self.probabilities
         probs[np.isnan(probs)] = -1
-        return [find_peaks(probs[:, icomp], height=threshold)[0]
-                for icomp in range(probs.shape[1])]
+        steps = []
+        for icomp in range(probs.shape[1]):
+            peaks, properties = find_peaks(probs[:, icomp], height=threshold)
+            if peaks.size > maxsteps:
+                largest_ix = np.argpartition(properties["peak_heights"], -maxsteps)[-maxsteps:]
+                peaks = peaks[largest_ix]
+                if verbose:
+                    print(f"In order to return at most {maxsteps} steps, the threshold has "
+                          f"been increased to {properties['peak_heights'][largest_ix].min()}.")
+            steps.append(peaks)
+        return steps
