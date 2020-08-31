@@ -130,7 +130,7 @@ class Station():
         --------
         add_timeseries : Add a timeseries to the station instance.
         """
-        self.add_timeseries(ts_description, timeseries)
+        self.add_timeseries(ts_description, timeseries, warn_existing=False)
 
     def __delitem__(self, ts_description):
         """
@@ -203,7 +203,8 @@ class Station():
 
     def add_timeseries(self, ts_description, timeseries, uncertainties_from=None,
                        override_src=None, override_data_unit=None, override_data_cols=None,
-                       override_var_cols=None, override_cov_cols=None, add_models=None):
+                       override_var_cols=None, override_cov_cols=None, add_models=None,
+                       warn_existing=True):
         """
         Add a timeseries to the station.
 
@@ -257,11 +258,11 @@ class Station():
         if not isinstance(timeseries, Timeseries):
             raise TypeError("Cannot add new timeseries: "
                             "'timeseries' is not a Timeseries object.")
-        if ts_description in self.timeseries:
+        if warn_existing and (ts_description in self.timeseries):
             warn(f"Station {self.name}: Overwriting time series '{ts_description}'.",
                  category=RuntimeWarning)
         if uncertainties_from is not None:
-            timeseries.add_uncertainties(ts=uncertainties_from)
+            timeseries.add_uncertainties(timeseries=uncertainties_from)
         if override_src is not None:
             timeseries.src = override_src
         if override_data_unit is not None:
