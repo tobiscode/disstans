@@ -619,7 +619,7 @@ class StepDetector():
                     probs[i, icomp] = Del
         self.probabilities = probs
 
-    def steps(self, threshold=2, maxsteps=10, verbose=True):
+    def steps(self, threshold=2, maxsteps=np.inf, verbose=True):
         r"""
         Threshold the saved probabilities to return a list of steps.
 
@@ -650,5 +650,9 @@ class StepDetector():
                 if verbose:
                     print(f"In order to return at most {maxsteps} steps, the threshold has "
                           f"been increased to {properties['peak_heights'][largest_ix].min()}.")
+            if verbose and (peaks.size / probs.shape[0] > 0.1):
+                warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
+                              f"{peaks.size / probs.shape[0]:.2%} of timestamps being steps. "
+                              "Consider setting a higher threshold.")
             steps.append(peaks)
         return steps
