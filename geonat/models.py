@@ -371,8 +371,8 @@ class Model():
 
     def tvec_to_numpycol(self, timevector):
         """
-        Convenience wrapper for :func:`~geonat.tools.tvec_to_numpycol` for Model objects that have the
-        :attr:`~time_unit` and :attr:`~t_reference` attributes set.
+        Convenience wrapper for :func:`~geonat.tools.tvec_to_numpycol` for Model objects that have
+        the :attr:`~time_unit` and :attr:`~t_reference` attributes set.
 
         See Also
         --------
@@ -1007,7 +1007,7 @@ class SplineSet(Model):
             spline class is not defined in this method yet.
         """
         # check input
-        assert self.is_fitted, f"SplineSet model needs to have already been fitted."
+        assert self.is_fitted, "SplineSet model needs to have already been fitted."
         # determine dimensions
         num_components = self.parameters.shape[1]
         num_scales = len(self.splines)

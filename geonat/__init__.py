@@ -9,15 +9,16 @@ classes of GeoNAT, namely
 - ``geonat.Station`` for ``geonat.station.Station``, and
 - ``geonat.Network`` for ``geonat.network.Network``.
 """
+# flake8: noqa
 
 import multiprocessing
 from pandas.plotting import register_matplotlib_converters
 
 # provide shortcuts for commonly used classes by importing them here
-from .config import defaults  # noqa: W0611
-from .timeseries import Timeseries  # noqa: W0611
-from .station import Station  # noqa: W0611
-from .network import Network  # noqa: W0611
+from .config import defaults
+from .timeseries import Timeseries
+from .station import Station
+from .network import Network
 
 # package version
 __version__ = '0.4.1'

@@ -328,7 +328,8 @@ class Network():
             If no location data is passed or found in :attr:`~default_location_path`.
         """
         if location is not None:
-            assert isinstance(location, list) and all([isinstance(l, float) for l in location]), \
+            assert (isinstance(location, list) and
+                    all([isinstance(loc, float) for loc in location])), \
                 "'location' needs to be a list of latitude, longitude and altitude floats, " \
                 f"go {location}."
         elif name in self._network_locations:
@@ -455,7 +456,7 @@ class Network():
             # add timeseries to station
             for ts_description, ts_cfg in station_cfg["timeseries"].items():
                 ts_class = getattr(geonat_ts, ts_cfg["type"])
-                ts = ts_class(**ts_cfg["kw_args"],**timeseries_kw_args)
+                ts = ts_class(**ts_cfg["kw_args"], **timeseries_kw_args)
                 station.add_timeseries(ts_description=ts_description, timeseries=ts)
                 # add default local models to station
                 if add_default_local_models:
@@ -619,8 +620,8 @@ class Network():
         else:
             assert isinstance(hidden_ts, str), \
                 f"'hidden_ts' must be None or a string, got {type(hidden_ts)}."
-        assert (models is None) or isinstance(models, str) or \
-               (isinstance(models, list) and all([isinstance(m, str) for m in models])), \
+        assert ((models is None) or isinstance(models, str) or
+                (isinstance(models, list) and all([isinstance(m, str) for m in models]))), \
             f"'models' must be None, a string or a list of strings, got {models}."
         if isinstance(models, str):
             models = [models]
@@ -1288,7 +1289,7 @@ class Network():
         # add velocity map
         if trend_kw_args:
             assert "ts_description" in trend_kw_args, \
-                f"'trend_kw_args' dictionary has to include a 'ts_description' keyword."
+                "'trend_kw_args' dictionary has to include a 'ts_description' keyword."
             if "model_list" not in trend_kw_args:
                 trend_kw_args["model_list"] = model_list
             # loop over stations
@@ -1341,7 +1342,8 @@ class Network():
             if station_name is None:
                 if (event.xdata is None) \
                    or (event.ydata is None) \
-                   or (event.inaxes is not ax_map): return
+                   or (event.inaxes is not ax_map):
+                    return
                 click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata,
                                                                 src_crs=proj_gui)
                 station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
@@ -1392,7 +1394,7 @@ class Network():
                         ax.fill_between(ts.time, fill_upper, fill_lower, facecolor='gray',
                                         alpha=gui_settings["plot_sigmas_alpha"], linewidth=0)
                     # plot data
-                    ax.plot(ts.time, ts.df[data_col], marker='.', color='k',label="Data"
+                    ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data"
                             if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
                     if sum_models:
@@ -1417,9 +1419,11 @@ class Network():
                             if (fit.var_cols is not None) \
                                and (gui_settings["plot_sigmas"] > 0):
                                 fill_upper = fit.df[fit.data_cols[icol]] \
-                                    + gui_settings["plot_sigmas"] * (fit.df[fit.var_cols[icol]] ** 0.5)
+                                    + gui_settings["plot_sigmas"] \
+                                    * (fit.df[fit.var_cols[icol]] ** 0.5)
                                 fill_lower = fit.df[fit.data_cols[icol]] \
-                                    - gui_settings["plot_sigmas"] * (fit.df[fit.var_cols[icol]] ** 0.5)
+                                    - gui_settings["plot_sigmas"] \
+                                    * (fit.df[fit.var_cols[icol]] ** 0.5)
                                 ax.fill_between(fit.time, fill_upper, fill_lower,
                                                 alpha=gui_settings["plot_sigmas_alpha"],
                                                 linewidth=0)

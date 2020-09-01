@@ -50,7 +50,7 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):
         reg_diag = np.array(reg_diag)
         num_reg = reg_diag.sum()
         if num_reg == 0:
-            warn(f"Regularized solver got no models to regularize.")
+            warn("Regularized solver got no models to regularize.")
         return G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag
     else:
         return G, obs_indices, num_time, num_params, num_comps

@@ -407,7 +407,7 @@ class StepDetector():
     def kernel_size(self):
         """ Kernel (window) size of the detector. """
         if self._kernel_size is None:
-            raise ValueError(f"'kernel_size' has not yet been set.")
+            raise ValueError("'kernel_size' has not yet been set.")
         return self._kernel_size
 
     @kernel_size.setter
@@ -620,7 +620,7 @@ class StepDetector():
         self.probabilities = probs
 
     def steps(self, threshold=2, maxsteps=10, verbose=True):
-        """
+        r"""
         Threshold the saved probabilities to return a list of steps.
 
         Parameters
@@ -638,7 +638,7 @@ class StepDetector():
             for each component.
         """
         assert self.probabilities is not None, \
-            f"'probabilities' has not been set yet, run StepDetector.search() first."
+            "'probabilities' has not been set yet, run StepDetector.search() first."
         probs = self.probabilities
         probs[np.isnan(probs)] = -1
         steps = []
