@@ -11,8 +11,8 @@ import scipy.sparse as sparse
 from copy import deepcopy
 from warnings import warn
 
-from . import Timeseries
 from . import models as geonat_models
+from .timeseries import Timeseries
 from .models import Model
 from .tools import tvec_to_numpycol
 

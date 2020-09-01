@@ -9,7 +9,7 @@ from tqdm import tqdm
 from okada_wrapper import dc3d0wrapper as dc3d0
 from warnings import warn
 
-from . import defaults
+from .config import defaults
 from .tools import parallelize
 from .models import Step
 

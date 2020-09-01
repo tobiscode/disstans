@@ -9,7 +9,7 @@ import scipy.sparse as sparse
 import cvxpy as cp
 from warnings import warn
 
-from . import defaults
+from .config import defaults
 
 
 def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):

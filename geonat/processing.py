@@ -13,7 +13,8 @@ from functools import wraps
 from sklearn.decomposition import PCA, FastICA
 from scipy.signal import find_peaks
 
-from . import defaults, Timeseries
+from .config import defaults
+from .timeseries import Timeseries
 from .compiled import maskedmedfilt2d
 
 

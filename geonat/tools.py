@@ -11,7 +11,7 @@ import pandas as pd
 from multiprocessing import Pool
 
 # set default number of threads to use
-from . import defaults
+from .config import defaults
 defaults["general"]["num_threads"] = int(len(os.sched_getaffinity(0)) // 2)
 
 

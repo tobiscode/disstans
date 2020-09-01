@@ -26,6 +26,9 @@ from . import station
 from . import timeseries
 from . import tools
 
+# import Scientific Colourmaps
+from . import scm
+
 # provide shortcuts for commonly used classes by importing them here
 from .config import defaults
 from .timeseries import Timeseries
