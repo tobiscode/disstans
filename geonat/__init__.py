@@ -14,6 +14,18 @@ classes of GeoNAT, namely
 import multiprocessing
 from pandas.plotting import register_matplotlib_converters
 
+# import submodules
+from . import compiled
+from . import config
+from . import earthquakes
+from . import models
+from . import network
+from . import processing
+from . import solvers
+from . import station
+from . import timeseries
+from . import tools
+
 # provide shortcuts for commonly used classes by importing them here
 from .config import defaults
 from .timeseries import Timeseries
