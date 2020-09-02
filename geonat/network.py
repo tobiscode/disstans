@@ -75,10 +75,10 @@ class Network():
         If ``net`` is a Network instance, the following adds an annual
         :class:`~geonat.models.Sinusoidal` model::
 
-            >>> models = {"Annual": {"type": "Sinusoidal",
-            ...                      "kw_args": {"period": 365.25,
-            ...                                  "t_reference": "2000-01-01"}}}
-            >>> net.update_default_local_models(models)
+            models = {"Annual": {"type": "Sinusoidal",
+                                 "kw_args": {"period": 365.25,
+                                             "t_reference": "2000-01-01"}}}
+            net.update_default_local_models(models)
         """
         self.update_default_local_models(default_local_models)
         self.stations = {}
@@ -122,7 +122,7 @@ class Network():
     @property
     def num_stations(self):
         """ Number of stations present in the network. """
-        return len(self.stations.keys())
+        return len(self.stations)
 
     def __repr__(self):
         """
@@ -207,6 +207,14 @@ class Network():
         """
         for station in self.stations.values():
             yield station
+
+    def __len__(self):
+        """
+        Special function that gives quick access to the number of stations in the
+        network (:attr:`~num_stations`) using Python's built-in ``len()`` function
+        to make interactions with iterators easier.
+        """
+        return self.num_stations
 
     def export_network_ts(self, ts_description):
         """
