@@ -231,7 +231,9 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
 
     Returns
     -------
-    dict
+    maint_table : pandas.DataFrame
+        Parsed maintenance table.
+    maint_dict : dict
         Dictionary of that maps the station names to a list of steptimes.
 
     Notes
@@ -247,35 +249,36 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
         assert (isinstance(exclude_codes, list) and
                 all([isinstance(ecode, str) for ecode in exclude_codes])), \
             f"'exclude_codes' needs to be a list of strings, got {exclude_codes}."
-        table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol, codecol])
+        maint_table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol, codecol])
         # because we don't know the column names, we need to make sure that the site will
         # always be in the first column for later
         if codecol < sitecol:
-            table = table.iloc[:, [1, 0]]
+            maint_table = maint_table.iloc[:, [1, 0]]
         # save code column name for later
-        codecolname = table.columns[1]
+        codecolname = maint_table.columns[1]
     else:
-        table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol])
+        maint_table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol])
     # get site column name
-    sitecolname = table.columns[0]
+    sitecolname = maint_table.columns[0]
     # load and parse time
     time = pd.read_csv(csvpath, delimiter=delimiter, usecols=datecols, squeeze=True,
                        parse_dates=[list(range(len(datecols)))] if len(datecols) > 1 else True)
     timecolname = time.name
     # connect time and data
-    table = table.join(time)
+    maint_table = maint_table.join(time)
     # process site name column with siteformatter and make sure we're not combining stations
     if siteformatter is not None:
         assert callable(siteformatter), \
             f"'siteformatter' needs to be a callable, got {siteformatter}."
-        unique_pre = len(table[sitecolname].unique())
-        table[sitecolname] = table[sitecolname].apply(siteformatter)
-        unique_post = len(table[sitecolname].unique())
+        unique_pre = len(maint_table[sitecolname].unique())
+        maint_table[sitecolname] = maint_table[sitecolname].apply(siteformatter)
+        unique_post = len(maint_table[sitecolname].unique())
         assert unique_pre == unique_post, "While applying siteformatter, stations were merged."
     # now drop all columns where code is exactly one of the elements in exclude_codes
     if (codecol is not None) and (exclude_codes is not None):
-        droprows = table[codecolname].isin(exclude_codes)
+        droprows = maint_table[codecolname].isin(exclude_codes)
         print(f"Dropping {droprows.sum()} rows because of exclude_codes={exclude_codes}.")
-        table = table[~droprows]
+        maint_table = maint_table[~droprows]
     # now produce a dictionary that maps sites to a list of step dates: {site: [steptimes]}
-    return dict(table.groupby(sitecolname)[timecolname].apply(list))
+    maint_dict = dict(maint_table.groupby(sitecolname)[timecolname].apply(list))
+    return maint_table, maint_dict
