@@ -243,12 +243,13 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
     (object on which the filtering happens).
     """
     # load codes and tables
-    if (codecol is not None) and (exclude_codes is not None):
+    if codecol is not None:
         assert isinstance(codecol, int), \
             f"'codecol' needs to be an integer, got {codecol}."
-        assert (isinstance(exclude_codes, list) and
-                all([isinstance(ecode, str) for ecode in exclude_codes])), \
-            f"'exclude_codes' needs to be a list of strings, got {exclude_codes}."
+        if exclude_codes is not None:
+            assert (isinstance(exclude_codes, list) and
+                    all([isinstance(ecode, str) for ecode in exclude_codes])), \
+                f"'exclude_codes' needs to be a list of strings, got {exclude_codes}."
         maint_table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol, codecol])
         # because we don't know the column names, we need to make sure that the site will
         # always be in the first column for later
