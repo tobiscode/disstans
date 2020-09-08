@@ -504,7 +504,7 @@ class Step(Model):
 
     def remove_step(self, step):
         """
-        Remove a step to the model.
+        Remove a step from the model.
 
         Parameters
         ----------

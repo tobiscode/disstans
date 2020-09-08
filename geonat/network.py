@@ -1125,6 +1125,7 @@ class Network():
         # get location data and projections
         stat_lats = [station.location[0] for station in self]
         stat_lons = [station.location[1] for station in self]
+        stat_names = list(self.stations.keys())
         proj_gui = getattr(ccrs, gui_settings["projection"])()
         proj_lla = ccrs.PlateCarree()
         # create figure and plot stations
@@ -1134,6 +1135,10 @@ class Network():
         stat_points = ax_map.scatter(stat_lons, stat_lats,
                                      linestyle='None', marker='.', transform=proj_lla,
                                      facecolor=default_station_colors, zorder=1000)
+        for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
+            ax_map.annotate(sname, (slon, slat),
+                            xycoords=proj_lla._as_mpl_transform(ax_map), annotation_clip=True,
+                            textcoords="offset pixels", xytext=(0, 5), ha="center")
         # create underlay
         map_underlay = False
         if gui_settings["wmts_show"]:
