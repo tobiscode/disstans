@@ -34,6 +34,43 @@ class Timedelta(pd.Timedelta):
         return super().__new__(cls, *args, **kwargs)
 
 
+class Click():
+    """
+    TODO
+    """
+    def __init__(self, ax, func, button=1):
+        self._ax = ax
+        self._func = func
+        self._button = button
+        self._press = False
+        self._move = False
+        self._c1 = self._ax.figure.canvas.mpl_connect('button_press_event', self._onpress)
+        self._c2 = self._ax.figure.canvas.mpl_connect('button_release_event', self._onrelease)
+        self._c3 = self._ax.figure.canvas.mpl_connect('motion_notify_event', self._onmove)
+
+    def __del__(self):
+        for cid in [self._c1, self._c2, self._c3]:
+            self._ax.figure.canvas.mpl_disconnect(cid)
+
+    def _onclick(self, event):
+        if event.inaxes == self._ax:
+            if event.button == self._button:
+                self._func(event)
+
+    def _onpress(self, event):
+        self._press = True
+
+    def _onmove(self, event):
+        if self._press:
+            self._move = True
+
+    def _onrelease(self, event):
+        if self._press and not self._move:
+            self._onclick(event)
+        self._press = False
+        self._move = False
+
+
 def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     """
     Converts a Pandas timestamp series into a NumPy array of relative

@@ -21,7 +21,7 @@ from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
 from .processing import common_mode
-from .tools import parallelize
+from .tools import parallelize, Click
 
 
 class Network():
@@ -1465,8 +1465,8 @@ class Network():
                          f"in timeseries {scalo_ts} for station {station_name}.",
                          category=RuntimeWarning)
 
-        cid = fig_map.canvas.mpl_connect("button_press_event", update_timeseries)
+        click = Click(ax_map, update_timeseries)
         if station is not None:
             update_timeseries(None, station)
         plt.show()
-        fig_map.canvas.mpl_disconnect(cid)
+        del click
