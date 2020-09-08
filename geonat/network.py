@@ -9,6 +9,7 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.path as mplpath
 import cartopy.crs as ccrs
+import cartopy.geodesic as cgeod
 from copy import deepcopy
 from tqdm import tqdm
 from warnings import warn
@@ -21,7 +22,8 @@ from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
 from .processing import common_mode
-from .tools import parallelize, Click
+from .tools import parallelize, Timedelta, Click
+from .earthquakes import okada_displacement
 
 
 class Network():
@@ -1226,7 +1228,8 @@ class Network():
         plt.show()
 
     def gui(self, station=None, timeseries=None, model_list=None, sum_models=True, verbose=False,
-            scalogram_kw_args={}, trend_kw_args={}, analyze_kw_args={}, gui_kw_args={}):
+            stepdetector={}, scalogram_kw_args={}, trend_kw_args={}, analyze_kw_args={},
+            gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -1243,6 +1246,7 @@ class Network():
         - start with a station pre-selected,
         - show only a subset of fitted models,
         - sum the models to an aggregate one,
+        - restrict the output to a timewindow showing potential steps from multiple sources,
         - show a scalogram (Model class permitting),
         - print statistics of residuals, and
         - print station information.
@@ -1261,6 +1265,23 @@ class Network():
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
             :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
+        stepdetector : dict, optional
+            Passing this dictionary will enable the plotting of events related to possible
+            steps, both on the map (in case of an earthquake catalog) and in the timeseries
+            (in case of detected steps by :class:`~geonat.processing.StepDetector` or a
+            maintenance catalog). To reduce cluttering, it will also only show a subset of
+            each timeseries, centered around consecutive probable steps. Using the terminal,
+            one can cycle through each period.
+            The ``stepdetector`` dictionary must contain the keys ``'plot_padding'`` (which
+            determines how many days before and after to include in the plotting),
+            ``'step_table'`` and ``'step_ranges'`` (both returned by
+            :meth:`~geonat.processing.StepDetector.search_network`),
+            ``'step_padding'`` (which determines how many days before and after the
+            ``'step_ranges'`` should be scanned for possible steps), optionally ``'catalog'``
+            and ``'eqcircle'`` (an earthquake catalog of same style as used in
+            :mod:`~geonat.earthquakes` and a maximum distance of stations to earthquakes of
+            magnitude less than 7.5), and optionally, ``'maint_table'`` (a maintenance table
+            as parsed by :func:`~geonat.tools.parse_maintenance_table`).
         scalogram_kw_args : dict, optional
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
@@ -1288,6 +1309,7 @@ class Network():
         gui_settings.update(gui_kw_args)
         fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
+        ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
         fig_ts = plt.figure()
         if scalogram_kw_args:
             assert isinstance(scalogram_kw_args, dict) \
@@ -1300,6 +1322,7 @@ class Network():
             scalo_ts = scalogram_kw_args.pop('ts')
             scalo_model = scalogram_kw_args.pop('model')
             fig_scalo = plt.figure()
+        station_name, station_index = None, None
 
         # add velocity map
         if trend_kw_args:
@@ -1351,20 +1374,43 @@ class Network():
                              coordinates="figure")
             # TODO: plot uncertainty ellipses
 
-        # define clicking function
-        def update_timeseries(event, station_name=None):
-            nonlocal analyze_kw_args, gui_settings
-            if station_name is None:
-                if (event.xdata is None) \
-                   or (event.ydata is None) \
-                   or (event.inaxes is not ax_map):
-                    return
-                click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata,
-                                                                src_crs=proj_gui)
-                station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
-                                                  + (np.array(stat_lons) - click_lon)**2))
-                station_name = list(self.stations.keys())[station_index]
+        # prepare stuff for the interactive step plotting
+        if stepdetector:
+            # get quick access
+            step_table = stepdetector["step_table"]
+            step_ranges = stepdetector["step_ranges"]
+            maint_table = stepdetector["maint_table"] if "maint_table" in stepdetector else None
+            if "catalog" in stepdetector:
+                catalog = stepdetector["catalog"]
+                eqcircle = stepdetector["eqcircle"]
             else:
+                catalog = None
+            step_padding = stepdetector["step_padding"]
+            plot_padding = stepdetector["plot_padding"]
+            n_ranges = len(step_ranges)
+            i_range = 0
+            geoid = cgeod.Geodesic()
+            last_eqs = None
+            last_eqs_lbl = []
+
+        # define clicking function
+        def update_timeseries(event, select_station=None):
+            nonlocal analyze_kw_args, gui_settings, station_name, station_index
+            if select_station is None:
+                if event is not None:
+                    if (event.xdata is None) \
+                       or (event.ydata is None) \
+                       or (event.inaxes is not ax_map):
+                        return
+                    click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata,
+                                                                    src_crs=proj_gui)
+                    station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
+                                                      + (np.array(stat_lons) - click_lon)**2))
+                    station_name = list(self.stations.keys())[station_index]
+                elif station_name is None:
+                    return
+            else:
+                station_name = select_station
                 station_index = list(self.stations.keys()).index(station_name)
             if verbose:
                 print(self[station_name])
@@ -1453,9 +1499,123 @@ class Network():
                     if scalogram_kw_args:
                         t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
                         t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
+
+            # plot possible steps
+            if stepdetector:
+                nonlocal i_range, last_eqs, last_eqs_lbl
+                sub_tmin = step_ranges[i_range][0] - Timedelta(step_padding, "D")
+                sub_tmax = step_ranges[i_range][-1] + Timedelta(step_padding, "D")
+                station_steps = step_table[(step_table["time"] >= sub_tmin) &
+                                           (step_table["time"] <= sub_tmax)]["station"].tolist()
+                print(f"\nPeriod {i_range}/{n_ranges}, "
+                      f"stations potentially seeing steps are: {station_steps}")
+                # get data for this station and time range
+                sub_step = step_table[(step_table["station"] == station_name) &
+                                      (step_table["time"] >= sub_tmin) &
+                                      (step_table["time"] <= sub_tmax)]
+                print(f"Station {station_name}: "
+                      f"{sub_step.shape[0]} potential steps detected")
+                if not sub_step.empty:
+                    print(sub_step[["time", "probability"]])
+                if maint_table is None:
+                    sub_maint = None
+                else:
+                    sub_maint = maint_table[(maint_table["station"] == station_name) &
+                                            (maint_table["time"] >= sub_tmin) &
+                                            (maint_table["time"] <= sub_tmax)]
+                    if not sub_maint.empty:
+                        maintcols = ["time", "code"] if "code" in sub_maint.columns else ["time"]
+                        print("Related maintenance:")
+                        print(sub_maint[maintcols])
+                if catalog is None:
+                    sub_cat = None
+                else:
+                    sub_cat = catalog[(catalog["Date_Origin_Time(JST)"] >= sub_tmin) &
+                                      (catalog["Date_Origin_Time(JST)"] <= sub_tmax)]
+                    if not sub_cat.empty:
+                        sub_lonlats = np.hstack((sub_cat["Longitude(°)"].values.reshape(-1, 1),
+                                                sub_cat["Latitude(°)"].values.reshape(-1, 1)))
+                        station_lonlat = np.array(self[station_name].location)[[1, 0]]
+                        # get distances in km from cartopy
+                        distances = geoid.inverse(station_lonlat.reshape(1, 2), sub_lonlats)
+                        distances = np.array(distances)[:, 0] / 1e3
+                        # get very large eartquakes
+                        large_ones = sub_cat["MT_Magnitude(Mw)"].values.squeeze() > 7.5
+                        # subset the catalog again
+                        sub_cat = sub_cat.iloc[np.any(np.stack([distances <= eqcircle,
+                                                                large_ones]), axis=0), :].copy()
+                        # print
+                        if not sub_cat.empty:
+                            # calculate probable earthquake offsets
+                            station_disp = np.zeros((sub_cat.shape[0], 3))
+                            for i in range(sub_cat.shape[0]):
+                                station_disp[i, :] = \
+                                    okada_displacement(self[station_name].location,
+                                                       sub_cat.iloc[i, :])
+                            sub_cat["Okada_Estim_Mag(mm)"] = \
+                                np.sqrt(np.sum(station_disp**2, axis=1))
+                            print("Related earthquakes:")
+                            print(sub_cat[["Date_Origin_Time(JST)", "Latitude(°)",
+                                           "Longitude(°)", "MT_Depth(km)",
+                                           "MT_Magnitude(Mw)", "Okada_Estim_Mag(mm)"]])
+
+                # plot on all timeseries axes
+                xlow = step_ranges[i_range][0] - Timedelta(plot_padding, "D")
+                xhigh = step_ranges[i_range][0] + Timedelta(plot_padding, "D")
+                if len(ax_ts) > 0:
+                    ax_ts[0].set_xlim(xlow, xhigh)
+                for ax in ax_ts:
+                    ylow, yhigh = np.inf, -np.inf
+                    for line in ax.get_lines():
+                        xdata = pd.Series(line.get_xdata())
+                        tsubset = (pd.Series(xdata) >= xlow) & (pd.Series(xdata) <= xhigh)
+                        ydisplayed = line.get_ydata()[tsubset.values]
+                        if ydisplayed.size > 0:
+                            ylow = min(ylow, np.min(ydisplayed))
+                            yhigh = max(yhigh, np.max(ydisplayed))
+                    if np.isfinite(ylow) and np.isfinite(yhigh):
+                        ymean = (ylow + yhigh) / 2
+                        ylow = ymean - (ymean - ylow) * 1.2
+                        yhigh = ymean + (yhigh - ymean) * 1.2
+                        ax.set_ylim(ylow, yhigh)
+                    ax.axvspan(sub_tmin, sub_tmax, ec=None, fc="C6", alpha=0.1, zorder=-100)
+                    if catalog is not None:
+                        for irow, row in sub_cat.iterrows():
+                            ax.axvline(row["Date_Origin_Time(JST)"], c="C3")
+                    for irow, row in sub_step.iterrows():
+                        ax.axvline(row["time"], ls="--", c="C1")
+                    if maint_table is not None:
+                        for irow, row in sub_maint.iterrows():
+                            ax.axvline(row["time"], ls=":", c="C2")
+
+                # plot earthquakes on map
+                if last_eqs is not None:
+                    last_eqs.remove()
+                    last_eqs = None
+                    for lbl in last_eqs_lbl:
+                        lbl.remove()
+                    last_eqs_lbl = []
+                    ax_map.set_extent([ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax],
+                                      crs=proj_gui)
+                if (catalog is not None) and (not sub_cat.empty):
+                    ax_map.set_autoscale_on(True)
+                    last_eqs = ax_map.scatter(sub_cat["Longitude(°)"], sub_cat["Latitude(°)"],
+                                              linestyle='None', marker='*', transform=proj_lla,
+                                              facecolor="C3", zorder=100)
+                    for irow, row in sub_cat.iterrows():
+                        lbl = ax_map.annotate(f"Mw {row['MT_Magnitude(Mw)']}",
+                                              (row["Longitude(°)"], row["Latitude(°)"]),
+                                              xycoords=proj_lla._as_mpl_transform(ax_map),
+                                              textcoords="offset pixels",
+                                              xytext=(0, 5), ha="center")
+                        last_eqs_lbl.append(lbl)
+                fig_map.canvas.draw_idle()
+
+            # finish up
             if len(ax_ts) > 0:  # only call this if there was a timeseries to plot
                 ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
+
             # get scalogram
             if scalogram_kw_args:
                 try:
@@ -1473,5 +1633,31 @@ class Network():
         click = Click(ax_map, update_timeseries)
         if station is not None:
             update_timeseries(None, station)
-        plt.show()
+        if stepdetector:
+            plt.show(block=False)
+            while True:
+                choice = input("> ")
+                if choice == "q":
+                    break
+                else:
+                    new_station = None
+                    if choice == "+":
+                        i_range = (i_range + 1) % n_ranges
+                    elif choice == "-":
+                        i_range = (i_range - 1) % n_ranges
+                    elif (len(choice) > 1) and (choice[0] == "i"):
+                        try:
+                            i_range = int(choice[1:]) % n_ranges
+                        except ValueError:
+                            continue
+                    elif (len(choice) > 1) and (choice[0] == "s"):
+                        try:
+                            new_station = str(choice[1:])
+                        except ValueError:
+                            continue
+                    else:
+                        continue
+                    update_timeseries(None, new_station)
+        else:
+            plt.show()
         del click

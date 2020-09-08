@@ -319,4 +319,7 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
         maint_table = maint_table[~droprows]
     # now produce a dictionary that maps sites to a list of step dates: {site: [steptimes]}
     maint_dict = dict(maint_table.groupby(sitecolname)[timecolname].apply(list))
+    # rename columns
+    maint_table.rename(columns={sitecolname: "station", codecolname: "code",
+                                timecolname: "time"}, inplace=True)
     return maint_table, maint_dict
