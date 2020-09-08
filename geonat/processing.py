@@ -12,10 +12,12 @@ import warnings
 from functools import wraps
 from sklearn.decomposition import PCA, FastICA
 from scipy.signal import find_peaks
+from tqdm import tqdm
 
 from .config import defaults
 from .timeseries import Timeseries
 from .compiled import maskedmedfilt2d
+from .tools import Timedelta, parallelize, tvec_to_numpycol
 
 
 def unwrap_dict_and_ts(func):
@@ -551,9 +553,62 @@ class StepDetector():
         else:
             return 0, Delta_best[best_hyp]
 
+    @staticmethod
+    def _search(data_and_params):
+        """
+        TODO
+        """
+        x, y, kernel_size, maxdel = data_and_params
+        # some checks
+        assert isinstance(x, np.ndarray) and isinstance(y, np.ndarray), \
+            f"'x' and 'y' need to be NumPy arrays, got {type(x)} and {type(y)}."
+        # get sizes
+        num_observations = x.shape[0]
+        y = y.reshape(num_observations, 1 if y.ndim == 1 else -1)
+        num_components = y.shape[1]
+        # get valid array
+        valid = np.isfinite(y)
+        # make output array
+        probs = np.empty((num_observations, num_components))
+        probs[:] = np.NaN
+        # loop over all columns
+        for icomp in range(num_components):
+            # loop through all rows, starting with a shrunken kernel at the edges
+            # Beginning region
+            halfwindow = 0
+            for i in range(kernel_size // 2):
+                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                                    y[i-halfwindow:i+halfwindow+1, icomp],
+                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
+                                                    maxdel=maxdel)
+                if hyp == 1:
+                    probs[i, icomp] = Del
+                halfwindow += 1
+            # Middle region
+            assert halfwindow == kernel_size // 2
+            for i in range(halfwindow, num_observations - halfwindow):
+                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                                    y[i-halfwindow:i+halfwindow+1, icomp],
+                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
+                                                    maxdel=maxdel)
+                if hyp == 1:
+                    probs[i, icomp] = Del
+            # Ending region
+            for i in range(num_observations - halfwindow, num_observations):
+                halfwindow -= 1
+                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                                    y[i-halfwindow:i+halfwindow+1, icomp],
+                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
+                                                    maxdel=maxdel)
+                if hyp == 1:
+                    probs[i, icomp] = Del
+        # return
+        return probs
+
     def search(self, x, y, kernel_size=None, maxdel=10):
         r"""
         Function that will search for steps in the data.
+        If ``kernel_size`` is set, the stored value in the instance object is updated.
         Upon successful completion, it will save the step probabilities in
         :attr:`~probabilities`.
 
@@ -572,53 +627,71 @@ class StepDetector():
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
         """
-        # some checks
-        assert isinstance(x, np.ndarray) and isinstance(y, np.ndarray), \
-            f"'x' and 'y' need to be NumPy arrays, got {type(x)} and {type(y)}."
         # check whether to update kernel_size
         if kernel_size is not None:
             self.kernel_size = kernel_size
-        # get sizes
-        num_observations = x.shape[0]
-        y = y.reshape(num_observations, 1 if y.ndim == 1 else -1)
-        num_components = y.shape[1]
-        # get valid array
-        valid = np.isfinite(y)
-        # make output array
-        probs = np.empty((num_observations, num_components))
-        probs[:] = np.NaN
-        # loop over all columns
-        for icomp in range(num_components):
-            # loop through all rows, starting with a shrunken kernel at the edges
-            # Beginning region
-            halfwindow = 0
-            for i in range(self.kernel_size // 2):
-                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                                    y[i-halfwindow:i+halfwindow+1, icomp],
-                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
-                                                    maxdel=maxdel)
-                if hyp == 1:
-                    probs[i, icomp] = Del
-                halfwindow += 1
-            # Middle region
-            assert halfwindow == self.kernel_size // 2
-            for i in range(halfwindow, num_observations - halfwindow):
-                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                                    y[i-halfwindow:i+halfwindow+1, icomp],
-                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
-                                                    maxdel=maxdel)
-                if hyp == 1:
-                    probs[i, icomp] = Del
-            # Ending region
-            for i in range(num_observations - halfwindow, num_observations):
-                halfwindow -= 1
-                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                                    y[i-halfwindow:i+halfwindow+1, icomp],
-                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
-                                                    maxdel=maxdel)
-                if hyp == 1:
-                    probs[i, icomp] = Del
-        self.probabilities = probs
+        # call individual search function and store result
+        self.probabilities = StepDetector._search(x, y, self.kernel_size, maxdel)
+
+    def search_network(self, net, ts_description, kernel_size=None, maxdel=10, threshold=20,
+                       gap=2, gap_unit="D"):
+        """
+        TODO
+        """
+        # check whether to update kernel_size
+        if kernel_size is not None:
+            self.kernel_size = kernel_size
+        # initialize DataFrame
+        step_table = pd.DataFrame(columns=["station", "time", "probability"])
+        # run parallelized StepDetector._search
+        iterable_input = ((tvec_to_numpycol(station[ts_description].time),
+                           station[ts_description].data.values,
+                           self.kernel_size, maxdel) for station in net)
+        for station, probs in zip(net, tqdm(parallelize(StepDetector._search, iterable_input),
+                                            ascii=True, total=net.num_stations, unit="station",
+                                            desc="Searching for steps")):
+            # this uses a large threshold t avoid a high number of steps
+            # this should be checked before looping
+            steps = StepDetector._steps((probs, threshold, np.inf, False))
+            unique_steps = np.sort(np.unique(np.concatenate(steps)))
+            maxstepprobs = np.max(probs[unique_steps, :], axis=1)
+            steptimes = station[ts_description].time[unique_steps]
+            step_table = step_table.append(pd.DataFrame({"station": [station.name]*len(steptimes),
+                                                         "time": steptimes,
+                                                         "probability": maxstepprobs}),
+                                           ignore_index=True)
+            # this code could be used to create a model object and assign it to the station
+            # mdl = geonat.models.Step(steptimes)
+            # station.add_local_model(ts_description, "Detections", mdl)
+        # get the consecutive steptime ranges
+        unique_steps = np.sort(step_table["time"].unique())
+        split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
+        split = np.concatenate([0, split + 1], axis=None)
+        step_ranges = [unique_steps[split[i]:split[i + 1]] for i in range(split.size - 1)]
+        return step_table, step_ranges
+
+    @staticmethod
+    def _steps(data_and_params):
+        """
+        TODO
+        """
+        probs, threshold, maxsteps, verbose = data_and_params
+        probs[np.isnan(probs)] = -1
+        steps = []
+        for icomp in range(probs.shape[1]):
+            peaks, properties = find_peaks(probs[:, icomp], height=threshold)
+            if peaks.size > maxsteps:
+                largest_ix = np.argpartition(properties["peak_heights"], -maxsteps)[-maxsteps:]
+                peaks = peaks[largest_ix]
+                if verbose:
+                    print(f"In order to return at most {maxsteps} steps, the threshold has "
+                          f"been increased to {properties['peak_heights'][largest_ix].min()}.")
+            if verbose and (peaks.size / probs.shape[0] > 0.1):
+                warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
+                              f"{peaks.size / probs.shape[0]:.2%} of timestamps being steps. "
+                              "Consider setting a higher threshold.")
+            steps.append(peaks)
+        return steps
 
     def steps(self, threshold=2, maxsteps=np.inf, verbose=True):
         r"""
@@ -640,20 +713,4 @@ class StepDetector():
         """
         assert self.probabilities is not None, \
             "'probabilities' has not been set yet, run StepDetector.search() first."
-        probs = self.probabilities
-        probs[np.isnan(probs)] = -1
-        steps = []
-        for icomp in range(probs.shape[1]):
-            peaks, properties = find_peaks(probs[:, icomp], height=threshold)
-            if peaks.size > maxsteps:
-                largest_ix = np.argpartition(properties["peak_heights"], -maxsteps)[-maxsteps:]
-                peaks = peaks[largest_ix]
-                if verbose:
-                    print(f"In order to return at most {maxsteps} steps, the threshold has "
-                          f"been increased to {properties['peak_heights'][largest_ix].min()}.")
-            if verbose and (peaks.size / probs.shape[0] > 0.1):
-                warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
-                              f"{peaks.size / probs.shape[0]:.2%} of timestamps being steps. "
-                              "Consider setting a higher threshold.")
-            steps.append(peaks)
-        return steps
+        return StepDetector._steps(self.probabilities, threshold, maxsteps, verbose)
