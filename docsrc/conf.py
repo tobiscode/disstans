@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import sphinx_rtd_theme  # noqa: W0611
+import sphinx_rtd_theme  # noqa: F401
 sys.path.insert(0, os.path.abspath('..'))
 from geonat import __version__ as geonat_version  # noqa: E402
 
@@ -65,18 +65,26 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # -- Other settings ------------------------------------------------
+
 # autodoc settings
 # add_module_names = False
 autodoc_default_options = {'undoc-members': True,
                            'exclude-members': '__init__, __module__, __dict__, __weakref__',
                            'member-order': 'groupwise'}
+
 # intersphinx settings
 intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'numpy': ('https://numpy.org/doc/1.18/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy-1.4.1/reference/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.0.4/', None)}
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.0.4/', None),
+                       'matplotlib': ('https://matplotlib.org/3.2.1/', None)}
+
 # ReadTheDocs theme settings
 html_theme_options = {'collapse_navigation': False}
+
+# allow the reusing of 'Classes' and 'Functions' section labels by prefixing the document name
+autosectionlabel_prefix_document = True
+
 # add copybutton.js (https://github.com/readthedocs/sphinx_rtd_theme/issues/167)
 def setup(app):  # noqa: E302
     app.add_js_file('copybutton.js')

@@ -36,7 +36,18 @@ class Timedelta(pd.Timedelta):
 
 class Click():
     """
-    TODO
+    Class that enables a GUI to distinguish between clicks (mouse press and release)
+    and dragging event (mouse press, move, then release).
+
+    Parameters
+    ----------
+    ax : matplotlib.axis.Axis
+        Axis on which to look for clicks.
+    func : function
+        Function to call, with the Matplotlib clicking :class:`~matplotlib.backend_bases.Event`
+        as its first argument.
+    button : int, optional
+        Which mouse button to operate on. Defaults to ``1`` (left).
     """
     def __init__(self, ax, func, button=1):
         self._ax = ax

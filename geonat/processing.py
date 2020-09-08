@@ -556,7 +556,7 @@ class StepDetector():
     @staticmethod
     def _search(data_and_params):
         """
-        TODO
+        Parallelizable part of the search and search_network functions.
         """
         x, y, kernel_size, maxdel = data_and_params
         # some checks
@@ -608,7 +608,6 @@ class StepDetector():
     def search(self, x, y, kernel_size=None, maxdel=10):
         r"""
         Function that will search for steps in the data.
-        If ``kernel_size`` is set, the stored value in the instance object is updated.
         Upon successful completion, it will save the step probabilities in
         :attr:`~probabilities`.
 
@@ -621,8 +620,8 @@ class StepDetector():
             Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
             Can contain NaNs.
         kernel_size : int, optional
-            Window size of the detector. Must be odd.
-            If ``None``, use the previously set :attr:`~kernel_size`
+            Window size of the detector. Must be odd. If ``None``, use the previously set
+            :attr:`~kernel_size`, otherwise set the attribute.
         maxdel : float, optional
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
@@ -635,8 +634,32 @@ class StepDetector():
 
     def search_network(self, net, ts_description, kernel_size=None, maxdel=10, threshold=20,
                        gap=2, gap_unit="D"):
-        """
-        TODO
+        r"""
+        Function that searches for steps in an entire network (possibly in parallel),
+        thresholds those probabilities, and identifies all the consecutive ranges in which
+        steps happen over the network.
+        Upon successful completion, it will save the step probabilities in
+        :attr:`~probabilities`.
+
+        Parameters
+        ----------
+        net : geonat.network.Network
+            Network instance to operate on.
+        ts_description : str
+            :class:`~geonat.timeseries.Timeseries` description that will be analyzed.
+        kernel_size : int, optional
+            Window size of the detector. Must be odd. If ``None``, use the previously set
+            :attr:`~kernel_size`, otherwise set the attribute.
+        maxdel : float, optional
+            Difference in AIC that should be considered not significantly better.
+            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
+        threshold : float, optional
+            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
+        gap : float, optional
+            Maximum gap between identified steps to count as a continuous period
+            of possible steps.
+        gap_unit : str, optional
+            Time unit of ``gap``.
         """
         # check whether to update kernel_size
         if kernel_size is not None:
@@ -673,19 +696,24 @@ class StepDetector():
     @staticmethod
     def _steps(data_and_params):
         """
-        TODO
+        Parallelizable part of the steps function.
         """
+        # initialize
         probs, threshold, maxsteps, verbose = data_and_params
         probs[np.isnan(probs)] = -1
         steps = []
         for icomp in range(probs.shape[1]):
+            # find peaks above the threshold
             peaks, properties = find_peaks(probs[:, icomp], height=threshold)
+            # if maxsteps is set, reduce steps to that number
             if peaks.size > maxsteps:
                 largest_ix = np.argpartition(properties["peak_heights"], -maxsteps)[-maxsteps:]
                 peaks = peaks[largest_ix]
+                # warn about the new effective threshold
                 if verbose:
                     print(f"In order to return at most {maxsteps} steps, the threshold has "
                           f"been increased to {properties['peak_heights'][largest_ix].min()}.")
+            # warn if a large number of steps have been detected
             if verbose and (peaks.size / probs.shape[0] > 0.1):
                 warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
                               f"{peaks.size / probs.shape[0]:.2%} of timestamps being steps. "
@@ -699,11 +727,14 @@ class StepDetector():
 
         Parameters
         ----------
-        threshold : float
+        threshold : float, optional
             Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
         maxsteps : int, optional
             Return at most ``maxsteps`` number of steps. Can be useful if a good value for
             ``threshold`` has not been found yet.
+        verbose : bool, optional
+            If ``True`` (default), print warnings when there will be a large number of
+            steps identified given the ``threshold``.
 
         Returns
         -------

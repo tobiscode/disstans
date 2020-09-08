@@ -16,7 +16,20 @@ from .models import Step
 
 def okada_displacement(station_lla, eq_catalog_row):
     """
-    TODO
+    For a single station and a single row from the earthquake catalog as defined by
+    :func:`~okada_prior`, calculate the estimated displacement.
+
+    Parameters
+    ----------
+    station_lla : list
+        Location of the station, see :attr:`~geonat.station.Station.location`.
+    eq_catalog_row : pandas.Series
+        A single row of the earthquake catalog as defined by :func:`~okada_prior`.
+
+    Returns
+    -------
+    station_disp : numpy.ndarray
+        3D displacement in mm.
     """
     station_lla = np.array(station_lla)
     station_lla[2] /= 1000
