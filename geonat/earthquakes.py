@@ -14,6 +14,28 @@ from .tools import parallelize
 from .models import Step
 
 
+def okada_displacement(station_lla, eq_catalog_row):
+    """
+    TODO
+    """
+    station_lla = np.array(station_lla)
+    station_lla[2] /= 1000
+    eq_lla = eq_catalog_row[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values.squeeze()
+    eq_lla[2] *= -1
+    station_rel = np.array(station_lla - eq_lla)
+    station_rel[0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[0]*np.pi/180)
+    station_rel[1] *= 111.41284*np.cos(eq_lla[0]*np.pi/180)
+    station_rel[2] = 0
+    eq_info = {'alpha': defaults["prior"]["alpha"],
+               'lat': eq_lla[0], 'lon': eq_lla[1],
+               'depth': -eq_lla[2],
+               'strike': float(eq_catalog_row['Strike'].split(';')[0]),
+               'dip': float(eq_catalog_row['Dip'].split(';')[0]),
+               'potency': [eq_catalog_row['Mo(Nm)'] / defaults["prior"]["mu"], 0, 0, 0]}
+    station_disp = _okada_get_displacements((station_rel.reshape(1, -1), eq_info))
+    return station_disp.squeeze()
+
+
 def _okada_get_displacements(station_and_parameters):
     """
     Parallelizable sub-function of okada_prior that for a single earthquake
