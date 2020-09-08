@@ -497,7 +497,7 @@ class Station():
                 fit_sum_var += fit.vars.values
         return fit_sum, fit_sum_var
 
-    def analyze_residuals(self, ts_description, verbose=False,
+    def analyze_residuals(self, ts_description, verbose=False, t_start=None, t_end=None,
                           mean=False, std=False, n_observations=False, std_outlier=0):
         """
         Analyze, print and return the residuals of a station's timeseries according
@@ -509,6 +509,14 @@ class Station():
             Timeseries to analyze. Method assumes it already is a residual.
         verbose : bool, optional
             If True, additionally print the results. Defaults to ``False``.
+        t_start : str or pandas.Timestamp, optional
+            If set, specify a lower bound for the analysis. ``t_start`` should be a
+            Timestamp-convertible string of the start time, or a datetime-like object.
+            Defaults to the first timestamp present in the timeseries.
+        t_end : str or pandas.Timestamp, optional
+            If set, specify an upper bound for the analysis. ``t_end`` should be a
+            Timestamp-convertible string of the end time, or a datetime-like object.
+            Defaults to the last timestamp present in the timeseries.
         mean : bool, optional
             If ``True``, calculate the mean of the timeseries.
             Adds the key ``'Mean'`` to the output dictionary.
@@ -533,30 +541,39 @@ class Station():
             Dictionary that includes the results as defined by the arguments.
             Empty by default.
         """
+        # do checks
         assert isinstance(ts_description, str), \
             f"Station {self.name}: " \
             f"'ts_description' needs to be a string, got {type(ts_description)}."
         assert ts_description in self.timeseries, \
             f"Station {self.name}: Can't find '{ts_description}' to analyze."
+        # restrict to time range
+        ts = self[ts_description]
+        t_start = pd.Timestamp(t_start) if t_start is not None else ts.time[0]
+        t_end = pd.Timestamp(t_end) if t_end is not None else ts.time[-1]
+        inside = np.all((ts.time >= t_start, ts.time <= t_end), axis=0)
+        ts = self[ts_description].data.iloc[inside, :]
+        # calculate the different metrics
         results = {}
         if mean:
-            mean = self[ts_description].data.mean(axis=0, skipna=True, numeric_only=True).values
+            mean = ts.mean(axis=0, skipna=True, numeric_only=True).values
             results["Mean"] = mean
         if std:
-            sd = self[ts_description].data.std(axis=0, skipna=True, numeric_only=True).values
+            sd = ts.std(axis=0, skipna=True, numeric_only=True).values
             results["Standard Deviation"] = sd
         if n_observations:
-            n_obs = self[ts_description].data.count(axis=0, numeric_only=True).values
+            n_obs = ts.count(axis=0, numeric_only=True).values
             results["Observations"] = n_obs
-            results["Gaps"] = self[ts_description].num_observations - n_obs
+            results["Gaps"] = ts.shape[0] - n_obs
         if std_outlier > 0:
-            temp = self[ts_description].data.values
+            temp = ts.values.copy()
             temp[np.isnan(temp)] = 0
             temp -= np.mean(temp, axis=0, keepdims=True)
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
-        if verbose and results:  # only print if any statistic was recorded
-            print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
+        # print if any statistic was recorded
+        if verbose and results:
+            print_df = pd.DataFrame(data=results, index=ts.data_cols)
             print(print_df.rename_axis(f"{self.name}: {ts_description}", axis=1))
         return results
 
