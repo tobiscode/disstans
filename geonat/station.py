@@ -498,7 +498,7 @@ class Station():
         return fit_sum, fit_sum_var
 
     def analyze_residuals(self, ts_description, verbose=False, t_start=None, t_end=None,
-                          mean=False, std=False, n_observations=False, std_outlier=0):
+                          mean=False, std=False, rms=False, n_observations=False, std_outlier=0):
         """
         Analyze, print and return the residuals of a station's timeseries according
         to certain metrics defined in the arguments.
@@ -524,6 +524,11 @@ class Station():
         std : bool, optional
             If ``True``, calculate the standard deviation of the timeseries.
             Adds the key ``'Standard Deviation'`` to the output dictionary.
+            Defaults to ``False``.
+        rms : bool, list, optional
+            If ``True``, calculate the root-mean-squared over all components combined,
+            or if ``rms`` is a list, only using those components.
+            Adds the key ``'RMS'`` to the output dictionary.
             Defaults to ``False``.
         n_observations : bool, optional
             If ``True``, count the number of observations (excluding NaNs) and NaNs.
@@ -559,8 +564,14 @@ class Station():
             mean = ts.mean(axis=0, skipna=True, numeric_only=True).values
             results["Mean"] = mean
         if std:
-            sd = ts.std(axis=0, skipna=True, numeric_only=True).values
-            results["Standard Deviation"] = sd
+            std = ts.std(axis=0, skipna=True, numeric_only=True).values
+            results["Standard Deviation"] = std
+        if rms:
+            if not isinstance(rms, list):
+                rms = list(range(self[ts_description].num_components))
+            rms_result = ((ts.iloc[:, rms] ** 2)
+                          .sum(axis=1, skipna=True, numeric_only=True)
+                          .mean(skipna=True) ** (0.5))
         if n_observations:
             n_obs = ts.count(axis=0, numeric_only=True).values
             results["Observations"] = n_obs
@@ -573,8 +584,14 @@ class Station():
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
         # print if any statistic was recorded
         if verbose and results:
-            print_df = pd.DataFrame(data=results, index=ts.data_cols)
+            print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
             print(print_df.rename_axis(f"{self.name}: {ts_description}", axis=1))
+            if rms:
+                print(f"RMS of components {rms}: "
+                      f"{rms_result} {self[ts_description].data_unit}")
+        # attach RMS here since it couldn't be added to the DataFrame before
+        if rms:
+            results["RMS"] = rms_result
         return results
 
     def get_trend(self, ts_description, model_list=None, components=None, total=False,
