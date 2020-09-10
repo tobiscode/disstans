@@ -249,7 +249,7 @@ def create_powerlaw_noise(size, exponent, seed=None):
 
 
 def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, delimiter=',',
-                            codecol=None, exclude_codes=None):
+                            codecol=None, exclude=None, include=None, verbose=False):
     """
     Function that loads a maintenance table from a .csv file (or similar) and returns
     a list of step times for each station. It also provides an interface to ignore
@@ -272,10 +272,15 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
         Delimiter character for the input file.
     codecol : int, optional
         Column index of the maintenance code.
-    exclude_codes : list, optional
-        List of strings that will lead to a maintenance record being ignored if there
-        is an exact match.
-        ``codecol`` and ``exclude_cols`` always have to be set both to work.
+    exclude : list, optional
+        Maintenance records that exactly match an element in ``exclude`` will be ignored.
+        ``codecol`` has to be set.
+    include : list, optional
+        Only maintenance records that include an element of ``include`` will be used.
+        No exact match is required.
+        ``codecol`` has to be set.
+    verbose : bool, optional
+        If ``True``, print loading information.
 
     Returns
     -------
@@ -294,10 +299,14 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
     if codecol is not None:
         assert isinstance(codecol, int), \
             f"'codecol' needs to be an integer, got {codecol}."
-        if exclude_codes is not None:
-            assert (isinstance(exclude_codes, list) and
-                    all([isinstance(ecode, str) for ecode in exclude_codes])), \
-                f"'exclude_codes' needs to be a list of strings, got {exclude_codes}."
+        if exclude is not None:
+            assert (isinstance(exclude, list) and
+                    all([isinstance(ecode, str) for ecode in exclude])), \
+                f"'exclude' needs to be a list of strings, got {exclude}."
+        if include is not None:
+            assert (isinstance(include, list) and
+                    all([isinstance(icode, str) for icode in include])), \
+                f"'include' needs to be a list of strings, got {include}."
         maint_table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol, codecol])
         # because we don't know the column names, we need to make sure that the site will
         # always be in the first column for later
@@ -315,6 +324,8 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
     timecolname = time.name
     # connect time and data
     maint_table = maint_table.join(time)
+    if verbose:
+        print(f"Loaded {maint_table.shape[0]} maintenance entries.")
     # process site name column with siteformatter and make sure we're not combining stations
     if siteformatter is not None:
         assert callable(siteformatter), \
@@ -323,11 +334,20 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
         maint_table[sitecolname] = maint_table[sitecolname].apply(siteformatter)
         unique_post = len(maint_table[sitecolname].unique())
         assert unique_pre == unique_post, "While applying siteformatter, stations were merged."
-    # now drop all columns where code is exactly one of the elements in exclude_codes
-    if (codecol is not None) and (exclude_codes is not None):
-        droprows = maint_table[codecolname].isin(exclude_codes)
-        print(f"Dropping {droprows.sum()} rows because of exclude_codes={exclude_codes}.")
+    # now drop all columns where code is exactly one of the elements in exclude
+    if (codecol is not None) and (exclude is not None):
+        droprows = maint_table[codecolname].isin(exclude)
+        if verbose:
+            print(f"Dropping {droprows.sum()} rows because of exclude={exclude}.")
         maint_table = maint_table[~droprows]
+    # now drop all columns where the code does not contain an element of 'include'
+    if (codecol is not None) and (include is not None):
+        keeprows = np.any([maint_table[codecolname].str.contains(pat).values
+                           for pat in include], axis=0)
+        if verbose:
+            print(f"Dropping {maint_table.shape[0] - keeprows.sum()} rows "
+                  f"because of include={include}.")
+        maint_table = maint_table.iloc[keeprows, :]
     # now produce a dictionary that maps sites to a list of step dates: {site: [steptimes]}
     maint_dict = dict(maint_table.groupby(sitecolname)[timecolname].apply(list))
     # rename columns
