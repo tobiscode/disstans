@@ -6,8 +6,8 @@ highest-level container object in GeoNAT.
 import numpy as np
 import pandas as pd
 import json
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.path as mplpath
 import cartopy.crs as ccrs
 import cartopy.geodesic as cgeod
 from copy import deepcopy
@@ -18,6 +18,7 @@ from . import timeseries as geonat_ts
 from . import models as geonat_models
 from . import solvers as geonat_solvers
 from . import processing as geonat_processing
+from . import scm
 from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
@@ -111,7 +112,7 @@ class Network():
                             auto_add_filter.shape[1] == 2), \
                         "'auto_add_filter' needs to be a (num_points, 2)-shaped " \
                         f"NumPy array, got {auto_add_filter}."
-                    net_poly = mplpath.Path(auto_add_filter)
+                    net_poly = mpl.path.Path(auto_add_filter)
                     stat_dict = {stat: loc for stat, loc in self._network_locations.items()
                                  if net_poly.contains_point(loc[:2])}
                 else:
@@ -1230,8 +1231,8 @@ class Network():
         plt.show()
 
     def gui(self, station=None, timeseries=None, model_list=None, sum_models=True, verbose=False,
-            stepdetector={}, scalogram_kw_args={}, trend_kw_args={}, analyze_kw_args={},
-            gui_kw_args={}):
+            stepdetector={}, scalogram_kw_args={}, trend_kw_args={},
+            analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -1249,6 +1250,7 @@ class Network():
         - show only a subset of fitted models,
         - sum the models to an aggregate one,
         - restrict the output to a timewindow showing potential steps from multiple sources,
+        - color the station markers by RMS and include a colormap,
         - show a scalogram (Model class permitting),
         - print statistics of residuals, and
         - print station information.
@@ -1302,14 +1304,24 @@ class Network():
             (for example for vertical motion), it will be plotted as the North component.
         analyze_kw_args : dict, optional
             If provided and non-empty, call :meth:`~geonat.station.Station.analyze_residuals`
-            and pass the dictionary on as keyword arguments. Defaults to no residual analysis.
+            and pass the dictionary on as keyword arguments (overriding ``'verbose'`` to
+            ``True`` to force an output). Defaults to no residual analysis.
+        rms_on_map : dict, optional
+            If provided and non-empty, this option will call
+            :meth:`~geonat.station.Station.analyze_residuals` to calculate
+            a residual timeseries' root-mean-squares to color the station markers on the map.
+            The dictionary must include the key ``'ts'`` (the residual timeseries' name), and
+            can optionally include the keys ``'comps'`` (a list of components to combine for
+            the RMS, defaults to all components), ``'c_max'`` (maximum colormap range,
+            defaults to maximum of the RMS), and ``'t_start', 't_end'`` (to restrict the time
+            window, defaults to ``analyze_kw_args`` if given, otherwise the entire timeseries).
         gui_kw_args : dict
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         """
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
-        fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
+        fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
         ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
         fig_ts = plt.figure()
@@ -1325,6 +1337,41 @@ class Network():
             scalo_model = scalogram_kw_args.pop('model')
             fig_scalo = plt.figure()
         station_name, station_index = None, None
+
+        # make sure that if analyze_kw_args is used, 'verbose' is set and True
+        if analyze_kw_args:
+            analyze_kw_args["verbose"] = True
+
+        # color the station markers by RMS
+        if rms_on_map:
+            # check input
+            assert isinstance(rms_on_map, dict) and ("ts" in rms_on_map) and \
+                   isinstance(rms_on_map["ts"], str), \
+                   "'rms_on_map' needs to be a dictionary including the key 'ts' with a " \
+                   f"string value, got {rms_on_map}."
+            # collect RMS
+            rms_comps = True if "comps" not in rms_on_map else rms_on_map["comps"]
+            rms_kw_args = {"rms": rms_comps}
+            for k in ["t_start", "t_end"]:
+                if k in rms_on_map:
+                    rms_kw_args[k] = rms_on_map[k]
+                elif k in analyze_kw_args:
+                    rms_kw_args[k] = analyze_kw_args[k]
+            rms = np.zeros(self.num_stations)
+            for i, stat in enumerate(self):
+                rms[i] = stat.analyze_residuals(rms_on_map["ts"], **rms_kw_args)["RMS"]
+            # make colormap
+            cmax = np.max(rms) if "c_max" not in rms_on_map else rms_on_map["c_max"]
+            rms_cmap = mpl.cm.ScalarMappable(cmap=scm.lajolla_r,
+                                             norm=mpl.colors.Normalize(vmin=0, vmax=cmax))
+            # update marker facecolors
+            stat_points.set_facecolor(rms_cmap.to_rgba(rms))
+            fig_map.canvas.draw_idle()
+            # add colorbar
+            cbar = fig_map.colorbar(rms_cmap, ax=ax_map, orientation="horizontal",
+                                    fraction=0.05, pad=0.03, aspect=10,
+                                    extend="max" if np.max(rms) > cmax else "neither")
+            cbar.set_label(f"RMS [{stat[rms_on_map['ts']].data_unit}]")
 
         # add velocity map
         if trend_kw_args:
