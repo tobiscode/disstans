@@ -794,7 +794,8 @@ class Network():
             kw_args["cached_mapping"] = self.common_mapping(ts_description)
         iterable_inputs = ((station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None
-                            else {m: station.models[ts_description][m] for m in model_list},
+                            else {m: station.models[ts_description][m] for m in model_list
+                                  if m in station.models[ts_description]},
                             solver, kw_args) for station in self)
         station_names = list(self.stations.keys())
         for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
@@ -912,7 +913,8 @@ class Network():
             iterable_inputs = ((station.timeseries[ts_description].time
                                 if timevector is None else timevector,
                                 station.models[ts_description] if model_list is None
-                                else {m: station.models[ts_description][m] for m in model_list})
+                                else {m: station.models[ts_description][m] for m in model_list
+                                      if m in station.models[ts_description]})
                                for station in self)
             station_names = list(self.stations.keys())
             for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station,
