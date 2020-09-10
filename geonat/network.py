@@ -1135,10 +1135,10 @@ class Network():
         # create figure and plot stations
         fig_map = plt.figure()
         ax_map = fig_map.add_subplot(projection=proj_gui)
-        default_station_colors = ['b'] * len(stat_lats)
-        stat_points = ax_map.scatter(stat_lons, stat_lats,
+        default_station_edges = ['none'] * len(stat_lats)
+        stat_points = ax_map.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
                                      linestyle='None', marker='.', transform=proj_lla,
-                                     facecolor=default_station_colors, zorder=1000)
+                                     edgecolor=default_station_edges, zorder=1000)
         for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
             ax_map.annotate(sname, (slon, slat),
                             xycoords=proj_lla._as_mpl_transform(ax_map), annotation_clip=True,
@@ -1156,7 +1156,7 @@ class Network():
         if gui_settings["coastlines_show"]:
             ax_map.coastlines(color="white" if map_underlay else "black",
                               resolution=gui_settings["coastlines_res"])
-        return fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
+        return fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons
 
     def graphical_cme(self, ts_in, ts_out=None, gui_kw_args={}, **cme_kw_args):
@@ -1205,7 +1205,7 @@ class Network():
             for j in range(ndim_max2):
                 latlonenu[i, 2 + j] = spatial[comps[j]][0, i]
         # make map for spatial component
-        fig_map, ax_map, proj_gui, proj_lla, default_station_colors, \
+        fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
         if ndim == 1:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
@@ -1398,6 +1398,7 @@ class Network():
         # define clicking function
         def update_timeseries(event, select_station=None):
             nonlocal analyze_kw_args, gui_settings, station_name, station_index
+            # select station
             if select_station is None:
                 if event is not None:
                     if (event.xdata is None) \
@@ -1416,9 +1417,10 @@ class Network():
                 station_index = list(self.stations.keys()).index(station_name)
             if verbose:
                 print(self[station_name])
-            highlight_station_colors = default_station_colors.copy()
-            highlight_station_colors[station_index] = 'r'
-            stat_points.set_facecolor(highlight_station_colors)
+            # change marker edges
+            highlight_station_edges = default_station_edges.copy()
+            highlight_station_edges[station_index] = 'k'
+            stat_points.set_edgecolor(highlight_station_edges)
             fig_map.canvas.draw_idle()
             # get components
             ts_to_plot = {ts_description: ts for ts_description, ts
@@ -1427,7 +1429,7 @@ class Network():
             n_components = 0
             for ts_description, ts in ts_to_plot.items():
                 n_components += ts.num_components
-                if len(analyze_kw_args) > 0:
+                if analyze_kw_args:
                     self[station_name].analyze_residuals(ts_description, **analyze_kw_args)
             # clear figure and add data
             fig_ts.clear()
