@@ -74,10 +74,10 @@ autodoc_default_options = {'undoc-members': True,
 
 # intersphinx settings
 intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
-                       'numpy': ('https://numpy.org/doc/1.18/', None),
-                       'scipy': ('https://docs.scipy.org/doc/scipy-1.4.1/reference/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.0.4/', None),
-                       'matplotlib': ('https://matplotlib.org/3.2.1/', None)}
+                       'numpy': ('https://numpy.org/doc/1.19/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy-1.5.2/reference/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.1.1/', None),
+                       'matplotlib': ('https://matplotlib.org/3.3.1/', None)}
 
 # ReadTheDocs theme settings
 html_theme_options = {'collapse_navigation': False}

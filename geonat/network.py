@@ -1257,6 +1257,8 @@ class Network():
 
         Parameters
         ----------
+        station : str, optional
+            Pre-select a station.
         timeseries : list, optional
             List of strings with the descriptions of the timeseries to plot.
             Defaults to all timeseries.
