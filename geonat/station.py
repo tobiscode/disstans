@@ -606,6 +606,8 @@ class Station():
         model_list : list, optional
             List of strings containing the model names of the subset of the fitted models
             to be used. Defaults to all fitted models.
+            If ``ts_description`` does not contain any fits, and the trend of the timeseries
+            itself is to be calculated, pass an empty list (``[]``).
         components : list, optional
             List of the numerical indices of which components of the timeseries to use.
             Defaults to all components.
@@ -638,8 +640,9 @@ class Station():
             f"'ts_description' needs to be a string, got {type(ts_description)}."
         assert ts_description in self.timeseries, \
             f"Station {self.name}: Can't find '{ts_description}' to calculate a trend for."
-        assert self.models[ts_description], \
-            f"Station {self.name}, timeseries {ts_description}: Can't find any models."
+        if model_list != []:
+            assert self.models[ts_description], \
+                f"Station {self.name}, timeseries {ts_description}: Can't find any models."
         ts = self[ts_description]
         if components is None:
             components = list(range(ts.num_components))
@@ -656,8 +659,12 @@ class Station():
             t_span = ts.time[inside]
         else:
             return None, None
-        # get fit sums
-        fit_sum, fit_sum_var = self.sum_fits(ts_description, model_list)
+        # get relevant timeseries
+        if model_list != []:
+            fit_sum, fit_sum_var = self.sum_fits(ts_description, model_list)
+        else:
+            fit_sum = ts.data.values
+            fit_sum_var = None if ts.var_cols is None else ts.vars.values
         # initialize fitting
         G = np.ones((t_span.size, 2))
         G[:, 1] = tvec_to_numpycol(t_span, time_unit=time_unit)
@@ -668,14 +675,29 @@ class Station():
             trend_sigma = np.zeros(n_comps)
         # fit components
         for icomp in components:
-            if fit_sum_var is not None:
-                GtW = G.T @ sparse.diags(1/fit_sum_var[inside, icomp])
-                GtWG = GtW @ G
-                GtWd = GtW @ fit_sum[inside, icomp]
+            if model_list != []:
+                validsub = np.ones(inside.sum(), dtype=bool)
+                Gsub = G
             else:
-                GtWG = G.T @ G
-                GtWd = G.T @ fit_sum[inside, icomp]
+                if fit_sum_var is not None:
+                    validsub = np.all((np.isfinite(fit_sum[inside, icomp]),
+                                       np.isfinite(fit_sum_var[inside, icomp])), axis=0)
+                else:
+                    validsub = np.isfinite(fit_sum[inside, icomp])
+                Gsub = G[validsub, :]
+                if Gsub.shape[0] < 2:
+                    return None, None
+            if fit_sum_var is not None:
+                GtW = Gsub.T @ sparse.diags(1/fit_sum_var[inside, icomp][validsub])
+                GtWG = GtW @ Gsub
+                GtWd = GtW @ fit_sum[inside, icomp][validsub]
+            else:
+                GtWG = Gsub.T @ Gsub
+                GtWd = Gsub.T @ fit_sum[inside, icomp][validsub]
             trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
             if include_sigma and (fit_sum_var is not None):
-                trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG)[1, 1])
+                if Gsub.shape[0] == 2:
+                    trend_sigma[icomp] = 0
+                else:
+                    trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG)[1, 1])
         return trend, trend_sigma if (include_sigma and fit_sum_var) else None

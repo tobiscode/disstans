@@ -1419,9 +1419,9 @@ class Network():
             quiv = ax_map.quiver(np.array(stat_lons), np.array(stat_lats),
                                  trend[:, 0], trend[:, 1],
                                  units='xy', transform=proj_lla)
-            key_length = np.median(np.sqrt(np.sum(trend**2, axis=1)))
+            key_length = np.nanpercentile(np.sqrt(np.nansum(trend**2, axis=1)), 90)
             ax_map.quiverkey(quiv, 0.9, 0.9, key_length,
-                             f"{key_length:.2e} {trend_unit:s}",
+                             f"{key_length:.2g} {trend_unit:s}",
                              coordinates="figure")
             # TODO: plot uncertainty ellipses
 
