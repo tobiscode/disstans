@@ -971,7 +971,8 @@ class SplineSet(Model):
             model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 
-    def make_scalogram(self, t_left, t_right, cmaprange=None, resolution=1000):
+    def make_scalogram(self, t_left, t_right, cmaprange=None, resolution=1000,
+                       min_param_mag=1e-9):
         """
         Create a scalogram figure of the model parameters.
 
@@ -992,6 +993,8 @@ class SplineSet(Model):
             Defaults to the 95th percentile of the absolute amplitudes of all parameters.
         resolution : int, optional
             Number of points inside the time span to evaluate the scalogram at.
+        min_param_mag : float, optional
+            The minimum absolute value of a parameter to be plotted.
 
         Returns
         -------
@@ -1046,10 +1049,11 @@ class SplineSet(Model):
                                 np.cumsum(mdl_mapping / mdl_sum, axis=1)])
             # plot cell
             for j, k in product(range(model.num_parameters), range(num_components)):
-                ax[k].fill_between(t_plot,
-                                   y_off + y_norm[:, j]*dy_scale,
-                                   y_off + y_norm[:, j+1]*dy_scale,
-                                   facecolor=cmap.to_rgba(model.parameters[j, k]))
+                if np.abs(model.parameters[j, k]) < min_param_mag:
+                    ax[k].fill_between(t_plot,
+                                       y_off + y_norm[:, j]*dy_scale,
+                                       y_off + y_norm[:, j+1]*dy_scale,
+                                       facecolor=cmap.to_rgba(model.parameters[j, k]))
             # plot vertical lines at centerpoints
             for j, k in product(range(model.num_parameters), range(num_components)):
                 ax[k].axvline(model.t_reference
