@@ -87,7 +87,8 @@ class Network():
         self.stations = {}
         """
         Dictionary of network stations, where the keys are their string names
-        and the values are their :class:`~geonat.station.Station` objects. """
+        and the values are their :class:`~geonat.station.Station` objects.
+        """
         self.global_models = {}
         """
         Dictionary of network-wide models, where the keys are string descriptions
@@ -731,7 +732,7 @@ class Network():
         return common_mapping
 
     def fit(self, ts_description, model_list=None, solver='linear_regression',
-            cached_mapping=True, **kw_args):
+            cached_mapping=True, local_input={}, **kw_args):
         """
         Fit the models (or a subset thereof) for a specific timeseries at all stations.
         Also provides a progress bar.
@@ -750,14 +751,24 @@ class Network():
             name in :mod:`~geonat.solvers`, otherwise will use the passed function as a
             solver (which needs to adhere to the same input/output structure as the
             included solver functions). Defaults to standard linear least squares.
-        cache_mapping : bool, optional
+        cached_mapping : bool, optional
             If ``True``, the mapping matrices for all models that are common to all stations
             is calculated and inserted into ``kw_args`` as ``'cached_mapping'``, such that
             redundant work is reduced.
             This is mostly impactful for serial processing, but does not have a noticeable
             drawback for parallel processing, which is why it defaults to ``True``.
+        local_input : dict, optional
+            Provides the ability to pass individual keyword arguments to the solver,
+            potentially overriding the (global) keywords in ``kw_args``.
         **kw_args : dict
-            Additional keyword arguments that are passed onto the solver function.
+            Additional keyword arguments that are passed on to the solver function.
+
+        Returns
+        -------
+        global_return : dict, optional
+            If the solver function returns more than the anticipated single return
+            object, a dictionary is created that for each station, contains the extra
+            result objects.
 
         Example
         -------
@@ -793,29 +804,41 @@ class Network():
         # get common mapping matrices
         if cached_mapping:
             kw_args["cached_mapping"] = self.common_mapping(ts_description)
+        station_names = list(self.stations.keys())
         iterable_inputs = ((station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None
                             else {m: station.models[ts_description][m] for m in model_list
                                   if m in station.models[ts_description]},
-                            solver, kw_args) for station in self)
-        station_names = list(self.stations.keys())
+                            solver,
+                            kw_args if local_input == {}
+                            else {**kw_args, **local_input[station_names[i]]})
+                           for i, station in enumerate(self))
+        global_return = {}
         for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
                                         desc="Fitting station models",
                                         total=len(self.stations),
                                         ascii=True, unit="station")):
             stat = self[station_names[i]]
             # print warning if the solver didn't converge
-            if any([np.isnan(params_var[0]).sum() > 0 for params_var in result.values()]):
+            if any([np.isnan(params_var[0]).sum() > 0 for params_var in result[0].values()]):
                 warn(f"Fitting did not converge for timeseries {ts_description} "
                      f"at {station_names[i]}", category=RuntimeWarning)
-            for model_description, (params, var) in result.items():
+            for model_description, (params, var) in result[0].items():
                 stat.models[ts_description][model_description].read_parameters(params, var)
+            # if there is additional output, save it
+            if len(result) > 1:
+                global_return[station_names[i]] = result[1:]
+        # output extra return values
+        if global_return != {}:
+            return global_return
 
     @staticmethod
     def _fit_single_station(parameter_tuple):
         station_time, station_models, solver, kw_args = parameter_tuple
-        model_params_var = solver(station_time, station_models, **kw_args)
-        return model_params_var
+        solver_output = solver(station_time, station_models, **kw_args)
+        if not isinstance(solver_output, tuple):
+            solver_output = (solver_output, )
+        return solver_output
 
     def evaluate(self, ts_description, model_list=None, timevector=None,
                  output_description=None, reuse=False):
