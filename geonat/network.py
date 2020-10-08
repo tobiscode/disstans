@@ -1231,7 +1231,7 @@ class Network():
         plt.show()
 
     def gui(self, station=None, timeseries=None, model_list=None, sum_models=True, verbose=False,
-            stepdetector={}, scalogram_kw_args={}, trend_kw_args={},
+            scalogram_kw_args=None, stepdetector={}, trend_kw_args={},
             analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
@@ -1271,6 +1271,12 @@ class Network():
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
             :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
+        scalogram_kw_args : dict, optional
+            If passed, also plot a scalogram. Defaults to no scalogram shown.
+            The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
+            are the names of the timeseries and associated model that are of the
+            :class:`~geonat.models.SplineSet` class, and therefore have a
+            :meth:`~geonat.models.SplineSet.make_scalogram` method.
         stepdetector : dict, optional
             Passing this dictionary will enable the plotting of events related to possible
             steps, both on the map (in case of an earthquake catalog) and in the timeseries
@@ -1288,12 +1294,6 @@ class Network():
             :mod:`~geonat.earthquakes` and a maximum distance of stations to earthquakes of
             magnitude less than 7.5), and optionally, ``'maint_table'`` (a maintenance table
             as parsed by :func:`~geonat.tools.parse_maintenance_table`).
-        scalogram_kw_args : dict, optional
-            If passed, also plot a scalogram. Defaults to no scalogram shown.
-            The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
-            are the names of the timeseries and associated model that are of the
-            :class:`~geonat.models.SplineSet` class, and therefore have a
-            :meth:`~geonat.models.SplineSet.make_scalogram` method.
         trend_kw_args : dict, optional
             If passed, also plot velocity trends on the station map.
             Defaults to no velocity arrows shown.
@@ -1327,7 +1327,7 @@ class Network():
             stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
         ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
         fig_ts = plt.figure()
-        if scalogram_kw_args:
+        if scalogram_kw_args is not None:
             assert isinstance(scalogram_kw_args, dict) \
                 and all([key in scalogram_kw_args for key in ['ts', 'model']]) \
                 and all([isinstance(scalogram_kw_args[key], str)
@@ -1484,7 +1484,7 @@ class Network():
             fig_ts.clear()
             icomp = 0
             ax_ts = []
-            if scalogram_kw_args:
+            if scalogram_kw_args is not None:
                 nonlocal fig_scalo
                 t_left, t_right = None, None
             for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
@@ -1549,7 +1549,7 @@ class Network():
                         ax.legend()
                     ax_ts.append(ax)
                     icomp += 1
-                    if scalogram_kw_args:
+                    if scalogram_kw_args is not None:
                         t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
                         t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
 
@@ -1670,7 +1670,7 @@ class Network():
             fig_ts.canvas.draw_idle()
 
             # get scalogram
-            if scalogram_kw_args:
+            if scalogram_kw_args is not None:
                 try:
                     splset = self[station_name].models[scalo_ts][scalo_model]
                     if isinstance(fig_scalo, plt.Figure):
