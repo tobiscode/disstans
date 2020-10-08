@@ -12,7 +12,7 @@ from warnings import warn
 from .config import defaults
 
 
-def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):
+def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None, init_reweights=None):
     """
     Quick helper function that concatenates the mapping matrices of the
     models given the timevector in ts, and returns the relevant sizes.
@@ -21,11 +21,18 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):
     It also makes sure that G only contains columns that contain at least
     one non-zero element, and correspond to parameters that are therefore
     observable.
+    Can also match model-specific init_reweights to the respective array.
     """
     mapping_matrices = []
     obs_indices = []
     if reg_indices:
         reg_diag = []
+        if init_reweights is None:
+            init_weights = None
+        elif isinstance(init_reweights, np.ndarray):
+            init_weights = init_reweights
+        elif isinstance(init_reweights, dict):
+            init_weights = []
     for (mdl_description, model) in models.items():
         if cached_mapping and mdl_description in cached_mapping:
             mapping = cached_mapping[mdl_description].loc[ts.time].values
@@ -33,14 +40,19 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):
             if reg_indices and model.regularize:
                 nunique = (~np.isclose(np.diff(mapping, axis=0), 0)).sum(axis=0) + 1
                 observable = np.logical_and(observable, nunique > 1)
+                if isinstance(init_reweights, dict) and (mdl_description in init_reweights):
+                    init_weights.append(init_reweights[mdl_description][observable, :])
             mapping = sparse.csc_matrix(mapping[:, observable])
         else:
             mapping, observable = model.get_mapping(ts.time, return_observability=True)
             mapping = mapping[:, observable]
+            if reg_indices and model.regularize and \
+               isinstance(init_reweights, dict) and (mdl_description in init_reweights):
+                init_weights.append(init_reweights[mdl_description][observable, :])
         mapping_matrices.append(mapping)
         obs_indices.append(observable)
         if reg_indices:
-            reg_diag.extend([model.regularize for _ in range(observable.sum())])
+            reg_diag.extend([model.regularize] * int(observable.sum()))
     G = sparse.hstack(mapping_matrices, format='csc')
     obs_indices = np.concatenate(obs_indices)
     num_time, num_params = G.shape
@@ -51,7 +63,13 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None):
         num_reg = reg_diag.sum()
         if num_reg == 0:
             warn("Regularized solver got no models to regularize.")
-        return G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag
+        if init_weights is not None:
+            if isinstance(init_weights, list):
+                init_weights = np.concatenate(init_weights)
+            assert init_weights.shape == (num_reg, num_comps), \
+                "The combined 'init_reweights' must have the shape " + \
+                f"{(num_reg, num_comps)}, got {init_weights.shape}."
+        return G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag, init_weights
     else:
         return G, obs_indices, num_time, num_params, num_comps
 
@@ -118,16 +136,24 @@ def _build_LS(ts, G, icomp=None, return_W_G=False, use_data_var=True, use_data_c
         return GtWG, GtWd
 
 
-def _pack_params_var(models, params, var, obs_indices):
+def _pack_params_var(models, params, var, obs_indices, weights=None, reg_diag=None):
     """
     Quick helper function that distributes the parameters (and variances)
     of the input matrices into the respective models.
     obs_indices indicates whether only certain columns (parameters) were estimated.
+    If weights and reg_diag are passed, the weights of the regularized model
+    parameters are also distributed and returned.
     """
     ix_model = 0
     ix_sol = 0
     num_components = params.shape[1]
     model_params_var = {}
+    pack_weights = True if (weights is not None) and (reg_diag is not None) else False
+    if pack_weights:
+        model_weights = {}
+        ix_reg = 0
+        assert reg_diag.size == params.shape[0], \
+            f"Unexpected parameter size mismatch: {reg_diag.size} != {params.shape}[0]"
     for (mdl_description, model) in models.items():
         mask = obs_indices[ix_model:ix_model+model.num_parameters]
         num_solved = mask.sum()
@@ -139,8 +165,27 @@ def _pack_params_var(models, params, var, obs_indices):
             v = np.zeros((model.num_parameters, num_components))
             v[mask, :] = var[ix_sol:ix_sol+num_solved, :]
         model_params_var[mdl_description] = (p, v)
+        if pack_weights:
+            mask_reg = reg_diag[ix_sol:ix_sol+num_solved]
+            num_solved_reg = mask_reg.sum()
+            if num_solved_reg > 0:
+                w = np.zeros((model.num_parameters, num_components))
+                w[np.flatnonzero(mask)[mask_reg], :] = weights[ix_reg:ix_reg+num_solved_reg, :]
+                model_weights[mdl_description] = w
+            else:
+                model_weights[mdl_description] = None
+            ix_reg += num_solved_reg
         ix_model += model.num_parameters
         ix_sol += num_solved
+    assert ix_model == obs_indices.shape[0], \
+        f"Unexpected model size mismatch: {ix_model} != {obs_indices.shape}[0]"
+    assert ix_sol == params.shape[0], \
+        f"Unexpected solution size mismatch: {ix_sol} != {params.shape}[0]"
+    if pack_weights:
+        assert ix_reg == weights.shape[0], \
+            f"Unexpected regularization size mismatch: {ix_reg} != {weights.shape}[0]"
+        return model_params_var, model_weights
+    else:
     return model_params_var
 
 
@@ -316,7 +361,7 @@ def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=
              "which effectively removes the regularization.")
 
     # get mapping and regularization matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag = \
+    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag, _ = \
         _combine_mappings(ts, models, reg_indices=True, cached_mapping=cached_mapping)
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
@@ -347,9 +392,10 @@ def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=
     return model_params_var
 
 
-def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss=1e-10,
+def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_rss=1e-10,
                      init_reweights=None, formal_variance=False, cached_mapping=None,
-                     use_data_variance=True, use_data_covariance=True, cvxpy_kw_args={}):
+                     use_data_variance=True, use_data_covariance=True, return_weights=False,
+                     cvxpy_kw_args={}):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -395,9 +441,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
     reweight_max_iters : int, optional
-        If greater than zero, include additional solver calls after reweighting
-        the regularization parameters (see Notes).
-        Defaults to no reweighting (``0``).
+        If an integer, number of solver iterations (see Notes), resulting in reweighting.
+        Defaults to no reweighting (``None``).
     reweight_max_rss : float, optional
         When reweighting is active and the maximum number of iterations has not yet
         been reached, let the iteration stop early if the solutions do not change much
@@ -422,6 +467,10 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     use_data_covariance : bool, optional
         If ``True`` (default), ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+    return_weights : bool, optional
+        When reweighting is active, set to ``True`` to return the weights after the last
+        update.
+        Defaults to ``False``.
     cvxpy_kw_args : dict
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
 
@@ -435,7 +484,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
     Notes
     -----
 
-    The L0-regularization approximation used by setting ``reweight_max_iters > 0`` is based
+    The L0-regularization approximation used by setting ``reweight_max_iters >= 0`` is based
     on [candes08]_. The idea here is to iteratively reduce the cost (before multiplication
     with :math:`\lambda`) of regularized, but significant parameters to 1, and iteratively
     increasing the cost of a regularized, but small parameter to a much larger value.
@@ -481,25 +530,38 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
              "which removes the regularization.")
 
     # get mapping and regularization matrix
-    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag = \
-        _combine_mappings(ts, models, reg_indices=True, cached_mapping=cached_mapping)
+    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag, init_weights = \
+        _combine_mappings(ts, models, reg_indices=True, cached_mapping=cached_mapping,
+                          init_reweights=init_reweights)
     regularize = (num_reg > 0) and (penalty > 0)
+    if (not regularize) or (reweight_max_iters is None):
+        return_weights = False
+    if reweight_max_iters is None:
+        n_iters = 1
+    else:
+        assert isinstance(reweight_max_iters, int) and reweight_max_iters > 0
+        n_iters = int(reweight_max_iters)
 
     # solve CVXPY problem while checking for convergence
-    def solve_problem(GtWG, GtWd, reg_diag, num_comps=num_comps):
+    def solve_problem(GtWG, GtWd, reg_diag, num_comps=num_comps, init_weights=init_weights):
         # build objective function
         m = cp.Variable(GtWd.size)
         objective = cp.norm2(GtWG @ m - GtWd)
         constraints = None
         if regularize:
             lambd = cp.Parameter(value=penalty, pos=True)
-            if reweight_max_iters > 0:
+            if reweight_max_iters is not None:
                 rw_func = _get_reweighting_function()
-                if init_reweights is None:
-                    init_weights = np.ones(num_reg*num_comps)
-                weights = cp.Parameter(shape=num_reg*num_comps,
+                reweight_size = num_reg*num_comps
+                if init_weights is None:
+                    init_weights = np.ones(reweight_size)
+                else:
+                    assert init_weights.size == reweight_size, \
+                        f"'init_weights' must have a size of {reweight_size}, " + \
+                        f"got {init_reweights.size}."
+                weights = cp.Parameter(shape=reweight_size,
                                        value=init_weights, pos=True)
-                z = cp.Variable(shape=num_reg*num_comps)
+                z = cp.Variable(shape=reweight_size)
                 objective = objective + lambd * cp.norm1(z)
                 constraints = [z == cp.multiply(weights, m[reg_diag])]
                 old_m = np.zeros(m.shape)
@@ -508,7 +570,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
         # define problem
         problem = cp.Problem(cp.Minimize(objective), constraints)
         # solve
-        for i in range(reweight_max_iters + 1):  # always solve at least once
+        for i in range(n_iters):  # always solve at least once
             try:
                 problem.solve(enforce_dpp=True, **cvxpy_kw_args)
             except cp.error.SolverError as e:
@@ -523,16 +585,22 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
                 # solved
                 converged = True
                 # if iterating, extra tasks
-                if regularize and (i < reweight_max_iters):
-                    # check if the solution changed to previous iteration
-                    rss = np.sqrt(np.sum((old_m - m.value)**2))  # root sum of squares
-                    if (i > 0) and (rss < reweight_max_rss):
-                        break
+                if regularize:
                     # update weights
                     weights.value = rw_func(m.value[reg_diag])
+                    # check if the solution changed to previous iteration
+                    if (i > 0) and (np.sqrt(np.sum((old_m - m.value)**2)) < reweight_max_rss):
+                        break
+                    # remember previous solution
                     old_m[:] = m.value[:]
         # return
-        return m.value if converged else None
+        if converged and (regularize and reweight_max_iters is not None):
+            result = (m.value, weights.value)
+        elif converged:
+            result = (m.value, None)
+        else:
+            result = (None, None)
+        return result
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
@@ -541,17 +609,23 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
         params = np.zeros((num_params, num_comps))
         if formal_variance:
             var = np.zeros((num_params, num_comps))
+        if regularize and return_weights:
+            weights = np.zeros((num_reg, num_comps))
         # loop over components
         for i in range(num_comps):
             # build and solve problem
             Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, icomp=i, return_W_G=True,
                                                    use_data_var=use_data_variance)
-            solution = solve_problem(GtWG, GtWd, reg_diag, num_comps=1)
+            solution, wts = solve_problem(GtWG, GtWd, reg_diag, num_comps=1,
+                                          init_weights=init_weights[:, i]
+                                          if init_weights is not None else None)
             # store results
             if solution is None:
                 params[:, i] = np.NaN
                 if formal_variance:
                     var[:, i] = np.NaN
+                if regularize and return_weights:
+                    weights[:, i] = np.NaN
             else:
                 params[:, i] = solution
                 # if desired, estimate formal variance here
@@ -560,13 +634,15 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
                     Gsub = Gnonan[:, best_ind]
                     GtWG = Gsub.T @ Wnonan @ Gsub
                     var[best_ind, i] = np.diag(np.linalg.pinv(GtWG))
+                if regularize and return_weights:
+                    weights[:, i] = wts
     else:
         # build stacked problem and solve
         Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, return_W_G=True,
                                                use_data_var=use_data_variance,
                                                use_data_cov=use_data_covariance)
         reg_diag = np.repeat(reg_diag, num_comps)
-        solution = solve_problem(GtWG, GtWd, reg_diag)
+        solution, weights = solve_problem(GtWG, GtWd, reg_diag)
         # store results
         if solution is None:
             params = np.empty((num_params, num_comps))
@@ -574,6 +650,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
             if formal_variance:
                 var = np.empty((num_params, num_comps))
                 var[:] = np.NaN
+            if regularize and return_weights:
+                weights = np.empty((num_reg, num_comps))
+                weights[:] = np.NaN
         else:
             params = solution.reshape(num_params, num_comps)
             # if desired, estimate formal variance here
@@ -584,8 +663,18 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=0, reweight_max_rss
                 GtWG = Gsub.T @ Wnonan @ Gsub
                 var[best_ind, :] = np.diag(np.linalg.pinv(GtWG))
                 var = var.reshape(num_params, num_comps)
+            if regularize and return_weights:
+                weights = weights.reshape(num_reg, num_comps)
 
-    # separate parameters back to models
+    # separate parameters back to models and return
+    if return_weights:
+        model_params_var, model_weights = _pack_params_var(models, params,
+                                                           var if formal_variance else None,
+                                                           obs_indices, weights, reg_diag)
+        return model_params_var, model_weights
+    else:
     model_params_var = _pack_params_var(models, params, var if formal_variance else None,
                                         obs_indices)
-    return model_params_var
+        return model_params_var,
+
+
