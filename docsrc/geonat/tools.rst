@@ -26,6 +26,11 @@ parse_maintenance_table
 
 .. autofunction:: geonat.tools.parse_maintenance_table
 
+weighted_median
+...............
+
+.. autofunction:: geonat.tools.weighted_median
+
 Classes
 -------
 

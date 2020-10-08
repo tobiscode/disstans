@@ -354,3 +354,51 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
     maint_table.rename(columns={sitecolname: "station", codecolname: "code",
                                 timecolname: "time"}, inplace=True)
     return maint_table, maint_dict
+
+
+def weighted_median(values, weights, axis=0, percentile=0.5, keepdims=False):
+    """
+    Calculates the weighted median along a given axis.
+
+    Parameters
+    ----------
+    values : numpy.ndarray
+        Values to calculate the medians for.
+    weights : numpy.ndarray
+        Weights of each value along the given ``axis``.
+    axis : int, optional
+        Axis along which to calculate the median. Defaults to the first one (``0``).
+    percentile : float, optional
+        Changes the percentile (between 0 and 1) of which median to calculate.
+        Defaults to ``0.5``.
+    keepdims : bool, optional
+        If ``True``, squeezes out the axis along which the median was calculated.
+        Defaults to ``False``.
+    """
+    # some checks
+    assert isinstance(values, np.ndarray) and isinstance(weights, np.ndarray), \
+        "'values' and 'weights' must be NumPy arrays, got " + \
+        f"{type(values)} and {type(weights)}."
+    assert isinstance(axis, int) and (axis < len(values.shape)), \
+        f"Axis {axis} is not a valid index for the shape of 'values' ({values.shape})."
+    assert (percentile >= 0) and (percentile <= 1), \
+        f"'percentile' must be between 0 and 1, got {percentile}."
+    # broadcast the weights
+    weights = np.expand_dims(weights,
+                             [i for i in range(len(values.shape))
+                              if i != axis])
+    # sort the values and weights
+    sort_indices = np.argsort(values, axis=axis)
+    sort_values = np.take_along_axis(values, sort_indices, axis=axis)
+    sort_weights = np.take_along_axis(weights, sort_indices, axis=axis)
+    # calculate the median cutoff
+    cumsum = np.cumsum(sort_weights, axis=axis)
+    cutoff = np.sum(sort_weights, axis=axis, keepdims=True) * percentile
+    # find the values at that cutoff
+    index_array = np.argmax(cumsum >= cutoff, axis=axis)
+    medians = np.take_along_axis(sort_values,
+                                 np.expand_dims(index_array, axis=axis), axis=axis)
+    # squeeze (if desired) and return
+    if not keepdims:
+        medians = medians.squeeze(axis=axis)
+    return medians
