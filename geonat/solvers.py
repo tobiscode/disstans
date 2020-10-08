@@ -7,9 +7,12 @@ import numpy as np
 import scipy as sp
 import scipy.sparse as sparse
 import cvxpy as cp
+import cartopy.geodesic as cgeod
 from warnings import warn
+from tqdm import tqdm
 
 from .config import defaults
+from .tools import weighted_median
 
 
 def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None, init_reweights=None):
@@ -186,7 +189,7 @@ def _pack_params_var(models, params, var, obs_indices, weights=None, reg_diag=No
             f"Unexpected regularization size mismatch: {ix_reg} != {weights.shape}[0]"
         return model_params_var, model_weights
     else:
-    return model_params_var
+        return model_params_var
 
 
 def _get_reweighting_function():
@@ -673,8 +676,150 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
                                                            obs_indices, weights, reg_diag)
         return model_params_var, model_weights
     else:
-    model_params_var = _pack_params_var(models, params, var if formal_variance else None,
-                                        obs_indices)
+        model_params_var = _pack_params_var(models, params, var if formal_variance else None,
+                                            obs_indices)
         return model_params_var,
 
 
+class SpatialSolver():
+    r"""
+    Solver class that in combination with :func:`~lasso_regression` solves the
+    spatiotemporal, L0-reweighted least squares fitting problem given the models and
+    timeseries found in a target :class:`~geonat.network.Network` object.
+    This is achieved by following the alternating computation scheme as described
+    in :meth:`~solve`.
+
+    Parameters
+    ----------
+    net : geonat.network.Network
+        Network to fit.
+    ts_description : str
+        Description of the timeseries to fit.
+    model_list : list, optional
+        List of strings containing the model names of the subset of the models
+        to fit. Defaults to all models.
+    """
+    def __init__(self, net, ts_description, model_list=None):
+        self.net = net
+        """ Network object to fit. """
+        self.ts_description = ts_description
+        """ Name of timeseries to fit. """
+        self.model_list = model_list
+        """ Names of the models to fit (``None`` for all). """
+
+    def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters=5,
+              formal_variance=False, use_data_variance=True, use_data_covariance=True,
+              cvxpy_kw_args={}):
+        r"""
+        Solve the network-wide fitting problem as follows:
+
+            1.  Fit the models individually using a single iteration step from
+                :func:`~lasso_regression`.
+            2.  Collect the L0 weights :math:`\mathbf{w}^{(i)}` from each station.
+            3.  Spatially combine (e.g. average) the weights, and redistribute them
+                to the stations for the next iteration.
+            4.  Repeat from 1.
+
+        Parameters
+        ----------
+        penalty : float
+            Penalty hyperparameter :math:`\lambda`.
+        spatial_reweight_models : list
+            Names of models to use in the spatial reweighting.
+        spatial_reweight_iters : int, optional
+            Number of spatial reweighting iterations.
+        formal_variance : bool, optional
+            If ``True``, also calculate the formal variance (diagonals of the covariance
+            matrix).
+        use_data_variance : bool, optional
+            If ``True`` (default) and ``ts`` contains variance information, this
+            uncertainty information will be used.
+        use_data_covariance : bool, optional
+            If ``True`` (default), ``ts`` contains variance and covariance information, and
+            ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+        cvxpy_kw_args : dict
+            Additional keyword arguments passed on to CVXPY's ``solve()`` function.
+        """
+        assert isinstance(spatial_reweight_models, list) and \
+            all([isinstance(mdl, str) for mdl in spatial_reweight_models]), \
+            "'spatial_reweight_models' must be a list of model name strings, got " + \
+            f"{spatial_reweight_models}."
+        assert isinstance(spatial_reweight_iters, int) and (spatial_reweight_iters >= 0), \
+            "'spatial_reweight_iters' must be an integer greater or equal than 0, got " + \
+            f"{spatial_reweight_iters}."
+
+        # get scale lengths (correlation lengths)
+        # using the average distance to the closest 4 stations
+        tqdm.write("Calculating scale lengths")
+        geoid = cgeod.Geodesic()
+        station_names = list(self.net.stations.keys())
+        station_lonlat = np.stack([np.array(self.net[name].location)[[1, 0]]
+                                   for name in station_names])
+        all_distances = np.empty((self.net.num_stations, self.net.num_stations))
+        net_avg_closests = []
+        for i, name in enumerate(station_names):
+            all_distances[i, :] = np.array(geoid.inverse(station_lonlat[i, :].reshape(1, 2),
+                                                         station_lonlat))[:, 0]
+            net_avg_closests.append(np.sort(all_distances[i, :])[1:1+4].mean())
+        distance_weights = np.exp(-all_distances / np.array(net_avg_closests).reshape(1, -1))
+
+        # first solve, default initial weights
+        tqdm.write("Performing initial solve")
+        net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
+                                   solver="lasso_regression", cached_mapping=True,
+                                   penalty=penalty, reweight_max_iters=1,
+                                   return_weights=True,
+                                   formal_variance=formal_variance,
+                                   use_data_variance=use_data_variance,
+                                   use_data_covariance=use_data_covariance,
+                                   cvxpy_kw_args=cvxpy_kw_args)
+
+        # iterate the specified amount of times, updating the weights in between
+        # TODO: implement early stopping criteria
+        for i in range(1, spatial_reweight_iters + 1):
+            tqdm.write("Updating weights")
+            model_list = list(set([mdl for n_w in net_weights.values() for mdl in n_w[0].keys()]))
+            new_net_weights = dict.fromkeys(station_names, {"init_reweights": {}})
+            for mdl_description in model_list:
+                mdl_weights_dict = {name: net_weights[name][0][mdl_description]
+                                    for name in station_names
+                                    if mdl_description in net_weights[name][0]}
+                mdl_weights = [mdl for mdl in mdl_weights_dict.values()
+                               if isinstance(mdl, np.ndarray)]
+                mdl_weights_shapes = [mdl.shape for mdl in mdl_weights]
+                if (mdl_description in spatial_reweight_models) and (len(mdl_weights) > 0) and \
+                   (mdl_weights_shapes.count(mdl_weights_shapes[0]) == len(mdl_weights)):
+                    print(f"stacking model {mdl_description}")
+                    new_net_weights[name]["init_reweights"] = {}
+                    parameter_weights = np.stack(mdl_weights)
+                    num_pweights_before = ((np.abs(parameter_weights) < 10).sum(),
+                                           (np.abs(parameter_weights) > 1e5).sum())
+                    for station_index, name in enumerate(station_names):
+                        new_weights = weighted_median(parameter_weights,
+                                                      distance_weights[station_index, :])
+                        num_pweights_after = ((np.abs(new_weights) < 10).sum(),
+                                              (np.abs(new_weights) > 1e5).sum())
+                        print(f"{num_pweights_before} -> {num_pweights_after}")
+                        new_net_weights[name]["init_reweights"][mdl_description] = new_weights
+                else:
+                    if mdl_description in spatial_reweight_models:
+                        print(f"{mdl_description} cannot be stacked, got {mdl_weights_dict} " +
+                              "(model should have been spatially reweighted).")
+                    else:
+                        print(f"Not stacking {mdl_description} because not " +
+                              "in 'spatial_reweight_models'.")
+                    for name in station_names:
+                        if mdl_description in net_weights[name][0]:
+                            new_net_weights[name]["init_reweights"][mdl_description] = \
+                                net_weights[name][0][mdl_description]
+            tqdm.write(f"Solving after {i} reweightings")
+            net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
+                                       solver="lasso_regression", cached_mapping=True,
+                                       local_input=new_net_weights,
+                                       penalty=penalty, reweight_max_iters=1,
+                                       return_weights=True,
+                                       formal_variance=formal_variance,
+                                       use_data_variance=use_data_variance,
+                                       use_data_covariance=use_data_covariance,
+                                       cvxpy_kw_args=cvxpy_kw_args)
+        tqdm.write("Done")
