@@ -184,12 +184,15 @@ def create_powerlaw_noise(size, exponent, seed=None):
 
     Parameters
     ----------
-    size : int
-        Number of (equally-spaced) noise samples of the output noise array.
+    size : int, list, tuple
+        Number of (equally-spaced) noise samples of the output noise array or
+        a shape where the first entry defines the number of noise samples for
+        the remaining dimensions.
     exponent : int
         Exponent of the power law noise model.
-    seed : int, optional
-        Pass an initial seed to the random number generator.
+    seed : int, numpy.random.Generator, optional
+        Pass an initial seed to the random number generator, or pass
+        a :class:`~numpy.random.Generator` instance.
 
     Returns
     -------
@@ -214,7 +217,24 @@ def create_powerlaw_noise(size, exponent, seed=None):
        Astronomy and Astrophysics, v.300, p.707.
     .. _`colorednoise`: https://github.com/felixpatzelt/colorednoise
     """
+    # parse desired output shape as list
+    if isinstance(size, tuple) or isinstance(size, list):
+        assert all([isinstance(dim, int) for dim in size]), \
+            "If passing a non-integer shape, 'size' must be a list or tuple " + \
+            f"of integers, got {size}."
+        shape = [*size]
+        if len(shape) == 1:
+            shape.append(1)
+    elif isinstance(size, int):
+        shape = [size, 1]
+    else:
+        raise ValueError(f"{size} is not a valid size or shape.")
+    # parse starting seed (if seed is already a generator, will be returned unaltered)
+    rng = np.random.default_rng(seed)
+    # get the number of noise samples and the remaining dimensions
+    size = shape[0]
     halfsize = int(size // 2 + 1)
+    ndims = np.prod(shape[1:])
     # step 1-2
     # get Fourier frequencies
     freqs = np.fft.rfftfreq(size)
@@ -223,29 +243,35 @@ def create_powerlaw_noise(size, exponent, seed=None):
     freqs[0] = 1/size
     # scale the frequencies
     freqs_scaled = freqs**(-exponent/2)
-    # draw two sets of Gaussian distributed random numbers
-    rng = np.random.default_rng(seed)
-    real_part = rng.standard_normal(halfsize) * freqs_scaled
-    imag_part = rng.standard_normal(halfsize) * freqs_scaled
-    # for real signals, there is no imaginary component at the zero frequency
-    imag_part[0] = 0
-    # for even length signals, the last component (Nyquist frequency)
-    # also has to be real because of symmetry properties
-    if (size % 2) == 0:
-        imag_part[-1] = 0
-    # combine the two parts
-    fourier_noise = real_part + imag_part * 1j
-    # step 3
-    # transform from frequency to time domain
-    noise = np.fft.irfft(fourier_noise, n=size)
-    # additional step: normalize to unit standard deviation
-    # estimate the standard deviation
-    freqs_sigma_est = freqs_scaled[1:].copy()
-    freqs_sigma_est[-1] *= (1 + (size % 2)) / 2
-    sigma = 2 * np.sqrt(np.sum(freqs_sigma_est**2)) / size
-    # normalize
-    noise /= sigma
-    return noise
+    # create an empty array and loop over the dimensions
+    out = np.empty([size, ndims])
+    for idim in range(ndims):
+        # draw two sets of Gaussian distributed random numbers
+        real_part = rng.standard_normal(halfsize) * freqs_scaled
+        imag_part = rng.standard_normal(halfsize) * freqs_scaled
+        # for real signals, there is no imaginary component at the zero frequency
+        imag_part[0] = 0
+        # for even length signals, the last component (Nyquist frequency)
+        # also has to be real because of symmetry properties
+        if (size % 2) == 0:
+            imag_part[-1] = 0
+        # combine the two parts
+        fourier_noise = real_part + imag_part * 1j
+        # step 3
+        # transform from frequency to time domain
+        noise = np.fft.irfft(fourier_noise, n=size)
+        # additional step: normalize to unit standard deviation
+        # estimate the standard deviation
+        freqs_sigma_est = freqs_scaled[1:].copy()
+        freqs_sigma_est[-1] *= (1 + (size % 2)) / 2
+        sigma = 2 * np.sqrt(np.sum(freqs_sigma_est**2)) / size
+        # normalize
+        noise /= sigma
+        # put into array
+        out[:, idim] = noise
+    # reshape output and return
+    out = out.reshape(shape)
+    return out
 
 
 def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, delimiter=',',

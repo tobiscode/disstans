@@ -401,7 +401,8 @@ class Model():
             :math:`(\text{num_parameters}, \text{num_components})`.
         """
         assert self.num_parameters == parameters.shape[0], \
-            "Read-in parameters have different size than the instantiated model."
+            "Read-in parameters have different size than the instantiated model. " + \
+            f"Expected {self.num_parameters}, got {parameters.shape}[0]."
         self.parameters = parameters.reshape([self.num_parameters, -1])
         if variances is not None:
             try:
