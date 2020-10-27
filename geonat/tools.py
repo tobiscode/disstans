@@ -6,9 +6,13 @@ For more specialized processing functions, see :mod:`~geonat.processing`.
 """
 
 import os
+import re
 import numpy as np
 import pandas as pd
+import cartopy.geodesic as cgeod
 from multiprocessing import Pool
+from tqdm import tqdm
+from urllib import request, error
 
 # set default number of threads to use
 from .config import defaults
@@ -428,3 +432,249 @@ def weighted_median(values, weights, axis=0, percentile=0.5, keepdims=False):
     if not keepdims:
         medians = medians.squeeze(axis=axis)
     return medians
+
+
+def download_unr_data(station_list_or_bbox, data_dir, solution="final",
+                      rate="24h", reference=None, min_solutions=100,
+                      t_min=None, t_max=None):
+    """
+    Downloads GNSS timeseries data from the University of Nevada at Reno's
+    `Nevada Geodetic Laboratory`_. When using this data, please cite [blewitt18]_,
+    as well as all the original data providers (the relevant info will be
+    downloaded as well).
+
+    Files will only be downloaded if there is no matching file already present,
+    or the remote file is newer than the local one.
+
+    Parameters
+    ----------
+    station_list_or_bbox : list
+        Defines which stations to look for data and download.
+        It can be either a list of station names (list of strings), a list of bounding
+        box coordinates (the four floats ``[lon_min, lon_max, lat_min, lat_max]``
+        in degrees), or a three-element list defining a circle (location in degrees
+        and radius in kilometers ``[center_lon, center_lat, radius]``).
+    data_dir : str
+        Folder for data.
+    solution : str, optional
+        Which timeseries solution to download. Possible values are ``'final'``,
+        ``'rapid'`` and ``'ultra'``. See the Notes for approximate latency times.
+        Defaults to ``'final'``.
+    rate : str, optional
+        Which sample rate to download. Possible values are ``'24h'`` and
+        ``'5min'``. See the Notes for a table of which rates are available for each
+        solution. Defaults to `'24h'``.
+    reference : str, optional
+        The UNR abbreviation for the reference frame in which to download the data.
+        Applies only for daily sample rates and final or rapid orbit solutions.
+        Defaults to ``IGS14``.
+    min_solutions : int, optional
+        Only consider stations with at least a certain number of all-time solutions
+        according to the station list file.
+        Defaults to ``100``.
+    t_min : str or pandas.Timestamp, optional
+        Only consider stations that have data on or after ``t_min``.
+    t_max : str or pandas.Timestamp, optional
+        Only consider stations that have data on or before ``t_max``.
+
+    Notes
+    -----
+
+    The following combinations of solution and sample rates are available.
+    Note that not all stations are equipped to provide all data types.
+    Furthermore, only the daily files will be available in a plate
+    reference frame.
+
+    +-----------------+----------+-----------+------------------+
+    | orbit solutions | 24 hours | 5 minutes | latency          |
+    +=================|==========|===========|==================+
+    | final           | yes      | yes       | approx. 2 weeks  |
+    +-----------------+----------+-----------+------------------+
+    | rapid           | yes      | yes       | approx. 24 hours |
+    +-----------------+----------+-----------+------------------+
+    | ultra           | no       | yes       | approx. 2 hours  |
+    +-----------------+----------+-----------+------------------+
+
+    Warning
+    -------
+
+    It is your responsibility that different reference frames or solution types are
+    not downloaded into the same folders, because this could lead to the overwriting
+    of data or ambiguities as to which files represent which solutions. This is because
+    this script does not rename files or change the folder structure that it finds
+    on UNR's servers.
+
+    References
+    ----------
+
+    .. _`Nevada Geodetic Laboratory`: http://geodesy.unr.edu/
+    .. [blewitt18] Blewitt, G., W. C. Hammond, and C. Kreemer (2018).
+       *Harnessing the GPS data explosion for interdisciplinary science.*
+       Eos, 99, doi:`10.1029/2018EO104623 <https://doi.org/10.1029/2018EO104623>`_
+    """
+    # do some checks
+    assert solution in ["final", "rapid", "ultra"], \
+        f"Please choose a valid orbit solution (got {solution})."
+    assert rate in ["24h", "5min"], \
+        f"Please choose a valid sample rate (got {rate})."
+    if (solution == "ultra") and (rate == "24h"):
+        raise ValueError("There are no ultra-rapid daily solutions available.")
+    assert isinstance(station_list_or_bbox, list), \
+        f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
+    # make the necessary folders
+    os.makedirs(data_dir, exist_ok=True)
+    os.makedirs(os.path.join(data_dir, "attributions"), exist_ok=True)
+    # set master station list URL and define the function that returns the URL
+    # (since we don't know which stations and times to actually download)
+    base_url = "http://geodesy.unr.edu/gps_timeseries/"
+    if solution == "final":
+        if rate == "24h":
+            if (reference is None) or (reference == "IGS14"):
+                def get_sta_url(sta):
+                    return base_url + f"tenv3/IGS14/{sta}.tenv3"
+            else:
+                def get_sta_url(sta):
+                    return base_url + f"tenv3/plates/{reference}/{sta}.{reference}.tenv3"
+        elif rate == "5min":
+            def get_sta_url(sta, year):
+                return base_url + f"kenv/{sta}/{sta}.{year}.kenv.zip"
+        station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldings.txt"
+    elif solution == "rapid":
+        if rate == "24h":
+            if (reference is None) or (reference == "IGS14"):
+                def get_sta_url(sta):
+                    return base_url + f"rapids/tenv3/{sta}.tenv3"
+            else:
+                def get_sta_url(sta):
+                    return base_url + f"rapids/plates/tenv3/{reference}/{sta}.{reference}.tenv3"
+            station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsRapid24hr.txt"
+        elif rate == "5min":
+            def get_sta_url(sta, year):
+                return base_url + f"rapids_5min/kenv/{sta}/{sta}.{year}.kenv.zip"
+            station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsRapid5min.txt"
+    elif solution == "ultra":
+        def get_sta_url(sta, year, doy, date):
+            return base_url + f"ultracombo/kenv/{year}/{doy}/{date}{sta}_fix.kenv"
+        station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsUltra5min.txt"
+    station_list_path = os.path.join(data_dir, station_list_url.split("/")[-1])
+    # download the station list and parse to a DataFrame
+    try:
+        request.urlretrieve(station_list_url, station_list_path)
+    except error.HTTPError as e:
+        raise RuntimeError("Failed to download the station list from "
+                           f"{station_list_url}.").with_traceback(e.__traceback__) from e
+    stations = pd.read_csv(station_list_path, delim_whitespace=True,
+                           parse_dates=[7, 8, 9], infer_datetime_format=True)
+    # subset according to station_list_or_bbox
+    if all([isinstance(site, str) for site in station_list_or_bbox]):
+        # list contains stations names
+        stations = stations[stations["Sta"].isin(station_list_or_bbox)]
+    elif all([isinstance(value, float) or isinstance(value, int)
+              for value in station_list_or_bbox]):
+        if len(station_list_or_bbox) == 4:
+            # list is a bounding box
+            [lon_min, lon_max, lat_min, lat_max] = station_list_or_bbox
+            assert lat_min < lat_max, "'lat_min' needs to be smaller than 'lat_max'."
+            lon_min = (lon_min + 360) % 360
+            lon_max = (lon_max + 360) % 360
+            if lon_min < lon_max:
+                lon_subset = (stations["Long(deg)"] <= lon_max) & \
+                             (stations["Long(deg)"] >= lon_min)
+            elif lon_min > lon_max:
+                lon_subset = (stations["Long(deg)"] <= lon_max) | \
+                             (stations["Long(deg)"] >= lon_min)
+            else:
+                lon_subset = True
+            lat_subset = (stations["Lat(deg)"] <= lat_max) & \
+                         (stations["Lat(deg)"] >= lat_min)
+            stations = stations[lat_subset & lon_subset]
+        elif len(station_list_or_bbox) == 3:
+            # list is a location and radius
+            [center_lon, center_lat, radius] = station_list_or_bbox
+            center_lonlat = np.array([[center_lon, center_lat]])
+            geoid = cgeod.Geodesic()
+            station_lonlat = stations[["Long(deg)", "Lat(deg)"]].values
+            distances = geoid.inverse(center_lonlat, station_lonlat)
+            distances = np.array(distances)[:, 0] / 1e3
+            stations = stations[distances <= radius]
+        else:
+            raise ValueError("Could not parse 'station_list_or_bbox' " +
+                             str(station_list_or_bbox))
+    else:
+        raise ValueError("Could not parse 'station_list_or_bbox' " +
+                         str(station_list_or_bbox))
+    # subset according to data availability
+    stations = stations[stations["NumSol"] >= min_solutions]
+    if t_min is not None:
+        stations = stations[stations["Dtend"] >= pd.Timestamp(t_min)]
+    if t_max is not None:
+        stations = stations[stations["Dtbeg"] <= pd.Timestamp(t_max)]
+    # this is now the final list of stations we're trying to download
+    stations_list = stations["Sta"].to_list()
+    if len(stations_list) == 0:
+        raise RuntimeError("No stations to download after applying all filters.")
+    # prepare list of URLs to download
+    if rate == "24h":
+        list_urls = [get_sta_url(sta) for sta in stations_list]
+    else:
+        # if it's a 5min sampling rate, there's multiple files per station,
+        # and we need to parse the index webpage for all possible links
+        list_urls = []
+        if (solution == "final") or (solution == "rapid"):
+            if solution == "final":
+                index_url = base_url + "kenv/"
+            else:
+                index_url = base_url + "rapids_5min/kenv/"
+            for sta in stations_list:
+                pattern = r'(?<=<a href=")' + str(sta) + \
+                          r'\.(\d{4})\.kenv\.zip(?=">)'
+                extractor = re.compile(pattern, re.IGNORECASE)
+                with request.urlopen(index_url + f"{sta}/") as f:
+                    index_page = f.read().decode("windows-1252")
+                    avail_years = extractor.findall(index_page)
+                list_urls.extend([get_sta_url(sta, year) for year in avail_years])
+        elif solution == "ultra":
+            index_url = base_url + "ultracombo/kenv/"
+            pattern_y = r'(?<=<a href=")(\d{4})/(?=">)'
+            pattern_d = r'(?<=<a href=")(\d{3})/(?=">)'
+            pattern_f = r'(?<=<a href=")(\d{2}\w{3}\d{2})(\w{4})_fix.kenv(?=">)'
+            extractor_y = re.compile(pattern_y, re.IGNORECASE)
+            extractor_d = re.compile(pattern_d, re.IGNORECASE)
+            extractor_f = re.compile(pattern_f, re.IGNORECASE)
+            with request.urlopen(index_url) as f:
+                index_page = f.read().decode("windows-1252")
+                avail_years = extractor_y.findall(index_page)
+            for year in avail_years:
+                with request.urlopen(index_url + f"{year}/") as f:
+                    index_page = f.read().decode("windows-1252")
+                    avail_doys = extractor_d.findall(index_page)
+                for doy in avail_doys:
+                    with request.urlopen(index_url + f"{year}/{doy}/") as f:
+                        index_page = f.read().decode("windows-1252")
+                        avail_files = extractor_f.findall(index_page)
+                    for stafile in avail_files:
+                        sta, date = stafile
+                        if sta in stations_list:
+                            list_urls.append(get_sta_url(sta, year, doy, date))
+    if len(list_urls) == 0:
+        raise RuntimeError("No files to download after looking on the server.")
+    elif len(list_urls) > 10000:
+        answer = input("WARNING: The current selection criteria would lead to "
+                       f"downloading {len(list_urls)} files (from "
+                       f"{len(stations_list)} stations).\nPress ENTER to continue, "
+                       "or anything else to abort.")
+        if answer != "":
+            exit()
+    # download files
+    for stafile in tqdm(list_urls, desc="Downloading station timeseries",
+                        ascii=True, unit="station"):
+        basename = stafile.split("/")[-1]
+        local_path = os.path.join(data_dir, basename)
+        # TODO check for local file existence and time first
+        local_time = pd.Timestamp(0, unit='d')
+        with request.urlopen(stafile) as remote:
+            remote_time = pd.Timestamp(remote.headers["Last-Modified"])
+            if remote_time > local_time:
+                local_path = stafile.split("/")[-1]
+                with open(local_path, mode="wb") as local:
+                    local.write(remote.read())
