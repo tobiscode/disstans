@@ -1290,7 +1290,7 @@ class Network():
             to be evaluated. Defaults to all fitted models.
         sum_models : bool, optional
             If ``True``, plot the sum of all selected models instead of every
-            model individually. Defaults to ``False``.
+            model individually. Defaults to ``True``.
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
             :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.

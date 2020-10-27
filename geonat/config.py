@@ -95,7 +95,7 @@ defaults["clean"] = {"min_obs": 100,
                      "std_thresh": 100}
 # priors from earthquake catalogs
 defaults["prior"] = {"mu": 48,
-                     "alpha": 2/3,
+                     "alpha": 0.667,
                      "threshold": 3}
 # for iterative reweighting L1-regularized solver
 defaults["solvers"] = {"reweight_func": "invsq",

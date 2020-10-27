@@ -610,7 +610,7 @@ class BSpline(Model):
     point :math:`(\text{num_splines} - 1)` times by the spacing (which must be given
     in the same units as the scale).
 
-    If no spacing is given but multiple splines are requested,the scale will be used
+    If no spacing is given but multiple splines are requested, the scale will be used
     as the spacing.
 
     References
@@ -938,9 +938,10 @@ class SplineSet(Model):
 
     def _get_mapping(self, timevector):
         coefs = np.empty((timevector.size, self.num_parameters))
+        min_scale = min([m.scale for m in self.splines])
         ix_coefs = 0
         for i, model in enumerate(self.splines):
-            internal_scale = model.scale if self.internal_scaling else 1
+            internal_scale = model.scale / min_scale if self.internal_scaling else 1
             temp = model.get_mapping(timevector).A.squeeze()
             coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp * internal_scale
             ix_coefs += model.num_parameters
@@ -973,7 +974,7 @@ class SplineSet(Model):
             ix_params += model.num_parameters
 
     def make_scalogram(self, t_left, t_right, cmaprange=None, resolution=1000,
-                       min_param_mag=1e-9):
+                       min_param_mag=0):
         """
         Create a scalogram figure of the model parameters.
 
@@ -1050,7 +1051,7 @@ class SplineSet(Model):
                                 np.cumsum(mdl_mapping / mdl_sum, axis=1)])
             # plot cell
             for j, k in product(range(model.num_parameters), range(num_components)):
-                if np.abs(model.parameters[j, k]) < min_param_mag:
+                if np.abs(model.parameters[j, k]) > min_param_mag:
                     ax[k].fill_between(t_plot,
                                        y_off + y_norm[:, j]*dy_scale,
                                        y_off + y_norm[:, j+1]*dy_scale,
@@ -1225,13 +1226,14 @@ class Arctangent(Model):
     Subclasses :class:`~geonat.models.Model`.
 
     This model provides the arctangent :math:`\arctan(\mathbf{t}/\tau)`,
-    stretched with a given time constant and normalized to approach
-    :math:`\pm 1` at the limits.
+    stretched with a given time constant and normalized to be between
+    :math:`(0, 1)` at the limits.
 
-    Because this model is always transient, it is recommended not to
+    Because this model is usually transient, it is recommended not to
     use it in the estimation of parameters, even when using ``t_start``
-    and ``t_end`` to cut off the tails (since that introduces high-frequency
-    artifacts).
+    and ``t_end`` to make the tails constant (since that introduces high-frequency
+    artifacts). (Using ``t_start`` and/or ``t_end`` might be desirable for creating
+    syntehtic data, however.)
 
     Parameters
     ----------
@@ -1258,5 +1260,5 @@ class Arctangent(Model):
 
     def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
-        coefs = np.arctan(dt / self.tau).reshape(-1, 1) / (np.pi/2)
+        coefs = np.arctan(dt / self.tau).reshape(-1, 1) / np.pi + 0.5
         return coefs

@@ -198,12 +198,16 @@ def _get_reweighting_function():
     """
     name = defaults["solvers"]["reweight_func"]
     eps = defaults["solvers"]["reweight_eps"]
-    if name == 'inv':
+    if name == "inv":
         def rw_func(x):
             return 1/(np.abs(x) + eps)
-    elif name == 'invsq':
+    elif name == "invsq":
         def rw_func(x):
             return 1/(x**2 + eps**2)
+    elif name == "log":
+        def rw_func(x):
+            mags = np.abs(x)
+            return np.log((mags.sum() + np.asarray(x).size * eps) / (mags + eps))
     else:
         raise NotImplementedError(f"'{name}' is an unrecognized reweighting function.")
     return rw_func
@@ -588,7 +592,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
                 # solved
                 converged = True
                 # if iterating, extra tasks
-                if regularize:
+                if regularize and reweight_max_iters is not None:
                     # update weights
                     weights.value = rw_func(m.value[reg_diag])
                     # check if the solution changed to previous iteration
