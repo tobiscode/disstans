@@ -954,21 +954,21 @@ class GipsyTimeseries(Timeseries):
 
     The column format is described on `JPL's website`_:
 
-    +---------------+-----------------------------------------------+
-    | Columns       | Description                                   |
-    +===============+===============================================+
-    | Column 1      | Decimal_YR computed with 365.25 days/yr       |
-    +---------------+-----------------------------------------------+
-    | Columns 2-4   | East(m) North(m) Vert(m)                      |
-    +---------------+-----------------------------------------------+
-    | Columns 5-7   | East_sig(m) North_sig(m) Vert_sig(m)          |
-    +---------------+-----------------------------------------------+
-    | Columns 8-10  | East_North_cov, East_Vert_cov, North_Vert_cov |
-    +---------------+-----------------------------------------------+
-    | Column 11     | Time in Seconds past J2000                    |
-    +---------------+-----------------------------------------------+
-    | Columns 12-17 | Time in YEAR MM DD HR MN SS                   |
-    +---------------+-----------------------------------------------+
+    +---------------+-------------------------------------------------+
+    | Columns       | Description                                     |
+    +===============+=================================================+
+    | Column 1      | Decimal year computed with 365.25 days/yr       |
+    +---------------+-------------------------------------------------+
+    | Columns 2-4   | East, North and Vertical [m]                    |
+    +---------------+-------------------------------------------------+
+    | Columns 5-7   | East, North and Vertical standard deviation [m] |
+    +---------------+-------------------------------------------------+
+    | Columns 8-10  | East, North and Vertical covariance [m^2]       |
+    +---------------+-------------------------------------------------+
+    | Column 11     | Time in Seconds past J2000                      |
+    +---------------+-------------------------------------------------+
+    | Columns 12-17 | Time in YEAR MM DD HR MN SS                     |
+    +---------------+-------------------------------------------------+
 
     Time is GPS time, and the time series are relative to each station's first epoch.
 
@@ -977,28 +977,32 @@ repro2018a/raw/position/envseries/0000_README.format
 
     """
     def __init__(self, path, show_warnings=True):
-        self._path = path
-        data_cols = ['east', 'north', 'up']
-        var_cols = ['east_var', 'north_var', 'up_var']
-        cov_cols = ['east_north_cov', 'east_up_cov', 'north_up_cov']
+        self._path = str(path)
+        # load data
+        data_cols = ["east", "north", "up"]
+        var_cols = ["east_var", "north_var", "up_var"]
+        cov_cols = ["east_north_cov", "east_up_cov", "north_up_cov"]
         all_cols = data_cols + var_cols + cov_cols
         time = pd.read_csv(self._path, delim_whitespace=True, header=None,
                            usecols=[11, 12, 13, 14, 15, 16],
-                           names=['year', 'month', 'day', 'hour', 'minute', 'second'])
-        time = pd.to_datetime(time).to_frame(name='time')
+                           names=["year", "month", "day", "hour", "minute", "second"])
+        time = pd.to_datetime(time).to_frame(name="time")
         data = pd.read_csv(self._path, delim_whitespace=True, header=None,
                            usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
                            names=all_cols)
+        # convert to standard deviations and millimeters
         data.loc[:, var_cols] *= data.loc[:, var_cols]  # original data is in s.d.
         data.loc[:, data_cols] *= 1e3  # now in mm
         data.loc[:, var_cols + cov_cols] *= 1e6  # now in mm^2
         df = time.join(data)
-        num_duplicates = int(df.duplicated(subset='time').sum())
-        if (num_duplicates > 0) and show_warnings:
+        # check for duplicate timestamps and create time index
+        num_duplicates = int(df.duplicated(subset="time").sum())
+        if show_warnings and (num_duplicates > 0):
             warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. "
                  "Keeping first occurrences.")
-        df = df.drop_duplicates(subset='time').set_index('time')
-        super().__init__(dataframe=df, src='.tseries', data_unit='mm',
+        df = df.drop_duplicates(subset="time").set_index("time")
+        # construct Timeseries object
+        super().__init__(dataframe=df, src=".tseries", data_unit="mm",
                          data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols)
 
     def get_arch(self):
@@ -1016,4 +1020,146 @@ repro2018a/raw/position/envseries/0000_README.format
         Timeseries.get_arch : For further information.
         """
         return {"type": "GipsyTimeseries",
+                "kw_args": {"path": self._path}}
+
+
+class UNRTimeseries(Timeseries):
+    """
+    Subclasses :class:`~Timeseries`.
+
+    Timeseries subclass for GNSS measurements in UNR's ``.tenv3`` file format.
+    The data and (co)variances are converted into millimeters (squared).
+
+    Parameters
+    ----------
+    path : str
+        Path to the timeseries file.
+    show_warnings : bool, optional
+        If ``True``, warn if there are data inconsistencies encountered while loading.
+        Defaults to ``True``.
+
+    Notes
+    -----
+
+    The column format is described on `UNR's website`_:
+
+    +---------------+---------------------------------------------------+
+    | Columns       | Description                                       |
+    +===============+===================================================+
+    | Column 1      | Station name                                      |
+    +---------------+---------------------------------------------------+
+    | Column 2      | Date                                              |
+    +---------------+---------------------------------------------------+
+    | Column 3      | Decimal year                                      |
+    +---------------+---------------------------------------------------+
+    | Column 4      | Modified Julian day                               |
+    +---------------+---------------------------------------------------+
+    | Columns 5-6   | GPS week and day                                  |
+    +---------------+---------------------------------------------------+
+    | Column 7      | Longitude [°] of reference meridian               |
+    +---------------+---------------------------------------------------+
+    | Columns 8-9   | Easting [m] from ref. mer., integer and fraction  |
+    +---------------+---------------------------------------------------+
+    | Columns 10-11 | Northing [m] from equator, integer and fraction   |
+    +---------------+---------------------------------------------------+
+    | Columns 12-13 | Vertical [m], integer and fraction                |
+    +---------------+---------------------------------------------------+
+    | Column 14     | Antenna height [m]                                |
+    +---------------+---------------------------------------------------+
+    | Column 15-17  | East, North, Vertical standard deviation [m]      |
+    +---------------+---------------------------------------------------+
+    | Column 18     | East-North correlation coefficient [-]            |
+    +---------------+---------------------------------------------------+
+    | Column 19     | East-Vertical correlation coefficient [-]         |
+    +---------------+---------------------------------------------------+
+    | Column 20     | North-Vertical correlation coefficient [-]        |
+    +---------------+---------------------------------------------------+
+
+    The time series are relative to each station's first integer epoch.
+
+    .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
+
+    """
+    def __init__(self, path, show_warnings=True):
+        self._path = str(path)
+        # load data and check for some warnings
+        df = pd.read_csv(self._path, delim_whitespace=True,
+                         usecols=[0, 3] + list(range(6, 13)) + list(range(14, 20)))
+        if show_warnings and int(df.duplicated(subset="site").sum()) > 1:
+            warn(f"Timeseries file {path} contains multiple site codes: "
+                 f"{df['site'].unique()}")
+        if int(df.duplicated(subset="reflon").sum()) > 1:
+            raise NotImplementedError(f"Timeseries file {path} contains "
+                                      "multiple reference longitudes: "
+                                      f"{df['reflon'].unique()}")
+        if int(df.duplicated(subset="_e0(m)").sum()) > 1:
+            if show_warnings:
+                warn(f"Timeseries file {path} contains multiple integer "
+                     f"Eastings: {df['_e0(m)'].unique()}")
+            offsets_east = df["_e0(m)"].values - df["_e0(m)"].values[0]
+        else:
+            offsets_east = 0
+        if int(df.duplicated(subset="____n0(m)").sum()) > 1:
+            if show_warnings:
+                warn(f"Timeseries file {path} contains multiple integer "
+                     f"Northings: {df['____n0(m)'].unique()}")
+            offsets_north = df["____n0(m)"].values - df["____n0(m)"].values[0]
+        else:
+            offsets_north = 0
+        if int(df.duplicated(subset="u0(m)").sum()) > 1:
+            if show_warnings:
+                warn(f"Timeseries file {path} contains multiple integer "
+                     f"Verticals: {df['u0(m)'].unique()}")
+            offsets_up = df["u0(m)"].values - df["u0(m)"].values[0]
+        else:
+            offsets_up = 0
+        # remove columns that are no longer needed
+        df.drop(columns=["site", "reflon"], inplace=True)
+        # make the data
+        df["east"] = (df["__east(m)"] + offsets_east) * 1e3
+        df["north"] = (df["_north(m)"] + offsets_north) * 1e3
+        df["up"] = (df["____up(m)"] + offsets_up) * 1e3
+        df.drop(columns=["_e0(m)", "__east(m)", "____n0(m)", "_north(m)",
+                         "u0(m)", "____up(m)"], inplace=True)
+        # make the covariance
+        df["__corr_en"] *= df["sig_e(m)"] * df["sig_n(m)"] * 1e6
+        df["__corr_eu"] *= df["sig_e(m)"] * df["sig_u(m)"] * 1e6
+        df["__corr_nu"] *= df["sig_n(m)"] * df["sig_u(m)"] * 1e6
+        df.rename(columns={"__corr_en": "east_north_cov", "__corr_eu": "east_up_cov",
+                           "__corr_nu": "north_up_cov"}, inplace=True)
+        # make the variance
+        old_sig_cols = ["sig_e(m)", "sig_n(m)", "sig_u(m)"]
+        df.loc[:, old_sig_cols] = (df.loc[:, old_sig_cols] * 1e3)**2
+        df.rename(columns={"sig_e(m)": "east_var", "sig_n(m)": "north_var",
+                           "sig_u(m)": "up_var"}, inplace=True)
+        # check for duplicate timestamps and create time index
+        num_duplicates = int(df.duplicated(subset="__MJD").sum())
+        if show_warnings and (num_duplicates > 0):
+            warn(f"Timeseries file {path} contains data for {num_duplicates} duplicate dates. "
+                 "Keeping first occurrences.")
+        df.drop_duplicates(subset="__MJD", inplace=True)
+        df["__MJD"] = pd.to_datetime(df["__MJD"] + 2400000.5, unit="D", origin='julian')
+        df.rename(columns={"__MJD": "time"}, inplace=True)
+        df.set_index("time", inplace=True)
+        # construct Timeseries object
+        super().__init__(dataframe=df, src=".tenv3", data_unit="mm",
+                         data_cols=["east", "north", "up"],
+                         var_cols=["east_var", "north_var", "up_var"],
+                         cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"])
+
+    def get_arch(self):
+        """
+        Returns a JSON-compatible dictionary with all the information necessary to recreate
+        the Timeseries instance (provided the data file is available).
+
+        Returns
+        -------
+        dict
+            JSON-compatible dictionary sufficient to recreate the UNRTimeseries instance.
+
+        See Also
+        --------
+        Timeseries.get_arch : For further information.
+        """
+        return {"type": "UNRTimeseries",
                 "kw_args": {"path": self._path}}
