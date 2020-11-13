@@ -1149,7 +1149,7 @@ class Network():
                                   ascii=True, unit="station"):
             func(station, **kw_args)
 
-    def _create_map_figure(self, gui_settings):
+    def _create_map_figure(self, gui_settings, annotate_stations):
         # get location data and projections
         stat_lats = [station.location[0] for station in self]
         stat_lons = [station.location[1] for station in self]
@@ -1163,10 +1163,13 @@ class Network():
         stat_points = ax_map.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
                                      linestyle='None', marker='.', transform=proj_lla,
                                      edgecolor=default_station_edges, zorder=1000)
+        # add labels
+        if annotate_stations:
         for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
             ax_map.annotate(sname, (slon, slat),
-                            xycoords=proj_lla._as_mpl_transform(ax_map), annotation_clip=True,
-                            textcoords="offset pixels", xytext=(0, 5), ha="center")
+                                xycoords=proj_lla._as_mpl_transform(ax_map),
+                                annotation_clip=True, textcoords="offset pixels",
+                                xytext=(0, 5), ha="center")
         # create underlay
         map_underlay = False
         if gui_settings["wmts_show"]:
@@ -1183,7 +1186,8 @@ class Network():
         return fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons
 
-    def graphical_cme(self, ts_in, ts_out=None, gui_kw_args={}, **cme_kw_args):
+    def graphical_cme(self, ts_in, ts_out=None, annotate_stations=True,
+                      gui_kw_args={}, **cme_kw_args):
         """
         Calculates the Common Mode Error (CME) of the network and shows its spatial
         and temporal pattern. Optionally saves the model for each station.
@@ -1195,6 +1199,8 @@ class Network():
         ts_out : str, optional
             If provided, save the model as a timeseries called ``ts_out`` to
             the stations in the network.
+        annotate_stations : bool, optional
+            If ``True`` (default), add the station names to the map.
         gui_kw_args : dict
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         **cme_kw_args : dict
@@ -1230,7 +1236,8 @@ class Network():
                 latlonenu[i, 2 + j] = spatial[comps[j]][0, i]
         # make map for spatial component
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
-            stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
+            stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings,
+                                                                        annotate_stations)
         if ndim == 1:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
                                  np.zeros_like(latlonenu[:, 2]), latlonenu[:, 2],
@@ -1253,9 +1260,10 @@ class Network():
         # show plot
         plt.show()
 
-    def gui(self, station=None, timeseries=None, model_list=None, sum_models=True, verbose=False,
-            scalogram_kw_args=None, stepdetector={}, trend_kw_args={},
-            analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
+    def gui(self, station=None, timeseries=None, model_list=None, sum_models=True,
+            verbose=False, annotate_stations=True, scalogram_kw_args=None,
+            stepdetector={}, trend_kw_args={}, analyze_kw_args={}, rms_on_map={},
+            gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -1294,6 +1302,8 @@ class Network():
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
             :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
+        annotate_stations : bool, optional
+            If ``True`` (default), add the station names to the map.
         scalogram_kw_args : dict, optional
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
@@ -1338,16 +1348,18 @@ class Network():
             The dictionary must include the key ``'ts'`` (the residual timeseries' name), and
             can optionally include the keys ``'comps'`` (a list of components to combine for
             the RMS, defaults to all components), ``'c_max'`` (maximum colormap range,
-            defaults to maximum of the RMS), and ``'t_start', 't_end'`` (to restrict the time
-            window, defaults to ``analyze_kw_args`` if given, otherwise the entire timeseries).
-        gui_kw_args : dict
+            defaults to maximum of the RMS), ``'t_start', 't_end'`` (to restrict the time
+            window, defaults to ``analyze_kw_args`` if given, otherwise the entire timeseries),
+            and ``'orientation'`` (for the colorbar orientation).
+        gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         """
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
-            stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings)
+            stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings,
+                                                                        annotate_stations)
         ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
         fig_ts = plt.figure()
         if scalogram_kw_args is not None:
@@ -1375,7 +1387,7 @@ class Network():
                    "'rms_on_map' needs to be a dictionary including the key 'ts' with a " \
                    f"string value, got {rms_on_map}."
             # collect RMS
-            rms_comps = True if "comps" not in rms_on_map else rms_on_map["comps"]
+            rms_comps = rms_on_map.get("comps", True)
             rms_kw_args = {"rms": rms_comps}
             for k in ["t_start", "t_end"]:
                 if k in rms_on_map:
@@ -1386,14 +1398,15 @@ class Network():
             for i, stat in enumerate(self):
                 rms[i] = stat.analyze_residuals(rms_on_map["ts"], **rms_kw_args)["RMS"]
             # make colormap
-            cmax = np.max(rms) if "c_max" not in rms_on_map else rms_on_map["c_max"]
+            cmax = rms_on_map.get("c_max", np.max(rms))
             rms_cmap = mpl.cm.ScalarMappable(cmap=scm.lajolla_r,
                                              norm=mpl.colors.Normalize(vmin=0, vmax=cmax))
             # update marker facecolors
             stat_points.set_facecolor(rms_cmap.to_rgba(rms))
             fig_map.canvas.draw_idle()
             # add colorbar
-            cbar = fig_map.colorbar(rms_cmap, ax=ax_map, orientation="horizontal",
+            orientation = rms_on_map.get("orientation", "horizontal")
+            cbar = fig_map.colorbar(rms_cmap, ax=ax_map, orientation=orientation,
                                     fraction=0.05, pad=0.03, aspect=10,
                                     extend="max" if np.max(rms) > cmax else "neither")
             cbar.set_label(f"RMS [{stat[rms_on_map['ts']].data_unit}]")

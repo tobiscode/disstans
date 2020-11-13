@@ -517,13 +517,16 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
 
     The reweighting function is set in the :attr:`~geonat.config.defaults` dictionary
     using the ``reweight_func`` key (along with a stabilizing parameter
-    ``reweight_eps`` that should not need tuning). Possible values are:
+    ``reweight_eps`` that should not need tuning). It defaults to the logarithmic
+    reweighting function. Possible values are:
 
-    +--------------+-------------------------------------------------------+
-    | ``'inv'``    | :math:`w(m) = \frac{1}{\|m\| + \text{eps}}` (default) |
-    +--------------+-------------------------------------------------------+
-    | ``'inv_sq'`` | :math:`w(m) = \frac{1}{m^2 + \text{eps}^2}`           |
-    +--------------+-------------------------------------------------------+
+    +--------------+------------------------------------------------------------------------------+
+    | ``'log'``    | :math:`w(m_j) = \log\frac{\sum_j\|m_j\|\cdot\text{eps}}{\|m_j\|+\text{eps}}` |
+    +--------------+------------------------------------------------------------------------------+
+    | ``'inv'``    | :math:`w(m_j) = \frac{1}{\|m_j\| + \text{eps}}`                              |
+    +--------------+------------------------------------------------------------------------------+
+    | ``'inv_sq'`` | :math:`w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}`                              |
+    +--------------+------------------------------------------------------------------------------+
 
     References
     ----------

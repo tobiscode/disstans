@@ -1,6 +1,6 @@
 """
-This module contains helper functions that are not dependent on any of
-GeoNAT's classes.
+This module contains helper functions and classes that are not dependent on
+any of GeoNAT's classes.
 
 For more specialized processing functions, see :mod:`~geonat.processing`.
 """
@@ -9,6 +9,7 @@ import os
 import re
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import cartopy.geodesic as cgeod
 from multiprocessing import Pool
 from tqdm import tqdm
@@ -386,7 +387,8 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
     return maint_table, maint_dict
 
 
-def weighted_median(values, weights, axis=0, percentile=0.5, keepdims=False):
+def weighted_median(values, weights, axis=0, percentile=0.5,
+                    keepdims=False, visualize=False):
     """
     Calculates the weighted median along a given axis.
 
@@ -404,6 +406,9 @@ def weighted_median(values, weights, axis=0, percentile=0.5, keepdims=False):
     keepdims : bool, optional
         If ``True``, squeezes out the axis along which the median was calculated.
         Defaults to ``False``.
+    visualize : bool, optional
+        If ``True``, show a plot of the weighted median calculation.
+        Defaults to ``False``.
     """
     # some checks
     assert isinstance(values, np.ndarray) and isinstance(weights, np.ndarray), \
@@ -414,9 +419,8 @@ def weighted_median(values, weights, axis=0, percentile=0.5, keepdims=False):
     assert (percentile >= 0) and (percentile <= 1), \
         f"'percentile' must be between 0 and 1, got {percentile}."
     # broadcast the weights
-    weights = np.expand_dims(weights,
-                             [i for i in range(len(values.shape))
-                              if i != axis])
+    other_axes = [i for i in range(len(values.shape)) if i != axis]
+    weights = np.expand_dims(weights, other_axes)
     # sort the values and weights
     sort_indices = np.argsort(values, axis=axis)
     sort_values = np.take_along_axis(values, sort_indices, axis=axis)
@@ -425,9 +429,33 @@ def weighted_median(values, weights, axis=0, percentile=0.5, keepdims=False):
     cumsum = np.cumsum(sort_weights, axis=axis)
     cutoff = np.sum(sort_weights, axis=axis, keepdims=True) * percentile
     # find the values at that cutoff
-    index_array = np.argmax(cumsum >= cutoff, axis=axis)
-    medians = np.take_along_axis(sort_values,
-                                 np.expand_dims(index_array, axis=axis), axis=axis)
+    index_array = np.expand_dims(np.argmax(cumsum >= cutoff, axis=axis), axis=axis)
+    medians = np.take_along_axis(sort_values, index_array, axis=axis)
+    # visualize
+    if visualize:
+        n_vals = values.shape[axis]
+        temp_values = sort_values.transpose(axis, *other_axes).reshape(n_vals, -1)
+        temp_weights = sort_weights.transpose(axis, *other_axes).reshape(n_vals, -1)
+        temp_cumsum = cumsum.transpose(axis, *other_axes).reshape(n_vals, -1)
+        temp_cutoff = cutoff.transpose(axis, *other_axes).reshape(1, -1)
+        temp_index = index_array.transpose(axis, *other_axes).reshape(1, -1)
+        temp_medians = medians.transpose(axis, *other_axes).reshape(1, -1)
+        n_other_axes = temp_values.shape[1]
+        for i in range(n_other_axes):
+            i_values = temp_values[:, i]
+            i_weights = temp_weights[:, i]
+            i_cumsum = temp_cumsum[:, i]
+            i_cutoff = temp_cutoff[0, i]
+            i_index = temp_index[0, i]
+            i_medians = temp_medians[0, i]
+            plt.figure()
+            plt.bar(i_cumsum, i_values, -i_weights, align="edge", color="C0")
+            plt.bar(i_cumsum, i_cumsum, -i_weights, align="edge",
+                    edgecolor="C1", facecolor=None)
+            plt.axhline(i_cutoff, color="k", linestyle="--")
+            plt.axvline(i_cumsum[i_index], color="r", linestyle="--")
+            plt.title(f"axis {i}: {i_medians}")
+            plt.show()
     # squeeze (if desired) and return
     if not keepdims:
         medians = medians.squeeze(axis=axis)
