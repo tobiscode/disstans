@@ -7,13 +7,22 @@ For more specialized processing functions, see :mod:`~geonat.processing`.
 
 import os
 import re
+import subprocess
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import cartopy.geodesic as cgeod
+import cartopy.crs as ccrs
 from multiprocessing import Pool
 from tqdm import tqdm
 from urllib import request, error
+from pathlib import Path
+from datetime import datetime, timezone
+from warnings import warn
+from matplotlib.ticker import FuncFormatter
+
+from . import scm
 
 # set default number of threads to use
 from .config import defaults
@@ -706,3 +715,655 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                 local_path = stafile.split("/")[-1]
                 with open(local_path, mode="wb") as local:
                     local.write(remote.read())
+
+
+class RINEXDataHolding():
+    """
+    Container class for a database of RINEX files.
+
+    A new object can be created by one of the two classmethods:
+
+    * From one or multiple folder(s) using :meth:`~from_folders`
+    * From a previously-saved file using :meth:`~from_file`
+
+    An object can be saved by using Pandas' :meth:`~pandas.DataFrame.to_pickle`
+    on the instance's :attr:`~df` attribute (it is recommended to add the ``.gz``
+    extension to enable compression).
+
+    The location information and availability metrics can be saved in the
+    same way. To load a previously-saved file, load it, and assign it to the
+    respective instance attributes.
+    """
+
+    GLOBPATTERN = "[0-9][0-9][0-9][0-9]/[0-9][0-9][0-9]/*"
+    """ The ``YYYY/DDD`` folder pattern in a glob-readable format. """
+
+    RINEXPATTERN = r"(?P<site>\w{4})(?P<day>\d{3})(?P<sequence>\w{1})\." + \
+                   r"(?P<yy>\d{2})(?P<type>\w{1})\.(?P<compression>\w+)"
+    """ The regex-style filename pattern for RINEX files. """
+
+    COMPRFILEEXTS = (".Z", ".gz")
+    """ The valid (compressed) RINEX file extensions to search for. """
+
+    COLUMNS = ("station", "year", "day", "date", "sequence", "type", "compression",
+               "filesize", "filetimeutc", "network", "basefolder")
+    """ The necessary information about each RINEX file. """
+
+    METRICCOLS = ("number", "age", "recency", "length", "reliability")
+    """ The metrics that can be calculated. """
+
+    def __init__(self, df):
+        self._df = None
+        self._locations_xyz = None
+        self._locations_lla = None
+        self._metrics = None
+        self.df = df
+
+    @property
+    def num_files(self):
+        """ Number of files in the database. """
+        return self.df.shape[0]
+
+    @property
+    def list_stations(self):
+        """ List of stations in the database. """
+        return self.df["station"].unique().tolist()
+
+    @property
+    def num_stations(self):
+        """ Number of stations in the database. """
+        return len(self.list_stations)
+
+    @property
+    def df(self):
+        """ Pandas DataFrame object containing the RINEX files database. """
+        return self._df
+
+    @df.setter
+    def df(self, new_df):
+        try:
+            assert all([col in new_df.columns for col in self.COLUMNS]), \
+                "Input DataFrame does not contain the necessary columns, try using the " + \
+                "class constructor methods."
+        except AttributeError as e:
+            raise TypeError("Cannot interpret input as a Pandas DataFrame for the RINEX "
+                            "file database.").with_traceback(e.__traceback__) from e
+        self._df = new_df
+
+    @property
+    def locations_xyz(self):
+        """
+        Dataframe of approximate positions of stations in WGS-84 (x, y, z) [m] coordinates.
+        """
+        if self._locations_xyz is None:
+            raise RuntimeError("Locations have not been loaded yet.")
+        if not all([station in self._locations_xyz["station"].values
+                    for station in self.list_stations]):
+            warn("Locations have likely not been updated since the database changed, "
+                 "there are stations missing.", category=RuntimeWarning)
+        return self._locations_xyz
+
+    @locations_xyz.setter
+    def locations_xyz(self, new_xyz):
+        if not (isinstance(new_xyz, pd.DataFrame) and
+                all([col in new_xyz.columns for col in ["station", "x", "y", "z"]])):
+            raise ValueError("Unrecognized input format. 'new_xyz' needs to be a "
+                             "Pandas DataFrame with the columns ['station', 'x', 'y', 'z'].")
+        if not all([station in new_xyz["station"].values for station in self.list_stations]):
+            warn("The new location DataFrame does not contain all stations "
+                 "that are currently in the database.", category=RuntimeWarning)
+        all_xyz = new_xyz[["x", "y", "z"]].values
+        all_lla = ccrs.Geodetic().transform_points(ccrs.Geocentric(), all_xyz[:, 0],
+                                                   all_xyz[:, 1], all_xyz[:, 2])
+        new_lla = pd.DataFrame(new_xyz["station"]
+                               ).join(pd.DataFrame(all_lla, columns=["lon", "lat", "alt"]))
+        self._locations_xyz = new_xyz
+        self._locations_lla = new_lla
+
+    @property
+    def locations_lla(self):
+        """
+        Approximate positions of stations in WGS-84 (longitude [°], latitude [°],
+        altitude [m]) coordinates.
+        """
+        if self._locations_lla is None:
+            raise RuntimeError("Locations have not been loaded yet.")
+        if not all([station in self._locations_lla["station"].values
+                    for station in self.list_stations]):
+            warn("Locations have likely not been updated since the database changed, "
+                 "there are stations missing.", category=RuntimeWarning)
+        return self._locations_lla
+
+    @locations_lla.setter
+    def locations_lla(self, new_lla):
+        if not (isinstance(new_lla, pd.DataFrame) and
+                all([col in new_lla.columns for col in ["station", "lon", "lat", "alt"]])):
+            raise ValueError("Unrecognized input format. 'new_lla' needs to be a "
+                             "Pandas DataFrame with the columns "
+                             "['station', 'lon', 'lat', 'alt'].")
+        if not all([station in new_lla["station"].values for station in self.list_stations]):
+            warn("The new location DataFrame does not contain all stations "
+                 "that are currently in the database.", category=RuntimeWarning)
+        all_lla = new_lla[["lon", "lat", "alt"]].values
+        all_xyz = ccrs.Geocentric().transform_points(ccrs.Geodetic(), all_lla[:, 0],
+                                                     all_lla[:, 1], all_lla[:, 2])
+        new_xyz = pd.DataFrame(new_lla["station"]
+                               ).join(pd.DataFrame(all_xyz, columns=["x", "y", "z"]))
+        self._locations_xyz = new_xyz
+        self._locations_lla = new_lla
+
+    @property
+    def metrics(self):
+        """
+        Contains the station metric calculated by :meth:`calculate_availability_metrics`.
+        """
+        if self._metrics is None:
+            raise RuntimeError("Metrics have not been calculated yet.")
+        if not all([station in self._metrics["station"].values
+                    for station in self.list_stations]):
+            warn("Metrics have likely not been updated since the database changed, "
+                 "there are stations missing.", category=RuntimeWarning)
+        return self._metrics
+
+    @metrics.setter
+    def metrics(self, metrics):
+        assert all([col in metrics.columns for col in self.METRICCOLS]), \
+            "Not all metrics are in the new DataFrame."
+        self._metrics = metrics
+
+    @classmethod
+    def from_folders(cls, folders, verbose=False):
+        """
+        Build a new RINEXDataHolding object from the file system.
+        The data should be located in one or multiple folder structure(s) organized by
+        ``YYYY/DDD``, where ``YYYY`` is a four-digit year and ``DDD`` is the three-digit
+        day of the year.
+
+        Parameters
+        ----------
+        folders : str, list
+            Folder(s) in which the different year-folders are found, formatted as a
+            list of tuples with name and respective folder
+            (``[('network1', '/folder/one/'), ...]``).
+        verbose : bool, optional
+            If ``True``, print loading progress, final database size and a sample entry.
+            Defaults to ``False``.
+        """
+        # input checks
+        if isinstance(folders, tuple):
+            folders = [folders]
+        if not (isinstance(folders, list) and
+                all([isinstance(tup, tuple) and len(tup) == 2 for tup in folders]) and
+                all([all([isinstance(elem, str) for elem in tup]) for tup in folders])):
+            raise ValueError("Invalid 'folder' argument, pass a list of tuples "
+                             "composed of a name and folder string each, "
+                             f"got {folders}.")
+        # empty starting values
+        dfdict = {col: [] for col in RINEXDataHolding.COLUMNS}
+        # loop over folder(s)
+        for network, folder in tqdm(folders, desc="Loading folders",
+                                    ascii=True, unit="folder"):
+            # initialize pattern extraction
+            rinex_pattern = re.compile(RINEXDataHolding.RINEXPATTERN, re.IGNORECASE)
+            cur_year = None
+            # loop over files
+            if verbose:
+                tqdm.write(f"Loading from folder {folder} the year(s):")
+            for pathobj in Path(folder).rglob(RINEXDataHolding.GLOBPATTERN):
+                year, day, filename = pathobj.parts[-3:]
+                if filename.endswith(RINEXDataHolding.COMPRFILEEXTS):
+                    info = rinex_pattern.match(filename).groupdict()
+                    if (info["yy"] != year[-2:] or info["day"] != day):
+                        warn(f"File '{str(pathobj)} has conflicting year/day information.",
+                             category=RuntimeWarning)
+                        continue
+                    if verbose and (cur_year != year):
+                        tqdm.write(f" {year}")
+                        cur_year = year
+                    date = datetime.strptime(f"{year} {day}", "%Y %j").date()
+                    filestat = os.stat(pathobj)
+                    filesize = filestat.st_size
+                    filetime = datetime.fromtimestamp(filestat.st_mtime, tz=timezone.utc)
+                    dfdict["station"].append(info["site"])
+                    dfdict["year"].append(year)
+                    dfdict["day"].append(day)
+                    dfdict["date"].append(date)
+                    dfdict["sequence"].append(info["sequence"])
+                    dfdict["type"].append(info["type"])
+                    dfdict["compression"].append(info["compression"])
+                    dfdict["filesize"].append(filesize)
+                    dfdict["filetimeutc"].append(filetime)
+                    dfdict["network"].append(network)
+                    dfdict["basefolder"].append(folder)
+        # build DataFrame and save some space
+        df = pd.DataFrame(dfdict)
+        df = df.astype({"network": pd.CategoricalDtype(), "basefolder": pd.CategoricalDtype()})
+        if verbose:
+            print(f"\nFound {df.shape[0]} files.\nSample:\n")
+            print(df.iloc[0, :])
+        return cls(df)
+
+    @classmethod
+    def from_file(cls, filepath, verbose=False):
+        """
+        Loads a RINEXDataHolding object from a pickled Pandas DataFrame file.
+
+        Parameters
+        ----------
+        filepath : str
+            Location of the file.
+        verbose : bool, optional
+            If ``True``, print final database size and a sample entry.
+            Defaults to ``False``.
+        """
+        df = pd.read_pickle(filepath)
+        if verbose:
+            print(f"\nFound {df.shape[0]} files.\nSample:\n")
+            print(df.iloc[0, :])
+        return cls(df)
+
+    def load_locations_from_rinex(self, keep='last'):
+        """
+        Scan the RINEX files' headers for approximate locations for
+        plotting purposes.
+
+        Parameters
+        ----------
+        keep : str, optional
+            Determine which location to use. Possible values are ``'last'``
+            (only scan the most recent file), ``'first'`` (only scan the oldest
+            file) or ``'mean'`` (load all files and calculate average).
+            Note that ``'mean'`` could take a substantial amount of time, since
+            all files have to opened, decompressed and searched.
+        """
+        # prepare
+        assert keep in ["first", "last", "mean"], \
+            f"Unrecognized 'keep' option {keep}."
+        XYZ = ["x", "y", "z"]
+        df = pd.DataFrame({"station": self.list_stations})
+        df = df.join(pd.DataFrame(np.zeros((self.num_stations, 3)), columns=XYZ))
+        # get xyz for each station
+        for row in tqdm(df.itertuples(), total=df.shape[0], ascii=True,
+                        desc="Reading RINEX headers", unit="file"):
+            subset = self.get_files_by(station=row.station)
+            filenames = self.make_filenames(subset)
+            if keep == "first":
+                filenames = [filenames[0]]
+            elif keep == "last":
+                filenames = [filenames[-1]]
+            approx_xyz = [np.array(self.get_rinex_header(f)["APPROX POSITION XYZ"].split(),
+                                   dtype=float)
+                          for f in filenames]
+            approx_xyz = np.array(approx_xyz)
+            if keep == "mean":
+                approx_xyz = np.mean(approx_xyz, axis=0)
+            df.loc[row.Index, XYZ] = approx_xyz.squeeze()
+        # set the instance properties
+        # the xyz-to-lla conversion is done there
+        self.locations_xyz = df
+
+    def load_locations_from_file(self, filepath):
+        """
+        Load a previously-saved DataFrame containing the locations
+        if each station.
+
+        Parameters
+        ----------
+        filepath : str
+            Path to the pickled DataFrame.
+        """
+        df = pd.read_pickle(filepath)
+        assert "station" in df.columns, f"No 'station' column in {filepath}."
+        if all(col in df.columns for col in ["x", "y", "z"]):
+            self.locations_xyz = df
+        elif all(col in df.columns for col in ["lon", "lat", "alt"]):
+            self.locations_lla = df
+        else:
+            raise ValueError(f"Unrecognized DataFrame columns in {filepath}: " +
+                             str(df.columns.tolist()))
+
+    def get_files_by(self, station=None, network=None, year=None, between=None,
+                     verbose=False):
+        """
+        Return a subset of the database by criteria.
+
+        Parameters
+        ----------
+        station : str, list, optional
+            Return only files of this/these station(s).
+        network : str, list, optional
+            Return only files of this/these network(s).
+        year : int, list, optional
+            Return only files of this/these year(s).
+        between : tuple, optional
+            Return only files between the start and end date (inclusive)
+            given by the length-two tuple.
+        verbose : bool, optional
+            If ``True``, print the number of selected entries.
+            Defaults to ``False``.
+        """
+        subset = pd.Series(True, index=range(self.num_files))
+        # subset by station
+        if station is not None:
+            if isinstance(station, str):
+                station = [station]
+            elif isinstance(station, list):
+                assert(all([isinstance(s, str) for s in station])), \
+                    "Found non-string station entries in 'station'."
+            else:
+                raise TypeError("Invalid input form for 'station', must be a string or "
+                                f"list of strings, got {station}.")
+            subset &= self.df["station"].isin(station)
+        # subset by network
+        if network is not None:
+            if isinstance(network, str):
+                network = [network]
+            elif isinstance(network, list):
+                assert(all([isinstance(s, str) for s in network])), \
+                    "Found non-string network entries in 'network'."
+            else:
+                raise TypeError("Invalid input form for 'network', must be a string or "
+                                f"list of strings, got {network}.")
+            subset &= self.df["network"].isin(network)
+        # subset by year
+        if year is not None:
+            if isinstance(year, int) or isinstance(year, str):
+                year = [year]
+            elif isinstance(year, list):
+                assert((all([isinstance(y, int) for y in year]) or
+                        all([isinstance(y, str) for y in year]))), \
+                    "Found non-string/integer year entries in 'year'."
+            else:
+                raise TypeError("Invalid input form for 'year', must be an integer, string or "
+                                f"list of integers or strings, got {year}.")
+            try:
+                year = [str(int(y)) for y in year]
+            except TypeError as e:
+                raise TypeError("Invalid input form for 'year', must be an integer, string or "
+                                f"list of integers or strings, got {year}."
+                                ).with_traceback(e.__traceback__) from e
+            subset &= self.df["year"].isin(year)
+        # subset by time span
+        if between is not None:
+            try:
+                between = (pd.Timestamp(between[0]), pd.Timestamp(between[1]))
+            except (ValueError, TypeError, IndexError) as e:
+                raise TypeError("Invalid input form for 'between', needs to be a length-two "
+                                "tuple of entries that can be converted to Pandas Timestamps, "
+                                f"got {between}.").with_traceback(e.__traceback__) from e
+            subset &= (self.df["date"] >= between[0]) & (self.df["date"] <= between[1])
+        # return
+        if verbose:
+            print(f"Selected {subset.sum()} files.")
+        return self.df[subset]
+
+    @staticmethod
+    def make_filenames(db):
+        """
+        Recreate the full paths to the individual rinex files from the database or
+        a subset thereof.
+
+        Parameters
+        ----------
+        db : pandas.DataFrame
+            :attr:`~df` or a subset thereof.
+
+        Returns
+        -------
+        filenames : list
+            List of paths.
+        """
+        return [os.path.join(row.basefolder, row.year, row.day,
+                             row.station + row.day + row.sequence + "." +
+                             row.year[-2:] + row.type + "." + row.compression)
+                for row in db.itertuples()]
+
+    @staticmethod
+    def get_rinex_header(filepath):
+        """
+        Open a RINEX file, read the header, and format it as a dictionary.
+        No data type conversion or stripping of whitespaces is performed.
+
+        Parameters
+        ----------
+        filepath : str
+            Path to RINEX file.
+
+        Returns
+        -------
+        headers : dict
+            Dictionary of header lines.
+        """
+        # if it's a compressed file, hope that gzip is installed and we can use
+        # it to decompress on-the-fly
+        try:
+            if filepath.endswith(RINEXDataHolding.COMPRFILEEXTS):
+                rinexfile = subprocess.check_output(["gzip", "-dc", filepath],
+                                                    text=True, errors="replace")
+            else:
+                with open(filepath, mode="rt", errors="replace") as f:
+                    rinexfile = f.read()
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Couldn't read compressed RINEX file {filepath}. "
+                               "Check if 'gzip' is available on your machine, or "
+                               "decompress the RINEX file before using this "
+                               "function.").with_traceback(e.__traceback__) from e
+        except UnicodeError as e:
+            raise RuntimeError(f"Can't read file {filepath}."
+                               ).with_traceback(e.__traceback__) from e
+        # extract headers
+        headers = {}
+        for line in rinexfile.splitlines():
+            content, descriptor = line[:60], line[60:].strip()
+            if descriptor == "END OF HEADER":
+                break
+            if descriptor in headers:
+                headers[descriptor] += f"\n{content}"
+            else:
+                headers[descriptor] = content
+        return headers
+
+    def calculate_availability_metrics(self, sampling=Timedelta(1, "D")):
+        """
+        Calculates the following metrics and stores them in the :attr:`~metrics`
+        DataFrame:
+
+        * ``'number'``: Number of available observations.
+        * ``'age'``: Time of first observation.
+        * ``'recency'``: Time of last observation.
+        * ``'length'``: Time between first and last observation.
+        * ``'reliability'``: Reliability defined as number of observations divided
+          by the maximum amount of possible observations between the first and last
+          acquisition given the assumed sampling interval of the data.
+
+        Parameters
+        ----------
+        sampling : geonat.tools.Timedelta
+            Assumed sampling frequency of the data files.
+            Defaults to daily.
+        """
+        # initialize empty DataFrame
+        metrics = pd.DataFrame(self.list_stations, columns=["station"])
+        metrics = metrics.join(pd.DataFrame(np.zeros((self.num_stations, 5)),
+                                            columns=self.METRICCOLS))
+        # calculate metrics station by station
+        for row in metrics.itertuples():
+            subset = self.get_files_by(station=row.station)
+            metrics.loc[row.Index, ["number", "age", "recency"]] = \
+                [subset.shape[0], subset["date"].min(), subset["date"].max()]
+            metrics.loc[row.Index, "length"] = \
+                metrics.loc[row.Index, "recency"] - metrics.loc[row.Index, "age"] + sampling
+            metrics.loc[row.Index, "reliability"] = (subset.shape[0] * sampling) / \
+                metrics.loc[row.Index, "length"]
+        # set attribute
+        metrics = metrics.astype({"number": int})
+        self.metrics = metrics
+
+    def _create_map_figure(self, gui_settings, annotate_stations):
+        """
+        Create a basemap of all stations.
+        """
+        # get location data and projections
+        stat_lats = self.locations_lla["lat"].values
+        stat_lons = self.locations_lla["lon"].values
+        stat_names = self.locations_lla["station"].values
+        proj_gui = getattr(ccrs, gui_settings["projection"])()
+        proj_lla = ccrs.PlateCarree()
+        # create figure and plot stations
+        fig = plt.figure()
+        ax = fig.add_subplot(projection=proj_gui)
+        stat_points = ax.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
+                                 linestyle='None', marker='.', transform=proj_lla,
+                                 edgecolor='None', zorder=1000)
+        if annotate_stations:
+            for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
+                ax.annotate(sname, (slon, slat),
+                            xycoords=proj_lla._as_mpl_transform(ax),
+                            annotation_clip=True, textcoords="offset pixels",
+                            xytext=(0, 5), ha="center")
+        # create underlay
+        map_underlay = False
+        if gui_settings["wmts_show"]:
+            try:
+                ax.add_wmts(gui_settings["wmts_server"],
+                            layer_name=gui_settings["wmts_layer"],
+                            alpha=gui_settings["wmts_alpha"])
+                map_underlay = True
+            except Exception as exc:
+                print(exc)
+        if gui_settings["coastlines_show"]:
+            ax.coastlines(color="white" if map_underlay else "black",
+                          resolution=gui_settings["coastlines_res"])
+        return fig, ax, proj_gui, proj_lla, stat_points, stat_names
+
+    def plot_map(self, metric=None, orientation="horizontal", annotate_stations=True,
+                 saveas=None, gui_kw_args={}):
+        """
+        Plot a map of all the stations present in the RINEX database.
+        The markers can be colored by the different availability metrics calculated
+        by :meth:`~calculate_availability_metrics`.
+
+        Parameters
+        ----------
+        metric : str, optional
+            Calculate the marker color (and respective colormap) given a certain
+            metric. If ``None`` (default), no color is applied.
+        orientation : str, optional
+            Colorbar orientation, see :func:`~matplotlib.pyplot.colorbar`.
+            Defaults to ``'horizontal'``.
+        annotate_stations : bool, optional
+            If ``True`` (default), add the station names to the map.
+        saveas : str, optional
+            If provided, the figure will be saved at this location.
+        gui_kw_args : dict, optional
+            Override default GUI settings of :attr:`~geonat.config.defaults`.
+        """
+        # prepare
+        gui_settings = defaults["gui"].copy()
+        gui_settings.update(gui_kw_args)
+        # get basemap
+        fig, ax, proj_gui, proj_lla, stat_points, stat_names = \
+            self._create_map_figure(gui_settings, annotate_stations)
+        # add colors
+        if metric in self.METRICCOLS:
+            # get metric in the same order as the stations in the figure
+            met = self.metrics[["station", metric]]
+            met_fmt = [met[met["station"] == station][metric].values[0]
+                       for station in stat_names]
+            # metric is a normal numeric value
+            if metric in ["number", "reliability"]:
+                met_raw = np.array(met_fmt)
+                tickformat = None
+            # metric is a timestamp, need to convert
+            elif metric in ["age", "recency"]:
+                met_ref = min(met_fmt)
+                met_raw = np.array([(m - met_ref).total_seconds() for m in met_fmt])
+                # make a helper function for the tick formatting
+                @FuncFormatter  # noqa: E306
+                def tickformat(x, pos):
+                    return (met_ref + pd.Timedelta(x, "s")).strftime(r"%Y-%m-%d")
+            # metric is a timedelta, need to convert
+            elif metric == "length":
+                met_raw = np.array([m.value for m in met_fmt])
+                # make a helper function for the tick formatting
+                @FuncFormatter  # noqa: E306
+                def tickformat(x, pos):
+                    return str(pd.Timedelta(x, "ns").days)
+            # get data range and make colormap
+            cmin, cmax = met_raw.min(), met_raw.max()
+            cmap = mpl.cm.ScalarMappable(cmap=scm.batlow,
+                                         norm=mpl.colors.Normalize(vmin=cmin, vmax=cmax))
+            # set marker facecolors
+            stat_points.set_facecolor(cmap.to_rgba(met_raw))
+            fig.canvas.draw_idle()
+            # add the colorbar
+            cbar = fig.colorbar(cmap, ax=ax, orientation=orientation,
+                                fraction=0.05 if orientation == "horizontal" else 0.2,
+                                pad=0.03, aspect=10, format=tickformat)
+            cticks = cbar.get_ticks()
+            if cticks[0] != cmin:
+                cticks = [cmin, *cticks]
+            if cticks[-1] != cmax:
+                cticks = [*cticks, cmax]
+            cbar.set_ticks(cticks)
+            cbar.set_label(metric)
+        elif metric is not None:
+            warn(f"Could not interpret '{metric}' as a metric to use for plotting.")
+        # save
+        if saveas is not None:
+            fig.savefig(saveas)
+        # show
+        plt.show()
+
+    def plot_availability(self, sampling=Timedelta(1, "D"), saveas=None):
+        """
+        Create an availability figure for the dataset.
+
+        Parameters
+        ----------
+        sampling : geonat.tools.Timedelta, optional
+            Assume that breaks strictly larger than ``sampling`` constitute a data gap.
+            Defaults to daily.
+        saveas : str, optional
+            If provided, the figure will be saved at this location.
+        """
+        # find a sorting by latitude to match a map view
+        lat_indices = np.argsort(self.locations_lla["lat"].values)
+        # make an empty figure and start a color loop
+        fig, ax = plt.subplots(figsize=(6, 0.25*lat_indices.size))
+        colors = [plt.cm.tab10(i) for i in range(10)]
+        icolor = 0
+        # loop over stations in the sorted order
+        for offset, index in enumerate(tqdm(lat_indices, desc="Drawing lines",
+                                            ascii=True, unit="station")):
+            # get the station in question
+            subset = self.get_files_by(station=self.locations_lla["station"].iloc[index])
+            # get the file dates and split them by contiguous chunks
+            all_dates = subset["date"].values
+            if all_dates.size > 1:
+                split_at = np.nonzero(np.diff(all_dates) > sampling)[0]
+                if split_at.size > 0:
+                    intervals = np.split(all_dates, split_at + 1)
+                else:
+                    intervals = [all_dates]
+            else:
+                intervals = [all_dates]
+            # plot a line for each chunk
+            for chunk in intervals:
+                ax.fill_between([chunk[0], chunk[-1]],
+                                [offset + 0.7, offset + 0.7], [offset + 1.3, offset + 1.3],
+                                fc=colors[icolor])
+            icolor = (icolor + 1) % 10
+        # add station labels
+        ax.set_yticks(np.arange(lat_indices.size) + 1)
+        ax.set_yticklabels(self.locations_lla["station"].values[lat_indices])
+        # do some pretty formatting
+        ax.grid(which="major", axis="x")
+        ax.xaxis.set_tick_params(labeltop='on')
+        ax.set_axisbelow(True)
+        ax.set_ylim(0.5, lat_indices.size + 0.5)
+        # save
+        if saveas is not None:
+            fig.savefig(saveas)
+        # show
+        plt.show()
