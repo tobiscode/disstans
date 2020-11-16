@@ -1430,6 +1430,7 @@ class RINEXDataHolding():
         ax_right.set_yticks(np.arange(n_stations) + 1)
         ax_right.set_yticklabels([f"({n})" for n in n_files], fontsize="x-small")
         ax_right.tick_params(which="major", axis="y", right=False)
+        fig.tight_layout()
         # save
         if saveas is not None:
             fig.savefig(saveas)

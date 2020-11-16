@@ -34,6 +34,13 @@ weighted_median
 Classes
 -------
 
+RINEXDataHolding
+................
+
+.. autoclass:: geonat.tools.RINEXDataHolding
+   :members:
+   :special-members:
+
 Timedelta
 .........
 
