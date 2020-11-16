@@ -944,25 +944,37 @@ class RINEXDataHolding():
         return cls(df)
 
     @classmethod
-    def from_file(cls, filepath, verbose=False):
+    def from_file(cls, db_file, locations_file=None, metrics_file=None, verbose=False):
         """
         Loads a RINEXDataHolding object from a pickled Pandas DataFrame file.
+        Optionally also loads pickled location and metrics files.
 
         Parameters
         ----------
-        filepath : str
-            Location of the file.
+        db_file : str
+            Path of the main file.
+        locations_file : str, optional
+            Path of the locations file.
+        metrics_file : str, optional
+            Path of the metrics file.
         verbose : bool, optional
             If ``True``, print final database size and a sample entry.
             Defaults to ``False``.
         """
-        df = pd.read_pickle(filepath)
+        # load main database
+        df = pd.read_pickle(db_file)
         if verbose:
             print(f"\nFound {df.shape[0]} files.\nSample:\n")
             print(df.iloc[0, :])
-        return cls(df)
+        new_instance = cls(df)
+        # optionally load locations and metrics
+        if locations_file:
+            new_instance.load_locations_from_file(locations_file)
+        if metrics_file:
+            new_instance.load_metrics_from_file(metrics_file)
+        return new_instance
 
-    def load_locations_from_rinex(self, keep='last'):
+    def load_locations_from_rinex(self, keep='last', replace_not_found=False):
         """
         Scan the RINEX files' headers for approximate locations for
         plotting purposes.
@@ -975,6 +987,11 @@ class RINEXDataHolding():
             file) or ``'mean'`` (load all files and calculate average).
             Note that ``'mean'`` could take a substantial amount of time, since
             all files have to opened, decompressed and searched.
+        replace_not_found : bool, optional
+            If a location is not found and ``replace_not_found=True``,
+            the location of Null Island (0° Longitude, 0° Latitude) is used
+            and a warning is issued.
+            If ``False`` (default), an error is raised instead.
         """
         # prepare
         assert keep in ["first", "last", "mean"], \
@@ -985,15 +1002,27 @@ class RINEXDataHolding():
         # get xyz for each station
         for row in tqdm(df.itertuples(), total=df.shape[0], ascii=True,
                         desc="Reading RINEX headers", unit="file"):
-            subset = self.get_files_by(station=row.station)
+            subset = self.get_files_by(station=row.station).sort_values(by=["date"])
             filenames = self.make_filenames(subset)
-            if keep == "first":
-                filenames = [filenames[0]]
-            elif keep == "last":
-                filenames = [filenames[-1]]
-            approx_xyz = [np.array(self.get_rinex_header(f)["APPROX POSITION XYZ"].split(),
-                                   dtype=float)
-                          for f in filenames]
+            if keep == "last":
+                filenames = reversed(filenames)
+            approx_xyz = []
+            for f in filenames:
+                try:
+                    found_pos = self.get_rinex_header(f)["APPROX POSITION XYZ"]
+                except KeyError:
+                    continue
+                approx_xyz.append(np.array(found_pos.split(), dtype=float))
+                if keep != "mean":
+                    break
+            if len(approx_xyz) == 0:
+                if replace_not_found:
+                    warn("Couldn't find an approximate location in the RINEX "
+                         f"headers for {row.station}. Using Null Island.")
+                    approx_xyz.append([0, 6378137, 0])
+                else:
+                    raise RuntimeError("Couldn't find an approximate location in "
+                                       f"the RINEX headers for {row.station}.")
             approx_xyz = np.array(approx_xyz)
             if keep == "mean":
                 approx_xyz = np.mean(approx_xyz, axis=0)
@@ -1004,8 +1033,7 @@ class RINEXDataHolding():
 
     def load_locations_from_file(self, filepath):
         """
-        Load a previously-saved DataFrame containing the locations
-        if each station.
+        Load a previously-saved DataFrame containing the locations of each station.
 
         Parameters
         ----------
@@ -1096,6 +1124,17 @@ class RINEXDataHolding():
         if verbose:
             print(f"Selected {subset.sum()} files.")
         return self.df[subset]
+
+    def load_metrics_from_file(self, filepath):
+        """
+        Load a previously-saved DataFrame containing the calculated availability metrics.
+
+        Parameters
+        ----------
+        filepath : str
+            Path to the pickled DataFrame.
+        """
+        self.metrics = pd.read_pickle(filepath)
 
     @staticmethod
     def make_filenames(db):
@@ -1199,7 +1238,7 @@ class RINEXDataHolding():
         metrics = metrics.astype({"number": int})
         self.metrics = metrics
 
-    def _create_map_figure(self, gui_settings, annotate_stations):
+    def _create_map_figure(self, gui_settings, annotate_stations, figsize):
         """
         Create a basemap of all stations.
         """
@@ -1210,7 +1249,7 @@ class RINEXDataHolding():
         proj_gui = getattr(ccrs, gui_settings["projection"])()
         proj_lla = ccrs.PlateCarree()
         # create figure and plot stations
-        fig = plt.figure()
+        fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(projection=proj_gui)
         stat_points = ax.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
                                  linestyle='None', marker='.', transform=proj_lla,
@@ -1237,7 +1276,7 @@ class RINEXDataHolding():
         return fig, ax, proj_gui, proj_lla, stat_points, stat_names
 
     def plot_map(self, metric=None, orientation="horizontal", annotate_stations=True,
-                 saveas=None, gui_kw_args={}):
+                 figsize=None, saveas=None, dpi=None, gui_kw_args={}):
         """
         Plot a map of all the stations present in the RINEX database.
         The markers can be colored by the different availability metrics calculated
@@ -1253,8 +1292,12 @@ class RINEXDataHolding():
             Defaults to ``'horizontal'``.
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
+        figsize : tuple, optional
+            Set the figure size (width, height) in inches.
         saveas : str, optional
             If provided, the figure will be saved at this location.
+        dpi : float, optional
+            Use this DPI for saved figures.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         """
@@ -1263,7 +1306,7 @@ class RINEXDataHolding():
         gui_settings.update(gui_kw_args)
         # get basemap
         fig, ax, proj_gui, proj_lla, stat_points, stat_names = \
-            self._create_map_figure(gui_settings, annotate_stations)
+            self._create_map_figure(gui_settings, annotate_stations, figsize)
         # add colors
         if metric in self.METRICCOLS:
             # get metric in the same order as the stations in the figure
@@ -1315,7 +1358,8 @@ class RINEXDataHolding():
         # show
         plt.show()
 
-    def plot_availability(self, sampling=Timedelta(1, "D"), saveas=None):
+    def plot_availability(self, sampling=Timedelta(1, "D"), sort_by_latitude=True,
+                          saveas=None):
         """
         Create an availability figure for the dataset.
 
@@ -1324,22 +1368,37 @@ class RINEXDataHolding():
         sampling : geonat.tools.Timedelta, optional
             Assume that breaks strictly larger than ``sampling`` constitute a data gap.
             Defaults to daily.
+        sort_by_latitude : bool, optional
+            If ``True`` (default), sort the stations by latitude, else alphabetical.
+            (Always falls back to alphabetical if location information is missing.)
         saveas : str, optional
             If provided, the figure will be saved at this location.
         """
-        # find a sorting by latitude to match a map view
-        lat_indices = np.argsort(self.locations_lla["lat"].values)
+        # find a sorting by latitude to match a map view,
+        # otherwise go by alphabet
+        sort_stations = None
+        if sort_by_latitude:
+            try:
+                sort_indices = np.argsort(self.locations_lla["lat"].values)
+                sort_stations = self.locations_lla["station"].iloc[sort_indices].tolist()
+            except RuntimeError:
+                pass
+        if sort_stations is None:
+            sort_stations = list(reversed(sorted([s.lower() for s in self.list_stations])))
+        n_stations = len(sort_stations)
         # make an empty figure and start a color loop
-        fig, ax = plt.subplots(figsize=(6, 0.25*lat_indices.size))
+        fig, ax = plt.subplots(figsize=(6, 0.25*n_stations))
         colors = [plt.cm.tab10(i) for i in range(10)]
         icolor = 0
+        n_files = []
         # loop over stations in the sorted order
-        for offset, index in enumerate(tqdm(lat_indices, desc="Drawing lines",
-                                            ascii=True, unit="station")):
+        for offset, station in enumerate(tqdm(sort_stations, desc="Drawing lines",
+                                              ascii=True, unit="station")):
             # get the station in question
-            subset = self.get_files_by(station=self.locations_lla["station"].iloc[index])
+            subset = self.get_files_by(station=station)
             # get the file dates and split them by contiguous chunks
-            all_dates = subset["date"].values
+            all_dates = subset["date"].sort_values().values
+            n_files.append(all_dates.size)
             if all_dates.size > 1:
                 split_at = np.nonzero(np.diff(all_dates) > sampling)[0]
                 if split_at.size > 0:
@@ -1355,13 +1414,22 @@ class RINEXDataHolding():
                                 fc=colors[icolor])
             icolor = (icolor + 1) % 10
         # add station labels
-        ax.set_yticks(np.arange(lat_indices.size) + 1)
-        ax.set_yticklabels(self.locations_lla["station"].values[lat_indices])
+        ax.set_yticks(np.arange(n_stations) + 1)
+        ax.set_yticklabels(sort_stations)
+        ax.tick_params(which="major", axis="y", left=False)
         # do some pretty formatting
+        ax.set_title(f"Network(s): {', '.join(self.df['network'].unique().tolist())}\n"
+                     f"Files: {sum(n_files)}")
         ax.grid(which="major", axis="x")
         ax.xaxis.set_tick_params(labeltop='on')
         ax.set_axisbelow(True)
-        ax.set_ylim(0.5, lat_indices.size + 0.5)
+        ax.set_ylim(0.5, n_stations + 0.5)
+        # add number of files per station
+        ax_right = ax.twinx()
+        ax_right.set_ylim(0.5, n_stations + 0.5)
+        ax_right.set_yticks(np.arange(n_stations) + 1)
+        ax_right.set_yticklabels([f"({n})" for n in n_files], fontsize="x-small")
+        ax_right.tick_params(which="major", axis="y", right=False)
         # save
         if saveas is not None:
             fig.savefig(saveas)
