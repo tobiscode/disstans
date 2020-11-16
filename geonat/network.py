@@ -1165,8 +1165,8 @@ class Network():
                                      edgecolor=default_station_edges, zorder=1000)
         # add labels
         if annotate_stations:
-        for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
-            ax_map.annotate(sname, (slon, slat),
+            for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
+                ax_map.annotate(sname, (slon, slat),
                                 xycoords=proj_lla._as_mpl_transform(ax_map),
                                 annotation_clip=True, textcoords="offset pixels",
                                 xytext=(0, 5), ha="center")
@@ -1261,7 +1261,7 @@ class Network():
         plt.show()
 
     def gui(self, station=None, timeseries=None, model_list=None, sum_models=True,
-            verbose=False, annotate_stations=True, scalogram_kw_args=None,
+            verbose=False, annotate_stations=True, save=False, scalogram_kw_args=None,
             stepdetector={}, trend_kw_args={}, analyze_kw_args={}, rms_on_map={},
             gui_kw_args={}):
         """
@@ -1283,6 +1283,7 @@ class Network():
         - restrict the output to a timewindow showing potential steps from multiple sources,
         - color the station markers by RMS and include a colormap,
         - show a scalogram (Model class permitting),
+        - save the output timeseries (and scalogram) as an image,
         - print statistics of residuals, and
         - print station information.
 
@@ -1304,6 +1305,13 @@ class Network():
             :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
+        save : bool, str, optional
+            If ``True``, save the figure of the selected timeseries. If a scalogram is
+            also created, save this as well. The output directory is the current folder.
+            Ignored if ``stepdetector`` is set. Suppresses all interactive figures.
+            If ``save`` is a string, it will be included in the output file name
+            for easier referencing.
+            Defaults to ``False``.
         scalogram_kw_args : dict, optional
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
@@ -1378,6 +1386,13 @@ class Network():
         # make sure that if analyze_kw_args is used, 'verbose' is set and True
         if analyze_kw_args:
             analyze_kw_args["verbose"] = True
+
+        # check the save settings
+        if isinstance(save, str):
+            fname_add = f"_{save}"
+            save = True
+        elif save:
+            fname_add = ""
 
         # color the station markers by RMS
         if rms_on_map:
@@ -1705,6 +1720,14 @@ class Network():
                 ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
 
+            # save figure
+            if save and not stepdetector:
+                nowtime = pd.Timestamp.now().isoformat()[:19].replace(":", "")
+                plotfname = f"{station_name}{fname_add}_{nowtime}"
+                fig_ts.savefig(f"ts_{plotfname}")
+                plt.close(fig_map)
+                plt.close(fig_ts)
+
             # get scalogram
             if scalogram_kw_args is not None:
                 try:
@@ -1713,7 +1736,12 @@ class Network():
                         plt.close(fig_scalo)
                     fig_scalo, ax_scalo = splset.make_scalogram(t_left, t_right,
                                                                 **scalogram_kw_args)
-                    fig_scalo.show()
+                    # save figure or show
+                    if save and not stepdetector:
+                        fig_scalo.savefig(f"scalo_{plotfname}")
+                        plt.close(fig_scalo)
+                    else:
+                        fig_scalo.show()
                 except KeyError:
                     warn(f"Could not find scalogram model {scalo_model} "
                          f"in timeseries {scalo_ts} for station {station_name}.",
@@ -1747,6 +1775,6 @@ class Network():
                     else:
                         continue
                     update_timeseries(None, new_station)
-        else:
+        elif not save:
             plt.show()
         del click
