@@ -731,8 +731,10 @@ class RINEXDataHolding():
     extension to enable compression).
 
     The location information and availability metrics can be saved in the
-    same way. To load a previously-saved file, load it, and assign it to the
-    respective instance attributes.
+    same way. To load a previously-saved file, you can use the convenience functions
+    :meth:`~load_locations_from_file` and :meth:`~load_metrics_from_file`, specify
+    the respective paths in the call to :meth:`~from_file`, or alternatively, load
+    the data directly with Pandas and assign it to the respective instance attributes.
     """
 
     GLOBPATTERN = "[0-9][0-9][0-9][0-9]/[0-9][0-9][0-9]/*"

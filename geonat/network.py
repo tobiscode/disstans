@@ -1778,3 +1778,4 @@ class Network():
         elif not save:
             plt.show()
         del click
+        plt.close("all")

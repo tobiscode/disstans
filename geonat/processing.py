@@ -374,38 +374,6 @@ class StepDetector():
         if (x is not None) and (y is not None) and (kernel_size is not None):
             self.search(x, y, kernel_size)
 
-    # @property
-    # def x(self):
-    #     r""" Hash of the ``x`` array (to check whether it changed). """
-    #     if self._x is None:
-    #         raise ValueError(f"'x' has not yet been set.")
-    #     return self._x
-
-    # @x.setter
-    # def x(self, x):
-    #     if x is not None:
-    #         assert isinstance(x, np.ndarray) and (x.ndim == 1), \
-    #             f"'x' must be a one-dimensional NumPy array."
-    #         self._x = hash(x.tostring())
-    #     else:
-    #         self._x = None
-
-    # @property
-    # def y(self):
-    #     r""" Hash of the ``y`` array (to check whether it changed). """
-    #     if self._y is None:
-    #         raise ValueError(f"'y' has not yet been set.")
-    #     return self._x
-
-    # @y.setter
-    # def y(self, y):
-    #     if y is not None:
-    #         assert isinstance(y, np.ndarray) and (y.ndim == 2), \
-    #             f"'y' must be a two-dimensional NumPy array."
-    #         self._y = hash(y.tostring())
-    #     else:
-    #         self._y = None
-
     @property
     def kernel_size(self):
         """ Kernel (window) size of the detector. """
@@ -744,4 +712,4 @@ class StepDetector():
         """
         assert self.probabilities is not None, \
             "'probabilities' has not been set yet, run StepDetector.search() first."
-        return StepDetector._steps(self.probabilities, threshold, maxsteps, verbose)
+        return StepDetector._steps((self.probabilities, threshold, maxsteps, verbose))
