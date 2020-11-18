@@ -68,6 +68,11 @@ and explained as follows:
 +-------------+------------------------+---------------------------------------------------+
 |             | ``reweight_eps``       | A small number used to stabilize the reweighting. |
 +-------------+------------------------+---------------------------------------------------+
+|             | ``reweight_usescales`` | If ``True``, the reweighting function checks for  |
+|             |                        | model-internal scales like the ones used by       |
+|             |                        | :class:`~geonat.models.SplineSet` and takes them  |
+|             |                        | into account when calculating the new penalties.  |
++-------------+------------------------+---------------------------------------------------+
 
 For more about the WMTS background imagery, see `Cartopy's documentation <WMTS_>`_.
 
@@ -99,4 +104,5 @@ defaults["prior"] = {"mu": 48,
                      "threshold": 3}
 # for iterative reweighting L1-regularized solver
 defaults["solvers"] = {"reweight_func": "log",
-                       "reweight_eps": 1e-4}
+                       "reweight_eps": 1e-4,
+                       "reweight_usescales": False}

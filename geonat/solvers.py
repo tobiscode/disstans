@@ -28,8 +28,11 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None, init_r
     """
     mapping_matrices = []
     obs_indices = []
+    use_internal_scales = defaults["solvers"]["reweight_usescales"]
     if reg_indices:
         reg_diag = []
+        if use_internal_scales:
+            weights_scaling = []
         if init_reweights is None:
             init_weights = None
         elif isinstance(init_reweights, np.ndarray):
@@ -56,6 +59,9 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None, init_r
         obs_indices.append(observable)
         if reg_indices:
             reg_diag.extend([model.regularize] * int(observable.sum()))
+            if use_internal_scales and model.regularize:
+                weights_scaling.append(getattr(model, "internal_scales",
+                                               np.ones(model.num_parameters))[observable])
     G = sparse.hstack(mapping_matrices, format='csc')
     obs_indices = np.concatenate(obs_indices)
     num_time, num_params = G.shape
@@ -64,6 +70,10 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None, init_r
     if reg_indices:
         reg_diag = np.array(reg_diag)
         num_reg = reg_diag.sum()
+        if use_internal_scales:
+            weights_scaling = np.concatenate(weights_scaling)
+        else:
+            weights_scaling = None
         if num_reg == 0:
             warn("Regularized solver got no models to regularize.")
         if init_weights is not None:
@@ -72,7 +82,8 @@ def _combine_mappings(ts, models, reg_indices=False, cached_mapping=None, init_r
             assert init_weights.shape == (num_reg, num_comps), \
                 "The combined 'init_reweights' must have the shape " + \
                 f"{(num_reg, num_comps)}, got {init_weights.shape}."
-        return G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag, init_weights
+        return G, obs_indices, num_time, num_params, num_comps, num_reg, \
+            reg_diag, init_weights, weights_scaling
     else:
         return G, obs_indices, num_time, num_params, num_comps
 
@@ -549,7 +560,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
              "which removes the regularization.")
 
     # get mapping and regularization matrix
-    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_diag, init_weights = \
+    G, obs_indices, num_time, num_params, num_comps, num_reg, \
+        reg_diag, init_weights, weights_scaling = \
         _combine_mappings(ts, models, reg_indices=True, cached_mapping=cached_mapping,
                           init_reweights=init_reweights)
     regularize = (num_reg > 0) and (penalty > 0)
@@ -586,7 +598,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
                 if reweights_coupled:
                     objective = objective + cp.norm1(z)
                 else:
-                objective = objective + lambd * cp.norm1(z)
+                    objective = objective + lambd * cp.norm1(z)
                 constraints = [z == cp.multiply(weights, m[reg_diag])]
                 old_m = np.zeros(m.shape)
             else:
@@ -611,7 +623,10 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
                 # if iterating, extra tasks
                 if regularize and reweight_max_iters is not None:
                     # update weights
-                    weights.value = rw_func(m.value[reg_diag])
+                    if weights_scaling is not None:
+                        weights.value = rw_func(m.value[reg_diag]*weights_scaling)
+                    else:
+                        weights.value = rw_func(m.value[reg_diag])
                     # check if the solution changed to previous iteration
                     if (i > 0) and (np.sqrt(np.sum((old_m - m.value)**2)) < reweight_max_rss):
                         break
@@ -837,7 +852,7 @@ class SpatialSolver():
                 else:
                     if mdl_description in spatial_reweight_models:
                         warn(f"{mdl_description} cannot be stacked, got {mdl_weights_dict} " +
-                              "(model should have been spatially reweighted).")
+                             "(model should have been spatially reweighted).")
                     for name in station_names:
                         if mdl_description in net_weights[name][0]:
                             new_net_weights[name]["init_reweights"][mdl_description] = \
