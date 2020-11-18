@@ -400,9 +400,9 @@ def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=
 
 
 def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_rss=1e-10,
-                     init_reweights=None, formal_variance=False, cached_mapping=None,
-                     use_data_variance=True, use_data_covariance=True, return_weights=False,
-                     cvxpy_kw_args={}):
+                     init_reweights=None, reweights_coupled=True, formal_variance=False,
+                     cached_mapping=None, use_data_variance=True, use_data_covariance=True,
+                     return_weights=False, cvxpy_kw_args={}):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -461,6 +461,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
         :math:`\text{num_components}=1` if covariances are not used (and the actual
         number of timeseries components otherwise) and :math:`\text{num_reg}` is the
         number of regularized model parameters.
+    reweights_coupled : bool, optional
+        If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
+        is coupled with the reweighting weights (see Notes).
     formal_variance : bool, optional
         If ``True``, also calculate the formal variance (diagonals of the covariance
         matrix).
@@ -528,6 +531,12 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
     | ``'inv_sq'`` | :math:`w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}`                              |
     +--------------+------------------------------------------------------------------------------+
 
+    If reweighting is active and ``reweights_coupled=True``, :math:`\lambda`
+    is moved into the norm and combined with :math:`\mathbf{w}`, such that
+    the reweighting applies to the product of both.
+    Note that if ``init_reweights`` is not ``None``, then the ``penalty`` is ignored
+    since it should already be contained in the passed weights array.
+
     References
     ----------
     .. [candes08] Candès, E. J., Wakin, M. B., & Boyd, S. P. (2008).
@@ -565,6 +574,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
                 reweight_size = num_reg*num_comps
                 if init_weights is None:
                     init_weights = np.ones(reweight_size)
+                    if reweights_coupled:
+                        init_weights *= penalty
                 else:
                     assert init_weights.size == reweight_size, \
                         f"'init_weights' must have a size of {reweight_size}, " + \
@@ -572,6 +583,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
                 weights = cp.Parameter(shape=reweight_size,
                                        value=init_weights, pos=True)
                 z = cp.Variable(shape=reweight_size)
+                if reweights_coupled:
+                    objective = objective + cp.norm1(z)
+                else:
                 objective = objective + lambd * cp.norm1(z)
                 constraints = [z == cp.multiply(weights, m[reg_diag])]
                 old_m = np.zeros(m.shape)
