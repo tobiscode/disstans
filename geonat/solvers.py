@@ -729,8 +729,9 @@ class SpatialSolver():
         """ Names of the models to fit (``None`` for all). """
 
     def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters=5,
-              formal_variance=False, use_data_variance=True, use_data_covariance=True,
-              cvxpy_kw_args={}):
+              spatial_reweight_percentile=0.5, local_reweight_iters=1,
+              reweights_coupled=True, formal_variance=False, use_data_variance=True,
+              use_data_covariance=True, cvxpy_kw_args={}):
         r"""
         Solve the network-wide fitting problem as follows:
 
@@ -749,6 +750,15 @@ class SpatialSolver():
             Names of models to use in the spatial reweighting.
         spatial_reweight_iters : int, optional
             Number of spatial reweighting iterations.
+        spatial_reweight_percentile : float, optional
+            Percentile used in the spatial reweighting.
+            Defaults to ``0.5``.
+        local_reweight_iters : int, optional
+            Number of local reweighting iterations, see ``reweight_max_iters`` in
+            :func:`~lasso_regression`.
+        reweights_coupled : bool, optional
+            If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
+            is coupled with the reweighting weights (see Notes).
         formal_variance : bool, optional
             If ``True``, also calculate the formal variance (diagonals of the covariance
             matrix).
@@ -770,7 +780,7 @@ class SpatialSolver():
             f"{spatial_reweight_iters}."
 
         # get scale lengths (correlation lengths)
-        # using the average distance to the closest 4 stations
+        # using the average distance to the closest 3 stations
         tqdm.write("Calculating scale lengths")
         geoid = cgeod.Geodesic()
         station_names = list(self.net.stations.keys())
@@ -788,7 +798,9 @@ class SpatialSolver():
         tqdm.write("Performing initial solve")
         net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
                                    solver="lasso_regression", cached_mapping=True,
-                                   penalty=penalty, reweight_max_iters=1,
+                                   penalty=penalty,
+                                   reweight_max_iters=local_reweight_iters,
+                                   reweights_coupled=reweights_coupled,
                                    return_weights=True,
                                    formal_variance=formal_variance,
                                    use_data_variance=use_data_variance,
@@ -797,10 +809,12 @@ class SpatialSolver():
 
         # iterate the specified amount of times, updating the weights in between
         # TODO: implement early stopping criteria
+        max_penalty = _get_reweighting_function()(0)
         for i in range(1, spatial_reweight_iters + 1):
             tqdm.write("Updating weights")
             model_list = list(set([mdl for n_w in net_weights.values() for mdl in n_w[0].keys()]))
-            new_net_weights = dict.fromkeys(station_names, {"init_reweights": {}})
+            new_net_weights = {statname: {"init_reweights": {}} for statname in station_names}
+            num_pweights_before, num_pweights_after = 0, 0
             for mdl_description in model_list:
                 mdl_weights_dict = {name: net_weights[name][0][mdl_description]
                                     for name in station_names
@@ -810,34 +824,33 @@ class SpatialSolver():
                 mdl_weights_shapes = [mdl.shape for mdl in mdl_weights]
                 if (mdl_description in spatial_reweight_models) and (len(mdl_weights) > 0) and \
                    (mdl_weights_shapes.count(mdl_weights_shapes[0]) == len(mdl_weights)):
-                    print(f"stacking model {mdl_description}")
+                    print(f"Stacking model {mdl_description}")
                     new_net_weights[name]["init_reweights"] = {}
                     parameter_weights = np.stack(mdl_weights)
-                    num_pweights_before = ((np.abs(parameter_weights) < 10).sum(),
-                                           (np.abs(parameter_weights) > 1e5).sum())
+                    num_pweights_before += (parameter_weights >= max_penalty).sum()
                     for station_index, name in enumerate(station_names):
                         new_weights = weighted_median(parameter_weights,
-                                                      distance_weights[station_index, :])
-                        num_pweights_after = ((np.abs(new_weights) < 10).sum(),
-                                              (np.abs(new_weights) > 1e5).sum())
-                        print(f"{num_pweights_before} -> {num_pweights_after}")
+                                                      distance_weights[station_index, :],
+                                                      percentile=spatial_reweight_percentile)
+                        num_pweights_after += (new_weights >= max_penalty).sum()
                         new_net_weights[name]["init_reweights"][mdl_description] = new_weights
                 else:
                     if mdl_description in spatial_reweight_models:
-                        print(f"{mdl_description} cannot be stacked, got {mdl_weights_dict} " +
+                        warn(f"{mdl_description} cannot be stacked, got {mdl_weights_dict} " +
                               "(model should have been spatially reweighted).")
-                    else:
-                        print(f"Not stacking {mdl_description} because not " +
-                              "in 'spatial_reweight_models'.")
                     for name in station_names:
                         if mdl_description in net_weights[name][0]:
                             new_net_weights[name]["init_reweights"][mdl_description] = \
                                 net_weights[name][0][mdl_description]
+            tqdm.write("Number of maximum penalty weights changed from " +
+                       f"{num_pweights_before} to {num_pweights_after}.")
             tqdm.write(f"Solving after {i} reweightings")
             net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
                                        solver="lasso_regression", cached_mapping=True,
                                        local_input=new_net_weights,
-                                       penalty=penalty, reweight_max_iters=1,
+                                       penalty=penalty,
+                                       reweight_max_iters=local_reweight_iters,
+                                       reweights_coupled=reweights_coupled,
                                        return_weights=True,
                                        formal_variance=formal_variance,
                                        use_data_variance=use_data_variance,
