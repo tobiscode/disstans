@@ -709,7 +709,8 @@ class ISpline(Model):
     """
     Subclasses :class:`~geonat.models.Model`.
 
-    Integral of cardinal, centralized B-Splines of certain order/degree and time scale.
+    Integral of cardinal, centralized B-Splines of certain order/degree and time scale,
+    with an amplitude of 1.
     The degree :math:`p` given in the initialization is the degree of the spline
     *before* the integration, i.e. the resulting ISpline is a piecewise polynomial
     of degree :math:`p + 1`. Used for transient permanent signals that stay at their
@@ -923,6 +924,16 @@ class SplineSet(Model):
         """ List of spline object contained within the SplineSet. """
         self.internal_scaling = bool(internal_scaling)
         """ Trackes whether to scale the sub-splines relative to their lengths. """
+        self.min_scale = min([m.scale for m in self.splines])
+        """ Minimum scale of the sub-splines. """
+        self.internal_scales = (np.concatenate([np.array([m.scale] * m.num_parameters)
+                                                for m in self.splines]) /
+                                self.min_scale
+                                if self.internal_scaling else None)
+        """
+        If :attr:`~internal_scaling` is ``True``, this NumPy array holds the relative
+        scaling factors of all parameters over all the sub-splines.
+        """
 
     def _get_arch(self):
         arch = {"type": "SplineSet",
@@ -938,13 +949,13 @@ class SplineSet(Model):
 
     def _get_mapping(self, timevector):
         coefs = np.empty((timevector.size, self.num_parameters))
-        min_scale = min([m.scale for m in self.splines])
         ix_coefs = 0
         for i, model in enumerate(self.splines):
-            internal_scale = model.scale / min_scale if self.internal_scaling else 1
-            temp = model.get_mapping(timevector).A.squeeze()
-            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = temp * internal_scale
+            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = \
+                model.get_mapping(timevector).A.squeeze()
             ix_coefs += model.num_parameters
+        if self.internal_scaling:
+            coefs *= self.internal_scales.reshape(1, self.num_parameters)
         return coefs
 
     def read_parameters(self, parameters, variances=None):
@@ -962,14 +973,15 @@ class SplineSet(Model):
             :math:`(\text{num_parameters}, \text{num_components})`.
         """
         super().read_parameters(parameters, variances)
+        if self.internal_scaling:
+            parameters = parameters * self.internal_scales.reshape(-1, 1)
+            if variances is not None:
+                variances = variances * self.internal_scales.reshape(-1, 1) ** 2
         ix_params = 0
         for i, model in enumerate(self.splines):
-            internal_scale = model.scale if self.internal_scaling else 1
-            param_model = (self.parameters[ix_params:ix_params + model.num_parameters, :]
-                           * internal_scale)
-            cov_model = (None if self.var is None else
-                         self.var[ix_params:ix_params + model.num_parameters, :]
-                         * internal_scale**2)
+            param_model = parameters[ix_params:ix_params + model.num_parameters, :]
+            cov_model = (None if variances is None else
+                         variances[ix_params:ix_params + model.num_parameters, :])
             model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 
