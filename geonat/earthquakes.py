@@ -212,3 +212,82 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
 
     # return the dictionary of steps {site: [steptimes]}
     return eq_steps_dict
+
+
+def empirical_prior(network, catalog_path, target_timeseries, target_model,
+                    target_model_regularize=False):
+    r"""
+    Given a catalog of earthquakes, add a step model to a station to the target
+    timeseries if the following empirical formula (used by the Geodesy group at
+    UNR, see `unr_steps`_) holds true, and therefore expects a step due to an earthquake:
+
+    .. math::
+
+        d < 10^{\text{M}_\text{w} / 2 - 0.8} ~\text{km}
+
+    where :math:`d` is the distance between the earthquake and the station
+    and M:sub:`w` is the moment magnitude.
+
+    This function operates on the network instance directly.
+
+    Parameters
+    ---------
+    network : Network
+        Network instance whose stations should be used.
+    catalog_path : str
+        File name of the earthquake catalog to load. Currently, only the Japanese
+        NIED's F-net earthquake mechanism catalog format is supported.
+    target_timeseries : str
+        Name of the timeseries to add the model to.
+    target_model : str
+        Name of the earthquake model added to ``target_timeseries``.
+    target_model_regularize : bool, optional
+        Whether to mark the model for regularization or not.
+
+    Returns
+    -------
+    eq_steps_dict : dict
+        Dictionary of that maps the station names to a list of steptimes.
+
+    References
+    ----------
+
+    .. _`unr_steps`: http://geodesy.unr.edu/NGLStationPages/steps_readme.txt
+    """
+    # get distances
+    stations_lla = np.array([station.location for station in network])
+    # convert height from m to km
+    stations_lla[:, 2] /= 1000
+    # load earthquake catalog
+    catalog = pd.read_csv(catalog_path, header=0, parse_dates=[[0, 1]])
+    eq_times = catalog['Date_Origin_Time(JST)']
+    eq_lla = catalog[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values
+    eq_lla[:, 2] *= -1
+    n_eq = eq_lla.shape[0]
+    # relative position in lla
+    stations_rel = [np.array(stations_lla - eq_lla[i, :].reshape(1, -1)) for i in range(n_eq)]
+    # transform to xyz space, coarse approximation
+    for i in range(n_eq):
+        stations_rel[i][:, 0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[i, 0]*np.pi/180)
+        stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
+        # stations_rel is now in km, just like depth
+        # get scalar distances
+        stations_rel[i] = np.sqrt(np.sum(stations_rel[i] ** 2, axis=1))
+    stations_rel = np.stack(stations_rel)
+
+    # get moment magnitudes and for each station and earthquake, apply formula
+    eq_mw = catalog['MT_Magnitude(Mw)'].values.reshape(-1, 1)
+    needs_steps = stations_rel < 10**(eq_mw/2 - 0.8)
+
+    # loop over stations and add a step where necessary:
+    eq_steps_dict = {}
+    station_names = list(network.stations.keys())
+    for istation, station in enumerate(station_names):
+        steps = [str(eq_times.iloc[i]) for i in range(n_eq) if needs_steps[i, istation]]
+        stepmodel = Step(steptimes=steps, regularize=target_model_regularize)
+        network[station].add_local_model(target_timeseries, target_model,
+                                         stepmodel)
+        eq_steps_dict[station] = steps
+
+    # return the dictionary of steps {site: [steptimes]}
+    return eq_steps_dict
