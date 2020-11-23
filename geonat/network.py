@@ -1149,6 +1149,39 @@ class Network():
                                   ascii=True, unit="station"):
             func(station, **kw_args)
 
+    def math(self, result, left, operator, right):
+        """
+        Convenience method that performs simple math for all stations.
+        Syntax is ``result = left operator right``.
+
+        Parameters
+        ----------
+        result : str
+            Name of the result timeseries.
+        left : str
+            Name of the left timeseries.
+        operator : str
+            Operator symbol (see :meth:`~geonat.timeseries.Timeseries.prepare_math` for
+            all supported operations).
+        right : str
+            Name of the right timeseries.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, and we want to calculate the residual
+        ``'res'`` between the data in timeseries ``'data'`` and the model in the timeseries
+        ``'model'``, then the following two are equivalent:
+
+            # long version
+            for station in net:
+                station['res'] = station['data'] - station['model']
+
+            # short version
+            net.math('res', 'data', '-', 'model')
+        """
+        for station in self:
+            station[result] = eval(f"station['{left}'] {operator} station['{right}']")
+
     def _create_map_figure(self, gui_settings, annotate_stations):
         # get location data and projections
         stat_lats = [station.location[0] for station in self]
