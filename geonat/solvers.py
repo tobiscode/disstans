@@ -10,6 +10,7 @@ import cvxpy as cp
 import cartopy.geodesic as cgeod
 from warnings import warn
 from tqdm import tqdm
+from scipy.stats import skew
 
 from .config import defaults
 from .tools import weighted_median
@@ -535,7 +536,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
     reweighting function. Possible values are:
 
     +--------------+------------------------------------------------------------------------------+
-    | ``'log'``    | :math:`w(m_j) = \log\frac{\sum_j\|m_j\|\cdot\text{eps}}{\|m_j\|+\text{eps}}` |
+    | ``'log'``    | :math:`w(m_j) = \log\frac{\sum_j \|m_j\|+\text{eps}}{\|m_j\|+\text{eps}}`    |
     +--------------+------------------------------------------------------------------------------+
     | ``'inv'``    | :math:`w(m_j) = \frac{1}{\|m_j\| + \text{eps}}`                              |
     +--------------+------------------------------------------------------------------------------+
@@ -746,7 +747,7 @@ class SpatialSolver():
     def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters=5,
               spatial_reweight_percentile=0.5, local_reweight_iters=1,
               reweights_coupled=True, formal_variance=False, use_data_variance=True,
-              use_data_covariance=True, cvxpy_kw_args={}):
+              use_data_covariance=True, verbose=False, cvxpy_kw_args={}):
         r"""
         Solve the network-wide fitting problem as follows:
 
@@ -783,6 +784,8 @@ class SpatialSolver():
         use_data_covariance : bool, optional
             If ``True`` (default), ``ts`` contains variance and covariance information, and
             ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+        verbose : bool, optional
+            If ``True`` (default: ``False``), print progress and statistics along the way.
         cvxpy_kw_args : dict
             Additional keyword arguments passed on to CVXPY's ``solve()`` function.
         """
@@ -796,7 +799,8 @@ class SpatialSolver():
 
         # get scale lengths (correlation lengths)
         # using the average distance to the closest 3 stations
-        tqdm.write("Calculating scale lengths")
+        if verbose:
+            tqdm.write("Calculating scale lengths")
         geoid = cgeod.Geodesic()
         station_names = list(self.net.stations.keys())
         station_lonlat = np.stack([np.array(self.net[name].location)[[1, 0]]
@@ -810,7 +814,8 @@ class SpatialSolver():
         distance_weights = np.exp(-all_distances / np.array(net_avg_closests).reshape(1, -1))
 
         # first solve, default initial weights
-        tqdm.write("Performing initial solve")
+        if verbose:
+            tqdm.write("Performing initial solve")
         net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
                                    solver="lasso_regression", cached_mapping=True,
                                    penalty=penalty,
@@ -821,15 +826,22 @@ class SpatialSolver():
                                    use_data_variance=use_data_variance,
                                    use_data_covariance=use_data_covariance,
                                    cvxpy_kw_args=cvxpy_kw_args)
+        num_total = sum([s.models["Displacement"][m].parameters.size
+                         for s in self.net for m in spatial_reweight_models])
+        num_nonzero = sum([(s.models["Displacement"][m].parameters.ravel()
+                           < defaults["solvers"]["reweight_eps"]).sum()
+                           for s in self.net for m in spatial_reweight_models])
+        if verbose:
+            tqdm.write(f"Number of non-zero parameters: {num_nonzero}/{num_total}")
 
         # iterate the specified amount of times, updating the weights in between
         # TODO: implement early stopping criteria
         max_penalty = _get_reweighting_function()(0)
         for i in range(1, spatial_reweight_iters + 1):
-            tqdm.write("Updating weights")
+            if verbose:
+                tqdm.write("Updating weights")
             model_list = list(set([mdl for n_w in net_weights.values() for mdl in n_w[0].keys()]))
             new_net_weights = {statname: {"init_reweights": {}} for statname in station_names}
-            num_pweights_before, num_pweights_after = 0, 0
             for mdl_description in model_list:
                 mdl_weights_dict = {name: net_weights[name][0][mdl_description]
                                     for name in station_names
@@ -839,16 +851,22 @@ class SpatialSolver():
                 mdl_weights_shapes = [mdl.shape for mdl in mdl_weights]
                 if (mdl_description in spatial_reweight_models) and (len(mdl_weights) > 0) and \
                    (mdl_weights_shapes.count(mdl_weights_shapes[0]) == len(mdl_weights)):
-                    print(f"Stacking model {mdl_description}")
+                    if verbose:
+                        tqdm.write(f"Stacking model {mdl_description}")
+                        new_weights_stacked = []
                     new_net_weights[name]["init_reweights"] = {}
                     parameter_weights = np.stack(mdl_weights)
-                    num_pweights_before += (parameter_weights >= max_penalty).sum()
                     for station_index, name in enumerate(station_names):
                         new_weights = weighted_median(parameter_weights,
                                                       distance_weights[station_index, :],
                                                       percentile=spatial_reweight_percentile)
-                        num_pweights_after += (new_weights >= max_penalty).sum()
                         new_net_weights[name]["init_reweights"][mdl_description] = new_weights
+                        if verbose:
+                            new_weights_stacked.append(new_weights)
+                    if verbose:
+                        new_weights_stacked = np.stack(new_weights_stacked)
+                        tqdm.write(f"Skewness changed from {skew(parameter_weights.ravel())} "
+                                   f"to {skew(new_weights_stacked.ravel())}.")
                 else:
                     if mdl_description in spatial_reweight_models:
                         warn(f"{mdl_description} cannot be stacked, got {mdl_weights_dict} " +
@@ -857,9 +875,8 @@ class SpatialSolver():
                         if mdl_description in net_weights[name][0]:
                             new_net_weights[name]["init_reweights"][mdl_description] = \
                                 net_weights[name][0][mdl_description]
-            tqdm.write("Number of maximum penalty weights changed from " +
-                       f"{num_pweights_before} to {num_pweights_after}.")
-            tqdm.write(f"Solving after {i} reweightings")
+            if verbose:
+                tqdm.write(f"Solving after {i} reweightings")
             net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
                                        solver="lasso_regression", cached_mapping=True,
                                        local_input=new_net_weights,
@@ -871,4 +888,10 @@ class SpatialSolver():
                                        use_data_variance=use_data_variance,
                                        use_data_covariance=use_data_covariance,
                                        cvxpy_kw_args=cvxpy_kw_args)
-        tqdm.write("Done")
+            num_nonzero = sum([(s.models["Displacement"][m].parameters.ravel()
+                               < defaults["solvers"]["reweight_eps"]).sum()
+                               for s in self.net for m in spatial_reweight_models])
+            if verbose:
+                tqdm.write(f"Number of non-zero parameters: {num_nonzero}/{num_total}")
+        if verbose:
+            tqdm.write("Done")
