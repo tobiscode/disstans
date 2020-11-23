@@ -124,6 +124,11 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
         A dictionary fine-tuning the displacement calculation and modeling, see
         :attr:`~geonat.config.defaults` for explanations and defaults.
 
+    Returns
+    -------
+    eq_steps_dict : dict
+        Dictionary of that maps the station names to a list of steptimes.
+
     Notes
     -----
     This function uses Okada's [okada92]_ dislocation calculation subroutines coded in
@@ -192,6 +197,7 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
 
     # add steps to station timeseries if they exceed the threshold
     station_names = list(network.stations.keys())
+    eq_steps_dict = {}
     cumdisp_parameters = ((eq_times,
                            network.stations[stat_name].timeseries[target_timeseries].time.values,
                            station_disp[:, istat, :], catalog_prior_settings["threshold"])
@@ -200,5 +206,9 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
                                     ascii=True, total=len(network.stations),
                                     desc="Adding steps where necessary", unit="station")):
         stepmodel = Step(steptimes=result, regularize=target_model_regularize)
-        network.stations[station_names[i]].add_local_model(target_timeseries, target_model,
-                                                           stepmodel)
+        network[station_names[i]].add_local_model(target_timeseries, target_model,
+                                                  stepmodel)
+        eq_steps_dict[station_names[i]] = result
+
+    # return the dictionary of steps {site: [steptimes]}
+    return eq_steps_dict
