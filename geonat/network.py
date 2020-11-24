@@ -1339,8 +1339,8 @@ class Network():
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
         save : bool, str, optional
-            If ``True``, save the figure of the selected timeseries. If a scalogram is
-            also created, save this as well. The output directory is the current folder.
+            If ``True``, save the map and figure of the selected timeseries. If a scalogram
+            is also created, save this as well. The output directory is the current folder.
             Ignored if ``stepdetector`` is set. Suppresses all interactive figures.
             If ``save`` is a string, it will be included in the output file name
             for easier referencing.
@@ -1757,6 +1757,7 @@ class Network():
             if save and not stepdetector:
                 nowtime = pd.Timestamp.now().isoformat()[:19].replace(":", "")
                 plotfname = f"{station_name}{fname_add}_{nowtime}"
+                fig_map.savefig(f"map_{plotfname}")
                 fig_ts.savefig(f"ts_{plotfname}")
                 plt.close(fig_map)
                 plt.close(fig_ts)
