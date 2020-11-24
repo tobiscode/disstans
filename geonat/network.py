@@ -1514,7 +1514,7 @@ class Network():
             # get quick access
             step_table = stepdetector["step_table"]
             step_ranges = stepdetector["step_ranges"]
-            maint_table = stepdetector["maint_table"] if "maint_table" in stepdetector else None
+            maint_table = stepdetector.get("maint_table", None)
             if "catalog" in stepdetector:
                 catalog = stepdetector["catalog"]
                 eqcircle = stepdetector["eqcircle"]

@@ -606,8 +606,6 @@ class StepDetector():
         Function that searches for steps in an entire network (possibly in parallel),
         thresholds those probabilities, and identifies all the consecutive ranges in which
         steps happen over the network.
-        Upon successful completion, it will save the step probabilities in
-        :attr:`~probabilities`.
 
         Parameters
         ----------
@@ -628,6 +626,16 @@ class StepDetector():
             of possible steps.
         gap_unit : str, optional
             Time unit of ``gap``.
+
+        Returns
+        -------
+        step_table : pandas.DataFrame
+            A DataFrame containing the columns ``'station'`` (its name), ``'time'``
+            (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
+            over all components for this timestamp).
+        step_ranges : list
+            A list of lists containing continuous periods of potential steps as determined
+            by ``gap`` and ``gap_unit``.
         """
         # check whether to update kernel_size
         if kernel_size is not None:
@@ -641,11 +649,14 @@ class StepDetector():
         for station, probs in zip(net, tqdm(parallelize(StepDetector._search, iterable_input),
                                             ascii=True, total=net.num_stations, unit="station",
                                             desc="Searching for steps")):
-            # this uses a large threshold t avoid a high number of steps
-            # this should be checked before looping
+            # find steps given the just calculated probabilities
+            # setting the maximum number of steps to infinite to not miss anything
             steps = StepDetector._steps((probs, threshold, np.inf, False))
+            # combine all data components and keep largest probability if the step
+            # is present in multiple components
             unique_steps = np.sort(np.unique(np.concatenate(steps)))
             maxstepprobs = np.max(probs[unique_steps, :], axis=1)
+            # isolate the actual timestamps and add to the DataFrame
             steptimes = station[ts_description].time[unique_steps]
             step_table = step_table.append(pd.DataFrame({"station": [station.name]*len(steptimes),
                                                          "time": steptimes,

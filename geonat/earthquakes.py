@@ -94,7 +94,11 @@ def _okada_get_cumdisp(time_station_settings):
                             & (eq_times <= stat_time[itime + 1]), :]
         cumdisp = np.sum(np.linalg.norm(disp, axis=1), axis=None)
         if cumdisp >= threshold:
-            steptimes.append(str(stat_time[itime]))
+            try:
+                last_eq_time = eq_times[eq_times <= stat_time[itime + 1]].values[-1]
+            except IndexError:
+                last_eq_time = stat_time[itime + 1]
+            steptimes.append(str(last_eq_time))
     return steptimes
 
 
