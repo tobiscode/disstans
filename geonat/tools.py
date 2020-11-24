@@ -137,6 +137,18 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
     and parallelization settings automatically either runs the function
     in serial or parallel.
 
+    Warning
+    -------
+    By default on most systems, NumPy will already use multiple cores and threads
+    in its routines. The Python :mod:`~multiprocessing` module does not
+    change these settings, since it is apparently hard to guess which backend
+    NumPy uses (e.g. BLAS, OpenMP, MKL, ...), see
+    `this thread on GitHub <https://github.com/numpy/numpy/issues/11826>`_.
+    So, it is sadly currently up to the user to disable this behavior when using
+    multiple Python threads as achieved with this function. For example,
+    this snipped might be enough to put at the beginning of a script:
+    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``.
+
     Parameters
     ----------
     func : function
@@ -524,7 +536,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
 
     +-----------------+----------+-----------+------------------+
     | orbit solutions | 24 hours | 5 minutes | latency          |
-    +=================|==========|===========|==================+
+    +=================+==========+===========+==================+
     | final           | yes      | yes       | approx. 2 weeks  |
     +-----------------+----------+-----------+------------------+
     | rapid           | yes      | yes       | approx. 24 hours |

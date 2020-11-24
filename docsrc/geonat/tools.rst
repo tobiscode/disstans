@@ -31,6 +31,11 @@ weighted_median
 
 .. autofunction:: geonat.tools.weighted_median
 
+download_unr_data
+.................
+
+.. autofunction:: geonat.tools.download_unr_data
+
 Classes
 -------
 

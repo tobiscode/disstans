@@ -1170,7 +1170,7 @@ class Network():
         -------
         If ``net`` is a :class:`~Network` instance, and we want to calculate the residual
         ``'res'`` between the data in timeseries ``'data'`` and the model in the timeseries
-        ``'model'``, then the following two are equivalent:
+        ``'model'``, then the following two are equivalent::
 
             # long version
             for station in net:

@@ -19,3 +19,10 @@ GipsyTimeseries
 .. autoclass:: geonat.timeseries.GipsyTimeseries
    :members:
    :special-members:
+
+UNRTimeseries
+.............
+
+.. autoclass:: geonat.timeseries.UNRTimeseries
+   :members:
+   :special-members:
