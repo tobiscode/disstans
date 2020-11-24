@@ -524,9 +524,17 @@ class StepDetector():
     @staticmethod
     def _search(data_and_params):
         """
-        Parallelizable part of the search and search_network functions.
+        Parallelizable part of the search, search_network and search_catalog methods.
         """
-        x, y, kernel_size, maxdel = data_and_params
+        if len(data_and_params) == 4:
+            x, y, kernel_size, maxdel = data_and_params
+            check_only = None
+        elif len(data_and_params) == 5:
+            # added the optional fifth parameter of which indices of x to check
+            x, y, kernel_size, maxdel, check_only = data_and_params
+        else:
+            raise RuntimeError("Passed invalid 'data_and_params' argument: "
+                               f"{data_and_params}")
         # some checks
         assert isinstance(x, np.ndarray) and isinstance(y, np.ndarray), \
             f"'x' and 'y' need to be NumPy arrays, got {type(x)} and {type(y)}."
@@ -545,6 +553,9 @@ class StepDetector():
             # Beginning region
             halfwindow = 0
             for i in range(kernel_size // 2):
+                if check_only and (i not in check_only):
+                    halfwindow += 1
+                    continue
                 hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
                                                     y[i-halfwindow:i+halfwindow+1, icomp],
                                                     valid[i-halfwindow:i+halfwindow+1, icomp],
@@ -554,7 +565,10 @@ class StepDetector():
                 halfwindow += 1
             # Middle region
             assert halfwindow == kernel_size // 2
-            for i in range(halfwindow, num_observations - halfwindow):
+            range_main = range(halfwindow, num_observations - halfwindow)
+            if check_only:
+                range_main = [i for i in range_main if i in check_only]
+            for i in range_main:
                 hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
                                                     y[i-halfwindow:i+halfwindow+1, icomp],
                                                     valid[i-halfwindow:i+halfwindow+1, icomp],
@@ -564,6 +578,8 @@ class StepDetector():
             # Ending region
             for i in range(num_observations - halfwindow, num_observations):
                 halfwindow -= 1
+                if check_only and (i not in check_only):
+                    continue
                 hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
                                                     y[i-halfwindow:i+halfwindow+1, icomp],
                                                     valid[i-halfwindow:i+halfwindow+1, icomp],
@@ -571,6 +587,8 @@ class StepDetector():
                 if hyp == 1:
                     probs[i, icomp] = Del
         # return
+        if check_only:
+            probs = probs[check_only, :].reshape(-1, num_components)
         return probs
 
     def search(self, x, y, kernel_size=None, maxdel=10):
@@ -634,8 +652,8 @@ class StepDetector():
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
             over all components for this timestamp).
         step_ranges : list
-            A list of lists containing continuous periods of potential steps as determined
-            by ``gap`` and ``gap_unit``.
+            A list of lists containing continuous periods over all stations of the potential
+            steps as determined by ``gap`` and ``gap_unit``.
         """
         # check whether to update kernel_size
         if kernel_size is not None:
@@ -646,9 +664,10 @@ class StepDetector():
         iterable_input = ((tvec_to_numpycol(station[ts_description].time),
                            station[ts_description].data.values,
                            self.kernel_size, maxdel) for station in net)
-        for station, probs in zip(net, tqdm(parallelize(StepDetector._search, iterable_input),
-                                            ascii=True, total=net.num_stations, unit="station",
-                                            desc="Searching for steps")):
+        for name, station, probs in zip(net.stations.keys(), net.stations.values(),
+                                        tqdm(parallelize(StepDetector._search, iterable_input),
+                                             ascii=True, total=net.num_stations, unit="station",
+                                             desc="Searching for steps")):
             # find steps given the just calculated probabilities
             # setting the maximum number of steps to infinite to not miss anything
             steps = StepDetector._steps((probs, threshold, np.inf, False))
@@ -658,13 +677,94 @@ class StepDetector():
             maxstepprobs = np.max(probs[unique_steps, :], axis=1)
             # isolate the actual timestamps and add to the DataFrame
             steptimes = station[ts_description].time[unique_steps]
-            step_table = step_table.append(pd.DataFrame({"station": [station.name]*len(steptimes),
+            step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
                                                          "time": steptimes,
                                                          "probability": maxstepprobs}),
                                            ignore_index=True)
             # this code could be used to create a model object and assign it to the station
             # mdl = geonat.models.Step(steptimes)
             # station.add_local_model(ts_description, "Detections", mdl)
+        # get the consecutive steptime ranges
+        unique_steps = np.sort(step_table["time"].unique())
+        split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
+        split = np.concatenate([0, split + 1], axis=None)
+        step_ranges = [unique_steps[split[i]:split[i + 1]] for i in range(split.size - 1)]
+        return step_table, step_ranges
+
+    def search_catalog(self, net, ts_description, catalog, kernel_size=None, threshold=None,
+                       gap=2, gap_unit="D"):
+        r"""
+        Search a dictionary of potential step times for each station in the dictionary
+        and assess the probability for each one.
+
+        Parameters
+        ----------
+        net : geonat.network.Network
+            Network instance to operate on.
+        ts_description : str
+            :class:`~geonat.timeseries.Timeseries` description that will be analyzed.
+        catalog : dict
+            Dictionary where each key is a station name and its value is a list of
+            :class:`~pandas.Timestamp` compatible potential times/dates.
+        kernel_size : int, optional
+            Window size of the detector. Must be odd. If ``None``, use the previously set
+            :attr:`~kernel_size`, otherwise set the attribute.
+        threshold : float, optional
+            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
+        gap : float, optional
+            Maximum gap between identified steps to count as a continuous period
+            of possible steps.
+        gap_unit : str, optional
+            Time unit of ``gap``.
+
+        Returns
+        -------
+        step_table : pandas.DataFrame
+            A DataFrame containing the columns ``'station'`` (its name), ``'time'``
+            (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
+            over all components for this timestamp) for each potential step in ``catalog``.
+        step_ranges : list
+            A list of lists containing continuous periods over all stations of the potential
+            steps as determined by ``gap`` and ``gap_unit``.
+        """
+        # hard-code maxdel to not filter out any item since we are asking about specific times
+        maxdel = 0
+        # check whether to update kernel_size
+        if kernel_size is not None:
+            self.kernel_size = kernel_size
+        # initialize DataFrame
+        step_table = pd.DataFrame(columns=["station", "time", "probability"])
+        # for each station, find the first time index after a catalogued event
+        check_indices = {}
+        for station, steptimes in catalog.items():
+            check_indices[station] = []
+            for st in steptimes:
+                index_after = (net[station][ts_description].time >= st).tolist()
+                try:
+                    check_indices[station].append(index_after.index(True))
+                except ValueError:  # catalogued time is after the last timestamp
+                    continue
+        # run parallelized StepDetector._search
+        iterable_input = ((tvec_to_numpycol(net[station][ts_description].time),
+                           net[station][ts_description].data.values,
+                           self.kernel_size, maxdel, check_indices[station])
+                          for station in catalog)
+        for name, station, probs in zip(net.stations.keys(), net.stations.values(),
+                                        tqdm(parallelize(StepDetector._search, iterable_input),
+                                             ascii=True, total=net.num_stations, unit="station",
+                                             desc="Searching for steps")):
+            # probs now contains a row for each catalog item
+            # if the probability is NaN, AIC does not see evidence for a step,
+            # if it is a float, then that's the likelihood of a step (always positive)
+            has_steps = np.any(~np.isnan(probs), axis=1)
+            maxstepprobs = probs[:, 0]
+            maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)
+            # isolate the actual timestamps and add to the DataFrame
+            steptimes = station[ts_description].time.iloc[check_indices[name]]
+            step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
+                                                         "time": steptimes,
+                                                         "probability": maxstepprobs}),
+                                           ignore_index=True)
         # get the consecutive steptime ranges
         unique_steps = np.sort(step_table["time"].unique())
         split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
