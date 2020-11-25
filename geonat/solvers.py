@@ -745,9 +745,10 @@ class SpatialSolver():
         """ Names of the models to fit (``None`` for all). """
 
     def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters=5,
-              spatial_reweight_percentile=0.5, local_reweight_iters=1,
-              reweights_coupled=True, formal_variance=False, use_data_variance=True,
-              use_data_covariance=True, verbose=False, cvxpy_kw_args={}):
+              spatial_reweight_percentile=0.5, spatial_reweight_max_rms=0,
+              local_reweight_iters=1, reweights_coupled=True, formal_variance=False,
+              use_data_variance=True, use_data_covariance=True, verbose=False,
+              cvxpy_kw_args={}):
         r"""
         Solve the network-wide fitting problem as follows:
 
@@ -769,6 +770,10 @@ class SpatialSolver():
         spatial_reweight_percentile : float, optional
             Percentile used in the spatial reweighting.
             Defaults to ``0.5``.
+        spatial_reweight_max_rms : float, optional
+            Stop the spatial iterations early if the difference in the RMS (Root Mean Square)
+            of the change of the parameter weights due to reweighting is less than
+            ``spatial_reweight_max_rms``. Defaults to no early stopping.
         local_reweight_iters : int, optional
             Number of local reweighting iterations, see ``reweight_max_iters`` in
             :func:`~lasso_regression`.
@@ -835,13 +840,12 @@ class SpatialSolver():
             tqdm.write(f"Number of non-zero parameters: {num_nonzero}/{num_total}")
 
         # iterate the specified amount of times, updating the weights in between
-        # TODO: implement early stopping criteria
-        max_penalty = _get_reweighting_function()(0)
         for i in range(1, spatial_reweight_iters + 1):
             if verbose:
                 tqdm.write("Updating weights")
             model_list = list(set([mdl for n_w in net_weights.values() for mdl in n_w[0].keys()]))
             new_net_weights = {statname: {"init_reweights": {}} for statname in station_names}
+            early_stop = True
             for mdl_description in model_list:
                 mdl_weights_dict = {name: net_weights[name][0][mdl_description]
                                     for name in station_names
@@ -853,20 +857,22 @@ class SpatialSolver():
                    (mdl_weights_shapes.count(mdl_weights_shapes[0]) == len(mdl_weights)):
                     if verbose:
                         tqdm.write(f"Stacking model {mdl_description}")
-                        new_weights_stacked = []
                     new_net_weights[name]["init_reweights"] = {}
                     parameter_weights = np.stack(mdl_weights)
+                    new_weights_stacked = []
                     for station_index, name in enumerate(station_names):
                         new_weights = weighted_median(parameter_weights,
                                                       distance_weights[station_index, :],
                                                       percentile=spatial_reweight_percentile)
                         new_net_weights[name]["init_reweights"][mdl_description] = new_weights
-                        if verbose:
-                            new_weights_stacked.append(new_weights)
+                        new_weights_stacked.append(new_weights)
+                    new_weights_stacked = np.stack(new_weights_stacked)
+                    rms_diff = np.linalg.norm(parameter_weights - new_weights_stacked)
                     if verbose:
-                        new_weights_stacked = np.stack(new_weights_stacked)
                         tqdm.write(f"Skewness changed from {skew(parameter_weights.ravel())} "
                                    f"to {skew(new_weights_stacked.ravel())}.")
+                        tqdm.write(f"RMS difference of parameters = {rms_diff}")
+                    early_stop &= rms_diff < spatial_reweight_max_rms
                 else:
                     if mdl_description in spatial_reweight_models:
                         warn(f"{mdl_description} cannot be stacked, got {mdl_weights_dict} " +
@@ -875,6 +881,10 @@ class SpatialSolver():
                         if mdl_description in net_weights[name][0]:
                             new_net_weights[name]["init_reweights"][mdl_description] = \
                                 net_weights[name][0][mdl_description]
+            if early_stop:
+                if verbose:
+                    tqdm.write("Stopping iteration early.")
+                break
             if verbose:
                 tqdm.write(f"Solving after {i} reweightings")
             net_weights = self.net.fit(self.ts_description, model_list=self.model_list,
