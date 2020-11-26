@@ -1042,10 +1042,12 @@ class SplineSet(Model):
         cmap = mpl.cm.ScalarMappable(cmap=scm.roma_r,
                                      norm=mpl.colors.Normalize(vmin=-cmaprange,
                                                                vmax=cmaprange))
+        # get heights of component axes that leaves room for colorbar
+        row_hr = 0.95 / num_components
+        height_ratios = [row_hr] * num_components + [0.05]
         # start plotting
-        fig, ax = plt.subplots(nrows=num_components, sharex=True)
-        if num_components == 1:
-            ax = [ax]
+        fig, ax = plt.subplots(nrows=num_components + 1, constrained_layout=True,
+                               gridspec_kw={"height_ratios": height_ratios})
         for i, model in enumerate(self.splines):
             # where to put this scale
             y_off = 1 - (i + 1)*dy_scale
@@ -1085,8 +1087,8 @@ class SplineSet(Model):
                                            for model in self.splines]), minor=True)
             ax[k].tick_params(axis='both', labelleft=False, direction='out')
             ax[k].tick_params(axis='y', left=False, which='minor')
-        fig.colorbar(cmap, orientation='horizontal',
-                     fraction=0.1, pad=0.1, label='Coefficient Value')
+        fig.colorbar(cmap, cax=ax[-1], orientation='horizontal',
+                     label='Coefficient Value')
         return fig, ax
 
 

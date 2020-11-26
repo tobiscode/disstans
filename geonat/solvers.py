@@ -755,8 +755,8 @@ class SpatialSolver():
             1.  Fit the models individually using a single iteration step from
                 :func:`~lasso_regression`.
             2.  Collect the L0 weights :math:`\mathbf{w}^{(i)}` from each station.
-            3.  Spatially combine (e.g. average) the weights, and redistribute them
-                to the stations for the next iteration.
+            3.  Spatially combine (e.g. take the median of) the weights,
+                and redistribute them to the stations for the next iteration.
             4.  Repeat from 1.
 
         Parameters

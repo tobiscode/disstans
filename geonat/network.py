@@ -782,7 +782,7 @@ class Network():
                 # a subset list of models would need to be collected here
                 model_params_var = mysolver(station_ts, station_models, **kw_args)
                 for model_description, (params, covs) in model_params_var.items():
-                    station.models['mydata'][model_description].read_parameters(params, covs)
+                    station_models[model_description].read_parameters(params, covs)
             # short version, automatically parallelizes according to geonat.defaults
             net.fit('mydata', solver=mysolver, **kw_args)
             # also allows for subsetting models and skipping the import of geonat.solvers
@@ -873,8 +873,7 @@ class Network():
         Example
         -------
         If ``net`` is a :class:`~Network` instance, ``'mydata'`` is the timeseries
-        to evaluate the models for, and ``mysolver`` is the solver to use, then the
-        following two are equivalent::
+        to evaluate the models for, then the following two are equivalent::
 
             # long version, not parallelized, defaulting to all models,
             # not reusing fits, and not creating a new independent timeseries
@@ -882,7 +881,7 @@ class Network():
                 station_ts = station.timeseries['mydata']
                 station_models = station.models['mydata']
                 # a subset list of models would need to be collected here
-                for imodel, (model_description, model) in enumerate(station_models.items()):
+                for (model_description, model) in station_models.items():
                     fit = model.evaluate(station_ts)
                     station.add_fit('mydata', model_description, fit)
             # short version, automatically parallelizes according to geonat.defaults
@@ -1179,6 +1178,10 @@ class Network():
             # short version
             net.math('res', 'data', '-', 'model')
         """
+        # check that inputs are valid
+        assert all([isinstance(p, str) for p in [result, left, operator, right]]), \
+            "All inputs to Network.math() need to be strings, got " \
+            f"{[result, left, operator, right]}."
         for station in self:
             station[result] = eval(f"station['{left}'] {operator} station['{right}']")
 
