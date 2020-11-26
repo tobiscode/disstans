@@ -967,6 +967,81 @@ class Network():
             fit[model_description] = model.evaluate(station_time)
         return fit
 
+    def fitevalres(self, ts_description, model_list=None, solver='linear_regression',
+                   cached_mapping=True, local_input={}, timevector=None,
+                   output_description=None, reuse=False, residual_description=None,
+                   **kw_args):
+        """
+        Convenience method that combines the calls for :meth:`~fit`, :meth:`~evaluate`
+        and :meth:`~math` (to compute the fit residual) into one method call.
+
+        Parameters
+        ----------
+        ts_description : str
+            See :meth:`~fit` and :meth:`~evaluate`.
+        model_list : list, optional
+            See :meth:`~fit` and :meth:`~evaluate`.
+        solver : str, function, optional
+            See :meth:`~fit`.
+        cached_mapping : bool, optional
+            See :meth:`~fit`.
+        local_input : dict, optional
+            See :meth:`~fit`.
+        timevector : pandas.Series, pandas.DatetimeIndex, optional
+            See :meth:`~evaluate`.
+        output_description : str, optional
+            See :meth:`~evaluate`.
+        reuse : bool, optional
+            See :meth:`~evaluate`.
+        residual_description : str, optional
+            If provided, calculate the residual as the difference between the data and
+            the model fit, and store it as the timeseries ``residual_description``.
+        **kw_args : dict
+            Additional keyword arguments that are passed on to the solver function,
+            see :meth:`~fit`.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, ``'mydata'`` is the timeseries to fit
+        and evaluate the models for, ``mysolver`` is the solver to use, ``'myfit'`` should
+        contain the model fit, and the residuals should be put into the timeseries
+        ``'myres'``, then the following two are equivalent::
+
+            # long version, not parallelized, defaulting to all models
+            for station in net:
+                station_ts = station.timeseries['mydata']
+                station_models = station.models['mydata']
+                model_params_var = mysolver(station_ts, station_models, **kw_args)
+                for model_description, (params, covs) in model_params_var.items():
+                    station_models[model_description].read_parameters(params, covs)
+                    fit = station_models[model_description].evaluate(station_ts)
+                    station.add_fit('mydata', model_description, fit)
+            net.fit('mydata', solver=mysolver, **kw_args)
+            net.evaluate('mydata', output_description='myfit')
+            net.math('myres', 'mydata', '-', 'myfit')
+            # shot version, combining everything into one call, using parallelization,
+            # offering easy access to subsetting models, reusing previous fits, etc.
+            net.fitevalres('mydata', solver=mysolver, output_description='myfit',
+                           residual_description='myres')
+
+        See Also
+        --------
+        evaluate : Evaluate the fitted models at all stations.
+        fit : Fit models at all stations.
+        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
+        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
+        """
+        # fit
+        self.fit(ts_description=ts_description, model_list=model_list, solver=solver,
+                 cached_mapping=cached_mapping, local_input=local_input, **kw_args)
+        # evaluate
+        self.evaluate(ts_description=ts_description, model_list=model_list,
+                      timevector=timevector, output_description=output_description,
+                      reuse=reuse)
+        # residual
+        if residual_description:
+            self.math(residual_description, ts_description, "-", output_description)
+
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
         """
         A convenience wrapper that for each station in the network, calls a given
