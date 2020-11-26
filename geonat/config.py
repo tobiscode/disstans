@@ -13,10 +13,8 @@ and explained as follows:
 +-------------+------------------------+---------------------------------------------------+
 | Group       | Keyword                | Description                                       |
 +=============+========================+===================================================+
-| ``general`` | ``num_threads``        | Number of threads to use, initialized at          |
-|             |                        | :mod:`~geonat.tools` import. Defaults two half    |
-|             |                        | of the available ones, ``0`` means no             |
-|             |                        | parallelization.                                  |
+| ``general`` | ``num_threads``        | Number of threads to use. Defaults to ``0``,      |
+|             |                        | no parallelization.                               |
 +-------------+------------------------+---------------------------------------------------+
 | ``gui``     | ``projection``         | Map projection.                                   |
 +-------------+------------------------+---------------------------------------------------+
@@ -81,7 +79,7 @@ geoaxes.html#cartopy.mpl.geoaxes.GeoAxes.add_wmts
 """
 
 # general
-defaults["general"] = {"num_threads": None}
+defaults["general"] = {"num_threads": 0}
 # GUI
 defaults["gui"] = {"projection": "Mercator",
                    "coastlines_show": True,

@@ -23,10 +23,7 @@ from warnings import warn
 from matplotlib.ticker import FuncFormatter
 
 from . import scm
-
-# set default number of threads to use
 from .config import defaults
-defaults["general"]["num_threads"] = int(len(os.sched_getaffinity(0)) // 2)
 
 
 class Timedelta(pd.Timedelta):
@@ -140,14 +137,18 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
     Warning
     -------
     By default on most systems, NumPy will already use multiple cores and threads
-    in its routines. The Python :mod:`~multiprocessing` module does not
-    change these settings, since it is apparently hard to guess which backend
-    NumPy uses (e.g. BLAS, OpenMP, MKL, ...), see
-    `this thread on GitHub <https://github.com/numpy/numpy/issues/11826>`_.
+    in its routines (you can check this by running some very large and time-consuming
+    math, and monitoring the usage of your processors). Just using multiple Python
+    threads will give the default number of threads to all new Python threads,
+    completely overloading the system since it's now out of processors, slowing
+    down the computations by a lot. The Python :mod:`~multiprocessing`
+    module does not change these settings, since it is apparently hard to guess which backend
+    NumPy uses, see `this thread on GitHub <https://github.com/numpy/numpy/issues/11826>`_.
     So, it is sadly currently up to the user to disable this behavior when using
     multiple Python threads as achieved with this function. For example,
     this snipped might be enough to put at the beginning of a script:
-    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``.
+    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of GeoNAT cores
+    can be set by e.g. ``import geonat; geonat.defaults["general"]["num_threads"] = 10``.
 
     Parameters
     ----------
