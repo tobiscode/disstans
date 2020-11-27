@@ -102,5 +102,5 @@ defaults["prior"] = {"mu": 48,
                      "threshold": 3}
 # for iterative reweighting L1-regularized solver
 defaults["solvers"] = {"reweight_func": "log",
-                       "reweight_eps": 1e-4,
+                       "reweight_eps": 1e-5,
                        "reweight_usescales": False}

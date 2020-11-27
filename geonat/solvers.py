@@ -219,7 +219,8 @@ def _get_reweighting_function():
     elif name == "log":
         def rw_func(x):
             mags = np.abs(x)
-            return np.log((mags.sum() + np.asarray(x).size * eps) / (mags + eps))
+            size = np.asarray(x).size
+            return np.log((mags.sum() + size*eps) / (mags + eps)) / np.log(size)
     else:
         raise NotImplementedError(f"'{name}' is an unrecognized reweighting function.")
     return rw_func
@@ -532,16 +533,19 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
 
     The reweighting function is set in the :attr:`~geonat.config.defaults` dictionary
     using the ``reweight_func`` key (along with a stabilizing parameter
-    ``reweight_eps`` that should not need tuning). It defaults to the logarithmic
-    reweighting function. Possible values are:
+    ``reweight_eps`` that should not need tuning, and should always be well below the
+    anticipated magnitudes of non-zero parameters). Possible values for the function
+    being used are:
 
-    +--------------+------------------------------------------------------------------------------+
-    | ``'log'``    | :math:`w(m_j) = \log\frac{\sum_j \|m_j\|+\text{eps}}{\|m_j\|+\text{eps}}`    |
-    +--------------+------------------------------------------------------------------------------+
-    | ``'inv'``    | :math:`w(m_j) = \frac{1}{\|m_j\| + \text{eps}}`                              |
-    +--------------+------------------------------------------------------------------------------+
-    | ``'inv_sq'`` | :math:`w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}`                              |
-    +--------------+------------------------------------------------------------------------------+
+    +--------------+---------------------------------------------------------------------+
+    | ``'log'``    | :math:`w(m_j) = \log_\text{num_reg} \frac{ \| \mathbf{m} \|_1 +     |
+    |              | \text{num_reg} \cdot \text{eps}}{|m_j| + \text{eps}}` (where        |
+    |              | :math:`0 < \text{eps} \ll \frac{1}{\text{num_reg}}`) [andrecut11]_  |
+    +--------------+---------------------------------------------------------------------+
+    | ``'inv'``    | :math:`w(m_j) = \frac{1}{|m_j| + \text{eps}}` [candes08]_           |
+    +--------------+---------------------------------------------------------------------+
+    | ``'inv_sq'`` | :math:`w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}` [candes08]_         |
+    +--------------+---------------------------------------------------------------------+
 
     If reweighting is active and ``reweights_coupled=True``, :math:`\lambda`
     is moved into the norm and combined with :math:`\mathbf{w}`, such that
@@ -552,9 +556,12 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_max_
     References
     ----------
     .. [candes08] Candès, E. J., Wakin, M. B., & Boyd, S. P. (2008).
-       *Enhancing Sparsity by Reweighted ℓ1 Minimization.*
+       *Enhancing Sparsity by Reweighted* :math:`\ell_1` *Minimization.*
        Journal of Fourier Analysis and Applications, 14(5), 877–905.
        doi:`10.1007/s00041-008-9045-x <https://doi.org/10.1007/s00041-008-9045-x>`_.
+    .. [andrecut11] Andrecut, M. (2011).
+       *Stochastic Recovery Of Sparse Signals From Random Measurements.*
+       Engineering Letters, 19(1), 1-6.
     """
     if penalty == 0:
         warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, "
