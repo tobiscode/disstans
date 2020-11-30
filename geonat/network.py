@@ -1260,6 +1260,47 @@ class Network():
         for station in self:
             station[result] = eval(f"station['{left}'] {operator} station['{right}']")
 
+    def analyze_residuals(self, ts_description, **kw_args):
+        """
+        Analyze residual timeseries for all stations and components, calling
+        :meth:`~geonat.station.Station.analyze_residuals`.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries to analyze. Method assumes it already is a residual.
+        **kw_args : dict
+            Additional keyword arguments are directly passed on to
+            :meth:`~geonat.station.Station.analyze_residuals`.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame with the station names as index, the different metrics
+            as top-level columns, and the different components as lower-level
+            columns.
+        """
+        # calculate the desired metrics
+        metrics_lists = [station.analyze_residuals(ts_description, **kw_args)
+                         for station in self]
+        # stack the data over the different metrics and components into a NumPy array
+        metrics_arr = np.array([[component for metric in sta_metrics.values()
+                                 for component in metric]
+                                for sta_metrics in metrics_lists])
+        # what are the metrics and components in the dictionary?
+        # (need to preserve order, hence not using set())
+        metrics = list(dict.fromkeys([metric for sta_metrics in metrics_lists
+                                      for metric in sta_metrics]))
+        components = list(dict.fromkeys([dcol for station in self
+                                         for dcol in station[ts_description].data_cols]))
+        # create a Pandas MultiIndex
+        metrics_components = pd.MultiIndex.from_product([metrics, components],
+                                                        names=["Metrics", "Components"])
+        # create and return a multi-level DataFrame
+        return pd.DataFrame(metrics_arr,
+                            index=list(self.stations.keys()),
+                            columns=metrics_components).rename_axis("Station")
+
     def _create_map_figure(self, gui_settings, annotate_stations):
         # get location data and projections
         stat_lats = [station.location[0] for station in self]
@@ -1312,7 +1353,7 @@ class Network():
             the stations in the network.
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
-        gui_kw_args : dict
+        gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         **cme_kw_args : dict
             Additional keyword arguments passed to :func:`~geonat.processing.common_mode`.
