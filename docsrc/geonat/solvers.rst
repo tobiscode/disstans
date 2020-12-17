@@ -30,3 +30,45 @@ SpatialSolver
 .. autoclass:: geonat.solvers.SpatialSolver
    :members:
    :special-members:
+
+Solution Object
+---------------
+
+.. autoclass:: geonat.solvers.Solution
+   :members:
+
+Helper class:
+
+.. autoclass:: geonat.solvers.ModelSolution
+   :members:
+
+Reweighting Functions
+---------------------
+
+ReweightingFunction
+...................
+
+.. autoclass:: geonat.solvers.ReweightingFunction
+   :members:
+   :special-members: __call__
+
+InverseReweighting
+..................
+
+.. autoclass:: geonat.solvers.InverseReweighting
+   :members:
+   :special-members: __call__
+
+InverseSquaredReweighting
+.........................
+
+.. autoclass:: geonat.solvers.InverseSquaredReweighting
+   :members:
+   :special-members: __call__
+
+LogarithmicReweighting
+......................
+
+.. autoclass:: geonat.solvers.LogarithmicReweighting
+   :members:
+   :special-members: __call__

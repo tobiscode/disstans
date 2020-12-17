@@ -62,15 +62,9 @@ and explained as follows:
 |             |                        | that a station needs to surpass in order for a    |
 |             |                        | step to be added to the model.                    |
 +-------------+------------------------+---------------------------------------------------+
-| ``solvers`` | ``reweight_func``      | Specifies the reweighting function.               |
-+-------------+------------------------+---------------------------------------------------+
-|             | ``reweight_eps``       | A small number used to stabilize the reweighting. |
-+-------------+------------------------+---------------------------------------------------+
-|             | ``reweight_usescales`` | If ``True``, the reweighting function checks for  |
-|             |                        | model-internal scales like the ones used by       |
-|             |                        | :class:`~geonat.models.SplineSet` and takes them  |
-|             |                        | into account when calculating the new penalties.  |
-+-------------+------------------------+---------------------------------------------------+
+
+Note that changes in this dictionary are not propagated into the parallelized
+subprocesses.
 
 For more about the WMTS background imagery, see `Cartopy's documentation <WMTS_>`_.
 
@@ -100,7 +94,3 @@ defaults["clean"] = {"min_obs": 100,
 defaults["prior"] = {"mu": 48,
                      "alpha": 0.667,
                      "threshold": 3}
-# for iterative reweighting L1-regularized solver
-defaults["solvers"] = {"reweight_func": "log",
-                       "reweight_eps": 1e-5,
-                       "reweight_usescales": False}

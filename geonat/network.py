@@ -732,9 +732,10 @@ class Network():
         return common_mapping
 
     def fit(self, ts_description, model_list=None, solver='linear_regression',
-            cached_mapping=True, local_input={}, **kw_args):
+            cached_mapping=True, local_input={}, return_solutions=False, **kw_args):
         """
-        Fit the models (or a subset thereof) for a specific timeseries at all stations.
+        Fit the models (or a subset thereof) for a specific timeseries at all stations,
+        and read the fitted parameters into the station's model objects.
         Also provides a progress bar.
         Will automatically use multiprocessing if parallelization has been enabled in
         the configuration (defaults to parallelization if possible).
@@ -760,15 +761,17 @@ class Network():
         local_input : dict, optional
             Provides the ability to pass individual keyword arguments to the solver,
             potentially overriding the (global) keywords in ``kw_args``.
+        return_solutions : bool, optional
+            If ``True`` (default: ``False``), return a dictionary of all solutions produced
+            by the calls to the solver function.
         **kw_args : dict
             Additional keyword arguments that are passed on to the solver function.
 
         Returns
         -------
-        global_return : dict, optional
-            If the solver function returns more than the anticipated single return
-            object, a dictionary is created that for each station, contains the extra
-            result objects.
+        solutions : dict, optional
+            If ``return_solutions=True``, a dictionary that contains the
+            :class:`~geonat.solvers.Solution` objects for each station.
 
         Example
         -------
@@ -805,40 +808,38 @@ class Network():
         if cached_mapping:
             kw_args["cached_mapping"] = self.common_mapping(ts_description)
         station_names = list(self.stations.keys())
-        iterable_inputs = ((station.timeseries[ts_description],
+        iterable_inputs = ((solver,
+                            station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None
                             else {m: station.models[ts_description][m] for m in model_list
                                   if m in station.models[ts_description]},
-                            solver,
                             kw_args if local_input == {}
                             else {**kw_args, **local_input[station_names[i]]})
                            for i, station in enumerate(self))
-        global_return = {}
+        if return_solutions:
+            solutions = {}
         for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
                                         desc="Fitting station models",
                                         total=len(self.stations),
                                         ascii=True, unit="station")):
-            stat = self[station_names[i]]
+            stat_ts = self[station_names[i]].models[ts_description]
             # print warning if the solver didn't converge
-            if any([np.isnan(params_var[0]).sum() > 0 for params_var in result[0].values()]):
+            if any([np.isnan(sol.parameters).sum() > 0 for sol in result.values()]):
                 warn(f"Fitting did not converge for timeseries {ts_description} "
                      f"at {station_names[i]}", category=RuntimeWarning)
-            for model_description, (params, var) in result[0].items():
-                stat.models[ts_description][model_description].read_parameters(params, var)
+            for model_description, sol in result.items():
+                stat_ts[model_description].read_parameters(sol.parameters, sol.variances)
             # if there is additional output, save it
-            if len(result) > 1:
-                global_return[station_names[i]] = result[1:]
-        # output extra return values
-        if global_return != {}:
-            return global_return
+            if return_solutions:
+                solutions[station_names[i]] = result
+        # output solutions if desired
+        if return_solutions:
+            return solutions
 
     @staticmethod
     def _fit_single_station(parameter_tuple):
-        station_time, station_models, solver, kw_args = parameter_tuple
-        solver_output = solver(station_time, station_models, **kw_args)
-        if not isinstance(solver_output, tuple):
-            solver_output = (solver_output, )
-        return solver_output
+        solver, station_time, station_models, kw_args = parameter_tuple
+        return solver(station_time, station_models, **kw_args)
 
     def evaluate(self, ts_description, model_list=None, timevector=None,
                  output_description=None, reuse=False):
@@ -968,9 +969,9 @@ class Network():
         return fit
 
     def fitevalres(self, ts_description, model_list=None, solver='linear_regression',
-                   cached_mapping=True, local_input={}, timevector=None,
-                   output_description=None, reuse=False, residual_description=None,
-                   **kw_args):
+                   cached_mapping=True, local_input={}, return_solutions=False,
+                   timevector=None, output_description=None, reuse=False,
+                   residual_description=None, **kw_args):
         """
         Convenience method that combines the calls for :meth:`~fit`, :meth:`~evaluate`
         and :meth:`~math` (to compute the fit residual) into one method call.
@@ -986,6 +987,8 @@ class Network():
         cached_mapping : bool, optional
             See :meth:`~fit`.
         local_input : dict, optional
+            See :meth:`~fit`.
+        return_solutions : bool, optional
             See :meth:`~fit`.
         timevector : pandas.Series, pandas.DatetimeIndex, optional
             See :meth:`~evaluate`.
@@ -1032,8 +1035,10 @@ class Network():
         geonat.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         # fit
-        self.fit(ts_description=ts_description, model_list=model_list, solver=solver,
-                 cached_mapping=cached_mapping, local_input=local_input, **kw_args)
+        possible_output = self.fit(ts_description=ts_description, model_list=model_list,
+                                   solver=solver, cached_mapping=cached_mapping,
+                                   local_input=local_input, return_solutions=return_solutions,
+                                   **kw_args)
         # evaluate
         self.evaluate(ts_description=ts_description, model_list=model_list,
                       timevector=timevector, output_description=output_description,
@@ -1041,6 +1046,8 @@ class Network():
         # residual
         if residual_description:
             self.math(residual_description, ts_description, "-", output_description)
+        # return either None or the results dictionary of self.fit():
+        return possible_output
 
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
         """
