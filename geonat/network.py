@@ -1278,7 +1278,8 @@ class Network():
         pandas.DataFrame
             DataFrame with the station names as index, the different metrics
             as top-level columns, and the different components as lower-level
-            columns.
+            columns. Averages of each metric can easily be calculated with the
+            Pandas command :meth:`~pandas.DataFrame.mean`.
         """
         # calculate the desired metrics
         metrics_lists = [station.analyze_residuals(ts_description, **kw_args)
@@ -1413,9 +1414,9 @@ class Network():
         plt.show()
 
     def gui(self, station=None, timeseries=None, model_list=None, sum_models=True,
-            verbose=False, annotate_stations=True, save=False, scalogram_kw_args=None,
-            stepdetector={}, trend_kw_args={}, analyze_kw_args={}, rms_on_map={},
-            gui_kw_args={}):
+            verbose=False, annotate_stations=True, save=False, save_map=False,
+            scalogram_kw_args=None, stepdetector={}, trend_kw_args={},
+            analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -1458,12 +1459,14 @@ class Network():
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
         save : bool, str, optional
-            If ``True``, save the map and figure of the selected timeseries. If a scalogram
+            If ``True``, save the figure of the selected timeseries. If a scalogram
             is also created, save this as well. The output directory is the current folder.
             Ignored if ``stepdetector`` is set. Suppresses all interactive figures.
             If ``save`` is a string, it will be included in the output file name
             for easier referencing.
             Defaults to ``False``.
+        save_map : bool, optional
+            If ``True``, also save a map if ``save=True``. Defaults to ``False``.
         scalogram_kw_args : dict, optional
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
@@ -1872,14 +1875,15 @@ class Network():
                 ax_ts[0].set_title(station_name)
             fig_ts.canvas.draw_idle()
 
-            # save figure
+            # save figure (and map)
             if save and not stepdetector:
                 nowtime = pd.Timestamp.now().isoformat()[:19].replace(":", "")
                 plotfname = f"{station_name}{fname_add}_{nowtime}"
-                fig_map.savefig(f"map_{plotfname}")
                 fig_ts.savefig(f"ts_{plotfname}")
-                plt.close(fig_map)
                 plt.close(fig_ts)
+                if save_map:
+                    fig_map.savefig(f"map_{plotfname}")
+                    plt.close(fig_map)
 
             # get scalogram
             if scalogram_kw_args is not None:

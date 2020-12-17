@@ -14,6 +14,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import cartopy.geodesic as cgeod
 import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 from multiprocessing import Pool
 from tqdm import tqdm
 from urllib import request, error
@@ -896,9 +897,9 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        folders : str, list
+        folders : list, tuple
             Folder(s) in which the different year-folders are found, formatted as a
-            list of tuples with name and respective folder
+            single tuple or a list of tuples with name and respective folder
             (``[('network1', '/folder/one/'), ...]``).
         verbose : bool, optional
             If ``True``, print loading progress, final database size and a sample entry.
@@ -915,9 +916,11 @@ class RINEXDataHolding():
                              f"got {folders}.")
         # empty starting values
         dfdict = {col: [] for col in RINEXDataHolding.COLUMNS}
+        # determine iterator based on verbosity
+        iterfolders = tqdm(folders, desc="Loading folders", ascii=True,
+                           unit="folder") if verbose else folders
         # loop over folder(s)
-        for network, folder in tqdm(folders, desc="Loading folders",
-                                    ascii=True, unit="folder"):
+        for network, folder in iterfolders:
             # initialize pattern extraction
             rinex_pattern = re.compile(RINEXDataHolding.RINEXPATTERN, re.IGNORECASE)
             cur_year = None
@@ -927,10 +930,23 @@ class RINEXDataHolding():
             for pathobj in Path(folder).rglob(RINEXDataHolding.GLOBPATTERN):
                 year, day, filename = pathobj.parts[-3:]
                 if filename.endswith(RINEXDataHolding.COMPRFILEEXTS):
-                    info = rinex_pattern.match(filename).groupdict()
+                    info = rinex_pattern.match(filename)
+                    if info is None:
+                        warn(f"File {str(pathobj)} can't match RINEX filename pattern, "
+                             "skipping file.", category=RuntimeWarning)
+                        continue
+                    info = info.groupdict()
                     if (info["yy"] != year[-2:] or info["day"] != day):
-                        warn(f"File '{str(pathobj)} has conflicting year/day information.",
-                             category=RuntimeWarning)
+                        skipmsg = f"File '{str(pathobj)} has conflicting year/day information, " \
+                                  "skipping file "
+                        trystem = f"{info['site']}{day}{info['sequence']}." \
+                                  f"{year[-2:]}{info['type']}"
+                        tryfile = Path(pathobj.parents[0], trystem + pathobj.suffix)
+                        if tryfile.is_file():
+                            skipmsg += f"(but {str(tryfile)} exists)."
+                        else:
+                            skipmsg += f"(and {str(tryfile)} also doesn't exist)."
+                        warn(skipmsg, category=RuntimeWarning)
                         continue
                     if verbose and (cur_year != year):
                         tqdm.write(f" {year}")
@@ -989,7 +1005,7 @@ class RINEXDataHolding():
             new_instance.load_metrics_from_file(metrics_file)
         return new_instance
 
-    def load_locations_from_rinex(self, keep='last', replace_not_found=False):
+    def load_locations_from_rinex(self, keep='last', replace_not_found=False, verbose=False):
         """
         Scan the RINEX files' headers for approximate locations for
         plotting purposes.
@@ -1007,6 +1023,8 @@ class RINEXDataHolding():
             the location of Null Island (0° Longitude, 0° Latitude) is used
             and a warning is issued.
             If ``False`` (default), an error is raised instead.
+        verbose : bool, optional
+            If ``True`` (default: ``False``), show loading progress.
         """
         # prepare
         assert keep in ["first", "last", "mean"], \
@@ -1015,8 +1033,9 @@ class RINEXDataHolding():
         df = pd.DataFrame({"station": self.list_stations})
         df = df.join(pd.DataFrame(np.zeros((self.num_stations, 3)), columns=XYZ))
         # get xyz for each station
-        for row in tqdm(df.itertuples(), total=df.shape[0], ascii=True,
-                        desc="Reading RINEX headers", unit="file"):
+        iterfiles = tqdm(df.itertuples(), total=df.shape[0], ascii=True, unit="file",
+                         desc="Reading RINEX headers") if verbose else df.itertuples()
+        for row in iterfiles:
             subset = self.get_files_by(station=row.station).sort_values(by=["date"])
             filenames = self.make_filenames(subset)
             if keep == "last":
@@ -1139,6 +1158,30 @@ class RINEXDataHolding():
         if verbose:
             print(f"Selected {subset.sum()} files.")
         return self.df[subset]
+
+    def get_location(self, station, lla=True):
+        """
+        Returns the approximate location of a station.
+
+        Parameters
+        ----------
+        station : str
+            Name of the station
+        lla : bool, optional
+            If ``True``, returns the coordinates in Longitude [°], Latitude [°] &
+            Altitude [m], otherwise in XYZ [m] coordinates.
+
+        Returns
+        -------
+        pandas.Series
+            The location of the station in the specified coordinate system.
+        """
+        loc_df = self.locations_lla if lla else self.locations_xyz
+        try:
+            return loc_df[loc_df["station"] == station].iloc[0] \
+                   .drop("station").rename(station)
+        except IndexError:
+            raise KeyError(f"Station {station} not present.")
 
     def load_metrics_from_file(self, filepath):
         """
@@ -1286,8 +1329,10 @@ class RINEXDataHolding():
             except Exception as exc:
                 print(exc)
         if gui_settings["coastlines_show"]:
-            ax.coastlines(color="white" if map_underlay else "black",
-                          resolution=gui_settings["coastlines_res"])
+            ax.add_feature(cfeature.BORDERS.with_scale(gui_settings["coastlines_res"]),
+                           edgecolor="white" if map_underlay else "black")
+            ax.add_feature(cfeature.COASTLINE.with_scale(gui_settings["coastlines_res"]),
+                           edgecolor="white" if map_underlay else "black")
         return fig, ax, proj_gui, proj_lla, stat_points, stat_names
 
     def plot_map(self, metric=None, orientation="horizontal", annotate_stations=True,
@@ -1407,8 +1452,7 @@ class RINEXDataHolding():
         icolor = 0
         n_files = []
         # loop over stations in the sorted order
-        for offset, station in enumerate(tqdm(sort_stations, desc="Drawing lines",
-                                              ascii=True, unit="station")):
+        for offset, station in enumerate(sort_stations):
             # get the station in question
             subset = self.get_files_by(station=station)
             # get the file dates and split them by contiguous chunks
