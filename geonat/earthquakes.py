@@ -103,13 +103,13 @@ def _okada_get_cumdisp(time_station_settings):
 
 
 def okada_prior(network, catalog_path, target_timeseries, target_model,
-                target_model_regularize=False, catalog_prior_kw_args={}):
+                target_model_regularize=False, do_add=True, catalog_prior_kw_args={}):
     r"""
     Given a catalog of earthquakes (including moment tensors), calculate an approximate
-    displacement for each of the stations in the network, and add a step model to
-    the target timeseries.
+    displacement for each of the stations in the network.
 
-    This function operates on the network instance directly.
+    If ``do_add=True`` (default), the function adds a step model to the target
+    timeseries in the passed ``network`` object.
 
     Parameters
     ---------
@@ -124,6 +124,8 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
         Name of the earthquake model added to ``target_timeseries``.
     target_model_regularize : bool, optional
         Whether to mark the model for regularization or not.
+    do_add : bool, optional
+        Whether to add the step models to the network (``True``, default) or not.
     catalog_prior_kw_args : dict, optional
         A dictionary fine-tuning the displacement calculation and modeling, see
         :attr:`~geonat.config.defaults` for explanations and defaults.
@@ -209,30 +211,32 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
     for i, result in enumerate(tqdm(parallelize(_okada_get_cumdisp, cumdisp_parameters),
                                     ascii=True, total=len(network.stations),
                                     desc="Adding steps where necessary", unit="station")):
-        stepmodel = Step(steptimes=result, regularize=target_model_regularize)
-        network[station_names[i]].add_local_model(target_timeseries, target_model,
-                                                  stepmodel)
         eq_steps_dict[station_names[i]] = result
+        if do_add:
+            stepmodel = Step(steptimes=result, regularize=target_model_regularize)
+            network[station_names[i]].add_local_model(target_timeseries, target_model,
+                                                      stepmodel)
 
     # return the dictionary of steps {site: [steptimes]}
     return eq_steps_dict
 
 
 def empirical_prior(network, catalog_path, target_timeseries, target_model,
-                    target_model_regularize=False):
+                    target_model_regularize=False, do_add=True):
     r"""
-    Given a catalog of earthquakes, add a step model to a station to the target
-    timeseries if the following empirical formula (used by the Geodesy group at
-    UNR, see `unr_steps`_) holds true, and therefore expects a step due to an earthquake:
+    Given a catalog of earthquakes, compute whether a station is expected to
+    see a step with the following empirical formula (used by the Geodesy group at
+    UNR, see `unr_steps`_):
 
     .. math::
 
         d < 10^{\text{M}_\text{w} / 2 - 0.8} ~\text{km}
 
     where :math:`d` is the distance between the earthquake and the station
-    and M:sub:`w` is the moment magnitude.
+    and :math:`\text{M}_\text{w}` is the moment magnitude.
 
-    This function operates on the network instance directly.
+    If ``do_add=True`` (default), the function adds a step model to the target
+    timeseries in the passed ``network`` object.
 
     Parameters
     ---------
@@ -247,14 +251,14 @@ def empirical_prior(network, catalog_path, target_timeseries, target_model,
         Name of the earthquake model added to ``target_timeseries``.
     target_model_regularize : bool, optional
         Whether to mark the model for regularization or not.
+    do_add : bool, optional
+        Whether to add the step models to the network (``True``, default) or not.
 
     Returns
     -------
     eq_steps_dict : dict
         Dictionary of that maps the station names to a list of steptimes.
 
-    References
-    ----------
 
     .. _`unr_steps`: http://geodesy.unr.edu/NGLStationPages/steps_readme.txt
     """
@@ -288,10 +292,11 @@ def empirical_prior(network, catalog_path, target_timeseries, target_model,
     station_names = list(network.stations.keys())
     for istation, station in enumerate(station_names):
         steps = [str(eq_times.iloc[i]) for i in range(n_eq) if needs_steps[i, istation]]
-        stepmodel = Step(steptimes=steps, regularize=target_model_regularize)
-        network[station].add_local_model(target_timeseries, target_model,
-                                         stepmodel)
         eq_steps_dict[station] = steps
+        if do_add:
+            stepmodel = Step(steptimes=steps, regularize=target_model_regularize)
+            network[station].add_local_model(target_timeseries, target_model,
+                                             stepmodel)
 
     # return the dictionary of steps {site: [steptimes]}
     return eq_steps_dict
