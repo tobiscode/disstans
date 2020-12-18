@@ -684,6 +684,9 @@ class StepDetector():
             # this code could be used to create a model object and assign it to the station
             # mdl = geonat.models.Step(steptimes)
             # station.add_local_model(ts_description, "Detections", mdl)
+        # sort dataframe by probability
+        step_table.sort_values(by=["probability", "time", "station"],
+                               ascending=False, inplace=True)
         # get the consecutive steptime ranges
         unique_steps = np.sort(step_table["time"].unique())
         split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
@@ -737,6 +740,8 @@ class StepDetector():
         # for each station, find the first time index after a catalogued event
         check_indices = {}
         for station, steptimes in catalog.items():
+            if station not in net.stations.keys():
+                continue
             check_indices[station] = []
             for st in steptimes:
                 index_after = (net[station][ts_description].time >= st).tolist()
@@ -748,7 +753,8 @@ class StepDetector():
         iterable_input = ((tvec_to_numpycol(net[station][ts_description].time),
                            net[station][ts_description].data.values,
                            self.kernel_size, maxdel, check_indices[station])
-                          for station in catalog)
+                          for station in net.stations.keys()
+                          if (station in check_indices))
         for name, station, probs in zip(net.stations.keys(), net.stations.values(),
                                         tqdm(parallelize(StepDetector._search, iterable_input),
                                              ascii=True, total=net.num_stations, unit="station",
@@ -760,11 +766,14 @@ class StepDetector():
             maxstepprobs = probs[:, 0]
             maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)
             # isolate the actual timestamps and add to the DataFrame
-            steptimes = station[ts_description].time.iloc[check_indices[name]]
+            steptimes = station[ts_description].time[check_indices[name]]
             step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
                                                          "time": steptimes,
                                                          "probability": maxstepprobs}),
                                            ignore_index=True)
+        # sort dataframe by probability
+        step_table.sort_values(by=["probability", "time", "station"],
+                               ascending=False, inplace=True)
         # get the consecutive steptime ranges
         unique_steps = np.sort(step_table["time"].unique())
         split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]

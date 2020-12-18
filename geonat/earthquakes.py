@@ -102,14 +102,14 @@ def _okada_get_cumdisp(time_station_settings):
     return steptimes
 
 
-def okada_prior(network, catalog_path, target_timeseries, target_model,
-                target_model_regularize=False, do_add=True, catalog_prior_kw_args={}):
+def okada_prior(network, catalog_path, target_timeseries=None, target_model=None,
+                target_model_regularize=False, catalog_prior_kw_args={}):
     r"""
     Given a catalog of earthquakes (including moment tensors), calculate an approximate
     displacement for each of the stations in the network.
 
-    If ``do_add=True`` (default), the function adds a step model to the target
-    timeseries in the passed ``network`` object.
+    If ``target_timeseries`` and ``target_model`` are passed, the function adds
+    step models to the respective station's timeseries and models.
 
     Parameters
     ---------
@@ -118,14 +118,13 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
     catalog_path : str
         File name of the earthquake catalog to load. Currently, only the Japanese
         NIED's F-net earthquake mechanism catalog format is supported.
-    target_timeseries : str
+    target_timeseries : str, optional
         Name of the timeseries to add the model to.
-    target_model : str
+    target_model : str, optional
         Name of the earthquake model added to ``target_timeseries``.
+        Has to be passed if ``target_timeseries`` is passed.
     target_model_regularize : bool, optional
         Whether to mark the model for regularization or not.
-    do_add : bool, optional
-        Whether to add the step models to the network (``True``, default) or not.
     catalog_prior_kw_args : dict, optional
         A dictionary fine-tuning the displacement calculation and modeling, see
         :attr:`~geonat.config.defaults` for explanations and defaults.
@@ -165,10 +164,18 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
        *Internal deformation due to shear and tensile faults in a half-space*.
        Bulletin of the Seismological Society of America, 82 (2): 1018–1040.
     """
+    # check whether to add the steps to the stations
+    if target_timeseries:
+        assert target_model, "If steps should be added to the stations, both " \
+            "'target_timeseries' and 'target_model' need to be specified."
+        do_add = True
+    else:
+        do_add = False
+    # update catalog settings
     catalog_prior_settings = defaults["prior"].copy()
     catalog_prior_settings.update(catalog_prior_kw_args)
+    # get station locations and convert height from m to km
     stations_lla = np.array([station.location for station in network])
-    # convert height from m to km
     stations_lla[:, 2] /= 1000
     # load earthquake catalog
     catalog = pd.read_csv(catalog_path, header=0, parse_dates=[[0, 1]])
@@ -221,7 +228,7 @@ def okada_prior(network, catalog_path, target_timeseries, target_model,
     return eq_steps_dict
 
 
-def empirical_prior(network, catalog_path, target_timeseries, target_model,
+def empirical_prior(network, catalog_path, target_timeseries=None, target_model=None,
                     target_model_regularize=False, do_add=True):
     r"""
     Given a catalog of earthquakes, compute whether a station is expected to
@@ -235,8 +242,8 @@ def empirical_prior(network, catalog_path, target_timeseries, target_model,
     where :math:`d` is the distance between the earthquake and the station
     and :math:`\text{M}_\text{w}` is the moment magnitude.
 
-    If ``do_add=True`` (default), the function adds a step model to the target
-    timeseries in the passed ``network`` object.
+    If ``target_timeseries`` and ``target_model`` are passed, the function adds
+    step models to the respective station's timeseries and models.
 
     Parameters
     ---------
@@ -245,14 +252,13 @@ def empirical_prior(network, catalog_path, target_timeseries, target_model,
     catalog_path : str
         File name of the earthquake catalog to load. Currently, only the Japanese
         NIED's F-net earthquake mechanism catalog format is supported.
-    target_timeseries : str
+    target_timeseries : str, optional
         Name of the timeseries to add the model to.
-    target_model : str
+    target_model : str, optional
         Name of the earthquake model added to ``target_timeseries``.
+        Has to be passed if ``target_timeseries`` is passed.
     target_model_regularize : bool, optional
         Whether to mark the model for regularization or not.
-    do_add : bool, optional
-        Whether to add the step models to the network (``True``, default) or not.
 
     Returns
     -------
@@ -262,6 +268,13 @@ def empirical_prior(network, catalog_path, target_timeseries, target_model,
 
     .. _`unr_steps`: http://geodesy.unr.edu/NGLStationPages/steps_readme.txt
     """
+    # check whether to add the steps to the stations
+    if target_timeseries:
+        assert target_model, "If steps should be added to the stations, both " \
+            "'target_timeseries' and 'target_model' need to be specified."
+        do_add = True
+    else:
+        do_add = False
     # get distances
     stations_lla = np.array([station.location for station in network])
     # convert height from m to km
