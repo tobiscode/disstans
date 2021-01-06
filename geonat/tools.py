@@ -761,19 +761,20 @@ class RINEXDataHolding():
     COMPRFILEEXTS = (".Z", ".gz")
     """ The valid (compressed) RINEX file extensions to search for. """
 
-    COLUMNS = ("station", "year", "day", "date", "sequence", "type", "compression",
-               "filesize", "filetimeutc", "network", "basefolder")
+    COLUMNS = ("station", "station_raw", "year", "day", "date", "sequence", "type",
+               "compression", "filesize", "filetimeutc", "network", "basefolder")
     """ The necessary information about each RINEX file. """
 
     METRICCOLS = ("number", "age", "recency", "length", "reliability")
     """ The metrics that can be calculated. """
 
-    def __init__(self, df):
+    def __init__(self, df=None):
         self._df = None
         self._locations_xyz = None
         self._locations_lla = None
         self._metrics = None
-        self.df = df
+        if df is not None:
+            self.df = df
 
     @property
     def num_files(self):
@@ -793,6 +794,8 @@ class RINEXDataHolding():
     @property
     def df(self):
         """ Pandas DataFrame object containing the RINEX files database. """
+        if self._df is None:
+            raise RuntimeError("RINEX files database has not been loaded yet.")
         return self._df
 
     @df.setter
@@ -890,7 +893,18 @@ class RINEXDataHolding():
     @classmethod
     def from_folders(cls, folders, verbose=False):
         """
-        Build a new RINEXDataHolding object from the file system.
+        Convenience class method that creates a new RINEXDataHolding object and directly
+        calls :meth:`~load_db_from_folder`.
+
+        For parameter explanations, see the aboce method documention.
+        """
+        instance = cls()
+        instance.load_db_from_folders(folders, verbose=verbose)
+        return instance
+
+    def load_db_from_folders(self, folders, verbose=False):
+        """
+        Loads a RINEX database from folders in the file system.
         The data should be located in one or multiple folder structure(s) organized by
         ``YYYY/DDD``, where ``YYYY`` is a four-digit year and ``DDD`` is the three-digit
         day of the year.
@@ -915,21 +929,40 @@ class RINEXDataHolding():
                              "composed of a name and folder string each, "
                              f"got {folders}.")
         # empty starting values
-        dfdict = {col: [] for col in RINEXDataHolding.COLUMNS}
+        dfdict = {col: [] for col in self.COLUMNS}
         # determine iterator based on verbosity
         iterfolders = tqdm(folders, desc="Loading folders", ascii=True,
                            unit="folder") if verbose else folders
         # loop over folder(s)
         for network, folder in iterfolders:
             # initialize pattern extraction
-            rinex_pattern = re.compile(RINEXDataHolding.RINEXPATTERN, re.IGNORECASE)
+            rinex_pattern = re.compile(self.RINEXPATTERN, re.IGNORECASE)
             cur_year = None
             # loop over files
             if verbose:
                 tqdm.write(f"Loading from folder {folder} the year(s):")
-            for pathobj in Path(folder).rglob(RINEXDataHolding.GLOBPATTERN):
+            for pathobj in Path(folder).rglob(self.GLOBPATTERN):
                 year, day, filename = pathobj.parts[-3:]
-                if filename.endswith(RINEXDataHolding.COMPRFILEEXTS):
+                # get clean year and day in case the globpattern changed
+                if self.GLOBPATTERN != RINEXDataHolding.GLOBPATTERN:
+                    year = re.findall(r"\d+", year)[0]
+                    if len(year) != 4:
+                        if len(year) == 2:
+                            year = "20" + year
+                            warn(f"Parsing {str(pathobj)} assumes a two-digit year is "
+                                 "post-2000.", category=RuntimeWarning)
+                        else:
+                            warn(f"File {str(pathobj)} doesn't have a recognizable year, "
+                                 "skipping file.", category=RuntimeWarning)
+                            continue
+                    day = re.findall(r"\d+", day)[0]
+                    day = f"{int(day):03d}"
+                    if not (0 < int(day) < 367):
+                        warn(f"File {str(pathobj)} doesn't have a valid day, "
+                             "skipping file.", category=RuntimeWarning)
+                        continue
+                # only continue if this is a valid file extension
+                if filename.endswith(self.COMPRFILEEXTS):
                     info = rinex_pattern.match(filename)
                     if info is None:
                         warn(f"File {str(pathobj)} can't match RINEX filename pattern, "
@@ -955,7 +988,8 @@ class RINEXDataHolding():
                     filestat = os.stat(pathobj)
                     filesize = filestat.st_size
                     filetime = datetime.fromtimestamp(filestat.st_mtime, tz=timezone.utc)
-                    dfdict["station"].append(info["site"])
+                    dfdict["station"].append(info["site"].upper())
+                    dfdict["station_raw"].append(info["site"])
                     dfdict["year"].append(year)
                     dfdict["day"].append(day)
                     dfdict["date"].append(date)
@@ -972,13 +1006,15 @@ class RINEXDataHolding():
         if verbose:
             print(f"\nFound {df.shape[0]} files.\nSample:\n")
             print(df.iloc[0, :])
-        return cls(df)
+        # save to attribute
+        self.df = df
 
     @classmethod
     def from_file(cls, db_file, locations_file=None, metrics_file=None, verbose=False):
         """
-        Loads a RINEXDataHolding object from a pickled Pandas DataFrame file.
-        Optionally also loads pickled location and metrics files.
+        Convenience class method that creates a new RINEXDataHolding object from a file
+        using :meth:`~load_db_from_file` and then optionally loads the locations and metrics
+        from their respective files.
 
         Parameters
         ----------
@@ -989,7 +1025,29 @@ class RINEXDataHolding():
         metrics_file : str, optional
             Path of the metrics file.
         verbose : bool, optional
-            If ``True``, print final database size and a sample entry.
+            If ``True``, print database size and a sample entry.
+            Defaults to ``False``.
+        """
+        # load instance from file
+        instance = cls()
+        instance.load_db_from_file(db_file, verbose=verbose)
+        # optionally load locations and metrics
+        if locations_file:
+            instance.load_locations_from_file(locations_file)
+        if metrics_file:
+            instance.load_metrics_from_file(metrics_file)
+        return instance
+
+    def load_db_from_file(self, db_file, verbose=False):
+        """
+        Loads a RINEXDataHolding object from a pickled Pandas DataFrame file.
+
+        Parameters
+        ----------
+        db_file : str
+            Path of the main file.
+        verbose : bool, optional
+            If ``True``, print database size and a sample entry.
             Defaults to ``False``.
         """
         # load main database
@@ -997,13 +1055,8 @@ class RINEXDataHolding():
         if verbose:
             print(f"\nFound {df.shape[0]} files.\nSample:\n")
             print(df.iloc[0, :])
-        new_instance = cls(df)
-        # optionally load locations and metrics
-        if locations_file:
-            new_instance.load_locations_from_file(locations_file)
-        if metrics_file:
-            new_instance.load_metrics_from_file(metrics_file)
-        return new_instance
+        # save to attribute
+        self.df = df
 
     def load_locations_from_rinex(self, keep='last', replace_not_found=False, verbose=False):
         """
@@ -1194,8 +1247,7 @@ class RINEXDataHolding():
         """
         self.metrics = pd.read_pickle(filepath)
 
-    @staticmethod
-    def make_filenames(db):
+    def make_filenames(self, db):
         """
         Recreate the full paths to the individual rinex files from the database or
         a subset thereof.
@@ -1209,14 +1261,25 @@ class RINEXDataHolding():
         -------
         filenames : list
             List of paths.
+
+        Raises
+        ------
+        NotImplementedError
+            If :attr:`~GLOBPATTERN` or :attr:`~RINEXPATTERN` for this instance are not the
+            same as the default values. In this case, redefine this function with the
+            appropriate folder and file patterns.
         """
+        if (self.GLOBPATTERN != RINEXDataHolding.GLOBPATTERN) or \
+           (self.RINEXPATTERN != RINEXDataHolding.RINEXPATTERN):
+            raise NotImplementedError("GLOBPATTERN or RINEXPATTERN of this instance have been "
+                                      "modified, therefore the default way of creating full "
+                                      "filenames is no longer valid.")
         return [os.path.join(row.basefolder, row.year, row.day,
-                             row.station + row.day + row.sequence + "." +
+                             row.station_raw + row.day + row.sequence + "." +
                              row.year[-2:] + row.type + "." + row.compression)
                 for row in db.itertuples()]
 
-    @staticmethod
-    def get_rinex_header(filepath):
+    def get_rinex_header(self, filepath):
         """
         Open a RINEX file, read the header, and format it as a dictionary.
         No data type conversion or stripping of whitespaces is performed.
@@ -1234,7 +1297,7 @@ class RINEXDataHolding():
         # if it's a compressed file, hope that gzip is installed and we can use
         # it to decompress on-the-fly
         try:
-            if filepath.endswith(RINEXDataHolding.COMPRFILEEXTS):
+            if filepath.endswith(self.COMPRFILEEXTS):
                 rinexfile = subprocess.check_output(["gzip", "-dc", filepath],
                                                     text=True, errors="replace")
             else:
