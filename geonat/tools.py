@@ -487,7 +487,7 @@ def weighted_median(values, weights, axis=0, percentile=0.5,
 
 def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                       rate="24h", reference=None, min_solutions=100,
-                      t_min=None, t_max=None):
+                      t_min=None, t_max=None, verbose=1):
     """
     Downloads GNSS timeseries data from the University of Nevada at Reno's
     `Nevada Geodetic Laboratory`_. When using this data, please cite [blewitt18]_,
@@ -514,11 +514,11 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     rate : str, optional
         Which sample rate to download. Possible values are ``'24h'`` and
         ``'5min'``. See the Notes for a table of which rates are available for each
-        solution. Defaults to `'24h'``.
+        solution. Defaults to ``'24h'``.
     reference : str, optional
         The UNR abbreviation for the reference frame in which to download the data.
         Applies only for daily sample rates and final or rapid orbit solutions.
-        Defaults to ``IGS14``.
+        Defaults to ``'IGS14'``.
     min_solutions : int, optional
         Only consider stations with at least a certain number of all-time solutions
         according to the station list file.
@@ -527,6 +527,9 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         Only consider stations that have data on or after ``t_min``.
     t_max : str or pandas.Timestamp, optional
         Only consider stations that have data on or before ``t_max``.
+    verbose : bool, int, optional
+        Sets the verbosity level. If ``0``, the function is quiet. If ``1`` (default),
+        a progress bar is shown. If ``2``, also the individual actions are printed.
 
     Notes
     -----
@@ -573,8 +576,11 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     assert isinstance(station_list_or_bbox, list), \
         f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
     # make the necessary folders
+    atr_dir = os.path.join(data_dir, "attributions")
+    if verbose > 1:
+        print(f"Making sure '{data_dir}' and '{atr_dir}' exist.")
     os.makedirs(data_dir, exist_ok=True)
-    os.makedirs(os.path.join(data_dir, "attributions"), exist_ok=True)
+    os.makedirs(atr_dir, exist_ok=True)
     # set master station list URL and define the function that returns the URL
     # (since we don't know which stations and times to actually download)
     base_url = "http://geodesy.unr.edu/gps_timeseries/"
@@ -609,12 +615,14 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsUltra5min.txt"
     station_list_path = os.path.join(data_dir, station_list_url.split("/")[-1])
     # download the station list and parse to a DataFrame
+    if verbose > 1:
+        print(f"Downloading station list from {station_list_url} to {station_list_path}.")
     try:
         request.urlretrieve(station_list_url, station_list_path)
     except error.HTTPError as e:
         raise RuntimeError("Failed to download the station list from "
                            f"{station_list_url}.").with_traceback(e.__traceback__) from e
-    stations = pd.read_csv(station_list_path, delim_whitespace=True,
+    stations = pd.read_csv(station_list_path, delim_whitespace=True, usecols=list(range(11)),
                            parse_dates=[7, 8, 9], infer_datetime_format=True)
     # subset according to station_list_or_bbox
     if all([isinstance(site, str) for site in station_list_or_bbox]):
@@ -662,11 +670,15 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         stations = stations[stations["Dtbeg"] <= pd.Timestamp(t_max)]
     # this is now the final list of stations we're trying to download
     stations_list = stations["Sta"].to_list()
+    if verbose > 1:
+        print(f"List of stations to download: {stations_list}.")
     if len(stations_list) == 0:
         raise RuntimeError("No stations to download after applying all filters.")
     # prepare list of URLs to download
     if rate == "24h":
         list_urls = [get_sta_url(sta) for sta in stations_list]
+        if verbose > 1:
+            print("No parsing of index pages necessary.")
     else:
         # if it's a 5min sampling rate, there's multiple files per station,
         # and we need to parse the index webpage for all possible links
@@ -676,7 +688,9 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                 index_url = base_url + "kenv/"
             else:
                 index_url = base_url + "rapids_5min/kenv/"
-            for sta in stations_list:
+            iter_stations_list = (tqdm(stations_list, desc="Parsing index pages", ascii=True,
+                                       unit="station") if verbose > 0 else stations_list)
+            for sta in iter_stations_list:
                 pattern = r'(?<=<a href=")' + str(sta) + \
                           r'\.(\d{4})\.kenv\.zip(?=">)'
                 extractor = re.compile(pattern, re.IGNORECASE)
@@ -688,14 +702,20 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
             index_url = base_url + "ultracombo/kenv/"
             pattern_y = r'(?<=<a href=")(\d{4})/(?=">)'
             pattern_d = r'(?<=<a href=")(\d{3})/(?=">)'
-            pattern_f = r'(?<=<a href=")(\d{2}\w{3}\d{2})(\w{4})_fix.kenv(?=">)'
+            pattern_f = r'(?<=<a href=")(\d{2}\w{3}\d{2})(\w{4})_fix\.kenv(?=">)'
             extractor_y = re.compile(pattern_y, re.IGNORECASE)
             extractor_d = re.compile(pattern_d, re.IGNORECASE)
             extractor_f = re.compile(pattern_f, re.IGNORECASE)
+            if verbose > 1:
+                print("Parsing main index page... ", end="", flush=True)
             with request.urlopen(index_url) as f:
                 index_page = f.read().decode("windows-1252")
                 avail_years = extractor_y.findall(index_page)
-            for year in avail_years:
+            if verbose > 1:
+                print("Done")
+            iter_avail_years = (tqdm(avail_years, desc="Parsing daily index pages", ascii=True,
+                                     unit="year") if verbose > 0 else avail_years)
+            for year in iter_avail_years:
                 with request.urlopen(index_url + f"{year}/") as f:
                     index_page = f.read().decode("windows-1252")
                     avail_doys = extractor_d.findall(index_page)
@@ -703,32 +723,94 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                     with request.urlopen(index_url + f"{year}/{doy}/") as f:
                         index_page = f.read().decode("windows-1252")
                         avail_files = extractor_f.findall(index_page)
-                    for stafile in avail_files:
-                        sta, date = stafile
+                    for staurl in avail_files:
+                        sta, date = staurl
                         if sta in stations_list:
                             list_urls.append(get_sta_url(sta, year, doy, date))
     if len(list_urls) == 0:
         raise RuntimeError("No files to download after looking on the server.")
-    elif len(list_urls) > 10000:
+    elif (len(list_urls) > 10000) and (verbose > 0):
         answer = input("WARNING: The current selection criteria would lead to "
                        f"downloading {len(list_urls)} files (from "
                        f"{len(stations_list)} stations).\nPress ENTER to continue, "
                        "or anything else to abort.")
         if answer != "":
             exit()
-    # download files
-    for stafile in tqdm(list_urls, desc="Downloading station timeseries",
-                        ascii=True, unit="station"):
-        basename = stafile.split("/")[-1]
-        local_path = os.path.join(data_dir, basename)
-        # TODO check for local file existence and time first
-        local_time = pd.Timestamp(0, unit='d')
-        with request.urlopen(stafile) as remote:
-            remote_time = pd.Timestamp(remote.headers["Last-Modified"])
-            if remote_time > local_time:
-                local_path = stafile.split("/")[-1]
-                with open(local_path, mode="wb") as local:
-                    local.write(remote.read())
+    # prepare list of attribution files
+    atr_base_url = "http://geodesy.unr.edu/NGLStationPages/attributions/"
+    pattern_atr = r'(?<=<a href=")(\w{4}\.atr\d?)(?=">)'
+    extractor_atr = re.compile(pattern_atr, re.IGNORECASE)
+    if verbose > 1:
+        print("Parsing attributions index page... ", end="", flush=True)
+    with request.urlopen(atr_base_url) as f:
+        index_page = f.read().decode("windows-1252")
+        avail_atr_files = extractor_atr.findall(index_page)
+    if verbose > 1:
+        print("Done")
+    list_atr_urls = []
+    for sta in stations_list:
+        list_atr_urls.append([atr_base_url + atr_file for atr_file in avail_atr_files
+                              if sta in atr_file])
+    # loop over list of URLs
+    iter_list_urls = tqdm(list_urls, desc="Downloading station timeseries",
+                          ascii=True, unit="station") if verbose > 0 else list_urls
+    for staurl, atrurls in zip(iter_list_urls, list_atr_urls):
+        # local target path
+        local_path = os.path.join(data_dir, staurl.split("/")[-1])
+        # check if local file exists and if so, get its last-modified time
+        if os.path.isfile(local_path):
+            local_time = \
+                pd.Timestamp(datetime.fromtimestamp(os.path.getmtime(local_path),
+                                                    tz=timezone.utc))
+            local_time_str = local_time.isoformat()
+        else:
+            local_time, local_time_str = None, "N/A"
+        # open the remote connection
+        try:
+            with request.urlopen(staurl) as remote:
+                # get the remote last-modified time
+                remote_time = pd.Timestamp(remote.headers["Last-Modified"])
+                if (local_time is None) or (remote_time > local_time):
+                    # need to download the file, since we either don't have a local copy
+                    # or the remote one is newer than the one we have
+                    status = "NEW FILE" if local_time is None else "UPDATE"
+                    with open(local_path, mode="wb") as local:
+                        local.write(remote.read())
+                else:
+                    status = "SKIPPED"
+        except error.HTTPError as e:
+            warn(f"Failed to download the remote file from {staurl}.\n"
+                 f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning)
+        else:
+            if verbose > 1:
+                tqdm.write(f"[{status}] '{staurl}' ({remote_time.isoformat()})"
+                           f" -> '{local_path}' ({local_time_str})")
+        # repeat the same procedure for the attribution files
+        for atrurl in atrurls:
+            local_atr_path = os.path.join(atr_dir, atrurl.split("/")[-1])
+            if os.path.isfile(local_atr_path):
+                local_atr_time = \
+                    pd.Timestamp(datetime.fromtimestamp(os.path.getmtime(local_atr_path),
+                                                        tz=timezone.utc))
+                local_atr_time_str = local_atr_time.isoformat()
+            else:
+                local_atr_time, local_atr_time_str = None, "N/A"
+            try:
+                with request.urlopen(atrurl) as remote_atr:
+                    remote_atr_time = pd.Timestamp(remote_atr.headers["Last-Modified"])
+                    if (local_atr_time is None) or (remote_atr_time > local_atr_time):
+                        status = "NEW FILE" if local_atr_time is None else "UPDATE"
+                        with open(local_atr_path, mode="wb") as local_atr:
+                            local_atr.write(remote_atr.read())
+                    else:
+                        status = "SKIPPED"
+            except error.HTTPError as e:
+                warn(f"Failed to download the remote attribution file from {atrurl}.\n"
+                     f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning)
+            else:
+                if verbose > 1:
+                    tqdm.write(f"[{status}] '{atrurl}' ({remote_atr_time.isoformat()})"
+                               f" -> '{local_atr_path}' ({local_atr_time_str})")
 
 
 class RINEXDataHolding():
