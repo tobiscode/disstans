@@ -531,6 +531,12 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         Sets the verbosity level. If ``0``, the function is quiet. If ``1`` (default),
         a progress bar is shown. If ``2``, also the individual actions are printed.
 
+    Returns
+    -------
+    stations : pandas.DataFrame
+        A DataFrame, built from UNR's data holding list, subset to the stations
+        actually selected for download.
+
     Notes
     -----
 
@@ -811,6 +817,8 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                 if verbose > 1:
                     tqdm.write(f"[{status}] '{atrurl}' ({remote_atr_time.isoformat()})"
                                f" -> '{local_atr_path}' ({local_atr_time_str})")
+    # return the DataFrame with the downloaded stations
+    return stations
 
 
 class RINEXDataHolding():
