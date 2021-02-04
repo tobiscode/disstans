@@ -40,8 +40,9 @@ class Network():
     default_location_path : str, optional
         If station locations aren't given directly, check for a file with this path for the
         station's location.
-        It needs to be a four-column, space-separated text file with the entries
-        ``name latitude[°] longitude[°] altitude[m]`` (without headers).
+        It needs to be an at-least four-column, space-separated text file with the entries
+        ``name latitude[°] longitude[°] altitude[m]``. Existing headers have to be able to be
+        identified as not being floats in the coordinate columns.
     auto_add : bool, optional
         If true, instatiation will automatically add all stations found in
         ``default_location_path``.
@@ -102,8 +103,21 @@ class Network():
         else:
             with open(self.default_location_path, mode='r') as locfile:
                 loclines = [line.strip() for line in locfile.readlines()]
+            # check for headers
+            for i in range(len(loclines)):
+                try:  # test by converting to lla
+                    _ = [float(lla) for lla in loclines[i].split()[1:4]]
+                except ValueError:
+                    continue
+                try:  # cut the header off
+                    loclines = loclines[i:]
+                    break
+                except IndexError as e:  # didn't find any data
+                    raise RuntimeError("Invalid text format for 'default_location_path'."
+                                       ).with_traceback(e.__traceback__) from e
+            # make {station: lla} dictionary
             self._network_locations = {line.split()[0]:
-                                       [float(lla) for lla in line.split()[1:]]
+                                       [float(lla) for lla in line.split()[1:4]]
                                        for line in loclines}
             # check if the stations should also be added
             if auto_add:
