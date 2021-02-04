@@ -1544,6 +1544,8 @@ class Network():
             scalo_model = scalogram_kw_args.pop('model')
             fig_scalo = plt.figure()
         station_name, station_index = None, None
+        stat_lonlats = np.stack((stat_lons, stat_lats), axis=1)
+        geoid = cgeod.Geodesic()
 
         # make sure that if analyze_kw_args is used, 'verbose' is set and True
         if analyze_kw_args:
@@ -1653,7 +1655,6 @@ class Network():
             plot_padding = stepdetector["plot_padding"]
             n_ranges = len(step_ranges)
             i_range = 0
-            geoid = cgeod.Geodesic()
             last_eqs = None
             last_eqs_lbl = []
 
@@ -1669,8 +1670,8 @@ class Network():
                         return
                     click_lon, click_lat = proj_lla.transform_point(event.xdata, event.ydata,
                                                                     src_crs=proj_gui)
-                    station_index = np.argmin(np.sqrt((np.array(stat_lats) - click_lat)**2
-                                                      + (np.array(stat_lons) - click_lon)**2))
+                    distances = geoid.inverse(np.array([[click_lon, click_lat]]), stat_lonlats)
+                    station_index = np.argmin(np.array(distances)[:, 0])
                     station_name = list(self.stations.keys())[station_index]
                 elif station_name is None:
                     return
