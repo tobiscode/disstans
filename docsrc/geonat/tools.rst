@@ -36,6 +36,11 @@ download_unr_data
 
 .. autofunction:: geonat.tools.download_unr_data
 
+parse_unr_steps
+...............
+
+.. autofunction:: geonat.tools.parse_unr_steps
+
 Classes
 -------
 

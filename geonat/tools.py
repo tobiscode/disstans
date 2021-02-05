@@ -402,7 +402,7 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
             print(f"Dropping {maint_table.shape[0] - keeprows.sum()} rows "
                   f"because of include={include}.")
         maint_table = maint_table.iloc[keeprows, :]
-    # now produce a dictionary that maps sites to a list of step dates: {site: [steptimes]}
+    # now produce a dictionary that maps sites to a list of step dates: {station: [steptimes]}
     maint_dict = dict(maint_table.groupby(sitecolname)[timecolname].apply(list))
     # rename columns
     maint_table.rename(columns={sitecolname: "station", codecolname: "code",
@@ -432,6 +432,11 @@ def weighted_median(values, weights, axis=0, percentile=0.5,
     visualize : bool, optional
         If ``True``, show a plot of the weighted median calculation.
         Defaults to ``False``.
+
+    Returns
+    -------
+    numpy.ndarray
+        Weighted median of input.
     """
     # some checks
     assert isinstance(values, np.ndarray) and isinstance(weights, np.ndarray), \
@@ -571,6 +576,10 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     .. [blewitt18] Blewitt, G., W. C. Hammond, and C. Kreemer (2018).
        *Harnessing the GPS data explosion for interdisciplinary science.*
        Eos, 99, doi:`10.1029/2018EO104623 <https://doi.org/10.1029/2018EO104623>`_
+
+    See Also
+    --------
+    parse_unr_steps : Function to download and parse UNR's main step file.
     """
     # do some checks
     assert solution in ["final", "rapid", "ultra"], \
@@ -819,6 +828,100 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                                f" -> '{local_atr_path}' ({local_atr_time_str})")
     # return the DataFrame with the downloaded stations
     return stations
+
+
+def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=False):
+    """
+    This functions parses the main step file from UNR and produces two step databases,
+    one for maintenance and one for earthquake-related events.
+    If a newer step file is found online, the local copy is updated.
+
+    See :func:`~download_unr_data` for more information about UNR's dataset, as well as
+    how to access and cite it.
+
+    Parameters
+    ----------
+    filepath : str
+        Path to the step file.
+    check_update : bool, optional
+        If ``True`` (default), check UNR's server for an updated step file.
+    only_stations : list, optional
+        If specified, a list of station IDs. Other stations are not included in the output.
+    verbose : bool, optional
+        If ``True`` (defaults to ``False``) print actions.
+
+    Returns
+    -------
+    maint_table : pandas.DataFrame
+        Parsed maintenance table.
+    maint_dict : dict
+        Dictionary of that maps the station names to a list of maintenance steptimes.
+    eq_table : pandas.DataFrame
+        Parsed earthquake table.
+    eq_dict : dict
+        Dictionary of that maps the station names to a list of earthquake-related steptimes.
+    """
+    # check if local file exists
+    local_exists = os.path.isfile(filepath)
+    # abort if no local file exists but also no update should be performed
+    assert local_exists or check_update, \
+        "The local file does not exist and no update was requested. No parsing possible."
+    # see if we need to download a newer step file
+    if check_update:
+        # check local last-modified time
+        if local_exists:
+            local_time = pd.Timestamp(datetime.fromtimestamp(os.path.getmtime(filepath),
+                                                             tz=timezone.utc))
+            local_time_str = local_time.isoformat()
+        else:
+            local_time, local_time_str = None, "N/A"
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        remote_url = "http://geodesy.unr.edu/NGLStationPages/steps.txt"
+        # open the remote connection
+        try:
+            with request.urlopen(remote_url) as remote:
+                # get the remote last-modified time
+                remote_time = pd.Timestamp(remote.headers["Last-Modified"])
+                if (local_time is None) or (remote_time > local_time):
+                    # need to download the file, since we either don't have a local copy
+                    # or the remote one is newer than the one we have
+                    status = "NEW FILE" if local_time is None else "UPDATE"
+                    with open(filepath, mode="wb") as local:
+                        local.write(remote.read())
+                else:
+                    status = "SKIPPED"
+        except error.HTTPError as e:
+            raise RuntimeError(f"Failed to download the remote file from {remote_url}.\n"
+                               f"HTTP Error {e.code}: {e.reason}"
+                               ).with_traceback(e.__traceback__) from e
+        else:
+            if verbose:
+                tqdm.write(f"[{status}] '{remote_url}' ({remote_time.isoformat()})"
+                           f" -> '{filepath}' ({local_time_str})")
+    # load the file
+    col_names = ["station", "date", "code", "type", "distance", "magnitude", "usgsid"]
+    # (for earthquake events, the "type" column is actually the "threshold" column)
+    raw = pd.read_csv(filepath, names=col_names, delim_whitespace=True, parse_dates=["date"],
+                      date_parser=lambda YYMMMDD: datetime.strptime(YYMMMDD, r"%y%b%d"))
+    # subset to specified stations
+    if only_stations:
+        raw = raw[raw["station"].isin(only_stations)]
+    # split the DataFrame into two
+    maint_table = raw[raw["code"] == 1].iloc[:, [0, 1, 3]]
+    eq_table = raw[raw["code"] == 2].iloc[:, [0, 1, 3, 4, 5, 6]]
+    eq_table.rename(columns={"type": "threshold"}, inplace=True)
+    del raw  # raw also contains a lot of NaNs because of extra columns we don't need to keep
+    # print the different maintenance codes and sizes
+    if verbose:
+        unique_descs = maint_table["type"].unique().tolist()
+        print("Maintenance descriptions:\n", unique_descs)
+        print("Number of Maintenance Events:", maint_table.shape[0])
+        print("Number of Earthquake-related Events:", eq_table.shape[0])
+    # make the dictionaries in form {station: [steptimes]}
+    maint_dict = dict(maint_table.groupby("station")["date"].apply(list))
+    eq_dict = dict(eq_table.groupby("station")["date"].apply(list))
+    # return everything
+    return maint_table, maint_dict, eq_table, eq_dict
 
 
 class RINEXDataHolding():
