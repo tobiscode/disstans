@@ -317,6 +317,32 @@ class Timeseries():
         """
         return (self.num_observations, self.num_components)
 
+    @property
+    def length(self):
+        """
+        Returns the length of the timeseries.
+        """
+        return self.time.max() - self.time.min()
+
+    @property
+    def reliability(self):
+        """
+        Returns the reliability (between 0 and 1) defined as the number of available
+        observations divided by the the number of expected observations. The expected
+        observations are calculated by taking the median timespan between observations,
+        and then dividing the total time span by that timespan.
+
+        (Essentially, this assumes that there are not any "close-by" observation, e.g.
+        two observation for the same day but a different hour in a dataset of otherwise
+        daily observations.)
+        """
+        # get median time difference
+        med_tdiff = np.median(np.diff(self.time.values))
+        # expected observations
+        exp_obs = int(np.round(self.length / med_tdiff + 1))
+        # return ratio
+        return self.num_observations / exp_obs
+
     def add_uncertainties(self, timeseries=None,
                           var_data=None, var_cols=None, cov_data=None, cov_cols=None):
         """
