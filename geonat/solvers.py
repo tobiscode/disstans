@@ -1160,7 +1160,7 @@ class SpatialSolver():
         if verbose:
             tqdm.write("Calculating scale lengths")
         geoid = cgeod.Geodesic()
-        station_names = list(self.net.stations.keys())
+        station_names = self.net.station_names
         station_lonlat = np.stack([np.array(self.net[name].location)[[1, 0]]
                                    for name in station_names])
         all_distances = np.empty((self.net.num_stations, self.net.num_stations))

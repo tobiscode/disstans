@@ -142,6 +142,11 @@ class Network():
         """ Number of stations present in the network. """
         return len(self.stations)
 
+    @property
+    def station_names(self):
+        """ Names of stations present in the network. """
+        return list(self.stations.keys())
+
     def __repr__(self):
         """
         Special function that returns a readable summary of the network.
@@ -821,7 +826,7 @@ class Network():
         # get common mapping matrices
         if cached_mapping:
             kw_args["cached_mapping"] = self.common_mapping(ts_description)
-        station_names = list(self.stations.keys())
+        station_names = self.station_names
         iterable_inputs = ((solver,
                             station.timeseries[ts_description],
                             station.models[ts_description] if model_list is None
@@ -954,7 +959,7 @@ class Network():
                                 else {m: station.models[ts_description][m] for m in model_list
                                       if m in station.models[ts_description]})
                                for station in self)
-            station_names = list(self.stations.keys())
+            station_names = self.station_names
             for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station,
                                                         iterable_inputs),
                                             desc="Evaluating station models",
@@ -1125,7 +1130,7 @@ class Network():
             assert isinstance(ts_out, str), \
                 f"'ts_out' must be None or a string, got {type(ts_out)}."
         iterable_inputs = ((func, station, ts_in, kw_args) for station in self)
-        station_names = list(self.stations.keys())
+        station_names = self.station_names
         for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return,
                                                     iterable_inputs),
                                         desc="Processing station timeseries with "
@@ -1320,14 +1325,14 @@ class Network():
                                                         names=["Metrics", "Components"])
         # create and return a multi-level DataFrame
         return pd.DataFrame(metrics_arr,
-                            index=list(self.stations.keys()),
+                            index=self.station_names,
                             columns=metrics_components).rename_axis("Station")
 
     def _create_map_figure(self, gui_settings, annotate_stations):
         # get location data and projections
         stat_lats = [station.location[0] for station in self]
         stat_lons = [station.location[1] for station in self]
-        stat_names = list(self.stations.keys())
+        stat_names = self.station_names
         proj_gui = getattr(ccrs, gui_settings["projection"])()
         proj_lla = ccrs.PlateCarree()
         # create figure and plot stations
@@ -1686,12 +1691,12 @@ class Network():
                                                                     src_crs=proj_gui)
                     distances = geoid.inverse(np.array([[click_lon, click_lat]]), stat_lonlats)
                     station_index = np.argmin(np.array(distances)[:, 0])
-                    station_name = list(self.stations.keys())[station_index]
+                    station_name = self.station_names[station_index]
                 elif station_name is None:
                     return
             else:
                 station_name = select_station
-                station_index = list(self.stations.keys()).index(station_name)
+                station_index = self.station_names.index(station_name)
             if verbose:
                 print(self[station_name])
             # change marker edges

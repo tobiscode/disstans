@@ -209,7 +209,7 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
         station_disp[i, :, :] = result
 
     # add steps to station timeseries if they exceed the threshold
-    station_names = list(network.stations.keys())
+    station_names = network.station_names
     eq_steps_dict = {}
     cumdisp_parameters = ((eq_times,
                            network.stations[stat_name].timeseries[target_timeseries].time.values,
@@ -302,7 +302,7 @@ def empirical_prior(network, catalog_path, target_timeseries=None, target_model=
 
     # loop over stations and add a step where necessary:
     eq_steps_dict = {}
-    station_names = list(network.stations.keys())
+    station_names = network.station_names
     for istation, station in enumerate(station_names):
         steps = [str(eq_times.iloc[i]) for i in range(n_eq) if needs_steps[i, istation]]
         eq_steps_dict[station] = steps

@@ -87,7 +87,7 @@ defaults["gui"] = {"projection": "Mercator",
                    "plot_sigmas_alpha": 0.5}
 # cleaning timeseries
 defaults["clean"] = {"min_obs": 100,
-                     "std_outlier": 5,
+                     "std_outlier": 10,
                      "min_clean_obs": 100,
                      "std_thresh": 100}
 # priors from earthquake catalogs
