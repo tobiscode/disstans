@@ -674,6 +674,23 @@ class Network():
                                             model_description=model_description,
                                             model=mdl)
 
+    def copy_uncertainties(self, origin_ts, target_ts):
+        """
+        Convenience function that copies the uncertainties of one timeseries
+        to another for all stations.
+
+        Parameters
+        ----------
+        origin_ts : str
+            Name of the timeseries that contains the uncertainty data.
+        target_ts : str
+            Name of the timeseries that should receive the uncertainty data.
+        """
+        for station in self:
+            if (origin_ts in station.timeseries.keys()) and \
+               (target_ts in station.timeseries.keys()):
+                station[target_ts].add_uncertainties(timeseries=station[origin_ts])
+
     def load_maintenance_dict(self, maint_dict, ts_description, model_description,
                               only_active=True):
         """
@@ -820,6 +837,8 @@ class Network():
         """
         assert isinstance(ts_description, str), \
             f"'ts_description' must be string, got {type(ts_description)}."
+        assert any([ts_description in station.timeseries.keys() for station in self]), \
+            f"Could not find any station with a timeseries called '{ts_description}'."
         if isinstance(solver, str):
             solver = getattr(geonat_solvers, solver)
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."

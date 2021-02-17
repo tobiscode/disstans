@@ -343,6 +343,54 @@ class Timeseries():
         # return ratio
         return self.num_observations / exp_obs
 
+    def cut(self, t_min=None, t_max=None, i_min=None, i_max=None):
+        """
+        Cut the timeseries to contain only data between certain times or indices.
+        If both a minimum (maximum) timestamp or index is provided, the later (earlier,
+        respectively) one is used (i.e., the more restrictive one).
+
+        This operation is changes the timeseries in-place; if it should be done on a
+        new timeseries, use :meth:`~copy` first.
+
+        Parameters
+        ----------
+        t_min : pandas.Timestamp, str, optional
+            A timestamp or timestamp-convertable string of the earliest observation
+            to keep.
+        t_max : pandas.Timestamp, str, optional
+            A timestamp or timestamp-convertable string of the latest observation
+            to keep.
+        i_min : int, optional
+            The index of the earliest observation to keep.
+        i_max : int, optional
+            The index of the latest observation to keep.
+        """
+        assert any([t_min, t_max, i_min, i_max]), "No cutting operation defined."
+        # convert to timestamps (if not already)
+        if i_min:
+            t_from_i_min = self.time[i_min]
+        if i_max:
+            t_from_i_max = self.time[i_max]
+        if t_min:
+            t_min = pd.Timestamp(t_min)
+        if t_max:
+            t_max = pd.Timestamp(t_max)
+        # get more restrictive cutoffs
+        if i_min and t_min:
+            cut_min = max([t_from_i_min, t_min])
+        elif i_min or t_min:
+            cut_min = t_min if t_min else t_from_i_min
+        else:
+            cut_min = self.time[0]
+        if i_max and t_max:
+            cut_max = min([t_from_i_max, t_max])
+        elif i_max or t_max:
+            cut_max = t_max if t_max else t_from_i_max
+        else:
+            cut_max = self.time[-1]
+        # cut the dataframe directly
+        self._df = self._df[(self.time >= cut_min) & (self.time <= cut_max)]
+
     def add_uncertainties(self, timeseries=None,
                           var_data=None, var_cols=None, cov_data=None, cov_cols=None):
         """
