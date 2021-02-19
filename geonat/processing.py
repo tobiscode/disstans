@@ -357,6 +357,9 @@ class StepDetector():
     ----------
     kernel_size : int, optional
         Window size of the detector. Must be odd.
+    kernel_size_min : int, optional
+        Minimum window size of the detector (for edges). Must be smaller than or equal
+        to ``kernel_size``. Defaults to ``0``.
     x : numpy.ndarray, optional
         Input array of shape :math:`(\text{num_observations},)`.
         Should not contain NaNs.
@@ -364,13 +367,9 @@ class StepDetector():
         Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
         Can contain NaNs.
     """
-    def __init__(self, kernel_size=None, x=None, y=None):
-        self.probabilities = None
-        r"""
-        Contains the probability array from the last :meth:`~search` function call.
-        Has shape :math:`(\text{num_observations}, \text{num_components})`.
-        """
+    def __init__(self, kernel_size=None, kernel_size_min=0, x=None, y=None):
         self.kernel_size = kernel_size
+        self.kernel_size_min = kernel_size_min
         if (x is not None) and (y is not None) and (kernel_size is not None):
             self.search(x, y, kernel_size)
 
@@ -387,6 +386,20 @@ class StepDetector():
             assert isinstance(kernel_size, int) and (kernel_size % 2 == 1), \
                 f"'kernel_size' must be an odd integer or None, got {kernel_size}."
         self._kernel_size = kernel_size
+
+    @property
+    def kernel_size_min(self):
+        """ Minimum kernel (window) size of the detector. """
+        if self._kernel_size_min is None:
+            raise ValueError("'kernel_size_min' has not yet been set.")
+        return self._kernel_size_min
+
+    @kernel_size_min.setter
+    def kernel_size_min(self, kernel_size_min):
+        if kernel_size_min is not None:
+            assert kernel_size_min <= self.kernel_size, "'kernel_size_min' must be smaller " + \
+                f"or equal to 'kernel_size', but {kernel_size_min} > {self.kernel_size}."
+        self._kernel_size_min = kernel_size_min
 
     @staticmethod
     def AIC_c(rss, n, K):
@@ -458,8 +471,16 @@ class StepDetector():
             Best hypothesis (``0`` for no step, ``1`` for step).
         float
             If H1 is the best hypothesis (and suffices ``maxdel``), its relative probability,
-            otherwise the relative probability of H0 (which therefore can be 0 if H0 is also
+            otherwise the relative probability of H0 (which therefore can be ``0`` if H0 is also
             the best hypothesis in general).
+        tuple
+            A 2-tuple of the two root-mean-squared residuals of the H0 and H1 hypotheses,
+            respectively. Assuming the test is unbiased, this is the residual's variance.
+            Is ``NaN`` in an element if the least-squares model did not converge.
+
+        See Also
+        --------
+        AIC_c : For more information about the AIC hypothesis test.
         """
         # do some checks
         assert xwindow.shape[0] == ywindow.shape[0], \
@@ -481,7 +502,7 @@ class StepDetector():
         n_total = n_pre + n_post
         # return with 0, 0 if we will not be able to get an estimate because of not enough data
         if (n_pre < 2) or (n_post < 2):
-            return 0, 0
+            return 0, 0, (np.NaN, np.NaN)
         xfinite = xwindow[valid]
         yfinite = ywindow[valid]
         # build mapping matrix for model H1
@@ -499,39 +520,39 @@ class StepDetector():
         try:
             rss1 = float(np.linalg.lstsq(G1, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
-            return 0, 0
+            return 0, 0, (np.NaN, np.NaN)
         # now we can fit for H0, and again just go with that if there is no solution
         try:
             rss0 = float(np.linalg.lstsq(G0, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
-            return 0, 0
+            return 0, 0, (np.NaN, rss1)
         # now that both models produce results, let's get the AIC_c values
         # we'll again return the H0 if not both models have a valid AIC_c value
         aic = [StepDetector.AIC_c(rss, n_total, dof) for (rss, dof)
                in zip([rss0, rss1], [3, 4])]
         if np.isnan(aic).sum() > 0:
-            return 0, 0
+            return 0, 0, (rss0, rss1)
         # let's check the difference between the two as a measure of evidence
         best_hyp = aic.index(min(aic))
         Delta_best = [a - aic[best_hyp] for a in aic]
         # we will only recommend H1 if it has the both the minimum AIC_c, and
         # the difference to H0 is larger than maxdel
         if (best_hyp == 1) and (Delta_best[0] > maxdel):
-            return 1, Delta_best[0]
+            return 1, Delta_best[0], (rss0, rss1)
         else:
-            return 0, Delta_best[best_hyp]
+            return 0, Delta_best[best_hyp], (rss0, rss1)
 
     @staticmethod
     def _search(data_and_params):
         """
         Parallelizable part of the search, search_network and search_catalog methods.
         """
-        if len(data_and_params) == 4:
-            x, y, kernel_size, maxdel = data_and_params
+        if len(data_and_params) == 5:
+            x, y, kernel_size, kernel_size_min, maxdel = data_and_params
             check_only = None
-        elif len(data_and_params) == 5:
+        elif len(data_and_params) == 6:
             # added the optional fifth parameter of which indices of x to check
-            x, y, kernel_size, maxdel, check_only = data_and_params
+            x, y, kernel_size, kernel_size_min, maxdel, check_only = data_and_params
         else:
             raise RuntimeError("Passed invalid 'data_and_params' argument: "
                                f"{data_and_params}")
@@ -544,24 +565,28 @@ class StepDetector():
         num_components = y.shape[1]
         # get valid array
         valid = np.isfinite(y)
-        # make output array
+        # make output arrays
         probs = np.empty((num_observations, num_components))
         probs[:] = np.NaN
+        sd0, sd1 = probs.copy(), probs.copy()
         # loop over all columns
         for icomp in range(num_components):
             # loop through all rows, starting with a shrunken kernel at the edges
             # Beginning region
             halfwindow = 0
             for i in range(kernel_size // 2):
-                if check_only and (i not in check_only):
+                if (check_only and (i not in check_only)) or \
+                   (halfwindow*2 + 1 < kernel_size_min):
                     halfwindow += 1
                     continue
-                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                                    y[i-halfwindow:i+halfwindow+1, icomp],
-                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
-                                                    maxdel=maxdel)
+                hyp, Del, (rss0, rss1) = \
+                    StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                             y[i-halfwindow:i+halfwindow+1, icomp],
+                                             valid[i-halfwindow:i+halfwindow+1, icomp],
+                                             maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
+                sd0[i, icomp], sd1[i, icomp] = rss0, rss1
                 halfwindow += 1
             # Middle region
             assert halfwindow == kernel_size // 2
@@ -569,33 +594,41 @@ class StepDetector():
             if check_only:
                 range_main = [i for i in range_main if i in check_only]
             for i in range_main:
-                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                                    y[i-halfwindow:i+halfwindow+1, icomp],
-                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
-                                                    maxdel=maxdel)
+                hyp, Del, (rss0, rss1) = \
+                    StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                             y[i-halfwindow:i+halfwindow+1, icomp],
+                                             valid[i-halfwindow:i+halfwindow+1, icomp],
+                                             maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
+                sd0[i, icomp], sd1[i, icomp] = rss0, rss1
             # Ending region
             for i in range(num_observations - halfwindow, num_observations):
                 halfwindow -= 1
-                if check_only and (i not in check_only):
+                if (check_only and (i not in check_only)) or \
+                   (halfwindow*2 + 1 < kernel_size_min):
                     continue
-                hyp, Del = StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                                    y[i-halfwindow:i+halfwindow+1, icomp],
-                                                    valid[i-halfwindow:i+halfwindow+1, icomp],
-                                                    maxdel=maxdel)
+                hyp, Del, (rss0, rss1) = \
+                    StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
+                                             y[i-halfwindow:i+halfwindow+1, icomp],
+                                             valid[i-halfwindow:i+halfwindow+1, icomp],
+                                             maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
+                sd0[i, icomp], sd1[i, icomp] = rss0, rss1
         # return
         if check_only:
             probs = probs[check_only, :].reshape(-1, num_components)
-        return probs
+            sd0 = sd0[check_only, :].reshape(-1, num_components)
+            sd1 = sd1[check_only, :].reshape(-1, num_components)
+        return probs, sd0, sd1
 
-    def search(self, x, y, kernel_size=None, maxdel=10):
+    def search(self, x, y, maxdel=10):
         r"""
         Function that will search for steps in the data.
-        Upon successful completion, it will save the step probabilities in
-        :attr:`~probabilities`.
+        Upon successful completion, it will return the relative step probabilities
+        as well as the residuals variances of the two hypotheses tested
+        (as reported by :meth:`~test_single`).
 
         Parameters
         ----------
@@ -605,20 +638,33 @@ class StepDetector():
         y : numpy.ndarray
             Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
             Can contain NaNs.
-        kernel_size : int, optional
-            Window size of the detector. Must be odd. If ``None``, use the previously set
-            :attr:`~kernel_size`, otherwise set the attribute.
         maxdel : float, optional
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
-        """
-        # check whether to update kernel_size
-        if kernel_size is not None:
-            self.kernel_size = kernel_size
-        # call individual search function and store result
-        self.probabilities = StepDetector._search(x, y, self.kernel_size, maxdel)
 
-    def search_network(self, net, ts_description, kernel_size=None, maxdel=10, threshold=20,
+        Returns
+        -------
+        probabilities : numpy.ndarray
+            Contains the relative probabilities array.
+            Has shape :math:`(\text{num_observations}, \text{num_components})`.
+        sd0 : numpy.ndarray
+            Contains the array of the residuals variance of the hypothesis
+            that no step is present.
+            Has shape :math:`(\text{num_observations}, \text{num_components})`.
+        sd1 : numpy.ndarray
+            Contains the array of the residuals variance of the hypothesis
+            that a step is present.
+            Has shape :math:`(\text{num_observations}, \text{num_components})`.
+
+        See Also
+        --------
+        :meth:`~test_single` : For more explanations about the return values.
+        """
+        # call individual search function and store result
+        return StepDetector._search(x, y, self.kernel_size,
+                                    self.kernel_size_min, maxdel)
+
+    def search_network(self, net, ts_description, maxdel=10, threshold=20,
                        gap=2, gap_unit="D"):
         r"""
         Function that searches for steps in an entire network (possibly in parallel),
@@ -631,9 +677,6 @@ class StepDetector():
             Network instance to operate on.
         ts_description : str
             :class:`~geonat.timeseries.Timeseries` description that will be analyzed.
-        kernel_size : int, optional
-            Window size of the detector. Must be odd. If ``None``, use the previously set
-            :attr:`~kernel_size`, otherwise set the attribute.
         maxdel : float, optional
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
@@ -650,43 +693,47 @@ class StepDetector():
         step_table : pandas.DataFrame
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
-            over all components for this timestamp).
+            over all components for this timestamp), as well as ``sd0`` and ``sd1``
+            (the two hypotheses' residuals variances for the component of
+            maximum step probability).
         step_ranges : list
             A list of lists containing continuous periods over all stations of the potential
             steps as determined by ``gap`` and ``gap_unit``.
         """
-        # check whether to update kernel_size
-        if kernel_size is not None:
-            self.kernel_size = kernel_size
         # initialize DataFrame
         step_table = pd.DataFrame(columns=["station", "time", "probability"])
         # run parallelized StepDetector._search
         iterable_input = ((tvec_to_numpycol(station[ts_description].time),
                            station[ts_description].data.values,
-                           self.kernel_size, maxdel) for station in net)
-        for name, station, probs in zip(net.stations.keys(), net.stations.values(),
-                                        tqdm(parallelize(StepDetector._search, iterable_input),
-                                             ascii=True, total=net.num_stations, unit="station",
-                                             desc="Searching for steps")):
+                           self.kernel_size, self.kernel_size_min, maxdel) for station in net)
+        for name, station, (probs, sd0, sd1) in \
+            zip(net.stations.keys(), net.stations.values(),
+                tqdm(parallelize(StepDetector._search, iterable_input), ascii=True,
+                     total=net.num_stations, unit="station", desc="Searching for steps")):
             # find steps given the just calculated probabilities
             # setting the maximum number of steps to infinite to not miss anything
-            steps = StepDetector._steps((probs, threshold, np.inf, False))
+            steps = StepDetector.steps(probs, threshold, np.inf, False)
             # combine all data components and keep largest probability if the step
             # is present in multiple components
             unique_steps = np.sort(np.unique(np.concatenate(steps)))
-            maxstepprobs = np.max(probs[unique_steps, :], axis=1)
+            stepprobs = probs[unique_steps, :]
+            stepsd0, stepsd1 = sd0[unique_steps, :], sd1[unique_steps, :]
+            maxprobindices = np.expand_dims(np.argmax(stepprobs, axis=1), axis=1)
+            maxstepprobs = np.take_along_axis(stepprobs, maxprobindices, axis=1).squeeze()
+            maxstepsd0 = np.take_along_axis(stepsd0, maxprobindices, axis=1).squeeze()
+            maxstepsd1 = np.take_along_axis(stepsd1, maxprobindices, axis=1).squeeze()
             # isolate the actual timestamps and add to the DataFrame
             steptimes = station[ts_description].time[unique_steps]
             step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
                                                          "time": steptimes,
-                                                         "probability": maxstepprobs}),
+                                                         "probability": maxstepprobs,
+                                                         "sd0": maxstepsd0, "sd1": maxstepsd1}),
                                            ignore_index=True)
             # this code could be used to create a model object and assign it to the station
             # mdl = geonat.models.Step(steptimes)
             # station.add_local_model(ts_description, "Detections", mdl)
         # sort dataframe by probability
-        step_table.sort_values(by=["probability", "time", "station"],
-                               ascending=False, inplace=True)
+        step_table.sort_values(by="probability", ascending=False, inplace=True)
         # get the consecutive steptime ranges
         unique_steps = np.sort(step_table["time"].unique())
         split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
@@ -694,8 +741,8 @@ class StepDetector():
         step_ranges = [unique_steps[split[i]:split[i + 1]] for i in range(split.size - 1)]
         return step_table, step_ranges
 
-    def search_catalog(self, net, ts_description, catalog, kernel_size=None, threshold=None,
-                       gap=2, gap_unit="D"):
+    def search_catalog(self, net, ts_description, catalog, threshold=None,
+                       gap=2, gap_unit="D", keep_nan_probs=True):
         r"""
         Search a dictionary of potential step times for each station in the dictionary
         and assess the probability for each one.
@@ -706,12 +753,10 @@ class StepDetector():
             Network instance to operate on.
         ts_description : str
             :class:`~geonat.timeseries.Timeseries` description that will be analyzed.
-        catalog : dict
+        catalog : dict, pandas.DataFrame
             Dictionary where each key is a station name and its value is a list of
             :class:`~pandas.Timestamp` compatible potential times/dates.
-        kernel_size : int, optional
-            Window size of the detector. Must be odd. If ``None``, use the previously set
-            :attr:`~kernel_size`, otherwise set the attribute.
+            Alternatively, a DataFrame with at least the columns ``'station'`` and ``'time'``.
         threshold : float, optional
             Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
         gap : float, optional
@@ -719,61 +764,110 @@ class StepDetector():
             of possible steps.
         gap_unit : str, optional
             Time unit of ``gap``.
+        keep_nan_probs : bool, optional
+            (Only applies to a DataFrame-type ``catalog`` input.)
+            If a catalogued station is not in the network, or if a catalogued timestamp
+            is after the available timeseries, no step probability can be calculated
+            and the results will contain NaNs.
+            If ``True`` (default), those entries will be kept in the output, and if
+            ``False``, they will be dropped.
 
         Returns
         -------
         step_table : pandas.DataFrame
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
-            over all components for this timestamp) for each potential step in ``catalog``.
+            over all components for this timestamp) for each potential step in ``catalog``,
+            as well as ``sd0`` and ``sd1`` (the two hypotheses' residuals variances
+            for the component of maximum step probability).
+            If a DataFrame was passed as ``catalog``, a copy of that will be returned, with
+            the added columns specified above.
         step_ranges : list
             A list of lists containing continuous periods over all stations of the potential
             steps as determined by ``gap`` and ``gap_unit``.
         """
         # hard-code maxdel to not filter out any item since we are asking about specific times
         maxdel = 0
-        # check whether to update kernel_size
-        if kernel_size is not None:
-            self.kernel_size = kernel_size
+        # get a simple dictionary representation if catalog was passed as dictionary
+        # and set keep_nan_probs if not specified
+        if isinstance(catalog, pd.DataFrame):
+            assert all([col in catalog.columns for col in ["station", "time"]]), \
+                "Invalid input 'catalog' DataFrame columns."
+            catalog_df = catalog
+            catalog = dict(catalog_df.groupby("station")["time"].apply(list))
+            augment_df = True
+        else:
+            assert isinstance(catalog, dict), \
+                "'catalog' must be either a dictionary or DataFrame."
+            augment_df = False
         # initialize DataFrame
         step_table = pd.DataFrame(columns=["station", "time", "probability"])
         # for each station, find the first time index after a catalogued event
+        # (alternatively, we could "add" a timestamp without an observation if
+        # there isn't a timestamp already present - probably better, but harder)
         check_indices = {}
-        for station, steptimes in catalog.items():
-            if station not in net.stations.keys():
+        # we also need to keep track of the originally requested time (for the output)
+        catalog_timeexists = {sta_name: [False] * len(steptimes)
+                              for sta_name, steptimes in catalog.items()}
+        for sta_name, steptimes in catalog.items():
+            if sta_name not in net.stations.keys():  # station not in network
                 continue
-            check_indices[station] = []
-            for st in steptimes:
-                index_after = (net[station][ts_description].time >= st).tolist()
+            check_indices[sta_name] = []
+            for ist, st in enumerate(steptimes):
+                index_after = (net[sta_name][ts_description].time >= st).tolist()
                 try:
-                    check_indices[station].append(index_after.index(True))
+                    check_indices[sta_name].append(index_after.index(True))
                 except ValueError:  # catalogued time is after the last timestamp
                     continue
+                else:
+                    catalog_timeexists[sta_name][ist] = True
         # run parallelized StepDetector._search
-        iterable_input = ((tvec_to_numpycol(net[station][ts_description].time),
-                           net[station][ts_description].data.values,
-                           self.kernel_size, maxdel, check_indices[station])
-                          for station in net.stations.keys()
-                          if (station in check_indices))
-        for name, station, probs in zip(net.stations.keys(), net.stations.values(),
-                                        tqdm(parallelize(StepDetector._search, iterable_input),
-                                             ascii=True, total=net.num_stations, unit="station",
-                                             desc="Searching for steps")):
+        stations_overlap = list(check_indices.keys())
+        iterable_input = ((tvec_to_numpycol(net[sta_name][ts_description].time),
+                           net[sta_name][ts_description].data.values,
+                           self.kernel_size, self.kernel_size_min,
+                           maxdel, check_indices[sta_name])
+                          for sta_name in stations_overlap)
+        results_iterator = tqdm(parallelize(StepDetector._search, iterable_input),
+                                ascii=True, total=len(stations_overlap), unit="station",
+                                desc="Searching for steps")
+        for name, (probs, sd0, sd1) in zip(stations_overlap, results_iterator):
             # probs now contains a row for each catalog item
             # if the probability is NaN, AIC does not see evidence for a step,
             # if it is a float, then that's the likelihood of a step (always positive)
+            # sd0 and sd1 can contain values regardless of the entry in probs
             has_steps = np.any(~np.isnan(probs), axis=1)
             maxstepprobs = probs[:, 0]
-            maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)
-            # isolate the actual timestamps and add to the DataFrame
-            steptimes = station[ts_description].time[check_indices[name]]
+            maxstepsd0, maxstepsd1 = sd0[:, 0], sd1[:, 0]
+            # maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)
+            maxprobindices = np.expand_dims(np.nanargmax(probs[has_steps, :], axis=1), axis=1)
+            maxstepprobs[has_steps], maxstepsd0[has_steps], maxstepsd1[has_steps] = \
+                np.take_along_axis(probs[has_steps, :], maxprobindices, axis=1).squeeze(), \
+                np.take_along_axis(sd0[has_steps, :], maxprobindices, axis=1).squeeze(), \
+                np.take_along_axis(sd1[has_steps, :], maxprobindices, axis=1).squeeze()
+            # isolate the original timestamps and add to the DataFrame
+            steptimes = [origtime for i, origtime in enumerate(catalog[name])
+                         if catalog_timeexists[name][i]]
             step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
                                                          "time": steptimes,
-                                                         "probability": maxstepprobs}),
+                                                         "probability": maxstepprobs,
+                                                         "sd0": maxstepsd0, "sd1": maxstepsd1}),
                                            ignore_index=True)
-        # sort dataframe by probability
-        step_table.sort_values(by=["probability", "time", "station"],
-                               ascending=False, inplace=True)
+        # sort dataframe by probability or merge it with the input dataframe
+        if augment_df:
+            catalog_df["probability"] = np.NaN
+            catalog_df["sd0"] = np.NaN
+            catalog_df["sd1"] = np.NaN
+            for _, row in step_table.iterrows():
+                row_location = (catalog_df["station"] == row["station"]) & \
+                               (catalog_df["time"] == row["time"])
+                catalog_df.loc[row_location, ["probability", "sd0", "sd1"]] = \
+                    row[["probability", "sd0", "sd1"]].values
+            if not keep_nan_probs:
+                catalog_df = catalog_df.dropna(how="all", subset=["probability", "sd0", "sd1"])
+            step_table = catalog_df
+        else:
+            step_table.sort_values(by="probability", ascending=False, inplace=True)
         # get the consecutive steptime ranges
         unique_steps = np.sort(step_table["time"].unique())
         split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
@@ -782,36 +876,9 @@ class StepDetector():
         return step_table, step_ranges
 
     @staticmethod
-    def _steps(data_and_params):
-        """
-        Parallelizable part of the steps function.
-        """
-        # initialize
-        probs, threshold, maxsteps, verbose = data_and_params
-        probs[np.isnan(probs)] = -1
-        steps = []
-        for icomp in range(probs.shape[1]):
-            # find peaks above the threshold
-            peaks, properties = find_peaks(probs[:, icomp], height=threshold)
-            # if maxsteps is set, reduce steps to that number
-            if peaks.size > maxsteps:
-                largest_ix = np.argpartition(properties["peak_heights"], -maxsteps)[-maxsteps:]
-                peaks = peaks[largest_ix]
-                # warn about the new effective threshold
-                if verbose:
-                    print(f"In order to return at most {maxsteps} steps, the threshold has "
-                          f"been increased to {properties['peak_heights'][largest_ix].min()}.")
-            # warn if a large number of steps have been detected
-            if verbose and (peaks.size / probs.shape[0] > 0.1):
-                warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
-                              f"{peaks.size / probs.shape[0]:.2%} of timestamps being steps. "
-                              "Consider setting a higher threshold.")
-            steps.append(peaks)
-        return steps
-
-    def steps(self, threshold=2, maxsteps=np.inf, verbose=True):
+    def steps(probabilities, threshold=2, maxsteps=np.inf, verbose=True):
         r"""
-        Threshold the saved probabilities to return a list of steps.
+        Threshold the probabilities to return a list of steps.
 
         Parameters
         ----------
@@ -826,10 +893,28 @@ class StepDetector():
 
         Returns
         -------
-        list
+        steps : list
             Returns a list of :class:`~numpy.ndarray` arrays that contain the indices of steps
             for each component.
         """
-        assert self.probabilities is not None, \
-            "'probabilities' has not been set yet, run StepDetector.search() first."
-        return StepDetector._steps((self.probabilities, threshold, maxsteps, verbose))
+        # initialize
+        probabilities[np.isnan(probabilities)] = -1
+        steps = []
+        for icomp in range(probabilities.shape[1]):
+            # find peaks above the threshold
+            peaks, properties = find_peaks(probabilities[:, icomp], height=threshold)
+            # if maxsteps is set, reduce steps to that number
+            if peaks.size > maxsteps:
+                largest_ix = np.argpartition(properties["peak_heights"], -maxsteps)[-maxsteps:]
+                peaks = peaks[largest_ix]
+                # warn about the new effective threshold
+                if verbose:
+                    print(f"In order to return at most {maxsteps} steps, the threshold has "
+                          f"been increased to {properties['peak_heights'][largest_ix].min()}.")
+            # warn if a large number of steps have been detected
+            if verbose and (peaks.size / probabilities.shape[0] > 0.1):
+                warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
+                              f"{peaks.size / probabilities.shape[0]:.2%} of timestamps "
+                              "being steps. Consider setting a higher threshold.")
+            steps.append(peaks)
+        return steps
