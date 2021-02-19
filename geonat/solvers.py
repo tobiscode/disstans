@@ -56,6 +56,11 @@ def _combine_mappings(ts, models, regularize=False, cached_mapping=None,
             mapping = sparse.csc_matrix(mapping[:, observable])
         else:
             mapping, observable = model.get_mapping(ts.time, return_observability=True)
+            if int(observable.sum()) == 0:
+                warn(f"For model '{mdl_description}' (regularized: {model.regularized}) "
+                     f"and a timespan ranging from {ts.time.min()} to {ts.time.max} "
+                     f"with {ts.num_observations} observations, no parameter is "
+                     "observable. GeoNAT has not been tested for this case.")
             mapping = mapping[:, observable]
             if regularize and model.regularize and \
                isinstance(reweight_init, dict) and (mdl_description in reweight_init):
@@ -277,14 +282,16 @@ class Solution(Mapping):
             v, w = None, None
             # pack the variances, if present
             if variances is not None:
-                v = np.zeros((model.num_parameters, num_components))
+                v = np.empty((model.num_parameters, num_components))
+                v[:] = np.NaN
                 v[mask, :] = variances[ix_sol:ix_sol+num_solved, :]
             # pack the weights, if present
             if pack_weights:
                 mask_reg = reg_indices[ix_sol:ix_sol+num_solved]
                 num_solved_reg = mask_reg.sum()
                 if num_solved_reg > 0:
-                    w = np.zeros((model.num_parameters, num_components))
+                    w = np.empty((model.num_parameters, num_components))
+                    w[:] = np.NaN
                     w[np.flatnonzero(mask)[mask_reg], :] = weights[ix_reg:ix_reg+num_solved_reg, :]
                 ix_reg += num_solved_reg
             ix_model += model.num_parameters

@@ -286,13 +286,15 @@ class Model():
                 f"returned an invalid shape. " \
                 f"Expected was ({last-first+1}, {self.num_parameters}), got {coefs.shape}."
             if return_observability:
-                observable = np.any(coefs, axis=0)
+                # check for the number effective non-zero coefficients
+                # technically observable where we have at least one such value
                 # for regularized models, also skip all columns with just a single value,
                 # as this would just map into another constant offset, which should
                 # be taken care of by a non-regularized polynomial
-                if self.regularize:
-                    nunique = (~np.isclose(np.diff(coefs, axis=0), 0)).sum(axis=0) + 1
-                    observable = np.logical_and(observable, nunique > 1)
+                maxamps = np.max(np.abs(coefs), axis=0, keepdims=True)
+                maxamps[maxamps == 0] = 1
+                numnotzero = np.sum(~np.isclose(coefs / maxamps, 0), axis=0)
+                observable = numnotzero > 1 if self.regularize else numnotzero > 0
             # build before- and after-matrices
             # either use zeros or the values at the active boundaries for padding
             if self.zero_before:
@@ -628,6 +630,7 @@ class BSpline(Model):
                  time_unit="D", num_splines=1, spacing=None, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
+        assert self.degree >= 0, "'degree' needs to be greater or equal to 0."
         self.order = self.degree + 1
         """ Order :math:`n=p+1` of the B-Splines. """
         self.scale = float(scale)
@@ -724,6 +727,7 @@ class ISpline(Model):
                  time_unit="D", num_splines=1, spacing=None, zero_after=False, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
+        assert self.degree >= 0, "'degree' needs to be greater or equal to 0."
         self.order = self.degree + 1
         """ Order :math:`n=p+1` of the B-Splines. """
         self.scale = float(scale)
@@ -876,7 +880,7 @@ class SplineSet(Model):
         t_range_tdelta = t_center_end_tstamp - t_center_start_tstamp
         # if a complete set is requested, we need to find the number of overlaps
         # given the degree on a single side
-        num_overlaps = degree if complete else 0
+        num_overlaps = int(np.floor(degree/2)) if complete else 0
         # for each scale, make a BSplines object
         splset = []
         num_parameters = 0

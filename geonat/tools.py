@@ -150,6 +150,9 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
     this snipped might be enough to put at the beginning of a script:
     ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of GeoNAT cores
     can be set by e.g. ``import geonat; geonat.defaults["general"]["num_threads"] = 10``.
+    Another important note is that if you're experiencing problems when running a script,
+    make sure the settings and the rest of the script are encapsulated in the standard
+    ``if __name__ == "__main__": ...`` clause.
 
     Parameters
     ----------
@@ -902,9 +905,9 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
                 tqdm.write(f"[{status}] '{remote_url}' ({remote_time.isoformat()})"
                            f" -> '{filepath}' ({local_time_str})")
     # load the file
-    col_names = ["station", "date", "code", "type", "distance", "magnitude", "usgsid"]
+    col_names = ["station", "time", "code", "type", "distance", "magnitude", "usgsid"]
     # (for earthquake events, the "type" column is actually the "threshold" column)
-    raw = pd.read_csv(filepath, names=col_names, delim_whitespace=True, parse_dates=["date"],
+    raw = pd.read_csv(filepath, names=col_names, delim_whitespace=True, parse_dates=["time"],
                       date_parser=lambda YYMMMDD: datetime.strptime(YYMMMDD, r"%y%b%d"))
     # subset to specified stations
     if only_stations:
@@ -921,8 +924,8 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
         print("Number of Maintenance Events:", maint_table.shape[0])
         print("Number of Earthquake-related Events:", eq_table.shape[0])
     # make the dictionaries in form {station: [steptimes]}
-    maint_dict = dict(maint_table.groupby("station")["date"].apply(list))
-    eq_dict = dict(eq_table.groupby("station")["date"].apply(list))
+    maint_dict = dict(maint_table.groupby("station")["time"].apply(list))
+    eq_dict = dict(eq_table.groupby("station")["time"].apply(list))
     # return everything
     return maint_table, maint_dict, eq_table, eq_dict
 

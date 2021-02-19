@@ -1460,7 +1460,7 @@ class Network():
 
     def gui(self, station=None, timeseries=None, model_list=None, sum_models=True,
             verbose=False, annotate_stations=True, save=False, save_map=False,
-            scalogram_kw_args=None, stepdetector={}, trend_kw_args={},
+            scalogram_kw_args=None, mark_events=None, stepdetector={}, trend_kw_args={},
             analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
@@ -1478,6 +1478,7 @@ class Network():
         - start with a station pre-selected,
         - show only a subset of fitted models,
         - sum the models to an aggregate one,
+        - mark events associated with a station's timeseries,
         - restrict the output to a timewindow showing potential steps from multiple sources,
         - color the station markers by RMS and include a colormap,
         - show a scalogram (Model class permitting),
@@ -1518,6 +1519,10 @@ class Network():
             are the names of the timeseries and associated model that are of the
             :class:`~geonat.models.SplineSet` class, and therefore have a
             :meth:`~geonat.models.SplineSet.make_scalogram` method.
+        mark_events : pandas.DataFrame, list, optional
+            If passed, a DataFrame or list of DataFrames that contain the columns
+            ``'station'`` and ``'time'``. For each timestamp, a vertical line is plotted
+            onto the station's timeseries and the relevant entries are printed out.
         stepdetector : dict, optional
             Passing this dictionary will enable the plotting of events related to possible
             steps, both on the map (in case of an earthquake catalog) and in the timeseries
@@ -1588,6 +1593,10 @@ class Network():
         # make sure that if analyze_kw_args is used, 'verbose' is set and True
         if analyze_kw_args:
             analyze_kw_args["verbose"] = True
+
+        # mark_events is mutually exclusive to stepdetector
+        assert not ((mark_events is not None) and stepdetector), \
+            "Functions 'mark_events' and 'stepdetector' are mutually exclusive."
 
         # check the save settings
         if isinstance(save, str):
@@ -1677,6 +1686,21 @@ class Network():
                              f"{key_length:.2g} {trend_unit:s}",
                              coordinates="figure")
             # TODO: plot uncertainty ellipses
+
+        # check if mark_events is either a DataFrame or list of DataFrames,
+        # containing the necessary columns
+        if mark_events is not None:
+            if isinstance(mark_events, pd.DataFrame):
+                assert all([col in mark_events.columns for col in ["station", "time"]]), \
+                    "'mark_events' needs to contain the columns 'station' and 'time'."
+            elif (isinstance(mark_events, list) and
+                  all([isinstance(elem, pd.DataFrame) for elem in mark_events])):
+                assert all([all([col in elem.columns for col in ["station", "time"]])
+                            for elem in mark_events]), "All DataFrames in " + \
+                    "'mark_events' need to contain the columns 'station' and 'time'."
+                mark_events = pd.concat(mark_events, ignore_index=True)
+            else:
+                raise ValueError("Invalid input format for 'mark_events'.")
 
         # prepare stuff for the interactive step plotting
         if stepdetector:
@@ -1804,6 +1828,23 @@ class Network():
                     if scalogram_kw_args is not None:
                         t_left = ts.time[0] if t_left is None else min(ts.time[0], t_left)
                         t_right = ts.time[-1] if t_right is None else max(ts.time[-1], t_right)
+
+            # add vertical lines for events
+            if mark_events is not None:
+                # subset to the station and sort by time
+                mark_subset = mark_events[mark_events["station"] == station_name]
+                mark_subset = mark_subset.sort_values(by="time")
+                # print all events to be plotted
+                print(mark_subset.to_string(), end="\n\n")
+                # loop over axes
+                ax_t_min, ax_t_max = (mpl.dates.num2date(ax_time).replace(tzinfo=None)
+                                      for ax_time in ax_ts[0].get_xlim())
+                mark_subset = mark_subset[(mark_subset["time"] >= ax_t_min) &
+                                          (mark_subset["time"] <= ax_t_max)]
+                if not mark_subset.empty:
+                    for ax in ax_ts:
+                        for _, row in mark_subset.iterrows():
+                            ax.axvline(row["time"])
 
             # plot possible steps
             if stepdetector:
