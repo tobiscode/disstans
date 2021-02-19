@@ -474,7 +474,7 @@ class StepDetector():
             otherwise the relative probability of H0 (which therefore can be ``0`` if H0 is also
             the best hypothesis in general).
         tuple
-            A 2-tuple of the two root-mean-squared residuals of the H0 and H1 hypotheses,
+            A 2-tuple of the two mean-squared residuals of the H0 and H1 hypotheses,
             respectively. Assuming the test is unbiased, this is the residual's variance.
             Is ``NaN`` in an element if the least-squares model did not converge.
 
@@ -525,22 +525,22 @@ class StepDetector():
         try:
             rss0 = float(np.linalg.lstsq(G0, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
-            return 0, 0, (np.NaN, rss1)
+            return 0, 0, (np.NaN, rss1/n_total)
         # now that both models produce results, let's get the AIC_c values
         # we'll again return the H0 if not both models have a valid AIC_c value
         aic = [StepDetector.AIC_c(rss, n_total, dof) for (rss, dof)
                in zip([rss0, rss1], [3, 4])]
         if np.isnan(aic).sum() > 0:
-            return 0, 0, (rss0, rss1)
+            return 0, 0, (rss0/n_total, rss1/n_total)
         # let's check the difference between the two as a measure of evidence
         best_hyp = aic.index(min(aic))
         Delta_best = [a - aic[best_hyp] for a in aic]
         # we will only recommend H1 if it has the both the minimum AIC_c, and
         # the difference to H0 is larger than maxdel
         if (best_hyp == 1) and (Delta_best[0] > maxdel):
-            return 1, Delta_best[0], (rss0, rss1)
+            return 1, Delta_best[0], (rss0/n_total, rss1/n_total)
         else:
-            return 0, Delta_best[best_hyp], (rss0, rss1)
+            return 0, Delta_best[best_hyp], (rss0/n_total, rss1/n_total)
 
     @staticmethod
     def _search(data_and_params):
@@ -568,7 +568,7 @@ class StepDetector():
         # make output arrays
         probs = np.empty((num_observations, num_components))
         probs[:] = np.NaN
-        sd0, sd1 = probs.copy(), probs.copy()
+        var0, var1 = probs.copy(), probs.copy()
         # loop over all columns
         for icomp in range(num_components):
             # loop through all rows, starting with a shrunken kernel at the edges
@@ -586,7 +586,7 @@ class StepDetector():
                                              maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
-                sd0[i, icomp], sd1[i, icomp] = rss0, rss1
+                var0[i, icomp], var1[i, icomp] = rss0, rss1
                 halfwindow += 1
             # Middle region
             assert halfwindow == kernel_size // 2
@@ -601,7 +601,7 @@ class StepDetector():
                                              maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
-                sd0[i, icomp], sd1[i, icomp] = rss0, rss1
+                var0[i, icomp], var1[i, icomp] = rss0, rss1
             # Ending region
             for i in range(num_observations - halfwindow, num_observations):
                 halfwindow -= 1
@@ -615,13 +615,13 @@ class StepDetector():
                                              maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
-                sd0[i, icomp], sd1[i, icomp] = rss0, rss1
+                var0[i, icomp], var1[i, icomp] = rss0, rss1
         # return
         if check_only:
             probs = probs[check_only, :].reshape(-1, num_components)
-            sd0 = sd0[check_only, :].reshape(-1, num_components)
-            sd1 = sd1[check_only, :].reshape(-1, num_components)
-        return probs, sd0, sd1
+            var0 = var0[check_only, :].reshape(-1, num_components)
+            var1 = var1[check_only, :].reshape(-1, num_components)
+        return probs, var0, var1
 
     def search(self, x, y, maxdel=10):
         r"""
@@ -647,11 +647,11 @@ class StepDetector():
         probabilities : numpy.ndarray
             Contains the relative probabilities array.
             Has shape :math:`(\text{num_observations}, \text{num_components})`.
-        sd0 : numpy.ndarray
+        var0 : numpy.ndarray
             Contains the array of the residuals variance of the hypothesis
             that no step is present.
             Has shape :math:`(\text{num_observations}, \text{num_components})`.
-        sd1 : numpy.ndarray
+        var1 : numpy.ndarray
             Contains the array of the residuals variance of the hypothesis
             that a step is present.
             Has shape :math:`(\text{num_observations}, \text{num_components})`.
@@ -693,7 +693,7 @@ class StepDetector():
         step_table : pandas.DataFrame
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
-            over all components for this timestamp), as well as ``sd0`` and ``sd1``
+            over all components for this timestamp), as well as ``var0`` and ``var1``
             (the two hypotheses' residuals variances for the component of
             maximum step probability).
         step_ranges : list
@@ -706,7 +706,7 @@ class StepDetector():
         iterable_input = ((tvec_to_numpycol(station[ts_description].time),
                            station[ts_description].data.values,
                            self.kernel_size, self.kernel_size_min, maxdel) for station in net)
-        for name, station, (probs, sd0, sd1) in \
+        for name, station, (probs, var0, var1) in \
             zip(net.stations.keys(), net.stations.values(),
                 tqdm(parallelize(StepDetector._search, iterable_input), ascii=True,
                      total=net.num_stations, unit="station", desc="Searching for steps")):
@@ -717,17 +717,18 @@ class StepDetector():
             # is present in multiple components
             unique_steps = np.sort(np.unique(np.concatenate(steps)))
             stepprobs = probs[unique_steps, :]
-            stepsd0, stepsd1 = sd0[unique_steps, :], sd1[unique_steps, :]
+            stepsvar0, stepsvar1 = var0[unique_steps, :], var1[unique_steps, :]
             maxprobindices = np.expand_dims(np.argmax(stepprobs, axis=1), axis=1)
             maxstepprobs = np.take_along_axis(stepprobs, maxprobindices, axis=1).squeeze()
-            maxstepsd0 = np.take_along_axis(stepsd0, maxprobindices, axis=1).squeeze()
-            maxstepsd1 = np.take_along_axis(stepsd1, maxprobindices, axis=1).squeeze()
+            maxstepvar0 = np.take_along_axis(stepsvar0, maxprobindices, axis=1).squeeze()
+            maxstepvar1 = np.take_along_axis(stepsvar1, maxprobindices, axis=1).squeeze()
             # isolate the actual timestamps and add to the DataFrame
             steptimes = station[ts_description].time[unique_steps]
             step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
                                                          "time": steptimes,
                                                          "probability": maxstepprobs,
-                                                         "sd0": maxstepsd0, "sd1": maxstepsd1}),
+                                                         "var0": maxstepvar0,
+                                                         "var1": maxstepvar1}),
                                            ignore_index=True)
             # this code could be used to create a model object and assign it to the station
             # mdl = geonat.models.Step(steptimes)
@@ -778,7 +779,7 @@ class StepDetector():
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
             over all components for this timestamp) for each potential step in ``catalog``,
-            as well as ``sd0`` and ``sd1`` (the two hypotheses' residuals variances
+            as well as ``var0`` and ``var1`` (the two hypotheses' residuals variances
             for the component of maximum step probability).
             If a DataFrame was passed as ``catalog``, a copy of that will be returned, with
             the added columns specified above.
@@ -831,40 +832,41 @@ class StepDetector():
         results_iterator = tqdm(parallelize(StepDetector._search, iterable_input),
                                 ascii=True, total=len(stations_overlap), unit="station",
                                 desc="Searching for steps")
-        for name, (probs, sd0, sd1) in zip(stations_overlap, results_iterator):
+        for name, (probs, var0, var1) in zip(stations_overlap, results_iterator):
             # probs now contains a row for each catalog item
             # if the probability is NaN, AIC does not see evidence for a step,
             # if it is a float, then that's the likelihood of a step (always positive)
-            # sd0 and sd1 can contain values regardless of the entry in probs
+            # var0 and var1 can contain values regardless of the entry in probs
             has_steps = np.any(~np.isnan(probs), axis=1)
             maxstepprobs = probs[:, 0]
-            maxstepsd0, maxstepsd1 = sd0[:, 0], sd1[:, 0]
+            maxstepvar0, maxstepvar1 = var0[:, 0], var1[:, 0]
             # maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)
             maxprobindices = np.expand_dims(np.nanargmax(probs[has_steps, :], axis=1), axis=1)
-            maxstepprobs[has_steps], maxstepsd0[has_steps], maxstepsd1[has_steps] = \
+            maxstepprobs[has_steps], maxstepvar0[has_steps], maxstepvar1[has_steps] = \
                 np.take_along_axis(probs[has_steps, :], maxprobindices, axis=1).squeeze(), \
-                np.take_along_axis(sd0[has_steps, :], maxprobindices, axis=1).squeeze(), \
-                np.take_along_axis(sd1[has_steps, :], maxprobindices, axis=1).squeeze()
+                np.take_along_axis(var0[has_steps, :], maxprobindices, axis=1).squeeze(), \
+                np.take_along_axis(var1[has_steps, :], maxprobindices, axis=1).squeeze()
             # isolate the original timestamps and add to the DataFrame
             steptimes = [origtime for i, origtime in enumerate(catalog[name])
                          if catalog_timeexists[name][i]]
             step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
                                                          "time": steptimes,
                                                          "probability": maxstepprobs,
-                                                         "sd0": maxstepsd0, "sd1": maxstepsd1}),
+                                                         "var0": maxstepvar0,
+                                                         "var1": maxstepvar1}),
                                            ignore_index=True)
         # sort dataframe by probability or merge it with the input dataframe
         if augment_df:
             catalog_df["probability"] = np.NaN
-            catalog_df["sd0"] = np.NaN
-            catalog_df["sd1"] = np.NaN
+            catalog_df["var0"] = np.NaN
+            catalog_df["var1"] = np.NaN
             for _, row in step_table.iterrows():
                 row_location = (catalog_df["station"] == row["station"]) & \
                                (catalog_df["time"] == row["time"])
-                catalog_df.loc[row_location, ["probability", "sd0", "sd1"]] = \
-                    row[["probability", "sd0", "sd1"]].values
+                catalog_df.loc[row_location, ["probability", "var0", "var1"]] = \
+                    row[["probability", "var0", "var1"]].values
             if not keep_nan_probs:
-                catalog_df = catalog_df.dropna(how="all", subset=["probability", "sd0", "sd1"])
+                catalog_df = catalog_df.dropna(how="all", subset=["probability", "var0", "var1"])
             step_table = catalog_df
         else:
             step_table.sort_values(by="probability", ascending=False, inplace=True)
