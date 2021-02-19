@@ -1071,8 +1071,8 @@ class SpatialSolver():
 
     def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters=5,
               spatial_reweight_percentile=0.5, spatial_reweight_max_rms=0,
-              spatial_reweight_max_changed=0, local_reweight_iters=1,
-              local_reweight_func="inv", local_reweight_eps=1e-4,
+              spatial_reweight_max_changed=0, continuous_reweight_models=[],
+              local_reweight_iters=1, local_reweight_func="inv", local_reweight_eps=1e-4,
               local_reweight_coupled=True, formal_variance=False, use_data_variance=True,
               use_data_covariance=True, use_internal_scales=False,
               verbose=False, cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
@@ -1112,6 +1112,9 @@ class SpatialSolver():
             flipped between zero and non-zero) falls below a threshold. The threshold
             ``spatial_reweight_max_changed`` is given as the percentage of changed over total
             parameters (including all models and components). Defaults to no early stopping.
+        continuous_reweight_models : list
+            Names of models that should carry over their weights from one solver iteration
+            to the next, but should not be reweighted.
         local_reweight_iters : int, optional
             Number of local reweighting iterations, see ``reweight_max_iters`` in
             :func:`~lasso_regression`.
@@ -1154,6 +1157,15 @@ class SpatialSolver():
             f"to be greater or equal to 0, got {spatial_reweight_max_rms}."
         assert 0 <= float(spatial_reweight_max_changed) <= 1, "'spatial_reweight_max_changed' " \
             f"needs to be between 0 and 1, got {spatial_reweight_max_changed}."
+        if continuous_reweight_models != []:
+            assert isinstance(continuous_reweight_models, list) and \
+                all([isinstance(mdl, str) for mdl in continuous_reweight_models]), \
+                "'continuous_reweight_models' must be a list of model name strings, got " + \
+                f"{continuous_reweight_models}."
+        all_reweight_models = set(spatial_reweight_models + continuous_reweight_models)
+        assert len(all_reweight_models) == len(spatial_reweight_models) + \
+            len(continuous_reweight_models), "'spatial_reweight_models' " + \
+            "and 'continuous_reweight_models' can not have shared elements"
 
         # set up reweighting function
         if isinstance(local_reweight_func, ReweightingFunction):
@@ -1177,6 +1189,9 @@ class SpatialSolver():
                                                          station_lonlat))[:, 0]
             net_avg_closests.append(np.sort(all_distances[i, :])[1:1+4].mean())
         distance_weights = np.exp(-all_distances / np.array(net_avg_closests).reshape(1, -1))
+        # distance_weights is ignoring whether (1) a station actually has data, and
+        # (2) if the spatial extent of the signal we're trying to estimate is correlated
+        # to the station geometry
 
         # first solve, default initial weights
         if verbose:
@@ -1195,12 +1210,13 @@ class SpatialSolver():
                                use_internal_scales=use_internal_scales,
                                cvxpy_kw_args=cvxpy_kw_args)
         num_total = sum([s.models[self.ts_description][m].parameters.size
-                         for s in self.net for m in spatial_reweight_models])
-        num_uniques = np.sum(np.any(np.stack([np.abs(s.models[self.ts_description][m].parameters)
-                                              > eps for s in self.net
-                                              for m in spatial_reweight_models]), axis=0), axis=0)
+                         for s in self.net for m in all_reweight_models])
+        num_uniques = np.sum(np.stack(
+            [np.sum(np.any(np.stack([np.abs(s.models[self.ts_description][m].parameters)
+                                     > eps for s in self.net]), axis=0), axis=0)
+             for m in all_reweight_models]), axis=0)
         num_nonzero = sum([(s.models[self.ts_description][m].parameters.ravel() > eps).sum()
-                           for s in self.net for m in spatial_reweight_models])
+                           for s in self.net for m in all_reweight_models])
         if verbose:
             tqdm.write(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
             tqdm.write("Number of unique reweighted non-zero parameters per component: "
@@ -1214,9 +1230,9 @@ class SpatialSolver():
         list_nonzeros = [np.NaN for _ in range(spatial_reweight_iters + 1)]
         list_nonzeros[0] = num_nonzero
         dict_rms_diff = {m: [np.NaN for _ in range(spatial_reweight_iters)]
-                         for m in spatial_reweight_models}
+                         for m in all_reweight_models}
         dict_num_changed = {m: [np.NaN for _ in range(spatial_reweight_iters)]
-                            for m in spatial_reweight_models}
+                            for m in all_reweight_models}
 
         # track parameters of weights of the reweighted models for early stopping
         old_params = {mdl_description:
@@ -1225,13 +1241,14 @@ class SpatialSolver():
                                                 key_list=station_names,
                                                 stack_variances=False,
                                                 stack_weights=False)[0]
-                      for mdl_description in spatial_reweight_models}
+                      for mdl_description in all_reweight_models}
 
         # iterate
         for i in range(spatial_reweight_iters):
             if verbose:
                 tqdm.write("Updating weights")
             new_net_weights = {statname: {"reweight_init": {}} for statname in station_names}
+            # reweighting spatial models
             for mdl_description in spatial_reweight_models:
                 stacked_weights, = \
                     Solution.aggregate_models(results_dict=results,
@@ -1244,7 +1261,7 @@ class SpatialSolver():
                     if verbose:
                         tqdm.write(f"Stacking model {mdl_description}")
                         # print percentiles
-                        percs = [np.percentile(stacked_weights, q) for q in [5, 50, 95]]
+                        percs = [np.nanpercentile(stacked_weights, q) for q in [5, 50, 95]]
                         tqdm.write(f"Weight percentiles (5-50-95): {percs}")
                     # now apply the spatial median to parameter weights
                     for station_index, name in enumerate(station_names):
@@ -1257,7 +1274,14 @@ class SpatialSolver():
                     for name in station_names:
                         if mdl_description in results[name]:
                             new_net_weights[name]["reweight_init"][mdl_description] = \
-                                results[name][mdl_description]
+                                results[name][mdl_description].weights
+            # copying over the old weights for the continuous models
+            for mdl_description in continuous_reweight_models:
+                for name in station_names:
+                    if mdl_description in results[name]:
+                        new_net_weights[name]["reweight_init"][mdl_description] = \
+                            results[name][mdl_description].weights
+            # next solver step
             if verbose:
                 tqdm.write(f"Solving after {i+1} reweightings")
             results = self.net.fit(self.ts_description, model_list=self.model_list,
@@ -1275,11 +1299,11 @@ class SpatialSolver():
                                    cvxpy_kw_args=cvxpy_kw_args)
             # get statistics
             num_nonzero = sum([(s.models[self.ts_description][m].parameters.ravel() > eps).sum()
-                               for s in self.net for m in spatial_reweight_models])
-            num_uniques = \
-                np.sum(np.any(np.stack([np.abs(s.models[self.ts_description][m].parameters)
-                                        > eps for s in self.net
-                                        for m in spatial_reweight_models]), axis=0), axis=0)
+                               for s in self.net for m in all_reweight_models])
+            num_uniques = np.sum(np.stack(
+                [np.sum(np.any(np.stack([np.abs(s.models[self.ts_description][m].parameters)
+                                        > eps for s in self.net]), axis=0), axis=0)
+                 for m in all_reweight_models]), axis=0)
             # save statistics
             arr_uniques[i+1, :] = num_uniques
             list_nonzeros[i+1] = num_nonzero
@@ -1291,7 +1315,7 @@ class SpatialSolver():
                            + str(num_uniques.tolist()))
             # check for early stopping by comparing parameters that were reweighted
             early_stop = True
-            for mdl_description in spatial_reweight_models:
+            for mdl_description in all_reweight_models:
                 stacked_params, = \
                     Solution.aggregate_models(results_dict=results,
                                               mdl_description=mdl_description,
