@@ -446,6 +446,8 @@ def weighted_median(values, weights, axis=0, percentile=0.5,
         f"Axis {axis} is not a valid index for the shape of 'values' ({values.shape})."
     assert (percentile >= 0) and (percentile <= 1), \
         f"'percentile' must be between 0 and 1, got {percentile}."
+    assert np.all(np.any(~np.isnan(values), axis=axis)), "'values' must at least " + \
+        "contain a single non-NaN element along 'axis' for every other dimension."
     # broadcast the weights
     other_axes = [i for i in range(len(values.shape)) if i != axis]
     weights = np.expand_dims(weights, other_axes)
@@ -453,6 +455,7 @@ def weighted_median(values, weights, axis=0, percentile=0.5,
     sort_indices = np.argsort(values, axis=axis)
     sort_values = np.take_along_axis(values, sort_indices, axis=axis)
     sort_weights = np.take_along_axis(weights, sort_indices, axis=axis)
+    sort_weights *= ~np.isnan(sort_values)  # if there are NaNs, zero out their weights
     # calculate the median cutoff
     cumsum = np.cumsum(sort_weights, axis=axis)
     cutoff = np.sum(sort_weights, axis=axis, keepdims=True) * percentile
