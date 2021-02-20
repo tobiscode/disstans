@@ -1093,7 +1093,7 @@ class RINEXDataHolding():
     def from_folders(cls, folders, verbose=False):
         """
         Convenience class method that creates a new RINEXDataHolding object and directly
-        calls :meth:`~load_db_from_folder`.
+        calls :meth:`~load_db_from_folders`.
 
         For parameter explanations, see the aboce method documention.
         """

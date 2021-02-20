@@ -1280,3 +1280,36 @@ class Arctangent(Model):
         dt = self.tvec_to_numpycol(timevector)
         coefs = np.arctan(dt / self.tau).reshape(-1, 1) / np.pi + 0.5
         return coefs
+
+
+def check_model_dict(models):
+    """
+    Checks whether a dictionary has the appropriate structure to be used to
+    create :class:`~Model` objects.
+
+    Parameters
+    ----------
+    models : dict
+        Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
+        {**kw_args}}}`` that contains the names, types and necessary keyword arguments
+        to create each model object.
+
+    Raises
+    ------
+    AssertionError
+        If the dictionary structure is invalid.
+    """
+    assert all([isinstance(mdl_name, str) for mdl_name in models.keys()]), \
+        f"Model names need to be strings, got {models.keys()}."
+    assert all([isinstance(mdl_cfg, dict) for mdl_cfg in models.values()]), \
+        f"Model configurations need to be dictionaries, got {models.keys()}."
+    for mdl_name, mdl_config in models.items():
+        assert all([key in mdl_config.keys() for key in ["type", "kw_args"]]), \
+            f"The configuration dictionary for '{mdl_name}' needs to contain " \
+            f"the keys 'type' and 'kw_args', got {mdl_config.keys()}."
+        assert isinstance(mdl_config["type"], str), \
+            f"'type' in configuration dictionary for '{mdl_name}' needs to be " \
+            f"a string, got {mdl_config['type']}."
+        assert isinstance(mdl_config["kw_args"], dict), \
+            f"'kw_args' in configuration dictionary for '{mdl_name}' needs to be " \
+            f"a dictionary, got {mdl_config['kw_args']}."

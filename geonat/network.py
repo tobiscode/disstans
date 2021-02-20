@@ -567,22 +567,9 @@ class Network():
         models : dict
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
-            to create each model object.
+            to create each model object (see :func:`~geonat.models.check_model_dict`).
         """
-        assert all([isinstance(mdl_name, str) for mdl_name in models.keys()]), \
-            f"Model names need to be strings, got {models.keys()}."
-        assert all([isinstance(mdl_cfg, dict) for mdl_cfg in models.values()]), \
-            f"Model configurations need to be dictionaries, got {models.keys()}."
-        for mdl_name, mdl_config in models.items():
-            assert all([key in mdl_config.keys() for key in ["type", "kw_args"]]), \
-                f"The configuration dictionary for '{mdl_name}' needs to contain " \
-                f"the keys 'type' and 'kw_args', got {mdl_config.keys()}."
-            assert isinstance(mdl_config["type"], str), \
-                f"'type' in configuration dictionary for '{mdl_name}' needs to be " \
-                f"a string, got {mdl_config['type']}."
-            assert isinstance(mdl_config["kw_args"], dict), \
-                f"'kw_args' in configuration dictionary for '{mdl_name}' needs to be " \
-                f"a dictionary, got {mdl_config['kw_args']}."
+        geonat_models.check_model_dict(models)
         self.default_local_models.update(models)
 
     def add_default_local_models(self, ts_description, models=None):
@@ -673,6 +660,40 @@ class Network():
                     station.add_local_model(ts_description=target_ts,
                                             model_description=model_description,
                                             model=mdl)
+
+    def add_local_models(self, models, ts_description, station_subset=None):
+        """
+        For each station in the network (or a subset thereof), add models
+        to a timeseries using dictionary keywords.
+
+        Parameters
+        ----------
+        models : dict
+            Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
+            {**kw_args}}}`` that contains the names, types and necessary keyword arguments
+            to create each model object (see :func:`~geonat.models.check_model_dict`).
+        ts_description : str
+            Timeseries to add the models to.
+        station_subset : list, optional
+            If provided, only add the models to the stations in this list.
+        """
+        # check input
+        assert isinstance(ts_description, str), \
+            f"'ts_description' must be a string, got {type(ts_description)}."
+        if isinstance(station_subset, list):
+            station_list = [self[stat_name] for stat_name in station_subset]
+            assert len(station_list) > 0, "No valid stations in 'station_subset'."
+        else:
+            station_list = self.stations.values()
+        geonat_models.check_model_dict(models)
+        # loop over stations
+        for station in station_list:
+            for model_description, model_cfg in models.items():
+                local_copy = deepcopy(model_cfg)
+                mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
+                station.add_local_model(ts_description=ts_description,
+                                        model_description=model_description,
+                                        model=mdl)
 
     def copy_uncertainties(self, origin_ts, target_ts):
         """

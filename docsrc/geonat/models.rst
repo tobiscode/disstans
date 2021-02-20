@@ -11,6 +11,8 @@ Model (Parent Class)
    :special-members:
    :private-members: _get_arch, _get_mapping
 
+.. autofunction:: geonat.models.check_model_dict
+
 Basic Models
 ------------
 
