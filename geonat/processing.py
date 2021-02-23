@@ -661,8 +661,8 @@ class StepDetector():
         :meth:`~test_single` : For more explanations about the return values.
         """
         # call individual search function and store result
-        return StepDetector._search(x, y, self.kernel_size,
-                                    self.kernel_size_min, maxdel)
+        return StepDetector._search((x, y, self.kernel_size,
+                                     self.kernel_size_min, maxdel))
 
     def search_network(self, net, ts_description, maxdel=10, threshold=20,
                        gap=2, gap_unit="D"):

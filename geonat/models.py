@@ -1299,9 +1299,11 @@ def check_model_dict(models):
     AssertionError
         If the dictionary structure is invalid.
     """
+    assert isinstance(models, dict), \
+        f"'models' input needs to be a dictionary, got {type(models)}."
     assert all([isinstance(mdl_name, str) for mdl_name in models.keys()]), \
         f"Model names need to be strings, got {models.keys()}."
-    assert all([isinstance(mdl_cfg, dict) for mdl_cfg in models.values()]), \
+    assert all([isinstance(mdl_config, dict) for mdl_config in models.values()]), \
         f"Model configurations need to be dictionaries, got {models.keys()}."
     for mdl_name, mdl_config in models.items():
         assert all([key in mdl_config.keys() for key in ["type", "kw_args"]]), \

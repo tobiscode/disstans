@@ -493,22 +493,13 @@ class Network():
                 station.add_timeseries(ts_description=ts_description, timeseries=ts)
                 # add default local models to station
                 if add_default_local_models:
-                    for model_description, model_cfg in net.default_local_models.items():
-                        local_copy = deepcopy(model_cfg)
-                        mdl_class = getattr(geonat_models, local_copy["type"])
-                        mdl = mdl_class(**local_copy["kw_args"])
-                        station.add_local_model(ts_description=ts_description,
-                                                model_description=model_description,
-                                                model=mdl)
+                    station.add_local_model_kwargs(ts_description=ts_description,
+                                                   model_kw_args=net.default_local_models)
             # add specific local models to station and timeseries
             for ts_description, ts_model_dict in station_cfg["models"].items():
                 if ts_description in station.timeseries:
-                    for model_description, model_cfg in ts_model_dict.items():
-                        mdl_class = getattr(geonat_models, model_cfg["type"])
-                        mdl = mdl_class(**model_cfg["kw_args"])
-                        station.add_local_model(ts_description=ts_description,
-                                                model_description=model_description,
-                                                model=mdl)
+                    station.add_local_model_kwargs(ts_description=ts_description,
+                                                   model_kw_args=ts_model_dict)
                 else:
                     station.unused_models.update({ts_description: ts_model_dict})
             # add to network
@@ -653,13 +644,8 @@ class Network():
                     local_models_subset = {name: model for name, model
                                            in station.unused_models[hidden_ts].items()
                                            if name in models}
-                for model_description, model_cfg in local_models_subset.items():
-                    local_copy = deepcopy(model_cfg)
-                    mdl_class = getattr(geonat_models, local_copy["type"])
-                    mdl = mdl_class(**local_copy["kw_args"])
-                    station.add_local_model(ts_description=target_ts,
-                                            model_description=model_description,
-                                            model=mdl)
+                station.add_local_model_kwargs(ts_description=target_ts,
+                                               model_kw_args=local_models_subset)
 
     def add_local_models(self, models, ts_description, station_subset=None):
         """

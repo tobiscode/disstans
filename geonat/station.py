@@ -277,11 +277,7 @@ class Station():
         self.fits[ts_description] = {}
         self.models[ts_description] = {}
         if add_models is not None:
-            for model_description, model_cfg in add_models.items():
-                local_copy = deepcopy(model_cfg)
-                mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
-                self.add_local_model(ts_description=ts_description,
-                                     model_description=model_description, model=mdl)
+            self.add_local_model_kwargs(ts_description=ts_description, model_kw_args=add_models)
 
     def remove_timeseries(self, ts_description):
         """
@@ -360,6 +356,29 @@ class Station():
             f"'model_dict' needs to be a dictionary, got {type(model_dict)}."
         for mdl_desc, mdl in model_dict.items():
             self.add_local_model(ts_description, mdl_desc, mdl)
+
+    def add_local_model_kwargs(self, ts_description, model_kw_args):
+        """
+        Add models to a timeseries from a dictionary of keyword arguments needed to create
+        them (overwrites the models if they have already been added with the same description).
+
+        Wraps :meth:`~add_local_model`.
+
+        Parameters
+        ----------
+        ts_description : str
+            Timeseries to add the model to.
+        model_kw_args : dict
+            Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
+            {**kw_args}}}`` that contains the names, types and necessary keyword arguments
+            to create each model object.
+        """
+        geonat_models.check_model_dict(model_kw_args)
+        for mdl_desc, mdl_cfg in model_kw_args.items():
+            local_copy = deepcopy(mdl_cfg)
+            mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
+            self.add_local_model(ts_description=ts_description,
+                                 model_description=mdl_desc, model=mdl)
 
     def remove_local_models(self, ts_description, model_descriptions):
         """
