@@ -13,6 +13,8 @@ import cartopy.geodesic as cgeod
 from copy import deepcopy
 from tqdm import tqdm
 from warnings import warn
+from matplotlib.animation import FuncAnimation
+from cartopy.io.ogc_clients import WMTSRasterSource
 
 from . import timeseries as geonat_ts
 from . import models as geonat_models
@@ -2061,3 +2063,180 @@ class Network():
             plt.show()
         del click
         plt.close("all")
+
+    def wormplot(self, ts_description, fname=None, fname_animation=None, subset_stations=None,
+                 t_min=None, t_max=None, lon_min=None, lon_max=None, lat_min=None, lat_max=None,
+                 en_col_names=[0, 1], interval=10, scale=1e2, gui_kw_args={}):
+        """
+        Creates an animated worm plot given the data in a timeseries.
+
+        Parameters
+        ----------
+        ts_description : str, tuple
+            Specifies the timeseries to plot. If a string, the name of a timeseries
+            directly associated with a station, and if a tuple, specifies the timeseries
+            and name of a fitted model for the timeseries.
+        fname : str, optional
+            If set, save the map to this filename, if not (default), show the map interactively.
+        fname_animation : str, optional
+            If specified, make an animation and save the video to this filename.
+        subset_stations : list, optional
+            If set, a list of strings that contains the names of stations to be shown.
+        t_min : str, pandas.Timestamp, optional
+            Start the plot at this time. Defaults to first observation.
+        t_max : str, pandas.Timestamp, optional
+            End the plot at this time. Defaults to last observation.
+        lon_min : float, optional
+            Specify the map's minimum longitude (in degrees).
+        lon_max : float, optional
+            Specify the map's maximum longitude (in degrees).
+        lat_min : float, optional
+            Specify the map's minimum latitude (in degrees).
+        lat_max : float, optional
+            Specify the map's maximum latitude (in degrees).
+        en_col_names : list, optional
+            By default, the first two components of the timeseries will be assumed to be the
+            East and North components, respectively, by having the default value ``[0, 1]``
+            indicating the desired components as integer indices. Alternatively, this can be
+            a list of strings with the two component's column names.
+        scale : float, optional
+            Specify the conversion scale factor for the displacement timeseries to be
+            visible on a map. The final distance for a unit displacement on the map
+            will be (timeseries assumed as meters) times (scale). E.g., for a timeseries
+            in millimeters and a scale of ``1e2`` (default), one millimeter displacement
+            will result in a mapped displacement of 100 meters.
+        interval : int, optional
+            The number of milliseconds each frame is shown (default: ``10``).
+        gui_kw_args : dict, optional
+            Override default GUI settings of :attr:`~geonat.config.defaults`.
+        """
+        # preparations
+        gui_settings = defaults["gui"].copy()
+        gui_settings.update(gui_kw_args)
+        # even if we should show a wmts, we need it to be non-interactive,
+        # and therefore is handled later
+        prev_wmts_show = gui_settings["wmts_show"]
+        gui_settings.update({"wmts_show": False})
+        fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
+            stat_points, stat_lats, stat_lons = \
+            self._create_map_figure(gui_settings, True, subset_stations)
+        gui_settings.update({"wmts_show": prev_wmts_show})
+
+        # set map extent
+        ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
+        cur_lon_min, cur_lat_min = \
+            proj_lla.transform_point(ax_map_xmin, ax_map_ymin, proj_gui)
+        cur_lon_max, cur_lat_max = \
+            proj_lla.transform_point(ax_map_xmax, ax_map_ymax, proj_gui)
+        map_extent_lonlat = [cur_lon_min, cur_lon_max, cur_lat_min, cur_lat_max]
+        if any([lon_min, lon_max, lat_min, lat_max]):
+            map_extent_lonlat = [new_val if new_val else cur_val for cur_val, new_val in
+                                 zip(map_extent_lonlat, [lon_min, lon_max, lat_min, lat_max])]
+            ax_map.set_extent(map_extent_lonlat, crs=proj_lla)
+
+        # collect all the relevant data and subset to time
+        network_df = self.export_network_ts(ts_description, subset_stations)
+        if isinstance(en_col_names, list) and (len(en_col_names) == 2) and \
+           all([isinstance(comp, int) for comp in en_col_names]):
+            col_east, col_north = np.array(list(network_df.keys()))[en_col_names].tolist()
+        elif (isinstance(en_col_names, list) and (len(en_col_names) == 2) and
+              all([isinstance(comp, str) for comp in en_col_names])):
+            col_east, col_north = en_col_names
+        else:
+            raise ValueError("'en_col_names' needs to be a two-element list of integers or "
+                             f"strings, got {en_col_names}.")
+
+        # for each station, get displacement timeseries for the east and north components
+        # these two dataframes will have a column for each station
+        disp_x, disp_y = network_df[col_east], network_df[col_north]
+        t_min = t_min if t_min else disp_x.time.min()
+        t_max = t_max if t_max else disp_x.time.max()
+        disp_x.cut(t_min=t_min, t_max=t_max)
+        disp_y.cut(t_min=t_min, t_max=t_max)
+
+        # remove all-nan stations and reference to first observation
+        nan_x = disp_x.data.columns[disp_x.data.isna().all()].tolist()
+        nan_y = disp_y.data.columns[disp_y.data.isna().all()].tolist()
+        nan_stations = set(nan_x + nan_y)
+        rel_disp_x = {}
+        rel_disp_y = {}
+        for name in disp_x.data_cols:
+            if name in nan_stations:
+                continue
+            rel_disp_x[name] = disp_x[name] - disp_x[name][~np.isnan(disp_x[name])][0]
+            rel_disp_y[name] = disp_y[name] - disp_y[name][~np.isnan(disp_y[name])][0]
+
+        # get times and respective colors
+        reltimes = ((disp_x.time - disp_x.time[0]) / pd.Timedelta(1, "D")).values
+        reltimes = (reltimes - reltimes[0])/(reltimes[-1] - reltimes[0])
+        relcolors = scm.batlow(reltimes)
+        relcolors[:, 3] = 0
+
+        # get direction of displacement
+        geoid = cgeod.Geodesic()
+        stat_lonlats = {name: np.array(self[name].location)[[1, 0]].reshape(1, 2)
+                        for name in rel_disp_x.keys()}
+        azi = {name: 90 - np.arctan2(rel_disp_y[name], rel_disp_x[name])*180/np.pi
+               for name in rel_disp_x.keys()}
+        dist = {name: np.sqrt(rel_disp_x[name]**2 + rel_disp_y[name]**2)
+                for name in rel_disp_x.keys()}
+        disp_latlon = \
+            {name: np.array(geoid.direct(stat_lonlats[name], azi[name],
+                                         dist[name]*scale)[:, :2])
+             for name in rel_disp_x.keys()}
+        lines = \
+            {name: ax_map.scatter(disp_latlon[name][:, 0], disp_latlon[name][:, 1],
+                                  facecolor=relcolors, edgecolor="none", zorder=1,
+                                  transform=proj_lla)
+             for name in rel_disp_x.keys()}
+
+        # add static background image and gridlines
+        if gui_settings["wmts_show"]:
+            try:
+                src = WMTSRasterSource(wmts=gui_settings["wmts_server"],
+                                       layer_name=gui_settings["wmts_layer"])
+                bbox = ax_map.get_window_extent().transformed(fig_map.dpi_scale_trans.inverted())
+                width_height_px = round(bbox.width*fig_map.dpi), round(bbox.height*fig_map.dpi)
+                imgs = src.fetch_raster(proj_gui, ax_map.get_extent(), width_height_px)
+                for img in imgs:
+                    ax_map.imshow(img.image, origin="upper", zorder=-1,
+                                  extent=img.extent, alpha=gui_settings["wmts_alpha"])
+            except Exception as exc:
+                print(exc)
+        ax_map.gridlines(draw_labels=True)
+
+        # only animate if respective output filename is set
+        if fname_animation:
+
+            # define animation functions
+            def init():
+                relcolors[:, 3] = 0
+                return lines.values()
+
+            def update(i):
+                relcolors[:i+1, 3] = 1
+                for name in rel_disp_x.keys():
+                    lines[name].set_facecolors(relcolors)
+                return lines.values()
+
+            # make actual animation
+            try:
+                pbar = tqdm(desc="Rendering animation", unit="frame",
+                            total=relcolors.shape[0], ascii=True)
+                ani = FuncAnimation(fig_map, update, frames=relcolors.shape[0],
+                                    init_func=init, interval=interval, blit=True)
+                ani.save(fname_animation, progress_callback=lambda i, n: pbar.update())
+            finally:
+                pbar.close()
+
+        # save figure at the last stage if output filename is set, otherwise show
+        relcolors[:, 3] = 1
+        for name in rel_disp_x.keys():
+            lines[name].set_facecolors(relcolors)
+        if fname:
+            fig_map.savefig(fname)
+        else:
+            plt.show()
+
+        # close figure
+        plt.close(fig_map)
