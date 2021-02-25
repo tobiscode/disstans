@@ -239,16 +239,20 @@ class Network():
         """
         return self.num_stations
 
-    def export_network_ts(self, ts_description):
+    def export_network_ts(self, ts_description, subset_stations=None):
         """
         Collects a specific timeseries from all stations and returns them in a dictionary
         of network-wide :class:`~geonat.timeseries.Timeseries` objects.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description : str, tuple
             :class:`~geonat.timeseries.Timeseries` description that will be collected
-            from all stations in the network.
+            from all stations in the network. If a tuple, specifies the timeseries
+            and name of a fitted model for the timeseries at each station.
+        subset_stations : list, optional
+            If set, this is a list of station names to include in the output, all
+            other stations will be ignored.
 
         Returns
         -------
@@ -262,13 +266,35 @@ class Network():
         import_network_ts : Inverse function.
         """
         df_dict = {}
-        for name, station in self.stations.items():
-            if ts_description in station.timeseries:
-                if df_dict == {}:
-                    network_data_cols = station[ts_description].data_cols
-                    network_src = station[ts_description].src
-                    network_unit = station[ts_description].data_unit
-                df_dict.update({name: station[ts_description].data.astype(pd.SparseDtype())})
+        if isinstance(ts_description, str):
+            ts_is_timeseries = True
+        elif isinstance(ts_description, tuple):
+            assert all([isinstance(t, str) for t in ts_description]), \
+                "When specifying a timeseries and model name tuple, each component " \
+                f"must be a string (got {ts_description})."
+            ts_model_ts, ts_model_name = ts_description
+            ts_is_timeseries = False
+        else:
+            raise ValueError("Unrecognized input type for 'ts_description': "
+                             f"{type(ts_description)}.")
+        if subset_stations:
+            stat_names = subset_stations
+        else:
+            stat_names = self.station_names
+        for name in stat_names:
+            station = self[name]
+            if ts_is_timeseries and (ts_description in station.timeseries):
+                ts = station[ts_description]
+            elif ((not ts_is_timeseries) and (ts_model_ts in station.fits)
+                  and (ts_model_name in station.fits[ts_model_ts])):
+                ts = station.fits[ts_model_ts][ts_model_name]
+            else:
+                continue
+            if df_dict == {}:
+                network_data_cols = ts.data_cols
+                network_src = ts.src
+                network_unit = ts.data_unit
+            df_dict.update({name: ts.data.astype(pd.SparseDtype())})
         if df_dict == {}:
             raise ValueError(f"No data found in network '{self.name}' "
                              f"for timeseries '{ts_description}'.")
@@ -1354,17 +1380,22 @@ class Network():
                             index=self.station_names,
                             columns=metrics_components).rename_axis("Station")
 
-    def _create_map_figure(self, gui_settings, annotate_stations):
+    def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
         # get location data and projections
-        stat_lats = [station.location[0] for station in self]
-        stat_lons = [station.location[1] for station in self]
-        stat_names = self.station_names
+        if subset_stations:
+            stat_names = subset_stations
+            stat_list = [self[staname] for staname in stat_names]
+        else:
+            stat_names = self.station_names
+            stat_list = self.stations.values()
+        stat_lats = [station.location[0] for station in stat_list]
+        stat_lons = [station.location[1] for station in stat_list]
         proj_gui = getattr(ccrs, gui_settings["projection"])()
         proj_lla = ccrs.PlateCarree()
         # create figure and plot stations
         fig_map = plt.figure()
         ax_map = fig_map.add_subplot(projection=proj_gui)
-        default_station_edges = ['none'] * len(stat_lats)
+        default_station_edges = ['none'] * len(stat_names)
         stat_points = ax_map.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
                                      linestyle='None', marker='.', transform=proj_lla,
                                      edgecolor=default_station_edges, zorder=1000)
