@@ -210,8 +210,7 @@ class Solution(Mapping):
         Defaults to all ``True``, which implies that
         :math:`\text{num_parameters} = \text{num_solved}`.
     reg_indices : numpy.ndarray, optional
-        Regularization mask of shape
-        :math:`(\text{num_solved}, \text{num_components})`
+        Regularization mask of shape :math:`(\text{num_solved}, )`
         with ``True`` where a parameter was subject to regularization,
         and ``False`` otherwise. Defaults to all ``False``.
 
@@ -878,7 +877,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             rw_func = ReweightingFunction.from_name(reweight_func, reweight_eps)
 
     # solve CVXPY problem while checking for convergence
-    def solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps, init_weights=init_weights):
+    def solve_problem(GtWG, GtWd, reg_indices, num_comps, init_weights):
         # build objective function
         m = cp.Variable(GtWd.size)
         objective = cp.norm2(GtWG @ m - GtWd)
@@ -989,7 +988,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                                                use_data_var=use_data_variance,
                                                use_data_cov=use_data_covariance)
         reg_indices = np.repeat(reg_indices, num_comps)
-        solution, weights = solve_problem(GtWG, GtWd, reg_indices)
+        solution, weights = solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps,
+                                          init_weights=init_weights.ravel()
+                                          if init_weights is not None else None)
         # store results
         if solution is None:
             params = np.empty((num_params, num_comps))
@@ -1012,6 +1013,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 var = var.reshape(num_params, num_comps)
             if regularize and return_weights:
                 weights = weights.reshape(num_reg, num_comps)
+        # restore reg_indices' original shape
+        reg_indices = reg_indices[::num_comps]
 
     # create solution object and return
     return Solution(models=models, parameters=params, variances=var, weights=weights,
