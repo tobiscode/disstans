@@ -2066,7 +2066,8 @@ class Network():
 
     def wormplot(self, ts_description, fname=None, fname_animation=None, subset_stations=None,
                  t_min=None, t_max=None, lon_min=None, lon_max=None, lat_min=None, lat_max=None,
-                 en_col_names=[0, 1], interval=10, scale=1e2, gui_kw_args={}):
+                 en_col_names=[0, 1], scale=1e2, interval=10, annotate_stations=True,
+                 gui_kw_args={}):
         """
         Creates an animated worm plot given the data in a timeseries.
 
@@ -2107,6 +2108,8 @@ class Network():
             will result in a mapped displacement of 100 meters.
         interval : int, optional
             The number of milliseconds each frame is shown (default: ``10``).
+        annotate_stations : bool, optional
+            If ``True`` (default), add the station names to the map.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         """
@@ -2119,7 +2122,7 @@ class Network():
         gui_settings.update({"wmts_show": False})
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = \
-            self._create_map_figure(gui_settings, True, subset_stations)
+            self._create_map_figure(gui_settings, annotate_stations, subset_stations)
         gui_settings.update({"wmts_show": prev_wmts_show})
 
         # set map extent

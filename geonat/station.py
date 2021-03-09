@@ -408,6 +408,8 @@ class Station():
                      category=RuntimeWarning)
             else:
                 del self.models[ts_description][mdl_desc]
+                if mdl_desc in self.fits[ts_description]:
+                    del self.fits[ts_description][mdl_desc]
 
     def add_fit(self, ts_description, model_description, fit):
         """

@@ -736,10 +736,13 @@ class StepDetector():
         # sort dataframe by probability
         step_table.sort_values(by="probability", ascending=False, inplace=True)
         # get the consecutive steptime ranges
-        unique_steps = np.sort(step_table["time"].unique())
-        split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
-        split = np.concatenate([0, split + 1], axis=None)
-        step_ranges = [unique_steps[split[i]:split[i + 1]] for i in range(split.size - 1)]
+        if not step_table.empty:
+            unique_steps = np.sort(step_table["time"].unique())
+            split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
+            split = np.concatenate([0, split + 1], axis=None)
+            step_ranges = [unique_steps[split[i]:split[i + 1]] for i in range(split.size - 1)]
+        else:
+            step_ranges = []
         return step_table, step_ranges
 
     def search_catalog(self, net, ts_description, catalog, threshold=None,

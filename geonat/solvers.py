@@ -291,7 +291,8 @@ class Solution(Mapping):
                 if num_solved_reg > 0:
                     w = np.empty((model.num_parameters, num_components))
                     w[:] = np.NaN
-                    w[np.flatnonzero(mask)[mask_reg], :] = weights[ix_reg:ix_reg+num_solved_reg, :]
+                    w[np.flatnonzero(mask)[mask_reg], :] = \
+                        weights[ix_reg:ix_reg+num_solved_reg, :]
                 ix_reg += num_solved_reg
             ix_model += model.num_parameters
             ix_sol += num_solved
@@ -988,7 +989,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                                                use_data_var=use_data_variance,
                                                use_data_cov=use_data_covariance)
         reg_indices = np.repeat(reg_indices, num_comps)
-        solution, weights = solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps,
+        solution, wts = solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps,
                                           init_weights=init_weights.ravel()
                                           if init_weights is not None else None)
         # store results
@@ -1012,7 +1013,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 var[best_ind, :] = np.diag(np.linalg.pinv(GtWG))
                 var = var.reshape(num_params, num_comps)
             if regularize and return_weights:
-                weights = weights.reshape(num_reg, num_comps)
+                weights = wts.reshape(num_reg, num_comps)
         # restore reg_indices' original shape
         reg_indices = reg_indices[::num_comps]
 
