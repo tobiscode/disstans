@@ -32,8 +32,7 @@ from .earthquakes import okada_displacement
 class Network():
     r"""
     Main class of GeoNAT. Contains information about the network, defines defaults,
-    contains global models, and most improtantly, contains a dictionary of all
-    stations in the network.
+    and most improtantly, contains a dictionary of all stations in the network.
 
     Parameters
     ----------
@@ -426,46 +425,6 @@ class Network():
         else:
             del self.stations[name]
 
-    def add_global_model(self, mdl_description, model):
-        """
-        Add a global model to the network.
-
-        Parameters
-        ----------
-        mdl_description : str
-            Description of the model.
-        model : geonat.models.Model
-            Model object to add.
-
-        Warning
-        -------
-        Global models have not been implemented yet.
-        """
-        if not isinstance(mdl_description, str):
-            raise TypeError("Cannot add new global model: 'mdl_description' is not a string.")
-        if mdl_description in self.global_models:
-            warn(f"Overwriting global model '{mdl_description}'.", category=RuntimeWarning)
-        self.global_models[mdl_description] = model
-
-    def remove_global_model(self, mdl_description):
-        """
-        Remove a global model from the network.
-
-        Parameters
-        ----------
-        mdl_description : str
-            Description of the model.
-
-        Warning
-        -------
-        Global models have not been implemented yet.
-        """
-        if mdl_description not in self.global_models:
-            warn(f"Cannot find global model '{mdl_description}', couldn't delete.",
-                 category=RuntimeWarning)
-        else:
-            del self.global_models[mdl_description]
-
     @classmethod
     def from_json(cls, path, add_default_local_models=True,
                   station_kw_args={}, timeseries_kw_args={}):
@@ -532,11 +491,6 @@ class Network():
                     station.unused_models.update({ts_description: ts_model_dict})
             # add to network
             net.add_station(name=station_name, station=station)
-        # add global models
-        for model_description, model_cfg in net_arch["global_models"].items():
-            mdl_class = getattr(geonat_models, model_cfg["type"])
-            mdl = mdl_class(**model_cfg["kw_args"])
-            net.add_global_model(mdl_description=model_description, model=mdl)
         return net
 
     def to_json(self, path):
@@ -570,9 +524,6 @@ class Network():
                         del stat_arch["models"][ts_description][model_description]
             # now we can append it to the main json
             net_arch["stations"].update({stat_name: stat_arch})
-        # add global model representations
-        for model_description, mdl in self.global_models.items():
-            net_arch["global_models"].update({model_description: mdl.get_arch()})
         # write file
         json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
 
