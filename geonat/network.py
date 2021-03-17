@@ -660,6 +660,25 @@ class Network():
                                         model_description=model_description,
                                         model=mdl)
 
+    def remove_timeseries(self, *ts_to_remove):
+        """
+        Convenience function that scans all stations for timeseries of given names
+        and removes them (together with models and fits).
+
+        Parameters
+        ----------
+        *ts_to_remove : list
+            Pass all timeseries to remove as function arguments.
+
+        See Also
+        --------
+        geonat.station.Station.remove_timeseries : Station-specific equivalent
+        """
+        for station in self:
+            for ts_description in ts_to_remove:
+                if ts_description in station.timeseries:
+                    station.remove_timeseries(ts_description)
+
     def copy_uncertainties(self, origin_ts, target_ts):
         """
         Convenience function that copies the uncertainties of one timeseries
