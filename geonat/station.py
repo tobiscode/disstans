@@ -519,7 +519,8 @@ class Station():
         return fit_sum, fit_sum_var
 
     def analyze_residuals(self, ts_description, verbose=False, t_start=None, t_end=None,
-                          mean=False, std=False, rms=False, n_observations=False, std_outlier=0):
+                          mean=False, std=False, rms=False, n_observations=False,
+                          std_outlier=0, max_rolling_mean=0):
         """
         Analyze, print and return the residuals of a station's timeseries according
         to certain metrics defined in the arguments.
@@ -560,6 +561,11 @@ class Station():
             by the number of standard deviations they are away from the mean.
             Adds the key ``'Outliers'`` to the output dictionary.
             Defaults to ``0``.
+        max_rolling_mean : int, optional
+            If ``max_rolling_mean > 0``, calculate the maximum of the rolling mean
+            with window size ``max_rolling_mean`` for each component. If this is
+            siginificantly different from the general mean, this is an indicator
+            of model inadequacies, as not all the data trends can be captured.
 
         Returns
         -------
@@ -603,6 +609,11 @@ class Station():
             temp -= np.mean(temp, axis=0, keepdims=True)
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
+        if max_rolling_mean > 0:
+            max_rolling_mean = np.atleast_1d(np.nanmax(np.abs(
+                ts.rolling(max_rolling_mean, min_periods=max_rolling_mean//2)
+                .mean().values), axis=0))
+            results["Maximum Rolling Mean"] = max_rolling_mean
         # print if any statistic was recorded
         if verbose and results:
             print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
