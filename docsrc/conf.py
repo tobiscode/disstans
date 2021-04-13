@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import datetime
 import sphinx_rtd_theme  # noqa: F401
 sys.path.insert(0, os.path.abspath('..'))
 from geonat import __version__ as geonat_version  # noqa: E402
@@ -20,8 +21,8 @@ from geonat import __version__ as geonat_version  # noqa: E402
 # -- Project information -----------------------------------------------------
 
 project = 'GeoNAT'
-copyright = '2020, Tobias Köhne'
 author = 'Tobias Köhne'
+copyright = f'{datetime.datetime.now().year}, {author}'
 version = geonat_version
 
 # The full version, including alpha/beta/rc tags

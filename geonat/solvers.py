@@ -1076,8 +1076,8 @@ class SpatialSolver():
             from zero to non-zero or vice-versa.
         list_res_stats : list
             (Only present if ``verbose=2`` in :meth:`~solve`.)
-            List of the results dataframe returned by :meth:`~networ.analyze_residuals`
-            for each iteration.
+            List of the results dataframe returned by
+            :meth:`~geonat.network.Network.analyze_residuals` for each iteration.
         dict_cors : dict
             (Only present if ``verbose=2`` in :meth:`~solve`.)
             For each of the reweighting models, contains a list of spatial correlation
