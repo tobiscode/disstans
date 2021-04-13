@@ -401,17 +401,21 @@ class ReweightingFunction(ABC):
     ----------
     eps : int, float
         Stability parameter to use for the reweighting function.
+    scale : float, optional
+        Scale parameter applied to reweighting result.
     """
-    def __init__(self, eps):
+    def __init__(self, eps, scale=1):
         self.eps = float(eps)
         """ Stability parameter to use for the reweighting function. """
+        self.scale = float(scale)
+        """ Scaling factor applied to reweighting result. """
 
     @abstractmethod
     def __call__(self, value):
         pass
 
     @staticmethod
-    def from_name(name, eps):
+    def from_name(name, *args, **kw_args):
         """
         Search the local namespace for a reweighting function of that name
         and return an initialized instance of it.
@@ -420,8 +424,10 @@ class ReweightingFunction(ABC):
         ----------
         name : str
             Name (or abbreviation) of the reweighting function.
-        eps : float
-            Stability parameter of the reweighting function.
+        *args : list
+            Argument list passed on to function initialization.
+        **kw_args : dict
+            Keyword arguments passed on to function initialization.
 
         Returns
         -------
@@ -429,11 +435,11 @@ class ReweightingFunction(ABC):
             An instantiated reweighting function object.
         """
         if name in ["inv", "InverseReweighting"]:
-            return InverseReweighting(eps)
+            return InverseReweighting(*args, **kw_args)
         elif name in ["inv_sq", "InverseSquaredReweighting"]:
-            return InverseSquaredReweighting(eps)
+            return InverseSquaredReweighting(*args, **kw_args)
         elif name in ["log", "LogarithmicReweighting"]:
-            return LogarithmicReweighting(eps)
+            return LogarithmicReweighting(*args, **kw_args)
         else:
             raise NotImplementedError(f"The reweighting function {name} "
                                       "could not be found.")
@@ -452,7 +458,7 @@ class InverseReweighting(ReweightingFunction):
         m : numpy.ndarray
             :math:`\mathbf{m}`
         """
-        return 1/(np.abs(m) + self.eps)
+        return self.scale / (np.abs(m) + self.eps)
 
 
 class InverseSquaredReweighting(ReweightingFunction):
@@ -468,7 +474,7 @@ class InverseSquaredReweighting(ReweightingFunction):
         m : numpy.ndarray
             :math:`\mathbf{m}`
         """
-        return 1/(m**2 + self.eps**2)
+        return self.scale / (m**2 + self.eps**2)
 
 
 class LogarithmicReweighting(ReweightingFunction):
@@ -495,7 +501,8 @@ class LogarithmicReweighting(ReweightingFunction):
         """
         mags = np.abs(m)
         size = mags.size
-        return np.log((mags.sum() + size*self.eps) / (mags + self.eps)) / np.log(size)
+        weight = np.log((mags.sum() + size*self.eps) / (mags + self.eps)) / np.log(size)
+        return self.scale * weight
 
 
 def linear_regression(ts, models, formal_variance=False, cached_mapping=None,
@@ -584,8 +591,7 @@ def linear_regression(ts, models, formal_variance=False, cached_mapping=None,
 
 
 def ridge_regression(ts, models, penalty, formal_variance=False, cached_mapping=None,
-                     use_data_variance=True, use_data_covariance=True,
-                     use_internal_scales=False):
+                     use_data_variance=True, use_data_covariance=True):
     r"""
     Performs linear, L2-regularized least squares using :mod:`~scipy.sparse.linalg`.
 
@@ -990,8 +996,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                                                use_data_cov=use_data_covariance)
         reg_indices = np.repeat(reg_indices, num_comps)
         solution, wts = solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps,
-                                          init_weights=init_weights.ravel()
-                                          if init_weights is not None else None)
+                                      init_weights=init_weights.ravel()
+                                      if init_weights is not None else None)
         # store results
         if solution is None:
             params = np.empty((num_params, num_comps))
