@@ -343,11 +343,12 @@ class Timeseries():
         # return ratio
         return self.num_observations / exp_obs
 
-    def cut(self, t_min=None, t_max=None, i_min=None, i_max=None):
+    def cut(self, t_min=None, t_max=None, i_min=None, i_max=None, keep_inside=True):
         """
         Cut the timeseries to contain only data between certain times or indices.
         If both a minimum (maximum) timestamp or index is provided, the later (earlier,
         respectively) one is used (i.e., the more restrictive one).
+        Also provides the reverse operation, i.e. only removing data between dates.
 
         This operation is changes the timeseries in-place; if it should be done on a
         new timeseries, use :meth:`~copy` first.
@@ -364,6 +365,9 @@ class Timeseries():
             The index of the earliest observation to keep.
         i_max : int, optional
             The index of the latest observation to keep.
+        keep_inside : bool, optional
+            If ``True`` (default), keeps data inside of the specified date range.
+            If ``False``, keeps only data outside the specified date range.
         """
         assert any([t_min, t_max, i_min, i_max]), "No cutting operation defined."
         # convert to timestamps (if not already)
@@ -389,7 +393,10 @@ class Timeseries():
         else:
             cut_max = self.time[-1]
         # cut the dataframe directly
-        self._df = self._df[(self.time >= cut_min) & (self.time <= cut_max)]
+        if keep_inside:
+            self._df = self._df[(self.time >= cut_min) & (self.time <= cut_max)]
+        else:
+            self._df = self._df[(self.time < cut_min) | (self.time > cut_max)]
 
     def add_uncertainties(self, timeseries=None,
                           var_data=None, var_cols=None, cov_data=None, cov_cols=None):
