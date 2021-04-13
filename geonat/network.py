@@ -773,7 +773,8 @@ class Network():
         return common_mapping
 
     def fit(self, ts_description, model_list=None, solver='linear_regression',
-            cached_mapping=True, local_input={}, return_solutions=False, **kw_args):
+            cached_mapping=True, local_input={}, return_solutions=False,
+            progress_desc=None, **kw_args):
         """
         Fit the models (or a subset thereof) for a specific timeseries at all stations,
         and read the fitted parameters into the station's model objects.
@@ -805,6 +806,8 @@ class Network():
         return_solutions : bool, optional
             If ``True`` (default: ``False``), return a dictionary of all solutions produced
             by the calls to the solver function.
+        progress_desc : str, optional
+            If provided, override the description of the progress bar.
         **kw_args : dict
             Additional keyword arguments that are passed on to the solver function.
 
@@ -847,6 +850,7 @@ class Network():
         if isinstance(solver, str):
             solver = getattr(geonat_solvers, solver)
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
+        progress_desc = str(progress_desc) if progress_desc else "Fitting station models"
         # get common mapping matrices
         if cached_mapping:
             kw_args["cached_mapping"] = self.common_mapping(ts_description)
@@ -862,8 +866,7 @@ class Network():
         if return_solutions:
             solutions = {}
         for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
-                                        desc="Fitting station models",
-                                        total=len(self.stations),
+                                        desc=progress_desc, total=len(self.stations),
                                         ascii=True, unit="station")):
             stat_ts = self[station_names[i]].models[ts_description]
             # print warning if the solver didn't converge
@@ -885,7 +888,7 @@ class Network():
         return solver(station_time, station_models, **kw_args)
 
     def evaluate(self, ts_description, model_list=None, timevector=None,
-                 output_description=None, reuse=False):
+                 output_description=None, reuse=False, progress_desc=None):
         """
         Evaluate a timeseries' models (or a subset thereof) at all stations and add them
         as a fit to the timeseries. Can optionally add the aggregate model as an independent
@@ -913,6 +916,8 @@ class Network():
             If ``timevector`` is ``None`` and ``output_description`` is set, this flag can
             be used to skip the actual evaluation of the models if they have already been
             added as fits, and instead use those fitted timeseries instead.
+        progress_desc : str, optional
+            If provided, override the description of the progress bar.
 
         Example
         -------
@@ -950,6 +955,7 @@ class Network():
             assert output_description is not None, \
                 "When reusing a previous model evaluation, 'output_description' " \
                 "must be set (otherwise nothing would happen)."
+        progress_desc = str(progress_desc) if progress_desc else "Evaluating station models"
         # should directly use fit from station timeseries, skip evaluation.
         # can only be used if the timeseries' timevector is used
         # (and wouldn't do anything if output_description is None)
@@ -986,9 +992,8 @@ class Network():
             station_names = self.station_names
             for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station,
                                                         iterable_inputs),
-                                            desc="Evaluating station models",
-                                            total=len(self.stations), ascii=True,
-                                            unit="station")):
+                                            desc=progress_desc, total=len(self.stations),
+                                            ascii=True, unit="station")):
                 stat_name = station_names[i]
                 for imodel, (model_description, fit) in enumerate(result.items()):
                     ts = self[stat_name].add_fit(ts_description, model_description, fit)
@@ -1014,7 +1019,7 @@ class Network():
     def fitevalres(self, ts_description, model_list=None, solver='linear_regression',
                    cached_mapping=True, local_input={}, return_solutions=False,
                    timevector=None, output_description=None, reuse=False,
-                   residual_description=None, **kw_args):
+                   residual_description=None, progress_desc=None, **kw_args):
         """
         Convenience method that combines the calls for :meth:`~fit`, :meth:`~evaluate`
         and :meth:`~math` (to compute the fit residual) into one method call.
@@ -1042,6 +1047,10 @@ class Network():
         residual_description : str, optional
             If provided, calculate the residual as the difference between the data and
             the model fit, and store it as the timeseries ``residual_description``.
+        progress_desc : list, tuple, optional
+            If provided, set ``progress_desc`` of :meth:`~fit` and :meth:`~evaluate`
+            using the first or second element of a tuple or list, respectively.
+            Leave ``None`` if only overriding one of them.
         **kw_args : dict
             Additional keyword arguments that are passed on to the solver function,
             see :meth:`~fit`.
@@ -1077,15 +1086,21 @@ class Network():
         :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
         geonat.tools.parallelize : Automatically execute a function in parallel or serial.
         """
+        if progress_desc is not None:
+            assert (isinstance(progress_desc, tuple) or isinstance(progress_desc, list)) \
+                   and (len(progress_desc) == 2), "If 'progress_desc' is not None, it needs " \
+                   f"to be a 2-element tuple or list, got {progress_desc}."
+        else:
+            progress_desc = [None, None]
         # fit
         possible_output = self.fit(ts_description=ts_description, model_list=model_list,
                                    solver=solver, cached_mapping=cached_mapping,
                                    local_input=local_input, return_solutions=return_solutions,
-                                   **kw_args)
+                                   progress_desc=progress_desc[0], **kw_args)
         # evaluate
         self.evaluate(ts_description=ts_description, model_list=model_list,
                       timevector=timevector, output_description=output_description,
-                      reuse=reuse)
+                      reuse=reuse, progress_desc=progress_desc[0])
         # residual
         if residual_description:
             self.math(residual_description, ts_description, "-", output_description)
