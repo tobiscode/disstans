@@ -520,7 +520,7 @@ class Station():
 
     def analyze_residuals(self, ts_description, verbose=False, t_start=None, t_end=None,
                           mean=False, std=False, rms=False, n_observations=False,
-                          std_outlier=0, max_rolling_mean=0):
+                          std_outlier=0, max_rolling_dev=0):
         """
         Analyze, print and return the residuals of a station's timeseries according
         to certain metrics defined in the arguments.
@@ -561,11 +561,12 @@ class Station():
             by the number of standard deviations they are away from the mean.
             Adds the key ``'Outliers'`` to the output dictionary.
             Defaults to ``0``.
-        max_rolling_mean : int, optional
-            If ``max_rolling_mean > 0``, calculate the maximum of the rolling mean
-            with window size ``max_rolling_mean`` for each component. If this is
-            siginificantly different from the general mean, this is an indicator
-            of model inadequacies, as not all the data trends can be captured.
+        max_rolling_dev : int, optional
+            If ``max_rolling_dev > 0``, calculate the (sign-aware) maximum of the
+            rolling deviation from the mean with window size ``max_rolling_dev`` for
+            each component. If this is significantly larger than the standard deviation,
+            this is an indicator of model inadequacies, as not all the data trends can
+            be captured.
 
         Returns
         -------
@@ -609,11 +610,18 @@ class Station():
             temp -= np.mean(temp, axis=0, keepdims=True)
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
-        if max_rolling_mean > 0:
-            max_rolling_mean = np.atleast_1d(np.nanmax(np.abs(
-                ts.rolling(max_rolling_mean, min_periods=max_rolling_mean//2)
-                .mean().values), axis=0))
-            results["Maximum Rolling Mean"] = max_rolling_mean
+        if max_rolling_dev > 0:
+            roll_mean = (ts - ts.mean()).rolling(max_rolling_dev,
+                                                 min_periods=max_rolling_dev//2
+                                                 ).mean().values
+            if np.isfinite(roll_mean.ravel()).sum() == 0:
+                results["Maximum Rolling Deviation"] = np.NaN
+            else:
+                roll_mean_max_ix = np.nanargmax(np.abs(roll_mean), axis=0)
+                max_rolling_dev = np.take_along_axis(roll_mean,
+                                                     np.expand_dims(roll_mean_max_ix, axis=0),
+                                                     axis=0).squeeze(axis=0)
+                results["Maximum Rolling Deviation"] = max_rolling_dev
         # print if any statistic was recorded
         if verbose and results:
             print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
