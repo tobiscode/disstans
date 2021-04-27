@@ -423,7 +423,8 @@ class Station():
         model_description : str
             Model description the fit applies to.
         fit : dict
-            Dictionary with the keys ``'time'``, ``'fit'`` and ``'var'``.
+            Dictionary with the keys ``'time'``, ``'fit'``, ``'var'`` and ``'cov'``
+            (the latter two can be set to ``None``).
 
         Returns
         -------

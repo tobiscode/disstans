@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import numpy as np
+import scipy.sparse as sparse
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -127,6 +128,259 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
         f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
     # return Numpy array
     return ((timevector - t_reference) / Timedelta(1, time_unit)).values
+
+
+def get_cov_dims(num_components):
+    r"""
+    Given a number of components, return the number of covariances that
+    exist between the components.
+
+    Parameters
+    ----------
+    num_components : int
+        Number of components of timeseries or model.
+
+    Returns
+    -------
+    int
+        Number of covariances, calculated as
+        :math:`\text{num_components}*(\text{num_components}-1))/2`.
+
+    See Also
+    --------
+    make_cov_index_map : For an example.
+    """
+    num_components = int(num_components)
+    return int((num_components * (num_components - 1)) / 2)
+
+
+def make_cov_index_map(num_components):
+    r"""
+    Given a number of components, create a matrix that shows the indexing
+    of where covariance columns present in a timeseries' or model's 2D dataframe
+    will show in the covariance matrix of a single observation or parameter.
+    Also provides the ordering in a 1D array which can be used together with
+    :func:`~numpy.reshape` to create the varaiance-covariance matrix from the columns.
+
+    Parameters
+    ----------
+    num_components : int
+        Number of components of timeseries or model.
+
+    Returns
+    -------
+    index_map : numpy.ndarray
+        Array of shape :math:`(\text{num_components}, \text{num_components})`
+        that is NaN everywhere except in the upper triangle, where integer numbers
+        denote where the column of a timseries' or model's 2D dataframe belong.
+    var_cov_map : numpy.ndarray
+        Array of shape :math:`(\text{num_components}^2, )` that can be used to
+        assemble the variance-covariance matrix from the columns given a particular
+        timestep or parameter.
+
+    Example
+    -------
+
+    >>> import numpy as np
+    >>> from geonat.tools import get_cov_dims, make_cov_index_map
+    >>> num_observations, num_components = 5, 2
+    >>> print(f"For {num_components} components, there should be:\n"
+    ...       f"- {num_components} data columns,\n"
+    ...       f"- {num_components} variance columns,\n"
+    ...       f"- and {get_cov_dims(num_components)} covariance columns.")
+    For 2 components, there should be:
+    - 2 data columns,
+    - 2 variance columns,
+    - and 1 covariance columns.
+    >>> index_map, var_cov_map = make_cov_index_map(num_components)
+    >>> test_varcov = np.stack([np.ones(5), np.arange(5)*2, np.ones(5)*0.5], axis=1)
+    >>> test_varcov
+    array([[1. , 0. , 0.5],
+           [1. , 2. , 0.5],
+           [1. , 4. , 0.5],
+           [1. , 6. , 0.5],
+           [1. , 8. , 0.5]])
+
+    The first two columns are the variances, and the third column is the covariance
+    column (since there is only one possible covariance).
+    ``index_map`` will show where the covariance columns fit into, indexed from ``0``
+    to ``get_cov_dims(num_components) - 1``. Since there is only one, the column
+    index ``0`` will feature in the upper right corner:
+
+    >>> index_map
+    array([[nan,  0.],
+           [nan, nan]])
+
+    If we want the full, symmetric variance-covariance matrix for the third
+    observation, we use ``var_cov_map``:
+
+    >>> var_cov_map
+    array([0, 2, 2, 1])
+    >>> test_varcov[2, var_cov_map].reshape(num_components, num_components)
+    array([[1. , 0.5],
+           [0.5, 4. ]])
+
+    """
+    index_map = np.empty((num_components, num_components))
+    index_map[:] = np.NaN
+    seq_ix = 0
+    for irow in range(num_components):
+        for icol in range(irow + 1, num_components):
+            index_map[irow, icol] = seq_ix
+            seq_ix += 1
+    var_cov_map = (np.triu(index_map + num_components, 1) +
+                   np.triu(index_map + num_components, 1).T)
+    var_cov_map = (var_cov_map + np.diag(np.arange(num_components))).astype(int).ravel()
+    return index_map, var_cov_map
+
+
+def get_cov_indices(icomp, index_map=None, num_components=None):
+    """
+    Given a data or variance component index, retrieve the indices in the covariance columns
+    of a timeseries or model that are associated with that component.
+    Exactly one of ``index_map`` or ``num_components`` must be provided as input.
+
+    Parameters
+    ----------
+    icomp : int
+        Index of the component.
+    index_map : numpy.ndarray
+        Output of :func:`~make_cov_index_map`.
+    num_components : int
+        Number of components of timeseries or model. (Function will call
+        :func:`~make_cov_index_map` to get ``index_map``.)
+
+    Returns
+    -------
+    list
+        List of integer covariance column indices associated with ``icomp``.
+
+    Example
+    -------
+    In a 3D dataset, the second component is associated with two covariances - between
+    the first and the second, and the second and the third. In a timeseries or model
+    covariance dataframe, this corresponds to the following columns:
+
+    >>> from geonat.tools import get_cov_indices
+    >>> get_cov_indices(1, num_components=3)
+    [0, 2]
+    """
+    if (index_map is None) and (num_components is None):
+        raise ValueError("Need to specify either 'index_map' or 'num_components'.")
+    if index_map is None:
+        index_map = make_cov_index_map(num_components)[0]
+    assert icomp < int(np.unique(index_map.shape)), "Invalid 'index_map' shape " \
+        f"{index_map.shape} for the index {icomp}."
+    from_row = index_map[icomp, :]
+    from_col = index_map[:, icomp]
+    indices = [int(i) for i in from_row if np.isfinite(i)] + \
+              [int(i) for i in from_col if np.isfinite(i)]
+    return sorted(indices)
+
+
+def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
+    r"""
+    Converts a full variance(-covariance) matrix with multiple components into a
+    column-based representation like the one used by :class:`~geonat.models.Model` or
+    :class:`~geonat.timeseries.Timeseries`.
+
+    It is assumed the the individual elements
+    are ordered such that all components of one parameter or observation are in
+    neighboring rows/columns (i.e. the first parameter or observation occupies the
+    first ``num_components`` rows/columns, the second one the second ``num_components``
+    rows/columns, etc.).
+
+    Parameters
+    ----------
+    cov_mat : numpy.ndarray
+        Square array with dimensions :math:`\text{num_elements} \cdot \text{num_components}`
+        where :math:`\text{num_elements}` is the number of elements (e.g. observations
+        or parameters) in each of the :math:`\text{num_components}` dimensions.
+    num_components : int
+        Number of components `cov_mat` contains.
+    include_covariance : bool, optional
+        If ``True``, also extract the off-diagonal covariances. Defaults to ``False``,
+        i.e. only the diagonal covariances.
+    Returns
+    -------
+    variance : numpy.ndarray
+        Array of shape :math:`(\text{num_elements}, \text{num_components})`.
+    covariance : numpy.ndarray
+        If ``include_covariance=True``, array of shape
+        :math:`(\text{num_parameters}, (\text{num_elements}*(\text{num_elements}-1))/2)`.
+    """
+    assert (cov_mat.ndim == 2) and (cov_mat.shape[0] == cov_mat.shape[1]), \
+        f"'cov_mat' must be a 2D square matrix, got array of shape {cov_mat.shape}."
+    assert (cov_mat.shape[0] % num_components) == 0, f"'cov_mat' can not be divided " \
+        f"into {num_components} components because of incompatible dimensions."
+    num_elements = int(cov_mat.shape[0] / num_components)
+    variance = np.diag(cov_mat).reshape(num_elements, num_components)
+    if include_covariance:
+        cov_dims = get_cov_dims(num_components)
+        index_map = make_cov_index_map(num_components)[0]
+        raveled_indices = np.nonzero(np.isfinite(index_map).ravel())[0]
+        assert raveled_indices.size == cov_dims
+        covariance = np.empty((num_elements, cov_dims))
+        for iobs, iblock in zip(range(num_elements),
+                                range(0, num_components*num_elements, num_components)):
+            sub_mat = cov_mat[iblock:iblock + num_components,
+                              iblock:iblock + num_components]
+            covariance[iobs, :] = sub_mat.ravel()[raveled_indices]
+    else:
+        covariance = None
+    return variance, covariance
+
+
+def block_permutation(n_outer, n_inner):
+    r"""
+    Convenience function to calculate a permutation matrix used to rearrange (permute)
+    blockwise-ordered submatrices in a big matrix.  ``n_outer`` outside blocks of
+    individual ``n_inner``-sized blocks will become ``n_inner`` outside blocks of
+    individual ``n_outer``-sized blocks.
+
+    Transposing the result is equivalent to calling this function with swapped arguments.
+
+    Parameters
+    ----------
+    n_outer : int
+        Number of sub-matrices.
+    n_inner : int
+        Size of the individual sub-matrices.
+
+    Returns
+    -------
+    P : numpy.ndarray
+        Square permutation matrix with dimensions
+        :math:`n = \text{n_outer} \cdot \text{n_inner}`.
+        To permute a matrix :math:`A`, calculate :math:`~P A P^T`.
+
+    Example
+    -------
+
+    >>> import numpy as np
+    >>> from geonat.tools import block_permutation
+    >>> n_outer, n_inner = 2, 2
+    >>> A = np.block([[np.arange(n_inner**2).reshape(n_inner, n_inner),
+    ...                np.zeros((n_inner, n_inner))], [np.zeros((n_inner, n_inner)),
+    ...                np.ones((n_inner, n_inner))]])
+    >>> A
+    array([[0., 1., 0., 0.],
+           [2., 3., 0., 0.],
+           [0., 0., 1., 1.],
+           [0., 0., 1., 1.]])
+    >>> P = block_permutation(n_outer, n_inner)
+    >>> P @ A @ P.T
+    array([[0., 0., 1., 0.],
+           [0., 1., 0., 1.],
+           [2., 0., 3., 0.],
+           [0., 1., 0., 1.]])
+    """
+    n = n_outer * n_inner
+    Pvals = np.ones(n, dtype=int)
+    Prowind = np.arange(n, dtype=int)
+    Pcolind = np.arange(n, dtype=int).reshape(n_outer, n_inner).T.ravel()
+    P = sparse.coo_matrix((Pvals, (Prowind, Pcolind))).tocsr()
+    return P
 
 
 def parallelize(func, iterable, num_threads=None, chunksize=1):

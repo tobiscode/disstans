@@ -450,7 +450,7 @@ and print some statistics:
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg          Mean  Standard Deviation
-    Total-Total     8.302148e-09            2.046006
+    Total-Total     1.610444e-08            2.046004
 
 Advanced plotting
 .................
@@ -521,7 +521,7 @@ solver:
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2          Mean  Standard Deviation
-    Total-Total  1.495277e-09            2.087589
+    Total-Total  1.667907e-09            2.087589
 
 ::
 
@@ -708,7 +708,7 @@ L1R-fitted model:
     ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: %}\n"
     ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: f} rad\n"
     ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: f} rad")
-    Percent Error Constant:              -34.870393%
+    Percent Error Constant:              -34.870394%
     Percent Error Linear:                 14.251579%
     Percent Error Annual Amplitude:      -1.046252%
     Percent Error Semi-Annual Amplitude: -0.037603%
@@ -1072,7 +1072,7 @@ and count the number of total, non-zero, and unique non-zero parameters:
     >>> num_nonzero = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > eps).sum()
     ...                    for s in net])
     >>> print(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
-    Number of reweighted non-zero parameters: 487/8736
+    Number of reweighted non-zero parameters: 487/8416
     >>> print("Number of unique reweighted non-zero parameters per component: "
     ...       + str(num_uniques.tolist()))
     Number of unique reweighted non-zero parameters per component: [109, 116]
@@ -1121,7 +1121,7 @@ either, but let's still have a look at the same two stations when we add that:
     >>> num_nonzero = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > eps).sum()
     ...                    for s in net])
     >>> print(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
-    Number of reweighted non-zero parameters: 260/8736
+    Number of reweighted non-zero parameters: 260/8416
     >>> print("Number of unique reweighted non-zero parameters per component: "
     ...       + str(num_uniques.tolist()))
     Number of unique reweighted non-zero parameters per component: [92, 90]
@@ -1186,16 +1186,14 @@ here). Let's start by running only one spatial iteration, and evaluating its sol
     ...               spatial_reweight_iters=1,
     ...               verbose=True)
     Calculating scale lengths
-    Performing initial solve
-    Number of reweighted non-zero parameters: 487/8736
+    Number of reweighted non-zero parameters: 487/8416
     Number of unique reweighted non-zero parameters per component: [109, 116]
     Updating weights
     Stacking model Transient
-    Weight percentiles (5-50-95): [5.55083872402302, 9999.784407914369, 9999.994803787344]
-    Solving after 1 reweightings
-    Number of reweighted non-zero parameters: 219/8736
+    Weight percentiles (5-50-95): [23.847919527393397, 9999.802661909114, 9999.994970807447]
+    Number of reweighted non-zero parameters: 219/8416
     Number of unique reweighted non-zero parameters per component: [51, 55]
-    RMS difference of 'Transient' parameters = 5.345396682386844 (575 changed)
+    RMS difference of 'Transient' parameters = 5.345396682386845 (575 changed)
     Done
     >>> # residual
     >>> net.evaluate("Displacement", output_description="Fit_L1R1S1")
@@ -1623,7 +1621,7 @@ parameters as well as the unique ones in both components have converged.
 .. image:: img/tutorial_3f_numparams.png
 
 The second figure shows that around the same time, the RMS difference of fitted
-parameters falls below 10:sup:`-2`, and around less than 10 parameters change
+parameters falls below 10 :sup:`-2`, and around less than 10 parameters change
 between each iteration. Towards 20 iterations, no parameters actually change between
 being close-to-zero or non-zero, they just change theit value slightly.
 This shows that the spatial reweighting scheme employed by GeoNAT converges nicely

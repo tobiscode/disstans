@@ -41,6 +41,31 @@ parse_unr_steps
 
 .. autofunction:: geonat.tools.parse_unr_steps
 
+get_cov_dims
+............
+
+.. autofunction:: geonat.tools.get_cov_dims
+
+make_cov_index_map
+..................
+
+.. autofunction:: geonat.tools.make_cov_index_map
+
+get_cov_indices
+...............
+
+.. autofunction:: geonat.tools.get_cov_indices
+
+full_cov_mat_to_columns
+.......................
+
+.. autofunction:: geonat.tools.full_cov_mat_to_columns
+
+block_permutation
+.................
+
+.. autofunction:: geonat.tools.block_permutation
+
 Classes
 -------
 

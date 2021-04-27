@@ -13,7 +13,9 @@ from scipy.special import comb, factorial
 from itertools import product
 
 from . import scm
-from .tools import tvec_to_numpycol, Timedelta
+from .tools import tvec_to_numpycol, Timedelta, get_cov_dims, \
+                   make_cov_index_map, full_cov_mat_to_columns, \
+                   block_permutation
 
 
 class Model():
@@ -75,15 +77,19 @@ class Model():
         If provided, already save the model parameters.
     variances : numpy.ndarray, optional
         If provided (and ``parameters`` is provided as well), already save the
-        model parameter covariances.
+        model parameter variances.
+    covariances : numpy.ndarray, optional
+        If provided (and both ``parameters`` and ``variances`` are provided as well),
+        already save the model parameter variances.
 
     See Also
     --------
-    read_parameters : Function used to read in the model parameters.
+    read_parameters : Function used to read in the model parameters and (co)variances.
     """
     def __init__(self, num_parameters, regularize=False, time_unit=None,
                  t_start=None, t_end=None, t_reference=None,
-                 zero_before=True, zero_after=True, parameters=None, variances=None):
+                 zero_before=True, zero_after=True,
+                 parameters=None, variances=None, covariances=None):
         self.num_parameters = int(num_parameters)
         """ Number of parameters that define the model and can be solved for. """
         assert self.num_parameters > 0, \
@@ -103,9 +109,28 @@ class Model():
         """
         self.var = None
         r"""
-        Attribute of shape
-        :math:`(\text{num_parameters}, \text{num_components})`
+        Attribute of shape :math:`(\text{num_parameters}, \text{num_components})`
         that contains the parameter's variances as a NumPy array.
+        """
+        self.cov = None
+        r"""
+        Attribute of shape
+        :math:`(\text{num_parameters}, (\text{num_components}*(\text{num_components}-1))/2)`
+        that contains the parameter's component covariances as a NumPy array.
+        See the Notes of :class:`~geonat.timeseries.Timeseries` for more details about the
+        ordering of the covariance columns.
+        """
+        self.index_map = None
+        r"""
+        Array of size :math:`(\text{num_components}, \text{num_components})` that is ``NaN``
+        everywhere except on the upper diagonal, where it contains the matching column numbers
+        of :attr:`~cov`.
+        """
+        self.var_cov_map = None
+        r"""
+        Array of size :math:`(\text{num_components}^2, )` that contains the column indices
+        of :attr:`~cov` needed to create the full variance-covariance matrix for a single
+        parameter.
         """
         self.regularize = bool(regularize)
         """ Indicate to solvers to regularize this model (``True``) or not. """
@@ -135,7 +160,19 @@ class Model():
         """
         # read in parameters if they were passed to constructor
         if parameters is not None:
-            self.read_parameters(parameters, variances)
+            self.read_parameters(parameters, variances, covariances)
+
+    @property
+    def var_cov(self):
+        """
+        Retuns a joint array of the variance and covariance columns, to be indexed
+        by :attr:`~var_cov_map` to yield the full variance-covariance matrix.
+        """
+        if self.var is None:
+            raise ValueError("No variances present to return.")
+        if self.cov is None:
+            raise ValueError("No covariances present to set.")
+        return np.concatenate([self.var, self.cov], axis=1)
 
     def __repr__(self):
         """
@@ -388,10 +425,10 @@ class Model():
                              "was specified in the model.")
         return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
-    def read_parameters(self, parameters, variances=None):
+    def read_parameters(self, parameters, variances=None, covariances=None):
         r"""
-        Reads in the parameters :math:`\mathbf{m}` (optionally also their covariance)
-        and stores them in the instance attributes.
+        Reads in the parameters :math:`\mathbf{m}` (optionally also their variances
+        and covariance) and stores them in the instance attributes.
 
         Parameters
         ----------
@@ -401,11 +438,15 @@ class Model():
         variances : numpy.ndarray, optional
             Model parameter variances of shape
             :math:`(\text{num_parameters}, \text{num_components})`.
+        covariances : numpy.ndarray, optional
+            Model component covariances of shape
+            :math:`(\text{num_parameters}, (\text{num_components}*(\text{num_components}-1))/2)`
         """
         assert self.num_parameters == parameters.shape[0], \
             "Read-in parameters have different size than the instantiated model. " + \
             f"Expected {self.num_parameters}, got {parameters.shape}[0]."
-        self.parameters = parameters.reshape([self.num_parameters, -1])
+        self.parameters = parameters.reshape((self.num_parameters, -1))
+        num_components = self.parameters.shape[1]
         if variances is not None:
             try:
                 self.var = variances.reshape(self.parameters.shape)
@@ -413,12 +454,27 @@ class Model():
                 raise ValueError("Variance matrix must have same shape as parameters "
                                  f"(expected {self.parameters.shape}, got "
                                  f"{variances.shape}).").with_traceback(e.__traceback__) from e
+        else:
+            self.var = None
+        if (variances is not None) and (covariances is not None):
+            assert num_components > 1, \
+                "In order to set covariances, the model needs at least 2 components."
+            cov_dims = get_cov_dims(num_components)
+            try:
+                self.cov = covariances.reshape((self.num_parameters, cov_dims))
+            except ValueError as e:
+                raise ValueError("Covariance matrix must have shape "
+                                 f"{(self.num_parameters, cov_dims)}, got "
+                                 f"{covariances.shape}).").with_traceback(e.__traceback__) from e
+            self.index_map, self.var_cov_map = make_cov_index_map(num_components)
+        else:
+            self.cov = None
         self.is_fitted = True
 
     def evaluate(self, timevector):
         r"""
         Evaluate the model given a time vector (calculates :math:`\mathbf{d}`
-        and its variance, if applicable).
+        and its (co)variance, if applicable).
 
         Parameters
         ----------
@@ -441,16 +497,49 @@ class Model():
         if not self.is_fitted:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         mapping_matrix = self.get_mapping(timevector=timevector)
+        num_components = self.parameters.shape[1]
         fit = mapping_matrix @ self.parameters
-        if self.var is not None:
-            fit_var = mapping_matrix @ self.var
-        else:
+        if self.var is None:
             fit_var = None
+            fit_cov = None
+        else:
+            # repeat the mapping matrix for all components
+            map_mat_full = sparse.block_diag([mapping_matrix for icomp
+                                              in range(num_components)], format="bsr")
+            if self.cov is None:
+                # concatenate the different component variances and make a diagonal matrix
+                var_full = sparse.diags(self.var.ravel(), format="dia")
+            else:
+                # need to build the variance-covariance matrix block-wise
+                var_cov_matrix = self.var_cov
+                var_blocks = [np.reshape(var_cov_matrix[iparam, self.var_cov_map],
+                                         (num_components, num_components))
+                              for iparam in range(self.num_parameters)]
+                var_full = sparse.block_diag(var_blocks, format="dia")
+            # var_full is ordered such that it first contains the sub-covariance between
+            # all components for the first parameter, then the sub-covariance between all
+            # components for the second parameter, and so forth
+            # need to reorder (permute) this to be ordered in the same way as the mapping
+            # matrix is, i.e. first everything for the first component, then everything for
+            # the second, etc.
+            # build permutation matrix
+            P = block_permutation(self.num_parameters, num_components)
+            # permute rows and columns
+            var_full = P @ var_full @ P.T
+            # calculate the predicted variance
+            pred_var = (map_mat_full @ var_full @ map_mat_full.T).A
+            # this is now ordered such that it first contains the timeseries for the first
+            # component, then for the second, etc.
+            # to use full_cov_mat_to_columns, it needs to be ordered by timesteps instead
+            # so we use another permutation matrix
+            P = block_permutation(num_components, timevector.size)
+            pred_var = P @ pred_var @ P.T
+            # extract the diagonal components and reshape
+            fit_var, fit_cov = full_cov_mat_to_columns(pred_var, timevector.size,
+                                                       num_components, include_covariance=True)
         if fit.ndim == 1:
             fit = fit.reshape(-1, 1)
-            if fit_var is not None:
-                fit_var = fit_var.reshape(-1, 1)
-        return {"time": timevector, "fit": fit, "var": fit_var}
+        return {"time": timevector, "fit": fit, "var": fit_var, "cov": fit_cov}
 
 
 class Step(Model):
@@ -962,7 +1051,7 @@ class SplineSet(Model):
             coefs *= self.internal_scales.reshape(1, self.num_parameters)
         return coefs
 
-    def read_parameters(self, parameters, variances=None):
+    def read_parameters(self, parameters, variances=None, covariances=None):
         r"""
         Reads in the parameters :math:`\mathbf{m}` (optionally also their variances)
         of all the sub-splines and stores them in the respective attributes.
@@ -975,18 +1064,25 @@ class SplineSet(Model):
         variances : numpy.ndarray, optional
             Model parameter variances of shape
             :math:`(\text{num_parameters}, \text{num_components})`.
+        covariances : numpy.ndarray, optional
+            Model component covariances of shape
+            :math:`(\text{num_parameters}, (\text{num_components}*(\text{num_components}-1))/2)`
         """
-        super().read_parameters(parameters, variances)
+        super().read_parameters(parameters, variances, covariances)
         if self.internal_scaling:
             parameters = parameters * self.internal_scales.reshape(-1, 1)
             if variances is not None:
                 variances = variances * self.internal_scales.reshape(-1, 1) ** 2
+                if covariances is not None:
+                    covariances = covariances * self.internal_scales.reshape(-1, 1) ** 2
         ix_params = 0
         for i, model in enumerate(self.splines):
             param_model = parameters[ix_params:ix_params + model.num_parameters, :]
-            cov_model = (None if variances is None else
+            var_model = (None if variances is None else
                          variances[ix_params:ix_params + model.num_parameters, :])
-            model.read_parameters(param_model, cov_model)
+            cov_model = (None if covariances is None else
+                         covariances[ix_params:ix_params + model.num_parameters, :])
+            model.read_parameters(param_model, var_model, cov_model)
             ix_params += model.num_parameters
 
     def make_scalogram(self, t_left, t_right, cmaprange=None, resolution=1000,

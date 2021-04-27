@@ -8,6 +8,8 @@ import pandas as pd
 from warnings import warn
 from copy import deepcopy
 
+from .tools import get_cov_dims, make_cov_index_map, get_cov_indices
+
 
 class Timeseries():
     """
@@ -90,12 +92,22 @@ class Timeseries():
                 f"If not None, 'cov_cols' must be a list of strings, got {cov_cols}."
             assert all([ccol in dataframe.columns for ccol in cov_cols]), \
                 "All entries in 'cov_cols' must be present in the dataframe."
-            cov_dims = int((self.num_components * (self.num_components - 1)) / 2)
+            cov_dims = get_cov_dims(self.num_components)
             assert len(cov_cols) == cov_dims, \
                 "If passing covariance columns, the list needs to have the appropriate " \
                 "length given the data columns length. " \
                 f"Expected {cov_dims}, got {len(cov_cols)}."
-            self._make_index_map()
+            index_map, var_cov_map = make_cov_index_map(self.num_components)
+            self.index_map = index_map
+            """
+            Matrix that contains the rolling indices of each matrix element used by
+            :func:`~geonat.tools.get_cov_indices`.
+            """
+            self.var_cov_map = var_cov_map
+            """
+            Contains the column indices needed to create the full variance-covariance
+            matrix for a single time.
+            """
         self._cov_cols = cov_cols
 
     def __repr__(self):
@@ -289,18 +301,22 @@ class Timeseries():
 
     @property
     def var_cov(self):
-        """ Retuns the variance as well as covariance columns from :attr:`~df`. """
+        """
+        Returns the variance as well as covariance columns from :attr:`~df`, to be indexed
+        by :attr:`~var_cov_map` to yield the full variance-covariance matrix.
+        """
         if self._var_cols is None:
             raise ValueError("No variance columns present to return.")
         if self._cov_cols is None:
-            raise ValueError("No covariance columns present to set.")
+            raise ValueError("No covariance columns present to return.")
         return self._df.loc[:, self._var_cols + self._cov_cols]
 
     @var_cov.setter
     def var_cov(self, new_var_cov):
-        assert new_var_cov.shape[1] == self.num_components * 2, \
-            "Setting 'var_cov' requires a column for each variance (first half of array) " \
-            "and covariance (second half)."
+        cov_dims = get_cov_dims(self.num_components)
+        assert new_var_cov.shape[1] == self.num_components + cov_dims, \
+            "Setting 'var_cov' requires a column for each variance (first half of array, " \
+            f"{self.num_components}) and covariance (second half, {cov_dims})."
         self.vars = new_var_cov[:, :self.num_components]
         self.covs = new_var_cov[:, self.num_components:]
 
@@ -342,6 +358,41 @@ class Timeseries():
         exp_obs = int(np.round(self.length / med_tdiff + 1))
         # return ratio
         return self.num_observations / exp_obs
+
+    def cov_at(self, t):
+        """
+        Returns the covariance matrix of the timeseries at a given time or index.
+
+        Parameters
+        ----------
+        t : pandas.Timestamp, str, int
+            A timestamp or timestamp-convertable string to return the covariance
+            matrix for. Alternatively, an integer index.
+
+        Returns
+        -------
+        cov_mat : numpy.ndarray
+            The full covariance matrix at time ``t``.
+        """
+        # input checks
+        assert self._var_cols is not None, \
+            "No variances available."
+        if isinstance(t, str):
+            t = pd.Timestamp(t)
+        elif isinstance(t, int):
+            t = self.time[t]
+        assert self.time.min() <= t <= self.time.max(), \
+            f"Time {t} not inside available timespan."
+        assert np.any(np.isfinite(self.vars[t].values)), \
+            f"No variances set at time {t}."
+        # only variance is set
+        if self._cov_cols is None:
+            cov_mat = np.diag(self.vars[t].values)
+        # full covariance matrix is available
+        else:
+            cov_mat = np.reshape(self.var_cov[t].values[0, self.var_cov_map],
+                                 (self.num_components, self.num_components))
+        return cov_mat
 
     def cut(self, t_min=None, t_max=None, i_min=None, i_max=None, keep_inside=True):
         """
@@ -472,7 +523,7 @@ class Timeseries():
         if cov_data is not None:
             assert self._var_cols is not None, \
                 "Cannot set covariance data without first adding variance data."
-            cov_dims = int((self.num_components * (self.num_components - 1)) / 2)
+            cov_dims = get_cov_dims(self.num_components)
             assert (isinstance(cov_data, np.ndarray)
                     and cov_data.shape[0] == self.num_observations
                     and cov_data.shape[1] == cov_dims), \
@@ -493,7 +544,7 @@ class Timeseries():
                     f"( expected {cov_dims}, got {len(cov_cols)}."
             for iccol, ccol in enumerate(cov_cols):
                 self._df[ccol] = cov_data[:, iccol]
-            self._make_index_map()
+            self.index_map, self.var_cov_map = make_cov_index_map(self.num_components)
             self._cov_cols = cov_cols
 
     def copy(self, only_data=False, src=None):
@@ -541,29 +592,10 @@ class Timeseries():
             self._df[vcol] = np.NaN
             self._df[vcol] = self._df[vcol].astype(pd.SparseDtype(dtype=float))
             if self._cov_cols is not None:
-                for iccol in self._get_cov_indices(icomp):
+                for iccol in get_cov_indices(icomp, index_map=self.index_map):
                     ccol = self._cov_cols[iccol]
                     self._df[ccol] = np.NaN
                     self._df[ccol] = self._df[ccol].astype(pd.SparseDtype(dtype=float))
-
-    def _make_index_map(self):
-        index_map = np.zeros((self.num_components, self.num_components))
-        index_map[:] = np.NaN
-        seq_ix = 0
-        for irow in range(self.num_components):
-            for icol in range(irow + 1, self.num_components):
-                index_map[irow, icol] = seq_ix
-                seq_ix += 1
-        var_cov_map = (np.triu(index_map + self.num_components, 1) +
-                       np.triu(index_map + self.num_components, 1).T)
-        self.index_map = index_map
-        self.var_cov_map = (var_cov_map + np.diag(np.arange(self.num_components))
-                            ).astype(int).ravel()
-
-    def _get_cov_indices(self, icomp):
-        from_row = self.index_map[icomp, :]
-        from_col = self.index_map[:, icomp]
-        return [i for i in from_row if i != np.NaN] + [i for i in from_col if i != np.NaN]
 
     @staticmethod
     def prepare_math(left, right, operation):
@@ -907,9 +939,10 @@ class Timeseries():
             Data unit.
         data_cols : list
             List of strings containing the data column names.
-            Uncertainty column names are generated by adding a '_sigma'.
+            Uncertainty column names are generated by adding a '_var'.
         fit : dict
-            Dictionary with the keys ``'time'``, ``'fit'`` and ``'var'``.
+            Dictionary with the keys ``'time'``, ``'fit'``, ``'var'`` and ``'cov'``
+            (the latter two can be set to ``None``).
 
         Returns
         -------
@@ -923,11 +956,19 @@ class Timeseries():
         """
         df_data = {dcol: fit["fit"][:, icol] for icol, dcol in enumerate(data_cols)}
         var_cols = None
+        cov_cols = None
         if fit["var"] is not None:
             var_cols = [dcol + "_var" for dcol in data_cols]
             df_data.update({vcol: fit["var"][:, icol] for icol, vcol in enumerate(var_cols)})
+            if fit["cov"] is not None:
+                cov_cols = []
+                num_components = len(data_cols)
+                for i1 in range(num_components):
+                    for i2 in range(i1 + 1, num_components):
+                        cov_cols.append(f"{data_cols[i1]}_{data_cols[i2]}_cov")
+                df_data.update({ccol: fit["cov"][:, icol] for icol, ccol in enumerate(cov_cols)})
         df = pd.DataFrame(data=df_data, index=fit["time"])
-        return cls(df, "fitted", data_unit, data_cols, var_cols)
+        return cls(df, "fitted", data_unit, data_cols, var_cols, cov_cols)
 
     @classmethod
     def from_array(cls, timevector, data, src, data_unit, data_cols,
@@ -999,12 +1040,13 @@ class Timeseries():
             if cov is None:
                 cov_cols = None
             else:
-                assert data.shape == cov.shape, \
-                    "'data' and 'cov' need to have the same shape, got " \
-                    f"{data.shape} and {cov.shape}."
+                num_components = data.shape[1]
+                cov_dims = get_cov_dims(num_components)
+                assert cov.shape == (data.shape[0], cov_dims), \
+                    "'data' and 'cov' need to have compatible shapes, got " \
+                    f"{data.shape} and {cov.shape} (need {cov_dims} columns)."
                 if cov_cols is None:
                     cov_cols = []
-                    num_components = len(data_cols)
                     for i1 in range(num_components):
                         for i2 in range(i1 + 1, num_components):
                             cov_cols.append(f"{data_cols[i1]}_{data_cols[i2]}_cov")

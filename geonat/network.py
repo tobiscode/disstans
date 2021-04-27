@@ -874,7 +874,8 @@ class Network():
                 warn(f"Fitting did not converge for timeseries {ts_description} "
                      f"at {station_names[i]}", category=RuntimeWarning)
             for model_description, sol in result.items():
-                stat_ts[model_description].read_parameters(sol.parameters, sol.variances)
+                stat_ts[model_description].read_parameters(sol.parameters,
+                                                           sol.variances, sol.covariances)
             # if there is additional output, save it
             if return_solutions:
                 solutions[station_names[i]] = result
