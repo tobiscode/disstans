@@ -293,7 +293,7 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
     Parameters
     ----------
     cov_mat : numpy.ndarray
-        Square array with dimensions :math:`\text{num_elements} \cdot \text{num_components}`
+        Square array with dimensions :math:`\text{num_elements} * \text{num_components}`
         where :math:`\text{num_elements}` is the number of elements (e.g. observations
         or parameters) in each of the :math:`\text{num_components}` dimensions.
     num_components : int
@@ -351,7 +351,7 @@ def block_permutation(n_outer, n_inner):
     -------
     P : numpy.ndarray
         Square permutation matrix with dimensions
-        :math:`n = \text{n_outer} \cdot \text{n_inner}`.
+        :math:`n = \text{n_outer} * \text{n_inner}`.
         To permute a matrix :math:`A`, calculate :math:`~P A P^T`.
 
     Example

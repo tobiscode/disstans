@@ -740,5 +740,5 @@ class Station():
                 if Gsub.shape[0] == 2:
                     trend_sigma[icomp] = 0
                 else:
-                    trend_sigma[icomp] = np.sqrt(np.linalg.pinv(GtWG)[1, 1])
+                    trend_sigma[icomp] = np.sqrt(np.linalg.inv(GtWG)[1, 1])
         return trend, trend_sigma if (include_sigma and fit_sum_var) else None

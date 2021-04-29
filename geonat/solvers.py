@@ -141,7 +141,7 @@ def _build_LS(ts, G, icomp=None, return_W_G=False, use_data_var=True, use_data_c
             if dnotnan.sum() < dnotnan.size:
                 W = W[dnotnan, :].tocsc()[:, dnotnan]
         elif (ts.var_cols is not None) and use_data_var:
-            W = sparse.diags(1/ts.vars.values.reshape(-1, 1))
+            W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
         else:
             W = sparse.eye(dnotnan.sum())
     if dnotnan.sum() < dnotnan.size:
@@ -606,14 +606,14 @@ def linear_regression(ts, models, formal_variance=False, formal_covariance=False
             GtWG, GtWd = _build_LS(ts, G, icomp=i, use_data_var=use_data_variance)
             params[:, i] = sp.linalg.lstsq(GtWG, GtWd)[0].squeeze()
             if formal_variance:
-                var[:, i] = np.diag(np.linalg.pinv(GtWG))
+                var[:, i] = np.diag(np.linalg.inv(GtWG))
     else:
         GtWG, GtWd = _build_LS(ts, G, use_data_var=use_data_variance,
                                use_data_cov=use_data_covariance)
         params = sp.linalg.lstsq(GtWG, GtWd)[0].reshape(num_params, num_comps)
         if formal_variance:
-            cov_mat = np.linalg.pinv(GtWG)
-            var, cov = full_cov_mat_to_columns(cov_mat, num_params, num_comps,
+            cov_mat = np.linalg.inv(GtWG)
+            var, cov = full_cov_mat_to_columns(cov_mat, num_comps,
                                                include_covariance=formal_covariance)
 
     # create solution object and return
@@ -713,7 +713,7 @@ def ridge_regression(ts, models, penalty, formal_variance=False, formal_covarian
             GtWGreg = GtWG + reg
             params[:, i] = sp.linalg.lstsq(GtWGreg, GtWd)[0].squeeze()
             if formal_variance:
-                var[:, i] = np.diag(np.linalg.pinv(GtWGreg))
+                var[:, i] = np.diag(np.linalg.inv(GtWGreg))
     else:
         GtWG, GtWd = _build_LS(ts, G, use_data_var=use_data_variance,
                                use_data_cov=use_data_covariance)
@@ -721,8 +721,8 @@ def ridge_regression(ts, models, penalty, formal_variance=False, formal_covarian
         GtWGreg = GtWG + reg
         params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_params, num_comps)
         if formal_variance:
-            cov_mat = np.linalg.pinv(GtWGreg)
-            var, cov = full_cov_mat_to_columns(cov_mat, num_params, num_comps,
+            cov_mat = np.linalg.inv(GtWGreg)
+            var, cov = full_cov_mat_to_columns(cov_mat, num_comps,
                                                include_covariance=formal_covariance)
 
     # create solution object and return
@@ -793,7 +793,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         Defaults to ``1e-10``. Set to ``0`` to deactivate early stopping.
     reweight_init : numpy.ndarray, optional
         When reweighting is active, use this array to initialize the weights.
-        It has to have size :math:`\text{num_components} \cdot \text{num_reg}`, where
+        It has to have size :math:`\text{num_components} * \text{num_reg}`, where
         :math:`\text{num_components}=1` if covariances are not used (and the actual
         number of timeseries components otherwise) and :math:`\text{num_reg}` is the
         number of regularized model parameters.
@@ -1021,7 +1021,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                     GtWG = Gsub.T @ Wnonan @ Gsub
                     if isinstance(GtWG, sparse.spmatrix):
                         GtWG = GtWG.A
-                    var[best_ind, i] = np.diag(np.linalg.pinv(GtWG))
+                    var[best_ind, i] = np.diag(np.linalg.inv(GtWG))
                 if regularize and return_weights:
                     weights[:, i] = wts
     else:
@@ -1056,8 +1056,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 if isinstance(GtWG, sparse.spmatrix):
                     GtWG = GtWG.A
                 cov_mat = np.zeros((num_params * num_comps, num_params * num_comps))
-                cov_mat[np.ix_(best_ind, best_ind)] = np.linalg.pinv(GtWG)
-                var, cov = full_cov_mat_to_columns(cov_mat, num_params, num_comps,
+                cov_mat[np.ix_(best_ind, best_ind)] = np.linalg.inv(GtWG)
+                var, cov = full_cov_mat_to_columns(cov_mat, num_comps,
                                                    include_covariance=formal_covariance)
             if regularize and return_weights:
                 weights = wts.reshape(num_reg, num_comps)

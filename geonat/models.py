@@ -535,8 +535,8 @@ class Model():
             P = block_permutation(num_components, timevector.size)
             pred_var = P @ pred_var @ P.T
             # extract the diagonal components and reshape
-            fit_var, fit_cov = full_cov_mat_to_columns(pred_var, timevector.size,
-                                                       num_components, include_covariance=True)
+            fit_var, fit_cov = full_cov_mat_to_columns(pred_var, num_components,
+                                                       include_covariance=True)
         if fit.ndim == 1:
             fit = fit.reshape(-1, 1)
         return {"time": timevector, "fit": fit, "var": fit_var, "cov": fit_cov}
@@ -695,7 +695,7 @@ class BSpline(Model):
     resulting polynomial). The order :math:`n` is related to the degree by the relation
     :math:`n = p + 1`. The scale determines the width of the spline in the time domain,
     and corresponds to the interval [0, 1] of the B-Spline. The full non-zero time span
-    of the spline is therefore :math:`\text{scale} * (p+1) = \text{scale} * n`.
+    of the spline is therefore :math:`\text{scale} \cdot (p+1) = \text{scale} \cdot n`.
 
     ``num_splines`` will increase the number of splines by shifting the reference
     point :math:`(\text{num_splines} - 1)` times by the spacing (which must be given
