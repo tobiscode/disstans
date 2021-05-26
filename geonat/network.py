@@ -15,12 +15,12 @@ from tqdm import tqdm
 from warnings import warn
 from matplotlib.animation import FuncAnimation
 from cartopy.io.ogc_clients import WMTSRasterSource
+from cmcrameri import cm as scm
 
 from . import timeseries as geonat_ts
 from . import models as geonat_models
 from . import solvers as geonat_solvers
 from . import processing as geonat_processing
-from . import scm
 from .config import defaults
 from .timeseries import Timeseries
 from .station import Station

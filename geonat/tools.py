@@ -23,8 +23,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 from warnings import warn
 from matplotlib.ticker import FuncFormatter
+from cmcrameri import cm as scm
 
-from . import scm
 from .config import defaults
 
 

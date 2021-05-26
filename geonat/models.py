@@ -11,8 +11,8 @@ import scipy.sparse as sparse
 from warnings import warn
 from scipy.special import comb, factorial
 from itertools import product
+from cmcrameri import cm as scm
 
-from . import scm
 from .tools import tvec_to_numpycol, Timedelta, get_cov_dims, \
                    make_cov_index_map, full_cov_mat_to_columns, \
                    block_permutation

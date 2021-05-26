@@ -11,6 +11,7 @@ classes of GeoNAT, namely
 """
 # flake8: noqa
 
+# imports for preparations later
 import multiprocessing
 from pandas.plotting import register_matplotlib_converters
 
@@ -25,9 +26,6 @@ from . import solvers
 from . import station
 from . import timeseries
 from . import tools
-
-# import Scientific Colourmaps
-from . import scm
 
 # provide shortcuts for commonly used classes by importing them here
 from .config import defaults

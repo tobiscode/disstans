@@ -6,4 +6,6 @@ cartopy
 pandas>=1
 tqdm
 cvxpy
+cvxopt
+cmcrameri
 okada_wrapper @ git+https://github.com/tbenthompson/okada_wrapper.git
