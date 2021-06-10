@@ -21,6 +21,7 @@ from . import timeseries as geonat_ts
 from . import models as geonat_models
 from . import solvers as geonat_solvers
 from . import processing as geonat_processing
+from .models import ALLFITS
 from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
@@ -91,11 +92,6 @@ class Network():
         Dictionary of network stations, where the keys are their string names
         and the values are their :class:`~geonat.station.Station` objects.
         """
-        self.global_models = {}
-        """
-        Dictionary of network-wide models, where the keys are string descriptions
-        and the values are their :class:`~geonat.models.Model` objects.
-        """
         # try to preload the location data
         # it's a private attribute because there's no guarantee this will be kept
         # up to date over the lifetime of the Network instance (yet)
@@ -159,8 +155,7 @@ class Network():
             Network summary.
         """
         info = f"Network {self.name}\n" + \
-               f"Stations:\n{[key for key in self.stations]}\n" + \
-               f"Global Models:\n{[key for key in self.global_models]}"
+               f"Stations:\n{[key for key in self.stations]}\n"
         return info
 
     def __getitem__(self, name):
@@ -211,6 +206,23 @@ class Network():
         remove_station : Remove a station from the network instance.
         """
         self.remove_station(name)
+
+    def __contains__(self, name):
+        """
+        Special function that allows to check whether a certain station name
+        is in the network.
+
+        Example
+        -------
+        If ``net`` is a :class:`~Network` instance, and we want to see whether
+        ``'mystat`` is in the network, the following two are equivalent::
+
+            # long version
+            'mystat` in net.stations
+            # short version
+            'mystat` in net
+        """
+        return name in self.stations
 
     def __iter__(self):
         """
@@ -511,8 +523,7 @@ class Network():
         net_arch = {"name": self.name,
                     "locations": self.default_location_path,
                     "stations": {},
-                    "default_local_models": self.default_local_models,
-                    "global_models": {}}
+                    "default_local_models": self.default_local_models}
         # add station representations
         for stat_name, station in self.stations.items():
             stat_arch = station.get_arch()
@@ -737,47 +748,58 @@ class Network():
                 self[station].add_local_model(ts_description, model_description,
                                               geonat_models.Step(localsteps))
 
-    def common_mapping(self, ts_description):
+    def freeze(self, ts_description, model_list=None, zero_threshold=1e-10):
         """
-        Return the mapping matrix for all models that are common to a given timeseries
-        over all stations, for all the timestamps present in the timeseries.
+        Convenience method that calls :meth:`~geonat.models.Model.freeze`
+        for the :class:`~geonat.models.ModelCollection` for a certain
+        timeseries at every station.
 
         Parameters
         ----------
         ts_description : str
-            Timeseries to check models for.
+            Description of the timeseries to to freeze the models for.
+        model_list : list, optional
+            If ``None`` (default), freeze all models. If a list of strings, only
+            freeze the corresponding models in the collection.
+        zero_threshold : float, optional
+            Model parameters with absolute values below ``zero_threshold`` will be
+            set to zero and set inactive. Defaults to ``1e-10``.
 
-        Returns
-        -------
-        common_mapping : dict
-            A dictionary that for every model description contains a
-            :class:`~pandas.DataFrame` with a timestamp index and columns for
-            each model parameter.
+        See Also
+        --------
+        unfreeze : The reverse network method.
         """
-        times = None
-        models = None
         for station in self:
-            if ts_description in station.timeseries:
-                if times is None:
-                    times = station[ts_description].time
-                else:
-                    times = times.union(station[ts_description].time)
-                if models is None:
-                    models = station.models[ts_description]
-                else:
-                    models = {mdl_desc: mdl for mdl_desc, mdl in models.items()
-                              if (mdl_desc in station.models[ts_description]
-                                  and mdl == station.models[ts_description][mdl_desc])}
-        common_mapping = {mdl_desc: pd.DataFrame(data=mdl.get_mapping(times).A, index=times)
-                          for mdl_desc, mdl in models.items()}
-        return common_mapping
+            if ts_description in station:
+                station.models[ts_description].freeze(model_list=model_list,
+                                                      zero_threshold=zero_threshold)
 
-    def fit(self, ts_description, model_list=None, solver='linear_regression',
-            cached_mapping=True, local_input={}, return_solutions=False,
-            progress_desc=None, **kw_args):
+    def unfreeze(self, ts_description, model_list=None):
         """
-        Fit the models (or a subset thereof) for a specific timeseries at all stations,
-        and read the fitted parameters into the station's model objects.
+        Convenience method that resets any frozen parameters for a certain timeseries
+        at every station.
+
+        Parameters
+        ----------
+        ts_description : str
+            Description of the timeseries to to unfreeze the models for.
+        model_list : list, optional
+            If ``None`` (default), freeze all models. If a list of strings, only
+            freeze the corresponding models in the collection.
+
+        See Also
+        --------
+        freeze : The reverse network method.
+        """
+        for station in self:
+            if ts_description in station:
+                station.models[ts_description].unfreeze(model_list=model_list)
+
+    def fit(self, ts_description, solver='linear_regression', local_input={},
+            return_solutions=False, progress_desc=None, **kw_args):
+        """
+        Fit the models for a specific timeseries at all stations,
+        and read the fitted parameters into the station's model collection.
         Also provides a progress bar.
         Will automatically use multiprocessing if parallelization has been enabled in
         the configuration (defaults to parallelization if possible).
@@ -786,20 +808,11 @@ class Network():
         ----------
         ts_description : str
             Description of the timeseries to fit.
-        model_list : list, optional
-            List of strings containing the model names of the subset of the models
-            to fit. Defaults to all models.
         solver : str, function, optional
             Solver function to use. If given a string, will look for a solver with that
             name in :mod:`~geonat.solvers`, otherwise will use the passed function as a
             solver (which needs to adhere to the same input/output structure as the
             included solver functions). Defaults to standard linear least squares.
-        cached_mapping : bool, optional
-            If ``True``, the mapping matrices for all models that are common to all stations
-            is calculated and inserted into ``kw_args`` as ``'cached_mapping'``, such that
-            redundant work is reduced.
-            This is mostly impactful for serial processing, but does not have a noticeable
-            drawback for parallel processing, which is why it defaults to ``True``.
         local_input : dict, optional
             Provides the ability to pass individual keyword arguments to the solver,
             potentially overriding the (global) keywords in ``kw_args``.
@@ -822,26 +835,21 @@ class Network():
         If ``net`` is a :class:`~Network` instance, ``'mydata'`` is the timeseries to fit,
         and ``mysolver`` is the solver to use, then the following two are equivalent::
 
-            # long version, not parallelized, defaulting to all models
+            # long version, not parallelized
             for station in net:
                 station_ts = station.timeseries['mydata']
                 station_models = station.models['mydata']
-                # a subset list of models would need to be collected here
-                model_params_var = mysolver(station_ts, station_models, **kw_args)
-                for model_description, (params, covs) in model_params_var.items():
-                    station_models[model_description].read_parameters(params, covs)
-            # short version, automatically parallelizes according to geonat.defaults
-            net.fit('mydata', solver=mysolver, **kw_args)
-            # also allows for subsetting models and skipping the import of geonat.solvers
-            net.fit('mydata', model_list=['onlythisone'],
-                    solver='lasso_regression', **kw_args)
+                sol = mysolver(station_ts, station_models, **kw_args)
+                station_models.read_parameters(sol.parameters_zeroed, sol.covariances_zeroed)
+            # short version, automatically parallelizes according to geonat.defaults,
+            # also allows skipping the import of geonat.solvers
+            net.fit('mydata', solver='lasso_regression', **kw_args)
 
         See Also
         --------
         evaluate : Evaluate the fitted models at all stations.
         :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
         geonat.tools.parallelize : Automatically execute a function in parallel or serial.
-        common_mapping : Used when ``cache_mapping`` is ``True``.
         """
         assert isinstance(ts_description, str), \
             f"'ts_description' must be string, got {type(ts_description)}."
@@ -851,35 +859,27 @@ class Network():
             solver = getattr(geonat_solvers, solver)
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
         progress_desc = str(progress_desc) if progress_desc else "Fitting station models"
-        # get common mapping matrices
-        if cached_mapping:
-            kw_args["cached_mapping"] = self.common_mapping(ts_description)
         station_names = self.station_names
         iterable_inputs = ((solver,
                             station.timeseries[ts_description],
-                            station.models[ts_description] if model_list is None
-                            else {m: station.models[ts_description][m] for m in model_list
-                                  if m in station.models[ts_description]},
+                            station.models[ts_description],
                             kw_args if local_input == {}
                             else {**kw_args, **local_input[station_names[i]]})
                            for i, station in enumerate(self))
         if return_solutions:
             solutions = {}
-        for i, result in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
-                                        desc=progress_desc, total=len(self.stations),
-                                        ascii=True, unit="station")):
-            stat_ts = self[station_names[i]].models[ts_description]
+        for i, sol in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
+                                     desc=progress_desc, total=len(self.stations),
+                                     ascii=True, unit="station")):
             # print warning if the solver didn't converge
-            if any([np.isnan(sol.parameters).sum() > 0 for sol in result.values()]):
+            if not sol.converged:
                 warn(f"Fitting did not converge for timeseries {ts_description} "
                      f"at {station_names[i]}", category=RuntimeWarning)
-            for model_description, sol in result.items():
-                stat_ts[model_description].read_parameters(sol.parameters,
-                                                           sol.variances, sol.covariances)
-            # if there is additional output, save it
+            stat_ts = self[station_names[i]].models[ts_description]
+            stat_ts.read_parameters(sol.parameters_zeroed, sol.covariances_zeroed)
+            # if raw output is requested, save it
             if return_solutions:
-                solutions[station_names[i]] = result
-        # output solutions if desired
+                solutions[station_names[i]] = sol
         if return_solutions:
             return solutions
 
@@ -888,11 +888,11 @@ class Network():
         solver, station_time, station_models, kw_args = parameter_tuple
         return solver(station_time, station_models, **kw_args)
 
-    def evaluate(self, ts_description, model_list=None, timevector=None,
-                 output_description=None, reuse=False, progress_desc=None):
+    def evaluate(self, ts_description, timevector=None, output_description=None,
+                 progress_desc=None):
         """
-        Evaluate a timeseries' models (or a subset thereof) at all stations and add them
-        as a fit to the timeseries. Can optionally add the aggregate model as an independent
+        Evaluate a timeseries' models at all stations and adds them as a fit to
+        the timeseries. Can optionally add the aggregate model as an independent
         timeseries to the station as well.
         Also provides a progress bar.
         Will automatically use multiprocessing if parallelization has been enabled in
@@ -902,9 +902,6 @@ class Network():
         ----------
         ts_description : str
             Description of the timeseries to evaluate.
-        model_list : list, optional
-            List of strings containing the model names of the subset of the models
-            to be evaluated. Defaults to all models.
         timevector : pandas.Series, pandas.DatetimeIndex, optional
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` of when to evaluate the model.
@@ -912,11 +909,7 @@ class Network():
         output_description : str, optional
             If provided, add the sum of the evaluated models as a new timeseries
             to each station with the provided description (instead of only adding
-            each individual model as a fit *to* the timeseries).
-        reuse : bool, optional
-            If ``timevector`` is ``None`` and ``output_description`` is set, this flag can
-            be used to skip the actual evaluation of the models if they have already been
-            added as fits, and instead use those fitted timeseries instead.
+            the model as a fit *to* the timeseries).
         progress_desc : str, optional
             If provided, override the description of the progress bar.
 
@@ -925,26 +918,23 @@ class Network():
         If ``net`` is a :class:`~Network` instance, ``'mydata'`` is the timeseries
         to evaluate the models for, then the following two are equivalent::
 
-            # long version, not parallelized, defaulting to all models,
-            # not reusing fits, and not creating a new independent timeseries
+            # long version, not parallelized, and not creating a new independent timeseries
             for station in net:
                 station_ts = station.timeseries['mydata']
-                station_models = station.models['mydata']
-                # a subset list of models would need to be collected here
+                fit_all = station_models.evaluate(station_ts)
+                station.add_fit('mydata', ALLFITS, fit_all)
                 for (model_description, model) in station_models.items():
                     fit = model.evaluate(station_ts)
                     station.add_fit('mydata', model_description, fit)
-            # short version, automatically parallelizes according to geonat.defaults
-            net.evaluate('mydata')
-            # the short version also allows for easy subsetting models,
-            # creating a new timeseries and saving time by reusing the previous fit
-            net.evaluate('mydata', model_list=['onlythisone'],
-                         output_description='evaluated', reuse=True)
+            # short version, automatically parallelizes according to geonat.defaults,
+            # and creating a new timeseries
+            net.evaluate('mydata', output_description='evaluated')
 
         See Also
         --------
         fit : Fit models at all stations.
         :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
+        :attr:`~geonat.models.ALLFITS` : Key used to denote the joint fit using all models.
         geonat.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         assert isinstance(ts_description, str), \
@@ -952,74 +942,38 @@ class Network():
         if output_description is not None:
             assert isinstance(output_description, str), \
                 f"'output_description' must be a string, got {type(output_description)}."
-        if reuse:
-            assert output_description is not None, \
-                "When reusing a previous model evaluation, 'output_description' " \
-                "must be set (otherwise nothing would happen)."
         progress_desc = str(progress_desc) if progress_desc else "Evaluating station models"
-        # should directly use fit from station timeseries, skip evaluation.
-        # can only be used if the timeseries' timevector is used
-        # (and wouldn't do anything if output_description is None)
-        if reuse:
-            assert timevector is None, \
-                "When reusing a previous model evaluation, 'timevector' has to be None"
-            for station in self:
-                stat_subset_models = station.models[ts_description] if model_list is None \
-                                     else {m: station.models[ts_description][m]
-                                           for m in model_list}
-                for imodel, model_description in enumerate(stat_subset_models):
-                    try:
-                        ts = station.fits[ts_description][model_description]
-                    except KeyError as e:
-                        raise KeyError(f"Station {station}, Timeseries '{ts_description}' or "
-                                       f"Model '{model_description}': Fit not found, cannot "
-                                       "evaluate.").with_traceback(e.__traceback__) from e
-                    if imodel == 0:
-                        model_aggregate = ts
-                    else:
-                        model_aggregate += ts
-                station.add_timeseries(output_description, model_aggregate,
-                                       override_src='model',
-                                       override_data_cols=station[ts_description].data_cols)
-        # if not reusing, have to evaluate the models and add to timeseries' fit
-        # and optionally add the aggregate timeseries to the station
-        else:
-            iterable_inputs = ((station.timeseries[ts_description].time
-                                if timevector is None else timevector,
-                                station.models[ts_description] if model_list is None
-                                else {m: station.models[ts_description][m] for m in model_list
-                                      if m in station.models[ts_description]})
-                               for station in self)
-            station_names = self.station_names
-            for i, result in enumerate(tqdm(parallelize(self._evaluate_single_station,
-                                                        iterable_inputs),
-                                            desc=progress_desc, total=len(self.stations),
-                                            ascii=True, unit="station")):
-                stat_name = station_names[i]
-                for imodel, (model_description, fit) in enumerate(result.items()):
-                    ts = self[stat_name].add_fit(ts_description, model_description, fit)
-                    if output_description is not None:
-                        if imodel == 0:
-                            model_aggregate = ts
-                        else:
-                            model_aggregate += ts
-                if output_description is not None:
-                    stat_ts = self[stat_name][ts_description]
-                    self[stat_name].add_timeseries(output_description, model_aggregate,
-                                                   override_src='model',
-                                                   override_data_cols=stat_ts.data_cols)
+        iterable_inputs = ((station.timeseries[ts_description].time
+                            if timevector is None else timevector,
+                            station.models[ts_description])
+                           for station in self)
+        station_names = self.station_names
+        for i, (sumfit, mdlfit) in enumerate(tqdm(parallelize(self._evaluate_single_station,
+                                                              iterable_inputs),
+                                                  desc=progress_desc, total=len(self.stations),
+                                                  ascii=True, unit="station")):
+            stat = self[station_names[i]]
+            # add overall model
+            ts = stat.add_fit(ts_description, ALLFITS, sumfit,
+                              return_ts=(output_description is not None))
+            # if desired, add as timeseries
+            if output_description is not None:
+                stat.add_timeseries(output_description, ts)
+            # add individual fits
+            for model_description, fit in mdlfit.items():
+                stat.add_fit(ts_description, model_description, fit)
 
     @staticmethod
     def _evaluate_single_station(parameter_tuple):
         station_time, station_models = parameter_tuple
-        fit = {}
+        sumfit = station_models.evaluate(station_time)
+        mdlfit = {}
         for model_description, model in station_models.items():
-            fit[model_description] = model.evaluate(station_time)
-        return fit
+            mdlfit[model_description] = model.evaluate(station_time)
+        return sumfit, mdlfit
 
-    def fitevalres(self, ts_description, model_list=None, solver='linear_regression',
-                   cached_mapping=True, local_input={}, return_solutions=False,
-                   timevector=None, output_description=None, reuse=False,
+    def fitevalres(self, ts_description, solver='linear_regression', local_input={},
+                   return_solutions=False, timevector=None, output_description=None,
                    residual_description=None, progress_desc=None, **kw_args):
         """
         Convenience method that combines the calls for :meth:`~fit`, :meth:`~evaluate`
@@ -1029,11 +983,7 @@ class Network():
         ----------
         ts_description : str
             See :meth:`~fit` and :meth:`~evaluate`.
-        model_list : list, optional
-            See :meth:`~fit` and :meth:`~evaluate`.
         solver : str, function, optional
-            See :meth:`~fit`.
-        cached_mapping : bool, optional
             See :meth:`~fit`.
         local_input : dict, optional
             See :meth:`~fit`.
@@ -1042,8 +992,6 @@ class Network():
         timevector : pandas.Series, pandas.DatetimeIndex, optional
             See :meth:`~evaluate`.
         output_description : str, optional
-            See :meth:`~evaluate`.
-        reuse : bool, optional
             See :meth:`~evaluate`.
         residual_description : str, optional
             If provided, calculate the residual as the difference between the data and
@@ -1094,14 +1042,13 @@ class Network():
         else:
             progress_desc = [None, None]
         # fit
-        possible_output = self.fit(ts_description=ts_description, model_list=model_list,
-                                   solver=solver, cached_mapping=cached_mapping,
-                                   local_input=local_input, return_solutions=return_solutions,
+        possible_output = self.fit(ts_description=ts_description,
+                                   solver=solver, local_input=local_input,
+                                   return_solutions=return_solutions,
                                    progress_desc=progress_desc[0], **kw_args)
         # evaluate
-        self.evaluate(ts_description=ts_description, model_list=model_list,
-                      timevector=timevector, output_description=output_description,
-                      reuse=reuse, progress_desc=progress_desc[0])
+        self.evaluate(ts_description=ts_description, timevector=timevector,
+                      output_description=output_description, progress_desc=progress_desc[0])
         # residual
         if residual_description:
             self.math(residual_description, ts_description, "-", output_description)
@@ -1411,7 +1358,7 @@ class Network():
             stat_points, stat_lats, stat_lons
 
     def graphical_cme(self, ts_in, ts_out=None, annotate_stations=True,
-                      gui_kw_args={}, **cme_kw_args):
+                      save=False, gui_kw_args={}, **cme_kw_args):
         """
         Calculates the Common Mode Error (CME) of the network and shows its spatial
         and temporal pattern. Optionally saves the model for each station.
@@ -1425,6 +1372,9 @@ class Network():
             the stations in the network.
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
+        save : bool, optional
+            If ``True``, save the map and timeseries plots to the current folder.
+            Defaults to ``False``.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~geonat.config.defaults`.
         **cme_kw_args : dict
@@ -1465,11 +1415,11 @@ class Network():
         if ndim == 1:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
                                  np.zeros_like(latlonenu[:, 2]), latlonenu[:, 2],
-                                 units='xy', transform=proj_lla)
+                                 units='xy', transform=proj_lla, clip_on=False)
         else:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
                                  latlonenu[:, 2], latlonenu[:, 3],
-                                 units='xy', transform=proj_lla)
+                                 units='xy', transform=proj_lla, clip_on=False)
         key_length = np.median(np.sqrt(np.sum(np.atleast_2d(latlonenu[:, 2:2 + ndim_max2]**2),
                                               axis=1)))
         ax_map.quiverkey(quiv, 0.9, 0.9, key_length,
@@ -1481,10 +1431,18 @@ class Network():
             ax_ts[icomp].plot(model[comp].time, ts)
             ax_ts[icomp].set_ylabel(f"{comp:s} [{model[comp].data_unit:s}]")
             ax_ts[icomp].grid()
-        # show plot
-        plt.show()
+        # show plots or save
+        if save:
+            fig_map.tight_layout()
+            fig_ts.tight_layout()
+            fig_map.savefig("cme_spatial")
+            fig_ts.savefig("cme_temporal")
+            plt.close(fig_map)
+            plt.close(fig_ts)
+        else:
+            plt.show()
 
-    def gui(self, station=None, timeseries=None, model_list=None, sum_models=True,
+    def gui(self, station=None, timeseries=None, fit_list=None, sum_models=True,
             verbose=False, annotate_stations=True, save=False, save_map=False,
             scalogram_kw_args=None, mark_events=None, stepdetector={}, trend_kw_args={},
             analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
@@ -1519,9 +1477,9 @@ class Network():
         timeseries : list, optional
             List of strings with the descriptions of the timeseries to plot.
             Defaults to all timeseries.
-        model_list : list, optional
+        fit_list : list, optional
             List of strings containing the model names of the subset of the models
-            to be evaluated. Defaults to all fitted models.
+            to be plotted. Defaults to all fitted models.
         sum_models : bool, optional
             If ``True``, plot the sum of all selected models instead of every
             model individually. Defaults to ``True``.
@@ -1571,7 +1529,7 @@ class Network():
             Defaults to no velocity arrows shown.
             The dictionary can contain all the keywords that are passed to
             :meth:`~geonat.station.Station.get_trend`, but has at least has to contain
-            the ``ts_description``. If no ``model_list`` is included, the ``model_list``
+            the ``ts_description``. If no ``fit_list`` is included, the ``fit_list``
             passed to ``gui()`` will be used instead. If the number of components available
             is 3 or more, only the first two will be used. If two components are plotted,
             they correspond to the East and North components. If only one component is plotted
@@ -1667,8 +1625,8 @@ class Network():
         if trend_kw_args:
             assert "ts_description" in trend_kw_args, \
                 "'trend_kw_args' dictionary has to include a 'ts_description' keyword."
-            if "model_list" not in trend_kw_args:
-                trend_kw_args["model_list"] = model_list
+            if "fit_list" not in trend_kw_args:
+                trend_kw_args["fit_list"] = fit_list
             # loop over stations
             trend = np.zeros((self.num_stations, 2))
             trend_sigma = np.zeros_like(trend)
@@ -1711,7 +1669,6 @@ class Network():
             ax_map.quiverkey(quiv, 0.9, 0.9, key_length,
                              f"{key_length:.2g} {trend_unit:s}",
                              coordinates="figure")
-            # TODO: plot uncertainty ellipses
 
         # check if mark_events is either a DataFrame or list of DataFrames,
         # containing the necessary columns
@@ -1790,10 +1747,6 @@ class Network():
                 nonlocal fig_scalo
                 t_left, t_right = None, None
             for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
-                # get model subset
-                fits_to_plot = {model_description: fit for model_description, fit
-                                in self[station_name].fits[ts_description].items()
-                                if (model_list is None) or (model_description in model_list)}
                 for icol, (data_col, var_col) in enumerate(zip(ts.data_cols,
                                                                [None] * len(ts.data_cols)
                                                                if ts.var_cols is None
@@ -1813,24 +1766,26 @@ class Network():
                     ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data"
                             if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
-                    if sum_models:
-                        fit_sum = np.zeros(ts.time.size)
-                        fit_sum_sigma = np.zeros(ts.time.size)
-                        for model_description, fit in fits_to_plot.items():
-                            fit_sum += fit.df[fit.data_cols[icol]].values
-                            if (fit.var_cols is not None) \
-                               and (gui_settings["plot_sigmas"] > 0):
-                                fit_sum_sigma += fit.df[fit.var_cols[icol]].values
-                        if fit_sum_sigma.sum() > 0:
-                            fit_sum_sigma = np.sqrt(fit_sum_sigma)
-                            fill_upper = fit_sum + gui_settings["plot_sigmas"] * fit_sum_sigma
-                            fill_lower = fit_sum - gui_settings["plot_sigmas"] * fit_sum_sigma
+                    if sum_models and (ALLFITS in self[station_name].fits[ts_description]):
+                        fit = self[station_name].fits[ts_description][ALLFITS]
+                        if (fit.var_cols is not None) and (gui_settings["plot_sigmas"] > 0):
+                            fill_upper = fit.df[fit.data_cols[icol]] \
+                                + gui_settings["plot_sigmas"] \
+                                * (fit.df[fit.var_cols[icol]] ** 0.5)
+                            fill_lower = fit.df[fit.data_cols[icol]] \
+                                - gui_settings["plot_sigmas"] \
+                                * (fit.df[fit.var_cols[icol]] ** 0.5)
                             ax.fill_between(fit.time, fill_upper, fill_lower,
                                             alpha=gui_settings["plot_sigmas_alpha"],
                                             linewidth=0)
-                        if np.abs(fit_sum).sum() > 0:
-                            ax.plot(fit.time, fit_sum, label="Model")
+                        ax.plot(fit.time, fit.df[fit.data_cols[icol]], label="Model")
                     else:
+                        # get model subset
+                        fits_to_plot = {model_description: fit for model_description, fit
+                                        in self[station_name].fits[ts_description].items()
+                                        if (((fit_list is None)
+                                             or (model_description in fit_list))
+                                            and model_description != ALLFITS)}
                         for model_description, fit in fits_to_plot.items():
                             if (fit.var_cols is not None) \
                                and (gui_settings["plot_sigmas"] > 0):

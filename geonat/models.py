@@ -4,6 +4,7 @@ or generate synthetic timeseries.
 """
 
 import numpy as np
+import scipy as sp
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -13,9 +14,8 @@ from scipy.special import comb, factorial
 from itertools import product
 from cmcrameri import cm as scm
 
-from .tools import tvec_to_numpycol, Timedelta, get_cov_dims, \
-                   make_cov_index_map, full_cov_mat_to_columns, \
-                   block_permutation
+from .tools import tvec_to_numpycol, Timedelta, full_cov_mat_to_columns, \
+                   block_permutation, cov2corr
 
 
 class Model():
@@ -73,65 +73,16 @@ class Model():
     zero_after : bool, optional
         Defines whether the model is zero after ``t_end``, or
         if the boundary value should be used (attribute :attr:`~zero_after`).
-    parameters : numpy.ndarray, optional
-        If provided, already save the model parameters.
-    variances : numpy.ndarray, optional
-        If provided (and ``parameters`` is provided as well), already save the
-        model parameter variances.
-    covariances : numpy.ndarray, optional
-        If provided (and both ``parameters`` and ``variances`` are provided as well),
-        already save the model parameter variances.
-
-    See Also
-    --------
-    read_parameters : Function used to read in the model parameters and (co)variances.
     """
     def __init__(self, num_parameters, regularize=False, time_unit=None,
                  t_start=None, t_end=None, t_reference=None,
-                 zero_before=True, zero_after=True,
-                 parameters=None, variances=None, covariances=None):
+                 zero_before=True, zero_after=True):
+        # define model settings
         self.num_parameters = int(num_parameters)
         """ Number of parameters that define the model and can be solved for. """
         assert self.num_parameters > 0, \
             "'num_parameters' must be an integer greater or equal to one, " \
             f"got {self.num_parameters}."
-        self.is_fitted = False
-        """
-        Tracks whether the model has its parameters set (either by fitting or direct)
-        and can therefore be evaluated. :meth:`~read_parameters` sets it to ``True``,
-        and changing the model (for example by calling :meth:`~Step.add_step`) resets
-        it to ``False``. Prevents model to be evaluated if ``False``.
-        """
-        self.parameters = None
-        r"""
-        Attribute of shape :math:`(\text{num_parameters}, \text{num_components})`
-        that contains the parameters as a NumPy array.
-        """
-        self.var = None
-        r"""
-        Attribute of shape :math:`(\text{num_parameters}, \text{num_components})`
-        that contains the parameter's variances as a NumPy array.
-        """
-        self.cov = None
-        r"""
-        Attribute of shape
-        :math:`(\text{num_parameters}, (\text{num_components}*(\text{num_components}-1))/2)`
-        that contains the parameter's component covariances as a NumPy array.
-        See the Notes of :class:`~geonat.timeseries.Timeseries` for more details about the
-        ordering of the covariance columns.
-        """
-        self.index_map = None
-        r"""
-        Array of size :math:`(\text{num_components}, \text{num_components})` that is ``NaN``
-        everywhere except on the upper diagonal, where it contains the matching column numbers
-        of :attr:`~cov`.
-        """
-        self.var_cov_map = None
-        r"""
-        Array of size :math:`(\text{num_components}^2, )` that contains the column indices
-        of :attr:`~cov` needed to create the full variance-covariance matrix for a single
-        parameter.
-        """
         self.regularize = bool(regularize)
         """ Indicate to solvers to regularize this model (``True``) or not. """
         self.time_unit = str(time_unit)
@@ -158,21 +109,53 @@ class Model():
         If ``True``, model will evaluate to zero after the end time, otherwise the
         model value at the end time will be used for all times after that.
         """
-        # read in parameters if they were passed to constructor
-        if parameters is not None:
-            self.read_parameters(parameters, variances, covariances)
+        self.active_parameters = None
+        r"""
+        By default, all parameters in the model are considered active, and this attribute is
+        set to ``None``. Otherwise, this attribute contains an array of shape
+        :math:`(\text{num_parameters}, )` with ``True`` where parameters are active, and
+        ``False`` otherwise.
+        """
+        # initialize data variables
+        self._par = None
+        self._cov = None
 
     @property
-    def var_cov(self):
+    def par(self):
+        r"""
+        Array property of shape :math:`(\text{num_parameters}, \text{num_components})`
+        that contains the parameters as a NumPy array.
         """
-        Retuns a joint array of the variance and covariance columns, to be indexed
-        by :attr:`~var_cov_map` to yield the full variance-covariance matrix.
+        return self._par
+
+    @property
+    def parameters(self):
+        """ Alias for :attr:`~par`. """
+        return self.par
+
+    @property
+    def var(self):
+        r"""
+        Array property of shape :math:`(\text{num_parameters}, \text{num_components})`
+        that returns the parameter's individual variances as a NumPy array.
         """
-        if self.var is None:
-            raise ValueError("No variances present to return.")
-        if self.cov is None:
-            raise ValueError("No covariances present to set.")
-        return np.concatenate([self.var, self.cov], axis=1)
+        if self._cov is not None:
+            var = np.diag(self._cov).reshape(self.num_parameters, -1)
+        else:
+            var = None
+        return var
+
+    @property
+    def cov(self):
+        r"""
+        Square array property with dimensions
+        :math:`\text{num_elements} * \text{num_components}` that contains the parameter's
+        full covariance matrix as a NumPy array. The rows (and columns) are ordered such
+        that they first correspond to the covariances between all components for the first
+        parameter, then the covariance between all components for the second parameter,
+        and so forth.
+        """
+        return self._cov
 
     def __repr__(self):
         """
@@ -218,6 +201,9 @@ class Model():
         >>> step1 is step2
         False
 
+        See Also
+        --------
+        get_arch : Function used to determine the equality.
         """
         return self.get_arch() == other.get_arch()
 
@@ -269,7 +255,48 @@ class Model():
         raise NotImplementedError("Instantiated model was not subclassed or "
                                   "it does not overwrite the '_get_arch' method.")
 
-    def get_mapping(self, timevector, return_observability=False):
+    def freeze(self, zero_threshold=1e-10):
+        """
+        In case some parameters are estimated to be close to zero and should not
+        be considered in future fits and evaluations, this function "freezes"
+        the model by setting parameters below the threshold ``zero_threshold``
+        to be invalid. The mask will be kept in :attr:`~active_parameters`.
+
+        Only valid parameters will be used by :meth:`~get_mapping` and
+        :meth:`~evaluate`.
+
+        Parameters
+        ----------
+        zero_threshold : float, optional
+            Model parameters with absolute values below ``zero_threshold`` will be
+            set to zero and set inactive. Defaults to ``1e-10``.
+
+        See Also
+        --------
+        unfreeze : The reverse method.
+        """
+        assert float(zero_threshold) > 0, \
+            f"'zero_threshold needs to be non-negative, got {zero_threshold}."
+        if self.par is None:
+            raise RuntimeError("Cannot freeze a model without set parameters.")
+        self.active_parameters = np.any(np.abs(self.par) > zero_threshold, axis=1)
+        self._par[~self.active_parameters, :] = 0
+        if self._cov is not None:
+            inactive_ix = np.repeat(~self.active_parameters, self.par.shape[1])
+            self._cov[np.ix_(inactive_ix, inactive_ix)] = 0
+
+    def unfreeze(self):
+        """
+        Resets previous model freezing done by :meth:`~freeze` such that all parameters
+        are active again.
+
+        See Also
+        --------
+        freeze : The reverse method.
+        """
+        self.active_parameters = None
+
+    def get_mapping(self, timevector, return_observability=False, ignore_active_parameters=False):
         r"""
         Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`.
         Requires the model to be subclassed and implement a :meth:`~_get_mapping` method.
@@ -283,6 +310,9 @@ class Model():
         gets padded before and after with empty sparse matrices (if the model is zero outside
         its boundaries) or the values at the boundaries themselves.
 
+        This method respects the parameters being set invalid by :meth:`~freeze`, and will
+        interpret those parameters to be unobservable.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -292,6 +322,9 @@ class Model():
             If true, the function will check if there are any all-zero columns, which
             would point to unobservable parameters, and return a boolean mask with the
             valid indices.
+        ignore_active_parameters : bool, optional
+            If ``True``, do not set inactive parameters to zero to avoid estimation.
+            Defaults to ``False``.
 
         Returns
         -------
@@ -300,7 +333,7 @@ class Model():
         observable : numpy.ndarray
             Returned if ``return_observability=True``.
             A boolean NumPy array of the same length as ``mapping`` has columns.
-            ``False`` indicates all-zero columns (unobservable parameters).
+            ``False`` indicates (close to) all-zero columns (unobservable parameters).
 
         Raises
         ------
@@ -322,6 +355,9 @@ class Model():
                 f"The child function '_get_mapping' of model {type(self).__name__} " \
                 f"returned an invalid shape. " \
                 f"Expected was ({last-first+1}, {self.num_parameters}), got {coefs.shape}."
+            # if model is frozen, zero out inactive parameters
+            if (self.active_parameters is not None) and (not ignore_active_parameters):
+                coefs[:, ~self.active_parameters] = 0
             if return_observability:
                 # check for the number effective non-zero coefficients
                 # technically observable where we have at least one such value
@@ -425,56 +461,57 @@ class Model():
                              "was specified in the model.")
         return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
-    def read_parameters(self, parameters, variances=None, covariances=None):
+    def read_parameters(self, parameters, covariances=None):
         r"""
-        Reads in the parameters :math:`\mathbf{m}` (optionally also their variances
-        and covariance) and stores them in the instance attributes.
+        Reads in the parameters :math:`\mathbf{m}` (optionally also their
+        covariance) and stores them in the instance attributes.
 
         Parameters
         ----------
         parameters : numpy.ndarray
             Model parameters of shape
             :math:`(\text{num_parameters}, \text{num_components})`.
-        variances : numpy.ndarray, optional
-            Model parameter variances of shape
-            :math:`(\text{num_parameters}, \text{num_components})`.
         covariances : numpy.ndarray, optional
-            Model component covariances of shape
-            :math:`(\text{num_parameters}, (\text{num_components}*(\text{num_components}-1))/2)`
+            Model component (co-)variances that can either have the same shape as
+            ``parameters``, in which case every parameter and component only has a
+            variance, or it is square with dimensions
+            :math:`\text{num_parameters} * \text{num_components}`, in which case it
+            represents a full variance-covariance matrix.
         """
+        # quick check if this is just a reset
+        if parameters is None:
+            self._par = None
+            self._cov = None
+            return
+        # check and set parameters
         assert self.num_parameters == parameters.shape[0], \
             "Read-in parameters have different size than the instantiated model. " + \
             f"Expected {self.num_parameters}, got {parameters.shape}[0]."
-        self.parameters = parameters.reshape((self.num_parameters, -1))
-        num_components = self.parameters.shape[1]
-        if variances is not None:
-            try:
-                self.var = variances.reshape(self.parameters.shape)
-            except ValueError as e:
-                raise ValueError("Variance matrix must have same shape as parameters "
-                                 f"(expected {self.parameters.shape}, got "
-                                 f"{variances.shape}).").with_traceback(e.__traceback__) from e
+        par = parameters.reshape((self.num_parameters, -1))
+        act_params = self.active_parameters
+        if act_params is not None:
+            assert np.all(par[~act_params, :] == 0), \
+                "Something went wrong: inactive parameters should be estimated as 0."
+        self._par = par
+        # check and set covariances
+        if covariances is None:
+            self._cov = None
         else:
-            self.var = None
-        if (variances is not None) and (covariances is not None):
-            assert num_components > 1, \
-                "In order to set covariances, the model needs at least 2 components."
-            cov_dims = get_cov_dims(num_components)
-            try:
-                self.cov = covariances.reshape((self.num_parameters, cov_dims))
-            except ValueError as e:
-                raise ValueError("Covariance matrix must have shape "
-                                 f"{(self.num_parameters, cov_dims)}, got "
-                                 f"{covariances.shape}).").with_traceback(e.__traceback__) from e
-            self.index_map, self.var_cov_map = make_cov_index_map(num_components)
-        else:
-            self.cov = None
-        self.is_fitted = True
+            assert covariances.shape == (parameters.size, parameters.size), \
+                "Covariance matrix must have shape " \
+                f"{(parameters.size, parameters.size)}, got {covariances.shape}."
+            if act_params is not None:
+                active_ix = np.repeat(act_params, self._par.shape[1])
+                assert np.all(covariances[np.ix_(~active_ix, ~active_ix)] == 0), \
+                    "Something went wrong: covariance for inactive parameters should be 0."
+            self._cov = covariances
 
     def evaluate(self, timevector):
         r"""
         Evaluate the model given a time vector (calculates :math:`\mathbf{d}`
         and its (co)variance, if applicable).
+
+        This method ignores the parameters being set invalid by :meth:`~freeze`.
 
         Parameters
         ----------
@@ -494,29 +531,19 @@ class Model():
         RuntimeError
             If the model parameters have not yet been set with :meth:`~read_parameters`.
         """
-        if not self.is_fitted:
+        if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         mapping_matrix = self.get_mapping(timevector=timevector)
-        num_components = self.parameters.shape[1]
-        fit = mapping_matrix @ self.parameters
-        if self.var is None:
+        fit = mapping_matrix @ self.par
+        if self.cov is None:
             fit_var = None
             fit_cov = None
         else:
             # repeat the mapping matrix for all components
+            num_components = self.par.shape[1]
             map_mat_full = sparse.block_diag([mapping_matrix for icomp
                                               in range(num_components)], format="bsr")
-            if self.cov is None:
-                # concatenate the different component variances and make a diagonal matrix
-                var_full = sparse.diags(self.var.ravel(), format="dia")
-            else:
-                # need to build the variance-covariance matrix block-wise
-                var_cov_matrix = self.var_cov
-                var_blocks = [np.reshape(var_cov_matrix[iparam, self.var_cov_map],
-                                         (num_components, num_components))
-                              for iparam in range(self.num_parameters)]
-                var_full = sparse.block_diag(var_blocks, format="dia")
-            # var_full is ordered such that it first contains the sub-covariance between
+            # self.cov is ordered such that it first contains the sub-covariance between
             # all components for the first parameter, then the sub-covariance between all
             # components for the second parameter, and so forth
             # need to reorder (permute) this to be ordered in the same way as the mapping
@@ -525,16 +552,16 @@ class Model():
             # build permutation matrix
             P = block_permutation(self.num_parameters, num_components)
             # permute rows and columns
-            var_full = P @ var_full @ P.T
+            var_full = P @ self.cov @ P.T
             # calculate the predicted variance
-            pred_var = (map_mat_full @ var_full @ map_mat_full.T).A
+            pred_var = map_mat_full @ var_full @ map_mat_full.T
             # this is now ordered such that it first contains the timeseries for the first
             # component, then for the second, etc.
             # to use full_cov_mat_to_columns, it needs to be ordered by timesteps instead
             # so we use another permutation matrix
             P = block_permutation(num_components, timevector.size)
             pred_var = P @ pred_var @ P.T
-            # extract the diagonal components and reshape
+            # extract the (block-)diagonal components and reshape
             fit_var, fit_cov = full_cov_mat_to_columns(pred_var, num_components,
                                                        include_covariance=True)
         if fit.ndim == 1:
@@ -575,9 +602,8 @@ class Step(Model):
         self.timestamps.sort()
         self.steptimes = [step.isoformat() for step in self.timestamps]
         self.num_parameters = len(self.timestamps)
-        self.is_fitted = False
-        self.parameters = None
-        self.var = None
+        self._par = None
+        self._cov = None
 
     def add_step(self, step):
         """
@@ -627,31 +653,32 @@ class Polynomial(Model):
     ----------
     order : int
         Order (highest exponent) of the polynomial. The number of model parameters
-        equals ``order + 1``.
+        equals ``order + 1 - min_exponent``.
+    min_exponent : int, optional
+        Lowest exponent of the polynomial. Defaults to ``0``, i.e. the constant offset.
 
 
     See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, order, t_reference,
+    def __init__(self, order, t_reference, min_exponent=0,
                  time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
-        super().__init__(num_parameters=order + 1, t_reference=t_reference, time_unit=time_unit,
+        super().__init__(num_parameters=order + 1 - min_exponent,
+                         t_reference=t_reference, time_unit=time_unit,
                          zero_before=zero_before, zero_after=zero_after, **model_kw_args)
         self.order = int(order)
+        self.min_exponent = int(min_exponent)
 
     def _get_arch(self):
         arch = {"type": "Polynomial",
-                "kw_args": {"order": self.order}}
+                "kw_args": {"order": self.order, "min_exponent": self.min_exponent}}
         return arch
 
     def _get_mapping(self, timevector):
-        coefs = np.ones((timevector.size, self.num_parameters))
-        if self.order >= 1:
-            # now we actually need the time
-            dt = self.tvec_to_numpycol(timevector)
-            # the exponents increase by column
-            exponents = np.arange(1, self.order + 1)
-            # broadcast to all coefficients
-            coefs[:, 1:] = dt.reshape(-1, 1) ** exponents.reshape(1, -1)
+        dt = self.tvec_to_numpycol(timevector)
+        # the exponents increase by column
+        exponents = np.arange(self.min_exponent, self.order + 1)
+        # broadcast to all coefficients
+        coefs = dt.reshape(-1, 1) ** exponents.reshape(1, -1)
         return coefs
 
 
@@ -1043,7 +1070,7 @@ class SplineSet(Model):
     def _get_mapping(self, timevector):
         coefs = np.empty((timevector.size, self.num_parameters))
         ix_coefs = 0
-        for i, model in enumerate(self.splines):
+        for model in self.splines:
             coefs[:, ix_coefs:ix_coefs + model.num_parameters] = \
                 model.get_mapping(timevector).A.squeeze()
             ix_coefs += model.num_parameters
@@ -1051,38 +1078,92 @@ class SplineSet(Model):
             coefs *= self.internal_scales.reshape(1, self.num_parameters)
         return coefs
 
-    def read_parameters(self, parameters, variances=None, covariances=None):
+    def freeze(self, zero_threshold=1e-10):
+        """
+        In case some parameters are estimated to be close to zero and should not
+        be considered in future fits and evaluations, this function "freezes"
+        the model by setting parameters below the threshold ``zero_threshold``
+        to be invalid. The mask will be kept in
+        :attr:`~geonat.models.Model.active_parameters`.
+
+        Only valid parameters will be used by :meth:`~geonat.models.Model.get_mapping` and
+        :meth:`~geonat.models.Model.evaluate`.
+
+        Parameters
+        ----------
+        zero_threshold : float, optional
+            Model parameters with absolute values below ``zero_threshold`` will be
+            set inactive. Defaults to ``1e-10``.
+
+        See Also
+        --------
+        unfreeze : The reverse method.
+        """
+        assert float(zero_threshold) > 0, \
+            f"'zero_threshold needs to be non-negative, got {zero_threshold}."
+        if self.par is None:
+            raise RuntimeError("Cannot freeze a model without set parameters.")
+        temp_par = (self.par * self.internal_scales.reshape(-1, 1) if self.internal_scaling
+                    else self.par)
+        self.active_parameters = np.any(np.abs(temp_par) > zero_threshold, axis=1)
+        ix_params = 0
+        for model in self.splines:
+            model.active_parameters = \
+                self.active_parameters[ix_params:ix_params + model.num_parameters]
+            ix_params += model.num_parameters
+
+    def unfreeze(self):
+        """
+        Resets previous model freezing done by :meth:`~freeze` such that all parameters
+        are active again.
+        """
+        self.active_parameters = None
+        for model in self.splines:
+            model.active_parameters = None
+
+    def read_parameters(self, parameters, covariances=None):
         r"""
         Reads in the parameters :math:`\mathbf{m}` (optionally also their variances)
         of all the sub-splines and stores them in the respective attributes.
+
+        Note that the main ``SplineSet`` object will still contain all the cross-spline
+        covariances (if contained in ``covariances``), but the sub-splines cannot.
 
         Parameters
         ----------
         parameters : numpy.ndarray
             Model parameters of shape
             :math:`(\text{num_parameters}, \text{num_components})`.
-        variances : numpy.ndarray, optional
-            Model parameter variances of shape
-            :math:`(\text{num_parameters}, \text{num_components})`.
         covariances : numpy.ndarray, optional
-            Model component covariances of shape
-            :math:`(\text{num_parameters}, (\text{num_components}*(\text{num_components}-1))/2)`
+            Model component (co-)variances that can either have the same shape as
+            ``parameters``, in which case every parameter and component only has a
+            variance, or it is square with dimensions
+            :math:`\text{num_parameters} * \text{num_components}`, in which case it
+            represents a full variance-covariance matrix.
         """
-        super().read_parameters(parameters, variances, covariances)
+        super().read_parameters(parameters, covariances)
+        num_components = parameters.shape[1]
         if self.internal_scaling:
             parameters = parameters * self.internal_scales.reshape(-1, 1)
-            if variances is not None:
-                variances = variances * self.internal_scales.reshape(-1, 1) ** 2
-                if covariances is not None:
+            if covariances is not None:
+                if parameters.shape == covariances.shape:
                     covariances = covariances * self.internal_scales.reshape(-1, 1) ** 2
+                else:
+                    repeat_int_scales = np.repeat(self.internal_scales, num_components)
+                    covariances = ((covariances * repeat_int_scales.reshape(-1, 1))
+                                   * repeat_int_scales.reshape(1, -1))
         ix_params = 0
-        for i, model in enumerate(self.splines):
+        for model in self.splines:
             param_model = parameters[ix_params:ix_params + model.num_parameters, :]
-            var_model = (None if variances is None else
-                         variances[ix_params:ix_params + model.num_parameters, :])
-            cov_model = (None if covariances is None else
-                         covariances[ix_params:ix_params + model.num_parameters, :])
-            model.read_parameters(param_model, var_model, cov_model)
+            if covariances is None:
+                cov_model = None
+            elif parameters.shape == covariances.shape:
+                cov_model = covariances[ix_params:ix_params + model.num_parameters, :]
+            else:
+                ix_start = ix_params * num_components
+                ix_end = ix_start + model.num_parameters * num_components
+                cov_model = covariances[ix_start:ix_end, ix_start:ix_end]
+            model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 
     def make_scalogram(self, t_left, t_right, cmaprange=None, resolution=1000,
@@ -1108,7 +1189,7 @@ class SplineSet(Model):
         resolution : int, optional
             Number of points inside the time span to evaluate the scalogram at.
         min_param_mag : float, optional
-            The minimum absolute value of a parameter to be plotted.
+            The absolute value under which any value is plotted as zero.
 
         Returns
         -------
@@ -1124,9 +1205,10 @@ class SplineSet(Model):
             spline class is not defined in this method yet.
         """
         # check input
-        assert self.is_fitted, "SplineSet model needs to have already been fitted."
+        if self.par is None:
+            RuntimeError("SplineSet model needs to have already been fitted.")
         # determine dimensions
-        num_components = self.parameters.shape[1]
+        num_components = self.par.shape[1]
         num_scales = len(self.splines)
         dy_scale = 1/num_scales
         t_plot = pd.Series(pd.date_range(start=t_left, end=t_right, periods=resolution))
@@ -1136,7 +1218,7 @@ class SplineSet(Model):
                 "'cmaprange' must be None or a single float or integer of the " \
                 f"one-sided color range of the scalogram, got {cmaprange}."
         else:
-            cmaprange = np.max(np.concatenate([np.abs(model.parameters)
+            cmaprange = np.max(np.concatenate([np.abs(model.par)
                                                for model in self.splines],
                                               axis=0).ravel())
         cmap = mpl.cm.ScalarMappable(cmap=scm.roma_r,
@@ -1153,9 +1235,10 @@ class SplineSet(Model):
             y_off = 1 - (i + 1)*dy_scale
             # get normalized values
             if self.splineclass == BSpline:
-                mdl_mapping = model.get_mapping(t_plot).A
+                mdl_mapping = model.get_mapping(t_plot, ignore_active_parameters=True).A
             elif self.splineclass == ISpline:
-                mdl_mapping = np.gradient(model.get_mapping(t_plot).A, axis=0)
+                mdl_mapping = np.gradient(
+                    model.get_mapping(t_plot, ignore_active_parameters=True).A, axis=0)
             else:
                 raise NotImplementedError("Scalogram undefined for a SplineSet of class "
                                           f"{self.splineclass.__name__}.")
@@ -1165,11 +1248,13 @@ class SplineSet(Model):
                                 np.cumsum(mdl_mapping / mdl_sum, axis=1)])
             # plot cell
             for j, k in product(range(model.num_parameters), range(num_components)):
-                if np.abs(model.parameters[j, k]) > min_param_mag:
+                if ~np.isnan(model.par[j, k]):
+                    facecol = cmap.to_rgba(model.par[j, k]
+                                           if np.abs(model.par[j, k]) >= min_param_mag else 0)
                     ax[k].fill_between(t_plot,
                                        y_off + y_norm[:, j]*dy_scale,
                                        y_off + y_norm[:, j+1]*dy_scale,
-                                       facecolor=cmap.to_rgba(model.parameters[j, k]))
+                                       facecolor=facecol)
             # plot vertical lines at centerpoints
             for j, k in product(range(model.num_parameters), range(num_components)):
                 ax[k].axvline(model.t_reference
@@ -1239,16 +1324,16 @@ class Sinusoidal(Model):
     @property
     def amplitude(self):
         """ Amplitude of the sinusoid. """
-        if not self.is_fitted:
+        if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return np.sqrt(np.sum(self.parameters ** 2))
+        return np.sqrt(np.sum(self.par ** 2))
 
     @property
     def phase(self):
         """ Phase of the sinusoid. """
-        if not self.is_fitted:
+        if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return np.arctan2(self.parameters[1], self.parameters[0])[0]
+        return np.arctan2(self.par[1], self.par[0])[0]
 
 
 class Logarithmic(Model):
@@ -1411,3 +1496,798 @@ def check_model_dict(models):
         assert isinstance(mdl_config["kw_args"], dict), \
             f"'kw_args' in configuration dictionary for '{mdl_name}' needs to be " \
             f"a dictionary, got {mdl_config['kw_args']}."
+
+
+# make a custom object that serves as the "all models" fit key
+class AllFits():
+    def __repr__(self):
+        return "Model"
+
+
+# this object is hashable, and we will create one instance that users can import
+ALLFITS = AllFits()
+
+
+class ModelCollection():
+    """
+    Class that contains :class:`~Model` objects and is mainly used to keep track
+    of across-model variables and relations such as the cross-model covariances.
+    It also contains convenience functions that wrap individual models' functions like
+    :meth:`~geonat.models.Model.evaluate`, :meth:`~geonat.models.Model.get_mapping`
+    or :meth:`~geonat.models.Model.read_parameters` or attributes like
+    :attr:`~geonat.models.Model.par`.
+    """
+    def __init__(self):
+        self.collection = {}
+        """
+        Dictionary of :class:`~Model` objects contained in this collection.
+        """
+        self._par = None
+        self._cov = None
+
+    @classmethod
+    def from_model_dict(cls, model_dict):
+        """
+        Creates an empty :class:`~ModelCollection` object, and adds a dictionary of
+        model objects to it.
+
+        Parameters
+        ----------
+        model_dict : dict
+            Dictionary with model names as keys, and :class:`~Model` object instances
+            as values.
+
+        Return
+        ------
+        ModelCollection
+            The new :class:`~ModelCollection` object.
+        """
+        coll = cls()
+        for model_description, model in model_dict.items():
+            coll[model_description] = model
+        return coll
+
+    def __getitem__(self, model_description):
+        """
+        Convenience special function to the models contained in :attr:`~collection`.
+        """
+        if model_description not in self.collection:
+            raise KeyError(f"No model '{model_description}' present in collection.")
+        return self.collection[model_description]
+
+    def __setitem__(self, model_description, model):
+        """
+        Convenience special function to add or update a model contained in
+        :attr:`~collection`. Setting or updating a model forces the collection's
+        parameter and covariance matrices to be reset to ``None``.
+        """
+        assert isinstance(model_description, str) and isinstance(model, Model), \
+            "'model_description' needs to be a string and 'model' needs to be a Model, " \
+            f"got {(type(model_description), type(model))}."
+        if model_description in self.collection:
+            warn(f"ModelCollection: Overwriting model '{model_description}'.",
+                 category=RuntimeWarning)
+        self._par = None
+        self._cov = None
+        self.collection[model_description] = model
+
+    def __delitem__(self, model_description):
+        """
+        Convenience special function to delete a model contained in
+        :attr:`~collection`. Deleting a model forces the collection's parameter and
+        covariance matrices to be reset to ``None``.
+        """
+        self._par = None
+        self._cov = None
+        del self.collection[model_description]
+
+    def __iter__(self):
+        """
+        Convenience special function that allows for a shorthand notation to quickly
+        iterate over all models in :attr:`~collection`.
+
+        Example
+        -------
+        If ``mc`` is a :class:`~ModelCollection` instance, then the following
+        two loops are equivalent::
+
+            # long version
+            for model in mc.collection.values():
+                pass
+            # shorthand
+            for model in mc:
+                pass
+        """
+        for model in self.collection.values():
+            yield model
+
+    def __len__(self):
+        """
+        Special function that gives quick access to the number of models
+        in the collection using Python's built-in ``len()`` function
+        to make interactions with iterators easier.
+        """
+        return len(self.collection)
+
+    def __contains__(self, model_description):
+        """
+        Special function that allows to check whether a certain model description
+        is in the collection.
+
+        Example
+        -------
+        If ``mc`` is a :class:`~ModelCollection` instance, and we want to check whether
+        ``'mymodel'`` is a model in the collection, the following two are equivalent:
+
+            # long version
+            'mymodel' in mc.collection
+            # short version
+            'mymodel' in mc
+        """
+        return model_description in self.collection
+
+    def __repr__(self):
+        """
+        Special function that returns a readable summary of the model collection.
+        Accessed, for example, by Python's ``print()`` built-in function.
+
+        Returns
+        -------
+        info : str
+            Model collection summary.
+        """
+        info = f"ModelCollection ({self.num_parameters} parameters)"
+        for k, v in self.collection.items():
+            info += f"\n  {k+':':<15}{v.get_arch()['type']}"
+        return info
+
+    def __eq__(self, other):
+        """
+        Special function that allows for the comparison of model collection based on
+        their contents, regardless of model parameters.
+
+        Parameters
+        ----------
+        other : geonat.models.ModelCollection
+            Model collection to compare to.
+
+        See Also
+        --------
+        geonat.models.Model.__eq__ : For more details.
+        """
+        return self.get_arch() == other.get_arch()
+
+    def get_arch(self):
+        """
+        Get a dictionary that describes the model collection fully and allows it to
+        be recreated.
+
+        Returns
+        -------
+        arch : dict
+            Model keyword dictionary.
+        """
+        arch = {"type": "ModelCollection",
+                "collection": {k: v.get_arch() for k, v in self.collection.items()}}
+        return arch
+
+    def items(self):
+        """
+        Convenience function that returns a key-value-iterator from :attr:`~collection`.
+        """
+        return self.collection.items()
+
+    @property
+    def num_parameters(self):
+        """
+        Number of parameters in the model collection, calculated as the sum of all
+        the parameters in the contained models.
+        """
+        return sum([m.num_parameters for m in self])
+
+    @property
+    def model_names(self):
+        """
+        List of all model names.
+        """
+        return list(self.collection.keys())
+
+    @property
+    def num_regularized(self):
+        """
+        Number of all regularized parameters.
+        """
+        return sum(self.regularized_mask)
+
+    @property
+    def regularized_mask(self):
+        r"""
+        A boolean array mask of shape :math:`(\text{num_parameters}, )`
+        where ``True`` denotes a regularized parameter (``False`` otherwise``).
+        """
+        regularized_mask = []
+        for m in self:
+            regularized_mask.extend([m.regularize] * m.num_parameters)
+        return regularized_mask
+
+    @property
+    def internal_scales(self):
+        r"""
+        Array of shape :math:`(\text{num_parameters}, )` that collects all the
+        models' internal scales.
+        """
+        if len(self) > 0:
+            internal_scales = []
+            for m in self:
+                internal_scales.append(getattr(m, "internal_scales",
+                                               np.ones(m.num_parameters)))
+            return np.concatenate(internal_scales)
+
+    @property
+    def active_parameters(self):
+        r"""
+        Either ``None``, if all parameters are active, or an array of shape
+        :math:`(\text{num_parameters}, )` that contains ``True`` for all active
+        parameters, and ``False`` otherwise.
+        """
+        if len(self) > 0:
+            active_params = [m.active_parameters if m.active_parameters is not None
+                             else np.ones(m.num_parameters, dtype=bool) for m in self]
+            active_params = np.concatenate(active_params)
+            if np.all(active_params):
+                return None
+            else:
+                return active_params
+
+    @property
+    def par(self):
+        r"""
+        Array property of shape :math:`(\text{num_parameters}, \text{num_components})`
+        that contains the parameters as a NumPy array.
+        """
+        test_par = [m.par for m in self]
+        test_par_anynone = any([p is None for p in test_par])
+        if (self._par is None) and not test_par_anynone:
+            warn("Discrepancy between ModelCollection parameters and individual "
+                 "parameters: collection is not fitted.")
+        elif self._par is not None:
+            assert self._par.shape[0] == self.num_parameters, \
+                "Saved parameter matrix does not match the model list in the collection."
+            if test_par_anynone:
+                warn("Discrepancy between ModelCollection parameters and individual "
+                     "parameters: individual models are not fitted.")
+            else:
+                test_par = np.concatenate(test_par, axis=0)
+                if not np.allclose(self._par, test_par):
+                    warn("Discrepancy between ModelCollection parameters and individual "
+                         "parameters: not matching (returning collection values).")
+        return self._par
+
+    @property
+    def parameters(self):
+        """ Alias for :attr:`~par`. """
+        return self.par
+
+    @property
+    def var(self):
+        r"""
+        Array property of shape :math:`(\text{num_parameters}, \text{num_components})`
+        that returns the parameter's individual variances as a NumPy array.
+        """
+        if self.cov is None:
+            return None
+        else:
+            return np.diag(self.cov).reshape(self.num_parameters, -1)
+
+    @property
+    def cov(self):
+        r"""
+        Square array property with dimensions
+        :math:`\text{num_elements} * \text{num_components}` that contains the parameter's
+        full covariance matrix as a NumPy array. The rows (and columns) are ordered such
+        that they first correspond to the covariances between all components for the first
+        parameter, then the covariance between all components for the second parameter,
+        and so forth.
+        """
+        test_cov = [m.cov for m in self]
+        test_cov_anynone = any([p is None for p in test_cov])
+        if (self._cov is None) and not test_cov_anynone:
+            warn("Discrepancy between ModelCollection covariance and individual "
+                 "covariances: collection is not fitted.")
+        elif self._cov is not None:
+            par_size = self.par.shape[0] * self.par.shape[1]
+            assert self._cov.shape == (par_size, par_size), \
+                "Saved covariance matrix does not match the model list in the collection."
+            if test_cov_anynone:
+                warn("Discrepancy between ModelCollection covariance and individual "
+                     "covariances: individual models are not fitted.")
+            else:
+                test_cov = sp.linalg.block_diag(*test_cov).ravel()
+                test_cov_nonzero = np.nonzero(test_cov)
+                test_cov = test_cov[test_cov_nonzero]
+                cov_nooffdiag = self._cov.ravel()[test_cov_nonzero]
+                if not np.allclose(cov_nooffdiag, test_cov, equal_nan=True):
+                    warn("Discrepancy between ModelCollection covariance and individual "
+                         "covariance: not matching (returning collection values).")
+        return self._cov
+
+    @property
+    def covariances(self):
+        """ Alias for :attr:`~cov`. """
+        return self.cov
+
+    def freeze(self, model_list=None, zero_threshold=1e-10):
+        """
+        Convenience function that calls :meth:`~geonat.models.Model.freeze` for all
+        models (or a subset thereof) contained in the collection.
+
+        Parameters
+        ----------
+        model_list : list, optional
+            If ``None`` (default), freeze all models. If a list of strings, only
+            freeze the corresponding models in the collection.
+        zero_threshold : float, optional
+            Model parameters with absolute values below ``zero_threshold`` will be
+            set to zero and set inactive. Defaults to ``1e-10``.
+        """
+        if model_list is not None:
+            assert (isinstance(model_list, list)
+                    and all([isinstance(mdl, str) for mdl in model_list])), \
+                f"'model_list' needs to be a list of strings, got {model_list}."
+        for model in [mdl for mdl_description, mdl in self.items()
+                      if (model_list is None) or (mdl_description in model_list)]:
+            model.freeze(zero_threshold)
+
+    def unfreeze(self, model_list=None):
+        """
+        Convenience function that calls :meth:`~geonat.models.Model.unfreeze` for all
+        models (or a subset thereof) contained in the collection.
+
+        Parameters
+        ----------
+        model_list : list, optional
+            If ``None`` (default), unfreeze all models. If a list of strings, only
+            unfreeze the corresponding models in the collection.
+        """
+        if model_list is not None:
+            assert (isinstance(model_list, list)
+                    and all([isinstance(mdl, str) for mdl in model_list])), \
+                f"'model_list' needs to be a list of strings, got {model_list}."
+        for model in [mdl for mdl_description, mdl in self.items()
+                      if (model_list is None) or (mdl_description in model_list)]:
+            model.unfreeze()
+
+    # "inherit" the read_parameter function from the Model class
+    _read_parameters = Model.read_parameters
+
+    def read_parameters(self, parameters, covariances=None):
+        r"""
+        Reads in the entire collection's parameters :math:`\mathbf{m}` (optionally also
+        their covariance) and stores them in the instance attributes.
+
+        Parameters
+        ----------
+        parameters : numpy.ndarray
+            Model collection parameters of shape
+            :math:`(\text{num_parameters}, \text{num_components})`.
+        covariances : numpy.ndarray, optional
+            Model collection component (co-)variances that can either have the same shape
+            as ``parameters``, in which case every parameter and component only has a
+            variance, or it is square with dimensions
+            :math:`\text{num_parameters} * \text{num_components}`, in which case it
+            represents a full variance-covariance matrix.
+        """
+        # read as if the collection was a model for itself
+        self._read_parameters(parameters, covariances)
+        # distribute to models (they should get just sliced views of the full data)
+        ix_params = 0
+        for model in self:
+            # get parameters slice
+            if self._par is None:
+                param_model = None
+            else:
+                param_model = self._par[ix_params:ix_params + model.num_parameters, :]
+            # get covariance slice
+            if (self._par is None) or (self._cov is None):
+                cov_model = None
+            else:
+                ix_start = ix_params * self._par.shape[1]
+                ix_end = ix_start + model.num_parameters * self._par.shape[1]
+                cov_model = self._cov[ix_start:ix_end, ix_start:ix_end]
+            # pass to model and advance
+            model.read_parameters(param_model, cov_model)
+            ix_params += model.num_parameters
+
+    # "inherit" the evaluate function from the Model class
+    evaluate = Model.evaluate
+
+    def get_mapping(self, timevector, return_observability=False,
+                    ignore_active_parameters=False):
+        r"""
+        Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`
+        by concatenating the individual mapping matrices from each contained model using
+        their method :meth:`~geonat.models.Model.get_mapping` (see for more details).
+
+        This method respects the parameters being set invalid by :meth:`~freeze`, and will
+        interpret those parameters to be unobservable.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+        return_observability : bool, optional
+            If true, the function will check if there are any all-zero columns, which
+            would point to unobservable parameters, and return a boolean mask with the
+            valid indices.
+        ignore_active_parameters : bool, optional
+            If ``True``, do not set inactive parameters to zero to avoid estimation.
+            Defaults to ``False``.
+
+        Returns
+        -------
+        mapping : scipy.sparse.csc_matrix
+            Sparse mapping matrix.
+        observable : numpy.ndarray
+            Returned if ``return_observability=True``.
+            A boolean NumPy array of the same length as ``mapping`` has columns.
+            ``False`` indicates (close to) all-zero columns (unobservable parameters).
+        """
+        mappings = [m.get_mapping(timevector,
+                                  return_observability=return_observability,
+                                  ignore_active_parameters=ignore_active_parameters)
+                    for m in self]
+        if return_observability:
+            mapping = sparse.hstack([m[0] for m in mappings], format='csc')
+            observable = np.concatenate([m[1] for m in mappings], axis=0)
+            return mapping, observable
+        else:
+            mapping = sparse.hstack(mappings, format='csc')
+            return mapping
+
+    def prepare_LS(self, ts, include_regularization=True, reweight_init=None,
+                   use_internal_scales=False):
+        r"""
+        Helper function that concatenates the mapping matrices of the collection
+        models given the timevector in in the input timeseries, and returns some
+        relevant sizes.
+
+        It can also combine the regularization masks and reshape the input weights
+        into the format used by the solvers, optionally taking into account
+        the internal scales.
+
+        Parameters
+        ----------
+        ts : geonat.timeseries.Timeseries
+            The timeseries whose time indices are used to calculate the mapping matrix.
+        include_regularization : bool, optional
+            If ``True`` (default), expands the returned variables (see below) and computes
+            the regularization mask for the observable parameters only.
+        reweight_init : numpy.ndarray, dict, list, optional
+            Contains the initial weights for the current iteration of the least squares
+            problem. It can be a Numpy array or a list of Numpy arrays, in which case it
+            (or the array created by concatenating the list) need to already have the right
+            output shape (no check is performed). If it is a dictionary, the keys need to be
+            model names, and the values are then the Numpy arrays which will be arranged
+            properly to match the mapping matrix.
+        use_internal_scales : bool, optional
+            If ``True`` (default: ``False``), also return the internal model scales,
+            subset to the observable and regularized parameters.
+
+        Returns
+        -------
+        G : scipy.sparse.spmatrix
+            Mapping matrix computed by :meth:`~get_mapping`.
+        obs_mask : numpy.ndarray
+            Observability mask computed by :meth:`~get_mapping`.
+        num_time : int
+            Length of the timeseries.
+        num_params : int
+            Number of total parameters present in the model collection.
+        num_comps : int
+            Number of components in the timeseries.
+        num_obs : int
+            Number of observable parameters.
+        num_reg : int
+            (Only if ``include_regularization=True``.)
+            Number of observable and regularized parameters.
+        reg_mask : numpy.ndarray
+            (Only if ``include_regularization=True``.)
+            Numpy array of shape :math:`(\text{num_obs}, )` that for each observable
+            parameter denotes whether that parameter is regularized (``True``) or not.
+        init_weights : numpy.ndarray
+            (Only if ``include_regularization=True``.)
+            Numpy array of shape :math:`(\text{num_reg}, )` that for each observable
+            and regularized parameter contains the initial weights.
+            ``None`` if ``reweight_init=None``.
+        weights_scaling : numpy.ndarray
+            (Only if ``include_regularization=True``.)
+            Numpy array of shape :math:`(\text{num_reg}, )` that for each observable
+            and regularized parameter contains the internal model scale.
+            ``None`` if ``use_internal_scales=False``.
+
+        See Also
+        --------
+        build_LS : Function that follows this one in the regular solving process.
+        """
+        # G has shape (ts.time.size, self.num_parameters)
+        # obs_mask has shape (self.num_parameters, ) and is True if a parameter
+        # is observable
+        G, obs_mask = self.get_mapping(ts.time, return_observability=True)
+        num_time, num_params = G.shape
+        assert num_params > 0, f"Mapping matrix is empty, has shape {G.shape}."
+        num_obs = obs_mask.sum()
+        assert num_obs > 0, "Mapping matrix has no observable parameters."
+        num_comps = ts.num_components
+        if include_regularization:
+            # reg_mask_full has shape (self.num_parameters, ) and is True if
+            # a parameter should be regularized
+            reg_mask_full = self.regularized_mask
+            # now, we need the regularization mask reg_mask for the reduced G matrix, which
+            # will only contain observable columns, has therefore shape (sum(obs_mask), )
+            reg_mask = np.array(reg_mask_full)[obs_mask]
+            # sum_reg is the number of parameters that are both observable and regularized
+            num_reg = sum(reg_mask)
+            if num_reg == 0:
+                warn("Regularized solver got no models to regularize.")
+            # if use_internal_scales, we still need the scales for all the observable and
+            # regularized parameters
+            # self.internal_scales has shape (self.num_parameters, ) so we can use the
+            # combination of obs_mask and reg_mask_full to find the relevant subset
+            if use_internal_scales:
+                weights_scaling = self.internal_scales[np.logical_and(reg_mask_full, obs_mask)]
+            else:
+                weights_scaling = None
+            # if there are initial weights, distribute those
+            if reweight_init is None:
+                init_weights = None
+            elif isinstance(reweight_init, np.ndarray):
+                init_weights = reweight_init
+            elif isinstance(reweight_init, list):
+                init_weights = np.concatenate(init_weights)
+            elif isinstance(reweight_init, dict):
+                # concatenace the sub-arrays in the right order, and fill with empty
+                # weights (temporarily) in between, so that we can use the global obs_mask
+                init_weights = []
+                for mdl_description, model in self.items():
+                    if model.regularize and mdl_description in reweight_init:
+                        init_weights.append(reweight_init[mdl_description])
+                    else:
+                        temp_weights = np.empty((model.num_parameters, num_comps))
+                        temp_weights[:] = np.NaN
+                        init_weights.append(temp_weights)
+                init_weights = \
+                    np.concatenate(init_weights)[np.logical_and(reg_mask_full, obs_mask)]
+                # this should not contain any NaNs anymore
+                assert np.isnan(init_weights).ravel().sum() == 0
+            else:
+                raise ValueError("Unrecognized input for 'reweight_init'.")
+            if init_weights is not None:
+                assert init_weights.shape == (num_reg, num_comps), \
+                    "The combined 'reweight_init' must have the shape " + \
+                    f"{(num_reg, num_comps)}, got {reweight_init.shape}."
+            return G, obs_mask, num_time, num_params, num_comps, num_obs, num_reg, \
+                reg_mask, init_weights, weights_scaling
+        else:
+            return G, obs_mask, num_time, num_params, num_comps, num_obs
+
+    @staticmethod
+    def build_LS(ts, G, obs_mask, icomp=None, return_W_G=False,
+                 use_data_var=True, use_data_cov=True):
+        r"""
+        Helper function that builds the necessary matrices to solve the
+        least-squares problem for the observable parameters given observations.
+
+        If the problem only attempts to solve a single data component (by specifying
+        its index in ``icomp``), it simply takes the input mapping matrix :math:`\mathbf{G}`,
+        creates the weight matrix :math:`\mathbf{W}`, and computes
+        :math:`\mathbf{G}^T \mathbf{W} \mathbf{G}` as well as
+        :math:`\mathbf{G}^T \mathbf{W} \mathbf{d}`.
+
+        If the problem is joint, i.e. there are multiple data components with covariance
+        between them, this function brodcasts the mapping matrix to the components,
+        creates the multi-component weight matrix, and then computes those same
+        :math:`\mathbf{G}^T \mathbf{W} \mathbf{G}` and
+        :math:`\mathbf{G}^T \mathbf{W} \mathbf{d}` matrices.
+
+        Parameters
+        ----------
+        G : scipy.sparse.spmatrix
+            Single-component mapping matrix.
+        obs_mask: numpy.ndarray
+            Observability mask.
+        icomp : int, optional
+            If provided, the integer index of the component of the data to be fitted.
+        return_W_G : bool, optional
+            If ``True`` (default: ``False``), also return the :math:`\mathbf{G}` and
+            :math:`\mathbf{W}` matrices, reduced to the observable parameters and
+            given observations.
+        use_data_var : bool, optional
+            If ``True`` (default), use the data variance if present. If ``False``,
+            ignore it even if it is present.
+        use_data_cov : bool, optional
+            If ``True`` (default), use the data covariance if present. If ``False``,
+            ignore it even if it is present.
+
+        Returns
+        -------
+        G : scipy.sparse.spmatrix
+            (If ``return_W_G=True``.) Reduced :math:`\mathbf{G}` matrix.
+        W : scipy.sparse.spmatrix
+            (If ``return_W_G=True``.) Reduced :math:`\mathbf{W}` matrix.
+        GtWG : numpy.ndarray
+            Reduced :math:`\mathbf{G}^T \mathbf{W} \mathbf{G}` matrix.
+        GtWd : numpy.ndarray
+            Reduced :math:`\mathbf{G}^T \mathbf{W} \mathbf{d}` matrix.
+
+        See Also
+        --------
+        prepare_LS : Function that precedes this one in the regular solving process.
+        """
+        num_comps = ts.num_components
+        if icomp is not None:
+            assert isinstance(icomp, int) and icomp in list(range(num_comps)), \
+                "'icomp' must be a valid integer component index (between 0 and " \
+                f"{num_comps-1}), got {icomp}."
+            # d and G are dense
+            d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
+            dnotnan = ~np.isnan(d).squeeze()
+            Gout = G.A[np.ix_(dnotnan, obs_mask)]
+            # W is sparse
+            if (ts.var_cols is not None) and use_data_var:
+                W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
+            else:
+                W = sparse.eye(dnotnan.sum())
+        else:
+            # d is dense, G and W are sparse
+            d = ts.data.values.reshape(-1, 1)
+            dnotnan = ~np.isnan(d).squeeze()
+            Gout = sparse.kron(G[:, obs_mask], sparse.eye(num_comps), format='csr')
+            if dnotnan.sum() < dnotnan.size:
+                Gout = Gout[dnotnan, :]
+            if (ts.cov_cols is not None) and use_data_var and use_data_cov:
+                var_cov_matrix = ts.var_cov.values
+                Wblocks = [np.linalg.inv(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
+                                                    (num_comps, num_comps)))
+                           for iobs in range(ts.num_observations)]
+                W = sparse.block_diag(Wblocks, format='csr')
+                W.eliminate_zeros()
+                if dnotnan.sum() < dnotnan.size:
+                    W = W[dnotnan, :].tocsc()[:, dnotnan]
+            elif (ts.var_cols is not None) and use_data_var:
+                W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
+            else:
+                W = sparse.eye(dnotnan.sum())
+        if dnotnan.sum() < dnotnan.size:
+            # double-check
+            if np.any(np.isnan(Gout.data)) or np.any(np.isnan(W.data)):
+                raise ValueError("Still NaNs in G or W, unexpected error!")
+        # everything here will be dense, except GtW when using data covariance
+        d = d[dnotnan]
+        GtW = Gout.T @ W
+        GtWG = GtW @ Gout
+        GtWd = (GtW @ d).squeeze()
+        if isinstance(GtWG, sparse.spmatrix):
+            GtWG = GtWG.A
+        if return_W_G:
+            return Gout, W, GtWG, GtWd
+        else:
+            return GtWG, GtWd
+
+    def plot_covariance(self, title=None, fname=None, use_corr_coef=False, plot_empty=True):
+        """
+        Plotting method that displays the covariance (or correlation coefficient) matrix.
+        The axes are labeled by model names for easier interpretation.
+
+        Parameters
+        ----------
+        title : str, optional
+            If provided, the title that is added to the figure.
+        fname : str, optional
+            By default (``None``), the figure is shown interarctively to enable zooming in
+            etc. If an ``fname`` is provided, the figure is instead directly saved to the
+            provided filename.
+        use_corr_coef : bool, optional
+            By default (``False``), the method plots the covariance matrix.
+            If ``True``, the correlation coefficient matrix is plotted instead.
+        plot_empty : bool, optional
+            By default (``True``), the full matrix is plotted. If it is sparse, it will be
+            hard to identify the interplay between the different parameters. Therefore,
+            setting ``plot_empty=False`` will only plot the rows and columns corresponding
+            to nonzero parameters.
+        """
+        # make a list of model names as well as the indices of the parameter boundaries
+        # and the location of where to put the label
+        # if a model is a spline collection, make the corresponding list entries another list
+        model_labels = []
+        boundary_indices = [0]
+        label_centerpoints = []
+        start_index = 0
+        for i, (model_description, model) in enumerate(self.collection.items()):
+            num_comps = model.par.shape[1]
+            if isinstance(model, SplineSet):
+                if plot_empty:
+                    model_labels.extend([f"{model_description}\n"
+                                         f"{m.scale:.4g} {m.time_unit}"
+                                         for m in model.splines])
+                    bndrs = np.concatenate([np.array([start_index]),
+                                            start_index +
+                                            np.cumsum([m.num_parameters * num_comps
+                                                       for m in model.splines])])
+                    boundary_indices.extend(bndrs[1:-1].tolist())
+                    boundary_indices.append(bndrs[-1])
+                    cntrpts = (bndrs[1:] + bndrs[:-1]) / 2
+                    label_centerpoints.extend(cntrpts.tolist())
+                    start_index += model.num_parameters * num_comps
+                else:
+                    for m in model.splines:
+                        mod_nonzero = ~np.all(m.cov == 0, axis=0)
+                        num_nonzero = mod_nonzero.sum()
+                        if num_nonzero > 0:
+                            model_labels.append(f"{model_description}\n"
+                                                f"{m.scale:.4g} {m.time_unit}")
+                            boundary_indices.append(start_index + num_nonzero)
+                            label_centerpoints.append(start_index + num_nonzero/2)
+                            start_index += num_nonzero
+            else:
+                if plot_empty:
+                    model_labels.append(model_description)
+                    boundary_indices.append(start_index + model.num_parameters * num_comps)
+                    label_centerpoints.append((boundary_indices[-1] + boundary_indices[-2])/2)
+                    start_index += model.num_parameters * num_comps
+                else:
+                    mod_nonzero = ~np.all(model.cov == 0, axis=0)
+                    num_nonzero = mod_nonzero.sum()
+                    if num_nonzero > 0:
+                        model_labels.append(model_description)
+                        boundary_indices.append(start_index + num_nonzero)
+                        label_centerpoints.append(start_index + num_nonzero/2)
+                        start_index += num_nonzero
+        # get whatever needs to be plotted
+        if not use_corr_coef:  # stick with covariance
+            cov_mat = self.cov
+            if not plot_empty:
+                cov_mat_nonzero = ~np.all(cov_mat == 0, axis=0)
+                assert cov_mat_nonzero.sum() == start_index
+                cov_mat = cov_mat[np.ix_(cov_mat_nonzero, cov_mat_nonzero)]
+            vmax = np.nanpercentile(np.abs(cov_mat.ravel()), 95)
+            vmin = -vmax
+            clabel = "Covariance"
+        else:
+            cov_mat = cov2corr(self.cov)
+            if not plot_empty:
+                cov_mat_nonzero = ~np.all(np.isnan(cov_mat), axis=0)
+                assert cov_mat_nonzero.sum() == start_index
+                cov_mat = cov_mat[np.ix_(cov_mat_nonzero, cov_mat_nonzero)]
+            vmin, vmax = -1, 1
+            clabel = "Correlation Coefficient"
+        # start the figure
+        fig, ax = plt.subplots()
+        cov_img = ax.imshow(cov_mat, cmap=scm.roma, vmin=vmin, vmax=vmax, interpolation="none",
+                            extent=(0, cov_mat.shape[1], cov_mat.shape[0], 0))
+        fig.colorbar(cov_img, ax=ax, label=clabel, fraction=0.1)
+        if title is not None:
+            ax.set_title(title)
+        # give the major axis the calculated boundaries
+        ax.set_yticks(boundary_indices)
+        ax.set_yticklabels([])
+        # give the minor axis the labels
+        ax.set_yticks(label_centerpoints, minor=True)
+        ax.set_yticklabels(model_labels, minor=True)
+        # give the y axis also the model name labels
+        ax.tick_params(axis="y", which="major", direction="out", right=True, length=10)
+        ax.tick_params(axis="y", which="minor", left=False, right=False)
+        # do the same with the x axis, but with rotated labels
+        ax.set_xticks(boundary_indices)
+        ax.set_xticklabels([])
+        ax.set_xticks(label_centerpoints, minor=True)
+        ax.set_xticklabels(model_labels, minor=True, rotation="vertical")
+        ax.tick_params(axis="x", which="major", direction="out", top=True, length=10)
+        ax.tick_params(axis="x", which="minor", bottom=False, labelbottom=False,
+                       top=False, labeltop=True)
+        # plot or save
+        if fname is None:
+            plt.show()
+        else:
+            fig.savefig(fname)
+            plt.close(fig)

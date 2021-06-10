@@ -12,205 +12,32 @@ from warnings import warn
 from tqdm import tqdm
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from collections.abc import Mapping
 
-from .tools import weighted_median, get_cov_dims, full_cov_mat_to_columns
-from .models import Model
-
-
-def _combine_mappings(ts, models, regularize=False, cached_mapping=None,
-                      reweight_init=None, use_internal_scales=False):
-    """
-    Quick helper function that concatenates the mapping matrices of the
-    models given the timevector in ts, and returns the relevant sizes.
-    If regularize = True, also return an array indicating which model
-    is set to be regularized.
-    It also makes sure that G only contains columns that contain at least
-    one non-zero element, and correspond to parameters that are therefore
-    observable.
-    Can also match model-specific reweight_init to the respective array.
-    use_internal_scales sets whether to check the models for internal
-    scaling parameters.
-    """
-    mapping_matrices = []
-    obs_indices = []
-    if regularize:
-        reg_indices = []
-        if use_internal_scales:
-            weights_scaling = []
-        if reweight_init is None:
-            init_weights = None
-        elif isinstance(reweight_init, np.ndarray):
-            init_weights = reweight_init
-        elif isinstance(reweight_init, dict):
-            init_weights = []
-    for (mdl_description, model) in models.items():
-        if cached_mapping and mdl_description in cached_mapping:
-            mapping = cached_mapping[mdl_description].loc[ts.time].values
-            observable = np.any(mapping != 0, axis=0)
-            if regularize and model.regularize:
-                nunique = (~np.isclose(np.diff(mapping, axis=0), 0)).sum(axis=0) + 1
-                observable = np.logical_and(observable, nunique > 1)
-                if isinstance(reweight_init, dict) and (mdl_description in reweight_init):
-                    init_weights.append(reweight_init[mdl_description][observable, :])
-            mapping = sparse.csc_matrix(mapping[:, observable])
-        else:
-            mapping, observable = model.get_mapping(ts.time, return_observability=True)
-            if int(observable.sum()) == 0:
-                warn(f"For model '{mdl_description}' (regularized: {model.regularized}) "
-                     f"and a timespan ranging from {ts.time.min()} to {ts.time.max} "
-                     f"with {ts.num_observations} observations, no parameter is "
-                     "observable. GeoNAT has not been tested for this case.")
-            mapping = mapping[:, observable]
-            if regularize and model.regularize and \
-               isinstance(reweight_init, dict) and (mdl_description in reweight_init):
-                init_weights.append(reweight_init[mdl_description][observable, :])
-        mapping_matrices.append(mapping)
-        obs_indices.append(observable)
-        if regularize:
-            reg_indices.extend([model.regularize] * int(observable.sum()))
-            if use_internal_scales and model.regularize:
-                weights_scaling.append(getattr(model, "internal_scales",
-                                               np.ones(model.num_parameters))[observable])
-    G = sparse.hstack(mapping_matrices, format='csc')
-    obs_indices = np.concatenate(obs_indices)
-    num_time, num_params = G.shape
-    assert num_params > 0, f"Mapping matrix is empty, has shape {G.shape}."
-    num_comps = ts.num_components
-    if regularize:
-        reg_indices = np.array(reg_indices)
-        num_reg = reg_indices.sum()
-        if use_internal_scales:
-            weights_scaling = np.concatenate(weights_scaling)
-        else:
-            weights_scaling = None
-        if num_reg == 0:
-            warn("Regularized solver got no models to regularize.")
-        if init_weights is not None:
-            if isinstance(init_weights, list):
-                init_weights = np.concatenate(init_weights)
-            assert init_weights.shape == (num_reg, num_comps), \
-                "The combined 'reweight_init' must have the shape " + \
-                f"{(num_reg, num_comps)}, got {init_weights.shape}."
-        return G, obs_indices, num_time, num_params, num_comps, num_reg, \
-            reg_indices, init_weights, weights_scaling
-    else:
-        return G, obs_indices, num_time, num_params, num_comps
+from .tools import weighted_median, block_permutation
+from .models import ModelCollection
 
 
-def _build_LS(ts, G, icomp=None, return_W_G=False, use_data_var=True, use_data_cov=True):
-    """
-    Quick helper function that given a multi-component data vector in ts,
-    broadcasts the per-component matrices G and W to joint G and W matrices,
-    and then computes GtWG and GtWd, the matrices necessary for least squares.
-    If icomp is the index of a single component, only build the GtWG and GtWd
-    matrices for that component (ignoring covariances).
-    """
-    num_comps = ts.num_components
-    if icomp is not None:
-        assert isinstance(icomp, int) and icomp in list(range(num_comps)), \
-            "'icomp' must be a valid integer component index (between 0 and " \
-            f"{num_comps-1}), got {icomp}."
-        # d and G are dense
-        d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
-        dnotnan = ~np.isnan(d).squeeze()
-        Gout = G.A[dnotnan, :]
-        # W is sparse
-        if (ts.var_cols is not None) and use_data_var:
-            W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
-        else:
-            W = sparse.eye(dnotnan.sum())
-    else:
-        # d is dense, G and W are sparse
-        d = ts.data.values.reshape(-1, 1)
-        dnotnan = ~np.isnan(d).squeeze()
-        Gout = sparse.kron(G, sparse.eye(num_comps), format='csr')
-        if dnotnan.sum() < dnotnan.size:
-            Gout = Gout[dnotnan, :]
-        if (ts.cov_cols is not None) and use_data_var and use_data_cov:
-            var_cov_matrix = ts.var_cov.values
-            Wblocks = [np.linalg.inv(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
-                                                (num_comps, num_comps)))
-                       for iobs in range(ts.num_observations)]
-            offsets = list(range(-num_comps, num_comps + 1))
-            diags = [np.concatenate([np.concatenate([np.diag(Welem, k), np.zeros(np.abs(k))])
-                                     for Welem in Wblocks]) for k in offsets]
-            Wn = len(Wblocks) * num_comps
-            W = sparse.diags(diags, offsets, shape=(Wn, Wn), format='csr')
-            W.eliminate_zeros()
-            if dnotnan.sum() < dnotnan.size:
-                W = W[dnotnan, :].tocsc()[:, dnotnan]
-        elif (ts.var_cols is not None) and use_data_var:
-            W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
-        else:
-            W = sparse.eye(dnotnan.sum())
-    if dnotnan.sum() < dnotnan.size:
-        # double-check
-        if np.any(np.isnan(Gout.data)) or np.any(np.isnan(W.data)):
-            raise ValueError("Still NaNs in G or W, unexpected error!")
-    # everything here will be dense, except GtW when using data covariance
-    d = d[dnotnan]
-    GtW = Gout.T @ W
-    GtWG = GtW @ Gout
-    GtWd = (GtW @ d).squeeze()
-    if isinstance(GtWG, sparse.spmatrix):
-        GtWG = GtWG.A
-    if return_W_G:
-        return Gout, W, GtWG, GtWd
-    else:
-        return GtWG, GtWd
-
-
-# simple helper class used within the Solution class just below
-# needs to be picklable, therefore defined here outside
-ModelSolution = namedtuple("ModelSolution",
-                           field_names=["parameters", "variances",
-                                        "covariances", "weights"])
-"""
-Helper class that contains the solution of an individual model for a single
-station. Used within :class:`~Solution`.
-"""
-ModelSolution.parameters.__doc__ = "Estimated model parameters."
-ModelSolution.variances.__doc__ = "Estimated model variances."
-ModelSolution.covariances.__doc__ = "Estimated model component covariances."
-ModelSolution.weights.__doc__ = "Model parameter weights used by the solver."
-
-
-class Solution(Mapping):
+class Solution():
     r"""
-    Class that contains the solution to the problems of the solver functions
-    in this module, and distributes the parameters, (co-)variances, and weights (where
-    present) into the respective models. Behaves like a (read-only) Python dictionary,
-    with the added attributes :attr:`~num_parameters` and :attr:`~num_components`.
-    The solution for each model is stored as a :class:`~ModelSolution` object.
+    Class that contains the solution output by the solver functions
+    in this module, and distributes the parameters, covariances, and weights (where
+    present) into the respective models.
 
     Parameters
     ----------
-    models : dict
-        Dictionary of :class:`~geonat.models.Model` instances in the format of
-        :attr:`~geonat.station.Station.models` (or a subset thereof) that were
-        used by the solver.
-    parameters : numpy.ndarray, int
-        Model parameters of shape
+    geonat.models.ModelCollection
+        Model collection object that describes which models were used by the solver.
+    parameters : numpy.ndarray
+        Model collection parameters of shape
         :math:`(\text{num_solved}, \text{num_components})`.
-        If no parameters were estimated, pass the integer
-        :math:`\text{num_components}`, which will create a memory-efficient
-        array of ``Nan`` of the required dimensions.
-    variances : numpy.ndarray, optional
-        Model parameter variances of shape
-        :math:`(\text{num_solved}, \text{num_components})`.
-        If no variances (or parameters) are passed, this is set to ``None``.
     covariances : numpy.ndarray, optional
-        Model parameter component covariances of shape
-        :math:`(\text{num_solved}, (\text{num_components}*(\text{num_components}-1))/2)`.
-        If no covariances (or parameters) are passed, this is set to ``None``.
+        Full model variance-covariance matrix that has a square shape with dimensions
+        :math:`\text{num_solved} * \text{num_components}`.
     weights : numpy.ndarray, optional
         Model parameter regularization weights of shape
         :math:`(\text{num_solved}, \text{num_components})`.
-        If no weights (or parameters) are passed, this is set to ``None``.
     obs_indices : numpy.ndarray, optional
-        Observation mask of shape
-        :math:`(\text{num_parameters}, \text{num_components})`
+        Observation mask of shape :math:`(\text{num_parameters}, )`
         with ``True`` at indices where the parameter was actually estimated,
         and ``False`` where the estimation was skipped du to observability or
         other reasons.
@@ -220,135 +47,211 @@ class Solution(Mapping):
         Regularization mask of shape :math:`(\text{num_solved}, )`
         with ``True`` where a parameter was subject to regularization,
         and ``False`` otherwise. Defaults to all ``False``.
-
-    Example
-    -------
-    Access the variances of the model ``'mymodel'`` in the solution object
-    ``mysol`` as follows::
-
-        >>> variances = mysol['mymodel'].variances
     """
-    def __init__(self, models, parameters, variances=None, covariances=None,
-                 weights=None, obs_indices=None, reg_indices=None):
+    def __init__(self, models, parameters, covariances=None, weights=None,
+                 obs_indices=None, reg_indices=None):
         # input checks
-        assert (isinstance(models, dict) and
-                all([isinstance(mdl_desc, str) and isinstance(mdl, Model)
-                     for (mdl_desc, mdl) in models.items()])), \
-            f"'models' is not a valid dictionary of model names and objects, got {models}."
+        assert isinstance(models, ModelCollection), \
+            f"'models' is not a valid ModelCollection object, got {type(models)}."
         input_types = [None if indat is None else type(indat) for indat
-                       in [parameters, variances, covariances,
-                           weights, obs_indices, reg_indices]]
+                       in [parameters, covariances, weights, obs_indices, reg_indices]]
         assert all([(intype is None) or (intype == np.ndarray) for intype in input_types]), \
             f"Unsupported input data types where not None: {input_types}."
-        # check if a solution was indeed passed
-        if isinstance(parameters, int):
-            solution_found = False
-            num_components = parameters
-            parameters = None
-            variances = None
-            covariances = None
-            weights = None
-        else:
-            solution_found = True
-            num_components = parameters.shape[1]
-            cov_dims = get_cov_dims(num_components)
-            if reg_indices is not None:
-                assert reg_indices.size == parameters.shape[0], \
-                    "Unexpected parameter size mismatch: " \
-                    f"{reg_indices.size} != {parameters.shape}[0]"
-        # get the number of total parameters and match them with obs_indices, if present
-        num_parameters = sum([m.num_parameters for m in models.values()])
-        if (obs_indices is None) and solution_found:
+        if reg_indices is not None:
+            assert reg_indices.size == parameters.shape[0], \
+                "Unexpected parameter size mismatch: " \
+                f"{reg_indices.size} != {parameters.shape}[0]"
+        # get the number of parameters and components, and match them with obs_indices
+        num_components = parameters.shape[1]
+        num_parameters = models.num_parameters
+        if obs_indices is None:
             assert parameters.shape[0] == num_parameters, \
                 "No 'obs_indices' was passed, but the shape of 'parameters' " \
                 f"{parameters.shape} does not match the total number of parameters " \
                 f"{num_parameters} in its first dimension."
+            obs_indices = np.s_[:]
         # skip the packing of weights if there isn't any regularization or weights
         if np.any(weights) and np.any(reg_indices):
             pack_weights = True
-            ix_reg = 0
+            # ix_reg = 0
         else:
             pack_weights = False
-        # start the iteration over the models
-        solutions = {}
-        ix_model = 0
-        ix_sol = 0
-        for (mdl_description, model) in models.items():
-            # check which parameters of all possible ones were estimated
-            if obs_indices is not None:
-                mask = obs_indices[ix_model:ix_model+model.num_parameters]
-            else:
-                mask = np.ones(model.num_parameters, dtype=bool)
-            num_solved = mask.sum()
-            # pack the parameters, if present
-            if parameters is not None:
-                p = np.zeros((model.num_parameters, num_components))
-                p[mask, :] = parameters[ix_sol:ix_sol+num_solved, :]
-            else:
-                p = np.broadcast_to(np.array([[np.NaN] * num_components]),
-                                    (model.num_parameters, num_components))
-            # initialize optional solution variables
-            v, c, w = None, None, None
-            # pack the variances, if present
-            if variances is not None:
-                v = np.empty((model.num_parameters, num_components))
-                v[:] = np.NaN
-                v[mask, :] = variances[ix_sol:ix_sol+num_solved, :]
-                if covariances is not None:
-                    c = np.empty((model.num_parameters, cov_dims))
-                    c[:] = np.NaN
-                    c[mask, :] = covariances[ix_sol:ix_sol+num_solved, :]
-            # pack the weights, if present
-            if pack_weights:
-                mask_reg = reg_indices[ix_sol:ix_sol+num_solved]
-                num_solved_reg = mask_reg.sum()
-                if num_solved_reg > 0:
-                    w = np.empty((model.num_parameters, num_components))
-                    w[:] = np.NaN
-                    w[np.flatnonzero(mask)[mask_reg], :] = \
-                        weights[ix_reg:ix_reg+num_solved_reg, :]
-                ix_reg += num_solved_reg
-            ix_model += model.num_parameters
-            ix_sol += num_solved
-            # create ModelSolution object
-            solutions[mdl_description] = ModelSolution(p, v, c, w)
-        # cleanup checks to see if all the iterations worked as planned
-        assert (obs_indices is None) or (ix_model == obs_indices.shape[0]), \
-            f"Unexpected model size mismatch: {ix_model} != {obs_indices.shape}[0]"
-        assert (parameters is None) or (ix_sol == parameters.shape[0]), \
-            f"Unexpected solution size mismatch: {ix_sol} != {parameters.shape}[0]"
+        # make full arrays to fill with values
+        par_full = np.empty((num_parameters, num_components))
+        par_full[:] = np.NaN
+        par_full[obs_indices, :] = parameters
+        if covariances is not None:
+            params_times_comps = num_parameters * num_components
+            cov_full = np.empty((params_times_comps, params_times_comps))
+            cov_full[:] = np.NaN
+            mask_cov = np.repeat(obs_indices, num_components)
+            cov_full[np.ix_(mask_cov, mask_cov)] = covariances
         if pack_weights:
-            assert ix_reg == weights.shape[0], \
-                f"Unexpected regularization size mismatch: {ix_reg} != {weights.shape}[0]"
+            weights_full = np.empty((num_parameters, num_components))
+            weights_full[:] = np.NaN
+            weights_full[np.flatnonzero(obs_indices)[reg_indices], :] = weights
+        # start the iteration over the models
+        model_ix_start_len = {}
+        ix_model = 0
+        # ix_sol = 0
+        for (mdl_description, model) in models.collection.items():
+            # save index range
+            model_ix_start_len[mdl_description] = (ix_model, model.num_parameters)
+            ix_model += model.num_parameters
         # save results to class instance
-        self._solutions = solutions
+        self._model_slice_ranges = model_ix_start_len
+        self.parameters = par_full
+        """ Full parameter matrix, where unsolved parameters are set to ``NaN``. """
+        self.covariances = cov_full if covariances is not None else None
+        """ Full covariance matrix, where unsolved covariances are set to ``NaN``. """
+        self.weights = weights_full if pack_weights else None
+        """ Full weights matrix, where unsolved weights are set to ``NaN``. """
+        self.obs_mask = obs_indices
+        """ Observability mask where ``True`` indicates observable parameters. """
         self.num_parameters = num_parameters
         """ Total number of parameters (solved or unsolved) in solution. """
         self.num_components = num_components
         """ Number of components the solution was computed for. """
+        self.converged = np.all(np.isfinite(parameters))
+        """
+        ``True``, if all values in the estimated parameters were finite (i.e., the solution
+        converged), ``False`` otherwise.
+        """
 
-    def __getitem__(self, model):
-        return self._solutions[model]
+    def get_model_indices(self, models, for_cov=False):
+        """
+        Given a model name or multiple names, returns an array of integer indices that
+        can be used to extract the relevant entries from :attr:`~parameters` and
+        :attr:`~covariances`.
 
-    def __iter__(self):
-        return iter(self._solutions)
+        Parameters
+        ----------
+        models : str, list
+            Name(s) of model(s).
+        for_cov : bool, optional
+            If ``False`` (default), return the indices for :attr:`~parameters`, otherwise
+            for :attr:`~covariances`
 
-    def __len__(self):
-        return len(self._solutions)
+        Returns
+        -------
+        numpy.ndarray
+            Integer index array for the models.
+        """
+        # (returns empty index array if models not found)
+        # check input
+        if isinstance(models, str):
+            model_list = [models]
+        elif isinstance(models, list):
+            model_list = models
+        else:
+            raise ValueError("Model key(s) need to be a string or list of strings, "
+                             f"got {models}.")
+        # build combined slice
+        nc = self.num_components if for_cov else 1
+        combined_ranges = np.concatenate([np.arange(ix*nc, (ix+num)*nc) for m, (ix, num)
+                                          in self._model_slice_ranges.items()
+                                          if m in model_list]).astype(int)
+        return np.sort(combined_ranges)
+
+    def parameters_by_model(self, models):
+        """
+        Helper function that uses :meth:`~get_model_indices` to quickly
+        return the parameters for (a) specific model(s).
+
+        Parameters
+        ----------
+        models : str, list
+            Name(s) of model(s).
+
+        Returns
+        -------
+        numpy.ndarray
+            Parameters of the model subset.
+        """
+        indices = self.get_model_indices(models)
+        return self.parameters[indices, :]
+
+    def covariances_by_model(self, models):
+        """
+        Helper function that uses :meth:`~get_model_indices` to quickly
+        return the covariances for (a) specific model(s).
+
+        Parameters
+        ----------
+        models : str, list
+            Name(s) of model(s).
+
+        Returns
+        -------
+        numpy.ndarray
+            Covariances of the model subset.
+        """
+        if self.covariances is not None:
+            indices = self.get_model_indices(models, for_cov=True)
+            return self.covariances[np.ix_(indices, indices)]
+
+    def weights_by_model(self, models):
+        """
+        Helper function that uses :meth:`~get_model_indices` to quickly
+        return the weights for specific model parameters.
+
+        Parameters
+        ----------
+        models : str, list
+            Name(s) of model(s).
+
+        Returns
+        -------
+        numpy.ndarray
+            Weights of the model parameter subset.
+        """
+        if self.weights is not None:
+            indices = self.get_model_indices(models)
+            return self.weights[indices, :]
+
+    @property
+    def parameters_zeroed(self):
+        """
+        Returns the model parameters but sets the unobservable ones to zero
+        to distinguish between unobservable ones and observable ones that
+        could not be estimated because of a solver failure (and which are NaNs).
+        """
+        par = self.parameters.copy()
+        par[~self.obs_mask, :] = 0
+        return par
+
+    @property
+    def covariances_zeroed(self):
+        """
+        Returns the model covariances but sets the unobservable ones to zero
+        to distinguish between unobservable ones and observable ones that
+        could not be estimated because of a solver failure (and which are NaNs).
+        """
+        if self.covariances is not None:
+            cov = self.covariances.copy()
+            unobs_indices = np.repeat(~self.obs_mask, self.num_components)
+            cov[unobs_indices, :] = 0
+            cov[:, unobs_indices] = 0
+            return cov
 
     @property
     def model_list(self):
         """ List of models present in the solution. """
-        return list(self._solutions.keys())
+        return list(self._model_slice_ranges.keys())
 
     @staticmethod
     def aggregate_models(results_dict, mdl_description, key_list=None,
-                         stack_parameters=False, stack_variances=False,
-                         stack_covariances=False, stack_weights=False):
+                         stack_parameters=False, stack_covariances=False,
+                         stack_weights=False):
         """
         For a dictionary of Solution objects (e.g. one per station) and a given
         model description, aggregate the model parameters, variances and parameter
         regularization weights (where present) into combined NumPy arrays.
+
+        If the shape of the individual parameters etc. do not match between objects
+        in the dictionary for the same model, ``None`` is returned instead, without
+        raising an error (e.g. if the same model is site-specific and has different
+        numbers of parameters).
 
         Parameters
         ----------
@@ -362,9 +265,6 @@ class Solution(Mapping):
         stack_parameters : bool, optional
             If ``True``, stack the parameters, otherwise just return ``None``.
             Defaults to ``False``.
-        stack_variances : bool, optional
-            If ``True``, stack the variances, otherwise just return ``None``.
-            Defaults to ``False``.
         stack_covariances : bool, optional
             If ``True``, stack the covariances, otherwise just return ``None``.
             Defaults to ``False``.
@@ -377,37 +277,51 @@ class Solution(Mapping):
         numpy.ndarray
             If ``stack_parameters=True``, the stacked model parameters.
         numpy.ndarray
-            If ``stack_variances=True`` and variances are present in the models,
-            the stacked variances.
-        numpy.ndarray
             If ``stack_covariances=True`` and covariances are present in the models,
-            the stacked component covariances.
+            the stacked component covariances, ``None`` if not present everywhere.
         numpy.ndarray
             If ``stack_weights=True`` and regularization weights are present in the models,
-            the stacked weights, ``None`` otherwise.
+            the stacked weights, ``None`` if not present everywhere.
         """
         # input checks
-        stack_mask = [stack_parameters, stack_variances, stack_covariances, stack_weights]
-        assert any(stack_mask), "Called 'aggregate_models' without anything to aggregate."
+        assert isinstance(mdl_description, str), \
+            f"'mdl_description' needs to be a single string, got {mdl_description}."
+        assert any([stack_parameters, stack_covariances, stack_weights]), \
+            "Called 'aggregate_models' without anything to aggregate."
         assert (isinstance(results_dict, dict) and
                 all([isinstance(mdl_sol, Solution) for mdl_sol in results_dict.values()])), \
             f"'results_dict' needs to be a dictionary of Solution objects, got {results_dict}."
         if key_list is None:
             key_list = list(results_dict.keys())
-        # loop over weights, variances, and weights
+        # collect output
         out = []
-        for var, dostack in zip(["parameters", "variances", "covariances", "weights"], stack_mask):
-            # skip if flagged
-            if not dostack:
-                continue
-            # stack arrays ignoring Nones
-            stack = [getattr(results_dict[key][mdl_description], var)
-                     for key in key_list if (mdl_description in results_dict[key])
-                     and (getattr(results_dict[key][mdl_description], var) is not None)]
+        # parameters
+        if stack_parameters:
+            stack = [results_dict[key].parameters_by_model(mdl_description)
+                     for key in key_list]
             stack_shapes = [mdl.shape for mdl in stack]
-            # only stack if all the models have actually the same dimensions
             if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
                 out.append(np.stack(stack))
+            else:
+                out.append(None)
+        # covariances
+        if stack_covariances:
+            stack = [results_dict[key].covariances_by_model(mdl_description)
+                     for key in key_list if results_dict[key].covariances is not None]
+            stack_shapes = [mdl.shape for mdl in stack]
+            if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
+                out.append(np.stack(stack))
+            else:
+                out.append(None)
+        # weights
+        if stack_weights:
+            stack = [results_dict[key].weights_by_model(mdl_description)
+                     for key in key_list if results_dict[key].weights is not None]
+            stack_shapes = [mdl.shape for mdl in stack]
+            if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
+                out.append(np.stack(stack))
+            else:
+                out.append(None)
         # return each item individually
         return (*out, )
 
@@ -528,8 +442,8 @@ class LogarithmicReweighting(ReweightingFunction):
         return self.scale * weight
 
 
-def linear_regression(ts, models, formal_variance=False, formal_covariance=False,
-                      cached_mapping=None, use_data_variance=True, use_data_covariance=True):
+def linear_regression(ts, models, formal_covariance=False,
+                      use_data_variance=True, use_data_covariance=True):
     r"""
     Performs linear, unregularized least squares using :mod:`~scipy.sparse.linalg`.
 
@@ -561,18 +475,10 @@ def linear_regression(ts, models, formal_variance=False, formal_covariance=False
     ----------
     ts : geonat.timeseries.Timeseries
         Timeseries to fit.
-    models : dict
-        Dictionary of :class:`~geonat.models.Model` instances used for fitting.
-    formal_variance : bool, optional
-        If ``True``, also calculate the formal variance (diagonals of the covariance
-        matrix). Defaults to ``False``.
+    models : geonat.models.ModelCollection
+        Model collection used for fitting.
     formal_covariance : bool, optional
-        If ``True``, also calculate the formal covariance between components
-        (found in the off-diagonals of the covariance matrix). Defaults to ``False``.
-    cached_mapping : dict, optional
-        If passed, a dictionary containing the mapping matrices as Pandas DataFrames
-        for a subset of models and for all timestamps present in ``ts``.
-        Mapping matrices not in ``cached_mapping`` will have to be recalculated.
+        If ``True``, calculate the formal model covariance. Defaults to ``False``.
     use_data_variance : bool, optional
         If ``True`` (default) and ``ts`` contains variance information, this
         uncertainty information will be used.
@@ -582,47 +488,47 @@ def linear_regression(ts, models, formal_variance=False, formal_covariance=False
 
     Returns
     -------
-    model_params_var : dict
-        Dictionary of form ``{"model_description": (parameters, variance), ...}``
-        which for every model that was fitted, contains a tuple of the best-fit
-        parameters and the formal variance (or ``None``, if not calculated).
+    Solution
+        Result of the regression.
     """
 
     # get mapping matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps = \
-        _combine_mappings(ts, models, cached_mapping=cached_mapping)
+    G, obs_indices, num_time, num_params, num_comps, num_obs = \
+        models.prepare_LS(ts, include_regularization=False)
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
-    if not formal_variance:
-        var = None
     if not formal_covariance:
         cov = None
     if (ts.cov_cols is None) or (not use_data_covariance):
-        params = np.zeros((num_params, num_comps))
-        if formal_variance:
-            var = np.zeros((num_params, num_comps))
+        params = np.zeros((num_obs, num_comps))
+        if formal_covariance:
+            cov = []
         for i in range(num_comps):
-            GtWG, GtWd = _build_LS(ts, G, icomp=i, use_data_var=use_data_variance)
+            GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
+                                         use_data_var=use_data_variance)
             params[:, i] = sp.linalg.lstsq(GtWG, GtWd)[0].squeeze()
-            if formal_variance:
-                var[:, i] = np.diag(np.linalg.inv(GtWG))
+            if formal_covariance:
+                cov.append(np.linalg.inv(GtWG))
+        if formal_covariance:
+            cov = sp.linalg.block_diag(*cov)
+            # permute to match ordering
+            P = block_permutation(num_comps, num_params)
+            cov = P @ cov @ P.T
     else:
-        GtWG, GtWd = _build_LS(ts, G, use_data_var=use_data_variance,
-                               use_data_cov=use_data_covariance)
-        params = sp.linalg.lstsq(GtWG, GtWd)[0].reshape(num_params, num_comps)
-        if formal_variance:
-            cov_mat = np.linalg.inv(GtWG)
-            var, cov = full_cov_mat_to_columns(cov_mat, num_comps,
-                                               include_covariance=formal_covariance)
+        GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
+                                     use_data_cov=use_data_covariance)
+        params = sp.linalg.lstsq(GtWG, GtWd)[0].reshape(num_obs, num_comps)
+        if formal_covariance:
+            cov = np.linalg.inv(GtWG)
 
     # create solution object and return
-    return Solution(models=models, parameters=params, variances=var, covariances=cov,
+    return Solution(models=models, parameters=params, covariances=cov,
                     obs_indices=obs_indices)
 
 
-def ridge_regression(ts, models, penalty, formal_variance=False, formal_covariance=False,
-                     cached_mapping=None, use_data_variance=True, use_data_covariance=True):
+def ridge_regression(ts, models, penalty, formal_covariance=False,
+                     use_data_variance=True, use_data_covariance=True):
     r"""
     Performs linear, L2-regularized least squares using :mod:`~scipy.sparse.linalg`.
 
@@ -661,20 +567,12 @@ def ridge_regression(ts, models, penalty, formal_variance=False, formal_covarian
     ----------
     ts : geonat.timeseries.Timeseries
         Timeseries to fit.
-    models : dict
-        Dictionary of :class:`~geonat.models.Model` instances used for fitting.
+    models : geonat.models.ModelCollection
+        Model collection used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
-    formal_variance : bool, optional
-        If ``True``, also calculate the formal variance (diagonals of the covariance
-        matrix). Defaults to ``False``.
     formal_covariance : bool, optional
-        If ``True``, also calculate the formal covariance between components
-        (found in the off-diagonals of the covariance matrix). Defaults to ``False``.
-    cached_mapping : dict, optional
-        If passed, a dictionary containing the mapping matrices as Pandas DataFrames
-        for a subset of models and for all timestamps present in ``ts``.
-        Mapping matrices not in ``cached_mapping`` will have to be recalculated.
+        If ``True``, calculate the formal model covariance. Defaults to ``False``.
     use_data_variance : bool, optional
         If ``True`` (default) and ``ts`` contains variance information, this
         uncertainty information will be used.
@@ -684,57 +582,56 @@ def ridge_regression(ts, models, penalty, formal_variance=False, formal_covarian
 
     Returns
     -------
-    model_params_var : dict
-        Dictionary of form ``{"model_description": (parameters, variance), ...}``
-        which for every model that was fitted, contains a tuple of the best-fit
-        parameters and the formal variance (or ``None``, if not calculated).
+    Solution
+        Result of the regression.
     """
     if penalty == 0.0:
         warn(f"Ridge Regression (L2-regularized) solver got a penalty of {penalty}, "
              "which effectively removes the regularization.")
 
     # get mapping and regularization matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps, num_reg, reg_indices, _, _ = \
-        _combine_mappings(ts, models, regularize=True, cached_mapping=cached_mapping)
+    G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, _, _ = \
+        models.prepare_LS(ts)
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
-    if not formal_variance:
-        var = None
     if not formal_covariance:
         cov = None
     if (ts.cov_cols is None) or (not use_data_covariance):
         reg = np.diag(reg_indices) * penalty
-        params = np.zeros((num_params, num_comps))
-        if formal_variance:
-            var = np.zeros((num_params, num_comps))
+        params = np.zeros((num_obs, num_comps))
+        if formal_covariance:
+            cov = []
         for i in range(num_comps):
-            GtWG, GtWd = _build_LS(ts, G, icomp=i, use_data_var=use_data_variance)
+            GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
+                                         use_data_var=use_data_variance)
             GtWGreg = GtWG + reg
             params[:, i] = sp.linalg.lstsq(GtWGreg, GtWd)[0].squeeze()
-            if formal_variance:
-                var[:, i] = np.diag(np.linalg.inv(GtWGreg))
+            if formal_covariance:
+                cov.append(np.linalg.inv(GtWGreg))
+        if formal_covariance:
+            cov = sp.linalg.block_diag(*cov)
+            # permute to match ordering
+            P = block_permutation(num_comps, num_params)
+            cov = P @ cov @ P.T
     else:
-        GtWG, GtWd = _build_LS(ts, G, use_data_var=use_data_variance,
-                               use_data_cov=use_data_covariance)
+        GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
+                                     use_data_cov=use_data_covariance)
         reg = np.diag(np.repeat(reg_indices, num_comps)) * penalty
         GtWGreg = GtWG + reg
-        params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_params, num_comps)
-        if formal_variance:
-            cov_mat = np.linalg.inv(GtWGreg)
-            var, cov = full_cov_mat_to_columns(cov_mat, num_comps,
-                                               include_covariance=formal_covariance)
+        params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_obs, num_comps)
+        if formal_covariance:
+            cov = np.linalg.inv(GtWGreg)
 
     # create solution object and return
-    return Solution(models=models, parameters=params, variances=var, covariances=cov,
+    return Solution(models=models, parameters=params, covariances=cov,
                     obs_indices=obs_indices)
 
 
 def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func=None,
-                     reweight_max_rss=1e-10, reweight_init=None, reweight_coupled=True,
-                     formal_variance=False, formal_covariance=False, cached_mapping=None,
-                     use_data_variance=True, use_data_covariance=True,
-                     use_internal_scales=False, return_weights=False,
+                     reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
+                     formal_covariance=False, use_data_variance=True, use_data_covariance=True,
+                     use_internal_scales=False, cov_zero_threshold=1e-6, return_weights=False,
                      cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
     r"""
     Performs linear, L1-regularized least squares using
@@ -768,16 +665,19 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     on its current value, approximating the L0 norm rather than the L1 norm (see Notes).
 
     The formal model covariance :math:`\mathbf{C}_m` is defined as being zero except in
-    the rows and columns corresponding to non-zero parameters, where it is defined
-    exactly as the unregularized version (see :func:`~geonat.solvers.linear_regression`),
-    restricted to those same rows and columns.
+    the rows and columns corresponding to non-zero parameters (as defined my the absolute
+    magnitude set by ``cov_zero_threshold``), where it is defined exactly as the
+    unregularized version (see :func:`~geonat.solvers.linear_regression`), restricted to
+    those same rows and columns. (This definition might very well be mathematically
+    or algorithmically wrong - there probably needs to be some dependence on the
+    reweighting function.)
 
     Parameters
     ----------
     ts : geonat.timeseries.Timeseries
         Timeseries to fit.
-    models : dict
-        Dictionary of :class:`~geonat.models.Model` instances used for fitting.
+    models : geonat.models.ModelCollection
+        Model collection used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
     reweight_max_iters : int, optional
@@ -790,7 +690,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         When reweighting is active and the maximum number of iterations has not yet
         been reached, let the iteration stop early if the solutions do not change much
         anymore (see Notes).
-        Defaults to ``1e-10``. Set to ``0`` to deactivate early stopping.
+        Set to ``0`` to deactivate early stopping.
     reweight_init : numpy.ndarray, optional
         When reweighting is active, use this array to initialize the weights.
         It has to have size :math:`\text{num_components} * \text{num_reg}`, where
@@ -800,16 +700,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     reweight_coupled : bool, optional
         If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
         is coupled with the reweighting weights (see Notes).
-    formal_variance : bool, optional
-        If ``True``, also calculate the formal variance (diagonals of the covariance
-        matrix). Defaults to ``False``.
     formal_covariance : bool, optional
-        If ``True``, also calculate the formal covariance between components
-        (found in the off-diagonals of the covariance matrix). Defaults to ``False``.
-    cached_mapping : dict, optional
-        If passed, a dictionary containing the mapping matrices as Pandas DataFrames
-        for a subset of models and for all timestamps present in ``ts``.
-        Mapping matrices not in ``cached_mapping`` will have to be recalculated.
+        If ``True``, calculate the formal model covariance. Defaults to ``False``.
     use_data_variance : bool, optional
         If ``True`` (default) and ``ts`` contains variance information, this
         uncertainty information will be used.
@@ -819,6 +711,10 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     use_internal_scales : bool, optional
         If ``False`` (default), the reweighting does not look for or take into account
         model-specific internal scaling parameters.
+    cov_zero_threshold : float, optional
+        When extracting the formal covariance matrix, assume parameters with absolute
+        values smaller than ``cov_zero_threshold`` are effectively zero.
+        Internal scales are always respected.
     return_weights : bool, optional
         When reweighting is active, set to ``True`` to return the weights after the last
         update.
@@ -833,10 +729,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
 
     Returns
     -------
-    model_params_var : dict
-        Dictionary of form ``{"model_description": (parameters, variance), ...}``
-        which for every model that was fitted, contains a tuple of the best-fit
-        parameters and the formal variance (or ``None``, if not calculated).
+    Solution
+        Result of the regression.
 
     Notes
     -----
@@ -890,15 +784,18 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     if penalty == 0:
         warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, "
              "which removes the regularization.")
+    assert float(cov_zero_threshold) > 0, \
+        f"'cov_zero_threshold needs to be non-negative, got {cov_zero_threshold}."
 
     # get mapping and regularization matrix
-    G, obs_indices, num_time, num_params, num_comps, num_reg, \
-        reg_indices, init_weights, weights_scaling = \
-        _combine_mappings(ts, models, regularize=True, cached_mapping=cached_mapping,
-                          reweight_init=reweight_init, use_internal_scales=use_internal_scales)
+    G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, \
+        reweight_init, weights_scaling = models.prepare_LS(
+            ts, reweight_init=reweight_init, use_internal_scales=True)
+    # determine if a shortcut is possible
     regularize = (num_reg > 0) and (penalty > 0)
     if (not regularize) or (reweight_max_iters is None):
         return_weights = False
+    # determine number of maximum iterations, and check reweighting function
     if reweight_max_iters is None:
         n_iters = 1
     else:
@@ -927,7 +824,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 else:
                     assert init_weights.size == reweight_size, \
                         f"'init_weights' must have a size of {reweight_size}, " + \
-                        f"got {reweight_init.size}."
+                        f"got {init_weights.size}."
                 weights = cp.Parameter(shape=reweight_size,
                                        value=init_weights, pos=True)
                 z = cp.Variable(shape=reweight_size)
@@ -961,7 +858,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 # if iterating, extra tasks
                 if regularize and reweight_max_iters is not None:
                     # update weights
-                    if weights_scaling is not None:
+                    if use_internal_scales and (weights_scaling is not None):
                         weights.value = rw_func(m.value[reg_indices]*weights_scaling)
                     else:
                         weights.value = rw_func(m.value[reg_indices])
@@ -981,92 +878,98 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
-    if not formal_variance:
-        var = None
-        cov = None
     if not formal_covariance:
         cov = None
-    else:
-        cov_dims = get_cov_dims(num_comps)
     if not return_weights:
         weights = None
     if (ts.cov_cols is None) or (not use_data_covariance):
         # initialize output
-        params = np.zeros((num_params, num_comps))
-        if formal_variance:
-            var = np.zeros((num_params, num_comps))
+        params = np.zeros((num_obs, num_comps))
+        if formal_covariance:
+            cov = []
         if regularize and return_weights:
             weights = np.zeros((num_reg, num_comps))
         # loop over components
         for i in range(num_comps):
             # build and solve problem
-            Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, icomp=i, return_W_G=True,
-                                                   use_data_var=use_data_variance)
+            Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
+                ts, G, obs_indices, icomp=i, return_W_G=True, use_data_var=use_data_variance)
             solution, wts = solve_problem(GtWG, GtWd, reg_indices, num_comps=1,
-                                          init_weights=init_weights[:, i]
-                                          if init_weights is not None else None)
+                                          init_weights=reweight_init[:, i]
+                                          if reweight_init is not None else None)
             # store results
             if solution is None:
                 params[:, i] = np.NaN
-                if formal_variance:
-                    var[:, i] = np.NaN
+                if formal_covariance:
+                    temp_cov = np.empty_like(GtWG)
+                    temp_cov[:] = np.NaN
+                    cov.append(temp_cov)
                 if regularize and return_weights:
                     weights[:, i] = np.NaN
             else:
                 params[:, i] = solution
                 # if desired, estimate formal variance here
-                if formal_variance:
-                    best_ind = np.nonzero(solution)[0]
+                if formal_covariance:
+                    temp_cov = np.empty_like(GtWG)
+                    temp_cov[:] = np.NaN
+                    scaled_solution = np.abs(solution)
+                    if weights_scaling is not None:
+                        scaled_solution[reg_indices] *= weights_scaling
+                    best_ind = np.nonzero(scaled_solution > cov_zero_threshold)[0]
                     Gsub = Gnonan[:, best_ind]
                     GtWG = Gsub.T @ Wnonan @ Gsub
                     if isinstance(GtWG, sparse.spmatrix):
                         GtWG = GtWG.A
-                    var[best_ind, i] = np.diag(np.linalg.inv(GtWG))
+                    temp_cov[np.ix_(best_ind, best_ind)] = np.linalg.inv(GtWG)
+                    cov.append(temp_cov)
                 if regularize and return_weights:
                     weights[:, i] = wts
+        if formal_covariance:
+            cov = sp.linalg.block_diag(*cov)
+            # permute to match ordering
+            P = block_permutation(num_comps, num_params)
+            cov = P @ cov @ P.T
     else:
         # build stacked problem and solve
-        Gnonan, Wnonan, GtWG, GtWd = _build_LS(ts, G, return_W_G=True,
-                                               use_data_var=use_data_variance,
-                                               use_data_cov=use_data_covariance)
+        Gnonan, Wnonan, GtWG, GtWd = models.build_LS(ts, G, obs_indices, return_W_G=True,
+                                                     use_data_var=use_data_variance,
+                                                     use_data_cov=use_data_covariance)
         reg_indices = np.repeat(reg_indices, num_comps)
         solution, wts = solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps,
-                                      init_weights=init_weights.ravel()
-                                      if init_weights is not None else None)
+                                      init_weights=reweight_init.ravel()
+                                      if reweight_init is not None else None)
         # store results
         if solution is None:
-            params = np.empty((num_params, num_comps))
+            params = np.empty((num_obs, num_comps))
             params[:] = np.NaN
-            if formal_variance:
-                var = np.empty((num_params, num_comps))
-                var[:] = np.NaN
-                if formal_covariance:
-                    cov = np.empty((num_params, cov_dims))
-                    cov[:] = np.NaN
+            if formal_covariance:
+                cov = np.empty((num_obs * num_comps, num_obs * num_comps))
+                cov[:] = np.NaN
             if regularize and return_weights:
                 weights = np.empty((num_reg, num_comps))
                 weights[:] = np.NaN
         else:
-            params = solution.reshape(num_params, num_comps)
+            params = solution.reshape(num_obs, num_comps)
             # if desired, estimate formal variance here
-            if formal_variance:
-                best_ind = np.nonzero(solution)[0]
+            if formal_covariance:
+                scaled_solution = np.abs(solution)
+                if weights_scaling is not None:
+                    scaled_solution[reg_indices] *= np.repeat(weights_scaling, num_comps)
+                best_ind = np.nonzero(scaled_solution > cov_zero_threshold)[0]
                 Gsub = Gnonan.tocsc()[:, best_ind]
                 GtWG = Gsub.T @ Wnonan @ Gsub
                 if isinstance(GtWG, sparse.spmatrix):
                     GtWG = GtWG.A
-                cov_mat = np.zeros((num_params * num_comps, num_params * num_comps))
-                cov_mat[np.ix_(best_ind, best_ind)] = np.linalg.inv(GtWG)
-                var, cov = full_cov_mat_to_columns(cov_mat, num_comps,
-                                                   include_covariance=formal_covariance)
+                cov = np.zeros((num_obs * num_comps, num_obs * num_comps))
+                cov[np.ix_(best_ind, best_ind)] = np.linalg.inv(GtWG)
             if regularize and return_weights:
                 weights = wts.reshape(num_reg, num_comps)
         # restore reg_indices' original shape
         reg_indices = reg_indices[::num_comps]
 
     # create solution object and return
-    return Solution(models=models, parameters=params, variances=var, covariances=cov,
-                    weights=weights, obs_indices=obs_indices, reg_indices=reg_indices)
+    return Solution(models=models, parameters=params, covariances=cov, weights=weights,
+                    obs_indices=obs_indices, reg_indices=reg_indices)
 
 
 class SpatialSolver():
@@ -1083,9 +986,6 @@ class SpatialSolver():
         Network to fit.
     ts_description : str
         Description of the timeseries to fit.
-    model_list : list, optional
-        List of strings containing the model names of the subset of the models
-        to fit. Defaults to all models.
     """
 
     ROLLMEANKERNEL = 30
@@ -1099,13 +999,11 @@ class SpatialSolver():
     when calculating diagnostic statistics.
     """
 
-    def __init__(self, net, ts_description, model_list=None):
+    def __init__(self, net, ts_description):
         self.net = net
         """ Network object to fit. """
         self.ts_description = ts_description
         """ Name of timeseries to fit. """
-        self.model_list = model_list
-        """ Names of the models to fit (``None`` for all). """
         self.last_statistics = None
         r"""
         :class:`~typing.NamedTuple` of the statistics of the last call to
@@ -1148,14 +1046,13 @@ class SpatialSolver():
             model, iteration, and component).
         """
 
-    def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters=5,
-              spatial_reweight_percentile=0.5, spatial_reweight_max_rms=1e-10,
+    def solve(self, penalty, spatial_reweight_models, spatial_reweight_iters,
+              spatial_reweight_percentile=0.5, spatial_reweight_max_rms=1e-9,
               spatial_reweight_max_changed=0, continuous_reweight_models=[],
               local_reweight_iters=1, local_reweight_func=None, local_reweight_coupled=True,
-              formal_variance=False, formal_covariance=False, use_data_variance=True,
-              use_data_covariance=True, use_internal_scales=False,
-              verbose=False, extended_stats=False,
-              cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
+              formal_covariance=False, use_data_variance=True, use_data_covariance=True,
+              use_internal_scales=False, cov_zero_threshold=1e-6, verbose=False,
+              extended_stats=False, cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
         r"""
         Solve the network-wide fitting problem as follows:
 
@@ -1180,7 +1077,7 @@ class SpatialSolver():
             penalties are largely controlled by ``local_reweight_func``.
         spatial_reweight_models : list
             Names of models to use in the spatial reweighting.
-        spatial_reweight_iters : int, optional
+        spatial_reweight_iters : int
             Number of spatial reweighting iterations.
         spatial_reweight_percentile : float, optional
             Percentile used in the spatial reweighting.
@@ -1188,7 +1085,7 @@ class SpatialSolver():
         spatial_reweight_max_rms : float, optional
             Stop the spatial iterations early if the difference in the RMS (Root Mean Square)
             of the change of the parameters between reweighting iterations is less than
-            ``spatial_reweight_max_rms``. Defaults to no early stopping.
+            ``spatial_reweight_max_rms``.
         spatial_reweight_max_changed : float, optional
             Stop the spatial iterations early if the number of changed parameters (i.e.,
             flipped between zero and non-zero) falls below a threshold. The threshold
@@ -1206,12 +1103,8 @@ class SpatialSolver():
         local_reweight_coupled : bool, optional
             If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
             is coupled with the reweighting weights (see Notes in :func:`~lasso_regression`).
-        formal_variance : bool, optional
-            If ``True``, also calculate the formal variance (diagonals of the covariance
-            matrix). Defaults to ``False``.
         formal_covariance : bool, optional
-            If ``True``, also calculate the formal covariance between components
-            (found in the off-diagonals of the covariance matrix). Defaults to ``False``.
+            If ``True``, calculate the formal model covariance. Defaults to ``False``.
         use_data_variance : bool, optional
             If ``True`` (default) and ``ts_description`` contains variance information, this
             uncertainty information will be used.
@@ -1222,6 +1115,9 @@ class SpatialSolver():
         use_internal_scales : bool, optional
             Sets whether internal scaling should be used when reweighting, see
             ``use_internal_scales`` in :func:`~lasso_regression`.
+        cov_zero_threshold : float, optional
+            When extracting the formal covariance matrix, assume parameters with absolute
+            values smaller than ``cov_zero_threshold`` are effectively zero.
         verbose : bool, optional
             If ``True`` (default: ``False``), print progress and statistics along the way.
         extended_stats : bool, optional
@@ -1282,20 +1178,22 @@ class SpatialSolver():
         # to the station geometry
 
         # first solve, default initial weights
-        results = self.net.fit(self.ts_description, model_list=self.model_list,
-                               solver="lasso_regression", cached_mapping=True,
+        if verbose:
+            tqdm.write("Initial fit")
+        results = self.net.fit(self.ts_description,
+                               solver="lasso_regression",
                                return_solutions=True,
-                               progress_desc="Initial fit",
+                               progress_desc=None if verbose else "Initial fit",
                                penalty=penalty,
                                reweight_max_iters=local_reweight_iters,
                                reweight_func=rw_func,
                                reweight_coupled=local_reweight_coupled,
                                return_weights=True,
-                               formal_variance=formal_variance,
                                formal_covariance=formal_covariance,
                                use_data_variance=use_data_variance,
                                use_data_covariance=use_data_covariance,
                                use_internal_scales=use_internal_scales,
+                               cov_zero_threshold=cov_zero_threshold,
                                cvxpy_kw_args=cvxpy_kw_args)
         num_total = sum([s.models[self.ts_description][m].parameters.size
                          for s in self.net for m in all_reweight_models])
@@ -1397,7 +1295,8 @@ class SpatialSolver():
                         tqdm.write(f"Stacking model {mdl_description}")
                         # print percentiles
                         percs = [np.nanpercentile(stacked_weights, q) for q in [5, 50, 95]]
-                        tqdm.write(f"Weight percentiles (5-50-95): {percs}")
+                        tqdm.write("Weight percentiles (5-50-95): "
+                                   f"[{percs[0]:.11g}, {percs[1]:.11g}, {percs[2]:.11g}]")
                     # now apply the spatial median to parameter weights
                     for station_index, name in enumerate(station_names):
                         new_net_weights[name]["reweight_init"][mdl_description] = \
@@ -1417,20 +1316,23 @@ class SpatialSolver():
                         new_net_weights[name]["reweight_init"][mdl_description] = \
                             results[name][mdl_description].weights
             # next solver step
-            results = self.net.fit(self.ts_description, model_list=self.model_list,
-                                   solver="lasso_regression", cached_mapping=True,
+            if verbose:
+                tqdm.write(f"Fit after {i+1} reweightings")
+            results = self.net.fit(self.ts_description,
+                                   solver="lasso_regression",
                                    return_solutions=True,
                                    local_input=new_net_weights,
-                                   progress_desc=f"Fit after {i+1} reweightings",
+                                   progress_desc=None if verbose
+                                   else f"Fit after {i+1} reweightings",
                                    penalty=penalty,
                                    reweight_max_iters=local_reweight_iters,
                                    reweight_func=rw_func,
                                    reweight_coupled=local_reweight_coupled,
                                    return_weights=True,
-                                   formal_variance=formal_variance,
                                    formal_covariance=formal_covariance,
                                    use_data_variance=use_data_variance,
                                    use_data_covariance=use_data_covariance,
+                                   cov_zero_threshold=cov_zero_threshold,
                                    cvxpy_kw_args=cvxpy_kw_args)
             # get statistics
             num_nonzero = sum([(s.models[self.ts_description][m].parameters.ravel()
@@ -1473,7 +1375,7 @@ class SpatialSolver():
                 # print
                 if verbose:
                     tqdm.write(f"RMS difference of '{mdl_description}' parameters = "
-                               f"{rms_diff} ({num_changed} changed)")
+                               f"{rms_diff:.11g} ({num_changed} changed)")
             # check if early stopping was triggered
             if early_stop:
                 if verbose:
