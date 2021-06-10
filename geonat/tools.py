@@ -282,7 +282,8 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
     r"""
     Converts a full variance(-covariance) matrix with multiple components into a
     column-based representation like the one used by :class:`~geonat.models.Model` or
-    :class:`~geonat.timeseries.Timeseries`.
+    :class:`~geonat.timeseries.Timeseries`. The extraction done basically implies
+    the assumption that the cross-parameter/cross-observation covariance is negligible.
 
     It is assumed the the individual elements
     are ordered such that all components of one parameter or observation are in
@@ -381,6 +382,32 @@ def block_permutation(n_outer, n_inner):
     Pcolind = np.arange(n, dtype=int).reshape(n_outer, n_inner).T.ravel()
     P = sparse.coo_matrix((Pvals, (Prowind, Pcolind))).tocsr()
     return P
+
+
+def cov2corr(cov):
+    """
+    Function that converts a covariance matrix into a (Pearson) correlation
+    matrix, taking into account zero-valued variances and setting the
+    respective correlation entries to NaN.
+
+    Parameters
+    ----------
+    cov : numpy.ndarray
+        Covariance matrix.
+
+    Returns
+    -------
+    corr : numpy.ndarray
+        Correlation matrix.
+    """
+    var = np.diag(cov)
+    var_nonzero = np.flatnonzero(var)
+    cov_nonzero = np.ix_(var_nonzero, var_nonzero)
+    corr = np.empty_like(cov)
+    corr[:] = np.NaN
+    Dinv = np.diag(1/np.sqrt(var[var_nonzero]))
+    corr[cov_nonzero] = Dinv @ cov[cov_nonzero] @ Dinv
+    return corr
 
 
 def parallelize(func, iterable, num_threads=None, chunksize=1):
