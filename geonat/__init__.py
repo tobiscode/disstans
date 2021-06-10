@@ -34,7 +34,7 @@ from .station import Station
 from .network import Network
 
 # package version
-__version__ = '0.6'
+__version__ = '0.7'
 
 # preparational steps
 multiprocessing.set_start_method('spawn', True)
