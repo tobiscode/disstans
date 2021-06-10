@@ -13,6 +13,19 @@ Model (Parent Class)
 
 .. autofunction:: geonat.models.check_model_dict
 
+Model Collection
+----------------
+
+.. autoclass:: geonat.models.ModelCollection
+   :members:
+   :special-members:
+
+Helper class and constant for combined fits of models:
+
+.. autoclass:: geonat.models.AllFits
+
+.. autoattribute:: geonat.models.ALLFITS
+
 Basic Models
 ------------
 

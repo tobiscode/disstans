@@ -7,7 +7,7 @@ Welcome to GeoNAT's documentation!
    :maxdepth: 2
 
    installation
-   tutorial
+   tutorials
 
 
 .. toctree::

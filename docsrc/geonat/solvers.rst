@@ -37,11 +37,6 @@ Solution Object
 .. autoclass:: geonat.solvers.Solution
    :members:
 
-Helper class:
-
-.. autoclass:: geonat.solvers.ModelSolution
-   :members:
-
 Reweighting Functions
 ---------------------
 

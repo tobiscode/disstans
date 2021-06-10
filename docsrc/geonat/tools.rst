@@ -66,6 +66,11 @@ block_permutation
 
 .. autofunction:: geonat.tools.block_permutation
 
+cov2corr
+........
+
+.. autofunction:: geonat.tools.cov2corr
+
 Classes
 -------
 
