@@ -477,7 +477,7 @@ class Timeseries():
             ts.covs = new_covariance
 
         will only work when the respective columns already exist in the dataframe.
-        (This is them same behavior for renaming variance columns that do not exist.)
+        (This is the same behavior for renaming variance columns that do not exist.)
         If they do not exist, the calls will results in an error because no column names exist,
         in an effort to make the inner workings more transparent and rigorous.
 
@@ -1042,6 +1042,8 @@ class Timeseries():
             else:
                 num_components = data.shape[1]
                 cov_dims = get_cov_dims(num_components)
+                if cov.ndim == 1:
+                    cov = cov.reshape(-1, 1)
                 assert cov.shape == (data.shape[0], cov_dims), \
                     "'data' and 'cov' need to have compatible shapes, got " \
                     f"{data.shape} and {cov.shape} (need {cov_dims} columns)."
@@ -1086,7 +1088,7 @@ class GipsyTimeseries(Timeseries):
     +---------------+-------------------------------------------------+
     | Columns 5-7   | East, North and Vertical standard deviation [m] |
     +---------------+-------------------------------------------------+
-    | Columns 8-10  | East, North and Vertical covariance [m^2]       |
+    | Columns 8-10  | East, North and Vertical correlation [-]        |
     +---------------+-------------------------------------------------+
     | Column 11     | Time in Seconds past J2000                      |
     +---------------+-------------------------------------------------+
@@ -1094,6 +1096,9 @@ class GipsyTimeseries(Timeseries):
     +---------------+-------------------------------------------------+
 
     Time is GPS time, and the time series are relative to each station's first epoch.
+
+    (Note that the documentation says covariance, but it is actually correlation,
+    as per personal communication with Angelyn Moore, JPL.)
 
     .. _JPL's website: https://sideshow.jpl.nasa.gov/pub/JPL_GPS_Timeseries/\
 repro2018a/raw/position/envseries/0000_README.format
@@ -1113,10 +1118,16 @@ repro2018a/raw/position/envseries/0000_README.format
         data = pd.read_csv(self._path, delim_whitespace=True, header=None,
                            usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
                            names=all_cols)
-        # convert to standard deviations and millimeters
-        data.loc[:, var_cols] *= data.loc[:, var_cols]  # original data is in s.d.
-        data.loc[:, data_cols] *= 1e3  # now in mm
-        data.loc[:, var_cols + cov_cols] *= 1e6  # now in mm^2
+        # compute covariance from correlation, still in meters
+        data.loc[:, "east_north_cov"] *= data.loc[:, "east_var"] * data.loc[:, "north_var"]
+        data.loc[:, "east_up_cov"] *= data.loc[:, "east_var"] * data.loc[:, "up_var"]
+        data.loc[:, "north_up_cov"] *= data.loc[:, "north_var"] * data.loc[:, "up_var"]
+        # convert standard deviation into variance, still in meters
+        data.loc[:, var_cols] *= data.loc[:, var_cols]
+        # now convert everything to millimeters
+        data.loc[:, data_cols] *= 1e3
+        data.loc[:, var_cols + cov_cols] *= 1e6
+        # combine dataframe with time
         df = time.join(data)
         # check for duplicate timestamps and create time index
         num_duplicates = int(df.duplicated(subset="time").sum())
