@@ -144,7 +144,7 @@ class Network():
         """ Names of stations present in the network. """
         return list(self.stations.keys())
 
-    def __repr__(self):
+    def __str__(self):
         """
         Special function that returns a readable summary of the network.
         Accessed, for example, by Python's ``print()`` built-in function.
@@ -1485,7 +1485,7 @@ class Network():
             model individually. Defaults to ``True``.
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
-            :meth:`~geonat.station.Station.__repr__`). Defaults to ``False``.
+            :meth:`~geonat.station.Station.__str__`). Defaults to ``False``.
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
         save : bool, str, optional

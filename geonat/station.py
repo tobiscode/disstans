@@ -74,7 +74,7 @@ class Station():
             stat.fits['myts']['mymodel']
         """
 
-    def __repr__(self):
+    def __str__(self):
         """
         Special function that returns a readable summary of the station.
         Accessed, for example, by Python's ``print()`` built-in function.
@@ -86,7 +86,7 @@ class Station():
         """
         info = f"Station {self.name} at {self.location} with timeseries"
         for ts_description, ts in self.timeseries.items():
-            info += ts.__repr__().replace("Timeseries", f"\n{ts_description}")
+            info += str(ts).replace("Timeseries", f"\n{ts_description}")
             if len(self.models[ts_description]) > 0:
                 info += f"\n - Models: {self.models[ts_description].model_names}"
             if len(self.fits[ts_description]) > 0:

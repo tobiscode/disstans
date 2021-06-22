@@ -157,7 +157,7 @@ class Model():
         """
         return self._cov
 
-    def __repr__(self):
+    def __str__(self):
         """
         Special function that returns a readable summary of the Model.
         Accessed, for example, by Python's ``print()`` built-in function.
@@ -1500,7 +1500,7 @@ def check_model_dict(models):
 
 # make a custom object that serves as the "all models" fit key
 class AllFits():
-    def __repr__(self):
+    def __str__(self):
         return "Model"
 
 
@@ -1626,7 +1626,7 @@ class ModelCollection():
         """
         return model_description in self.collection
 
-    def __repr__(self):
+    def __str__(self):
         """
         Special function that returns a readable summary of the model collection.
         Accessed, for example, by Python's ``print()`` built-in function.

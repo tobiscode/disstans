@@ -110,7 +110,7 @@ class Timeseries():
             """
         self._cov_cols = cov_cols
 
-    def __repr__(self):
+    def __str__(self):
         """
         Special function that returns a readable summary of the timeseries.
         Accessed, for example, by Python's ``print()`` built-in function.
