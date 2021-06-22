@@ -1,0 +1,29 @@
+name: geonat
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.9
+  - numpy>=1.20
+  - pandas>=1
+  - scipy>=1.6
+  - scikit-learn
+  - matplotlib>=3.4
+  - cartopy>=0.19
+  - owslib
+  - cmcrameri
+  - cvxpy>=1
+  - cvxopt
+  - tqdm
+  - sqlalchemy
+  - ffmpeg
+  - jupyterlab
+  - sphinx>=4
+  - docutils
+  - doc8
+  - rstcheck
+  - flake8
+  - pip:
+    - sphinx-rtd-theme
+    - git+https://github.com/sphinx-contrib/video.git
+    - git+https://github.com/tbenthompson/okada_wrapper.git
