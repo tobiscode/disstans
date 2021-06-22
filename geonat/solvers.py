@@ -159,7 +159,7 @@ class Solution():
                                           if m in model_list]).astype(int)
         return np.sort(combined_ranges)
 
-    def parameters_by_model(self, models):
+    def parameters_by_model(self, models, zeroed=False):
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the parameters for (a) specific model(s).
@@ -168,6 +168,9 @@ class Solution():
         ----------
         models : str, list
             Name(s) of model(s).
+        zeroed : bool, optional
+            If ``False`` (default), use :attr:`~parameters`, else
+            :attr:`~parameters_zeroed`.
 
         Returns
         -------
@@ -175,9 +178,12 @@ class Solution():
             Parameters of the model subset.
         """
         indices = self.get_model_indices(models)
-        return self.parameters[indices, :]
+        if zeroed:
+            return self.parameters_zeroed[indices, :]
+        else:
+            return self.parameters[indices, :]
 
-    def covariances_by_model(self, models):
+    def covariances_by_model(self, models, zeroed=False):
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the covariances for (a) specific model(s).
@@ -186,6 +192,9 @@ class Solution():
         ----------
         models : str, list
             Name(s) of model(s).
+        zeroed : bool, optional
+            If ``False`` (default), use :attr:`~covariances`, else
+            :attr:`~covariances_zeroed`.
 
         Returns
         -------
@@ -194,7 +203,10 @@ class Solution():
         """
         if self.covariances is not None:
             indices = self.get_model_indices(models, for_cov=True)
-            return self.covariances[np.ix_(indices, indices)]
+            if zeroed:
+                return self.covariances_zeroed[np.ix_(indices, indices)]
+            else:
+                return self.covariances[np.ix_(indices, indices)]
 
     def weights_by_model(self, models):
         """
@@ -248,7 +260,7 @@ class Solution():
     @staticmethod
     def aggregate_models(results_dict, mdl_description, key_list=None,
                          stack_parameters=False, stack_covariances=False,
-                         stack_weights=False):
+                         stack_weights=False, zeroed=False):
         """
         For a dictionary of Solution objects (e.g. one per station) and a given
         model description, aggregate the model parameters, variances and parameter
@@ -277,6 +289,9 @@ class Solution():
         stack_weights : bool, optional
             If ``True``, stack the weights, otherwise just return ``None``.
             Defaults to ``False``.
+        zeroed : bool, optional
+            If ``False`` (default), use :attr:`~parameters` and :attr:`~covariances`,
+            else :attr:`~parameters_zeroed` and :attr:`~covariances_zeroed`.
 
         Returns
         -------
@@ -303,7 +318,7 @@ class Solution():
         out = []
         # parameters
         if stack_parameters:
-            stack = [results_dict[key].parameters_by_model(mdl_description)
+            stack = [results_dict[key].parameters_by_model(mdl_description, zeroed=zeroed)
                      for key in key_list]
             stack_shapes = [mdl.shape for mdl in stack]
             if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
@@ -312,7 +327,7 @@ class Solution():
                 out.append(None)
         # covariances
         if stack_covariances:
-            stack = [results_dict[key].covariances_by_model(mdl_description)
+            stack = [results_dict[key].covariances_by_model(mdl_description, zeroed=zeroed)
                      for key in key_list if results_dict[key].covariances is not None]
             stack_shapes = [mdl.shape for mdl in stack]
             if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
@@ -1241,7 +1256,8 @@ class SpatialSolver():
                       Solution.aggregate_models(results_dict=results,
                                                 mdl_description=mdl_description,
                                                 key_list=station_names,
-                                                stack_parameters=True)[0]
+                                                stack_parameters=True,
+                                                zeroed=True)[0]
                       for mdl_description in all_reweight_models}
 
         if extended_stats:
@@ -1376,7 +1392,8 @@ class SpatialSolver():
                     Solution.aggregate_models(results_dict=results,
                                               mdl_description=mdl_description,
                                               key_list=station_names,
-                                              stack_parameters=True)
+                                              stack_parameters=True,
+                                              zeroed=True)
                 # check for early stopping criterion and save current parameters
                 rms_diff = np.linalg.norm(old_params[mdl_description] - stacked_params)
                 num_changed = np.logical_xor(np.abs(old_params[mdl_description]) < self.ZERO,
