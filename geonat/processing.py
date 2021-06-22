@@ -189,14 +189,14 @@ def common_mode(array, method, num_components=1, plot=False):
     References
     ----------
 
-    .. [dong06] Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L., Kedar,
-       S., and Jamason, P. (2006), *Spatiotemporal filtering using principal component
-       analysis and Karhunen‐Loeve expansion approaches for regional GPS network analysis*,
-       J. Geophys. Res., 111, B03405, doi:`10.1029/2005JB003806
-       <https://doi.org/10.1029/2005JB003806>`_.
-    .. [huang12] Huang, D. W., Dai, W. J., & Luo, F. X. (2012),
-       *ICA spatiotemporal filtering method and its application in GPS deformation monitoring*,
-       Applied Mechanics and Materials, 204-208, 2806,
+    .. [dong06] Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L.,
+       Kedar, S., & Jamason, P. (2006). *Spatiotemporal filtering using principal component
+       analysis and Karhunen-Loeve expansion approaches for regional GPS network analysis*.
+       Journal of Geophysical Research: Solid Earth, 111(B3).
+       doi:`10.1029/2005JB003806 <https://doi.org/10.1029/2005JB003806>`_.
+    .. [huang12] Huang, D. W., Dai, W. J., & Luo, F. X. (2012).
+       *ICA Spatiotemporal Filtering Method and Its Application in GPS Deformation Monitoring*.
+       Applied Mechanics and Materials, 204–208, 2806–2812.
        doi:`10.4028/www.scientific.net/AMM.204-208.2806
        <http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_.
 
@@ -254,6 +254,15 @@ def clean(station, ts_in, reference, ts_out=None,
     Function operating on a single station's timeseries to clean it from outliers,
     and mask it out if the data is not good enough. The criteria are set by
     :attr:`~geonat.config.defaults` but can be overriden by providing ``clean_kw_args``.
+    The criteria are:
+
+    - ``'min_obs'``: Minimum number of observations the timeseries has to contain.
+    - ``'std_outlier'``: Classify as an outlier any observation that is this many
+      standard deviations away from the reference.
+    - ``'std_thresh'``: After the removal of outliers, the maximum standard deviation
+      that the residual between reference and input timeseries is allowed to have.
+    - ``'min_clean_obs'``: After the removal of outliers, the minimum number of
+      observations the timeseries has to contain.
 
     Parameters
     ----------
@@ -270,9 +279,10 @@ def clean(station, ts_in, reference, ts_out=None,
     ts_out : str, optional
         If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``
         and clean the copy (to preserve the raw timeseries).
-    clean_kw_args : dict
-        Override the default cleaning criteria in :attr:`~geonat.config.defaults`.
-    reference_callable_args : dict
+    clean_kw_args : dict, optional
+        Override the default cleaning criteria in :attr:`~geonat.config.defaults`,
+        see the explanations above.
+    reference_callable_args : dict, optional
         If ``reference`` is a function, ``reference_callable_args`` can be used
         to pass additional keyword arguments to the former when calculating
         the reference timeseries.
@@ -426,8 +436,8 @@ class StepDetector():
         References
         ----------
 
-        .. [burnhamanderson02] (2002) *Information and Likelihood Theory:*
-           *A Basis for Model Selection and Inference.* In: Burnham K.P., Anderson D.R. (eds)
+        .. [burnhamanderson02] (2002) *Information and Likelihood Theory:
+           A Basis for Model Selection and Inference.* In: Burnham K.P., Anderson D.R. (eds)
            Model Selection and Multimodel Inference. Springer, New York, NY.
            doi:`10.1007/978-0-387-22456-5_2 <https://doi.org/10.1007/978-0-387-22456-5_2>`_.
         """

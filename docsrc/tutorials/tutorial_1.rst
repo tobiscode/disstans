@@ -4,7 +4,7 @@ Tutorial 1: The first synthetic station
 Building a Model collection
 ---------------------------
 
-Let's create an empty synthetic station ``"TUT"`` located in Los Angeles using
+Let's create an empty synthetic station "TUT" located in Los Angeles using
 :class:`~geonat.station.Station`:
 
 .. doctest::

@@ -101,9 +101,15 @@ class Solution():
         # save results to class instance
         self._model_slice_ranges = model_ix_start_len
         self.parameters = par_full
-        """ Full parameter matrix, where unsolved parameters are set to ``NaN``. """
+        """
+        Full parameter matrix, where unsolved and unobservable parameters are
+        set to ``NaN``.
+        """
         self.covariances = cov_full if covariances is not None else None
-        """ Full covariance matrix, where unsolved covariances are set to ``NaN``. """
+        """
+        Full covariance matrix, where unsolved and unobservable covariances are
+        set to ``NaN``.
+        """
         self.weights = weights_full if pack_weights else None
         """ Full weights matrix, where unsolved weights are set to ``NaN``. """
         self.obs_mask = obs_indices

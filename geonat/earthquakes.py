@@ -160,9 +160,9 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
     ----------
 
     .. _`okada_wrapper`: https://github.com/tbenthompson/okada_wrapper
-    .. [okada92] Yoshimitsu Okada (1992),
+    .. [okada92] Okada, Y. (1992).
        *Internal deformation due to shear and tensile faults in a half-space*.
-       Bulletin of the Seismological Society of America, 82 (2): 1018–1040.
+       Bulletin of the Seismological Society of America, 82(2), 1018–1040.
     """
     # check whether to add the steps to the stations
     if target_timeseries:

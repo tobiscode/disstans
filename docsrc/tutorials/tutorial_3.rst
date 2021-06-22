@@ -415,7 +415,7 @@ use the :meth:`~geonat.network.Network.gui` function to save some plots::
     ...             scalogram_kw_args={"ts": "Displacement", "model": "Transient",
     ...                                "cmaprange": 2})
 
-Now, let's have a look at the two most western stations, "Jeckle" and "Cylon":
+Now, let's have a look at the two most western stations, Jeckle and Cylon:
 
 |3c_scalo_Jeckle_base| |3c_ts_Jeckle_base|
 
@@ -435,7 +435,7 @@ Now, let's have a look at the two most western stations, "Jeckle" and "Cylon":
 
 While in all cases the models fit the data well, one can observe two things.
 
-First, for the time that we added colored noise to "Cylon", just as in the previous
+First, for the time that we added colored noise to Cylon, just as in the previous
 tutorial, the transients created by the noise are fit by our spline dictionary.
 
 Second, especially for the time without the colored noise, we can see that apart from a couple
@@ -684,7 +684,7 @@ we looked at before:
 
 We can now see that this effect is much stronger now: only a handful of splines
 are used by the two stations. Unavoidably, the fit has become a bit worse: for the
-"Jeckle" station, for example, we can see that some left-over signal can be found
+Jeckle station, for example, we can see that some left-over signal can be found
 in the residual North timeseries around the first SSE.
 This can probably be tuned by changing the L1 ``penalty``, or by choosing a different
 ``local_reweight_func``, or many other configuration settings that are present in
@@ -697,7 +697,7 @@ More importantly though, since in the real world you don't know the true signal
 and noise, even if you would fit more signal, you could not be sure that you didn't
 fit a noise process.
 
-What is important to point out, however, is that the residuals at "Cylon" do not look as
+What is important to point out, however, is that the residuals at Cylon do not look as
 Gaussian anymore for the timespan we added colored noise. Our goal was to suppress
 fitting noise processes as signals. Let's plot the residuals, true noise, and our errors,
 to see if that was successful by comparing this solution with the one that only
@@ -819,7 +819,7 @@ for both error timeseries ``'Err_L1R5'`` and ``'Err_L1R1S20'``:
              Displacement_Model_N-N    0.073046
     dtype: float64
 
-If you look at the lines for "Cylon", the standard deviation reduced from
+If you look at the lines for Cylon, the standard deviation reduced from
 ``0.236574`` and ``0.234167`` to ``0.207266`` and ``0.222614``, respectively.
 
 .. warning::
@@ -836,7 +836,7 @@ Finding unmodeled jumps
 -----------------------
 
 When looking at the errors that we just printed out, we are painfully reminded that
-we added an unmodeled maintenance step to the station "Corko". Lets's use the
+we added an unmodeled maintenance step to the station Corko. Lets's use the
 :meth:`~geonat.network.Network.gui` function to plot the scalograms and timeseries
 fits for the station for the two cases we just used.
 
@@ -866,7 +866,7 @@ The result is an overall good fit, with some larger residuals around the time of
 the jump (since even the smallest spline is not as short as a day).
 
 If we enforce spatial coherence, the other stations "forbid" the use of the spline
-closest to the maintenance jump, such that "Corko" can't use it, resulting in large
+closest to the maintenance jump, such that Corko can't use it, resulting in large
 residuals before and after the jump. All other modeled signals are contorted
 to try to minimize the rest of the residual: for example, the splines that are
 associated with the SSEs are fit to a much larger amplitude to compensate for the
@@ -1121,7 +1121,7 @@ Model parameter covariances
 ---------------------------
 
 While a more detailed exploration of the parameter covariances is left to the next tutorial,
-let's have a quick look at the covariance and correlation matrices at station "Jeckle".
+let's have a quick look at the covariance and correlation matrices at station Jeckle.
 The following code will produce the annotated covariance plot using the
 :meth:`~geonat.models.ModelCollection.plot_covariance` method::
 
@@ -1177,14 +1177,14 @@ L0 estimation process, show a more homogenous direction of the motion to the sou
 which we know to be the true direction of motion. This is also visible in the far east
 of the network, where the signal is close or below the noise floor.
 
-One very visible outlier is the station "Corko": it contains the unmodeled maintenance
+One very visible outlier is the station Corko: it contains the unmodeled maintenance
 step that has can only be fit by the splines. In a second iteration of analyzing this synthetic
-network, one would of course model the step at "Corko" for a better fit.
+network, one would of course model the step at Corko for a better fit.
 
 References
 ----------
 
-.. [riel14] Riel, B., Simons, M., Agram, P., & Zhan, Z. (2014),
-   *Detecting transient signals in geodetic time series using sparse estimation techniques*,
-   Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160,
+.. [riel14] Riel, B., Simons, M., Agram, P., & Zhan, Z. (2014).
+   *Detecting transient signals in geodetic time series using sparse estimation techniques*.
+   Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
    doi:`10.1002/2014JB011077 <https://doi.org/10.1002/2014JB011077>`_

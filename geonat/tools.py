@@ -860,9 +860,9 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     ----------
 
     .. _`Nevada Geodetic Laboratory`: http://geodesy.unr.edu/
-    .. [blewitt18] Blewitt, G., W. C. Hammond, and C. Kreemer (2018).
-       *Harnessing the GPS data explosion for interdisciplinary science.*
-       Eos, 99, doi:`10.1029/2018EO104623 <https://doi.org/10.1029/2018EO104623>`_
+    .. [blewitt18] Blewitt, G., Hammond, W., & Kreemer, C. (2018).
+       *Harnessing the GPS Data Explosion for Interdisciplinary Science*. Eos, 99.
+       doi:`10.1029/2018EO104623 <https://doi.org/10.1029/2018EO104623>`_
 
     See Also
     --------

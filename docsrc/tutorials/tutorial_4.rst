@@ -148,7 +148,7 @@ Which will yield the following map:
 
 .. image:: ../img/tutorial_4a_map.png
 
-And for station ``'S1'``, we see the following two timeseries:
+And for station S1, we see the following two timeseries:
 
 .. image:: ../img/tutorial_4b_ts_S1.png
 
@@ -236,7 +236,7 @@ scalograms::
     >>> net.gui(station="S2", timeseries=["Displacement"],
     ...     scalogram_kw_args={"ts": "Displacement", "model": "Transient", "cmaprange": 3})
 
-For station ``'S2'``, we get the following model fit and scalogram:
+For station S2, we get the following model fit and scalogram:
 
 |4c_ts_S2| |4c_scalo_S2|
 
