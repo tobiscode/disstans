@@ -637,7 +637,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
 def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func=None,
                      reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
                      formal_covariance=False, use_data_variance=True, use_data_covariance=True,
-                     use_internal_scales=False, cov_zero_threshold=1e-6, return_weights=False,
+                     use_internal_scales=True, cov_zero_threshold=1e-6, return_weights=False,
                      cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
     r"""
     Performs linear, L1-regularized least squares using
@@ -715,8 +715,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         If ``True`` (default), ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
     use_internal_scales : bool, optional
-        If ``False`` (default), the reweighting does not look for or take into account
-        model-specific internal scaling parameters.
+        If ``True`` (default), the reweighting takes into account potential
+        model-specific internal scaling parameters, otherwise ignores them.
     cov_zero_threshold : float, optional
         When extracting the formal covariance matrix, assume parameters with absolute
         values smaller than ``cov_zero_threshold`` are effectively zero.
@@ -813,9 +813,15 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             assert isinstance(reweight_func, ReweightingFunction), "'reweight_func' " \
                 f"needs to be None or a ReweightingFunction, got {type(reweight_func)}."
             rw_func = reweight_func
+    # determine if reg_indices and weights_scaling need a reshape
+    if (ts.cov_cols is None) or (not use_data_covariance):
+        pass
+    else:
+        reg_indices = np.repeat(reg_indices, num_comps)
+        weights_scaling = np.repeat(weights_scaling, num_comps)
 
     # solve CVXPY problem while checking for convergence
-    def solve_problem(GtWG, GtWd, reg_indices, num_comps, init_weights):
+    def solve_problem(GtWG, GtWd, num_comps, init_weights):
         # build objective function
         m = cp.Variable(GtWd.size)
         objective = cp.norm2(GtWG @ m - GtWd)
@@ -900,7 +906,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             # build and solve problem
             Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
                 ts, G, obs_indices, icomp=i, return_W_G=True, use_data_var=use_data_variance)
-            solution, wts = solve_problem(GtWG, GtWd, reg_indices, num_comps=1,
+            solution, wts = solve_problem(GtWG, GtWd, num_comps=1,
                                           init_weights=reweight_init[:, i]
                                           if reweight_init is not None else None)
             # store results
@@ -940,8 +946,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         Gnonan, Wnonan, GtWG, GtWd = models.build_LS(ts, G, obs_indices, return_W_G=True,
                                                      use_data_var=use_data_variance,
                                                      use_data_cov=use_data_covariance)
-        reg_indices = np.repeat(reg_indices, num_comps)
-        solution, wts = solve_problem(GtWG, GtWd, reg_indices, num_comps=num_comps,
+        solution, wts = solve_problem(GtWG, GtWd, num_comps=num_comps,
                                       init_weights=reweight_init.ravel()
                                       if reweight_init is not None else None)
         # store results
@@ -1060,7 +1065,7 @@ class SpatialSolver():
               spatial_reweight_max_changed=0, continuous_reweight_models=[],
               local_reweight_iters=1, local_reweight_func=None, local_reweight_coupled=True,
               formal_covariance=False, use_data_variance=True, use_data_covariance=True,
-              use_internal_scales=False, cov_zero_threshold=1e-6, verbose=False,
+              use_internal_scales=True, cov_zero_threshold=1e-6, verbose=False,
               extended_stats=False, cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
         r"""
         Solve the network-wide fitting problem as follows:

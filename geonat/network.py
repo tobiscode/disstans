@@ -878,8 +878,8 @@ class Network():
             if not sol.converged:
                 warn(f"Fitting did not converge for timeseries {ts_description} "
                      f"at {station_names[i]}", category=RuntimeWarning)
-            stat_ts = self[station_names[i]].models[ts_description]
-            stat_ts.read_parameters(sol.parameters_zeroed, sol.covariances_zeroed)
+            self[station_names[i]].models[ts_description] \
+                .read_parameters(sol.parameters_zeroed, sol.covariances_zeroed)
             # if raw output is requested, save it
             if return_solutions:
                 solutions[station_names[i]] = sol
@@ -1614,7 +1614,9 @@ class Network():
                     rms_kw_args[k] = analyze_kw_args[k]
             rms = np.zeros(self.num_stations)
             for i, stat in enumerate(self):
-                rms[i] = stat.analyze_residuals(rms_on_map["ts"], **rms_kw_args)["RMS"]
+                rms[i] = (np.linalg.norm(stat.analyze_residuals(rms_on_map["ts"],
+                                                                **rms_kw_args)["RMS"])
+                          if rms_on_map["ts"] in stat.timeseries else 0)
             # make colormap
             cmax = rms_on_map.get("c_max", np.max(rms))
             rms_cmap = mpl.cm.ScalarMappable(cmap=scm.lajolla_r,
@@ -1833,7 +1835,7 @@ class Network():
                 if not mark_subset.empty:
                     for ax in ax_ts:
                         for _, row in mark_subset.iterrows():
-                            ax.axvline(row["time"])
+                            ax.axvline(row["time"], c="0.5")
 
             # plot possible steps
             if stepdetector:
