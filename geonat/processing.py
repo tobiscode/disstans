@@ -703,9 +703,10 @@ class StepDetector():
         step_table : pandas.DataFrame
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
-            over all components for this timestamp), as well as ``var0`` and ``var1``
+            over all components for this timestamp), as well as ``var0``, ``var1``
             (the two hypotheses' residuals variances for the component of
-            maximum step probability).
+            maximum step probability) and ``varred`` (the variance reduction in percent,
+            ``(var0 - var1) / var0``).
         step_ranges : list
             A list of lists containing continuous periods over all stations of the potential
             steps as determined by ``gap`` and ``gap_unit``.
@@ -749,6 +750,9 @@ class StepDetector():
             # station.add_local_model(ts_description, "Detections", mdl)
         # sort dataframe by probability
         step_table.sort_values(by="probability", ascending=False, inplace=True)
+        # get coefficient of partial determination, i.e. how much the variance is reduced
+        # (in percent) by including a step
+        step_table["varred"] = (step_table["var0"] - step_table["var1"]) / step_table["var0"]
         # get the consecutive steptime ranges
         if not step_table.empty:
             unique_steps = np.sort(step_table["time"].unique())
@@ -874,7 +878,7 @@ class StepDetector():
                                                          "var0": maxstepvar0,
                                                          "var1": maxstepvar1}),
                                            ignore_index=True)
-        # sort dataframe by probability or merge it with the input dataframe
+        # merge it with the input dataframe, if provided
         if augment_df:
             catalog_df["probability"] = np.NaN
             catalog_df["var0"] = np.NaN
@@ -887,8 +891,11 @@ class StepDetector():
             if not keep_nan_probs:
                 catalog_df = catalog_df.dropna(how="all", subset=["probability", "var0", "var1"])
             step_table = catalog_df
-        else:
-            step_table.sort_values(by="probability", ascending=False, inplace=True)
+        # sort
+        step_table.sort_values(by="probability", ascending=False, inplace=True)
+        # get coefficient of partial determination, i.e. how much the variance is reduced
+        # (in percent) by including a step
+        step_table["varred"] = (step_table["var0"] - step_table["var1"]) / step_table["var0"]
         # get the consecutive steptime ranges
         unique_steps = np.sort(step_table["time"].unique())
         split = np.nonzero((np.diff(unique_steps) / Timedelta(1, gap_unit)) > gap)[0]
