@@ -394,7 +394,7 @@ class Station():
             self.add_local_model(ts_description=ts_description,
                                  model_description=mdl_desc, model=mdl)
 
-    def remove_local_models(self, ts_description, model_descriptions):
+    def remove_local_models(self, ts_description, model_descriptions, verbose=False):
         """
         Remove models from a timeseries.
 
@@ -404,6 +404,9 @@ class Station():
             Timeseries to remove the model from.
         model_descriptions : str or list
             Model description(s).
+        verbose : bool, optional
+            If ``True`` (default: ``False``), raise a warning if a timeseries or model
+            could not be found in the network.
         """
         # unpack list
         if isinstance(model_descriptions, str):
@@ -412,18 +415,19 @@ class Station():
             model_list = model_descriptions
         # iterate removal
         for mdl_desc in model_list:
-            if ts_description not in self.timeseries:
+            if ts_description in self.timeseries:
+                if mdl_desc in self.models[ts_description].model_names:
+                    del self.models[ts_description][mdl_desc]
+                    if mdl_desc in self.fits[ts_description]:
+                        del self.fits[ts_description][mdl_desc]
+                elif verbose:
+                    warn(f"Station {self.name}, timeseries {ts_description}: "
+                         f"Cannot find local model '{mdl_desc}', couldn't delete.",
+                         category=RuntimeWarning)
+            elif verbose:
                 warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
                      f"couldn't delete local model '{mdl_desc}'.",
                      category=RuntimeWarning)
-            elif mdl_desc not in self.models[ts_description].model_names:
-                warn(f"Station {self.name}, timeseries {ts_description}: "
-                     f"Cannot find local model '{mdl_desc}', couldn't delete.",
-                     category=RuntimeWarning)
-            else:
-                del self.models[ts_description][mdl_desc]
-                if mdl_desc in self.fits[ts_description]:
-                    del self.fits[ts_description][mdl_desc]
 
     def add_fit(self, ts_description, model_description, fit, return_ts=False):
         """
