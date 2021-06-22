@@ -664,6 +664,8 @@ class Network():
         geonat_models.check_model_dict(models)
         # loop over stations
         for station in station_list:
+            if ts_description not in station.timeseries:
+                continue
             for model_description, model_cfg in models.items():
                 local_copy = deepcopy(model_cfg)
                 mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
@@ -859,17 +861,18 @@ class Network():
             solver = getattr(geonat_solvers, solver)
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
         progress_desc = str(progress_desc) if progress_desc else "Fitting station models"
-        station_names = self.station_names
+        station_names = [name for name, station in self.stations.items()
+                         if ts_description in station.timeseries]
         iterable_inputs = ((solver,
-                            station.timeseries[ts_description],
-                            station.models[ts_description],
+                            self[stat_name].timeseries[ts_description],
+                            self[stat_name].models[ts_description],
                             kw_args if local_input == {}
-                            else {**kw_args, **local_input[station_names[i]]})
-                           for i, station in enumerate(self))
+                            else {**kw_args, **local_input[stat_name]})
+                           for stat_name in station_names)
         if return_solutions:
             solutions = {}
         for i, sol in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
-                                     desc=progress_desc, total=len(self.stations),
+                                     desc=progress_desc, total=len(station_names),
                                      ascii=True, unit="station")):
             # print warning if the solver didn't converge
             if not sol.converged:
@@ -943,14 +946,15 @@ class Network():
             assert isinstance(output_description, str), \
                 f"'output_description' must be a string, got {type(output_description)}."
         progress_desc = str(progress_desc) if progress_desc else "Evaluating station models"
-        iterable_inputs = ((station.timeseries[ts_description].time
+        station_names = [name for name, station in self.stations.items()
+                         if ts_description in station.timeseries]
+        iterable_inputs = ((self[stat_name].timeseries[ts_description].time
                             if timevector is None else timevector,
-                            station.models[ts_description])
-                           for station in self)
-        station_names = self.station_names
+                            self[stat_name].models[ts_description])
+                           for stat_name in station_names)
         for i, (sumfit, mdlfit) in enumerate(tqdm(parallelize(self._evaluate_single_station,
                                                               iterable_inputs),
-                                                  desc=progress_desc, total=len(self.stations),
+                                                  desc=progress_desc, total=len(station_names),
                                                   ascii=True, unit="station")):
             stat = self[station_names[i]]
             # add overall model
@@ -1271,7 +1275,8 @@ class Network():
             "All inputs to Network.math() need to be strings, got " \
             f"{[result, left, operator, right]}."
         for station in self:
-            station[result] = eval(f"station['{left}'] {operator} station['{right}']")
+            if (left in station.timeseries) and (right in station.timeseries):
+                station[result] = eval(f"station['{left}'] {operator} station['{right}']")
 
     def analyze_residuals(self, ts_description, **kw_args):
         """
@@ -1294,9 +1299,12 @@ class Network():
             columns. Averages of each metric can easily be calculated with the
             Pandas command :meth:`~pandas.DataFrame.mean`.
         """
+        # get the stations who have this timeseries
+        valid_stations = {name: station for name, station in self.stations.items()
+                          if ts_description in station.timeseries}
         # calculate the desired metrics
         metrics_lists = [station.analyze_residuals(ts_description, **kw_args)
-                         for station in self]
+                         for station in valid_stations.values()]
         # stack the data over the different metrics and components into a NumPy array
         metrics_arr = np.array([[component for metric in sta_metrics.values()
                                  for component in metric]
@@ -1305,14 +1313,14 @@ class Network():
         # (need to preserve order, hence not using set())
         metrics = list(dict.fromkeys([metric for sta_metrics in metrics_lists
                                       for metric in sta_metrics]))
-        components = list(dict.fromkeys([dcol for station in self
+        components = list(dict.fromkeys([dcol for station in valid_stations.values()
                                          for dcol in station[ts_description].data_cols]))
         # create a Pandas MultiIndex
         metrics_components = pd.MultiIndex.from_product([metrics, components],
                                                         names=["Metrics", "Components"])
         # create and return a multi-level DataFrame
         return pd.DataFrame(metrics_arr,
-                            index=self.station_names,
+                            index=list(valid_stations.keys()),
                             columns=metrics_components).rename_axis("Station")
 
     def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):

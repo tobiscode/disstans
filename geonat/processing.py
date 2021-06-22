@@ -712,14 +712,18 @@ class StepDetector():
         """
         # initialize DataFrame
         step_table = pd.DataFrame(columns=["station", "time", "probability"])
+        # get the stations who have this timeseries
+        valid_stations = {name: station for name, station in net.stations.items()
+                          if ts_description in station.timeseries}
         # run parallelized StepDetector._search
         iterable_input = ((tvec_to_numpycol(station[ts_description].time),
                            station[ts_description].data.values,
-                           self.kernel_size, self.kernel_size_min, maxdel) for station in net)
+                           self.kernel_size, self.kernel_size_min, maxdel)
+                          for station in valid_stations.values())
         for name, station, (probs, var0, var1) in \
-            zip(net.stations.keys(), net.stations.values(),
+            zip(valid_stations.keys(), valid_stations.values(),
                 tqdm(parallelize(StepDetector._search, iterable_input), ascii=True,
-                     total=net.num_stations, unit="station", desc="Searching for steps")):
+                     total=len(valid_stations), unit="station", desc="Searching for steps")):
             # find steps given the just calculated probabilities
             # setting the maximum number of steps to infinite to not miss anything
             steps = StepDetector.steps(probs, threshold, np.inf, False)
@@ -824,7 +828,9 @@ class StepDetector():
         catalog_timeexists = {sta_name: [False] * len(steptimes)
                               for sta_name, steptimes in catalog.items()}
         for sta_name, steptimes in catalog.items():
-            if sta_name not in net.stations.keys():  # station not in network
+            # skip if station or timeseries not present
+            if (sta_name not in net.stations.keys()) or \
+               (ts_description not in net[sta_name].timeseries):
                 continue
             check_indices[sta_name] = []
             for ist, st in enumerate(steptimes):

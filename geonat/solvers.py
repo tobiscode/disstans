@@ -1010,6 +1010,9 @@ class SpatialSolver():
         """ Network object to fit. """
         self.ts_description = ts_description
         """ Name of timeseries to fit. """
+        self.valid_stations = {name: station for name, station in net.stations.items()
+                               if ts_description in station.timeseries}
+        """ Dictionary of all stations that contain the timeseries. """
         self.last_statistics = None
         r"""
         :class:`~typing.NamedTuple` of the statistics of the last call to
@@ -1169,10 +1172,11 @@ class SpatialSolver():
         if verbose:
             tqdm.write("Calculating scale lengths")
         geoid = cgeod.Geodesic()
-        station_names = self.net.station_names
+        station_names = list(self.valid_stations.keys())
+        num_stations = len(station_names)
         station_lonlat = np.stack([np.array(self.net[name].location)[[1, 0]]
                                    for name in station_names])
-        all_distances = np.empty((self.net.num_stations, self.net.num_stations))
+        all_distances = np.empty((num_stations, num_stations))
         net_avg_closests = []
         for i, name in enumerate(station_names):
             all_distances[i, :] = np.array(geoid.inverse(station_lonlat[i, :].reshape(1, 2),
@@ -1202,14 +1206,14 @@ class SpatialSolver():
                                cov_zero_threshold=cov_zero_threshold,
                                cvxpy_kw_args=cvxpy_kw_args)
         num_total = sum([s.models[self.ts_description][m].parameters.size
-                         for s in self.net for m in all_reweight_models])
+                         for s in self.valid_stations.values() for m in all_reweight_models])
         num_uniques = np.sum(np.stack(
             [np.sum(np.any(np.stack([np.abs(s.models[self.ts_description][m].parameters)
-                                     > self.ZERO for s in self.net]), axis=0), axis=0)
-             for m in all_reweight_models]), axis=0)
+                                     > self.ZERO for s in self.valid_stations.values()]),
+                           axis=0), axis=0) for m in all_reweight_models]), axis=0)
         num_nonzero = sum([(s.models[self.ts_description][m].parameters.ravel()
                             > self.ZERO).sum()
-                           for s in self.net for m in all_reweight_models])
+                           for s in self.valid_stations.values() for m in all_reweight_models])
         if verbose:
             tqdm.write(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
             tqdm.write("Number of unique reweighted non-zero parameters per component: "
@@ -1343,11 +1347,11 @@ class SpatialSolver():
             # get statistics
             num_nonzero = sum([(s.models[self.ts_description][m].parameters.ravel()
                                 > self.ZERO).sum()
-                               for s in self.net for m in all_reweight_models])
+                               for s in self.valid_stations.values() for m in all_reweight_models])
             num_uniques = np.sum(np.stack(
                 [np.sum(np.any(np.stack([np.abs(s.models[self.ts_description][m].parameters)
-                                        > self.ZERO for s in self.net]), axis=0), axis=0)
-                 for m in all_reweight_models]), axis=0)
+                                        > self.ZERO for s in self.valid_stations.values()]),
+                               axis=0), axis=0) for m in all_reweight_models]), axis=0)
             # save statistics
             arr_uniques[i+1, :] = num_uniques
             list_nonzeros[i+1] = num_nonzero
