@@ -7,6 +7,7 @@ associated fits.
 
 import numpy as np
 import pandas as pd
+import scipy as sp
 import scipy.sparse as sparse
 from copy import deepcopy
 from warnings import warn
@@ -763,5 +764,5 @@ class Station():
                 if Gsub.shape[0] == 2:
                     trend_sigma[icomp] = 0
                 else:
-                    trend_sigma[icomp] = np.sqrt(np.linalg.inv(GtWG)[1, 1])
+                    trend_sigma[icomp] = np.sqrt(sp.linalg.pinvh(GtWG)[1, 1])
         return trend, trend_sigma if (include_sigma and fit_sum_var) else None

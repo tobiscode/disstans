@@ -530,7 +530,7 @@ def linear_regression(ts, models, formal_covariance=False,
                                          use_data_var=use_data_variance)
             params[:, i] = sp.linalg.lstsq(GtWG, GtWd)[0].squeeze()
             if formal_covariance:
-                cov.append(np.linalg.inv(GtWG))
+                cov.append(sp.linalg.pinvh(GtWG))
         if formal_covariance:
             cov = sp.linalg.block_diag(*cov)
             # permute to match ordering
@@ -541,7 +541,7 @@ def linear_regression(ts, models, formal_covariance=False,
                                      use_data_cov=use_data_covariance)
         params = sp.linalg.lstsq(GtWG, GtWd)[0].reshape(num_obs, num_comps)
         if formal_covariance:
-            cov = np.linalg.inv(GtWG)
+            cov = sp.linalg.pinvh(GtWG)
 
     # create solution object and return
     return Solution(models=models, parameters=params, covariances=cov,
@@ -629,7 +629,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
             GtWGreg = GtWG + reg
             params[:, i] = sp.linalg.lstsq(GtWGreg, GtWd)[0].squeeze()
             if formal_covariance:
-                cov.append(np.linalg.inv(GtWGreg))
+                cov.append(sp.linalg.pinvh(GtWGreg))
         if formal_covariance:
             cov = sp.linalg.block_diag(*cov)
             # permute to match ordering
@@ -642,7 +642,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
         GtWGreg = GtWG + reg
         params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_obs, num_comps)
         if formal_covariance:
-            cov = np.linalg.inv(GtWGreg)
+            cov = sp.linalg.pinvh(GtWGreg)
 
     # create solution object and return
     return Solution(models=models, parameters=params, covariances=cov,
@@ -947,7 +947,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                     GtWG = Gsub.T @ Wnonan @ Gsub
                     if isinstance(GtWG, sparse.spmatrix):
                         GtWG = GtWG.A
-                    temp_cov[np.ix_(best_ind, best_ind)] = np.linalg.inv(GtWG)
+                    temp_cov[np.ix_(best_ind, best_ind)] = sp.linalg.pinvh(GtWG)
                     cov.append(temp_cov)
                 if regularize and return_weights:
                     weights[:, i] = wts
@@ -987,7 +987,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 if isinstance(GtWG, sparse.spmatrix):
                     GtWG = GtWG.A
                 cov = np.zeros((num_obs * num_comps, num_obs * num_comps))
-                cov[np.ix_(best_ind, best_ind)] = np.linalg.inv(GtWG)
+                cov[np.ix_(best_ind, best_ind)] = sp.linalg.pinvh(GtWG)
             if regularize and return_weights:
                 weights = wts.reshape(num_reg, num_comps)
         # restore reg_indices' original shape

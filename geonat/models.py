@@ -2147,8 +2147,8 @@ class ModelCollection():
                 Gout = Gout[dnotnan, :]
             if (ts.cov_cols is not None) and use_data_var and use_data_cov:
                 var_cov_matrix = ts.var_cov.values
-                Wblocks = [np.linalg.inv(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
-                                                    (num_comps, num_comps)))
+                Wblocks = [sp.linalg.pinvh(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
+                                                      (num_comps, num_comps)))
                            for iobs in range(ts.num_observations)]
                 W = sparse.block_diag(Wblocks, format='csr')
                 W.eliminate_zeros()
