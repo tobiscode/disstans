@@ -39,7 +39,7 @@ class Solution():
     obs_indices : numpy.ndarray, optional
         Observation mask of shape :math:`(\text{num_parameters}, )`
         with ``True`` at indices where the parameter was actually estimated,
-        and ``False`` where the estimation was skipped du to observability or
+        and ``False`` where the estimation was skipped due to observability or
         other reasons.
         Defaults to all ``True``, which implies that
         :math:`\text{num_parameters} = \text{num_solved}`.
@@ -829,9 +829,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 f"needs to be None or a ReweightingFunction, got {type(reweight_func)}."
             rw_func = reweight_func
     # determine if reg_indices and weights_scaling need a reshape
-    if (ts.cov_cols is None) or (not use_data_covariance):
-        pass
-    else:
+    if (ts.cov_cols is not None) and use_data_covariance:
         reg_indices = np.repeat(reg_indices, num_comps)
         weights_scaling = np.repeat(weights_scaling, num_comps)
 
@@ -937,8 +935,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 params[:, i] = solution
                 # if desired, estimate formal variance here
                 if formal_covariance:
-                    temp_cov = np.empty_like(GtWG)
-                    temp_cov[:] = np.NaN
+                    temp_cov = np.zeros_like(GtWG)
                     scaled_solution = np.abs(solution)
                     if weights_scaling is not None:
                         scaled_solution[reg_indices] *= weights_scaling
@@ -954,7 +951,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         if formal_covariance:
             cov = sp.linalg.block_diag(*cov)
             # permute to match ordering
-            P = block_permutation(num_comps, num_params)
+            P = block_permutation(num_comps, num_obs)
             cov = P @ cov @ P.T
     else:
         # build stacked problem and solve
@@ -980,7 +977,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             if formal_covariance:
                 scaled_solution = np.abs(solution)
                 if weights_scaling is not None:
-                    scaled_solution[reg_indices] *= np.repeat(weights_scaling, num_comps)
+                    scaled_solution[reg_indices] *= weights_scaling
                 best_ind = np.nonzero(scaled_solution > cov_zero_threshold)[0]
                 Gsub = Gnonan.tocsc()[:, best_ind]
                 GtWG = Gsub.T @ Wnonan @ Gsub
