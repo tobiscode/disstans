@@ -14,8 +14,7 @@ from scipy.special import comb, factorial
 from itertools import product
 from cmcrameri import cm as scm
 
-from .tools import tvec_to_numpycol, Timedelta, full_cov_mat_to_columns, \
-                   block_permutation, cov2corr
+from .tools import tvec_to_numpycol, Timedelta, full_cov_mat_to_columns, cov2corr
 
 
 class Model():
@@ -74,6 +73,14 @@ class Model():
         Defines whether the model is zero after ``t_end``, or
         if the boundary value should be used (attribute :attr:`~zero_after`).
     """
+
+    EVAL_PREDVAR_PRECISION = np.single
+    """
+    To reduce memory impact when estimating the full covariance of the predicted
+    timeseries when calling :meth:`~evaluate`, this attribute is by default set to
+    single precision, but can be changed to double precision if desired.
+    """
+
     def __init__(self, num_parameters, regularize=False, time_unit=None,
                  t_start=None, t_end=None, t_reference=None,
                  zero_before=True, zero_after=True):
@@ -539,28 +546,19 @@ class Model():
             fit_var = None
             fit_cov = None
         else:
-            # repeat the mapping matrix for all components
+            # repeat the mapping matrix for all components,
+            # same order as full_cov_mat_to_columns needs
             num_components = self.par.shape[1]
-            map_mat_full = sparse.block_diag([mapping_matrix for icomp
-                                              in range(num_components)], format="bsr")
-            # self.cov is ordered such that it first contains the sub-covariance between
-            # all components for the first parameter, then the sub-covariance between all
-            # components for the second parameter, and so forth
-            # need to reorder (permute) this to be ordered in the same way as the mapping
-            # matrix is, i.e. first everything for the first component, then everything for
-            # the second, etc.
-            # build permutation matrix
-            P = block_permutation(self.num_parameters, num_components)
-            # permute rows and columns
-            var_full = P @ self.cov @ P.T
+            map_mat = sparse.kron(mapping_matrix, np.eye(num_components), format="csc")
+            # reduce the size of matrix calculation by removing all-zero rows and columns
+            var_full = self.cov
+            rowcolnonzero = ~np.all(var_full == 0, axis=0)
+            assert np.all(rowcolnonzero == ~np.all(var_full == 0, axis=1))
+            var_full = var_full[np.ix_(rowcolnonzero, rowcolnonzero)]
+            map_mat = map_mat[:, rowcolnonzero].A
             # calculate the predicted variance
-            pred_var = map_mat_full @ var_full @ map_mat_full.T
-            # this is now ordered such that it first contains the timeseries for the first
-            # component, then for the second, etc.
-            # to use full_cov_mat_to_columns, it needs to be ordered by timesteps instead
-            # so we use another permutation matrix
-            P = block_permutation(num_components, timevector.size)
-            pred_var = P @ pred_var @ P.T
+            pred_var = np.matmul(map_mat @ var_full, map_mat.T,
+                                 dtype=self.EVAL_PREDVAR_PRECISION, casting="same_kind")
             # extract the (block-)diagonal components and reshape
             fit_var, fit_cov = full_cov_mat_to_columns(pred_var, num_components,
                                                        include_covariance=True)
@@ -1517,6 +1515,14 @@ class ModelCollection():
     or :meth:`~geonat.models.Model.read_parameters` or attributes like
     :attr:`~geonat.models.Model.par`.
     """
+
+    EVAL_PREDVAR_PRECISION = np.single
+    """
+    To reduce memory impact when estimating the full covariance of the predicted
+    timeseries when calling :meth:`~evaluate`, this attribute is by default set to
+    single precision, but can be changed to double precision if desired.
+    """
+
     def __init__(self):
         self.collection = {}
         """

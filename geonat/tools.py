@@ -315,7 +315,8 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
     assert (cov_mat.shape[0] % num_components) == 0, f"'cov_mat' can not be divided " \
         f"into {num_components} components because of incompatible dimensions."
     num_elements = int(cov_mat.shape[0] / num_components)
-    variance = np.diag(cov_mat).reshape(num_elements, num_components)
+    variance = np.diag(cov_mat) \
+        .reshape(num_elements, num_components).astype(dtype=np.double, casting="safe")
     if include_covariance:
         cov_dims = get_cov_dims(num_components)
         index_map = make_cov_index_map(num_components)[0]
