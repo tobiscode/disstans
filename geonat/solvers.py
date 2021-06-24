@@ -13,6 +13,7 @@ from tqdm import tqdm
 from abc import ABC, abstractmethod
 from collections import namedtuple
 
+from .config import defaults
 from .tools import weighted_median, block_permutation
 from .models import ModelCollection
 
@@ -1078,7 +1079,8 @@ class SpatialSolver():
               local_reweight_iters=1, local_reweight_func=None, local_reweight_coupled=True,
               formal_covariance=False, use_data_variance=True, use_data_covariance=True,
               use_internal_scales=True, cov_zero_threshold=1e-6, verbose=False,
-              extended_stats=False, cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
+              extended_stats=False, num_threads_evaluate=None,
+              cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
         r"""
         Solve the network-wide fitting problem as follows:
 
@@ -1150,6 +1152,14 @@ class SpatialSolver():
             If ``True`` (default: ``False``), the fitted models are evaluated at each iteration
             to calculate residual and fit statistics. These extended statistics are added to
             :attr:`~last_statistics` (see there for more details).
+        num_threads_evaluate : int, optional
+            If ``extended_stats=True`` and ``formal_covariance=True``, there will be calls to
+            :meth:`~geonat.network.Network.evaluate` that will estimate the predicted variance,
+            which will be memory-intensive if the timeseries are long. Using the same number
+            of threads as defined in :attr:`~geonat.config.defaults` might therefore exceed
+            the available memory on the system. This option allows to set a different number
+            of threads or disable parallelized processing entirely for those calls.
+            Defaults to ``None``, which uses the same setting as in the defaults.
         cvxpy_kw_args : dict
             Additional keyword arguments passed on to CVXPY's ``solve()`` function,
             see ``cvxpy_kw_args`` in :func:`~lasso_regression`.
@@ -1270,7 +1280,12 @@ class SpatialSolver():
                 iter_name_fit = self.ts_description + "_extendedstats_fit"
                 iter_name_res = self.ts_description + "_extendedstats_res"
                 # evaluate model fit to timeseries
+                if num_threads_evaluate is not None:
+                    curr_num_threads = defaults["general"]["num_threads"]
+                    defaults["general"]["num_threads"] = int(num_threads_evaluate)
                 self.net.evaluate(self.ts_description, output_description=iter_name_fit)
+                if num_threads_evaluate is not None:
+                    defaults["general"]["num_threads"] = curr_num_threads
                 # calculate residuals
                 self.net.math(iter_name_res, self.ts_description, "-", iter_name_fit)
                 # analyze the residuals
