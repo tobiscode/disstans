@@ -286,42 +286,42 @@ from the true values:
     <BLANKLINE>
     Statistics for Data:
         Amplitude      Angle
-    S1   1.697650   4.359438
-    S2   0.328071   0.261525
-    S3  -0.677940   4.072156
-    S4  -0.659412  13.525478
-    S5  -0.898881   4.207883
-    S6   0.819918  10.613693
-    S7   0.157743  13.085970
-    S8   0.894261  15.771299
-    RMS Amplitude: 0.87955337933
-    RMS Angle: 9.8038724072
+    S1   1.697651   4.359484
+    S2   0.328071   0.261513
+    S3  -0.677940   4.072121
+    S4  -0.659412  13.525467
+    S5  -0.898881   4.207969
+    S6   0.819918  10.613691
+    S7   0.157743  13.085969
+    S8   0.894263  15.771350
+    RMS Amplitude: 0.87955367999
+    RMS Angle: 9.8038857489
     <BLANKLINE>
     Statistics for Data + Variance:
         Amplitude     Angle
     S1   1.511762  1.839559
-    S2   1.496592  0.231865
-    S3   1.594657  1.128779
-    S4  -1.494916  6.149112
+    S2   1.496591  0.231865
+    S3   1.594666  1.128778
+    S4  -1.494915  6.149112
     S5  -0.972639  6.333535
     S6   0.683505  6.031706
     S7   0.000223  1.616320
     S8   0.708014  4.211801
-    RMS Amplitude: 1.1841349516
-    RMS Angle: 4.1738824039
+    RMS Amplitude: 1.1841362945
+    RMS Angle: 4.1738823044
     <BLANKLINE>
     Statistics for Data + Variance + Covariance:
         Amplitude     Angle
-    S1   1.572796  1.954797
-    S2   0.767872  3.342294
-    S3  -0.656516  2.929670
-    S4  -0.903186  9.660251
-    S5  -1.009938  6.237066
-    S6   0.562827  6.694857
-    S7   0.015475  1.011020
+    S1   1.572796  1.954775
+    S2   0.767869  3.342269
+    S3  -0.656516  2.929676
+    S4  -0.903166  9.659920
+    S5  -1.009938  6.237068
+    S6   0.562830  6.694827
+    S7   0.015474  1.011020
     S8   0.728856  5.113027
-    RMS Amplitude: 0.87879850525
-    RMS Angle: 5.3359967059
+    RMS Amplitude: 0.87879575059
+    RMS Angle: 5.3359148666
 
 Clearly, the fit using all the available information leads to the best set of parameters.
 Furthermore, from the verbose output of the spatial solver, we also see that we find sparser,

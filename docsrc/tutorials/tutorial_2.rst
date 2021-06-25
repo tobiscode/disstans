@@ -213,7 +213,7 @@ and print some statistics:
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg                          Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.781587e-08            2.042834
+    Total-Displacement_Model_Total  1.622931e-08            2.046006
 
 Advanced plotting
 -----------------
@@ -284,7 +284,7 @@ solver:
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2                             Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.516837e-09            2.087589
+    Total-Displacement_Model_Total  1.503516e-09            2.087589
 
 ::
 
@@ -406,8 +406,8 @@ the notes of :func:`~geonat.solvers.lasso_regression`. Let's try it:
     >>> stat["Err_L1R"] = stat["Fit_L1R"] - stat["Truth"]
     >>> _ = stat.analyze_residuals(ts_description="Res_L1R",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_L1R                        Mean  Standard Deviation
-    Total-Displacement_Model_Total -0.000001            2.119665
+    TUT: Res_L1R                            Mean  Standard Deviation
+    Total-Displacement_Model_Total  9.511043e-08            2.117921
 
 ::
 
@@ -471,12 +471,12 @@ L1R-fitted model:
     ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: %}\n"
     ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: f} rad\n"
     ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: f} rad")
-    Percent Error Constant:              -34.870394%
-    Percent Error Linear:                 14.251579%
-    Percent Error Annual Amplitude:      -1.046252%
-    Percent Error Semi-Annual Amplitude: -0.037603%
-    Absolute Error Annual Phase:          0.019479 rad
-    Absolute Error Semi-Annual Phase:    -0.017371 rad
+    Percent Error Constant:              -44.023921%
+    Percent Error Linear:                 20.780108%
+    Percent Error Annual Amplitude:      -0.233888%
+    Percent Error Semi-Annual Amplitude:  0.061881%
+    Absolute Error Annual Phase:          0.016006 rad
+    Absolute Error Semi-Annual Phase:    -0.017135 rad
 
 Apart from the trade-off between the polynomial trend and long-term splines, which can be
 expected in this synthetic example, we got pretty close to our ground truth. Let's finish
@@ -491,7 +491,7 @@ transient model:
     >>> trend, _ = stat.get_trend("Displacement", fit_list=["Transient"],
     ...                           t_start="2002-06-01", t_end="2002-08-01")
     >>> print(f"Transient Velocity: {trend[0]:f} {ts.data_unit}/D")
-    Transient Velocity: 0.120261 mm/D
+    Transient Velocity: 0.121516 mm/D
 
 We can use average velocities like these when we want to create velocity maps for
 certain episodes.

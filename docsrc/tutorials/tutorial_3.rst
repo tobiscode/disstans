@@ -220,7 +220,7 @@ but rather a cleaner timeseries after we remove the CME.
     ...     if station.name == "Cylon":
     ...         gen_data["noise"][timevector.size//3:, :] += \
     ...             create_powerlaw_noise(size=(2 * timevector.size // 3, 2),
-    ...                                   exponent=1.5, seed=rng)*0.4
+    ...                                   exponent=1.6, seed=rng) * np.array([[0.3, 0.4]])
     ...     # for one special station, we add the maintenance step
     ...     # repeating all steps above
     ...     if station.name == "Corko":
@@ -461,8 +461,17 @@ and count the number of total, non-zero, and unique non-zero parameters:
     ...                             > ZERO for s in net]), axis=0), axis=0)
     >>> num_nonzero = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO).sum()
     ...                    for s in net])
+
+.. doctest::
+    :hide:
+
+    >>> assert num_nonzero < 500
+    >>> assert all([num < 150 for num in num_uniques])
+
+Giving us (the exact numbers might differ slightly)::
+
     >>> print(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
-    Number of reweighted non-zero parameters: 480/8416
+    Number of reweighted non-zero parameters: 478/8416
     >>> print("Number of unique reweighted non-zero parameters per component: "
     ...       + str(num_uniques.tolist()))
     Number of unique reweighted non-zero parameters per component: [115, 102]
@@ -510,11 +519,20 @@ either, but let's still have a look at the same two stations when we add that:
     ...                             > ZERO for s in net]), axis=0), axis=0)
     >>> num_nonzero = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO).sum()
     ...                    for s in net])
+
+.. doctest::
+    :hide:
+
+    >>> assert num_nonzero < 350
+    >>> assert all([num < 120 for num in num_uniques])
+
+Giving approximately::
+
     >>> print(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
-    Number of reweighted non-zero parameters: 243/8416
+    Number of reweighted non-zero parameters: 301/8416
     >>> print("Number of unique reweighted non-zero parameters per component: "
     ...       + str(num_uniques.tolist()))
-    Number of unique reweighted non-zero parameters per component: [86, 72]
+    Number of unique reweighted non-zero parameters per component: [96, 87]
 
 Which gives the following figures (see the plotting code above):
 
@@ -534,9 +552,9 @@ Which gives the following figures (see the plotting code above):
 .. |3c_ts_Cylon_local| image:: ../img/tutorial_3c_ts_Cylon_local.png
     :width: 49%
 
-We can see that the total number of non-zero splines decreased by around half, the number
-of *unique* non-zero splines decreased by far less. Furthermore, we still
-see that different splines are used throughout the stations for the same signal.
+We can see that while the total number of non-zero splines decreased by around a third,
+the number of *unique* non-zero splines decreased by far less. Furthermore, we still
+see that different splines are used throughout the stations for the same domminant signals.
 
 Unless we want to create one giant least-squares L1-regularized problem that combines
 all stations, and giving the spline parameters a distance-dependent covariance matrix
@@ -579,15 +597,9 @@ here). Let's start by running only one spatial iteration, and evaluating its sol
     ...               verbose=True)
     Calculating scale lengths
     Initial fit
-    Number of reweighted non-zero parameters: 480/8416
-    Number of unique reweighted non-zero parameters per component: [115, 102]
-    Updating weights
-    Stacking model Transient
-    Weight percentiles (5-50-95): [29.2007317, 9999.8402817, 9999.995094]
+    ...
     Fit after 1 reweightings
-    Number of reweighted non-zero parameters: 216/8416
-    Number of unique reweighted non-zero parameters per component: [48, 46]
-    RMS difference of 'Transient' parameters = 5.867862896 (552 changed)
+    ...
     Done
     >>> net.evaluate("Displacement", output_description="Fit_L1R1S1")
     >>> for stat in net:
@@ -599,19 +611,23 @@ here). Let's start by running only one spatial iteration, and evaluating its sol
     ...     np.corrcoef(np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1]
     ...                           for s in net]))
 
-The two key numbers we want to check first are the same two we looked at above,
-which are automatically output by the ``verbose`` option::
+Where the solver will give us (approximately) the following statistics::
 
-    ...
+    Calculating scale lengths
     Initial fit
-    Number of reweighted non-zero parameters: 480/8416
+    Number of reweighted non-zero parameters: 478/8416
     Number of unique reweighted non-zero parameters per component: [115, 102]
-    ...
+    Updating weights
+    Stacking model Transient
+    Weight percentiles (5-50-95): [8.7902000814, 9999.689285, 9999.9902768]
     Fit after 1 reweightings
-    Number of reweighted non-zero parameters: 216/8416
-    Number of unique reweighted non-zero parameters per component: [48, 46]
-    ...
+    Number of reweighted non-zero parameters: 243/8416
+    Number of unique reweighted non-zero parameters per component: [53, 48]
+    RMS difference of 'Transient' parameters = 5.753307113 (507 changed)
+    Done
 
+We can look at the characteristic numbers we calculated above by providing the solver
+the ``verbose`` option.
 The numbers before the first reweighting are exactly the same from before we iterated
 at all - which makes sense since the initial solve is before any reweighting can be
 done, and we did not specify any local L1 reweighting iterations.
@@ -651,6 +667,9 @@ steps:
     ...               formal_covariance=True,
     ...               verbose=True)
     Calculating scale lengths
+    Initial fit
+    ...
+    Fit after 20 reweightings
     ...
     Done
     >>> net.evaluate("Displacement", output_description="Fit_L1R1S20")
@@ -747,80 +766,92 @@ Which produces the following plots:
 .. |3d_Cylon_spatial20| image:: ../img/tutorial_3d_Cylon_spatial20.png
     :width: 49%
 
-Indeed, we can see that the spatial reweighting hindered the solver to fit for many
+Indeed, we can see that the spatial reweighting hindered the solver to fit for some
 small-scale noise transients. We can see this in the fact that our residual now more
 closely tracks the true noise, and the true error oscillates less and stays closer to zero.
+For the longer-scale noise, it is too strong for the solver to ignore (at least with the
+current regularization penalties and other hyperparameters). In general, the degree of
+success of this method can vary significantly between datasets and hyperparameters.
 
-Quantitatively, we can also see this when we compute the root-mean-squared error
-for the error time series. We can calculate it easily using
+Quantitatively, we can also see this small improvement when we compute the root-mean-squared
+error for the error time series. We can calculate it easily using
 :meth:`~geonat.network.Network.analyze_residuals`
 for both error timeseries ``'Err_L1R5'`` and ``'Err_L1R1S20'``:
 
 .. doctest::
-    :options: +NORMALIZE_WHITESPACE
 
+    >>> stats_dict = {}
     >>> for err_ts in ["Err_L1R5", "Err_L1R1S20"]:
-    ...     print(f"\nErrors for {err_ts}:")
-    ...     stats = net.analyze_residuals(err_ts, mean=True, rms=True)
+    ...     stats_dict[err_ts] = net.analyze_residuals(err_ts, mean=True, rms=True)
+
+.. doctest::
+    :hide:
+
+    >>> assert all([(stats_dict["Err_L1R1S20"].loc["Cylon", ("RMS", comp)]
+    ...              < stats_dict["Err_L1R5"].loc["Cylon", ("RMS", comp)] * 0.97)
+    ...             for comp in ["Displacement_Model_E-E", "Displacement_Model_N-N"]])
+
+Giving us (again, approximately)::
+
+    >>> for err_ts, stats in stats_dict.items():
+    ...     print(f"Errors for {err_ts}:")
     ...     print(stats)
     ...     print(stats.mean())
-    <BLANKLINE>
     Errors for Err_L1R5:
-    Metrics                      Mean                                           RMS                       
+    Metrics                      Mean                                           RMS
     Components Displacement_Model_E-E Displacement_Model_N-N Displacement_Model_E-E Displacement_Model_N-N
-    Station                                                                                               
-    Jeckle                  -0.000419               0.004276               0.051671               0.052860
-    Cylon                   -0.014228              -0.069455               0.236574               0.234167
-    Marper                   0.000090               0.009656               0.054688               0.066559
-    Timble                  -0.003406              -0.009334               0.051991               0.056480
-    Macnaw                   0.013660               0.002161               0.049895               0.059900
-    Colzyy                  -0.008162              -0.009456               0.055317               0.049139
-    Mrror                    0.005766               0.002203               0.039287               0.051551
-    Mankith                 -0.002974               0.015512               0.033198               0.045708
-    Lingo                    0.001447              -0.013287               0.049481               0.047579
-    Marvish                  0.003766              -0.002676               0.036636               0.038895
-    Corko                   -0.008496              -0.001993               0.156964               0.039665
-    Kogon                   -0.006134               0.000849               0.042909               0.033994
-    Malool                  -0.000222               0.006196               0.024945               0.037281
-    Aarla                    0.002159              -0.001884               0.028283               0.037532
-    Tygrar                   0.019776              -0.007437               0.040040               0.032706
-    Jozga                   -0.006292               0.002840               0.030650               0.034295
-    Metrics  Components            
-    Mean     Displacement_Model_E-E   -0.000229
-             Displacement_Model_N-N   -0.004489
-    RMS      Displacement_Model_E-E    0.061408
-             Displacement_Model_N-N    0.057394
+    Station
+    Jeckle                  -0.000491               0.004247               0.047617               0.054745
+    Cylon                   -0.013340              -0.073916               0.182140               0.244717
+    Marper                   0.000150               0.009685               0.052781               0.065970
+    Timble                  -0.003361              -0.009412               0.047401               0.056194
+    Macnaw                   0.013679               0.002058               0.049528               0.059661
+    Colzyy                  -0.008207              -0.009420               0.052918               0.047769
+    Mrror                    0.005841               0.002133               0.042675               0.048494
+    Mankith                 -0.002962               0.015497               0.032748               0.042579
+    Lingo                    0.001484              -0.013256               0.048957               0.048060
+    Marvish                  0.003773              -0.002676               0.037533               0.039151
+    Corko                   -0.008459              -0.002010               0.148405               0.037812
+    Kogon                   -0.006207               0.000764               0.043394               0.034810
+    Malool                  -0.000250               0.006225               0.023989               0.039196
+    Aarla                    0.002147              -0.001871               0.031010               0.037852
+    Tygrar                   0.019808              -0.007456               0.038625               0.035975
+    Jozga                   -0.006202               0.002822               0.031258               0.037786
+    Metrics  Components
+    Mean     Displacement_Model_E-E   -0.000162
+             Displacement_Model_N-N   -0.004787
+    RMS      Displacement_Model_E-E    0.056936
+             Displacement_Model_N-N    0.058173
     dtype: float64
-    <BLANKLINE>
     Errors for Err_L1R1S20:
-    Metrics                      Mean                                           RMS                       
+    Metrics                      Mean                                           RMS
     Components Displacement_Model_E-E Displacement_Model_N-N Displacement_Model_E-E Displacement_Model_N-N
-    Station                                                                                               
-    Jeckle                  -0.000603               0.004310               0.074261               0.089493
-    Cylon                   -0.014122              -0.069685               0.207266               0.222614
-    Marper                   0.000354               0.009706               0.076109               0.083413
-    Timble                  -0.003060              -0.008974               0.069288               0.075120
-    Macnaw                   0.013533               0.002567               0.066525               0.070245
-    Colzyy                  -0.008294              -0.009594               0.060502               0.059799
-    Mrror                    0.005581               0.002369               0.052769               0.049664
-    Mankith                 -0.003092               0.015610               0.046768               0.051902
-    Lingo                    0.001431              -0.012418               0.070340               0.116142
-    Marvish                  0.003723              -0.002539               0.049711               0.077394
-    Corko                   -0.007965               0.000391               0.964100               0.068229
-    Kogon                   -0.005963               0.000649               0.050347               0.042423
-    Malool                   0.000086               0.006696               0.044707               0.045154
-    Aarla                    0.002088              -0.001602               0.037883               0.050733
-    Tygrar                   0.019685              -0.007423               0.031079               0.037552
-    Jozga                   -0.006362               0.002919               0.022684               0.028852
-    Metrics  Components            
-    Mean     Displacement_Model_E-E   -0.000186
-             Displacement_Model_N-N   -0.004189
-    RMS      Displacement_Model_E-E    0.120271
-             Displacement_Model_N-N    0.073046
+    Station
+    Jeckle                  -0.000761               0.004266               0.059535               0.081529
+    Cylon                   -0.013613              -0.073966               0.168762               0.232670
+    Marper                   0.000199               0.009608               0.059188               0.083246
+    Timble                  -0.003364              -0.009068               0.058463               0.075741
+    Macnaw                   0.013499               0.002391               0.054904               0.070136
+    Colzyy                  -0.008323              -0.009570               0.049136               0.060753
+    Mrror                    0.005573               0.002426               0.057697               0.049647
+    Mankith                 -0.003031               0.015523               0.047270               0.047615
+    Lingo                    0.001706              -0.012213               0.069547               0.083686
+    Marvish                  0.003819              -0.002441               0.037920               0.055211
+    Corko                   -0.006929               0.001102               0.884932               0.054108
+    Kogon                   -0.006141               0.001367               0.051069               0.081481
+    Malool                  -0.000201               0.006488               0.035133               0.040612
+    Aarla                    0.002082              -0.001654               0.021539               0.032675
+    Tygrar                   0.019632              -0.007462               0.030916               0.026622
+    Jozga                   -0.006513               0.002785               0.024586               0.022031
+    Metrics  Components
+    Mean     Displacement_Model_E-E   -0.000148
+             Displacement_Model_N-N   -0.004401
+    RMS      Displacement_Model_E-E    0.106912
+             Displacement_Model_N-N    0.068610
     dtype: float64
 
-If you look at the lines for Cylon, the standard deviation reduced from
-``0.236574`` and ``0.234167`` to ``0.207266`` and ``0.222614``, respectively.
+If you look at the lines for Cylon, the standard deviation reduced slightly from
+``0.182140`` and ``0.244717`` to ``0.168762`` and ``0.232670``, respectively.
 
 .. warning::
 
@@ -875,71 +906,79 @@ maintenance step.
 Let's look at the residuals more quantitatively, similar to above:
 
 .. doctest::
-    :options: +NORMALIZE_WHITESPACE
 
+    >>> stats_dict = {}
     >>> for res_ts in ["Res_L1R5", "Res_L1R1S20"]:
-    ...     print(f"\nResiduals for {res_ts}:")
-    ...     stats = net.analyze_residuals(res_ts, mean=True, rms=True)
+    ...     stats_dict[res_ts] = net.analyze_residuals(res_ts, mean=True, rms=True)
+
+.. doctest::
+    :hide:
+
+    >>> assert (stats_dict["Res_L1R5"].loc["Corko", ("RMS", "E-Displacement_Model_E")] * 1.5
+    ...         < stats_dict["Res_L1R1S20"].loc["Corko", ("RMS", "E-Displacement_Model_E")])
+
+Which yields::
+
+    >>> for res_ts, stats in stats_dict.items():
+    ...     print(f"Residuals for {res_ts}:")
     ...     print(stats)
     ...     print(stats.mean())
-    <BLANKLINE>
     Residuals for Res_L1R5:
-    Metrics                      Mean                                           RMS                       
+    Metrics                      Mean                                           RMS
     Components E-Displacement_Model_E N-Displacement_Model_N E-Displacement_Model_E N-Displacement_Model_N
-    Station                                                                                               
-    Jeckle                   0.000217              -0.000406               0.299326               0.365428
-    Cylon                    0.000888              -0.000722               0.336985               0.392841
-    Marper                  -0.001353               0.000735               0.298187               0.372748
-    Timble                   0.000195               0.000298               0.305253               0.367437
-    Macnaw                  -0.002215               0.000072               0.302128               0.373000
-    Colzyy                   0.000524              -0.000496               0.299192               0.366715
-    Mrror                    0.000439              -0.001248               0.298842               0.366128
-    Mankith                 -0.000727               0.000515               0.297009               0.361576
-    Lingo                   -0.000670               0.000531               0.305571               0.369482
-    Marvish                  0.000656               0.001027               0.294560               0.365664
-    Corko                   -0.001105              -0.000343               0.330492               0.363457
-    Kogon                   -0.002307              -0.000045               0.297508               0.369853
-    Malool                   0.001667              -0.000952               0.297290               0.364235
-    Aarla                   -0.000689              -0.000590               0.294162               0.368612
-    Tygrar                  -0.001552              -0.001614               0.302507               0.363075
-    Jozga                    0.001387              -0.002295               0.297752               0.370264
-    Metrics  Components            
-    Mean     E-Displacement_Model_E   -0.000290
-             N-Displacement_Model_N   -0.000346
-    RMS      E-Displacement_Model_E    0.303548
-             N-Displacement_Model_N    0.368782
+    Station
+    Jeckle                   0.000289              -0.000376               0.298429               0.364957
+    Cylon                    0.001167              -0.000911               0.318695               0.385978
+    Marper                  -0.001412               0.000706               0.297877               0.372178
+    Timble                   0.000150               0.000376               0.304567               0.367052
+    Macnaw                  -0.002235               0.000175               0.301741               0.371671
+    Colzyy                   0.000569              -0.000532               0.298693               0.366651
+    Mrror                    0.000364              -0.001178               0.298302               0.365291
+    Mankith                 -0.000738               0.000531               0.296764               0.361432
+    Lingo                   -0.000707               0.000500               0.304847               0.369540
+    Marvish                  0.000648               0.001028               0.294572               0.365542
+    Corko                   -0.001142              -0.000326               0.325757               0.363515
+    Kogon                   -0.002234               0.000040               0.297231               0.369583
+    Malool                   0.001695              -0.000980               0.297162               0.363995
+    Aarla                   -0.000677              -0.000603               0.294081               0.368550
+    Tygrar                  -0.001584              -0.001595               0.302404               0.362925
+    Jozga                    0.001297              -0.002277               0.297551               0.369949
+    Metrics  Components
+    Mean     E-Displacement_Model_E   -0.000284
+             N-Displacement_Model_N   -0.000339
+    RMS      E-Displacement_Model_E    0.301792
+             N-Displacement_Model_N    0.368051
     dtype: float64
-    <BLANKLINE>
     Residuals for Res_L1R1S20:
-    Metrics                      Mean                                           RMS                       
+    Metrics                      Mean                                           RMS
     Components E-Displacement_Model_E N-Displacement_Model_N E-Displacement_Model_E N-Displacement_Model_N
-    Station                                                                                               
-    Jeckle                   0.000401              -0.000440               0.305737               0.373605
-    Cylon                    0.000782              -0.000492               0.367720               0.423246
-    Marper                  -0.001617               0.000685               0.306087               0.378808
-    Timble                  -0.000151              -0.000062               0.310387               0.372219
-    Macnaw                  -0.002088              -0.000334               0.306180               0.375493
-    Colzyy                   0.000655              -0.000358               0.302303               0.370089
-    Mrror                    0.000625              -0.001414               0.303279               0.366867
-    Mankith                 -0.000609               0.000418               0.298799               0.363577
-    Lingo                   -0.000655              -0.000338               0.310232               0.383017
-    Marvish                  0.000698               0.000891               0.297081               0.371303
-    Corko                   -0.001635              -0.002726               1.014667               0.368751
-    Kogon                   -0.002477               0.000154               0.300482               0.372760
-    Malool                   0.001360              -0.001451               0.298818               0.367367
-    Aarla                   -0.000618              -0.000872               0.296498               0.371617
-    Tygrar                  -0.001461              -0.001629               0.303384               0.364730
-    Jozga                    0.001457              -0.002374               0.298983               0.371413
-    Metrics  Components            
-    Mean     E-Displacement_Model_E   -0.000333
-             N-Displacement_Model_N   -0.000646
-    RMS      E-Displacement_Model_E    0.351290
-             N-Displacement_Model_N    0.374679
+    Station
+    Jeckle                   0.000559              -0.000396               0.302239               0.371825
+    Cylon                    0.001440              -0.000860               0.332546               0.403983
+    Marper                  -0.001461               0.000783               0.301469               0.378728
+    Timble                   0.000153               0.000032               0.307061               0.372174
+    Macnaw                  -0.002054              -0.000157               0.303219               0.375472
+    Colzyy                   0.000685              -0.000382               0.300941               0.370224
+    Mrror                    0.000632              -0.001471               0.303317               0.366791
+    Mankith                 -0.000670               0.000505               0.298210               0.363107
+    Lingo                   -0.000929              -0.000543               0.309568               0.377019
+    Marvish                  0.000602               0.000793               0.296313               0.368489
+    Corko                   -0.002671              -0.003438               0.932213               0.365678
+    Kogon                   -0.002299              -0.000563               0.301393               0.378165
+    Malool                   0.001646              -0.001243               0.298285               0.365840
+    Aarla                   -0.000612              -0.000821               0.295696               0.369827
+    Tygrar                  -0.001408              -0.001589               0.303370               0.364032
+    Jozga                    0.001608              -0.002241               0.298941               0.371406
+    Metrics  Components
+    Mean     E-Displacement_Model_E   -0.000299
+             N-Displacement_Model_N   -0.000724
+    RMS      E-Displacement_Model_E    0.342799
+             N-Displacement_Model_N    0.372672
     dtype: float64
 
-While in the first case, the residual in the North component at ``0.330492``,
-in the second case, it is significantly larger at ``1.014667``, making it
-clearly stand out.
+While in the first case, the residual in the North component is at ``0.325757`` (comparable
+in magnitude to the other stations), in the second case, it is significantly larger at
+``0.932213``, making it clearly stand out.
 
 In fact, we can use :meth:`~geonat.network.Network.gui` to visualize this
 (using the ``rms_on_map`` option)::
@@ -968,18 +1007,34 @@ identified by the algorithm:
 
     >>> from geonat.processing import StepDetector
     >>> stepdet = StepDetector(kernel_size=31)
+    >>> steps_dict = {}
     >>> for res_ts in ["Res_L1R5", "Res_L1R1S20"]:
-    ...     print(f"\nPossible steps for {res_ts}:")
-    ...     print(stepdet.search_network(net, res_ts)[0])
-    <BLANKLINE>
+    ...     steps_dict[res_ts] = stepdet.search_network(net, res_ts)[0]
+
+.. doctest::
+    :hide:
+    :options: +NORMALIZE_WHITESPACE
+    
+    >>> for res_ts, steps in steps_dict.items():
+    ...     print(steps)
+      station       time  probability ...
+    0   Corko 2005-01-01  ...
+      station       time  probability ...
+    ... Corko 2005-01-01  ...
+    ... Corko 2002-07-01  ...
+
+Which gives::
+
+    >>> for res_ts, steps in steps_dict.items():
+    ...     print(f"Possible steps for {res_ts}:")
+    ...     print(steps)
     Possible steps for Res_L1R5:
-      station       time  probability      var0      var1
-    0   Corko 2005-01-01    91.875255  1.545948  0.073274
-    <BLANKLINE>
+      station       time  probability      var0      var1    varred
+    0   Corko 2005-01-01    91.067621  1.532238  0.074541  0.951352
     Possible steps for Res_L1R1S20:
-      station       time  probability      var0      var1
-    0   Corko 2002-07-01   115.882824  2.467034  0.053901
-    1   Corko 2005-01-01    95.743064  1.607549  0.067256
+      station       time  probability      var0      var1    varred
+    1   Corko 2005-01-01    95.731499  1.606585  0.067241  0.958147
+    0   Corko 2002-07-01    86.455304  0.916521  0.051740  0.943547
 
 In this case, both residual timeseries contain a strong enough jump for the detector to
 isolate the missing maintenance step on 2005-01-01. Furthermore, we also see in numbers
@@ -1093,8 +1148,8 @@ spatial reweighting. Here's some example code::
     ...     plt.savefig(f"tutorial_3f_corr_{case}.png")
     ...     plt.close()
 
-In fact, our average spatial correlation increased from ``0.867657903563245``
-to ``0.9629705453051701``. We can see this visually in the plots we just saved:
+In fact, our average spatial correlation increased from ``0.559811635602448``
+to ``0.8484197775591782``. We can see this visually in the plots we just saved:
 
 |3f_corr_local| |3f_corr_spatial20|
 
@@ -1111,26 +1166,26 @@ timeseries will obviously correlate much less because of the different SSEs, mai
 steps, etc.)
 
 This did not come with a meaningfully different residuals. As we printed out above
-when we we're looking for the unmodeled maintenance step, we saw that
-the residuals in the North component only changed from ``0.368782`` to ``0.374679``.
+when we we're looking for the unmodeled maintenance step, we saw that the mean of
+the residuals' RMS in the North component only changed from ``0.368051`` to ``0.372672``.
 Also, keep in mind that something we're fitting less now is the non-spatially-coherent
 colored noise; by principle, our *residuals* will be slightly larger, in the hopes
 that our *errors* are smaller.
 
-Model parameter covariances
----------------------------
+Model parameter correlations
+----------------------------
 
-While a more detailed exploration of the parameter covariances is left to the next tutorial,
-let's have a quick look at the covariance and correlation matrices at station Jeckle.
-The following code will produce the annotated covariance plot using the
+While a more detailed exploration of the parameter correlations is left to the next tutorial,
+let's have a quick look at the correlation matrices at station Jeckle.
+The following code will produce the annotated correlation plot using the
 :meth:`~geonat.models.ModelCollection.plot_covariance` method::
 
     >>> net["Jeckle"].models["Displacement"].plot_covariance(
-    ...     fname="tutorial_3g_Jeckle_cov_sparse.png")
+    ...     fname="tutorial_3g_Jeckle_corr_sparse.png", use_corr_coef=True)
 
 Which yields the following figure:
 
-.. image:: ../img/tutorial_3g_Jeckle_cov_sparse.png
+.. image:: ../img/tutorial_3g_Jeckle_corr_sparse.png
 
 The first impression is that of extreme sparsity: very few rows and columns actually have
 colors diverging from zero. If the user doesn't provide the ``fname`` keyword, the function
@@ -1139,10 +1194,13 @@ will show the interactive plot window, where one can zoom in. However, using the
 are omitted, yielding the following plot::
 
     >>> net["Jeckle"].models["Displacement"].plot_covariance(
-    ...     fname="tutorial_3g_Jeckle_cov_dense.png", plot_empty=False)
+    ...     fname="tutorial_3g_Jeckle_corr_dense.png",
+    ...     plot_empty=False, use_corr_coef=True)
 
-.. image:: ../img/tutorial_3g_Jeckle_cov_dense.png
+.. image:: ../img/tutorial_3g_Jeckle_corr_dense.png
 
+One can now see the strong correlation between the transient splines, but also between the
+splines and the other models.
 
 Transient visualization with worm plots
 ---------------------------------------
@@ -1173,13 +1231,13 @@ Which yields the following two maps:
     :width: 49%
 
 We can see that in general, the transients that were estimated through the spatial
-L0 estimation process, show a more homogenous direction of the motion to the southeast,
+L0 estimation process show a more homogenous direction of the motion to the southeast,
 which we know to be the true direction of motion. This is also visible in the far east
 of the network, where the signal is close or below the noise floor.
 
 One very visible outlier is the station Corko: it contains the unmodeled maintenance
-step that has can only be fit by the splines. In a second iteration of analyzing this synthetic
-network, one would of course model the step at Corko for a better fit.
+step that can only be fit by the short-term splines. In a second iteration of analyzing this
+synthetic network, one would of course model the step at Corko for a better fit.
 
 References
 ----------
