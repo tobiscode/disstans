@@ -1,0 +1,857 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Tutorial 4: The use and estimation of covariance &mdash; GeoNAT 0.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="Tutorial 3: Incorporating Spatial Coherence" href="tutorial_3.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> GeoNAT
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#creating-timeseries-objects">Creating Timeseries objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#fitting-the-models">Fitting the models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#plotting-the-fit-and-residuals">Plotting the fit and residuals</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_2.html">Tutorial 2: Advanced Models and Fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#creating-more-complex-synthetic-data">Creating more complex synthetic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#spline-models-for-transients">Spline models for transients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#building-a-network">Building a Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#fitting-an-entire-network">Fitting an entire network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_3.html">Tutorial 3: Incorporating Spatial Coherence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#dreaming-up-a-network">Dreaming up a network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#fantasizing-data">Fantasizing data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#removing-the-common-mode-error">Removing the Common Mode Error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#fitting-the-data-using-reweighted-l1-regularization">Fitting the data using reweighted L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#fitting-the-data-using-a-spatially-aware-l1-reweighting">Fitting the data using a spatially-aware L1 reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#finding-unmodeled-jumps">Finding unmodeled jumps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 4: The use and estimation of covariance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#making-a-noisy-network">Making a noisy network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fitting-the-models-with-the-spatial-l0-solver">Fitting the models with the spatial L0 solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quality-of-the-fits">Quality of the fits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#correlation-of-parameters">Correlation of parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simple-linear-regression-with-restricted-spline-set">Simple linear regression with restricted spline set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#empirical-covariance-estimation">Empirical covariance estimation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_1.html">Example 1: Long Valley Caldera Transient Motions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#preparations">Preparations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#getting-data">Getting data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#building-the-network">Building the network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#cleaning-the-timeseries">Cleaning the timeseries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#outlier-and-cme-removal">Outlier and CME removal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#first-pass-major-steps-and-noisy-periods">First pass: major steps and noisy periods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#second-pass-minor-catalog-based-steps">Second pass: minor, catalog-based steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../geonat.html">GeoNAT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/compiled.html">Compiled</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/compiled.html#source-code">Source Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#model-parent-class">Model (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#basic-models">Basic Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#arctangent">Arctangent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#logarithmic">Logarithmic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#polynomial">Polynomial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#step">Step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#sinusoidal">Sinusoidal</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#spline-models">Spline Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#bspline">BSpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#splineset">SplineSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/processing.html">Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/processing.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#clean">clean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#median">median</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/processing.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#stepdetector">StepDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/solvers.html">Solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#lasso-regression">lasso_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#linear-regression">linear_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#ridge-regression">ridge_regression</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#spatialsolver">SpatialSolver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#reweightingfunction">ReweightingFunction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#inversereweighting">InverseReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#inversesquaredreweighting">InverseSquaredReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#logarithmicreweighting">LogarithmicReweighting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/timeseries.html">Timeseries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/timeseries.html#specialized-classes">Specialized Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/tools.html">Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#get-cov-dims">get_cov_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#make-cov-index-map">make_cov_index_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#cov2corr">cov2corr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#rinexdataholding">RINEXDataHolding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#timedelta">Timedelta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#click">Click</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeoNAT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../tutorials.html">Tutorials</a> &raquo;</li>
+        
+      <li>Tutorial 4: The use and estimation of covariance</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tutorials/tutorial_4.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial-4-the-use-and-estimation-of-covariance">
+<h1>Tutorial 4: The use and estimation of covariance<a class="headerlink" href="#tutorial-4-the-use-and-estimation-of-covariance" title="Permalink to this headline">¶</a></h1>
+<p>As seen in Tutorial 3, GeoNAT can also make use of data variance and covariance if provided
+in the timeseries. While this was not specifically addressed in the previous tutorial,
+taking advantage of that information can improve the fit to the data, especially when
+there is a large amount of correlation across components. This tutorial
+will explore this with a small synthetic network that has large but strongly
+correlated errors.</p>
+<div class="section" id="making-a-noisy-network">
+<h2>Making a noisy network<a class="headerlink" href="#making-a-noisy-network" title="Permalink to this headline">¶</a></h2>
+<p>The setup should be familiar:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># initialize RNG</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create network in shape of a circle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat</span> <span class="kn">import</span> <span class="n">Network</span><span class="p">,</span> <span class="n">Station</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;CircleVolcano&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_stations</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">station_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;S</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">1d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_stations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num_stations</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">/</span><span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">net_name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">istat</span><span class="p">,</span> <span class="n">stat_name</span><span class="p">),</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">station_names</span><span class="p">),</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">net</span><span class="p">[</span><span class="n">stat_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Station</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">stat_name</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create timevector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t_end_str</span> <span class="o">=</span> <span class="s2">&quot;2001-01-01&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timevector</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will create a network of 8 stations, arranged in a circle, and define the timespan
+we’re interested in.</p>
+<p>In the next step, like i the previous tutorial, we will create a function that returns
+model parameters for the generation of the synthetic data.
+The function most crucially though will also create the correlated noise. It does that
+by defining a (constant) noise covariance matrix, and then rotating that based on the
+location of the station. The result will be a noise covariance ellipse that will also
+have its long side pointed outwards of the center of the network. The function will
+both return the noise realization for a station, as well as the data variance and
+covariance vectors.</p>
+<p>For the signal itself, we will have a constant secular motion across the network, and
+in the first half of the timespan, a transient outwards of the center.</p>
+<p>The function will look like this:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">generate_model_and_noise</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># get dimensions</span>
+<span class="gp">... </span>    <span class="n">n1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">n2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="c1"># rotation matrix</span>
+<span class="gp">... </span>    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)]])</span>
+<span class="gp">... </span>    <span class="c1"># secular motion</span>
+<span class="gp">... </span>    <span class="n">p_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="gp">... </span>    <span class="c1"># transient motion, only in first half</span>
+<span class="gp">... </span>    <span class="n">p_vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="gp">... </span>    <span class="n">p_vol_rot</span> <span class="o">=</span> <span class="n">p_vol</span> <span class="o">@</span> <span class="n">R</span><span class="o">.</span><span class="n">T</span>
+<span class="gp">... </span>    <span class="c1"># correlated error in direction of angle in first half</span>
+<span class="gp">... </span>    <span class="n">cov_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">cov_rot</span> <span class="o">=</span> <span class="n">R</span> <span class="o">@</span> <span class="n">cov_cor</span> <span class="o">@</span> <span class="n">R</span><span class="o">.</span><span class="n">T</span>
+<span class="gp">... </span>    <span class="n">noise_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">noise_cor</span><span class="p">[:</span><span class="n">n1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov_rot</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># not correlated in second half</span>
+<span class="gp">... </span>    <span class="n">cov_uncor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">noise_cor</span><span class="p">[</span><span class="o">-</span><span class="n">n2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov_uncor</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n2</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># make uncertainty columns</span>
+<span class="gp">... </span>    <span class="n">var_en</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">cov_en</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">var_en</span><span class="p">[:</span><span class="n">n1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_rot</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">var_en</span><span class="p">[</span><span class="o">-</span><span class="n">n2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov_uncor</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">cov_en</span><span class="p">[:</span><span class="n">n1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cov_rot</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">cov_en</span><span class="p">[</span><span class="o">-</span><span class="n">n2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cov_uncor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">p_sec</span><span class="p">,</span> <span class="n">p_vol_rot</span><span class="p">,</span> <span class="n">noise_cor</span><span class="p">,</span> <span class="n">var_en</span><span class="p">,</span> <span class="n">cov_en</span>
+</pre></div>
+</div>
+<p>Now we can create the “true” timeseries, as well as a “data” timeseries that contains
+noise. As before, we first create the <a class="reference internal" href="../geonat/models.html#geonat.models.Model" title="geonat.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> objects, then evaluate
+them to get the two timeseries, then make <a class="reference internal" href="../geonat/timeseries.html#geonat.timeseries.Timeseries" title="geonat.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> objects
+out of them, add them to the station as the two timeseries <code class="docutils literal notranslate"><span class="pre">'Truth'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'Displacement'</span></code>, and finally add the model objects to the station as well.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat</span> <span class="kn">import</span> <span class="n">Timeseries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.models</span> <span class="kn">import</span> <span class="n">Arctangent</span><span class="p">,</span> <span class="n">Polynomial</span><span class="p">,</span> <span class="n">SplineSet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_coll</span><span class="p">,</span> <span class="n">mdl_coll_synth</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>  <span class="c1"># containers for the model objects</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">synth_coll</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary of synthetic data &amp; noise for each stations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">station</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># think of some model parameters</span>
+<span class="gp">... </span>    <span class="n">gen_data</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">... </span>    <span class="n">p_sec</span><span class="p">,</span> <span class="n">p_vol</span><span class="p">,</span> <span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;noise&quot;</span><span class="p">],</span> <span class="n">var_en</span><span class="p">,</span> <span class="n">cov_en</span> <span class="o">=</span> \
+<span class="gp">... </span>        <span class="n">generate_model_and_noise</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># create model objects</span>
+<span class="gp">... </span>    <span class="n">mdl_sec</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># Arctangent is for the truth, SplineSet are for how we will estimate them</span>
+<span class="gp">... </span>    <span class="n">mdl_vol</span> <span class="o">=</span> <span class="n">Arctangent</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2000-03-01&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">mdl_trans</span> <span class="o">=</span> <span class="n">SplineSet</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">t_center_start</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">t_center_end</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">list_num_knots</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">13</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="c1"># collect the models in the dictionary</span>
+<span class="gp">... </span>    <span class="n">mdl_coll_synth</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Secular&quot;</span><span class="p">:</span> <span class="n">mdl_sec</span><span class="p">}</span>
+<span class="gp">... </span>    <span class="n">mdl_coll</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">mdl_coll_synth</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Volcano&quot;</span><span class="p">:</span> <span class="n">mdl_vol</span><span class="p">})</span>
+<span class="gp">... </span>    <span class="n">mdl_coll</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Transient&quot;</span><span class="p">:</span> <span class="n">mdl_trans</span><span class="p">})</span>
+<span class="gp">... </span>    <span class="c1"># only the model objects that will not be associated with the station</span>
+<span class="gp">... </span>    <span class="c1"># get their model parameters input</span>
+<span class="gp">... </span>    <span class="n">mdl_sec</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">p_sec</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">mdl_vol</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">p_vol</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># now, evaluate the models...</span>
+<span class="gp">... </span>    <span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;truth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mdl_sec</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span> <span class="o">+</span>
+<span class="gp">... </span>                         <span class="n">mdl_vol</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;truth&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;noise&quot;</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">synth_coll</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_data</span>
+<span class="gp">... </span>    <span class="c1"># ... and assign them to the station as timeseries objects</span>
+<span class="gp">... </span>    <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>        <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">timevector</span><span class="o">=</span><span class="n">timevector</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data</span><span class="o">=</span><span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;truth&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="n">src</span><span class="o">=</span><span class="s2">&quot;synthetic&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>        <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">timevector</span><span class="o">=</span><span class="n">timevector</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data</span><span class="o">=</span><span class="n">gen_data</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="n">var</span><span class="o">=</span><span class="n">var_en</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">cov</span><span class="o">=</span><span class="n">cov_en</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">src</span><span class="o">=</span><span class="s2">&quot;synthetic&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="c1"># finally, we give the station the models to fit</span>
+<span class="gp">... </span>    <span class="n">station</span><span class="o">.</span><span class="n">add_local_model_dict</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="n">model_dict</span><span class="o">=</span><span class="n">mdl_coll</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Let’s have a quick look at the network and its timeseries by using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Which will yield the following map:</p>
+<img alt="../_images/tutorial_4a_map.png" src="../_images/tutorial_4a_map.png" />
+<p>And for station S1, we see the following two timeseries:</p>
+<img alt="../_images/tutorial_4b_ts_S1.png" src="../_images/tutorial_4b_ts_S1.png" />
+</div>
+<div class="section" id="fitting-the-models-with-the-spatial-l0-solver">
+<h2>Fitting the models with the spatial L0 solver<a class="headerlink" href="#fitting-the-models-with-the-spatial-l0-solver" title="Permalink to this headline">¶</a></h2>
+<p>The following steps are nothing new - we will solve for model parameters with the
+<a class="reference internal" href="../geonat/solvers.html#geonat.solvers.SpatialSolver" title="geonat.solvers.SpatialSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialSolver</span></code></a> class. However, this time we’re explicitly
+specifying if we want the solver to use data (co)variance.</p>
+<p>This first run doesn’t use either the data variance or covariance, and we will save
+the estimated linear velocity parameter for every station and component for later
+comparison.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define a reweighting function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.solvers</span> <span class="kn">import</span> <span class="n">LogarithmicReweighting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">LogarithmicReweighting</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># preparations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.solvers</span> <span class="kn">import</span> <span class="n">SpatialSolver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spatsol</span> <span class="o">=</span> <span class="n">SpatialSolver</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="s2">&quot;Displacement&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># solve without using the data variance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spatsol</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">Calculating scale lengths</span>
+<span class="gp">...</span>
+<span class="go">Done</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_onlydata&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span><span class="p">[</span><span class="s2">&quot;onlydata&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In the next two runs, we will first add the variance, and then the covariance. At the end,
+for future comparison, we save the estimated parameters and covariance.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># solve using the data variance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spatsol</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">Calculating scale lengths</span>
+<span class="gp">...</span>
+<span class="go">Done</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_withvar&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span><span class="p">[</span><span class="s2">&quot;withvar&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># solve with the data variance and covariance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spatsol</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>              <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">Calculating scale lengths</span>
+<span class="gp">...</span>
+<span class="go">Done</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_withvarcov&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span><span class="p">[</span><span class="s2">&quot;withvarcov&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Notice that right off the bat, including the variance and covariance data in the estimation
+has reduced the number of unique splines from up to 3 per component to 1 per component.</p>
+<p>Just to get an idea of the fit, we can again use the GUI function to show us the fits and
+scalograms:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">station</span><span class="o">=</span><span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="n">timeseries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">scalogram_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;Transient&quot;</span><span class="p">,</span> <span class="s2">&quot;cmaprange&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>For station S2, we get the following model fit and scalogram:</p>
+<p><a class="reference internal" href="../_images/tutorial_4c_ts_S2.png"><img alt="4c_ts_S2" src="../_images/tutorial_4c_ts_S2.png" style="width: 49%;" /></a> <a class="reference internal" href="../_images/tutorial_4c_scalo_S2.png"><img alt="4c_scalo_S2" src="../_images/tutorial_4c_scalo_S2.png" style="width: 49%;" /></a></p>
+</div>
+<div class="section" id="quality-of-the-fits">
+<h2>Quality of the fits<a class="headerlink" href="#quality-of-the-fits" title="Permalink to this headline">¶</a></h2>
+<p>We now want to see how close we got to the true secular velocity. For that, we first need
+to collect the true velocity vectors at all stations:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">... </span>                        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">norm_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vel_en_true</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now we can calculate the deviation of the estimate both in terms of magnitude and direction
+from the true values:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">err_stats</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">case</span> <span class="ow">in</span> \
+<span class="gp">... </span>    <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Data + Variance&quot;</span><span class="p">,</span> <span class="s2">&quot;Data + Variance + Covariance&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="p">[</span><span class="s2">&quot;onlydata&quot;</span><span class="p">,</span> <span class="s2">&quot;withvar&quot;</span><span class="p">,</span> <span class="s2">&quot;withvarcov&quot;</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="c1"># error statistics</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Statistics for </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># get amplitude errors</span>
+<span class="gp">... </span>    <span class="n">norm_est</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vel_en_est</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">err_amp</span> <span class="o">=</span> <span class="n">norm_est</span> <span class="o">-</span> <span class="n">norm_true</span>
+<span class="gp">... </span>    <span class="c1"># get absolute angle error by calculating the angle between the two vectors</span>
+<span class="gp">... </span>    <span class="n">dotprodnorm</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vel_en_est</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">*</span> <span class="n">vel_en_true</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span>
+<span class="gp">... </span>                   <span class="p">(</span><span class="n">norm_est</span> <span class="o">*</span> <span class="n">norm_true</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">err_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dotprodnorm</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="c1"># make error dataframe and print</span>
+<span class="gp">... </span>    <span class="n">err_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">station_names</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Amplitude&quot;</span><span class="p">:</span> <span class="n">err_amp</span><span class="p">,</span> <span class="s2">&quot;Angle&quot;</span><span class="p">:</span> <span class="n">err_angle</span><span class="p">})</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">err_df</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># print rms of both</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RMS Amplitude: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">err_amp</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RMS Angle: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">err_angle</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="go">Statistics for Data:</span>
+<span class="go">    Amplitude      Angle</span>
+<span class="go">S1   1.697651   4.359484</span>
+<span class="go">S2   0.328071   0.261513</span>
+<span class="go">S3  -0.677940   4.072121</span>
+<span class="go">S4  -0.659412  13.525467</span>
+<span class="go">S5  -0.898881   4.207969</span>
+<span class="go">S6   0.819918  10.613691</span>
+<span class="go">S7   0.157743  13.085969</span>
+<span class="go">S8   0.894263  15.771350</span>
+<span class="go">RMS Amplitude: 0.87955367999</span>
+<span class="go">RMS Angle: 9.8038857489</span>
+
+<span class="go">Statistics for Data + Variance:</span>
+<span class="go">    Amplitude     Angle</span>
+<span class="go">S1   1.511762  1.839559</span>
+<span class="go">S2   1.496591  0.231865</span>
+<span class="go">S3   1.594666  1.128778</span>
+<span class="go">S4  -1.494915  6.149112</span>
+<span class="go">S5  -0.972639  6.333535</span>
+<span class="go">S6   0.683505  6.031706</span>
+<span class="go">S7   0.000223  1.616320</span>
+<span class="go">S8   0.708014  4.211801</span>
+<span class="go">RMS Amplitude: 1.1841362945</span>
+<span class="go">RMS Angle: 4.1738823044</span>
+
+<span class="go">Statistics for Data + Variance + Covariance:</span>
+<span class="go">    Amplitude     Angle</span>
+<span class="go">S1   1.572796  1.954775</span>
+<span class="go">S2   0.767869  3.342269</span>
+<span class="go">S3  -0.656516  2.929676</span>
+<span class="go">S4  -0.903166  9.659920</span>
+<span class="go">S5  -1.009938  6.237068</span>
+<span class="go">S6   0.562830  6.694827</span>
+<span class="go">S7   0.015474  1.011020</span>
+<span class="go">S8   0.728856  5.113027</span>
+<span class="go">RMS Amplitude: 0.87879575059</span>
+<span class="go">RMS Angle: 5.3359148666</span>
+</pre></div>
+</div>
+<p>Clearly, the fit using all the available information leads to the best set of parameters.
+Furthermore, from the verbose output of the spatial solver, we also see that we find sparser,
+and more spatially-consistent solution for the network, as evidenced by the smaller number
+of unique parameters.</p>
+</div>
+<div class="section" id="correlation-of-parameters">
+<h2>Correlation of parameters<a class="headerlink" href="#correlation-of-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Let’s have a closer look at how we can estimate the error in our prediction (i.e. fitted
+timeseries). By default, if the formal covariance is estimated by the solver, that formal
+uncertainty is passed on to the <a class="reference internal" href="../geonat/models.html#geonat.models.ModelCollection" title="geonat.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> object where
+we can look at it in the <a class="reference internal" href="../geonat/models.html#geonat.models.ModelCollection.cov" title="geonat.models.ModelCollection.cov"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cov</span></code></a> property.
+We can save it for later like this:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spat_cov</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span>
+<span class="gp">... </span>            <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Whenever then the model gets evaluated, it will also map that model parameter uncertainty
+into the data space (the blue shaded region in the figure above). For the case where the
+dictionary of splines is overcomplete, there will undoubtedly be a large correlation
+between splines - this is the entire reason we need L1/L0 regularization to deal with
+the degeneracy.</p>
+<p>Let’s have a look at the correlation matrix, by first defining a simple plotting
+function:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cmcrameri</span> <span class="kn">import</span> <span class="n">cm</span> <span class="k">as</span> <span class="n">scm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.tools</span> <span class="kn">import</span> <span class="n">cov2corr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># define a plotting function for repeatability</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">corr_plot</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">fname_corr</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cov2corr</span><span class="p">(</span><span class="n">cov</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">scm</span><span class="o">.</span><span class="n">roma</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Correlation Coefficient $[-]$&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation: &quot;</span> <span class="o">+</span> <span class="n">title</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Parameter index&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Parameter index&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname_corr</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(We don’t want to use <a class="reference internal" href="../geonat/models.html#geonat.models.ModelCollection.plot_covariance" title="geonat.models.ModelCollection.plot_covariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot_covariance()</span></code></a> here since
+later we will have an empirical covariance that we have to plot ourselves anyways.)</p>
+<p>And now running it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">corr_plot</span><span class="p">(</span><span class="n">spat_cov</span><span class="p">[</span><span class="s2">&quot;S2&quot;</span><span class="p">],</span> <span class="s2">&quot;Spatial L0 at S2&quot;</span><span class="p">,</span> <span class="s2">&quot;tutorial_4d_corr_S2.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_4d_corr_S2.png" src="../_images/tutorial_4d_corr_S2.png" />
+<p>As one can see, there is a strong tradeoff between the linear terms (indices 2-3)
+and the splines in the rest of the dictionary. Note that all but one splines have
+zero-valued parameters, so the uncertainty is not directly visible in the timeseries.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The empty columns and rows in the correlation matrix are a result of how the
+model parameter covariance matrix is estimated by
+<a class="reference internal" href="../geonat/solvers.html#geonat.solvers.lasso_regression" title="geonat.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>. Because the computation requires a
+matrix inverse, but the problem is not full rank (because the splines are an
+overcomplete dictionary), some entries have to be set to zero before the inversion,
+yielding in empty correlation rows. This threshold can be set with the
+<code class="docutils literal notranslate"><span class="pre">zero_threshold</span></code> option.</p>
+</div>
+<p>In the following sections, let’s explore other ways we can get a sense of our
+parameter uncertainty.</p>
+</div>
+<div class="section" id="simple-linear-regression-with-restricted-spline-set">
+<h2>Simple linear regression with restricted spline set<a class="headerlink" href="#simple-linear-regression-with-restricted-spline-set" title="Permalink to this headline">¶</a></h2>
+<p>The goal of the L0 solver is to find the minimum set of splines necessary to model
+the transient signal, based on an overcomplete dictionary of splines. Once
+that subset is found (e.g., the one spline in shown above), it is mathematically
+equivalent to just doing an unregularized, linear least squares fit.</p>
+<p>In the correlation matrix above, we have an almost full matrix, where we see how
+parameters trade off with each other, even when they have been estimated to be zero
+because of our regularization. If we only wanted to see how the <em>non-zero</em>
+parameters trade off with each other, we can “freeze” the models based on the absolute
+value of their parameters. This is accomplished with the
+<a class="reference internal" href="../geonat/models.html#geonat.models.Model.freeze" title="geonat.models.Model.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a> method:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">freeze</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">model_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span> <span class="n">zero_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fitevalres</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;linear_regression&quot;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">unfreeze</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sub_param</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="gp">... </span>             <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sub_cov</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span>
+<span class="gp">... </span>           <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Looking at the covariance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">corr_plot</span><span class="p">(</span><span class="n">sub_cov</span><span class="p">[</span><span class="s2">&quot;S2&quot;</span><span class="p">],</span> <span class="s2">&quot;Frozen local L0 at S2&quot;</span><span class="p">,</span> <span class="s2">&quot;tutorial_4e_corr_S2.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_4e_corr_S2.png" src="../_images/tutorial_4e_corr_S2.png" />
+<p>We now see how only the parameters that have been estimated have correlation entries,
+and again, we see the tradeoff between the one spline and the linear polynomial.</p>
+</div>
+<div class="section" id="empirical-covariance-estimation">
+<h2>Empirical covariance estimation<a class="headerlink" href="#empirical-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have the formal covariance, we can also try to estimate the empirical (sample)
+parameters covariance. With synthetic data, this is straightforward: we create a large number
+of timeseries, all with the same truth signal underlying it, but with different noise
+realizations. We then solve for the parameters in all these cases, and use those
+to compute the sample covariance. If we don’t have the true original timeseries,
+we can still add different noise realizations at each step, but we will add the to
+observed timeseries (accepting that the new timeseries will have double the noise).</p>
+<p>What we want to learn from it will then determine which of the different solvers we use.
+If we want to get a better understanding of the tradeoff between the actual non-zero
+parameters, we would repeat either the spatial L0 solution, or the unregularized
+solution using the restricted dictionary.</p>
+<p>Just for demonstration purposes, however, we will do it using the local L0 solution,
+which will give us the understanding how different splines trade off between each other
+(similar to the first correlation matrix shown in this tutorial). This is because
+with different noise realizations, and without the spatial part of the algorithm,
+it is very likely that different splines will get chosen for each solution, giving
+us therefore a good sample set to estimate the covariance.</p>
+<p>Now, to the code: we will first create a variable to store the estimated parameters,
+then start a loop, and at the end compute the sample covariance. Inside the loop,
+first, a new timeseries is created, then a local L0 fit is performed, and then the
+estimated parameters are saved.</p>
+<p>We repeat this exercise twice, once taking advantage of our knowledge of the truth,
+and once purely data-based. First, truth-based:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_repeat</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stacked_params_tru</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_repeat</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">num_parameters</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>     <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># loop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_repeat</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># change noise</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">station</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> \
+<span class="gp">... </span>            <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">generate_model_and_noise</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">rng</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="c1"># solve, same reweight_func, same penalty = easy</span>
+<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fit </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># save</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">stacked_params_tru</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># calculate empirical covariance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">emp_cov_tru</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">stacked_params_tru</span><span class="p">[</span><span class="n">sta_name</span><span class="p">],</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">... </span>               <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>And second, data-based:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_repeat</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stacked_params_dat</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_repeat</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">num_parameters</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">... </span>     <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">orig_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">... </span>             <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># loop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_repeat</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># change noise</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">station</span><span class="p">,</span> <span class="n">angle</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> \
+<span class="gp">... </span>            <span class="n">orig_data</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="n">generate_model_and_noise</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">rng</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="c1"># solve, same reweight_func, same penalty = easy</span>
+<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fit </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># save</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">stacked_params_dat</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># calculate empirical covariance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">emp_cov_dat</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">stacked_params_dat</span><span class="p">[</span><span class="n">sta_name</span><span class="p">],</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">... </span>               <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Producing the two covariance plots:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">corr_plot</span><span class="p">(</span><span class="n">emp_cov_tru</span><span class="p">[</span><span class="s2">&quot;S2&quot;</span><span class="p">],</span> <span class="s2">&quot;Truth-based Empirical Local L0 at S2&quot;</span><span class="p">,</span> <span class="s2">&quot;tutorial_4f_corr_S2.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corr_plot</span><span class="p">(</span><span class="n">emp_cov_dat</span><span class="p">[</span><span class="s2">&quot;S2&quot;</span><span class="p">],</span> <span class="s2">&quot;Data-based Empirical Local L0 at S2&quot;</span><span class="p">,</span> <span class="s2">&quot;tutorial_4g_corr_S2.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s have a look at the two figures side-by-side:</p>
+<p><a class="reference internal" href="../_images/tutorial_4f_corr_S2.png"><img alt="4f_corr_S2" src="../_images/tutorial_4f_corr_S2.png" style="width: 49%;" /></a> <a class="reference internal" href="../_images/tutorial_4g_corr_S2.png"><img alt="4g_corr_S2" src="../_images/tutorial_4g_corr_S2.png" style="width: 49%;" /></a></p>
+<p>Again, we see the strong trade-off between the splines. We also see that the data-based
+is relatively close to the truth-based one, which gives us at least a little bit of
+confidence in this approach when using real data.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorial_3.html" class="btn btn-neutral float-left" title="Tutorial 3: Incorporating Spatial Coherence" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Tobias Köhne.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

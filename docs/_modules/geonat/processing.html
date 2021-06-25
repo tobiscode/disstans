@@ -1,0 +1,1326 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>geonat.processing &mdash; GeoNAT 0.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> GeoNAT
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#creating-timeseries-objects">Creating Timeseries objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#fitting-the-models">Fitting the models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#plotting-the-fit-and-residuals">Plotting the fit and residuals</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_2.html">Tutorial 2: Advanced Models and Fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#creating-more-complex-synthetic-data">Creating more complex synthetic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#spline-models-for-transients">Spline models for transients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#building-a-network">Building a Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#fitting-an-entire-network">Fitting an entire network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_3.html">Tutorial 3: Incorporating Spatial Coherence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#dreaming-up-a-network">Dreaming up a network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#fantasizing-data">Fantasizing data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#removing-the-common-mode-error">Removing the Common Mode Error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#fitting-the-data-using-reweighted-l1-regularization">Fitting the data using reweighted L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#fitting-the-data-using-a-spatially-aware-l1-reweighting">Fitting the data using a spatially-aware L1 reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#finding-unmodeled-jumps">Finding unmodeled jumps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#making-a-noisy-network">Making a noisy network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#fitting-the-models-with-the-spatial-l0-solver">Fitting the models with the spatial L0 solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#quality-of-the-fits">Quality of the fits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#correlation-of-parameters">Correlation of parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#simple-linear-regression-with-restricted-spline-set">Simple linear regression with restricted spline set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_1.html">Example 1: Long Valley Caldera Transient Motions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#preparations">Preparations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#getting-data">Getting data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#building-the-network">Building the network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#cleaning-the-timeseries">Cleaning the timeseries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#outlier-and-cme-removal">Outlier and CME removal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#first-pass-major-steps-and-noisy-periods">First pass: major steps and noisy periods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#second-pass-minor-catalog-based-steps">Second pass: minor, catalog-based steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#final-considerations">Final considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../geonat.html">GeoNAT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/compiled.html">Compiled</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/compiled.html#source-code">Source Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/models.html#model-parent-class">Model (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/models.html#basic-models">Basic Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#arctangent">Arctangent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#logarithmic">Logarithmic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#polynomial">Polynomial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#step">Step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#sinusoidal">Sinusoidal</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/models.html#spline-models">Spline Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#bspline">BSpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/models.html#splineset">SplineSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/processing.html">Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/processing.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/processing.html#clean">clean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/processing.html#median">median</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/processing.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/processing.html#stepdetector">StepDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/solvers.html">Solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#lasso-regression">lasso_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#linear-regression">linear_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#ridge-regression">ridge_regression</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#spatialsolver">SpatialSolver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#reweightingfunction">ReweightingFunction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#inversereweighting">InverseReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#inversesquaredreweighting">InverseSquaredReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/solvers.html#logarithmicreweighting">LogarithmicReweighting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/timeseries.html">Timeseries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/timeseries.html#specialized-classes">Specialized Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../geonat/tools.html">Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#get-cov-dims">get_cov_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#make-cov-index-map">make_cov_index_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#cov2corr">cov2corr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../geonat/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#rinexdataholding">RINEXDataHolding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#timedelta">Timedelta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../geonat/tools.html#click">Click</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GeoNAT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>geonat.processing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for geonat.processing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains some processing functions that while not belonging</span>
+<span class="sd">to a specific class, require them to already be loaded and GeoNAT to</span>
+<span class="sd">be initialized.</span>
+
+<span class="sd">For general helper functions, see :mod:`~geonat.tools`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span><span class="p">,</span> <span class="n">FastICA</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
+<span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
+<span class="kn">from</span> <span class="nn">.compiled</span> <span class="kn">import</span> <span class="n">maskedmedfilt2d</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">parallelize</span><span class="p">,</span> <span class="n">tvec_to_numpycol</span>
+
+
+<div class="viewcode-block" id="unwrap_dict_and_ts"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.unwrap_dict_and_ts">[docs]</a><span class="k">def</span> <span class="nf">unwrap_dict_and_ts</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A wrapper decorator that aims at simplifying the coding of processing functions.</span>
+<span class="sd">    Ideally, a new function that doesn&#39;t need to know if its input is a</span>
+<span class="sd">    :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame`,</span>
+<span class="sd">    :class:`~numpy.ndarray` or a dictionary containing them, should not need to reimplement</span>
+<span class="sd">    a check and conversion for all of these because they just represent a data</span>
+<span class="sd">    array of some form. So, by providing this function decorator, a wrapped function</span>
+<span class="sd">    only needs to be able to work for a single array (plus some optional keyword arguments).</span>
+<span class="sd">    The wrapping will extract the data of the input types and convert the returned</span>
+<span class="sd">    array from ``func`` into the original format.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    A basic function of the form::</span>
+
+<span class="sd">        def func(in_array, **kw_args):</span>
+<span class="sd">            # do some things</span>
+<span class="sd">            return out_array</span>
+
+<span class="sd">    that takes and returns a NumPy array can be wrapped as follows</span>
+<span class="sd">    to be able to also take and return all the other data forms::</span>
+
+<span class="sd">        @unwrap_dict_and_ts</span>
+<span class="sd">        def func(in_array, **kw_args):</span>
+<span class="sd">            # do some things</span>
+<span class="sd">            return out_array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ts&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+            <span class="n">was_dict</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">was_dict</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">additional_output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># loop over components</span>
+        <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">):</span>
+                <span class="n">array</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                <span class="n">array</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">array</span> <span class="o">=</span> <span class="n">ts</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot unwrap object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">func_output</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func_output</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">additional_output</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">func_output</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="n">additional_output</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func_output</span>
+                <span class="n">additional_output</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># save results</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">only_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">elem</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">additional_output</span><span class="o">.</span><span class="n">values</span><span class="p">()]):</span>
+            <span class="n">has_additional_output</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">has_additional_output</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">was_dict</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span>
+            <span class="n">additional_output</span> <span class="o">=</span> <span class="n">additional_output</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">has_additional_output</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">additional_output</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="median"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.median">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
+<span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the median filter (ignoring NaNs) column-wise, either by calling</span>
+<span class="sd">    :func:`~numpy.nanmedian` iteratively or by using the precompiled Fortran</span>
+<span class="sd">    function :func:`~geonat.compiled.maskedmedfilt2d`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    array : numpy.ndarray</span>
+<span class="sd">        2D input array (can contain NaNs).</span>
+<span class="sd">        Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept</span>
+<span class="sd">        :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and</span>
+<span class="sd">        dictionaries of them as input.</span>
+<span class="sd">    kernel_size : int</span>
+<span class="sd">        Kernel size (length of moving window to compute the median over).</span>
+<span class="sd">        Has to be an odd number.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    filtered : numpy.ndarray</span>
+<span class="sd">        2D filtered array (may still contain NaNs).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">maskedmedfilt2d</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">),</span> <span class="n">kernel_size</span><span class="p">)</span>
+        <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;&#39;kernel_size&#39; has to be odd, got </span><span class="si">{</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">num_obs</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_obs</span><span class="p">,</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="c1"># Run filtering while suppressing warnings</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;All-NaN slice encountered&#39;</span><span class="p">)</span>
+            <span class="c1"># Beginning region</span>
+            <span class="n">halfwindow</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">filtered</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">halfwindow</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Middle region</span>
+            <span class="k">assert</span> <span class="n">halfwindow</span> <span class="o">==</span> <span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">num_obs</span> <span class="o">-</span> <span class="n">halfwindow</span><span class="p">):</span>
+                <span class="n">filtered</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># Ending region</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_obs</span> <span class="o">-</span> <span class="n">halfwindow</span><span class="p">,</span> <span class="n">num_obs</span><span class="p">):</span>
+                <span class="n">halfwindow</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">filtered</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filtered</span></div>
+
+
+<div class="viewcode-block" id="common_mode"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.common_mode">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
+<span class="k">def</span> <span class="nf">common_mode</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the Common Mode Error (CME) with the given method.</span>
+<span class="sd">    The input array should already be a residual.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    array : numpy.ndarray</span>
+<span class="sd">        Input array of shape :math:`(\text{num_observations},\text{n_stations})`</span>
+<span class="sd">        (can contain NaNs).</span>
+<span class="sd">        Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept</span>
+<span class="sd">        :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and</span>
+<span class="sd">        dictionaries of them as input.</span>
+<span class="sd">    method : str</span>
+<span class="sd">        Method to use to decompose the array. Possible values are ``&#39;pca&#39;`` and ``&#39;ica&#39;}.</span>
+<span class="sd">        ``&#39;pca&#39;`` uses `Principal Component Analysis`_ (motivated by [dong06]_), whereas</span>
+<span class="sd">        ``&#39;ica&#39;`` uses `Independent Component Analysis`_ (motivated by [huang12]_).</span>
+<span class="sd">    num_components : int, optional</span>
+<span class="sd">        Number of CME bases to estimate. Defaults to ``1``.</span>
+<span class="sd">    plot : bool, optional</span>
+<span class="sd">        If ``True``, include not only the modeled CME, but also the components</span>
+<span class="sd">        themselves in space and time. Defaults to ``False``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model : numpy.ndarray</span>
+<span class="sd">        Modeled CME of shape :math:`(\text{num_observations},\text{n_stations})`.</span>
+<span class="sd">    temporal : numpy.ndarray</span>
+<span class="sd">        (Only if ``plot=True``.) CME in time of shape</span>
+<span class="sd">        :math:`(\text{num_observations},\text{num_components})`.</span>
+<span class="sd">    spatial : numpy.ndarray</span>
+<span class="sd">        (Only if ``plot=True``.) CME in space of shape</span>
+<span class="sd">        :math:`(\text{num_components},\text{n_stations})`.</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [dong06] Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L.,</span>
+<span class="sd">       Kedar, S., &amp; Jamason, P. (2006). *Spatiotemporal filtering using principal component</span>
+<span class="sd">       analysis and Karhunen-Loeve expansion approaches for regional GPS network analysis*.</span>
+<span class="sd">       Journal of Geophysical Research: Solid Earth, 111(B3).</span>
+<span class="sd">       doi:`10.1029/2005JB003806 &lt;https://doi.org/10.1029/2005JB003806&gt;`_.</span>
+<span class="sd">    .. [huang12] Huang, D. W., Dai, W. J., &amp; Luo, F. X. (2012).</span>
+<span class="sd">       *ICA Spatiotemporal Filtering Method and Its Application in GPS Deformation Monitoring*.</span>
+<span class="sd">       Applied Mechanics and Materials, 204–208, 2806–2812.</span>
+<span class="sd">       doi:`10.4028/www.scientific.net/AMM.204-208.2806</span>
+<span class="sd">       &lt;http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806&gt;`_.</span>
+
+<span class="sd">    .. _Principal Component Analysis:</span>
+<span class="sd">       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html</span>
+<span class="sd">    .. _Independent Component Analysis:</span>
+<span class="sd">       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.FastICA.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ignore all only-NaN columns</span>
+    <span class="n">array_nanind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="n">finite_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="o">~</span><span class="n">array_nanind</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nan_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">array_nanind</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="p">[:,</span> <span class="n">finite_cols</span><span class="p">]</span>
+    <span class="c1"># fill NaNs with white Gaussian noise</span>
+    <span class="n">array_nanmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">array_nansd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">array_nanind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">icol</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">],</span> <span class="n">icol</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_nansd</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span> \
+                                             <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> \
+                                             <span class="o">+</span> <span class="n">array_nanmean</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span>
+    <span class="c1"># decompose using the specified solver</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;pca&#39;</span><span class="p">:</span>
+        <span class="n">decomposer</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_components</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;ica&#39;</span><span class="p">:</span>
+        <span class="n">decomposer</span> <span class="o">=</span> <span class="n">FastICA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_components</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot estimate the common mode error &quot;</span>
+                                  <span class="sa">f</span><span class="s2">&quot;using the &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; method.&quot;</span><span class="p">)</span>
+    <span class="c1"># extract temporal component and build model</span>
+    <span class="n">temporal</span> <span class="o">=</span> <span class="n">decomposer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">decomposer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">temporal</span><span class="p">)</span>
+    <span class="c1"># reduce to where original timeseries were not NaNs and return</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">array_nanind</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="k">if</span> <span class="n">nan_cols</span> <span class="o">!=</span> <span class="p">[]:</span>
+        <span class="n">newmod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">temporal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">finite_cols</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_cols</span><span class="p">)))</span>
+        <span class="n">newmod</span><span class="p">[:,</span> <span class="n">finite_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="n">newmod</span><span class="p">[:,</span> <span class="n">nan_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">newmod</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">spatial</span> <span class="o">=</span> <span class="n">decomposer</span><span class="o">.</span><span class="n">components_</span>
+        <span class="k">if</span> <span class="n">nan_cols</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">newspat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">spatial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">finite_cols</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_cols</span><span class="p">)))</span>
+            <span class="n">newspat</span><span class="p">[:,</span> <span class="n">finite_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial</span>
+            <span class="n">newspat</span><span class="p">[:,</span> <span class="n">nan_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="n">spatial</span> <span class="o">=</span> <span class="n">newspat</span>
+        <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">temporal</span><span class="p">,</span> <span class="n">spatial</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="clean"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.clean">[docs]</a><span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">ts_in</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">ts_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">clean_kw_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">reference_callable_args</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function operating on a single station&#39;s timeseries to clean it from outliers,</span>
+<span class="sd">    and mask it out if the data is not good enough. The criteria are set by</span>
+<span class="sd">    :attr:`~geonat.config.defaults` but can be overriden by providing ``clean_kw_args``.</span>
+<span class="sd">    The criteria are:</span>
+
+<span class="sd">    - ``&#39;min_obs&#39;``: Minimum number of observations the timeseries has to contain.</span>
+<span class="sd">    - ``&#39;std_outlier&#39;``: Classify as an outlier any observation that is this many</span>
+<span class="sd">      standard deviations away from the reference.</span>
+<span class="sd">    - ``&#39;std_thresh&#39;``: After the removal of outliers, the maximum standard deviation</span>
+<span class="sd">      that the residual between reference and input timeseries is allowed to have.</span>
+<span class="sd">    - ``&#39;min_clean_obs&#39;``: After the removal of outliers, the minimum number of</span>
+<span class="sd">      observations the timeseries has to contain.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    station : geonat.station.Station</span>
+<span class="sd">        Station to operate on.</span>
+<span class="sd">    ts_in : str</span>
+<span class="sd">        Description of the timeseries to clean.</span>
+<span class="sd">    reference : str, geonat.timeseries.Timeseries, function</span>
+<span class="sd">        Reference timeseries.</span>
+<span class="sd">        If string, checks for a timeseries with that description in the ``station``.</span>
+<span class="sd">        If a :class:`~geonat.timeseries.Timeseries` instance, use it directly.</span>
+<span class="sd">        If a function, the reference timeseries will be calculated as</span>
+<span class="sd">        ``t_ref = reference(ts_in, **reference_callable_args)``.</span>
+<span class="sd">    ts_out : str, optional</span>
+<span class="sd">        If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``</span>
+<span class="sd">        and clean the copy (to preserve the raw timeseries).</span>
+<span class="sd">    clean_kw_args : dict, optional</span>
+<span class="sd">        Override the default cleaning criteria in :attr:`~geonat.config.defaults`,</span>
+<span class="sd">        see the explanations above.</span>
+<span class="sd">    reference_callable_args : dict, optional</span>
+<span class="sd">        If ``reference`` is a function, ``reference_callable_args`` can be used</span>
+<span class="sd">        to pass additional keyword arguments to the former when calculating</span>
+<span class="sd">        the reference timeseries.</span>
+
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    By default, this function operates *in-place*. If you don&#39;t wish to overwrite</span>
+<span class="sd">    the raw input timeseries, specify ``ts_out``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clean_settings</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;clean&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">clean_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clean_kw_args</span><span class="p">)</span>
+    <span class="c1"># check if we&#39;re modifying in-place or copying</span>
+    <span class="k">if</span> <span class="n">ts_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">ts_in</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">ts_in</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">only_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s1">&#39;clean&#39;</span><span class="p">)</span>
+    <span class="c1"># check if we have a reference time series or need to calculate one</span>
+    <span class="c1"># in the latter case, the input is name of function to call</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">reference</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;reference&#39; has to either be a Timeseries, the name of one, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;or a function, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">):</span>
+        <span class="n">ts_ref</span> <span class="o">=</span> <span class="n">reference</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># get reference time series</span>
+        <span class="n">ts_ref</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">reference</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">reference</span><span class="p">):</span>
+        <span class="n">ts_ref</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="o">**</span><span class="n">reference_callable_args</span><span class="p">)</span>
+    <span class="c1"># check that both timeseries have the same data columns</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ts_ref</span><span class="o">.</span><span class="n">data_cols</span> <span class="o">==</span> <span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Reference time series has to have the same data columns as &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;input time series, but got </span><span class="si">{</span><span class="n">ts_ref</span><span class="o">.</span><span class="n">data_cols</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">dcol</span> <span class="ow">in</span> <span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">:</span>
+        <span class="c1"># check for minimum number of observations</span>
+        <span class="k">if</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;min_obs&quot;</span><span class="p">]:</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">mask_out</span><span class="p">(</span><span class="n">dcol</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="c1"># compute residuals</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> \
+           <span class="ow">or</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_thresh&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts_ref</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+        <span class="c1"># check for and remove outliers</span>
+        <span class="k">if</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sd</span>
+            <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts_ref</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
+        <span class="c1"># check for minimum number of clean observations</span>
+        <span class="k">if</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;min_clean_obs&quot;</span><span class="p">]:</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">mask_out</span><span class="p">(</span><span class="n">dcol</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="c1"># check if total standard deviation is still too large</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_thresh&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sd</span> <span class="o">&gt;</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_thresh&quot;</span><span class="p">]):</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">mask_out</span><span class="p">(</span><span class="n">dcol</span><span class="p">)</span>
+    <span class="c1"># if we made a copy, add it to the station, otherwise we&#39;re already done</span>
+    <span class="k">if</span> <span class="n">ts_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">station</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">ts_out</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StepDetector"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector">[docs]</a><span class="k">class</span> <span class="nc">StepDetector</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements a step detector based on the Akaike Information Criterion (AIC).</span>
+
+<span class="sd">    A window is moved over the input data, and two linear models are fit in the</span>
+<span class="sd">    method :meth:`~search`: one containing only a linear polynomial, and one containing an</span>
+<span class="sd">    additional step in the middle of the window. Then, using the AIC, the relative</span>
+<span class="sd">    probabilities are calculated, and saved for each timestep.</span>
+
+<span class="sd">    In the final step, one can threshold these relative probabilities with the method</span>
+<span class="sd">    :meth:`~steps`, and look for local maxima, which will correspond to probable steps.</span>
+
+<span class="sd">    If the class is constructed with ``kernel_size``, ``x`` and ``y`` passed, it automatically</span>
+<span class="sd">    calls its method :meth:`~search`, otherwise, :meth:`~search` needs to be called manually.</span>
+<span class="sd">    Running the method again with a different ``kernel_size``, ``x`` or ``y`` will overwrite</span>
+<span class="sd">    previous results.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kernel_size : int, optional</span>
+<span class="sd">        Window size of the detector. Must be odd.</span>
+<span class="sd">    kernel_size_min : int, optional</span>
+<span class="sd">        Minimum window size of the detector (for edges). Must be smaller than or equal</span>
+<span class="sd">        to ``kernel_size``. Defaults to ``0``.</span>
+<span class="sd">    x : numpy.ndarray, optional</span>
+<span class="sd">        Input array of shape :math:`(\text{num_observations},)`.</span>
+<span class="sd">        Should not contain NaNs.</span>
+<span class="sd">    y : numpy.ndarray, optional</span>
+<span class="sd">        Input array of shape :math:`(\text{num_observations}, \text{num_components})`.</span>
+<span class="sd">        Can contain NaNs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">=</span> <span class="n">kernel_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span> <span class="o">=</span> <span class="n">kernel_size_min</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Kernel (window) size of the detector. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;kernel_size&#39; has not yet been set.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span>
+
+    <span class="nd">@kernel_size</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kernel_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">),</span> \
+                <span class="sa">f</span><span class="s2">&quot;&#39;kernel_size&#39; must be an odd integer or None, got </span><span class="si">{</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span> <span class="o">=</span> <span class="n">kernel_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Minimum kernel (window) size of the detector. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;kernel_size_min&#39; has not yet been set.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span>
+
+    <span class="nd">@kernel_size_min</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kernel_size_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">kernel_size_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="s2">&quot;&#39;kernel_size_min&#39; must be smaller &quot;</span> <span class="o">+</span> \
+                <span class="sa">f</span><span class="s2">&quot;or equal to &#39;kernel_size&#39;, but </span><span class="si">{</span><span class="n">kernel_size_min</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span> <span class="o">=</span> <span class="n">kernel_size_min</span>
+
+<div class="viewcode-block" id="StepDetector.AIC_c"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector.AIC_c">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">AIC_c</span><span class="p">(</span><span class="n">rss</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the Akaike Information Criterion for small samples for Least Squares</span>
+<span class="sd">        regression results. Implementation is based on [burnhamanderson02]_ (ch. 2).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rss : float</span>
+<span class="sd">            Residual sum of squares.</span>
+<span class="sd">        n : int</span>
+<span class="sd">            Number of samples.</span>
+<span class="sd">        K : int</span>
+<span class="sd">            Degrees of freedom. If the Least Squares model has :math:`\text{num_parameters}`</span>
+<span class="sd">            parameters (including the mean), then the degrees of freedom are</span>
+<span class="sd">            :math:`K = \text{num_parameters} + 1`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The Small Sample AIC for Least Squares :math:`\text{AIC}_c`.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        .. [burnhamanderson02] (2002) *Information and Likelihood Theory:</span>
+<span class="sd">           A Basis for Model Selection and Inference.* In: Burnham K.P., Anderson D.R. (eds)</span>
+<span class="sd">           Model Selection and Multimodel Inference. Springer, New York, NY.</span>
+<span class="sd">           doi:`10.1007/978-0-387-22456-5_2 &lt;https://doi.org/10.1007/978-0-387-22456-5_2&gt;`_.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># input check</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">-</span> <span class="n">K</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># can&#39;t return meaningful statistic, hypothesis unlikely</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+        <span class="c1"># calculate AIC for LS</span>
+        <span class="n">AIC</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rss</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">K</span>
+        <span class="c1"># apply small sample size correction</span>
+        <span class="n">correction</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="p">(</span><span class="n">K</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">K</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AIC</span> <span class="o">+</span> <span class="n">correction</span></div>
+
+<div class="viewcode-block" id="StepDetector.test_single"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector.test_single">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">test_single</span><span class="p">(</span><span class="n">xwindow</span><span class="p">,</span> <span class="n">ywindow</span><span class="p">,</span> <span class="n">valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a single window (of arbitrary, but odd length), perform the AIC hypothesis test</span>
+<span class="sd">        whether a step is likely present (H1) or not (H0) in the ``y`` data given</span>
+<span class="sd">        ``x`` coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xwindow : numpy.ndarray</span>
+<span class="sd">            Time array of shape :math:`(\text{num_window},)`.</span>
+<span class="sd">            Should not contain NaNs.</span>
+<span class="sd">        ywindow : numpy.ndarray</span>
+<span class="sd">            Data array of shape :math:`(\text{num_window},)`.</span>
+<span class="sd">            Should not contain NaNs.</span>
+<span class="sd">        valid : numpy.ndarray, optional</span>
+<span class="sd">            Mask array of the data of shape :math:`(\text{num_window},)`,</span>
+<span class="sd">            with ``1`` where the ``ywindow`` is finite (not NaN or infinity).</span>
+<span class="sd">            If not passed to the function, it is calculated internally, which will slow</span>
+<span class="sd">            down the computation.</span>
+<span class="sd">        maxdel : float, optional</span>
+<span class="sd">            Difference in AIC that should be considered not significantly better.</span>
+<span class="sd">            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Best hypothesis (``0`` for no step, ``1`` for step).</span>
+<span class="sd">        float</span>
+<span class="sd">            If H1 is the best hypothesis (and suffices ``maxdel``), its relative probability,</span>
+<span class="sd">            otherwise the relative probability of H0 (which therefore can be ``0`` if H0 is also</span>
+<span class="sd">            the best hypothesis in general).</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A 2-tuple of the two mean-squared residuals of the H0 and H1 hypotheses,</span>
+<span class="sd">            respectively. Assuming the test is unbiased, this is the residual&#39;s variance.</span>
+<span class="sd">            Is ``NaN`` in an element if the least-squares model did not converge.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        AIC_c : For more information about the AIC hypothesis test.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># do some checks</span>
+        <span class="k">assert</span> <span class="n">xwindow</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ywindow</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> \
+            <span class="s2">&quot;&#39;xwindow&#39; and &#39;ywindow&#39; have to have the same length in the first dimensions, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">xwindow</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">ywindow</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">xwindow</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">),</span> \
+            <span class="s2">&quot;&#39;xwindow&#39; and &#39;ywindow&#39; must have an odd number of entries, &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">xwindow</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="n">valid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ywindow</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">ywindow</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">valid</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> \
+                <span class="s2">&quot;&#39;ywindow&#39; and &#39;valid&#39; have to have the same shape, &quot;</span> \
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">ywindow</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">valid</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="c1"># get number of valid observations</span>
+        <span class="n">i_mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xwindow</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">n_pre</span> <span class="o">=</span> <span class="n">valid</span><span class="p">[:</span><span class="n">i_mid</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_post</span> <span class="o">=</span> <span class="n">valid</span><span class="p">[</span><span class="n">i_mid</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_total</span> <span class="o">=</span> <span class="n">n_pre</span> <span class="o">+</span> <span class="n">n_post</span>
+        <span class="c1"># return with 0, 0 if we will not be able to get an estimate because of not enough data</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n_pre</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n_post</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
+        <span class="n">xfinite</span> <span class="o">=</span> <span class="n">xwindow</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">yfinite</span> <span class="o">=</span> <span class="n">ywindow</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="c1"># build mapping matrix for model H1</span>
+        <span class="n">G1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_total</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="c1"># first column is mean</span>
+        <span class="n">G1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># second column is slope</span>
+        <span class="n">G1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xfinite</span> <span class="o">-</span> <span class="n">xfinite</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># third column is the additional step</span>
+        <span class="n">G1</span><span class="p">[</span><span class="n">n_pre</span><span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># without the step it&#39;s just the first two columns</span>
+        <span class="n">G0</span> <span class="o">=</span> <span class="n">G1</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># fit for H1 first</span>
+        <span class="c1"># (since if that one doesn&#39;t converge, we have to go with H0 anyway)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rss1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">yfinite</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
+        <span class="c1"># now we can fit for H0, and again just go with that if there is no solution</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rss0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G0</span><span class="p">,</span> <span class="n">yfinite</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">rss1</span><span class="o">/</span><span class="n">n_total</span><span class="p">)</span>
+        <span class="c1"># now that both models produce results, let&#39;s get the AIC_c values</span>
+        <span class="c1"># we&#39;ll again return the H0 if not both models have a valid AIC_c value</span>
+        <span class="n">aic</span> <span class="o">=</span> <span class="p">[</span><span class="n">StepDetector</span><span class="o">.</span><span class="n">AIC_c</span><span class="p">(</span><span class="n">rss</span><span class="p">,</span> <span class="n">n_total</span><span class="p">,</span> <span class="n">dof</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">rss</span><span class="p">,</span> <span class="n">dof</span><span class="p">)</span>
+               <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">aic</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">rss0</span><span class="o">/</span><span class="n">n_total</span><span class="p">,</span> <span class="n">rss1</span><span class="o">/</span><span class="n">n_total</span><span class="p">)</span>
+        <span class="c1"># let&#39;s check the difference between the two as a measure of evidence</span>
+        <span class="n">best_hyp</span> <span class="o">=</span> <span class="n">aic</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">aic</span><span class="p">))</span>
+        <span class="n">Delta_best</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">-</span> <span class="n">aic</span><span class="p">[</span><span class="n">best_hyp</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">aic</span><span class="p">]</span>
+        <span class="c1"># we will only recommend H1 if it has the both the minimum AIC_c, and</span>
+        <span class="c1"># the difference to H0 is larger than maxdel</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">best_hyp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Delta_best</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxdel</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Delta_best</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">rss0</span><span class="o">/</span><span class="n">n_total</span><span class="p">,</span> <span class="n">rss1</span><span class="o">/</span><span class="n">n_total</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Delta_best</span><span class="p">[</span><span class="n">best_hyp</span><span class="p">],</span> <span class="p">(</span><span class="n">rss0</span><span class="o">/</span><span class="n">n_total</span><span class="p">,</span> <span class="n">rss1</span><span class="o">/</span><span class="n">n_total</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parallelizable part of the search, search_network and search_catalog methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="p">,</span> <span class="n">maxdel</span> <span class="o">=</span> <span class="n">data_and_params</span>
+            <span class="n">check_only</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="c1"># added the optional fifth parameter of which indices of x to check</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="p">,</span> <span class="n">maxdel</span><span class="p">,</span> <span class="n">check_only</span> <span class="o">=</span> <span class="n">data_and_params</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Passed invalid &#39;data_and_params&#39; argument: &quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_and_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># some checks</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;x&#39; and &#39;y&#39; need to be NumPy arrays, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="c1"># get sizes</span>
+        <span class="n">num_observations</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_observations</span><span class="p">,</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">num_components</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># get valid array</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="c1"># make output arrays</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_observations</span><span class="p">,</span> <span class="n">num_components</span><span class="p">))</span>
+        <span class="n">probs</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+        <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">probs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># loop over all columns</span>
+        <span class="k">for</span> <span class="n">icomp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_components</span><span class="p">):</span>
+            <span class="c1"># loop through all rows, starting with a shrunken kernel at the edges</span>
+            <span class="c1"># Beginning region</span>
+            <span class="n">halfwindow</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">check_only</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">check_only</span><span class="p">))</span> <span class="ow">or</span> \
+                   <span class="p">(</span><span class="n">halfwindow</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">kernel_size_min</span><span class="p">):</span>
+                    <span class="n">halfwindow</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">continue</span>
+                <span class="n">hyp</span><span class="p">,</span> <span class="n">Del</span><span class="p">,</span> <span class="p">(</span><span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span><span class="p">)</span> <span class="o">=</span> \
+                    <span class="n">StepDetector</span><span class="o">.</span><span class="n">test_single</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                             <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span>
+                                             <span class="n">valid</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span>
+                                             <span class="n">maxdel</span><span class="o">=</span><span class="n">maxdel</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hyp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">probs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">Del</span>
+                <span class="n">var0</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span> <span class="n">var1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span>
+                <span class="n">halfwindow</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Middle region</span>
+            <span class="k">assert</span> <span class="n">halfwindow</span> <span class="o">==</span> <span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">range_main</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">num_observations</span> <span class="o">-</span> <span class="n">halfwindow</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">check_only</span><span class="p">:</span>
+                <span class="n">range_main</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">range_main</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">check_only</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">range_main</span><span class="p">:</span>
+                <span class="n">hyp</span><span class="p">,</span> <span class="n">Del</span><span class="p">,</span> <span class="p">(</span><span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span><span class="p">)</span> <span class="o">=</span> \
+                    <span class="n">StepDetector</span><span class="o">.</span><span class="n">test_single</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                             <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span>
+                                             <span class="n">valid</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span>
+                                             <span class="n">maxdel</span><span class="o">=</span><span class="n">maxdel</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hyp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">probs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">Del</span>
+                <span class="n">var0</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span> <span class="n">var1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span>
+            <span class="c1"># Ending region</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_observations</span> <span class="o">-</span> <span class="n">halfwindow</span><span class="p">,</span> <span class="n">num_observations</span><span class="p">):</span>
+                <span class="n">halfwindow</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">check_only</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">check_only</span><span class="p">))</span> <span class="ow">or</span> \
+                   <span class="p">(</span><span class="n">halfwindow</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">kernel_size_min</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">hyp</span><span class="p">,</span> <span class="n">Del</span><span class="p">,</span> <span class="p">(</span><span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span><span class="p">)</span> <span class="o">=</span> \
+                    <span class="n">StepDetector</span><span class="o">.</span><span class="n">test_single</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                             <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span>
+                                             <span class="n">valid</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span>
+                                             <span class="n">maxdel</span><span class="o">=</span><span class="n">maxdel</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hyp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">probs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">Del</span>
+                <span class="n">var0</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">],</span> <span class="n">var1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">rss0</span><span class="p">,</span> <span class="n">rss1</span>
+        <span class="c1"># return</span>
+        <span class="k">if</span> <span class="n">check_only</span><span class="p">:</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="n">check_only</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_components</span><span class="p">)</span>
+            <span class="n">var0</span> <span class="o">=</span> <span class="n">var0</span><span class="p">[</span><span class="n">check_only</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_components</span><span class="p">)</span>
+            <span class="n">var1</span> <span class="o">=</span> <span class="n">var1</span><span class="p">[</span><span class="n">check_only</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_components</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span>
+
+<div class="viewcode-block" id="StepDetector.search"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that will search for steps in the data.</span>
+<span class="sd">        Upon successful completion, it will return the relative step probabilities</span>
+<span class="sd">        as well as the residuals variances of the two hypotheses tested</span>
+<span class="sd">        (as reported by :meth:`~test_single`).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : numpy.ndarray</span>
+<span class="sd">            Input array of shape :math:`(\text{num_observations},)`.</span>
+<span class="sd">            Should not contain NaNs.</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            Input array of shape :math:`(\text{num_observations}, \text{num_components})`.</span>
+<span class="sd">            Can contain NaNs.</span>
+<span class="sd">        maxdel : float, optional</span>
+<span class="sd">            Difference in AIC that should be considered not significantly better.</span>
+<span class="sd">            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        probabilities : numpy.ndarray</span>
+<span class="sd">            Contains the relative probabilities array.</span>
+<span class="sd">            Has shape :math:`(\text{num_observations}, \text{num_components})`.</span>
+<span class="sd">        var0 : numpy.ndarray</span>
+<span class="sd">            Contains the array of the residuals variance of the hypothesis</span>
+<span class="sd">            that no step is present.</span>
+<span class="sd">            Has shape :math:`(\text{num_observations}, \text{num_components})`.</span>
+<span class="sd">        var1 : numpy.ndarray</span>
+<span class="sd">            Contains the array of the residuals variance of the hypothesis</span>
+<span class="sd">            that a step is present.</span>
+<span class="sd">            Has shape :math:`(\text{num_observations}, \text{num_components})`.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :meth:`~test_single` : For more explanations about the return values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># call individual search function and store result</span>
+        <span class="k">return</span> <span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span><span class="p">,</span> <span class="n">maxdel</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StepDetector.search_network"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector.search_network">[docs]</a>    <span class="k">def</span> <span class="nf">search_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that searches for steps in an entire network (possibly in parallel),</span>
+<span class="sd">        thresholds those probabilities, and identifies all the consecutive ranges in which</span>
+<span class="sd">        steps happen over the network.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        net : geonat.network.Network</span>
+<span class="sd">            Network instance to operate on.</span>
+<span class="sd">        ts_description : str</span>
+<span class="sd">            :class:`~geonat.timeseries.Timeseries` description that will be analyzed.</span>
+<span class="sd">        maxdel : float, optional</span>
+<span class="sd">            Difference in AIC that should be considered not significantly better.</span>
+<span class="sd">            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)</span>
+<span class="sd">        threshold : float, optional</span>
+<span class="sd">            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.</span>
+<span class="sd">        gap : float, optional</span>
+<span class="sd">            Maximum gap between identified steps to count as a continuous period</span>
+<span class="sd">            of possible steps.</span>
+<span class="sd">        gap_unit : str, optional</span>
+<span class="sd">            Time unit of ``gap``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        step_table : pandas.DataFrame</span>
+<span class="sd">            A DataFrame containing the columns ``&#39;station&#39;`` (its name), ``&#39;time&#39;``</span>
+<span class="sd">            (a timestamp of the station) and ``&#39;probability&#39;`` (maximum :math:`\Delta_i`</span>
+<span class="sd">            over all components for this timestamp), as well as ``var0``, ``var1``</span>
+<span class="sd">            (the two hypotheses&#39; residuals variances for the component of</span>
+<span class="sd">            maximum step probability) and ``varred`` (the variance reduction in percent,</span>
+<span class="sd">            ``(var0 - var1) / var0``).</span>
+<span class="sd">        step_ranges : list</span>
+<span class="sd">            A list of lists containing continuous periods over all stations of the potential</span>
+<span class="sd">            steps as determined by ``gap`` and ``gap_unit``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialize DataFrame</span>
+        <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">])</span>
+        <span class="c1"># get the stations who have this timeseries</span>
+        <span class="n">valid_stations</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">station</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                          <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">}</span>
+        <span class="c1"># run parallelized StepDetector._search</span>
+        <span class="n">iterable_input</span> <span class="o">=</span> <span class="p">((</span><span class="n">tvec_to_numpycol</span><span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+                           <span class="n">station</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span><span class="p">,</span> <span class="n">maxdel</span><span class="p">)</span>
+                          <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">valid_stations</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span><span class="p">)</span> <span class="ow">in</span> \
+            <span class="nb">zip</span><span class="p">(</span><span class="n">valid_stations</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">valid_stations</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                <span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">,</span> <span class="n">iterable_input</span><span class="p">),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_stations</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Searching for steps&quot;</span><span class="p">)):</span>
+            <span class="c1"># find steps given the just calculated probabilities</span>
+            <span class="c1"># setting the maximum number of steps to infinite to not miss anything</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">StepDetector</span><span class="o">.</span><span class="n">steps</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># combine all data components and keep largest probability if the step</span>
+            <span class="c1"># is present in multiple components</span>
+            <span class="n">unique_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">steps</span><span class="p">)))</span>
+            <span class="n">stepprobs</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[</span><span class="n">unique_steps</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">stepsvar0</span><span class="p">,</span> <span class="n">stepsvar1</span> <span class="o">=</span> <span class="n">var0</span><span class="p">[</span><span class="n">unique_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">var1</span><span class="p">[</span><span class="n">unique_steps</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">maxprobindices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">stepprobs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">maxstepprobs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">stepprobs</span><span class="p">,</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+            <span class="n">maxstepvar0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">stepsvar0</span><span class="p">,</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+            <span class="n">maxstepvar1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">stepsvar1</span><span class="p">,</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+            <span class="c1"># isolate the actual timestamps and add to the DataFrame</span>
+            <span class="n">steptimes</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">unique_steps</span><span class="p">]</span>
+            <span class="n">step_table</span> <span class="o">=</span> <span class="n">step_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
+                                                         <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
+                                                         <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
+                                                         <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
+                                                         <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}),</span>
+                                           <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># this code could be used to create a model object and assign it to the station</span>
+            <span class="c1"># mdl = geonat.models.Step(steptimes)</span>
+            <span class="c1"># station.add_local_model(ts_description, &quot;Detections&quot;, mdl)</span>
+        <span class="c1"># sort dataframe by probability</span>
+        <span class="n">step_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># get coefficient of partial determination, i.e. how much the variance is reduced</span>
+        <span class="c1"># (in percent) by including a step</span>
+        <span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;varred&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;var0&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;var1&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;var0&quot;</span><span class="p">]</span>
+        <span class="c1"># get the consecutive steptime ranges</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">step_table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">unique_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+            <span class="n">split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">unique_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">Timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">gap_unit</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">gap</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">split</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">step_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="n">unique_steps</span><span class="p">[</span><span class="n">split</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">split</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">split</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">step_ranges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">step_table</span><span class="p">,</span> <span class="n">step_ranges</span></div>
+
+<div class="viewcode-block" id="StepDetector.search_catalog"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector.search_catalog">[docs]</a>    <span class="k">def</span> <span class="nf">search_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">keep_nan_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Search a dictionary of potential step times for each station in the dictionary</span>
+<span class="sd">        and assess the probability for each one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        net : geonat.network.Network</span>
+<span class="sd">            Network instance to operate on.</span>
+<span class="sd">        ts_description : str</span>
+<span class="sd">            :class:`~geonat.timeseries.Timeseries` description that will be analyzed.</span>
+<span class="sd">        catalog : dict, pandas.DataFrame</span>
+<span class="sd">            Dictionary where each key is a station name and its value is a list of</span>
+<span class="sd">            :class:`~pandas.Timestamp` compatible potential times/dates.</span>
+<span class="sd">            Alternatively, a DataFrame with at least the columns ``&#39;station&#39;`` and ``&#39;time&#39;``.</span>
+<span class="sd">        threshold : float, optional</span>
+<span class="sd">            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.</span>
+<span class="sd">        gap : float, optional</span>
+<span class="sd">            Maximum gap between identified steps to count as a continuous period</span>
+<span class="sd">            of possible steps.</span>
+<span class="sd">        gap_unit : str, optional</span>
+<span class="sd">            Time unit of ``gap``.</span>
+<span class="sd">        keep_nan_probs : bool, optional</span>
+<span class="sd">            (Only applies to a DataFrame-type ``catalog`` input.)</span>
+<span class="sd">            If a catalogued station is not in the network, or if a catalogued timestamp</span>
+<span class="sd">            is after the available timeseries, no step probability can be calculated</span>
+<span class="sd">            and the results will contain NaNs.</span>
+<span class="sd">            If ``True`` (default), those entries will be kept in the output, and if</span>
+<span class="sd">            ``False``, they will be dropped.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        step_table : pandas.DataFrame</span>
+<span class="sd">            A DataFrame containing the columns ``&#39;station&#39;`` (its name), ``&#39;time&#39;``</span>
+<span class="sd">            (a timestamp of the station) and ``&#39;probability&#39;`` (maximum :math:`\Delta_i`</span>
+<span class="sd">            over all components for this timestamp) for each potential step in ``catalog``,</span>
+<span class="sd">            as well as ``var0`` and ``var1`` (the two hypotheses&#39; residuals variances</span>
+<span class="sd">            for the component of maximum step probability).</span>
+<span class="sd">            If a DataFrame was passed as ``catalog``, a copy of that will be returned, with</span>
+<span class="sd">            the added columns specified above.</span>
+<span class="sd">        step_ranges : list</span>
+<span class="sd">            A list of lists containing continuous periods over all stations of the potential</span>
+<span class="sd">            steps as determined by ``gap`` and ``gap_unit``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># hard-code maxdel to not filter out any item since we are asking about specific times</span>
+        <span class="n">maxdel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># get a simple dictionary representation if catalog was passed as dictionary</span>
+        <span class="c1"># and set keep_nan_probs if not specified</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">col</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">]]),</span> \
+                <span class="s2">&quot;Invalid input &#39;catalog&#39; DataFrame columns.&quot;</span>
+            <span class="n">catalog_df</span> <span class="o">=</span> <span class="n">catalog</span>
+            <span class="n">catalog</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">catalog_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">))</span>
+            <span class="n">augment_df</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> \
+                <span class="s2">&quot;&#39;catalog&#39; must be either a dictionary or DataFrame.&quot;</span>
+            <span class="n">augment_df</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># initialize DataFrame</span>
+        <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">])</span>
+        <span class="c1"># for each station, find the first time index after a catalogued event</span>
+        <span class="c1"># (alternatively, we could &quot;add&quot; a timestamp without an observation if</span>
+        <span class="c1"># there isn&#39;t a timestamp already present - probably better, but harder)</span>
+        <span class="n">check_indices</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># we also need to keep track of the originally requested time (for the output)</span>
+        <span class="n">catalog_timeexists</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">)</span>
+                              <span class="k">for</span> <span class="n">sta_name</span><span class="p">,</span> <span class="n">steptimes</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">for</span> <span class="n">sta_name</span><span class="p">,</span> <span class="n">steptimes</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># skip if station or timeseries not present</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sta_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> \
+               <span class="p">(</span><span class="n">ts_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">timeseries</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">check_indices</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ist</span><span class="p">,</span> <span class="n">st</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">steptimes</span><span class="p">):</span>
+                <span class="n">index_after</span> <span class="o">=</span> <span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="n">st</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">check_indices</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_after</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># catalogued time is after the last timestamp</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ist</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># run parallelized StepDetector._search</span>
+        <span class="n">stations_overlap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">check_indices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">iterable_input</span> <span class="o">=</span> <span class="p">((</span><span class="n">tvec_to_numpycol</span><span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+                           <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span><span class="p">,</span>
+                           <span class="n">maxdel</span><span class="p">,</span> <span class="n">check_indices</span><span class="p">[</span><span class="n">sta_name</span><span class="p">])</span>
+                          <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">stations_overlap</span><span class="p">)</span>
+        <span class="n">results_iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">,</span> <span class="n">iterable_input</span><span class="p">),</span>
+                                <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">stations_overlap</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span>
+                                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Searching for steps&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stations_overlap</span><span class="p">,</span> <span class="n">results_iterator</span><span class="p">):</span>
+            <span class="c1"># probs now contains a row for each catalog item</span>
+            <span class="c1"># if the probability is NaN, AIC does not see evidence for a step,</span>
+            <span class="c1"># if it is a float, then that&#39;s the likelihood of a step (always positive)</span>
+            <span class="c1"># var0 and var1 can contain values regardless of the entry in probs</span>
+            <span class="n">has_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">probs</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">maxstepprobs</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">maxstepvar0</span><span class="p">,</span> <span class="n">maxstepvar1</span> <span class="o">=</span> <span class="n">var0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">var1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)</span>
+            <span class="n">maxprobindices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">maxstepprobs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">],</span> <span class="n">maxstepvar0</span><span class="p">[</span><span class="n">has_steps</span><span class="p">],</span> <span class="n">maxstepvar1</span><span class="p">[</span><span class="n">has_steps</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">var0</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">var1</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+            <span class="c1"># isolate the original timestamps and add to the DataFrame</span>
+            <span class="n">steptimes</span> <span class="o">=</span> <span class="p">[</span><span class="n">origtime</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">origtime</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                         <span class="k">if</span> <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+            <span class="n">step_table</span> <span class="o">=</span> <span class="n">step_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
+                                                         <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
+                                                         <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
+                                                         <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
+                                                         <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}),</span>
+                                           <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># merge it with the input dataframe, if provided</span>
+        <span class="k">if</span> <span class="n">augment_df</span><span class="p">:</span>
+            <span class="n">catalog_df</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="n">catalog_df</span><span class="p">[</span><span class="s2">&quot;var0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="n">catalog_df</span><span class="p">[</span><span class="s2">&quot;var1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">step_table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">row_location</span> <span class="o">=</span> <span class="p">(</span><span class="n">catalog_df</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">])</span> <span class="o">&amp;</span> \
+                               <span class="p">(</span><span class="n">catalog_df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+                <span class="n">catalog_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_location</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">]]</span> <span class="o">=</span> \
+                    <span class="n">row</span><span class="p">[[</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_nan_probs</span><span class="p">:</span>
+                <span class="n">catalog_df</span> <span class="o">=</span> <span class="n">catalog_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">])</span>
+            <span class="n">step_table</span> <span class="o">=</span> <span class="n">catalog_df</span>
+        <span class="c1"># sort</span>
+        <span class="n">step_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># get coefficient of partial determination, i.e. how much the variance is reduced</span>
+        <span class="c1"># (in percent) by including a step</span>
+        <span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;varred&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;var0&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;var1&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;var0&quot;</span><span class="p">]</span>
+        <span class="c1"># get the consecutive steptime ranges</span>
+        <span class="n">unique_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">unique_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">Timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">gap_unit</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">gap</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">split</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">step_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="n">unique_steps</span><span class="p">[</span><span class="n">split</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">split</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">split</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">step_table</span><span class="p">,</span> <span class="n">step_ranges</span></div>
+
+<div class="viewcode-block" id="StepDetector.steps"><a class="viewcode-back" href="../../geonat/processing.html#geonat.processing.StepDetector.steps">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">steps</span><span class="p">(</span><span class="n">probabilities</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxsteps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Threshold the probabilities to return a list of steps.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        threshold : float, optional</span>
+<span class="sd">            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.</span>
+<span class="sd">        maxsteps : int, optional</span>
+<span class="sd">            Return at most ``maxsteps`` number of steps. Can be useful if a good value for</span>
+<span class="sd">            ``threshold`` has not been found yet.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If ``True`` (default), print warnings when there will be a large number of</span>
+<span class="sd">            steps identified given the ``threshold``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        steps : list</span>
+<span class="sd">            Returns a list of :class:`~numpy.ndarray` arrays that contain the indices of steps</span>
+<span class="sd">            for each component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialize</span>
+        <span class="n">probabilities</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">probabilities</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">icomp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="c1"># find peaks above the threshold</span>
+            <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="n">probabilities</span><span class="p">[:,</span> <span class="n">icomp</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
+            <span class="c1"># if maxsteps is set, reduce steps to that number</span>
+            <span class="k">if</span> <span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="n">maxsteps</span><span class="p">:</span>
+                <span class="n">largest_ix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;peak_heights&quot;</span><span class="p">],</span> <span class="o">-</span><span class="n">maxsteps</span><span class="p">)[</span><span class="o">-</span><span class="n">maxsteps</span><span class="p">:]</span>
+                <span class="n">peaks</span> <span class="o">=</span> <span class="n">peaks</span><span class="p">[</span><span class="n">largest_ix</span><span class="p">]</span>
+                <span class="c1"># warn about the new effective threshold</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In order to return at most </span><span class="si">{</span><span class="n">maxsteps</span><span class="si">}</span><span class="s2"> steps, the threshold has &quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;been increased to </span><span class="si">{</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;peak_heights&#39;</span><span class="p">][</span><span class="n">largest_ix</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="c1"># warn if a large number of steps have been detected</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In component </span><span class="si">{</span><span class="n">icomp</span><span class="si">}</span><span class="s2">, using threshold=</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> leads to &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> of timestamps &quot;</span>
+                              <span class="s2">&quot;being steps. Consider setting a higher threshold.&quot;</span><span class="p">)</span>
+            <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">steps</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Tobias Köhne.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

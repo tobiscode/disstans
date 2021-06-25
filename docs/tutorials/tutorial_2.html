@@ -1,0 +1,827 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Tutorial 2: Advanced Models and Fitting &mdash; GeoNAT 0.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial 3: Incorporating Spatial Coherence" href="tutorial_3.html" />
+    <link rel="prev" title="Tutorial 1: The first synthetic station" href="tutorial_1.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> GeoNAT
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#creating-timeseries-objects">Creating Timeseries objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#fitting-the-models">Fitting the models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_1.html#plotting-the-fit-and-residuals">Plotting the fit and residuals</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 2: Advanced Models and Fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-more-complex-synthetic-data">Creating more complex synthetic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spline-models-for-transients">Spline models for transients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-a-network">Building a Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fitting-an-entire-network">Fitting an entire network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-plotting">Advanced plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comparing-specific-parameters">Comparing specific parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_3.html">Tutorial 3: Incorporating Spatial Coherence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#dreaming-up-a-network">Dreaming up a network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#fantasizing-data">Fantasizing data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#removing-the-common-mode-error">Removing the Common Mode Error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#fitting-the-data-using-reweighted-l1-regularization">Fitting the data using reweighted L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#fitting-the-data-using-a-spatially-aware-l1-reweighting">Fitting the data using a spatially-aware L1 reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#finding-unmodeled-jumps">Finding unmodeled jumps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#making-a-noisy-network">Making a noisy network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#fitting-the-models-with-the-spatial-l0-solver">Fitting the models with the spatial L0 solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#quality-of-the-fits">Quality of the fits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#correlation-of-parameters">Correlation of parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#simple-linear-regression-with-restricted-spline-set">Simple linear regression with restricted spline set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_1.html">Example 1: Long Valley Caldera Transient Motions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#preparations">Preparations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#getting-data">Getting data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#building-the-network">Building the network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#cleaning-the-timeseries">Cleaning the timeseries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#outlier-and-cme-removal">Outlier and CME removal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#first-pass-major-steps-and-noisy-periods">First pass: major steps and noisy periods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/example_1.html#second-pass-minor-catalog-based-steps">Second pass: minor, catalog-based steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../geonat.html">GeoNAT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/compiled.html">Compiled</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/compiled.html#source-code">Source Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#model-parent-class">Model (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#basic-models">Basic Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#arctangent">Arctangent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#logarithmic">Logarithmic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#polynomial">Polynomial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#step">Step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#sinusoidal">Sinusoidal</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/models.html#spline-models">Spline Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#bspline">BSpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/models.html#splineset">SplineSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/processing.html">Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/processing.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#clean">clean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#median">median</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/processing.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/processing.html#stepdetector">StepDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/solvers.html">Solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#lasso-regression">lasso_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#linear-regression">linear_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#ridge-regression">ridge_regression</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#spatialsolver">SpatialSolver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#reweightingfunction">ReweightingFunction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#inversereweighting">InverseReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#inversesquaredreweighting">InverseSquaredReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/solvers.html#logarithmicreweighting">LogarithmicReweighting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/timeseries.html">Timeseries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/timeseries.html#specialized-classes">Specialized Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../geonat/tools.html">Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#get-cov-dims">get_cov_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#make-cov-index-map">make_cov_index_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#cov2corr">cov2corr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../geonat/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#rinexdataholding">RINEXDataHolding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#timedelta">Timedelta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../geonat/tools.html#click">Click</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GeoNAT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../tutorials.html">Tutorials</a> &raquo;</li>
+        
+      <li>Tutorial 2: Advanced Models and Fitting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tutorials/tutorial_2.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial-2-advanced-models-and-fitting">
+<h1>Tutorial 2: Advanced Models and Fitting<a class="headerlink" href="#tutorial-2-advanced-models-and-fitting" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial recreates the basics of the synthetic timeseries example
+as described in Bryan Riel’s <a class="reference internal" href="tutorial_3.html#riel14" id="id1"><span>[riel14]</span></a> paper on detecting geodetic transients.</p>
+</div>
+<p>For this tutorial, we’ll be building on and expanding the workflow from the first one.
+This time though, we’ll first focus a bit more on making the synthetic data, before
+creating the station itself.</p>
+<div class="section" id="creating-more-complex-synthetic-data">
+<h2>Creating more complex synthetic data<a class="headerlink" href="#creating-more-complex-synthetic-data" title="Permalink to this headline">¶</a></h2>
+<p>Let’s start with creating the timestamps for our synthetic data:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t_end_str</span> <span class="o">=</span> <span class="s2">&quot;2020-01-01&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timevector</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next up is the model collection we’re going to use to simulate our data.
+This time, we’ll be using a Polynomial, Sinusoids and some Arctangents.
+If you have any question about this, please refer to the previous tutorial.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.models</span> <span class="kn">import</span> <span class="n">Arctangent</span><span class="p">,</span> <span class="n">Polynomial</span><span class="p">,</span> <span class="n">Sinusoidal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_secular</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_annual</span> <span class="o">=</span> <span class="n">Sinusoidal</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">365.25</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_semiannual</span> <span class="o">=</span> <span class="n">Sinusoidal</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">365.25</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_transient_1</span> <span class="o">=</span> <span class="n">Arctangent</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2002-07-01&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_transient_2</span> <span class="o">=</span> <span class="n">Arctangent</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2010-01-01&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_transient_3</span> <span class="o">=</span> <span class="n">Arctangent</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2016-01-01&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_coll_synth</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Secular&quot;</span><span class="p">:</span> <span class="n">mdl_secular</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="s2">&quot;Annual&quot;</span><span class="p">:</span> <span class="n">mdl_annual</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="s2">&quot;Semi-Annual&quot;</span><span class="p">:</span> <span class="n">mdl_semiannual</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="s2">&quot;Transient_1&quot;</span><span class="p">:</span> <span class="n">mdl_transient_1</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="s2">&quot;Transient_2&quot;</span><span class="p">:</span> <span class="n">mdl_transient_2</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="s2">&quot;Transient_3&quot;</span><span class="p">:</span> <span class="n">mdl_transient_3</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Now, if we give these model objects to our station and perform fitting, their parameters
+will be overwritten (it’s one of those Python caveats). So, let’s take this time here
+to create a “deep” copy that we will then use for fitting. (Because fitting Arctangents
+is hard, we’ll omit them here, and try to approximate them with other models later.)</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_coll</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">({</span><span class="s2">&quot;Secular&quot;</span><span class="p">:</span> <span class="n">mdl_secular</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="s2">&quot;Annual&quot;</span><span class="p">:</span> <span class="n">mdl_annual</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="s2">&quot;Semi-Annual&quot;</span><span class="p">:</span> <span class="n">mdl_semiannual</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Now that we have a copy for safekeeping, we can add the “true” parameters to the models:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_secular</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="o">/</span><span class="p">(</span><span class="mi">20</span><span class="o">*</span><span class="mf">365.25</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_annual</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_semiannual</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_transient_1</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">40</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_transient_2</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_transient_3</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">20</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>We can evaluate them just like before:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sum_seas_sec</span> <span class="o">=</span> <span class="n">mdl_secular</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span> \
+<span class="gp">... </span>               <span class="o">+</span> <span class="n">mdl_annual</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span> \
+<span class="gp">... </span>               <span class="o">+</span> <span class="n">mdl_semiannual</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sum_transient</span> <span class="o">=</span> <span class="n">mdl_transient_1</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span> \
+<span class="gp">... </span>                <span class="o">+</span> <span class="n">mdl_transient_2</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span> \
+<span class="gp">... </span>                <span class="o">+</span> <span class="n">mdl_transient_3</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sum_all_models</span> <span class="o">=</span> <span class="n">sum_seas_sec</span> <span class="o">+</span> <span class="n">sum_transient</span>
+</pre></div>
+</div>
+<p>Our noise this time has two components: white and colored. For the white noise,
+we can just use NumPy’s default functions, but for the colored noise, we have to use
+GeoNAT’s <a class="reference internal" href="../geonat/tools.html#geonat.tools.create_powerlaw_noise" title="geonat.tools.create_powerlaw_noise"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_powerlaw_noise()</span></code></a> function:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.tools</span> <span class="kn">import</span> <span class="n">create_powerlaw_noise</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">white_noise</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">colored_noise</span> <span class="o">=</span> <span class="n">create_powerlaw_noise</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="gp">... </span>                                      <span class="n">exponent</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sum_noise</span> <span class="o">=</span> <span class="n">white_noise</span> <span class="o">+</span> <span class="n">colored_noise</span>
+</pre></div>
+</div>
+<p>Our synthetic data is then just the sum of the ground truth <code class="docutils literal notranslate"><span class="pre">sum_all_models</span></code>
+and the total noise <code class="docutils literal notranslate"><span class="pre">sum_noise</span></code>:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">synth_data</span> <span class="o">=</span> <span class="n">sum_all_models</span> <span class="o">+</span> <span class="n">sum_noise</span>
+</pre></div>
+</div>
+<p>Let’s have a look what we fabricated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pandas.plotting</span> <span class="kn">import</span> <span class="n">register_matplotlib_converters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">register_matplotlib_converters</span><span class="p">()</span>  <span class="c1"># improve how time data looks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">sum_seas_sec</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Seasonal + Secular&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">sum_transient</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Transient&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.5&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Noise&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">synth_data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+<span class="gp">... </span>         <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Synthetic Data&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Displacement [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2a.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2a.png" src="../_images/tutorial_2a.png" />
+<p>This looks close to the example in <a class="reference internal" href="tutorial_3.html#riel14" id="id2"><span>[riel14]</span></a>. We can see that there are some significant
+transients alongside a strong secular signal, and seasonal signals plus the colored
+noise make it look a bit more realistic.</p>
+</div>
+<div class="section" id="spline-models-for-transients">
+<h2>Spline models for transients<a class="headerlink" href="#spline-models-for-transients" title="Permalink to this headline">¶</a></h2>
+<p>How do we model the transients though? For this, we will use an over-complete set
+of basis functions, built by a collection of integrated B-Splines. For more on that,
+see the class documentations for <a class="reference internal" href="../geonat/models.html#geonat.models.BSpline" title="geonat.models.BSpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">BSpline</span></code></a> and
+<a class="reference internal" href="../geonat/models.html#geonat.models.ISpline" title="geonat.models.ISpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISpline</span></code></a>. There is a simple <a class="reference internal" href="../geonat/models.html#geonat.models.SplineSet" title="geonat.models.SplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineSet</span></code></a>
+constructor class that takes care of that for us, which we’ll directly add to our
+model collection from before:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat.models</span> <span class="kn">import</span> <span class="n">ISpline</span><span class="p">,</span> <span class="n">SplineSet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_coll</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SplineSet</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                                  <span class="n">t_center_start</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
+<span class="gp">... </span>                                  <span class="n">t_center_end</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span>
+<span class="gp">... </span>                                  <span class="n">list_num_knots</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span>
+<span class="gp">... </span>                                  <span class="n">splineclass</span><span class="o">=</span><span class="n">ISpline</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It creates sets of integrated B-Splines of degree 2, with the timespan
+covered to be that of our synthetic timeseries, and then divided into 4, 8, etc.
+subintervals. The <code class="docutils literal notranslate"><span class="pre">splineclass</span></code> parameter only makes it clear that we want a set of
+<a class="reference internal" href="../geonat/models.html#geonat.models.ISpline" title="geonat.models.ISpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISpline</span></code></a>, but we could have omitted it, as it’s the default
+behavior.</p>
+</div>
+<div class="section" id="building-a-network">
+<h2>Building a Network<a class="headerlink" href="#building-a-network" title="Permalink to this headline">¶</a></h2>
+<p>Now, we’re ready to build our synthetic network and add our generated data.
+Again, we start by creating a <a class="reference internal" href="../geonat/station.html#geonat.station.Station" title="geonat.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> object, but this time,
+we’ll also assign it to a <a class="reference internal" href="../geonat/network.html#geonat.network.Network" title="geonat.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> object:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geonat</span> <span class="kn">import</span> <span class="n">Network</span><span class="p">,</span> <span class="n">Station</span><span class="p">,</span> <span class="n">Timeseries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;TutorialLand&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat_name</span> <span class="o">=</span> <span class="s2">&quot;TUT&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caltech_lla</span> <span class="o">=</span> <span class="p">(</span><span class="mf">34.1375</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.125</span><span class="p">,</span> <span class="mi">263</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">net_name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span> <span class="o">=</span> <span class="n">Station</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">stat_name</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="n">location</span><span class="o">=</span><span class="n">caltech_lla</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="n">stat_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that the stations internal name <a class="reference internal" href="../geonat/station.html#geonat.station.Station.name" title="geonat.station.Station.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></a> does not
+have to match the network’s name of that station in
+<a class="reference internal" href="../geonat/network.html#geonat.network.Network.stations" title="geonat.network.Network.stations"><code class="xref py py-class docutils literal notranslate"><span class="pre">stations</span></code></a>, but it avoids confusion.</p>
+<p><code class="docutils literal notranslate"><span class="pre">net[stat_name]</span> <span class="pre">=</span> <span class="pre">synth_stat</span></code> is equivalent to
+<code class="docutils literal notranslate"><span class="pre">net.add_station(stat_name,</span> <span class="pre">synth_stat)</span></code>.</p>
+</div>
+<p>Add the generated timeseries (including models), as well as the ground truth
+to the station:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">timevector</span><span class="o">=</span><span class="n">timevector</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">data</span><span class="o">=</span><span class="n">synth_data</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">src</span><span class="o">=</span><span class="s2">&quot;synthetic&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Total&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">truth</span> <span class="o">=</span> <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">timevector</span><span class="o">=</span><span class="n">timevector</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data</span><span class="o">=</span><span class="n">sum_all_models</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">src</span><span class="o">=</span><span class="s2">&quot;synthetic&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Total&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">truth</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="o">.</span><span class="n">add_local_model_dict</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">model_dict</span><span class="o">=</span><span class="n">mdl_coll</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fitting-an-entire-network">
+<h2>Fitting an entire network<a class="headerlink" href="#fitting-an-entire-network" title="Permalink to this headline">¶</a></h2>
+<p>At this point, we’re ready to do the fitting using the simple linear non-regularized
+least-squares we used in the previous tutorial:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;linear_regression&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_noreg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We saved a lot of lines and hassle compared to the previous fitting by using the
+<a class="reference internal" href="../geonat/network.html#geonat.network.Network" title="geonat.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> methods. Let’s calculate the residuals and errors,
+and print some statistics:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_noreg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_noreg&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_noreg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_noreg&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_noreg&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">TUT: Res_noreg                          Mean  Standard Deviation</span>
+<span class="go">Total-Displacement_Model_Total  1.622931e-08            2.046006</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="advanced-plotting">
+<h2>Advanced plotting<a class="headerlink" href="#advanced-plotting" title="Permalink to this headline">¶</a></h2>
+<p>What do our fit, residuals (between the observations and our fit) and errors
+(between the fit and the true displacement signal) look like compared to the
+data and noise?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="kn">import</span> <span class="n">Line2D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Synthetic&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_noreg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fit&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Displacement [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;No Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_noreg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_noreg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_noreg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Error [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;0.3&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">custom_lines</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Residual&quot;</span><span class="p">,</span> <span class="s2">&quot;True Noise&quot;</span><span class="p">,</span> <span class="s2">&quot;Error&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower left&quot;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2b.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2b.png" src="../_images/tutorial_2b.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As expected with any regular least-squares minimization, the residuals look like a
+zero-mean Gaussian distribution. The true noise, plotted for comparison, contains
+colored noise, and therefore is not Gaussian. Because our solver has no way of
+knowing what is true noise and small transient signals, it assumes that all the
+transient it sees are part of the displacement signal to fit. Therefore, our
+error tracks the noise. This behaviour will not change significantly throughout
+this second tutorial, but will be addressed in the third tutorial.</p>
+</div>
+<p>We can use a scalogram (see <a class="reference internal" href="../geonat/models.html#geonat.models.SplineSet.make_scalogram" title="geonat.models.SplineSet.make_scalogram"><code class="xref py py-meth docutils literal notranslate"><span class="pre">make_scalogram()</span></code></a>) to visualize
+the coefficient values of our spline collection, and quickly understand that without
+regularization, the set is quite heavily populated in order to minimize the residuals:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">make_scalogram</span><span class="p">(</span><span class="n">t_left</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">t_right</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">cmaprange</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;No Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2c.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2c.png" src="../_images/tutorial_2c.png" />
+</div>
+<div class="section" id="repeat-with-l2-regularization">
+<h2>Repeat with L2 regularization<a class="headerlink" href="#repeat-with-l2-regularization" title="Permalink to this headline">¶</a></h2>
+<p>Now, we can do the exact same thing as above, but choose a ridge regression (L2-regularized)
+solver:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;ridge_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_L2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L2&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L2&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L2&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">TUT: Res_L2                             Mean  Standard Deviation</span>
+<span class="go">Total-Displacement_Model_Total  1.503516e-09            2.087589</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Synthetic&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fit&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Displacement [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;L2 Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Error [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;0.3&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">custom_lines</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Residual&quot;</span><span class="p">,</span> <span class="s2">&quot;True Noise&quot;</span><span class="p">,</span> <span class="s2">&quot;Error&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower left&quot;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2d.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2d.png" src="../_images/tutorial_2d.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">make_scalogram</span><span class="p">(</span><span class="n">t_left</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">t_right</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">cmaprange</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;L2 Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2e.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2e.png" src="../_images/tutorial_2e.png" />
+<p>We can see that L2 regularization has significantly reduced the magnitude of the splines
+used in the fitting, and the fit overall (see the residual statistics) appears to be
+better. However, most splines are actually non-zero. This might produced the best fit,
+but our physical knowledge of the processes happening tell us that our station is not
+always moving - there are discrete processes. A higher penalty parameter might make
+those parameters even smaller, but they will not become significantly sparser.</p>
+</div>
+<div class="section" id="repeat-with-l1-regularization">
+<h2>Repeat with L1 regularization<a class="headerlink" href="#repeat-with-l1-regularization" title="Permalink to this headline">¶</a></h2>
+<p>Using L1-regularized lasso regression, we finally hope to get rid of all the small,
+basically-zero splines in the transient dictionary:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_L1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L1&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">TUT: Res_L1                         Mean  Standard Deviation</span>
+<span class="go">Total-Displacement_Model_Total  0.000003            2.121952</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Synthetic&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fit&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Displacement [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;L1 Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Error [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;0.3&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">custom_lines</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Residual&quot;</span><span class="p">,</span> <span class="s2">&quot;True Noise&quot;</span><span class="p">,</span> <span class="s2">&quot;Error&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower left&quot;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2f.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2f.png" src="../_images/tutorial_2f.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">make_scalogram</span><span class="p">(</span><span class="n">t_left</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">t_right</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">cmaprange</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;L1 Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2g.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2g.png" src="../_images/tutorial_2g.png" />
+<p>This looks much better - the scalogram now shows us that we only select splines around
+where we put the Arctangent models, and is close to zero otherwise.</p>
+</div>
+<div class="section" id="adding-reweighting-iterations">
+<h2>Adding reweighting iterations<a class="headerlink" href="#adding-reweighting-iterations" title="Permalink to this headline">¶</a></h2>
+<p>Okay, one last thing about fitting, I promise. L1 regularization aims to penalize the sum of
+the absolute values of our model parameters. However, that’s also not actually what we want.
+In fact, transient signals in the real world have no constraint to be as small as possible.
+However, the <em>number</em> of transients should be the one that is minimized. That is what is
+mathematically referred to as L0 regularization, but is sadly not an easy problem to solve
+rigorously.</p>
+<p>However, by modifying an additional weight of each regularized parameter, that drives small
+values even closer to zero, but leaves significant values unperturbed, one can approximate
+such an L0 regularization by iteratively solving the L1-regularized problem. That is exactly
+what the option <code class="docutils literal notranslate"><span class="pre">reweight_max_iters</span></code> does. You can find more information about it in
+the notes of <a class="reference internal" href="../geonat/solvers.html#geonat.solvers.lasso_regression" title="geonat.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>. Let’s try it:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L1R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L1R&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">TUT: Res_L1R                            Mean  Standard Deviation</span>
+<span class="go">Total-Displacement_Model_Total  9.511043e-08            2.117921</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Synthetic&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fit&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Displacement [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Reweighted L1 Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Error [mm]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;0.3&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                <span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">custom_lines</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Residual&quot;</span><span class="p">,</span> <span class="s2">&quot;True Noise&quot;</span><span class="p">,</span> <span class="s2">&quot;Error&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower left&quot;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2h.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2h.png" src="../_images/tutorial_2h.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">make_scalogram</span><span class="p">(</span><span class="n">t_left</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">t_right</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span>
+<span class="gp">... </span>                                                                  <span class="n">cmaprange</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Reweighted L1 Regularization&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;tutorial_2i.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2i.png" src="../_images/tutorial_2i.png" />
+<p>As you can see, the significant components of the splines have now been emphasized when
+compared to the previous scalogram, and all the values that were small but not really
+zero in the previous case are now <em>really</em> close to zero.</p>
+</div>
+<div class="section" id="comparing-specific-parameters">
+<h2>Comparing specific parameters<a class="headerlink" href="#comparing-specific-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Before we finish up, let’s just print some differences between the ground truth and our
+L1R-fitted model:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reldiff_sec</span> <span class="o">=</span> <span class="p">(</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span>
+<span class="gp">... </span>               <span class="o">/</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reldiff_ann_amp</span> <span class="o">=</span> <span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amplitude</span> \
+<span class="gp">... </span>                  <span class="o">/</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reldiff_sem_amp</span> <span class="o">=</span> <span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amplitude</span> \
+<span class="gp">... </span>                  <span class="o">/</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amplitude</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">absdiff_ann_ph</span> <span class="o">=</span> <span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span> \
+<span class="gp">... </span>                  <span class="o">-</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">absdiff_sem_ph</span> <span class="o">=</span> <span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span> \
+<span class="gp">... </span>                  <span class="o">-</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Percent Error Constant:              </span><span class="si">{</span><span class="n">reldiff_sec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2"> %</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Percent Error Linear:                </span><span class="si">{</span><span class="n">reldiff_sec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2"> %</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Percent Error Annual Amplitude:      </span><span class="si">{</span><span class="n">reldiff_ann_amp</span><span class="si">:</span><span class="s2"> %</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Percent Error Semi-Annual Amplitude: </span><span class="si">{</span><span class="n">reldiff_sem_amp</span><span class="si">:</span><span class="s2"> %</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Absolute Error Annual Phase:         </span><span class="si">{</span><span class="n">absdiff_ann_ph</span><span class="si">:</span><span class="s2"> f</span><span class="si">}</span><span class="s2"> rad</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Absolute Error Semi-Annual Phase:    </span><span class="si">{</span><span class="n">absdiff_sem_ph</span><span class="si">:</span><span class="s2"> f</span><span class="si">}</span><span class="s2"> rad&quot;</span><span class="p">)</span>
+<span class="go">Percent Error Constant:              -44.023921%</span>
+<span class="go">Percent Error Linear:                 20.780108%</span>
+<span class="go">Percent Error Annual Amplitude:      -0.233888%</span>
+<span class="go">Percent Error Semi-Annual Amplitude:  0.061881%</span>
+<span class="go">Absolute Error Annual Phase:          0.016006 rad</span>
+<span class="go">Absolute Error Semi-Annual Phase:    -0.017135 rad</span>
+</pre></div>
+</div>
+<p>Apart from the trade-off between the polynomial trend and long-term splines, which can be
+expected in this synthetic example, we got pretty close to our ground truth. Let’s finish
+up by calculating an average velocity of the station using
+<a class="reference internal" href="../geonat/station.html#geonat.station.Station.get_trend" title="geonat.station.Station.get_trend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_trend()</span></code></a> around the time when it’s rapidly moving
+(around the middle of 2002). We don’t want a normal trend through the data, since that
+is also influenced by the secular velocity, the noise, etc., so we choose to only fit our
+transient model:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trend</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">get_trend</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">fit_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                          <span class="n">t_start</span><span class="o">=</span><span class="s2">&quot;2002-06-01&quot;</span><span class="p">,</span> <span class="n">t_end</span><span class="o">=</span><span class="s2">&quot;2002-08-01&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transient Velocity: </span><span class="si">{</span><span class="n">trend</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ts</span><span class="o">.</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">/D&quot;</span><span class="p">)</span>
+<span class="go">Transient Velocity: 0.121516 mm/D</span>
+</pre></div>
+</div>
+<p>We can use average velocities like these when we want to create velocity maps for
+certain episodes.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="tutorial_3.html" class="btn btn-neutral float-right" title="Tutorial 3: Incorporating Spatial Coherence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorial_1.html" class="btn btn-neutral float-left" title="Tutorial 1: The first synthetic station" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Tobias Köhne.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

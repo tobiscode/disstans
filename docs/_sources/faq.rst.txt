@@ -1,0 +1,8 @@
+Frequently Asked Questions
+==========================
+
+#. Parametric vs. non-parametric solvers.
+
+   - Not discussed here, philosophical difference.
+
+#. Test
