@@ -1623,7 +1623,7 @@ class ModelCollection():
         Example
         -------
         If ``mc`` is a :class:`~ModelCollection` instance, and we want to check whether
-        ``'mymodel'`` is a model in the collection, the following two are equivalent:
+        ``'mymodel'`` is a model in the collection, the following two are equivalent::
 
             # long version
             'mymodel' in mc.collection
