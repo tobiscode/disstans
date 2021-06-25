@@ -8,6 +8,7 @@ Welcome to GeoNAT's documentation!
 
    installation
    tutorials
+   examples
 
 
 .. toctree::
