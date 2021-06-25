@@ -74,7 +74,7 @@ class Model():
         if the boundary value should be used (attribute :attr:`~zero_after`).
     """
 
-    EVAL_PREDVAR_PRECISION = np.single
+    EVAL_PREDVAR_PRECISION = np.dtype(np.single)
     """
     To reduce memory impact when estimating the full covariance of the predicted
     timeseries when calling :meth:`~evaluate`, this attribute is by default set to
@@ -1516,7 +1516,7 @@ class ModelCollection():
     :attr:`~geonat.models.Model.par`.
     """
 
-    EVAL_PREDVAR_PRECISION = np.single
+    EVAL_PREDVAR_PRECISION = np.dtype(np.single)
     """
     To reduce memory impact when estimating the full covariance of the predicted
     timeseries when calling :meth:`~evaluate`, this attribute is by default set to

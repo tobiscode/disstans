@@ -37,7 +37,8 @@ release = geonat_version
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
               'sphinx.ext.napoleon', 'sphinx.ext.viewcode',
               'sphinx_rtd_theme', 'sphinx.ext.intersphinx',
-              'sphinx.ext.mathjax', 'sphinx.ext.autosectionlabel']
+              'sphinx.ext.mathjax', 'sphinx.ext.autosectionlabel',
+              'sphinxcontrib.video']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -70,7 +71,8 @@ html_static_path = ['_static']
 # autodoc settings
 # add_module_names = False
 autodoc_default_options = {'undoc-members': True,
-                           'exclude-members': '__init__, __module__, __dict__, __weakref__',
+                           'exclude-members': '__init__, __module__, __dict__, '
+                                              '__weakref__, __hash__',
                            'member-order': 'groupwise'}
 
 # intersphinx settings
