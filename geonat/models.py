@@ -49,6 +49,13 @@ class Model():
     the parameters, and then evaluate it later. For synthetic timeseries, it is
     instantiated and the parameters are set manually.
 
+    A minimal user-defined subclass should look similar to :class:`~geonat.models.Polynomial`
+    or :class:`~geonat.models.Exponential`. Three methods need to be provided: an
+    ``__init__()`` function that takes in any model-specific parameters and passes all
+    other parameters into the parent class through ``super().__init__()``, as well as
+    both :meth:`~_get_mapping` and :meth:`~_get_arch` (see the base class' documentation
+    for expected in- and output).
+
     Parameters
     ----------
     num_parameters : int
@@ -251,13 +258,12 @@ class Model():
     def _get_arch(self):
         """
         Subclass-specific model keyword dictionary.
-        Must have keys ``'type'`` and ``'kw_args'``, the latter having another
-        dictionary as value.
 
         Returns
         -------
         arch : dict
-            Model keyword dictionary.
+            Model keyword dictionary. Must have keys ``'type'`` and ``'kw_args'``,
+            with a string and a dictionary as values, respectively.
         """
         raise NotImplementedError("Instantiated model was not subclassed or "
                                   "it does not overwrite the '_get_arch' method.")
@@ -407,12 +413,13 @@ class Model():
         timevector : pandas.Series, pandas.DatetimeIndex
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
-            It can be assumed that only timestamps that are valid (i.e., defined by the model's
-            :attr:`~zero_before` and :attr:`~zero_after`).
+            It can and should be assumed that all included timestamps are valid
+            (i.e., defined by the model's :attr:`~zero_before` and :attr:`~zero_after`).
 
         Returns
         -------
-        numpy.ndarray : Mapping matrix with the same number of rows as ``timevector`` and
+        coefs : numpy.ndarray
+            Mapping matrix with the same number of rows as ``timevector`` and
             :attr:`~num_parameters` columns.
         """
         raise NotImplementedError("'Model' needs to be subclassed and its child needs to "

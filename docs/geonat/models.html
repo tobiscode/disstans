@@ -368,6 +368,12 @@ and is zero or continuous outside of that interval (see the attributes
 <p>The usual workflow is to instantiate a model, then fit it to a timeseries, saving
 the parameters, and then evaluate it later. For synthetic timeseries, it is
 instantiated and the parameters are set manually.</p>
+<p>A minimal user-defined subclass should look similar to <a class="reference internal" href="#geonat.models.Polynomial" title="geonat.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a>
+or <a class="reference internal" href="#geonat.models.Exponential" title="geonat.models.Exponential"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exponential</span></code></a>. Three methods need to be provided: an
+<code class="docutils literal notranslate"><span class="pre">__init__()</span></code> function that takes in any model-specific parameters and passes all
+other parameters into the parent class through <code class="docutils literal notranslate"><span class="pre">super().__init__()</span></code>, as well as
+both <a class="reference internal" href="#geonat.models.Model._get_mapping" title="geonat.models.Model._get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_mapping()</span></code></a> and <a class="reference internal" href="#geonat.models.Model._get_arch" title="geonat.models.Model._get_arch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_arch()</span></code></a> (see the base class’ documentation
+for expected in- and output).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -441,12 +447,11 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 <dl class="py method">
 <dt class="sig sig-object py" id="geonat.models.Model._get_arch">
 <span class="sig-name descname"><span class="pre">_get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/models.html#Model._get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.models.Model._get_arch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subclass-specific model keyword dictionary.
-Must have keys <code class="docutils literal notranslate"><span class="pre">'type'</span></code> and <code class="docutils literal notranslate"><span class="pre">'kw_args'</span></code>, the latter having another
-dictionary as value.</p>
+<dd><p>Subclass-specific model keyword dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>arch</strong> – Model keyword dictionary.</p>
+<dd class="field-odd"><p><strong>arch</strong> – Model keyword dictionary. Must have keys <code class="docutils literal notranslate"><span class="pre">'type'</span></code> and <code class="docutils literal notranslate"><span class="pre">'kw_args'</span></code>,
+with a string and a dictionary as values, respectively.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
@@ -463,14 +468,15 @@ for the active period. Called inside <a class="reference internal" href="#geonat
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.
-It can be assumed that only timestamps that are valid (i.e., defined by the model’s
-<a class="reference internal" href="#geonat.models.Model.zero_before" title="geonat.models.Model.zero_before"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_before</span></code></a> and <a class="reference internal" href="#geonat.models.Model.zero_after" title="geonat.models.Model.zero_after"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_after</span></code></a>).</p>
+It can and should be assumed that all included timestamps are valid
+(i.e., defined by the model’s <a class="reference internal" href="#geonat.models.Model.zero_before" title="geonat.models.Model.zero_before"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_before</span></code></a> and <a class="reference internal" href="#geonat.models.Model.zero_after" title="geonat.models.Model.zero_after"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_after</span></code></a>).</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>numpy.ndarray</strong> – <a class="reference internal" href="#geonat.models.Model.num_parameters" title="geonat.models.Model.num_parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_parameters</span></code></a> columns.</p>
+<dd class="field-even"><p><strong>coefs</strong> – Mapping matrix with the same number of rows as <code class="docutils literal notranslate"><span class="pre">timevector</span></code> and
+<a class="reference internal" href="#geonat.models.Model.num_parameters" title="geonat.models.Model.num_parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_parameters</span></code></a> columns.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Mapping matrix with the same number of rows as <code class="docutils literal notranslate"><span class="pre">timevector</span></code> and</p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -381,6 +381,13 @@
 <span class="sd">    the parameters, and then evaluate it later. For synthetic timeseries, it is</span>
 <span class="sd">    instantiated and the parameters are set manually.</span>
 
+<span class="sd">    A minimal user-defined subclass should look similar to :class:`~geonat.models.Polynomial`</span>
+<span class="sd">    or :class:`~geonat.models.Exponential`. Three methods need to be provided: an</span>
+<span class="sd">    ``__init__()`` function that takes in any model-specific parameters and passes all</span>
+<span class="sd">    other parameters into the parent class through ``super().__init__()``, as well as</span>
+<span class="sd">    both :meth:`~_get_mapping` and :meth:`~_get_arch` (see the base class&#39; documentation</span>
+<span class="sd">    for expected in- and output).</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    num_parameters : int</span>
@@ -583,13 +590,12 @@
 <div class="viewcode-block" id="Model._get_arch"><a class="viewcode-back" href="../../geonat/models.html#geonat.models.Model._get_arch">[docs]</a>    <span class="k">def</span> <span class="nf">_get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Subclass-specific model keyword dictionary.</span>
-<span class="sd">        Must have keys ``&#39;type&#39;`` and ``&#39;kw_args&#39;``, the latter having another</span>
-<span class="sd">        dictionary as value.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        arch : dict</span>
-<span class="sd">            Model keyword dictionary.</span>
+<span class="sd">            Model keyword dictionary. Must have keys ``&#39;type&#39;`` and ``&#39;kw_args&#39;``,</span>
+<span class="sd">            with a string and a dictionary as values, respectively.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Instantiated model was not subclassed or &quot;</span>
                                   <span class="s2">&quot;it does not overwrite the &#39;_get_arch&#39; method.&quot;</span><span class="p">)</span></div>
@@ -739,12 +745,13 @@
 <span class="sd">        timevector : pandas.Series, pandas.DatetimeIndex</span>
 <span class="sd">            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a</span>
 <span class="sd">            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.</span>
-<span class="sd">            It can be assumed that only timestamps that are valid (i.e., defined by the model&#39;s</span>
-<span class="sd">            :attr:`~zero_before` and :attr:`~zero_after`).</span>
+<span class="sd">            It can and should be assumed that all included timestamps are valid</span>
+<span class="sd">            (i.e., defined by the model&#39;s :attr:`~zero_before` and :attr:`~zero_after`).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray : Mapping matrix with the same number of rows as ``timevector`` and</span>
+<span class="sd">        coefs : numpy.ndarray</span>
+<span class="sd">            Mapping matrix with the same number of rows as ``timevector`` and</span>
 <span class="sd">            :attr:`~num_parameters` columns.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;&#39;Model&#39; needs to be subclassed and its child needs to &quot;</span>
