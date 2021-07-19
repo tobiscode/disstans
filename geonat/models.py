@@ -538,7 +538,8 @@ class Model():
         dict
             Dictionary with the keys ``time`` containing the input time vector,
             ``fit`` containing :math:`\mathbf{d}`, and ``var`` containing
-            the formal variance (or ``None``, if not present).
+            the formal variance (or ``None``, if not present). ``fit`` and ``var``
+            (if not ``None``) are :class:`~numpy.ndarray` objects.
 
         Raises
         ------

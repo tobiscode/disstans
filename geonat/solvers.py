@@ -467,10 +467,10 @@ class LogarithmicReweighting(ReweightingFunction):
 def linear_regression(ts, models, formal_covariance=False,
                       use_data_variance=True, use_data_covariance=True):
     r"""
-    Performs linear, unregularized least squares using :mod:`~scipy.sparse.linalg`.
+    Performs linear, unregularized least squares using :mod:`~scipy.linalg`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
-    matrices are stacked together to form a single, sparse mapping matrix
+    matrices are stacked together to form a single mapping matrix
     :math:`\mathbf{G}`. The solver then computes the model parameters
     :math:`\mathbf{m}` that minimize the cost function
 
@@ -479,9 +479,8 @@ def linear_regression(ts, models, formal_covariance=False,
     where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual.
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
-    :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),
-    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`
-    are replaced by their weighted versions
+    :math:`\mathbf{C}_d`, this information can be used. In this case,
+    :math:`\mathbf{G}` and :math:`\mathbf{d}` are replaced by their weighted versions
 
     .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}
 
@@ -552,10 +551,10 @@ def linear_regression(ts, models, formal_covariance=False,
 def ridge_regression(ts, models, penalty, formal_covariance=False,
                      use_data_variance=True, use_data_covariance=True):
     r"""
-    Performs linear, L2-regularized least squares using :mod:`~scipy.sparse.linalg`.
+    Performs linear, L2-regularized least squares using :mod:`~scipy.linalg`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
-    matrices are stacked together to form a single, sparse mapping matrix
+    matrices are stacked together to form a single mapping matrix
     :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver then
     computes the model parameters :math:`\mathbf{m}` that minimize the cost function
 
@@ -567,9 +566,8 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
     not designated to be regularized (see :attr:`~geonat.models.Model.regularize`).
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
-    :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),
-    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`
-    are replaced by their weighted versions
+    :math:`\mathbf{C}_d`, this information can be used. In this case,
+    :math:`\mathbf{G}` and :math:`\mathbf{d}` are replaced by their weighted versions
 
     .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}
 
@@ -1082,7 +1080,7 @@ class SpatialSolver():
               extended_stats=False, num_threads_evaluate=None,
               cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
         r"""
-        Solve the network-wide fitting problem as follows:
+        Solve the network-wide fitting problem as proposed by [riel14]_:
 
             1.  Fit the models individually using a single iteration step from
                 :func:`~lasso_regression`.
@@ -1163,6 +1161,14 @@ class SpatialSolver():
         cvxpy_kw_args : dict
             Additional keyword arguments passed on to CVXPY's ``solve()`` function,
             see ``cvxpy_kw_args`` in :func:`~lasso_regression`.
+
+        References
+        ----------
+
+        .. [riel14] Riel, B., Simons, M., Agram, P., & Zhan, Z. (2014). *Detecting transient
+           signals in geodetic time series using sparse estimation techniques*.
+           Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
+           doi:`10.1002/2014JB011077 <https://doi.org/10.1002/2014JB011077>`_
         """
         # input tests
         assert isinstance(spatial_reweight_models, list) and \
