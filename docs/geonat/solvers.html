@@ -465,7 +465,7 @@ reweighting functions for the same input parameters can differ significantly, ev
 with the same <code class="docutils literal notranslate"><span class="pre">penalty</span></code>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
-<dt class="label" id="candes08"><span class="brackets">candes08</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>)</span></dt>
+<dt class="label" id="candes08"><span class="brackets">candes08</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>)</span></dt>
 <dd><p>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008).
 <em>Enhancing Sparsity by Reweighted</em> <span class="math notranslate nohighlight">\(\ell_1\)</span> <em>Minimization.</em>
 Journal of Fourier Analysis and Applications, 14(5), 877–905.
@@ -480,18 +480,17 @@ doi:<a class="reference external" href="https://doi.org/10.1007/s00041-008-9045-
 <dl class="py function">
 <dt class="sig sig-object py" id="geonat.solvers.linear_regression">
 <span class="sig-prename descclassname"><span class="pre">geonat.solvers.</span></span><span class="sig-name descname"><span class="pre">linear_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/solvers.html#linear_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.solvers.linear_regression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs linear, unregularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.6.3/reference/sparse.linalg.html#module-scipy.sparse.linalg" title="(in SciPy v1.6.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
+<dd><p>Performs linear, unregularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.6.3/reference/linalg.html#module-scipy.linalg" title="(in SciPy v1.6.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
 <p>The timeseries are the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and the models’ mapping
-matrices are stacked together to form a single, sparse mapping matrix
+matrices are stacked together to form a single mapping matrix
 <span class="math notranslate nohighlight">\(\mathbf{G}\)</span>. The solver then computes the model parameters
 <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> that minimize the cost function</p>
 <div class="math notranslate nohighlight">
 \[f(\mathbf{m}) = \left\| \mathbf{Gm} - \mathbf{d} \right\|_2^2\]</div>
 <p>where <span class="math notranslate nohighlight">\(\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}\)</span> is the residual.</p>
 <p>If the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> include a covariance matrix
-<span class="math notranslate nohighlight">\(\mathbf{C}_d\)</span> (incorporating <cite>var_cols</cite> and possibly also <cite>cov_cols</cite>),
-this data will be used. In this case, <span class="math notranslate nohighlight">\(\mathbf{G}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>
-are replaced by their weighted versions</p>
+<span class="math notranslate nohighlight">\(\mathbf{C}_d\)</span>, this information can be used. In this case,
+<span class="math notranslate nohighlight">\(\mathbf{G}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> are replaced by their weighted versions</p>
 <div class="math notranslate nohighlight">
 \[\mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}\]</div>
 <p>and</p>
@@ -527,9 +526,9 @@ uncertainty information will be used.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="geonat.solvers.ridge_regression">
 <span class="sig-prename descclassname"><span class="pre">geonat.solvers.</span></span><span class="sig-name descname"><span class="pre">ridge_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/solvers.html#ridge_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.solvers.ridge_regression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs linear, L2-regularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.6.3/reference/sparse.linalg.html#module-scipy.sparse.linalg" title="(in SciPy v1.6.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
+<dd><p>Performs linear, L2-regularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.6.3/reference/linalg.html#module-scipy.linalg" title="(in SciPy v1.6.3)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
 <p>The timeseries are the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and the models’ mapping
-matrices are stacked together to form a single, sparse mapping matrix
+matrices are stacked together to form a single mapping matrix
 <span class="math notranslate nohighlight">\(\mathbf{G}\)</span>. Given the penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>, the solver then
 computes the model parameters <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> that minimize the cost function</p>
 <div class="math notranslate nohighlight">
@@ -539,9 +538,8 @@ computes the model parameters <span class="math notranslate nohighlight">\(\math
 and the subscript <span class="math notranslate nohighlight">\(_\text{reg}\)</span> masks to zero the model parameters
 not designated to be regularized (see <a class="reference internal" href="models.html#geonat.models.Model.regularize" title="geonat.models.Model.regularize"><code class="xref py py-attr docutils literal notranslate"><span class="pre">regularize</span></code></a>).</p>
 <p>If the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> include a covariance matrix
-<span class="math notranslate nohighlight">\(\mathbf{C}_d\)</span> (incorporating <cite>var_cols</cite> and possibly also <cite>cov_cols</cite>),
-this data will be used. In this case, <span class="math notranslate nohighlight">\(\mathbf{G}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>
-are replaced by their weighted versions</p>
+<span class="math notranslate nohighlight">\(\mathbf{C}_d\)</span>, this information can be used. In this case,
+<span class="math notranslate nohighlight">\(\mathbf{G}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{d}\)</span> are replaced by their weighted versions</p>
 <div class="math notranslate nohighlight">
 \[\mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}\]</div>
 <p>and</p>
@@ -600,7 +598,7 @@ in <a class="reference internal" href="#geonat.solvers.SpatialSolver.solve" titl
 <dl class="py method">
 <dt class="sig sig-object py" id="geonat.solvers.SpatialSolver.solve">
 <span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_iters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_max_rms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_max_changed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continuous_reweight_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_reweight_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_reweight_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_reweight_coupled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_internal_scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extended_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads_evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvxpy_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'kktsolver':</span> <span class="pre">'robust',</span> <span class="pre">'solver':</span> <span class="pre">'CVXOPT'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/solvers.html#SpatialSolver.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.solvers.SpatialSolver.solve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Solve the network-wide fitting problem as follows:</p>
+<dd><p>Solve the network-wide fitting problem as proposed by <a class="reference internal" href="#riel14" id="id2"><span>[riel14]</span></a>:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Fit the models individually using a single iteration step from
@@ -664,6 +662,15 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">None</s
 <li><p><strong>cvxpy_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments passed on to CVXPY’s <code class="docutils literal notranslate"><span class="pre">solve()</span></code> function,
 see <code class="docutils literal notranslate"><span class="pre">cvxpy_kw_args</span></code> in <a class="reference internal" href="#geonat.solvers.lasso_regression" title="geonat.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p></li>
 </ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="riel14"><span class="brackets"><a class="fn-backref" href="#id2">riel14</a></span></dt>
+<dd><p>Riel, B., Simons, M., Agram, P., &amp; Zhan, Z. (2014). <em>Detecting transient
+signals in geodetic time series using sparse estimation techniques</em>.
+Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
+doi:<a class="reference external" href="https://doi.org/10.1002/2014JB011077">10.1002/2014JB011077</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1112,7 +1119,7 @@ and return an initialized instance of it.</p>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="geonat.solvers.InverseReweighting.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/solvers.html#InverseReweighting.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.solvers.InverseReweighting.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reweighting function based on the inverse of the input based on <a class="reference internal" href="#candes08" id="id2"><span>[candes08]</span></a>:</p>
+<dd><p>Reweighting function based on the inverse of the input based on <a class="reference internal" href="#candes08" id="id3"><span>[candes08]</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[w(m_j) = \frac{1}{|m_j| + \text{eps}}\]</div>
 <dl class="field-list simple">
@@ -1133,7 +1140,7 @@ and return an initialized instance of it.</p>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="geonat.solvers.InverseSquaredReweighting.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/solvers.html#InverseSquaredReweighting.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.solvers.InverseSquaredReweighting.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reweighting function based on the inverse squared of the input based on <a class="reference internal" href="#candes08" id="id3"><span>[candes08]</span></a>:</p>
+<dd><p>Reweighting function based on the inverse squared of the input based on <a class="reference internal" href="#candes08" id="id4"><span>[candes08]</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}\]</div>
 <dl class="field-list simple">
@@ -1154,7 +1161,7 @@ and return an initialized instance of it.</p>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="geonat.solvers.LogarithmicReweighting.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geonat/solvers.html#LogarithmicReweighting.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geonat.solvers.LogarithmicReweighting.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reweighting function based on the logarithm of the input based on <a class="reference internal" href="#andrecut11" id="id4"><span>[andrecut11]</span></a>:</p>
+<dd><p>Reweighting function based on the logarithm of the input based on <a class="reference internal" href="#andrecut11" id="id5"><span>[andrecut11]</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[w(m_j) = \log_\text{num_reg} \frac{ \| \mathbf{m} \|_1 +
 \text{num_reg} \cdot \text{eps}}{|m_j| + \text{eps}}\]</div>
@@ -1166,7 +1173,7 @@ and return an initialized instance of it.</p>
 </dl>
 <p class="rubric">References</p>
 <dl class="citation">
-<dt class="label" id="andrecut11"><span class="brackets"><a class="fn-backref" href="#id4">andrecut11</a></span></dt>
+<dt class="label" id="andrecut11"><span class="brackets"><a class="fn-backref" href="#id5">andrecut11</a></span></dt>
 <dd><p>Andrecut, M. (2011).
 <em>Stochastic Recovery Of Sparse Signals From Random Measurements.</em>
 Engineering Letters, 19(1), 1-6.</p>

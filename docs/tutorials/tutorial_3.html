@@ -128,7 +128,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -802,7 +801,7 @@ network), we need to think of a better way to reduce the number of unique spline
 </div>
 <div class="section" id="fitting-the-data-using-a-spatially-aware-l1-reweighting">
 <h2>Fitting the data using a spatially-aware L1 reweighting<a class="headerlink" href="#fitting-the-data-using-a-spatially-aware-l1-reweighting" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="#riel14" id="id1"><span>[riel14]</span></a> solves the problem by alternating between a station-specific solution, and a step
+<p><a class="reference internal" href="../geonat/solvers.html#riel14" id="id1"><span>[riel14]</span></a> solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
 updated based on a weighting scheme. In GeoNAT, this is handled by the
 <a class="reference internal" href="../geonat/solvers.html#geonat.solvers.SpatialSolver" title="geonat.solvers.SpatialSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialSolver</span></code></a> class, where more information about its algorithm
@@ -1342,17 +1341,6 @@ of the network, where the signal is close or below the noise floor.</p>
 <p>One very visible outlier is the station Corko: it contains the unmodeled maintenance
 step that can only be fit by the short-term splines. In a second iteration of analyzing this
 synthetic network, one would of course model the step at Corko for a better fit.</p>
-</div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="citation">
-<dt class="label" id="riel14"><span class="brackets"><a class="fn-backref" href="#id1">riel14</a></span></dt>
-<dd><p>Riel, B., Simons, M., Agram, P., &amp; Zhan, Z. (2014).
-<em>Detecting transient signals in geodetic time series using sparse estimation techniques</em>.
-Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
-doi:<a class="reference external" href="https://doi.org/10.1002/2014JB011077">10.1002/2014JB011077</a></p>
-</dd>
-</dl>
 </div>
 </div>
 

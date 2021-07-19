@@ -799,10 +799,10 @@
 <div class="viewcode-block" id="linear_regression"><a class="viewcode-back" href="../../geonat/solvers.html#geonat.solvers.linear_regression">[docs]</a><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Performs linear, unregularized least squares using :mod:`~scipy.sparse.linalg`.</span>
+<span class="sd">    Performs linear, unregularized least squares using :mod:`~scipy.linalg`.</span>
 
 <span class="sd">    The timeseries are the observations :math:`\mathbf{d}`, and the models&#39; mapping</span>
-<span class="sd">    matrices are stacked together to form a single, sparse mapping matrix</span>
+<span class="sd">    matrices are stacked together to form a single mapping matrix</span>
 <span class="sd">    :math:`\mathbf{G}`. The solver then computes the model parameters</span>
 <span class="sd">    :math:`\mathbf{m}` that minimize the cost function</span>
 
@@ -811,9 +811,8 @@
 <span class="sd">    where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual.</span>
 
 <span class="sd">    If the observations :math:`\mathbf{d}` include a covariance matrix</span>
-<span class="sd">    :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),</span>
-<span class="sd">    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`</span>
-<span class="sd">    are replaced by their weighted versions</span>
+<span class="sd">    :math:`\mathbf{C}_d`, this information can be used. In this case,</span>
+<span class="sd">    :math:`\mathbf{G}` and :math:`\mathbf{d}` are replaced by their weighted versions</span>
 
 <span class="sd">    .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}</span>
 
@@ -884,10 +883,10 @@
 <div class="viewcode-block" id="ridge_regression"><a class="viewcode-back" href="../../geonat/solvers.html#geonat.solvers.ridge_regression">[docs]</a><span class="k">def</span> <span class="nf">ridge_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">penalty</span><span class="p">,</span> <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Performs linear, L2-regularized least squares using :mod:`~scipy.sparse.linalg`.</span>
+<span class="sd">    Performs linear, L2-regularized least squares using :mod:`~scipy.linalg`.</span>
 
 <span class="sd">    The timeseries are the observations :math:`\mathbf{d}`, and the models&#39; mapping</span>
-<span class="sd">    matrices are stacked together to form a single, sparse mapping matrix</span>
+<span class="sd">    matrices are stacked together to form a single mapping matrix</span>
 <span class="sd">    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver then</span>
 <span class="sd">    computes the model parameters :math:`\mathbf{m}` that minimize the cost function</span>
 
@@ -899,9 +898,8 @@
 <span class="sd">    not designated to be regularized (see :attr:`~geonat.models.Model.regularize`).</span>
 
 <span class="sd">    If the observations :math:`\mathbf{d}` include a covariance matrix</span>
-<span class="sd">    :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),</span>
-<span class="sd">    this data will be used. In this case, :math:`\mathbf{G}` and :math:`\mathbf{d}`</span>
-<span class="sd">    are replaced by their weighted versions</span>
+<span class="sd">    :math:`\mathbf{C}_d`, this information can be used. In this case,</span>
+<span class="sd">    :math:`\mathbf{G}` and :math:`\mathbf{d}` are replaced by their weighted versions</span>
 
 <span class="sd">    .. math:: \mathbf{G} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{G}</span>
 
@@ -1414,7 +1412,7 @@
               <span class="n">extended_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_threads_evaluate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
               <span class="n">cvxpy_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;CVXOPT&quot;</span><span class="p">,</span> <span class="s2">&quot;kktsolver&quot;</span><span class="p">:</span> <span class="s2">&quot;robust&quot;</span><span class="p">}):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Solve the network-wide fitting problem as follows:</span>
+<span class="sd">        Solve the network-wide fitting problem as proposed by [riel14]_:</span>
 
 <span class="sd">            1.  Fit the models individually using a single iteration step from</span>
 <span class="sd">                :func:`~lasso_regression`.</span>
@@ -1495,6 +1493,14 @@
 <span class="sd">        cvxpy_kw_args : dict</span>
 <span class="sd">            Additional keyword arguments passed on to CVXPY&#39;s ``solve()`` function,</span>
 <span class="sd">            see ``cvxpy_kw_args`` in :func:`~lasso_regression`.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        .. [riel14] Riel, B., Simons, M., Agram, P., &amp; Zhan, Z. (2014). *Detecting transient</span>
+<span class="sd">           signals in geodetic time series using sparse estimation techniques*.</span>
+<span class="sd">           Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.</span>
+<span class="sd">           doi:`10.1002/2014JB011077 &lt;https://doi.org/10.1002/2014JB011077&gt;`_</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># input tests</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spatial_reweight_models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> \

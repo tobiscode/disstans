@@ -1238,11 +1238,3 @@ of the network, where the signal is close or below the noise floor.
 One very visible outlier is the station Corko: it contains the unmodeled maintenance
 step that can only be fit by the short-term splines. In a second iteration of analyzing this
 synthetic network, one would of course model the step at Corko for a better fit.
-
-References
-----------
-
-.. [riel14] Riel, B., Simons, M., Agram, P., & Zhan, Z. (2014).
-   *Detecting transient signals in geodetic time series using sparse estimation techniques*.
-   Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
-   doi:`10.1002/2014JB011077 <https://doi.org/10.1002/2014JB011077>`_
