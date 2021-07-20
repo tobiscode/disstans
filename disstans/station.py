@@ -1,7 +1,7 @@
 """
 This module contains the :class:`~Station` class, which is the main
-component of a :class:`~geonat.network.Network` and contains
-:class:`~geonat.timeseries.Timeseries`, :class:`~geonat.models.Model` and
+component of a :class:`~disstans.network.Network` and contains
+:class:`~disstans.timeseries.Timeseries`, :class:`~disstans.models.Model` and
 associated fits.
 """
 
@@ -12,7 +12,7 @@ import scipy.sparse as sparse
 from copy import deepcopy
 from warnings import warn
 
-from . import models as geonat_models
+from . import models as disstans_models
 from .timeseries import Timeseries
 from .models import Model, ModelCollection, AllFits
 from .tools import tvec_to_numpycol
@@ -42,11 +42,11 @@ class Station():
         self.timeseries = {}
         """
         Dictionary of timeseries, where the keys are their string descriptions
-        and the values are :class:`~geonat.timeseries.Timeseries` instances.
+        and the values are :class:`~disstans.timeseries.Timeseries` instances.
         """
         self.models = {}
         """
-        Dictionary of :class:`~geonat.models.ModelCollection` objects associated
+        Dictionary of :class:`~disstans.models.ModelCollection` objects associated
         with a timeseries saved in :attr:`~timeseries`.
 
         Example
@@ -63,7 +63,7 @@ class Station():
         """
         self.fits = {}
         """
-        Dictionary of dictionaries of fitted :class:`~geonat.timeseries.Timeseries`
+        Dictionary of dictionaries of fitted :class:`~disstans.timeseries.Timeseries`
         associated with a timeseries saved in :attr:`~timeseries`.
 
         Example
@@ -106,7 +106,7 @@ class Station():
 
         Returns
         -------
-        geonat.timeseries.Timeseries
+        disstans.timeseries.Timeseries
             Timeseries in station.
 
         Example
@@ -194,14 +194,14 @@ class Station():
 
         See Also
         --------
-        geonat.network.Network.to_json
+        disstans.network.Network.to_json
             Export the Network configuration as a JSON file.
-        geonat.timeseries.Timeseries.get_arch
+        disstans.timeseries.Timeseries.get_arch
             Get the architecture dictionary of a
-            :class:`~geonat.timeseries.Timeseries` instance.
-        geonat.models.Model.get_arch
+            :class:`~disstans.timeseries.Timeseries` instance.
+        disstans.models.Model.get_arch
             Get the architecture dictionary of a
-            :class:`~geonat.models.Model` instance.
+            :class:`~disstans.models.Model` instance.
         """
         # create empty dictionary
         stat_arch = {"location": self.location,
@@ -230,29 +230,29 @@ class Station():
         ----------
         ts_description : str
             Description of the timeseries.
-        timeseries : geonat.timeseries.Timeseries
+        timeseries : disstans.timeseries.Timeseries
             Timeseries object to add.
-        uncertainties_from : geonat.timeseries.Timeseries, optional
+        uncertainties_from : disstans.timeseries.Timeseries, optional
             If the variance and covariance data should come from another timeseries,
             specify the source timeseries here.
         override_src : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.src`
+            Override the :attr:`~disstans.timeseries.Timeseries.src`
             attribute of ``timeseries``.
         override_data_unit : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.data_unit`
+            Override the :attr:`~disstans.timeseries.Timeseries.data_unit`
             attribute of ``timeseries``.
         override_data_cols : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.data_cols`
+            Override the :attr:`~disstans.timeseries.Timeseries.data_cols`
             attribute of ``timeseries``.
         override_var_cols : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.var_cols`
+            Override the :attr:`~disstans.timeseries.Timeseries.var_cols`
             attribute of ``timeseries``.
         override_cov_cols : str, optional
-            Override the :attr:`~geonat.timeseries.Timeseries.cov_cols`
+            Override the :attr:`~disstans.timeseries.Timeseries.cov_cols`
             attribute of ``timeseries``.
         add_models : dict, optional
             Dictionary of models to add to the timeseries, where the keys are the
-            model description and the values are :class:`~geonat.models.Model` objects.
+            model description and the values are :class:`~disstans.models.Model` objects.
 
         See Also
         --------
@@ -261,7 +261,7 @@ class Station():
         Example
         -------
         If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description
-        of a new timeseries, and ``ts`` a :class:`~geonat.timeseries.Timeseries` instance,
+        of a new timeseries, and ``ts`` a :class:`~disstans.timeseries.Timeseries` instance,
         then the following two are equivalent::
 
             stat.add_timeseries(ts_description, timeseries)
@@ -335,7 +335,7 @@ class Station():
             Timeseries to add the model to.
         model_description : str
             Model description.
-        model : geonat.models.Model
+        model : disstans.models.Model
             Model object.
         """
         if not isinstance(ts_description, str):
@@ -388,10 +388,10 @@ class Station():
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
             to create each model object.
         """
-        geonat_models.check_model_dict(model_kw_args)
+        disstans_models.check_model_dict(model_kw_args)
         for mdl_desc, mdl_cfg in model_kw_args.items():
             local_copy = deepcopy(mdl_cfg)
-            mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
+            mdl = getattr(disstans_models, local_copy["type"])(**local_copy["kw_args"])
             self.add_local_model(ts_description=ts_description,
                                  model_description=mdl_desc, model=mdl)
 
@@ -449,13 +449,13 @@ class Station():
 
         Returns
         -------
-        fit_ts : geonat.timeseries.Timeseries
+        fit_ts : disstans.timeseries.Timeseries
             (If ``return_ts=True``.) The fit as a Timeseries object.
 
         See Also
         --------
-        geonat.timeseries.Timeseries.from_fit
-            Convert a fit dictionary to a :class:`~geonat.timeseries.Timeseries` object.
+        disstans.timeseries.Timeseries.from_fit
+            Convert a fit dictionary to a :class:`~disstans.timeseries.Timeseries` object.
         """
         if not isinstance(ts_description, str):
             raise TypeError("Cannot add new fit: 'ts_description' is not a string.")

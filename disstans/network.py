@@ -1,6 +1,6 @@
 """
-This module contains the :class:`~geonat.network.Network` class, which is the
-highest-level container object in GeoNAT.
+This module contains the :class:`~disstans.network.Network` class, which is the
+highest-level container object in disstans.
 """
 
 import numpy as np
@@ -17,10 +17,10 @@ from matplotlib.animation import FuncAnimation
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
 
-from . import timeseries as geonat_ts
-from . import models as geonat_models
-from . import solvers as geonat_solvers
-from . import processing as geonat_processing
+from . import timeseries as disstans_ts
+from . import models as disstans_models
+from . import solvers as disstans_solvers
+from . import processing as disstans_processing
 from .models import ALLFITS
 from .config import defaults
 from .timeseries import Timeseries
@@ -32,7 +32,7 @@ from .earthquakes import okada_displacement
 
 class Network():
     r"""
-    Main class of GeoNAT. Contains information about the network, defines defaults,
+    Main class of disstans. Contains information about the network, defines defaults,
     and most improtantly, contains a dictionary of all stations in the network.
 
     Parameters
@@ -79,7 +79,7 @@ class Network():
         -------
 
         If ``net`` is a Network instance, the following adds an annual
-        :class:`~geonat.models.Sinusoidal` model::
+        :class:`~disstans.models.Sinusoidal` model::
 
             models = {"Annual": {"type": "Sinusoidal",
                                  "kw_args": {"period": 365.25,
@@ -90,7 +90,7 @@ class Network():
         self.stations = {}
         """
         Dictionary of network stations, where the keys are their string names
-        and the values are their :class:`~geonat.station.Station` objects.
+        and the values are their :class:`~disstans.station.Station` objects.
         """
         # try to preload the location data
         # it's a private attribute because there's no guarantee this will be kept
@@ -170,7 +170,7 @@ class Network():
 
         Returns
         -------
-        geonat.station.Station
+        disstans.station.Station
             Station in network.
 
         Example
@@ -255,12 +255,12 @@ class Network():
     def export_network_ts(self, ts_description, subset_stations=None):
         """
         Collects a specific timeseries from all stations and returns them in a dictionary
-        of network-wide :class:`~geonat.timeseries.Timeseries` objects.
+        of network-wide :class:`~disstans.timeseries.Timeseries` objects.
 
         Parameters
         ----------
         ts_description : str, tuple
-            :class:`~geonat.timeseries.Timeseries` description that will be collected
+            :class:`~disstans.timeseries.Timeseries` description that will be collected
             from all stations in the network. If a tuple, specifies the timeseries
             and name of a fitted model for the timeseries at each station.
         subset_stations : list, optional
@@ -271,7 +271,7 @@ class Network():
         -------
         network_df : dict
             Dictionary with the data components of the ``ts_description`` timeseries
-            as keys and :class:`~geonat.timeseries.Timeseries` objects as values
+            as keys and :class:`~disstans.timeseries.Timeseries` objects as values
             (which will have in turn the station names as column names).
 
         See Also
@@ -321,16 +321,16 @@ class Network():
 
     def import_network_ts(self, ts_description, dict_of_timeseries):
         """
-        Distributes a dictionary of network-wide :class:`~geonat.timeseries.Timeseries`
+        Distributes a dictionary of network-wide :class:`~disstans.timeseries.Timeseries`
         objects onto the network stations.
 
         Parameters
         ----------
         ts_description : str
-            :class:`~geonat.timeseries.Timeseries` description where the data will be placed.
+            :class:`~disstans.timeseries.Timeseries` description where the data will be placed.
         dict_of_timeseries : dict
             Dictionary with the data components of the ``ts_description`` timeseries
-            as keys and :class:`~geonat.timeseries.Timeseries` objects as values
+            as keys and :class:`~disstans.timeseries.Timeseries` objects as values
             (which will have in turn the station names as column names).
 
         See Also
@@ -357,7 +357,7 @@ class Network():
         ----------
         name : str
             Name of the station.
-        station : geonat.station.Station
+        station : disstans.station.Station
             Station object to add.
 
         See Also
@@ -367,7 +367,7 @@ class Network():
         Example
         -------
         If ``net`` is a :class:`~Network` instance, ``name`` the name of a new station,
-        and ``station`` a :class:`~geonat.station.Station` instance, then the following
+        and ``station`` a :class:`~disstans.station.Station` instance, then the following
         two are equivalent::
 
             net.add_station(name, station)
@@ -441,7 +441,7 @@ class Network():
     def from_json(cls, path, add_default_local_models=True,
                   station_kw_args={}, timeseries_kw_args={}):
         """
-        Create a :class:`~geonat.network.Network` instance from a JSON configuration file.
+        Create a :class:`~disstans.network.Network` instance from a JSON configuration file.
 
         Parameters
         ----------
@@ -451,14 +451,14 @@ class Network():
             If false, skip the adding of any default local model found in a station.
         station_kw_args : dict, optional
             Additional keyword arguments passed on to the
-            :class:`~geonat.station.Station` constructor.
+            :class:`~disstans.station.Station` constructor.
         timeseries_kw_args : dict, optional
             Additional keyword arguments passed on to the
-            :class:`~geonat.timeseries.Timeseries` constructor.
+            :class:`~disstans.timeseries.Timeseries` constructor.
 
         Returns
         -------
-        net : geonat.network.Network
+        net : disstans.network.Network
             Network instance.
 
         See Also
@@ -487,7 +487,7 @@ class Network():
             station = Station(name=station_name, location=station_loc, **station_kw_args)
             # add timeseries to station
             for ts_description, ts_cfg in station_cfg["timeseries"].items():
-                ts_class = getattr(geonat_ts, ts_cfg["type"])
+                ts_class = getattr(disstans_ts, ts_cfg["type"])
                 ts = ts_class(**ts_cfg["kw_args"], **timeseries_kw_args)
                 station.add_timeseries(ts_description=ts_description, timeseries=ts)
                 # add default local models to station
@@ -516,7 +516,7 @@ class Network():
 
         See Also
         --------
-        from_json : Create a :class:`~geonat.network.Network` instance
+        from_json : Create a :class:`~disstans.network.Network` instance
             from a JSON configuration file.
         """
         # create new dictionary
@@ -548,9 +548,9 @@ class Network():
         models : dict
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
-            to create each model object (see :func:`~geonat.models.check_model_dict`).
+            to create each model object (see :func:`~disstans.models.check_model_dict`).
         """
-        geonat_models.check_model_dict(models)
+        disstans_models.check_model_dict(models)
         self.default_local_models.update(models)
 
     def add_default_local_models(self, ts_description, models=None):
@@ -589,7 +589,7 @@ class Network():
         for station in self:
             for model_description, model_cfg in local_models_subset.items():
                 local_copy = deepcopy(model_cfg)
-                mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
+                mdl = getattr(disstans_models, local_copy["type"])(**local_copy["kw_args"])
                 station.add_local_model(ts_description=ts_description,
                                         model_description=model_description,
                                         model=mdl)
@@ -647,7 +647,7 @@ class Network():
         models : dict
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
-            to create each model object (see :func:`~geonat.models.check_model_dict`).
+            to create each model object (see :func:`~disstans.models.check_model_dict`).
         ts_description : str
             Timeseries to add the models to.
         station_subset : list, optional
@@ -661,14 +661,14 @@ class Network():
             assert len(station_list) > 0, "No valid stations in 'station_subset'."
         else:
             station_list = self.stations.values()
-        geonat_models.check_model_dict(models)
+        disstans_models.check_model_dict(models)
         # loop over stations
         for station in station_list:
             if ts_description not in station.timeseries:
                 continue
             for model_description, model_cfg in models.items():
                 local_copy = deepcopy(model_cfg)
-                mdl = getattr(geonat_models, local_copy["type"])(**local_copy["kw_args"])
+                mdl = getattr(disstans_models, local_copy["type"])(**local_copy["kw_args"])
                 station.add_local_model(ts_description=ts_description,
                                         model_description=model_description,
                                         model=mdl)
@@ -685,7 +685,7 @@ class Network():
 
         See Also
         --------
-        geonat.station.Station.remove_timeseries : Station-specific equivalent
+        disstans.station.Station.remove_timeseries : Station-specific equivalent
         """
         for station in self:
             for ts_description in ts_to_remove:
@@ -712,7 +712,7 @@ class Network():
     def load_maintenance_dict(self, maint_dict, ts_description, model_description,
                               only_active=True):
         """
-        Convenience wrapper to add :class:`~geonat.models.Step` models to the stations
+        Convenience wrapper to add :class:`~disstans.models.Step` models to the stations
         in the network where they experienced maitenance and therefore likely a jump
         in station coordinates.
 
@@ -732,7 +732,7 @@ class Network():
 
         See Also
         --------
-        :class:`~geonat.models.Step` : Model used to add steps.
+        :class:`~disstans.models.Step` : Model used to add steps.
         """
         assert all([isinstance(station, str) for station in maint_dict.keys()]), \
             f"Keys in 'maint_dict' must be strings, got {maint_dict.keys()}."
@@ -748,12 +748,12 @@ class Network():
                 else:
                     localsteps = steptimes
                 self[station].add_local_model(ts_description, model_description,
-                                              geonat_models.Step(localsteps))
+                                              disstans_models.Step(localsteps))
 
     def freeze(self, ts_description, model_list=None, zero_threshold=1e-10):
         """
-        Convenience method that calls :meth:`~geonat.models.Model.freeze`
-        for the :class:`~geonat.models.ModelCollection` for a certain
+        Convenience method that calls :meth:`~disstans.models.Model.freeze`
+        for the :class:`~disstans.models.ModelCollection` for a certain
         timeseries at every station.
 
         Parameters
@@ -812,7 +812,7 @@ class Network():
             Description of the timeseries to fit.
         solver : str, function, optional
             Solver function to use. If given a string, will look for a solver with that
-            name in :mod:`~geonat.solvers`, otherwise will use the passed function as a
+            name in :mod:`~disstans.solvers`, otherwise will use the passed function as a
             solver (which needs to adhere to the same input/output structure as the
             included solver functions). Defaults to standard linear least squares.
         local_input : dict, optional
@@ -830,7 +830,7 @@ class Network():
         -------
         solutions : dict, optional
             If ``return_solutions=True``, a dictionary that contains the
-            :class:`~geonat.solvers.Solution` objects for each station.
+            :class:`~disstans.solvers.Solution` objects for each station.
 
         Example
         -------
@@ -843,22 +843,22 @@ class Network():
                 station_models = station.models['mydata']
                 sol = mysolver(station_ts, station_models, **kw_args)
                 station_models.read_parameters(sol.parameters_zeroed, sol.covariances_zeroed)
-            # short version, automatically parallelizes according to geonat.defaults,
-            # also allows skipping the import of geonat.solvers
+            # short version, automatically parallelizes according to disstans.defaults,
+            # also allows skipping the import of disstans.solvers
             net.fit('mydata', solver='lasso_regression', **kw_args)
 
         See Also
         --------
         evaluate : Evaluate the fitted models at all stations.
-        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
-        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~disstans.config.defaults` : Dictionary of settings, including parallelization.
+        disstans.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         assert isinstance(ts_description, str), \
             f"'ts_description' must be string, got {type(ts_description)}."
         assert any([ts_description in station.timeseries.keys() for station in self]), \
             f"Could not find any station with a timeseries called '{ts_description}'."
         if isinstance(solver, str):
-            solver = getattr(geonat_solvers, solver)
+            solver = getattr(disstans_solvers, solver)
         assert callable(solver), f"'solver' must be a callable function, got {type(solver)}."
         progress_desc = str(progress_desc) if progress_desc else "Fitting station models"
         station_names = [name for name, station in self.stations.items()
@@ -929,16 +929,16 @@ class Network():
                 for (model_description, model) in station_models.items():
                     fit = model.evaluate(station_ts)
                     station.add_fit('mydata', model_description, fit)
-            # short version, automatically parallelizes according to geonat.defaults,
+            # short version, automatically parallelizes according to disstans.defaults,
             # and creating a new timeseries
             net.evaluate('mydata', output_description='evaluated')
 
         See Also
         --------
         fit : Fit models at all stations.
-        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
-        :attr:`~geonat.models.ALLFITS` : Key used to denote the joint fit using all models.
-        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~disstans.config.defaults` : Dictionary of settings, including parallelization.
+        :attr:`~disstans.models.ALLFITS` : Key used to denote the joint fit using all models.
+        disstans.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         assert isinstance(ts_description, str), \
             f"'ts_description' must be string, got {type(ts_description)}."
@@ -1036,8 +1036,8 @@ class Network():
         --------
         evaluate : Evaluate the fitted models at all stations.
         fit : Fit models at all stations.
-        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
-        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~disstans.config.defaults` : Dictionary of settings, including parallelization.
+        disstans.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         if progress_desc is not None:
             assert (isinstance(progress_desc, tuple) or isinstance(progress_desc, list)) \
@@ -1071,7 +1071,7 @@ class Network():
         ----------
         func : str, function
             Function to use. If provided with a string, will check for that function in
-            :mod:`~geonat.processing`, otherwise the function will be assumed to adhere
+            :mod:`~disstans.processing`, otherwise the function will be assumed to adhere
             to the same input and output format than the included ones.
         ts_in : str
             Name of the timeseries to use as input to ``func``.
@@ -1092,28 +1092,28 @@ class Network():
                 ts_in = station.timeseries['input']
                 ts_out = func(ts_in, **kw_args)
                 station.add_timeseries('output', ts_out)
-            # short version, automatically parallelizes according to geonat.defaults
+            # short version, automatically parallelizes according to disstans.defaults
             net.call_func_ts_return(func, 'input', ts_out='output', **kw_args)
-            # if using a geonat.processing function, no need to import that function
+            # if using a disstans.processing function, no need to import that function
             net.call_func_ts_return('clean', 'input', ts_out='output', **kw_args)
 
         See Also
         --------
-        :attr:`~geonat.config.defaults` : Dictionary of settings, including parallelization.
-        geonat.tools.parallelize : Automatically execute a function in parallel or serial.
+        :attr:`~disstans.config.defaults` : Dictionary of settings, including parallelization.
+        disstans.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         if not callable(func):
             if isinstance(func, str):
                 try:
-                    func = getattr(geonat_processing, func)
+                    func = getattr(disstans_processing, func)
                 except AttributeError as e:
                     raise AttributeError(
-                        f"'{func}' can not be found as a function in geonat.processing."
+                        f"'{func}' can not be found as a function in disstans.processing."
                         ).with_traceback(e.__traceback__) from e
             else:
                 raise RuntimeError(f"'{func}' needs to be a function or a string "
                                    "representation thereof "
-                                   "(if loaded from geonat.processing).")
+                                   "(if loaded from disstans.processing).")
         assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(ts_in)}."
         if ts_out is None:
             ts_out = ts_in
@@ -1144,7 +1144,7 @@ class Network():
         ----------
         func : str, function
             Function to use. If provided with a string, will check for that function in
-            :mod:`~geonat.processing`, otherwise the function will be assumed to adhere
+            :mod:`~disstans.processing`, otherwise the function will be assumed to adhere
             to the same input and output format than the included ones.
         ts_in : str
             Name of the timeseries to use as input to ``func``.
@@ -1166,7 +1166,7 @@ class Network():
             net.import_network_ts('output', net_out)
             # short version
             net.call_netwide_func(func, ts_in='input, ts_out='output', **kw_args)
-            # the short version also knows about the functions in geonat.processing
+            # the short version also knows about the functions in disstans.processing
             net.call_netwide_func('common_mode', ts_in='input, ts_out='output', **kw_args)
 
         See Also
@@ -1177,15 +1177,15 @@ class Network():
         if not callable(func):
             if isinstance(func, str):
                 try:
-                    func = getattr(geonat_processing, func)
+                    func = getattr(disstans_processing, func)
                 except AttributeError as e:
                     raise AttributeError(
-                        f"'{func}' can not be found as a function in geonat.processing."
+                        f"'{func}' can not be found as a function in disstans.processing."
                         ).with_traceback(e.__traceback__) from e
             else:
                 raise RuntimeError(f"'{func}' needs to be a function or a string "
                                    "representation thereof "
-                                   "(if loaded from geonat.processing).")
+                                   "(if loaded from disstans.processing).")
         assert isinstance(ts_in, str), f"'ts_in' must be string, got {type(ts_in)}."
         if ts_out is None:
             ts_out = ts_in
@@ -1205,7 +1205,7 @@ class Network():
         ----------
         func : str, function
             Function to use. If provided with a string, will check for that function in
-            :mod:`~geonat.processing`, otherwise the function will be assumed to adhere to the
+            :mod:`~disstans.processing`, otherwise the function will be assumed to adhere to the
             same input format than the included ones.
         **kw_args : dict
             Additional keyword arguments to be passed onto ``func``.
@@ -1220,21 +1220,21 @@ class Network():
                 func(station, **kw_args)
             # shorter version
             net.call_func_no_return(func, **kw_args)
-            # shorter version, no need to import a geonat.processing function first
+            # shorter version, no need to import a disstans.processing function first
             net.call_func_no_return('clean', **kw_args)
         """
         if not callable(func):
             if isinstance(func, str):
                 try:
-                    func = getattr(geonat_processing, func)
+                    func = getattr(disstans_processing, func)
                 except AttributeError as e:
                     raise AttributeError(
-                        f"'{func}' can not be found as a function in geonat.processing."
+                        f"'{func}' can not be found as a function in disstans.processing."
                         ).with_traceback(e.__traceback__) from e
             else:
                 raise RuntimeError(f"'{func}' needs to be a function or a string "
                                    "representation thereof "
-                                   "(if loaded from geonat.processing).")
+                                   "(if loaded from disstans.processing).")
         for name, station in tqdm(self.stations.items(),
                                   desc=f"Calling function '{func.__name__}' on stations",
                                   ascii=True, unit="station"):
@@ -1252,7 +1252,7 @@ class Network():
         left : str
             Name of the left timeseries.
         operator : str
-            Operator symbol (see :meth:`~geonat.timeseries.Timeseries.prepare_math` for
+            Operator symbol (see :meth:`~disstans.timeseries.Timeseries.prepare_math` for
             all supported operations).
         right : str
             Name of the right timeseries.
@@ -1281,7 +1281,7 @@ class Network():
     def analyze_residuals(self, ts_description, **kw_args):
         """
         Analyze residual timeseries for all stations and components, calling
-        :meth:`~geonat.station.Station.analyze_residuals`.
+        :meth:`~disstans.station.Station.analyze_residuals`.
 
         Parameters
         ----------
@@ -1289,7 +1289,7 @@ class Network():
             Timeseries to analyze. Method assumes it already is a residual.
         **kw_args : dict
             Additional keyword arguments are directly passed on to
-            :meth:`~geonat.station.Station.analyze_residuals`.
+            :meth:`~disstans.station.Station.analyze_residuals`.
 
         Returns
         -------
@@ -1384,13 +1384,13 @@ class Network():
             If ``True``, save the map and timeseries plots to the current folder.
             Defaults to ``False``.
         gui_kw_args : dict, optional
-            Override default GUI settings of :attr:`~geonat.config.defaults`.
+            Override default GUI settings of :attr:`~disstans.config.defaults`.
         **cme_kw_args : dict
-            Additional keyword arguments passed to :func:`~geonat.processing.common_mode`.
+            Additional keyword arguments passed to :func:`~disstans.processing.common_mode`.
 
         See Also
         --------
-        geonat.processing.common_mode : CME calculation function.
+        disstans.processing.common_mode : CME calculation function.
         """
         # get common mode and make sure to return spatial and temporal models
         gui_settings = defaults["gui"].copy()
@@ -1493,7 +1493,7 @@ class Network():
             model individually. Defaults to ``True``.
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
-            :meth:`~geonat.station.Station.__str__`). Defaults to ``False``.
+            :meth:`~disstans.station.Station.__str__`). Defaults to ``False``.
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
         save : bool, str, optional
@@ -1509,8 +1509,8 @@ class Network():
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
             are the names of the timeseries and associated model that are of the
-            :class:`~geonat.models.SplineSet` class, and therefore have a
-            :meth:`~geonat.models.SplineSet.make_scalogram` method.
+            :class:`~disstans.models.SplineSet` class, and therefore have a
+            :meth:`~disstans.models.SplineSet.make_scalogram` method.
         mark_events : pandas.DataFrame, list, optional
             If passed, a DataFrame or list of DataFrames that contain the columns
             ``'station'`` and ``'time'``. For each timestamp, a vertical line is plotted
@@ -1518,37 +1518,37 @@ class Network():
         stepdetector : dict, optional
             Passing this dictionary will enable the plotting of events related to possible
             steps, both on the map (in case of an earthquake catalog) and in the timeseries
-            (in case of detected steps by :class:`~geonat.processing.StepDetector` or a
+            (in case of detected steps by :class:`~disstans.processing.StepDetector` or a
             maintenance catalog). To reduce cluttering, it will also only show a subset of
             each timeseries, centered around consecutive probable steps. Using the terminal,
             one can cycle through each period.
             The ``stepdetector`` dictionary must contain the keys ``'plot_padding'`` (which
             determines how many days before and after to include in the plotting),
             ``'step_table'`` and ``'step_ranges'`` (both returned by
-            :meth:`~geonat.processing.StepDetector.search_network`),
+            :meth:`~disstans.processing.StepDetector.search_network`),
             ``'step_padding'`` (which determines how many days before and after the
             ``'step_ranges'`` should be scanned for possible steps), optionally ``'catalog'``
             and ``'eqcircle'`` (an earthquake catalog of same style as used in
-            :mod:`~geonat.earthquakes` and a maximum distance of stations to earthquakes of
+            :mod:`~disstans.earthquakes` and a maximum distance of stations to earthquakes of
             magnitude less than 7.5), and optionally, ``'maint_table'`` (a maintenance table
-            as parsed by :func:`~geonat.tools.parse_maintenance_table`).
+            as parsed by :func:`~disstans.tools.parse_maintenance_table`).
         trend_kw_args : dict, optional
             If passed, also plot velocity trends on the station map.
             Defaults to no velocity arrows shown.
             The dictionary can contain all the keywords that are passed to
-            :meth:`~geonat.station.Station.get_trend`, but has at least has to contain
+            :meth:`~disstans.station.Station.get_trend`, but has at least has to contain
             the ``ts_description``. If no ``fit_list`` is included, the ``fit_list``
             passed to ``gui()`` will be used instead. If the number of components available
             is 3 or more, only the first two will be used. If two components are plotted,
             they correspond to the East and North components. If only one component is plotted
             (for example for vertical motion), it will be plotted as the North component.
         analyze_kw_args : dict, optional
-            If provided and non-empty, call :meth:`~geonat.station.Station.analyze_residuals`
+            If provided and non-empty, call :meth:`~disstans.station.Station.analyze_residuals`
             and pass the dictionary on as keyword arguments (overriding ``'verbose'`` to
             ``True`` to force an output). Defaults to no residual analysis.
         rms_on_map : dict, optional
             If provided and non-empty, this option will call
-            :meth:`~geonat.station.Station.analyze_residuals` to calculate
+            :meth:`~disstans.station.Station.analyze_residuals` to calculate
             a residual timeseries' root-mean-squares to color the station markers on the map.
             The dictionary must include the key ``'ts'`` (the residual timeseries' name), and
             can optionally include the keys ``'comps'`` (a list of components to combine for
@@ -1557,7 +1557,7 @@ class Network():
             window, defaults to ``analyze_kw_args`` if given, otherwise the entire timeseries),
             and ``'orientation'`` (for the colorbar orientation).
         gui_kw_args : dict, optional
-            Override default GUI settings of :attr:`~geonat.config.defaults`.
+            Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
@@ -2062,7 +2062,7 @@ class Network():
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
         gui_kw_args : dict, optional
-            Override default GUI settings of :attr:`~geonat.config.defaults`.
+            Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
         # preparations
         gui_settings = defaults["gui"].copy()

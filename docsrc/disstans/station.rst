@@ -1,8 +1,8 @@
 Station
 =======
 
-.. automodule:: geonat.station
+.. automodule:: disstans.station
 
-.. autoclass:: geonat.station.Station
+.. autoclass:: disstans.station.Station
    :members:
    :special-members:

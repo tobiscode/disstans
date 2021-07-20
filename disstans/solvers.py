@@ -26,7 +26,7 @@ class Solution():
 
     Parameters
     ----------
-    geonat.models.ModelCollection
+    disstans.models.ModelCollection
         Model collection object that describes which models were used by the solver.
     parameters : numpy.ndarray
         Model collection parameters of shape
@@ -494,9 +494,9 @@ def linear_regression(ts, models, formal_covariance=False,
 
     Parameters
     ----------
-    ts : geonat.timeseries.Timeseries
+    ts : disstans.timeseries.Timeseries
         Timeseries to fit.
-    models : geonat.models.ModelCollection
+    models : disstans.models.ModelCollection
         Model collection used for fitting.
     formal_covariance : bool, optional
         If ``True``, calculate the formal model covariance. Defaults to ``False``.
@@ -563,7 +563,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
 
     where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual
     and the subscript :math:`_\text{reg}` masks to zero the model parameters
-    not designated to be regularized (see :attr:`~geonat.models.Model.regularize`).
+    not designated to be regularized (see :attr:`~disstans.models.Model.regularize`).
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
     :math:`\mathbf{C}_d`, this information can be used. In this case,
@@ -585,9 +585,9 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
 
     Parameters
     ----------
-    ts : geonat.timeseries.Timeseries
+    ts : disstans.timeseries.Timeseries
         Timeseries to fit.
-    models : geonat.models.ModelCollection
+    models : disstans.models.ModelCollection
         Model collection used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
@@ -667,7 +667,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
 
     where :math:`\mathbf{\epsilon} = \mathbf{Gm} - \mathbf{d}` is the residual
     and the subscript :math:`_\text{reg}` masks to zero the model parameters
-    not designated to be regularized (see :attr:`~geonat.models.Model.regularize`).
+    not designated to be regularized (see :attr:`~disstans.models.Model.regularize`).
 
     If the observations :math:`\mathbf{d}` include a covariance matrix
     :math:`\mathbf{C}_d` (incorporating `var_cols` and possibly also `cov_cols`),
@@ -687,16 +687,16 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     The formal model covariance :math:`\mathbf{C}_m` is defined as being zero except in
     the rows and columns corresponding to non-zero parameters (as defined my the absolute
     magnitude set by ``cov_zero_threshold``), where it is defined exactly as the
-    unregularized version (see :func:`~geonat.solvers.linear_regression`), restricted to
+    unregularized version (see :func:`~disstans.solvers.linear_regression`), restricted to
     those same rows and columns. (This definition might very well be mathematically
     or algorithmically wrong - there probably needs to be some dependence on the
     reweighting function.)
 
     Parameters
     ----------
-    ts : geonat.timeseries.Timeseries
+    ts : disstans.timeseries.Timeseries
         Timeseries to fit.
-    models : geonat.models.ModelCollection
+    models : disstans.models.ModelCollection
         Model collection used for fitting.
     penalty : float
         Penalty hyperparameter :math:`\lambda`.
@@ -998,13 +998,13 @@ class SpatialSolver():
     r"""
     Solver class that in combination with :func:`~lasso_regression` solves the
     spatiotemporal, L0-reweighted least squares fitting problem given the models and
-    timeseries found in a target :class:`~geonat.network.Network` object.
+    timeseries found in a target :class:`~disstans.network.Network` object.
     This is achieved by following the alternating computation scheme as described
     in :meth:`~solve`.
 
     Parameters
     ----------
-    net : geonat.network.Network
+    net : disstans.network.Network
         Network to fit.
     ts_description : str
         Description of the timeseries to fit.
@@ -1055,7 +1055,7 @@ class SpatialSolver():
         list_res_stats : list
             (Only present if ``verbose=2`` in :meth:`~solve`.)
             List of the results dataframe returned by
-            :meth:`~geonat.network.Network.analyze_residuals` for each iteration.
+            :meth:`~disstans.network.Network.analyze_residuals` for each iteration.
         dict_cors : dict
             (Only present if ``verbose=2`` in :meth:`~solve`.)
             For each of the reweighting models, contains a list of spatial correlation
@@ -1152,9 +1152,9 @@ class SpatialSolver():
             :attr:`~last_statistics` (see there for more details).
         num_threads_evaluate : int, optional
             If ``extended_stats=True`` and ``formal_covariance=True``, there will be calls to
-            :meth:`~geonat.network.Network.evaluate` that will estimate the predicted variance,
+            :meth:`~disstans.network.Network.evaluate` that will estimate the predicted variance,
             which will be memory-intensive if the timeseries are long. Using the same number
-            of threads as defined in :attr:`~geonat.config.defaults` might therefore exceed
+            of threads as defined in :attr:`~disstans.config.defaults` might therefore exceed
             the available memory on the system. This option allows to set a different number
             of threads or disable parallelized processing entirely for those calls.
             Defaults to ``None``, which uses the same setting as in the defaults.

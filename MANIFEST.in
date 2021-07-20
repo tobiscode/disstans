@@ -1,1 +1,1 @@
-recursive-include geonat *.f90
+recursive-include disstans *.f90

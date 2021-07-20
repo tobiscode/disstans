@@ -2,7 +2,7 @@ Example 1: Long Valley Caldera Transient Motions
 ================================================
 
 The `Long Valley Caldera <https://en.wikipedia.org/wiki/Long_Valley_Caldera>`_ region in
-California is a good example to show the capabilities of GeoNAT of separating different signals
+California is a good example to show the capabilities of disstans of separating different signals
 from geodetic timeseries. Most prominently, it exhibits transient motions associated with
 magmatic activity, and includes sometimes large seasonal signals due to hydrological loading.
 Because of the geophysical interest, it has been monitored with GNSS since the late 1990s.
@@ -35,7 +35,7 @@ Here are the imports we will need throughout the example:
     >>> import numpy as np
     >>> import scipy as sp
     >>> import matplotlib.pyplot as plt
-    >>> import geonat
+    >>> import disstans
     >>> from pathlib import Path
 
 We will also need two folders, one parent one, and one where the individual timeseries
@@ -64,15 +64,15 @@ need to make on your own machine):
 .. doctest::
 
     >>> os.environ['OMP_NUM_THREADS'] = '1'
-    >>> geonat.config.defaults["general"]["num_threads"] = 10
+    >>> disstans.config.defaults["general"]["num_threads"] = 10
 
 Getting data
 ............
 
-GeoNAT includes the :func:`~geonat.tools.download_unr_data` function to automatically
+disstans includes the :func:`~disstans.tools.download_unr_data` function to automatically
 download timeseries files from the UNR servers, the
-:class:`~geonat.timeseries.UNRTimeseries` class to load the files, and the
-:func:`~geonat.tools.parse_unr_steps` function to parse the steps file.
+:class:`~disstans.timeseries.UNRTimeseries` class to load the files, and the
+:func:`~disstans.tools.parse_unr_steps` function to parse the steps file.
 Feel free to check out their documentation for options used or not used here.
 
 To download the timeseries, we first define the region of interest as a circle:
@@ -87,7 +87,7 @@ To download the timeseries, we first define the region of interest as a circle:
 We now download the data into the data directory, only using stations that have a minimum
 number of observations::
 
-    >>> stations_df = geonat.tools.download_unr_data(station_bbox, gnss_dir,
+    >>> stations_df = disstans.tools.download_unr_data(station_bbox, gnss_dir,
     ...                                              min_solutions=600, verbose=2)
     Making sure ...
     Downloading station list ...
@@ -110,18 +110,18 @@ save the dataframe now, and load it the next time we use the data::
 Building the network
 ....................
 
-First off, we instantiate a :class:`~geonat.network.Network` object:
+First off, we instantiate a :class:`~disstans.network.Network` object:
 
 .. doctest::
 
-    >>> net = geonat.Network("LVC")
+    >>> net = disstans.Network("LVC")
 
 We now use the ``station_df`` dataframe to loop over the paths of the downloaded files,
 get the name and location of the stations, create
-:class:`~geonat.timeseries.UNRTimeseries` objects, and if they meet some quality
-thresholds (see :attr:`~geonat.timeseries.Timeseries.reliability` and
-:attr:`~geonat.timeseries.Timeseries.length`), we create a
-:class:`~geonat.station.Station` object, add the timeseries, and then add it to the network:
+:class:`~disstans.timeseries.UNRTimeseries` objects, and if they meet some quality
+thresholds (see :attr:`~disstans.timeseries.Timeseries.reliability` and
+:attr:`~disstans.timeseries.Timeseries.length`), we create a
+:class:`~disstans.station.Station` object, add the timeseries, and then add it to the network:
 
 .. doctest::
 
@@ -131,13 +131,13 @@ thresholds (see :attr:`~geonat.timeseries.Timeseries.reliability` and
     ...     loc = [row["Lat(deg)"], row["Long(deg)"], row["Hgt(m)"]]
     ...     # make a timeseries object to check availability metric
     ...     tspath = f"{gnss_dir}/{name}.tenv3"
-    ...     loaded_ts = geonat.timeseries.UNRTimeseries(tspath)
+    ...     loaded_ts = disstans.timeseries.UNRTimeseries(tspath)
     ...     # make a station and add the timeseries only if two quality metrics are met
     ...     if (loaded_ts.reliability > 0.5) and (loaded_ts.length > pd.Timedelta(365, "D")):
-    ...         net[name] = geonat.Station(name, loc)
+    ...         net[name] = disstans.Station(name, loc)
     ...         net[name]["raw"] = loaded_ts
 
-We can now use :meth:`~geonat.network.Network.gui` to have a first look at the data
+We can now use :meth:`~disstans.network.Network.gui` to have a first look at the data
 that was downloaded::
 
     >>> net.gui(station="CASA", gui_kw_args={"wmts_show": True, "wmts_alpha": 0.5})
@@ -175,13 +175,13 @@ can affect other stations as well.
 Outlier and CME removal
 .......................
 
-Outlier removal is done with the :func:`~geonat.processing.clean` function using the raw
+Outlier removal is done with the :func:`~disstans.processing.clean` function using the raw
 timeseries and a reference timeseries, accessed as a one-liner through
-:meth:`~geonat.network.Network.call_func_no_return`.
-The reference timeseries is created similarly using :func:`~geonat.processing.median` and
-:meth:`~geonat.network.Network.call_func_ts_return`.
+:meth:`~disstans.network.Network.call_func_no_return`.
+The reference timeseries is created similarly using :func:`~disstans.processing.median` and
+:meth:`~disstans.network.Network.call_func_ts_return`.
 The residual, which is needed for the Common Mode Error estimation, is quickly computed
-at all stations with :meth:`~geonat.network.Network.math`.
+at all stations with :meth:`~disstans.network.Network.math`.
 
 .. doctest::
 
@@ -230,16 +230,16 @@ timeseries: the seasonal (sinusoidal) and secular (linear plate motion) componen
 
 This means we have to add models to the ``'final'`` timeseries at all stations.
 In the :doc:`Tutorials </tutorials>`, this was done individually for each station using
-a loop and explicitly instantiating :class:`~geonat.models.Model` objects, and then
-adding them to the stations using :meth:`~geonat.station.Station.add_local_model_dict`.
-This was both desired to illustrate the object-based nature of GeoNAT, as well as
+a loop and explicitly instantiating :class:`~disstans.models.Model` objects, and then
+adding them to the stations using :meth:`~disstans.station.Station.add_local_model_dict`.
+This was both desired to illustrate the object-based nature of disstans, as well as
 necessary since we needed direct access to the model objects anyway to read in
 parameters and then evaluate the models to create synthetic timeseries.
 
 Here, the models we're using will change throughout the examples, and we don't need
 explicit access to the individual fitted parameters anytime soon, so we can skip all
 of the work and instead just define the models using keyword dictionaries, taking
-advantage of the :meth:`~geonat.network.Network.add_local_models` that will do all
+advantage of the :meth:`~disstans.network.Network.add_local_models` that will do all
 of the instantiating and assigning for us:
 
 .. doctest::
@@ -257,8 +257,8 @@ of the instantiating and assigning for us:
     >>> net.add_local_models(models=models, ts_description="final")
 
 Now that we have added the models, we can perform the first model fitting
-using basic linear least squares (:func:`~geonat.solvers.linear_regression`)
-in parallel through the :meth:`~geonat.network.Network.fitevalres` method:
+using basic linear least squares (:func:`~disstans.solvers.linear_regression`)
+in parallel through the :meth:`~disstans.network.Network.fitevalres` method:
 
 .. doctest::
 
@@ -267,7 +267,7 @@ in parallel through the :meth:`~geonat.network.Network.fitevalres` method:
     ...                residual_description="resid_noreg")
 
 We ignore the data covariance in this very first step for computation time
-considerations. Again, we can use the :meth:`~geonat.network.Network.gui`
+considerations. Again, we can use the :meth:`~disstans.network.Network.gui`
 method to have a look at the result (both the fit and the residuals).
 
 By removing the major signals modeled, obvious transients and steps become
@@ -277,11 +277,11 @@ one by one and writing down the dates on which to add steps that need to be esti
 and removed before we're able to accurately estimate transients and smaller-magnitude
 events.
 
-GeoNAT provides a simple step detector to avoid having to look at all stations and
+disstans provides a simple step detector to avoid having to look at all stations and
 all timespans, which instead tries to look for potential steps, and sorts them by
 probability and station, such that the user can start from the most likely ones,
 and then work their way down until all obvious steps (at least in this first stage)
-are found. The included :class:`~geonat.processing.StepDetector` class is a simple
+are found. The included :class:`~disstans.processing.StepDetector` class is a simple
 and imperfect one, but even more complicated ones (e.g. see [gazeaux13]_ for an
 overview of manual and automated methods) fall short of human-in-the-loop techniques.
 The class should therefore be viewed as only an aid to the user.
@@ -291,7 +291,7 @@ works and keyword descriptions):
 
 .. doctest::
 
-    >>> stepdet = geonat.processing.StepDetector(kernel_size=61, kernel_size_min=21)
+    >>> stepdet = disstans.processing.StepDetector(kernel_size=61, kernel_size_min=21)
     >>> step_table, _ = stepdet.search_network(net, "resid_noreg")
 
 There are two ways of inspecting the outputs now. First, we can of course just
@@ -314,7 +314,7 @@ print the results::
     [2886 rows x 6 columns]
 
 To get an intuition what those numbers translate to in the timeseries, we can use
-the second method: using the :meth:`~geonat.network.Network.gui` with the
+the second method: using the :meth:`~disstans.network.Network.gui` with the
 ``mark_events`` keyword option. If we supply it the entire table we just computed,
 we will see that the low probabilities are most likely false detections::
 
@@ -370,13 +370,13 @@ We can add specific steps to those dates as follows:
 
     >>> net["TILC"].add_local_model(ts_description="final",
     ...                             model_description="Unknown",
-    ...                             model=geonat.models.Step(["2008-07-26"]))
+    ...                             model=disstans.models.Step(["2008-07-26"]))
     >>> net["LINC"].add_local_model(ts_description="final",
     ...                             model_description="Unknown",
-    ...                             model=geonat.models.Step(["1998-09-13"]))
+    ...                             model=disstans.models.Step(["1998-09-13"]))
     >>> net["DOND"].add_local_model(ts_description="final",
     ...                             model_description="Unknown",
-    ...                             model=geonat.models.Step(["2016-04-20"]))
+    ...                             model=disstans.models.Step(["2016-04-20"]))
 
 Slightly different is WATC with a clear offset, but then also returning to its previous value:
 
@@ -388,7 +388,7 @@ Where we can add the two steps as follows
 
     >>> net["WATC"].add_local_model(ts_description="final",
     ...                             model_description="Unknown",
-    ...                             model=geonat.models.Step(["2002-04-04", "2002-06-18"]))
+    ...                             model=disstans.models.Step(["2002-04-04", "2002-06-18"]))
 
 P628 and P636 exhibit a different behavior: Here, we can see that the
 identified steps are related to transient motion. At P628 we can guess
@@ -409,7 +409,7 @@ In our framework, we would think of this as noise, since it is not related
 to any tectonic process. For P636, the most straightforward way to
 avoid this noise affecting our fitting process is to eliminate the single
 timespan this appears - towards the end of 2011. This is easily
-done with the :meth:`~geonat.timeseries.Timeseries.cut` method:
+done with the :meth:`~disstans.timeseries.Timeseries.cut` method:
 
 .. doctest::
 
@@ -453,7 +453,7 @@ we add some longterm, unregularized spline models:
 Where we know that CASA has the earliest observation, and CA99 (as well as many other stations)
 are active today and so will have the latest observation timestamp.
 (See :ref:`Tutorial 2 <tutorials/tutorial_2:Spline models for transients>` for an
-introduction to splines in GeoNAT.)
+introduction to splines in disstans.)
 
 Now, let's fit again:
 
@@ -556,14 +556,14 @@ We perform the regular step detection like above with the new residual timeserie
 
     >>> step_table, _ = stepdet.search_network(net, "resid_noreg_3")
 
-And then we use the :func:`~geonat.tools.parse_unr_steps` function to download
+And then we use the :func:`~disstans.tools.parse_unr_steps` function to download
 (if ``check_update=True``) or load (if already present) the catalog, parsing it into
 two separate tables - one for the maintenance events, and one for potential earthquake events:
 
 .. doctest::
 
     >>> unr_maint_table, _, unr_eq_table, _ = \
-    ...     geonat.tools.parse_unr_steps(f"{data_dir}/unr_steps.txt",
+    ...     disstans.tools.parse_unr_steps(f"{data_dir}/unr_steps.txt",
     ...                                  verbose=True, check_update=False,
     ...                                  only_stations=net.station_names)
     ...
@@ -573,7 +573,7 @@ two separate tables - one for the maintenance events, and one for potential eart
     Number of Earthquake-related Events: ...
 
 Then, we use the step detector object's
-:meth:`~geonat.processing.StepDetector.search_catalog` method to specifically test
+:meth:`~disstans.processing.StepDetector.search_catalog` method to specifically test
 the dates where events where recorded:
 
 .. doctest::
@@ -582,7 +582,7 @@ the dates where events where recorded:
     >>> eq_table, _ = stepdet.search_catalog(net, "resid_noreg_3", unr_eq_table)
 
 (Of course, those dates will already have been checked by the general call to
-:meth:`~geonat.processing.StepDetector.search_network`, but if the step detector does
+:meth:`~disstans.processing.StepDetector.search_network`, but if the step detector does
 not see evidence for a step there given its input parameters, the probability of a
 step being present at that date will not be included in the output table.)
 
@@ -702,9 +702,9 @@ we should probably skip. One exception is KRAC, where we have another step-and-r
 event similar to the previous section. We could again just cut out the affected timespan,
 but for purely example reasons, we're instead going to add a model that will model
 this temporary offset. We craft this particular model with a constant
-:class:`~geonat.models.Polynomial` with a set start and end date, and setting it to zero
-outside it's active period. (We could also use a :class:`~geonat.models.Step` model with
-an end date, or write a new :class:`~geonat.models.Model` class entirely.)
+:class:`~disstans.models.Polynomial` with a set start and end date, and setting it to zero
+outside it's active period. (We could also use a :class:`~disstans.models.Step` model with
+an end date, or write a new :class:`~disstans.models.Model` class entirely.)
 
 .. doctest::
 
@@ -748,17 +748,17 @@ And we add a new Transient model with a larger range of timescales:
 
 Similar to
 :ref:`Tutorial 3 <tutorials/tutorial_3:Fitting the data using a spatially-aware L1 reweighting>`
-we now create the :class:`~geonat.solvers.SpatialSolver` object:
+we now create the :class:`~disstans.solvers.SpatialSolver` object:
 
 .. doctest::
 
-    >>> spatsol = geonat.solvers.SpatialSolver(net, "final")
+    >>> spatsol = disstans.solvers.SpatialSolver(net, "final")
 
 This time, we also specify our reweighting function explicitly:
 
 .. doctest::
 
-    >>> rw_func = geonat.solvers.InverseReweighting(eps=1e-4, scale=1e-3)
+    >>> rw_func = disstans.solvers.InverseReweighting(eps=1e-4, scale=1e-3)
 
 Finally, we can run the estimation:
 
@@ -822,7 +822,7 @@ and the other models, let's have a look at the correlation matrix for the CASA s
 
 .. image:: ../img/example_1e_corr.png
 
-We can also use the :meth:`~geonat.network.Network.wormplot` method
+We can also use the :meth:`~disstans.network.Network.wormplot` method
 (also see :ref:`Tutorial 3 <tutorials/tutorial_3:Transient visualization with worm plots>`)
 to have a closer look at one of the transient periods at the center of the network::
 
@@ -895,11 +895,11 @@ Final considerations
 Let's conclude with two remarks:
 
 #. The choice of the hyperparameters (e.g. starting ``penalty``; the type and ``eps``,
-   ``scale`` values for :class:`~geonat.solvers.SpatialSolver`; the number and timescales
+   ``scale`` values for :class:`~disstans.solvers.SpatialSolver`; the number and timescales
    of the splines) are of course informed by me debugging and testing my code over and over
    again. Different dataset, and possibly different questions wanted to be solved, will
    likely warrant a systematic exploration of those. The
-   :attr:`~geonat.solvers.SpatialSolver.last_statistics` attribute can be helpful to track
+   :attr:`~disstans.solvers.SpatialSolver.last_statistics` attribute can be helpful to track
    the performance of different estimation hyperparameters.
 #. For the best model fit, additional cleaning (outlier removal) and common mode estimation
    steps might be useful.

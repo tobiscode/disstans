@@ -1,8 +1,8 @@
 """
 This module contains helper functions and classes that are not dependent on
-any of GeoNAT's classes.
+any of disstans's classes.
 
-For more specialized processing functions, see :mod:`~geonat.processing`.
+For more specialized processing functions, see :mod:`~disstans.processing`.
 """
 
 import os
@@ -31,7 +31,7 @@ from .config import defaults
 class Timedelta(pd.Timedelta):
     def __new__(cls, *args, **kwargs):
         """
-        GeoNAT Timedelta subclassed from :class:`~pandas.Timedelta` but with support
+        disstans Timedelta subclassed from :class:`~pandas.Timedelta` but with support
         for the ``'Y'`` year time unit, defined as always exactly 365.25 days.
         Other possible values are:
 
@@ -111,7 +111,7 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
         Defaults to the first element of ``timevector``.
     time_unit : str, optional
         Time unit for parameters.
-        Refer to :class:`~geonat.tools.Timedelta` for more details.
+        Refer to :class:`~disstans.tools.Timedelta` for more details.
         Defaults to ``D``.
 
     Returns
@@ -182,7 +182,7 @@ def make_cov_index_map(num_components):
     -------
 
     >>> import numpy as np
-    >>> from geonat.tools import get_cov_dims, make_cov_index_map
+    >>> from disstans.tools import get_cov_dims, make_cov_index_map
     >>> num_observations, num_components = 5, 2
     >>> print(f"For {num_components} components, there should be:\n"
     ...       f"- {num_components} data columns,\n"
@@ -261,7 +261,7 @@ def get_cov_indices(icomp, index_map=None, num_components=None):
     the first and the second, and the second and the third. In a timeseries or model
     covariance dataframe, this corresponds to the following columns:
 
-    >>> from geonat.tools import get_cov_indices
+    >>> from disstans.tools import get_cov_indices
     >>> get_cov_indices(1, num_components=3)
     [0, 2]
     """
@@ -281,8 +281,8 @@ def get_cov_indices(icomp, index_map=None, num_components=None):
 def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
     r"""
     Converts a full variance(-covariance) matrix with multiple components into a
-    column-based representation like the one used by :class:`~geonat.models.Model` or
-    :class:`~geonat.timeseries.Timeseries`. The extraction done basically implies
+    column-based representation like the one used by :class:`~disstans.models.Model` or
+    :class:`~disstans.timeseries.Timeseries`. The extraction done basically implies
     the assumption that the cross-parameter/cross-observation covariance is negligible.
 
     It is assumed the the individual elements
@@ -360,7 +360,7 @@ def block_permutation(n_outer, n_inner):
     -------
 
     >>> import numpy as np
-    >>> from geonat.tools import block_permutation
+    >>> from disstans.tools import block_permutation
     >>> n_outer, n_inner = 2, 2
     >>> A = np.block([[np.arange(n_inner**2).reshape(n_inner, n_inner),
     ...                np.zeros((n_inner, n_inner))], [np.zeros((n_inner, n_inner)),
@@ -430,8 +430,8 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
     So, it is sadly currently up to the user to disable this behavior when using
     multiple Python threads as achieved with this function. For example,
     this snipped might be enough to put at the beginning of a script:
-    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of GeoNAT cores
-    can be set by e.g. ``import geonat; geonat.defaults["general"]["num_threads"] = 10``.
+    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of disstans cores
+    can be set by e.g. ``import disstans; disstans.defaults["general"]["num_threads"] = 10``.
     Another important note is that if you're experiencing problems when running a script,
     make sure the settings and the rest of the script are encapsulated in the standard
     ``if __name__ == "__main__": ...`` clause.
@@ -445,7 +445,7 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
         arguments that ``func`` should be called with.
     num_threads : int, optional
         Number of threads to use. Set to ``0`` if no parallelization is desired.
-        Defaults to the value in :attr:`~geonat.config.defaults`.
+        Defaults to the value in :attr:`~disstans.config.defaults`.
     chunksize : int, optional
         Chunk size used in the parallelization pool, see
         :meth:`~multiprocessing.pool.Pool.imap`.
@@ -474,7 +474,7 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
 
     Using :func:`~parallelize`, both cases simplify to:
 
-    >>> from geonat.tools import parallelize
+    >>> from disstans.tools import parallelize
     >>> print([result for result in parallelize(sum, iterable, num_threads=0)])
     [3, 5]
     >>> print([result for result in parallelize(sum, iterable, num_threads=2)])
@@ -1819,7 +1819,7 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        sampling : geonat.tools.Timedelta
+        sampling : disstans.tools.Timedelta
             Assumed sampling frequency of the data files.
             Defaults to daily.
         """
@@ -1903,7 +1903,7 @@ class RINEXDataHolding():
         dpi : float, optional
             Use this DPI for saved figures.
         gui_kw_args : dict, optional
-            Override default GUI settings of :attr:`~geonat.config.defaults`.
+            Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
         # prepare
         gui_settings = defaults["gui"].copy()
@@ -1969,7 +1969,7 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        sampling : geonat.tools.Timedelta, optional
+        sampling : disstans.tools.Timedelta, optional
             Assume that breaks strictly larger than ``sampling`` constitute a data gap.
             Defaults to daily.
         sort_by_latitude : bool, optional

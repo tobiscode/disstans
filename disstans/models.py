@@ -49,8 +49,8 @@ class Model():
     the parameters, and then evaluate it later. For synthetic timeseries, it is
     instantiated and the parameters are set manually.
 
-    A minimal user-defined subclass should look similar to :class:`~geonat.models.Polynomial`
-    or :class:`~geonat.models.Exponential`. Three methods need to be provided: an
+    A minimal user-defined subclass should look similar to :class:`~disstans.models.Polynomial`
+    or :class:`~disstans.models.Exponential`. Three methods need to be provided: an
     ``__init__()`` function that takes in any model-specific parameters and passes all
     other parameters into the parent class through ``super().__init__()``, as well as
     both :meth:`~_get_mapping` and :meth:`~_get_arch` (see the base class' documentation
@@ -65,7 +65,7 @@ class Model():
         parameters of this model.
     time_unit : str, optional
         Time unit for parameters.
-        Refer to :class:`~geonat.tools.Timedelta` for more details.
+        Refer to :class:`~disstans.tools.Timedelta` for more details.
     t_start : str, pandas.Timestamp or None, optional
         Sets the model start time (attributes :attr:`~t_start` and :attr:`t_start_str`).
     t_end : str, pandas.Timestamp or None, optional
@@ -194,13 +194,13 @@ class Model():
 
         Parameters
         ----------
-        other : geonat.models.Model
+        other : disstans.models.Model
             Model to compare to.
 
         Example
         -------
 
-        >>> from geonat.models import Step, Sinusoidal
+        >>> from disstans.models import Step, Sinusoidal
         >>> step1, step2 = Step(["2020-01-01"]), Step(["2020-01-02"])
         >>> sin1, sin2 = Sinusoidal(1, "2020-01-01"), Sinusoidal(1, "2020-01-01")
         >>> step1 == step2
@@ -460,12 +460,12 @@ class Model():
 
     def tvec_to_numpycol(self, timevector):
         """
-        Convenience wrapper for :func:`~geonat.tools.tvec_to_numpycol` for Model objects that have
-        the :attr:`~time_unit` and :attr:`~t_reference` attributes set.
+        Convenience wrapper for :func:`~disstans.tools.tvec_to_numpycol` for Model objects that
+        have the :attr:`~time_unit` and :attr:`~t_reference` attributes set.
 
         See Also
         --------
-        :func:`~geonat.tools.tvec_to_numpycol` : Convert a Timestamp vector into a NumPy array.
+        :func:`~disstans.tools.tvec_to_numpycol` : Convert a Timestamp vector into a NumPy array.
         """
         if self.t_reference is None:
             raise ValueError("Can't call 'tvec_to_numpycol' because no reference time "
@@ -577,7 +577,7 @@ class Model():
 
 class Step(Model):
     """
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     Model that introduces steps at discrete times.
 
@@ -588,7 +588,7 @@ class Step(Model):
         Length of it equals the number of model parameters.
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, steptimes, zero_after=False, **model_kw_args):
         super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
@@ -651,7 +651,7 @@ class Step(Model):
 
 class Polynomial(Model):
     """
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     Polynomial model of given order.
 
@@ -664,7 +664,7 @@ class Polynomial(Model):
         Lowest exponent of the polynomial. Defaults to ``0``, i.e. the constant offset.
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, order, t_reference, min_exponent=0,
                  time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
@@ -690,7 +690,7 @@ class Polynomial(Model):
 
 class BSpline(Model):
     r"""
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     Model defined by cardinal, centralized B-Splines of certain order/degree and time scale.
     Used for transient temporary signals that return to zero after a given time span.
@@ -712,7 +712,7 @@ class BSpline(Model):
         Defaults to ``scale``.
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
 
     Notes
     -----
@@ -832,7 +832,7 @@ class BSpline(Model):
 
 class ISpline(Model):
     """
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     Integral of cardinal, centralized B-Splines of certain order/degree and time scale,
     with an amplitude of 1.
@@ -843,7 +843,7 @@ class ISpline(Model):
 
     See Also
     --------
-    geonat.models.BSpline : More details about B-Splines.
+    disstans.models.BSpline : More details about B-Splines.
     """
     def __init__(self, degree, scale, t_reference, regularize=True,
                  time_unit="D", num_splines=1, spacing=None, zero_after=False, **model_kw_args):
@@ -929,7 +929,7 @@ class ISpline(Model):
 
 class SplineSet(Model):
     """
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     Contains a list of splines that share a common degree, but different center
     times and scales.
@@ -968,14 +968,14 @@ class SplineSet(Model):
         List of number of knots to divide the time span into for each of the sub-splines.
         Mutually exclusive to setting ``list_scales``.
     splineclass : Model, optional
-        Model class to use for the splines. Defaults to :class:`~geonat.models.ISpline`.
+        Model class to use for the splines. Defaults to :class:`~disstans.models.ISpline`.
     complete : bool, optional
         See usage description. Defaults to ``True``.
     internal_scaling : bool, optional
         See usage description. Defaults to ``True``.
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, degree, t_center_start, t_center_end, time_unit="D",
                  list_scales=None, list_num_knots=None, splineclass=ISpline, complete=True,
@@ -1090,10 +1090,10 @@ class SplineSet(Model):
         be considered in future fits and evaluations, this function "freezes"
         the model by setting parameters below the threshold ``zero_threshold``
         to be invalid. The mask will be kept in
-        :attr:`~geonat.models.Model.active_parameters`.
+        :attr:`~disstans.models.Model.active_parameters`.
 
-        Only valid parameters will be used by :meth:`~geonat.models.Model.get_mapping` and
-        :meth:`~geonat.models.Model.evaluate`.
+        Only valid parameters will be used by :meth:`~disstans.models.Model.get_mapping` and
+        :meth:`~disstans.models.Model.evaluate`.
 
         Parameters
         ----------
@@ -1285,7 +1285,7 @@ class SplineSet(Model):
 
 class Sinusoidal(Model):
     r"""
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     This model provides a sinusoidal of a fixed period, with amplitude and phase
     to be fitted.
@@ -1293,10 +1293,10 @@ class Sinusoidal(Model):
     Parameters
     ----------
     period : float
-        Period length in :attr:`~geonat.models.Model.time_unit` units.
+        Period length in :attr:`~disstans.models.Model.time_unit` units.
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
 
     Notes
     -----
@@ -1344,7 +1344,7 @@ class Sinusoidal(Model):
 
 class Logarithmic(Model):
     r"""
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     This model provides the "geophysical" logarithmic :math:`\ln(1 + \mathbf{t}/\tau)`
     with a given time constant and zero for :math:`\mathbf{t} < 0`.
@@ -1357,7 +1357,7 @@ class Logarithmic(Model):
         time, the logarithm reaches the value 1 (before model scaling).
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, t_reference,
                  time_unit="D", t_start=None, zero_after=False, **model_kw_args):
@@ -1384,7 +1384,7 @@ class Logarithmic(Model):
 
 class Exponential(Model):
     r"""
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     This model provides the "geophysical" exponential :math:`1-\exp(-\mathbf{t}/\tau)`
     with a given time constant, zero for :math:`\mathbf{t} < 0`, and approaching
@@ -1401,7 +1401,7 @@ class Exponential(Model):
         :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, t_reference,
                  time_unit="D", t_start=None, zero_after=False, **model_kw_args):
@@ -1428,7 +1428,7 @@ class Exponential(Model):
 
 class Arctangent(Model):
     r"""
-    Subclasses :class:`~geonat.models.Model`.
+    Subclasses :class:`~disstans.models.Model`.
 
     This model provides the arctangent :math:`\arctan(\mathbf{t}/\tau)`,
     stretched with a given time constant and normalized to be between
@@ -1449,7 +1449,7 @@ class Arctangent(Model):
         i.e. half of the one-sided amplitude.
 
 
-    See :class:`~geonat.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, tau, t_reference,
                  time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
@@ -1519,9 +1519,9 @@ class ModelCollection():
     Class that contains :class:`~Model` objects and is mainly used to keep track
     of across-model variables and relations such as the cross-model covariances.
     It also contains convenience functions that wrap individual models' functions like
-    :meth:`~geonat.models.Model.evaluate`, :meth:`~geonat.models.Model.get_mapping`
-    or :meth:`~geonat.models.Model.read_parameters` or attributes like
-    :attr:`~geonat.models.Model.par`.
+    :meth:`~disstans.models.Model.evaluate`, :meth:`~disstans.models.Model.get_mapping`
+    or :meth:`~disstans.models.Model.read_parameters` or attributes like
+    :attr:`~disstans.models.Model.par`.
     """
 
     EVAL_PREDVAR_PRECISION = np.dtype(np.single)
@@ -1662,12 +1662,12 @@ class ModelCollection():
 
         Parameters
         ----------
-        other : geonat.models.ModelCollection
+        other : disstans.models.ModelCollection
             Model collection to compare to.
 
         See Also
         --------
-        geonat.models.Model.__eq__ : For more details.
+        disstans.models.Model.__eq__ : For more details.
         """
         return self.get_arch() == other.get_arch()
 
@@ -1832,7 +1832,7 @@ class ModelCollection():
 
     def freeze(self, model_list=None, zero_threshold=1e-10):
         """
-        Convenience function that calls :meth:`~geonat.models.Model.freeze` for all
+        Convenience function that calls :meth:`~disstans.models.Model.freeze` for all
         models (or a subset thereof) contained in the collection.
 
         Parameters
@@ -1854,7 +1854,7 @@ class ModelCollection():
 
     def unfreeze(self, model_list=None):
         """
-        Convenience function that calls :meth:`~geonat.models.Model.unfreeze` for all
+        Convenience function that calls :meth:`~disstans.models.Model.unfreeze` for all
         models (or a subset thereof) contained in the collection.
 
         Parameters
@@ -1920,7 +1920,7 @@ class ModelCollection():
         r"""
         Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`
         by concatenating the individual mapping matrices from each contained model using
-        their method :meth:`~geonat.models.Model.get_mapping` (see for more details).
+        their method :meth:`~disstans.models.Model.get_mapping` (see for more details).
 
         This method respects the parameters being set invalid by :meth:`~freeze`, and will
         interpret those parameters to be unobservable.
@@ -1972,7 +1972,7 @@ class ModelCollection():
 
         Parameters
         ----------
-        ts : geonat.timeseries.Timeseries
+        ts : disstans.timeseries.Timeseries
             The timeseries whose time indices are used to calculate the mapping matrix.
         include_regularization : bool, optional
             If ``True`` (default), expands the returned variables (see below) and computes

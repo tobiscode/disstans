@@ -1,3 +1,3 @@
-# GeoNAT
+# The disstans Python package
 
-Package repository for the **Geo**detic **N**etwork **A**nalysis **T**ools.
+Package repository for the **D**ecomposition and **I**nference of **S**ources through **S**patio**t**emporal **A**nalysis of **N**etwork **S**ignals (disstans) toolbox.

@@ -28,7 +28,7 @@ If you have any question about this, please refer to the previous tutorial.
 
 .. doctest::
 
-    >>> from geonat.models import Arctangent, Polynomial, Sinusoidal
+    >>> from disstans.models import Arctangent, Polynomial, Sinusoidal
     >>> mdl_secular = Polynomial(order=1, t_reference=t_start_str)
     >>> mdl_annual = Sinusoidal(period=365.25, t_reference=t_start_str)
     >>> mdl_semiannual = Sinusoidal(period=365.25/2, t_reference=t_start_str)
@@ -80,11 +80,11 @@ We can evaluate them just like before:
 
 Our noise this time has two components: white and colored. For the white noise,
 we can just use NumPy's default functions, but for the colored noise, we have to use
-GeoNAT's :func:`~geonat.tools.create_powerlaw_noise` function:
+disstans's :func:`~disstans.tools.create_powerlaw_noise` function:
 
 .. doctest::
 
-    >>> from geonat.tools import create_powerlaw_noise
+    >>> from disstans.tools import create_powerlaw_noise
     >>> rng = np.random.default_rng(0)
     >>> white_noise = rng.normal(scale=2, size=(timevector.size, 1))
     >>> colored_noise = create_powerlaw_noise(size=(timevector.size, 1),
@@ -125,14 +125,14 @@ Spline models for transients
 
 How do we model the transients though? For this, we will use an over-complete set
 of basis functions, built by a collection of integrated B-Splines. For more on that,
-see the class documentations for :class:`~geonat.models.BSpline` and
-:class:`~geonat.models.ISpline`. There is a simple :class:`~geonat.models.SplineSet`
+see the class documentations for :class:`~disstans.models.BSpline` and
+:class:`~disstans.models.ISpline`. There is a simple :class:`~disstans.models.SplineSet`
 constructor class that takes care of that for us, which we'll directly add to our
 model collection from before:
 
 .. doctest::
 
-    >>> from geonat.models import ISpline, SplineSet
+    >>> from disstans.models import ISpline, SplineSet
     >>> mdl_coll["Transient"] = SplineSet(degree=2,
     ...                                   t_center_start=t_start_str,
     ...                                   t_center_end=t_end_str,
@@ -142,19 +142,19 @@ model collection from before:
 It creates sets of integrated B-Splines of degree 2, with the timespan
 covered to be that of our synthetic timeseries, and then divided into 4, 8, etc.
 subintervals. The ``splineclass`` parameter only makes it clear that we want a set of
-:class:`~geonat.models.ISpline`, but we could have omitted it, as it's the default
+:class:`~disstans.models.ISpline`, but we could have omitted it, as it's the default
 behavior.
 
 Building a Network
 ------------------
 
 Now, we're ready to build our synthetic network and add our generated data.
-Again, we start by creating a :class:`~geonat.station.Station` object, but this time,
-we'll also assign it to a :class:`~geonat.network.Network` object:
+Again, we start by creating a :class:`~disstans.station.Station` object, but this time,
+we'll also assign it to a :class:`~disstans.network.Network` object:
 
 .. doctest::
 
-    >>> from geonat import Network, Station, Timeseries
+    >>> from disstans import Network, Station, Timeseries
     >>> net_name = "TutorialLand"
     >>> stat_name = "TUT"
     >>> caltech_lla = (34.1375, -118.125, 263)
@@ -164,9 +164,9 @@ we'll also assign it to a :class:`~geonat.network.Network` object:
     >>> net[stat_name] = stat
 
 .. note::
-    Note that the stations internal name :attr:`~geonat.station.Station.name` does not
+    Note that the stations internal name :attr:`~disstans.station.Station.name` does not
     have to match the network's name of that station in
-    :class:`~geonat.network.Network.stations`, but it avoids confusion.
+    :class:`~disstans.network.Network.stations`, but it avoids confusion.
 
     ``net[stat_name] = synth_stat`` is equivalent to
     ``net.add_station(stat_name, synth_stat)``.
@@ -203,7 +203,7 @@ least-squares we used in the previous tutorial:
     >>> net.evaluate(ts_description="Displacement", output_description="Fit_noreg")
 
 We saved a lot of lines and hassle compared to the previous fitting by using the
-:class:`~geonat.network.Network` methods. Let's calculate the residuals and errors,
+:class:`~disstans.network.Network` methods. Let's calculate the residuals and errors,
 and print some statistics:
 
 .. doctest::
@@ -257,7 +257,7 @@ data and noise? ::
     error tracks the noise. This behaviour will not change significantly throughout
     this second tutorial, but will be addressed in the third tutorial.
 
-We can use a scalogram (see :meth:`~geonat.models.SplineSet.make_scalogram`) to visualize
+We can use a scalogram (see :meth:`~disstans.models.SplineSet.make_scalogram`) to visualize
 the coefficient values of our spline collection, and quickly understand that without
 regularization, the set is quite heavily populated in order to minimize the residuals::
 
@@ -395,7 +395,7 @@ However, by modifying an additional weight of each regularized parameter, that d
 values even closer to zero, but leaves significant values unperturbed, one can approximate
 such an L0 regularization by iteratively solving the L1-regularized problem. That is exactly
 what the option ``reweight_max_iters`` does. You can find more information about it in
-the notes of :func:`~geonat.solvers.lasso_regression`. Let's try it:
+the notes of :func:`~disstans.solvers.lasso_regression`. Let's try it:
 
 .. doctest::
 
@@ -481,7 +481,7 @@ L1R-fitted model:
 Apart from the trade-off between the polynomial trend and long-term splines, which can be
 expected in this synthetic example, we got pretty close to our ground truth. Let's finish
 up by calculating an average velocity of the station using
-:meth:`~geonat.station.Station.get_trend` around the time when it's rapidly moving
+:meth:`~disstans.station.Station.get_trend` around the time when it's rapidly moving
 (around the middle of 2002). We don't want a normal trend through the data, since that
 is also influenced by the secular velocity, the noise, etc., so we choose to only fit our
 transient model:

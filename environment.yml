@@ -1,4 +1,4 @@
-name: geonat
+name: disstans
 channels:
   - conda-forge
   - nodefaults

@@ -2,7 +2,7 @@ Compiled
 ========
 
 This module contains subroutines that are written in Fortran90 and compiled
-during the installation of GeoNAT. They provide a significant speed boost
+during the installation of disstans. They provide a significant speed boost
 compared to pure-Python implementations.
 
 maskedmedfilt2d
@@ -18,10 +18,10 @@ is computed column-wise with a specified kernel size.
   (where it should be 0 or False)
 * *kernel* is the (odd) integer kernel window size
 
-.. autofunction:: geonat.compiled.maskedmedfilt2d
+.. autofunction:: disstans.compiled.maskedmedfilt2d
 
 Source Code
 -----------
 
-.. literalinclude:: ../../geonat/compiled.f90
+.. literalinclude:: ../../disstans/compiled.f90
    :language: Fortran

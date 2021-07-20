@@ -1,5 +1,5 @@
-Welcome to GeoNAT's documentation!
-==================================
+Welcome to disstans's documentation!
+====================================
 
 
 .. toctree::
@@ -16,7 +16,7 @@ Welcome to GeoNAT's documentation!
    :includehidden:
    :maxdepth: 2
 
-   geonat
+   disstans
 
 
 

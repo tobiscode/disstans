@@ -1,6 +1,6 @@
 """
 This module contains the :class:`~Timeseries` base class and other
-formats included by default in GeoNAT.
+formats included by default in disstans.
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ from .tools import get_cov_dims, make_cov_index_map, get_cov_indices
 class Timeseries():
     """
     Object that expands the functionality of a :class:`~pandas.DataFrame` object
-    for better integration into GeoNAT. Apart from the data itself, it contains
+    for better integration into disstans. Apart from the data itself, it contains
     information about the source and units of the data. It also performs input
     checks and uses property setters/getters to ensure consistency.
 
@@ -101,7 +101,7 @@ class Timeseries():
             self.index_map = index_map
             """
             Matrix that contains the rolling indices of each matrix element used by
-            :func:`~geonat.tools.get_cov_indices`.
+            :func:`~disstans.tools.get_cov_indices`.
             """
             self.var_cov_map = var_cov_map
             """
@@ -456,7 +456,7 @@ class Timeseries():
 
         Parameters
         ----------
-        timeseries : geonat.timeseries.Timeseries
+        timeseries : disstans.timeseries.Timeseries
             Another timeseries object that contains uncertainty information.
             If set, the function will ignore the rest of the arguments.
         var_data : numpy.ndarray, optional
@@ -471,7 +471,7 @@ class Timeseries():
 
         Notes
         -----
-        If ``ts`` is a :class:`~geonat.timeseries.Timeseries` instance, just using::
+        If ``ts`` is a :class:`~disstans.timeseries.Timeseries` instance, just using::
 
             ts.vars = new_variance
             ts.covs = new_covariance
@@ -920,11 +920,11 @@ class Timeseries():
 
         See Also
         --------
-        geonat.network.Network.to_json : Export the Network configuration as a JSON file.
-        geonat.timeseries.Timeseries.get_arch
-            Get the architecture dictionary of a :class:`~geonat.timeseries.Timeseries` instance.
-        geonat.models.Model.get_arch
-            Get the architecture dictionary of a :class:`~geonat.models.Model` instance.
+        disstans.network.Network.to_json : Export the Network configuration as a JSON file.
+        disstans.timeseries.Timeseries.get_arch
+            Get the architecture dictionary of a :class:`~disstans.timeseries.Timeseries` instance.
+        disstans.models.Model.get_arch
+            Get the architecture dictionary of a :class:`~disstans.models.Model` instance.
         """
         return {}
 
@@ -951,7 +951,7 @@ class Timeseries():
 
         See Also
         --------
-        geonat.models.Model.evaluate
+        disstans.models.Model.evaluate
             Evaluating a model produces the fit dictionary.
         """
         df_data = {dcol: fit["fit"][:, icol] for icol, dcol in enumerate(data_cols)}

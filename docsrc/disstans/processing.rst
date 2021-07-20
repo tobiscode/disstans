@@ -1,12 +1,12 @@
 Processing
 ==========
 
-.. automodule:: geonat.processing
+.. automodule:: disstans.processing
 
 unwrap_dict_and_ts
 ------------------
 
-.. autodecorator:: geonat.processing.unwrap_dict_and_ts
+.. autodecorator:: disstans.processing.unwrap_dict_and_ts
 
 Functions
 ---------
@@ -14,17 +14,17 @@ Functions
 clean
 .....
 
-.. autofunction:: geonat.processing.clean
+.. autofunction:: disstans.processing.clean
 
 common_mode
 ...........
 
-.. autofunction:: geonat.processing.common_mode
+.. autofunction:: disstans.processing.common_mode
 
 median
 ......
 
-.. autofunction:: geonat.processing.median
+.. autofunction:: disstans.processing.median
 
 Classes
 -------
@@ -32,6 +32,6 @@ Classes
 StepDetector
 ............
 
-.. autoclass:: geonat.processing.StepDetector
+.. autoclass:: disstans.processing.StepDetector
    :members:
    :special-members:

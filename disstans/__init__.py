@@ -2,12 +2,12 @@
 This is the initialization script.
 
 It also provides shorthand notations for the three most common
-classes of GeoNAT, namely
+classes of disstans, namely
 
-- ``geonat.defaults`` for ``geonat.config.defaults``,
-- ``geonat.Timeseries`` for ``geonat.timeseries.Timeseries``,
-- ``geonat.Station`` for ``geonat.station.Station``, and
-- ``geonat.Network`` for ``geonat.network.Network``.
+- ``disstans.defaults`` for ``disstans.config.defaults``,
+- ``disstans.Timeseries`` for ``disstans.timeseries.Timeseries``,
+- ``disstans.Station`` for ``disstans.station.Station``, and
+- ``disstans.Network`` for ``disstans.network.Network``.
 """
 # flake8: noqa
 

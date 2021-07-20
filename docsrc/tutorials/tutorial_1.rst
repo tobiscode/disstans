@@ -5,21 +5,21 @@ Building a Model collection
 ---------------------------
 
 Let's create an empty synthetic station "TUT" located in Los Angeles using
-:class:`~geonat.station.Station`:
+:class:`~disstans.station.Station`:
 
 .. doctest::
 
-    >>> from geonat import Station
+    >>> from disstans import Station
     >>> synth_stat = Station(name="TUT", location=(34.05, -118.25, 93))
 
-Now, let's create a dictionary of :class:`~geonat.models.Model` objects which we would
+Now, let's create a dictionary of :class:`~disstans.models.Model` objects which we would
 like to use to create our synthetic timeseries. We'll start with a linear trend, an annual
 sinusoid and some steps.
 
 .. doctest::
 
     >>> import numpy as np
-    >>> from geonat.models import Polynomial, Sinusoidal, Step
+    >>> from disstans.models import Polynomial, Sinusoidal, Step
     >>> mdl_secular = Polynomial(order=1, time_unit="D", t_reference="2000-01-01")
     >>> mdl_secular.read_parameters(np.array([-1, 5e-3]))
     >>> mdl_annual = Sinusoidal(period=365.25, time_unit="D", t_reference="2000-01-01")
@@ -43,7 +43,7 @@ Next, we need the time span to evaluate our models over. We can use Pandas'
     >>> import pandas as pd
     >>> timevector = pd.date_range(start="2000-01-01", end="2000-12-31", freq="1D")
 
-Now, we can evaluate the models, and sum them all up. :meth:`~geonat.models.Model.evaluate`
+Now, we can evaluate the models, and sum them all up. :meth:`~disstans.models.Model.evaluate`
 returns a dictionary and the modeled output can be found in the ``'fit'`` key:
 
 .. doctest::
@@ -56,12 +56,12 @@ returns a dictionary and the modeled output can be found in the ``'fit'`` key:
 Creating Timeseries objects
 ---------------------------
 
-A :class:`~geonat.timeseries.Timeseries` can now be created using the data we just
+A :class:`~disstans.timeseries.Timeseries` can now be created using the data we just
 made up, and we can add it to our station:
 
 .. doctest::
 
-    >>> from geonat import Timeseries
+    >>> from disstans import Timeseries
     >>> synth_ts = Timeseries.from_array(timevector=timevector,
     ...                                  data=sum_models,
     ...                                  src="synthetic",
@@ -96,7 +96,7 @@ the tutorial:
     >>> noise = np.random.randn(*synth_stat["Data"].shape)*0.01
     >>> synth_stat["Data"].data += noise
 
-Finally, let's have a look at the timeseries we created. GeoNAT provides a straightforward
+Finally, let's have a look at the timeseries we created. disstans provides a straightforward
 interface to plot timeseries with Matplotlib::
 
     >>> import matplotlib.pyplot as plt
@@ -121,36 +121,36 @@ in. To this end, we must first associate our models with the timeseries at the s
     ...     synth_stat.add_local_model("Data", model_description, model)
 
 Under the hood, adding individual models will create a
-:class:`~geonat.models.ModelCollection` object at the station, which keeps track
+:class:`~disstans.models.ModelCollection` object at the station, which keeps track
 of all the different models. This collection object is necessary because once
 we solve for the model parameters, there will be covariances between the different
 models which are important to track for the uncertainty estimation.
 The model collection object is accessed as ``synth_stat.models["Data"]``.
 
-For the fitting, we first import a solver function from the :mod:`~geonat.solvers`
-module, and then call it to give us a :class:`~geonat.solvers.Solution` object of
+For the fitting, we first import a solver function from the :mod:`~disstans.solvers`
+module, and then call it to give us a :class:`~disstans.solvers.Solution` object of
 the fitted parameters.
 We will start with basic, linear, non-regularized least-squares, which returns
-a :class:`~geonat.solvers.Solution` object:
+a :class:`~disstans.solvers.Solution` object:
 
 .. doctest::
 
-    >>> from geonat.solvers import linear_regression
+    >>> from disstans.solvers import linear_regression
     >>> result = linear_regression(ts=synth_stat["Data"],
     ...                            models=synth_stat.models["Data"])
 
 With the solver finished, we want to do multiple things for all models:
 
 1. Give the models their best-fit parameters as returned by the solver using the
-   :meth:`~geonat.models.ModelCollection.read_parameters` method.
+   :meth:`~disstans.models.ModelCollection.read_parameters` method.
 2. Calculate the trajectory of each individual model given the best-fit parameters
-   using the :meth:`~geonat.models.Model.evaluate` method.
+   using the :meth:`~disstans.models.Model.evaluate` method.
 3. Calculate the combined trajectory of all models together (i.e., the best fit to
-   the timeseries) using the :meth:`~geonat.models.ModelCollection.evaluate` method.
+   the timeseries) using the :meth:`~disstans.models.ModelCollection.evaluate` method.
    (One could also combine the timeseries produces in point 2 and sum them, but this
    will not work if we want to estimate the predicted fit covariance.)
 4. Add the evaluated trajectories to the station as a "fit" using the
-   :meth:`~geonat.station.Station.add_fit` method.
+   :meth:`~disstans.station.Station.add_fit` method.
 
 We can do this in the following way:
 
@@ -168,7 +168,7 @@ We can do this in the following way:
     ...                                 fit=modeled)
     >>> # evaluate the entire model collection at once
     >>> modeled = stat_coll.evaluate(timevector)
-    >>> from geonat.models import ALLFITS
+    >>> from disstans.models import ALLFITS
     >>> fit_ts = synth_stat.add_fit(ts_description="Data", model_description=ALLFITS,
     ...                             fit=modeled)
 
@@ -198,9 +198,9 @@ purposes. We can do that by directly accessing the ``ALLFITS`` fit:
 
     It should be pointed out here that this is a lot of code that doesn't need to be
     repeated by the user every time, but is intended to illustrate what is happening
-    under the hood. For ease of use, the :class:`~geonat.network.Network` class
-    can do all of these things with its two methods :meth:`~geonat.network.Network.fit`
-    and :meth:`~geonat.network.Network.evaluate`.
+    under the hood. For ease of use, the :class:`~disstans.network.Network` class
+    can do all of these things with its two methods :meth:`~disstans.network.Network.fit`
+    and :meth:`~disstans.network.Network.evaluate`.
 
 Plotting the fit and residuals
 ------------------------------
@@ -241,7 +241,7 @@ And we can plot it like before::
 
 .. note::
 
-    This is very simple plotting. The :class:`~geonat.network.Network` class provides
+    This is very simple plotting. The :class:`~disstans.network.Network` class provides
     some better plotting tools to use with larger networks or stations with more
     timeseries which we will explore later. This is again just intended to show how
     the data is accessible.

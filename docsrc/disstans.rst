@@ -1,7 +1,7 @@
-GeoNAT
-======
+disstans
+========
 
-.. automodule:: geonat
+.. automodule:: disstans
 
 
 .. toctree::
@@ -9,4 +9,4 @@ GeoNAT
    :glob:
    :maxdepth: 2
 
-   geonat/*
+   disstans/*

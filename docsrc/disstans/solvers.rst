@@ -1,7 +1,7 @@
 Solvers
 =======
 
-.. automodule:: geonat.solvers
+.. automodule:: disstans.solvers
 
 Local Solver Functions
 ----------------------
@@ -9,17 +9,17 @@ Local Solver Functions
 lasso_regression
 ................
 
-.. autofunction:: geonat.solvers.lasso_regression
+.. autofunction:: disstans.solvers.lasso_regression
 
 linear_regression
 ..................
 
-.. autofunction:: geonat.solvers.linear_regression
+.. autofunction:: disstans.solvers.linear_regression
 
 ridge_regression
 ................
 
-.. autofunction:: geonat.solvers.ridge_regression
+.. autofunction:: disstans.solvers.ridge_regression
 
 Global Solver Classes
 ---------------------
@@ -27,14 +27,14 @@ Global Solver Classes
 SpatialSolver
 .............
 
-.. autoclass:: geonat.solvers.SpatialSolver
+.. autoclass:: disstans.solvers.SpatialSolver
    :members:
    :special-members:
 
 Solution Object
 ---------------
 
-.. autoclass:: geonat.solvers.Solution
+.. autoclass:: disstans.solvers.Solution
    :members:
 
 Reweighting Functions
@@ -43,27 +43,27 @@ Reweighting Functions
 ReweightingFunction
 ...................
 
-.. autoclass:: geonat.solvers.ReweightingFunction
+.. autoclass:: disstans.solvers.ReweightingFunction
    :members:
    :special-members: __call__
 
 InverseReweighting
 ..................
 
-.. autoclass:: geonat.solvers.InverseReweighting
+.. autoclass:: disstans.solvers.InverseReweighting
    :members:
    :special-members: __call__
 
 InverseSquaredReweighting
 .........................
 
-.. autoclass:: geonat.solvers.InverseSquaredReweighting
+.. autoclass:: disstans.solvers.InverseSquaredReweighting
    :members:
    :special-members: __call__
 
 LogarithmicReweighting
 ......................
 
-.. autoclass:: geonat.solvers.LogarithmicReweighting
+.. autoclass:: disstans.solvers.LogarithmicReweighting
    :members:
    :special-members: __call__

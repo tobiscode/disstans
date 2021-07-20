@@ -1,6 +1,6 @@
 Configuration
 =============
 
-.. automodule:: geonat.config
+.. automodule:: disstans.config
 
-.. autoattribute:: geonat.config.defaults
+.. autoattribute:: disstans.config.defaults

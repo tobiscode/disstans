@@ -1,9 +1,9 @@
 """
 This module contains some processing functions that while not belonging
-to a specific class, require them to already be loaded and GeoNAT to
+to a specific class, require them to already be loaded and disstans to
 be initialized.
 
-For general helper functions, see :mod:`~geonat.tools`.
+For general helper functions, see :mod:`~disstans.tools`.
 """
 
 import numpy as np
@@ -24,7 +24,7 @@ def unwrap_dict_and_ts(func):
     """
     A wrapper decorator that aims at simplifying the coding of processing functions.
     Ideally, a new function that doesn't need to know if its input is a
-    :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame`,
+    :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame`,
     :class:`~numpy.ndarray` or a dictionary containing them, should not need to reimplement
     a check and conversion for all of these because they just represent a data
     array of some form. So, by providing this function decorator, a wrapped function
@@ -105,14 +105,14 @@ def median(array, kernel_size):
     """
     Computes the median filter (ignoring NaNs) column-wise, either by calling
     :func:`~numpy.nanmedian` iteratively or by using the precompiled Fortran
-    function :func:`~geonat.compiled.maskedmedfilt2d`.
+    function :func:`~disstans.compiled.maskedmedfilt2d`.
 
     Parameters
     ----------
     array : numpy.ndarray
         2D input array (can contain NaNs).
-        Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept
-        :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
+        Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept
+        :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
         dictionaries of them as input.
     kernel_size : int
         Kernel size (length of moving window to compute the median over).
@@ -161,8 +161,8 @@ def common_mode(array, method, num_components=1, plot=False):
     array : numpy.ndarray
         Input array of shape :math:`(\text{num_observations},\text{n_stations})`
         (can contain NaNs).
-        Wrapped by :func:`~geonat.processing.unwrap_dict_and_ts` to also accept
-        :class:`~geonat.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
+        Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept
+        :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
         dictionaries of them as input.
     method : str
         Method to use to decompose the array. Possible values are ``'pca'`` and ``'ica'}.
@@ -253,7 +253,7 @@ def clean(station, ts_in, reference, ts_out=None,
     """
     Function operating on a single station's timeseries to clean it from outliers,
     and mask it out if the data is not good enough. The criteria are set by
-    :attr:`~geonat.config.defaults` but can be overriden by providing ``clean_kw_args``.
+    :attr:`~disstans.config.defaults` but can be overriden by providing ``clean_kw_args``.
     The criteria are:
 
     - ``'min_obs'``: Minimum number of observations the timeseries has to contain.
@@ -266,21 +266,21 @@ def clean(station, ts_in, reference, ts_out=None,
 
     Parameters
     ----------
-    station : geonat.station.Station
+    station : disstans.station.Station
         Station to operate on.
     ts_in : str
         Description of the timeseries to clean.
-    reference : str, geonat.timeseries.Timeseries, function
+    reference : str, disstans.timeseries.Timeseries, function
         Reference timeseries.
         If string, checks for a timeseries with that description in the ``station``.
-        If a :class:`~geonat.timeseries.Timeseries` instance, use it directly.
+        If a :class:`~disstans.timeseries.Timeseries` instance, use it directly.
         If a function, the reference timeseries will be calculated as
         ``t_ref = reference(ts_in, **reference_callable_args)``.
     ts_out : str, optional
         If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``
         and clean the copy (to preserve the raw timeseries).
     clean_kw_args : dict, optional
-        Override the default cleaning criteria in :attr:`~geonat.config.defaults`,
+        Override the default cleaning criteria in :attr:`~disstans.config.defaults`,
         see the explanations above.
     reference_callable_args : dict, optional
         If ``reference`` is a function, ``reference_callable_args`` can be used
@@ -683,10 +683,10 @@ class StepDetector():
 
         Parameters
         ----------
-        net : geonat.network.Network
+        net : disstans.network.Network
             Network instance to operate on.
         ts_description : str
-            :class:`~geonat.timeseries.Timeseries` description that will be analyzed.
+            :class:`~disstans.timeseries.Timeseries` description that will be analyzed.
         maxdel : float, optional
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
@@ -746,7 +746,7 @@ class StepDetector():
                                                          "var1": maxstepvar1}),
                                            ignore_index=True)
             # this code could be used to create a model object and assign it to the station
-            # mdl = geonat.models.Step(steptimes)
+            # mdl = disstans.models.Step(steptimes)
             # station.add_local_model(ts_description, "Detections", mdl)
         # sort dataframe by probability
         step_table.sort_values(by="probability", ascending=False, inplace=True)
@@ -771,10 +771,10 @@ class StepDetector():
 
         Parameters
         ----------
-        net : geonat.network.Network
+        net : disstans.network.Network
             Network instance to operate on.
         ts_description : str
-            :class:`~geonat.timeseries.Timeseries` description that will be analyzed.
+            :class:`~disstans.timeseries.Timeseries` description that will be analyzed.
         catalog : dict, pandas.DataFrame
             Dictionary where each key is a station name and its value is a list of
             :class:`~pandas.Timestamp` compatible potential times/dates.

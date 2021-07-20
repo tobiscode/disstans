@@ -1,30 +1,30 @@
 Models
 ======
 
-.. automodule:: geonat.models
+.. automodule:: disstans.models
 
 Model (Parent Class)
 --------------------
 
-.. autoclass:: geonat.models.Model
+.. autoclass:: disstans.models.Model
    :members:
    :special-members:
    :private-members: _get_arch, _get_mapping
 
-.. autofunction:: geonat.models.check_model_dict
+.. autofunction:: disstans.models.check_model_dict
 
 Model Collection
 ----------------
 
-.. autoclass:: geonat.models.ModelCollection
+.. autoclass:: disstans.models.ModelCollection
    :members:
    :special-members:
 
 Helper class and constant for combined fits of models:
 
-.. autoclass:: geonat.models.AllFits
+.. autoclass:: disstans.models.AllFits
 
-.. autoattribute:: geonat.models.ALLFITS
+.. autoattribute:: disstans.models.ALLFITS
 
 Basic Models
 ------------
@@ -32,42 +32,42 @@ Basic Models
 Arctangent
 ..........
 
-.. autoclass:: geonat.models.Arctangent
+.. autoclass:: disstans.models.Arctangent
    :members:
    :special-members:
 
 Exponential
 ...........
 
-.. autoclass:: geonat.models.Exponential
+.. autoclass:: disstans.models.Exponential
    :members:
    :special-members:
 
 Logarithmic
 ...........
 
-.. autoclass:: geonat.models.Logarithmic
+.. autoclass:: disstans.models.Logarithmic
    :members:
    :special-members:
 
 Polynomial
 ..........
 
-.. autoclass:: geonat.models.Polynomial
+.. autoclass:: disstans.models.Polynomial
    :members:
    :special-members:
 
 Step
 ....
 
-.. autoclass:: geonat.models.Step
+.. autoclass:: disstans.models.Step
    :members:
    :special-members:
 
 Sinusoidal
 ..........
 
-.. autoclass:: geonat.models.Sinusoidal
+.. autoclass:: disstans.models.Sinusoidal
    :members:
    :special-members:
 
@@ -77,20 +77,20 @@ Spline Models
 BSpline
 .......
 
-.. autoclass:: geonat.models.BSpline
+.. autoclass:: disstans.models.BSpline
    :members:
    :special-members:
 
 ISpline
 .......
 
-.. autoclass:: geonat.models.ISpline
+.. autoclass:: disstans.models.ISpline
    :members:
    :special-members:
 
 SplineSet
 .........
 
-.. autoclass:: geonat.models.SplineSet
+.. autoclass:: disstans.models.SplineSet
    :members:
    :special-members:

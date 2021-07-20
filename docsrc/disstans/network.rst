@@ -1,8 +1,8 @@
 Network
 =======
 
-.. automodule:: geonat.network
+.. automodule:: disstans.network
 
-.. autoclass:: geonat.network.Network
+.. autoclass:: disstans.network.Network
    :members:
    :special-members:

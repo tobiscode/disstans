@@ -1,7 +1,7 @@
 Tutorial 3: Incorporating Spatial Coherence
 ===========================================
 
-One of the main goals of GeoNAT that should make it stand out from other timeseries analysis
+One of the main goals of disstans that should make it stand out from other timeseries analysis
 software/routines is its ability to use spatial coherence as an additional source of
 information and constrain. In general, signals like earthquakes, slip events, or seasonal
 signals are spatially correlated, as the process have the same sources but affect multiple
@@ -24,10 +24,10 @@ at the station with the singular maintenance step) as well as over the entire ne
 evaluating will be done in parallel to achieve a significant speed-up.
 
 .. note::
-    By default, GeoNAT does not use parallelization because of the intricacies
+    By default, disstans does not use parallelization because of the intricacies
     between Python, NumPy/SciPy, and the low-level math libraries like BLAS/LAPACK
     (which can differ from machine to machine). For more information, including how
-    to properly set up parallelization, see :func:`~geonat.tools.parallelize`.
+    to properly set up parallelization, see :func:`~disstans.tools.parallelize`.
 
 Preparations
 ------------
@@ -42,8 +42,8 @@ in the script does the trick, and we can set the number of threads manually:
 
     >>> import os
     >>> os.environ['OMP_NUM_THREADS'] = '1'
-    >>> import geonat
-    >>> geonat.defaults["general"]["num_threads"] = 10
+    >>> import disstans
+    >>> disstans.defaults["general"]["num_threads"] = 10
 
 And we can create a random number generator just like in the previous example:
 
@@ -60,12 +60,12 @@ The network we're dreaming of is a collection of 16 stations situated on the bea
 stations shouldn't be named after fake kitten names created by a neural network of
 `AI Weirdness <https://aiweirdness.com/post/162396324452/neural-networks-kittens>`_.
 So, let's create the locations on a line-like grid with some random variations,
-instantiate a :class:`~geonat.network.Network` object, and add the corresponding
-:class:`~geonat.station.Station` objects:
+instantiate a :class:`~disstans.network.Network` object, and add the corresponding
+:class:`~disstans.station.Station` objects:
 
 .. doctest::
 
-    >>> from geonat import Network, Station
+    >>> from disstans import Network, Station
     >>> net_name = "NullIsland"
     >>> station_names = ["Jeckle", "Cylon", "Marper", "Timble",
     ...                  "Macnaw", "Colzyy", "Mrror", "Mankith",
@@ -159,10 +159,10 @@ but rather a cleaner timeseries after we remove the CME.
 .. doctest::
 
     >>> from copy import deepcopy
-    >>> from geonat import Timeseries
-    >>> from geonat.models import Arctangent, Polynomial, Sinusoidal, Step, \
+    >>> from disstans import Timeseries
+    >>> from disstans.models import Arctangent, Polynomial, Sinusoidal, Step, \
     ...     SplineSet, Logarithmic
-    >>> from geonat.tools import create_powerlaw_noise
+    >>> from disstans.tools import create_powerlaw_noise
     >>> mdl_coll, mdl_coll_synth = {}, {}  # containers for the model objects
     >>> synth_coll = {}  # dictionary of synthetic data & noise for each stations
     >>> for station in net:
@@ -271,7 +271,7 @@ Let's have a look at the summary of the first station to see what we added:
      - Covariances: ['E_N_cov']
 
 One can also have a look at an interactive map and inspect the data and models
-of the stations using :meth:`~geonat.network.Network.gui`::
+of the stations using :meth:`~disstans.network.Network.gui`::
 
     >>> net.gui()
 
@@ -291,7 +291,7 @@ part. How well we can recover the original signal can therefore be tested by loo
 at all stations from west to east.
 
 The figures above can either be saved from the interactive window, or by running
-:meth:`~geonat.network.Network.gui` in a non-interactive mode::
+:meth:`~disstans.network.Network.gui` in a non-interactive mode::
 
     >>> net.gui(station="Jeckle", save=True, save_map=True)
 
@@ -318,7 +318,7 @@ In code, the first three steps will look like this:
     >>> net.call_netwide_func("common_mode", ts_in="Residual", ts_out="CME", method="ica")
 
 To have a closer look at the estimated common mode, one can also use the
-:meth:`~geonat.network.Network.graphical_cme` method, which will show plots of the temporal
+:meth:`~disstans.network.Network.graphical_cme` method, which will show plots of the temporal
 and spatial components of the estimated CME. If everything goes well, the temporal component
 should look like normally-distributed noise, and the spatial component should look like
 a homogenous motion of the stations across the network, like this:
@@ -352,7 +352,7 @@ defined above. Lastly, we can remove the now-obsolete intermediate timeseries.
     >>> net.remove_timeseries("Filtered", "CME", "Residual")
 
 To inspect the result, we can again have a look at the network with
-:meth:`~geonat.network.Network.gui`, or print the summary of a station:
+:meth:`~disstans.network.Network.gui`, or print the summary of a station:
 
 .. doctest::
 
@@ -384,9 +384,9 @@ Fitting the data using reweighted L1 regularization
 
 We'll basically do the same processing as at the end of the previous tutorial, but make
 use of yet another high-level function to reduce the amount of lines we have to write:
-:meth:`~geonat.network.Network.fitevalres`, which combines the two functions
-:meth:`~geonat.network.Network.fit` and :meth:`~geonat.network.Network.evaluate` and
-also calculates the residual using :meth:`~geonat.network.Network.math`.
+:meth:`~disstans.network.Network.fitevalres`, which combines the two functions
+:meth:`~disstans.network.Network.fit` and :meth:`~disstans.network.Network.evaluate` and
+also calculates the residual using :meth:`~disstans.network.Network.math`.
 We'll start with a single, non-iterative L1-regularized solution:
 
 .. doctest::
@@ -406,7 +406,7 @@ and save the transient fitted model as a new timeseries (we'll use them later):
 For this solution and the future ones which will be exploting the spatial structure,
 we want to continuously compare the fitted timeseries as well as the scalograms of
 the Transient model. So let's decide on some potentially interesting stations, and
-use the :meth:`~geonat.network.Network.gui` function to save some plots::
+use the :meth:`~disstans.network.Network.gui` function to save some plots::
 
     >>> figure_stations = ["Jeckle", "Cylon", "Marvish", "Mankith", "Corko", "Tygrar", "Jozga"]
     >>> for s in figure_stations:
@@ -566,8 +566,8 @@ Fitting the data using a spatially-aware L1 reweighting
 
 [riel14]_ solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
-updated based on a weighting scheme. In GeoNAT, this is handled by the
-:class:`~geonat.solvers.SpatialSolver` class, where more information about its algorithm
+updated based on a weighting scheme. In disstans, this is handled by the
+:class:`~disstans.solvers.SpatialSolver` class, where more information about its algorithm
 can be found. In this tutorial, we just want to show how it is used and how it can improve
 the quality of the fit.
 
@@ -576,11 +576,11 @@ at (``'Displacement'``) that will be used for the next couple of solution calls:
 
 .. doctest::
 
-    >>> from geonat.solvers import SpatialSolver
+    >>> from disstans.solvers import SpatialSolver
     >>> spatsol = SpatialSolver(net, "Displacement")
 
-Now, we use the :meth:`~geonat.solvers.SpatialSolver.solve` method, which takes some
-important arguments, and passes the rest onto the general :meth:`~geonat.network.Network.fit`
+Now, we use the :meth:`~disstans.solvers.SpatialSolver.solve` method, which takes some
+important arguments, and passes the rest onto the general :meth:`~disstans.network.Network.fit`
 method. Just like the latter, we give it an (initial) ``penalty`` parameter, and our
 ``cvxpy_kw_args`` solver settings. Additionally, we can now specify the models which we
 want to combine spatially (``spatial_reweight_models``), and how many spatial iterations
@@ -707,7 +707,7 @@ Jeckle station, for example, we can see that some left-over signal can be found
 in the residual North timeseries around the first SSE.
 This can probably be tuned by changing the L1 ``penalty``, or by choosing a different
 ``local_reweight_func``, or many other configuration settings that are present in
-:meth:`~geonat.solvers.SpatialSolver.solve`.
+:meth:`~disstans.solvers.SpatialSolver.solve`.
 Another way that could potentially mitigate the problem would be to use more splines
 that will then better match the onset times of the transients we generated. However,
 we won't spend time on it here since the effects of the tuning will depend a lot on the
@@ -775,7 +775,7 @@ success of this method can vary significantly between datasets and hyperparamete
 
 Quantitatively, we can also see this small improvement when we compute the root-mean-squared
 error for the error time series. We can calculate it easily using
-:meth:`~geonat.network.Network.analyze_residuals`
+:meth:`~disstans.network.Network.analyze_residuals`
 for both error timeseries ``'Err_L1R5'`` and ``'Err_L1R1S20'``:
 
 .. doctest::
@@ -868,7 +868,7 @@ Finding unmodeled jumps
 
 When looking at the errors that we just printed out, we are painfully reminded that
 we added an unmodeled maintenance step to the station Corko. Lets's use the
-:meth:`~geonat.network.Network.gui` function to plot the scalograms and timeseries
+:meth:`~disstans.network.Network.gui` function to plot the scalograms and timeseries
 fits for the station for the two cases we just used.
 
 For 5 local iterations, we get:
@@ -980,7 +980,7 @@ While in the first case, the residual in the North component is at ``0.325757`` 
 in magnitude to the other stations), in the second case, it is significantly larger at
 ``0.932213``, making it clearly stand out.
 
-In fact, we can use :meth:`~geonat.network.Network.gui` to visualize this
+In fact, we can use :meth:`~disstans.network.Network.gui` to visualize this
 (using the ``rms_on_map`` option)::
 
     >>> net.gui(station="Corko", save=True, save_map=True,
@@ -997,7 +997,7 @@ check an earthquake catalog to see if there is a step signal that should be mode
 Then, a step model can be added to the station, and the entire network can be fit again,
 producing an even better fit to the data.
 
-The :class:`~geonat.processing.StepDetector` class is a simple method to check for these
+The :class:`~disstans.processing.StepDetector` class is a simple method to check for these
 large unmodeled jumps in the residuals (see its documentation for more details).
 If we use it to find steps in the two residual timeseries, we can skip the manual labor
 of clicking through all the stations and looking for jumps, and focus on those that are
@@ -1005,7 +1005,7 @@ identified by the algorithm:
 
 .. doctest::
 
-    >>> from geonat.processing import StepDetector
+    >>> from disstans.processing import StepDetector
     >>> stepdet = StepDetector(kernel_size=31)
     >>> steps_dict = {}
     >>> for res_ts in ["Res_L1R5", "Res_L1R1S20"]:
@@ -1047,8 +1047,8 @@ Statistics of spatial reweighting
 ---------------------------------
 
 Let's have a look at the statistics saved by ourselves as well as those saved
-by :class:`~geonat.solvers.SpatialSolver` into its attribute
-:attr:`~geonat.solvers.SpatialSolver.last_statistics`.
+by :class:`~disstans.solvers.SpatialSolver` into its attribute
+:attr:`~disstans.solvers.SpatialSolver.last_statistics`.
 The first three variables contain the key numbers we used before to show how
 the spatial reweighting not only reduces the total number of splines used, but
 also the number of *unique* splines used across the network.
@@ -1110,7 +1110,7 @@ The second figure shows that around the same time, the RMS difference of fitted
 parameters falls below 10 :sup:`-2`, and around less than 10 parameters change
 between each iteration. Towards 20 iterations, no parameters actually change between
 being close-to-zero or non-zero, they just change their value slightly.
-This shows that the spatial reweighting scheme employed by GeoNAT converges nicely
+This shows that the spatial reweighting scheme employed by disstans converges nicely
 and fulfills the goal of reducing the number of unique splines used by the entire network.
 
 .. image:: ../img/tutorial_3e_diffs.png
@@ -1120,7 +1120,7 @@ without explaining you why:
 ``cor_base, cor_localiters, cor_spatialiters1, cor_spatialiters20``.
 What are they? For the North component (the one without the unmodeled maintenance step),
 we computed the correlation coefficients (between -1 and 1) of the modeled signal (timeseries)
-from only the transient :class:`~geonat.models.SplineSet` model between station.
+from only the transient :class:`~disstans.models.SplineSet` model between station.
 This means that the more similar the fitted transients are in shape (amplitude does not
 influence the correlation coefficient), i.e. in timing and phases of the transients,
 the higher the coefficients will be.
@@ -1178,7 +1178,7 @@ Model parameter correlations
 While a more detailed exploration of the parameter correlations is left to the next tutorial,
 let's have a quick look at the correlation matrices at station Jeckle.
 The following code will produce the annotated correlation plot using the
-:meth:`~geonat.models.ModelCollection.plot_covariance` method::
+:meth:`~disstans.models.ModelCollection.plot_covariance` method::
 
     >>> net["Jeckle"].models["Displacement"].plot_covariance(
     ...     fname="tutorial_3g_Jeckle_corr_sparse.png", use_corr_coef=True)
@@ -1207,7 +1207,7 @@ Transient visualization with worm plots
 
 The reason we saved the transient model fits as separate timeseries
 (e.g. ``'Trans_L1R1S20'``) is because we will make use of the
-:meth:`~geonat.network.Network.wormplot` method to show the motion of the different
+:meth:`~disstans.network.Network.wormplot` method to show the motion of the different
 stations across the network. Compared to a static map of instantaneous (or time-integrated)
 velocity arrows, a wormplot is able to show no only the total accumulated displacement
 over a timespan, but also its evolution, and highlighting periods of fast motion.

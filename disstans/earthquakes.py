@@ -22,7 +22,7 @@ def okada_displacement(station_lla, eq_catalog_row):
     Parameters
     ----------
     station_lla : list
-        Location of the station, see :attr:`~geonat.station.Station.location`.
+        Location of the station, see :attr:`~disstans.station.Station.location`.
     eq_catalog_row : pandas.Series
         A single row of the earthquake catalog as defined by :func:`~okada_prior`.
 
@@ -127,7 +127,7 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
         Whether to mark the model for regularization or not.
     catalog_prior_kw_args : dict, optional
         A dictionary fine-tuning the displacement calculation and modeling, see
-        :attr:`~geonat.config.defaults` for explanations and defaults.
+        :attr:`~disstans.config.defaults` for explanations and defaults.
 
     Returns
     -------

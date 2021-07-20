@@ -1,10 +1,10 @@
 Earthquakes
 ===========
 
-.. automodule:: geonat.earthquakes
+.. automodule:: disstans.earthquakes
 
-.. autofunction:: geonat.earthquakes.okada_displacement
+.. autofunction:: disstans.earthquakes.okada_displacement
 
-.. autofunction:: geonat.earthquakes.okada_prior
+.. autofunction:: disstans.earthquakes.okada_prior
 
-.. autofunction:: geonat.earthquakes.empirical_prior
+.. autofunction:: disstans.earthquakes.empirical_prior
