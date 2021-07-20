@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>disstans.earthquakes &mdash; disstans 0.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> disstans
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#creating-timeseries-objects">Creating Timeseries objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#fitting-the-models">Fitting the models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#plotting-the-fit-and-residuals">Plotting the fit and residuals</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_2.html">Tutorial 2: Advanced Models and Fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#creating-more-complex-synthetic-data">Creating more complex synthetic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#spline-models-for-transients">Spline models for transients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#building-a-network">Building a Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#fitting-an-entire-network">Fitting an entire network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_3.html">Tutorial 3: Incorporating Spatial Coherence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#dreaming-up-a-network">Dreaming up a network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#fantasizing-data">Fantasizing data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#removing-the-common-mode-error">Removing the Common Mode Error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#fitting-the-data-using-reweighted-l1-regularization">Fitting the data using reweighted L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#fitting-the-data-using-a-spatially-aware-l1-reweighting">Fitting the data using a spatially-aware L1 reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#finding-unmodeled-jumps">Finding unmodeled jumps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#making-a-noisy-network">Making a noisy network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#fitting-the-models-with-the-spatial-l0-solver">Fitting the models with the spatial L0 solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#quality-of-the-fits">Quality of the fits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#correlation-of-parameters">Correlation of parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#simple-linear-regression-with-restricted-spline-set">Simple linear regression with restricted spline set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_1.html">Example 1: Long Valley Caldera Transient Motions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#preparations">Preparations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#getting-data">Getting data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#building-the-network">Building the network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#cleaning-the-timeseries">Cleaning the timeseries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#outlier-and-cme-removal">Outlier and CME removal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#first-pass-major-steps-and-noisy-periods">First pass: major steps and noisy periods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/example_1.html#second-pass-minor-catalog-based-steps">Second pass: minor, catalog-based steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#final-considerations">Final considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../disstans.html">disstans</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#basic-models">Basic Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#arctangent">Arctangent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#logarithmic">Logarithmic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#polynomial">Polynomial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#step">Step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#sinusoidal">Sinusoidal</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#spline-models">Spline Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#bspline">BSpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#splineset">SplineSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/processing.html">Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#clean">clean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#median">median</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#stepdetector">StepDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/solvers.html">Solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#linear-regression">linear_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#ridge-regression">ridge_regression</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#spatialsolver">SpatialSolver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#reweightingfunction">ReweightingFunction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#inversereweighting">InverseReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#inversesquaredreweighting">InverseSquaredReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#logarithmicreweighting">LogarithmicReweighting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/timeseries.html">Timeseries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/timeseries.html#specialized-classes">Specialized Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rinexdataholding">RINEXDataHolding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#timedelta">Timedelta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#click">Click</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">disstans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>disstans.earthquakes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for disstans.earthquakes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains functions relating to the processing and representation</span>
+<span class="sd">of earthquakes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">okada_wrapper</span> <span class="kn">import</span> <span class="n">dc3d0wrapper</span> <span class="k">as</span> <span class="n">dc3d0</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">parallelize</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Step</span>
+
+
+<div class="viewcode-block" id="okada_displacement"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_displacement">[docs]</a><span class="k">def</span> <span class="nf">okada_displacement</span><span class="p">(</span><span class="n">station_lla</span><span class="p">,</span> <span class="n">eq_catalog_row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a single station and a single row from the earthquake catalog as defined by</span>
+<span class="sd">    :func:`~okada_prior`, calculate the estimated displacement.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    station_lla : list</span>
+<span class="sd">        Location of the station, see :attr:`~disstans.station.Station.location`.</span>
+<span class="sd">    eq_catalog_row : pandas.Series</span>
+<span class="sd">        A single row of the earthquake catalog as defined by :func:`~okada_prior`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    station_disp : numpy.ndarray</span>
+<span class="sd">        3D displacement in mm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">station_lla</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">station_lla</span><span class="p">)</span>
+    <span class="n">station_lla</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">eq_lla</span> <span class="o">=</span> <span class="n">eq_catalog_row</span><span class="p">[[</span><span class="s1">&#39;Latitude(°)&#39;</span><span class="p">,</span> <span class="s1">&#39;Longitude(°)&#39;</span><span class="p">,</span>  <span class="s1">&#39;MT_Depth(km)&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    <span class="n">eq_lla</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">station_rel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">station_lla</span> <span class="o">-</span> <span class="n">eq_lla</span><span class="p">)</span>
+    <span class="n">station_rel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">111.13292</span> <span class="o">-</span> <span class="mf">0.55982</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">eq_lla</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+    <span class="n">station_rel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">111.41284</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">eq_lla</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+    <span class="n">station_rel</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">eq_info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;prior&quot;</span><span class="p">][</span><span class="s2">&quot;alpha&quot;</span><span class="p">],</span>
+               <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="n">eq_lla</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="n">eq_lla</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+               <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">eq_lla</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+               <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">eq_catalog_row</span><span class="p">[</span><span class="s1">&#39;Strike&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+               <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">eq_catalog_row</span><span class="p">[</span><span class="s1">&#39;Dip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+               <span class="s1">&#39;potency&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">eq_catalog_row</span><span class="p">[</span><span class="s1">&#39;Mo(Nm)&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;prior&quot;</span><span class="p">][</span><span class="s2">&quot;mu&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
+    <span class="n">station_disp</span> <span class="o">=</span> <span class="n">_okada_get_displacements</span><span class="p">((</span><span class="n">station_rel</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">eq_info</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">station_disp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_okada_get_displacements</span><span class="p">(</span><span class="n">station_and_parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parallelizable sub-function of okada_prior that for a single earthquake</span>
+<span class="sd">    source calculates the displacement response for many locations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># unpack inputs</span>
+    <span class="n">stations</span><span class="p">,</span> <span class="n">eq</span> <span class="o">=</span> <span class="n">station_and_parameters</span>
+    <span class="c1"># rotate from relative lat, lon, alt to xyz</span>
+    <span class="n">strike_rad</span> <span class="o">=</span> <span class="n">eq</span><span class="p">[</span><span class="s1">&#39;strike&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">strike_rad</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">strike_rad</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">strike_rad</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">strike_rad</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">stations</span> <span class="o">=</span> <span class="n">stations</span> <span class="o">@</span> <span class="n">R</span>
+    <span class="c1"># get displacements in xyz-frame</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">stations</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">stations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">grad_u</span> <span class="o">=</span> <span class="n">dc3d0</span><span class="p">(</span><span class="n">eq</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">],</span> <span class="n">stations</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span>
+                                   <span class="n">eq</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">],</span> <span class="n">eq</span><span class="p">[</span><span class="s1">&#39;dip&#39;</span><span class="p">],</span> <span class="n">eq</span><span class="p">[</span><span class="s1">&#39;potency&#39;</span><span class="p">])</span>
+        <span class="c1"># unit for u is [unit of potency] / [unit of station location &amp; depth]^2</span>
+        <span class="c1"># unit for grad_u is [unit of potency] / [unit of station location &amp; depth]^3</span>
+        <span class="c1"># assume potency is Nm/GPa = 1e-9 m^3 and locations are in km,</span>
+        <span class="c1"># then u is in [1e-15 m] and grad_u in [1e-18 m]</span>
+        <span class="k">if</span> <span class="n">success</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">disp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">u</span> <span class="o">/</span> <span class="mi">10</span><span class="o">**</span><span class="mi">12</span>  <span class="c1"># output is now in mm</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Success = </span><span class="si">{</span><span class="n">success</span><span class="si">}</span><span class="s2"> for station </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+    <span class="c1"># transform back to lat, lon, alt</span>
+    <span class="c1"># yes this is the same matrix</span>
+    <span class="n">disp</span> <span class="o">=</span> <span class="n">disp</span> <span class="o">@</span> <span class="n">R</span>
+    <span class="k">return</span> <span class="n">disp</span>
+
+
+<span class="k">def</span> <span class="nf">_okada_get_cumdisp</span><span class="p">(</span><span class="n">time_station_settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parallelizable sub-function of okada_prior that for a single station</span>
+<span class="sd">    calculates the cumulative displacements at the timestamps contained</span>
+<span class="sd">    in the timeseries of that station.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eq_times</span><span class="p">,</span> <span class="n">stat_time</span><span class="p">,</span> <span class="n">station_disp</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="n">time_station_settings</span>
+    <span class="n">steptimes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">itime</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stat_time</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">disp</span> <span class="o">=</span> <span class="n">station_disp</span><span class="p">[(</span><span class="n">eq_times</span> <span class="o">&gt;</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span><span class="p">])</span>
+                            <span class="o">&amp;</span> <span class="p">(</span><span class="n">eq_times</span> <span class="o">&lt;=</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="p">:]</span>
+        <span class="n">cumdisp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cumdisp</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">last_eq_time</span> <span class="o">=</span> <span class="n">eq_times</span><span class="p">[</span><span class="n">eq_times</span> <span class="o">&lt;=</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This part is new - no error&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">cumdisp</span><span class="p">,</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span><span class="p">],</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">eq_times</span><span class="p">[(</span><span class="n">eq_times</span> <span class="o">&gt;</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span><span class="p">])</span>
+                               <span class="o">&amp;</span> <span class="p">(</span><span class="n">eq_times</span> <span class="o">&lt;=</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">last_eq_time</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">last_eq_time</span> <span class="o">=</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This part is new - error caught&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">cumdisp</span><span class="p">,</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span><span class="p">],</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">eq_times</span><span class="p">[(</span><span class="n">eq_times</span> <span class="o">&gt;</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span><span class="p">])</span>
+                               <span class="o">&amp;</span> <span class="p">(</span><span class="n">eq_times</span> <span class="o">&lt;=</span> <span class="n">stat_time</span><span class="p">[</span><span class="n">itime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">last_eq_time</span><span class="p">)</span>
+            <span class="n">steptimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">last_eq_time</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">steptimes</span>
+
+
+<div class="viewcode-block" id="okada_prior"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_prior">[docs]</a><span class="k">def</span> <span class="nf">okada_prior</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">,</span> <span class="n">target_timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">target_model_regularize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">catalog_prior_kw_args</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a catalog of earthquakes (including moment tensors), calculate an approximate</span>
+<span class="sd">    displacement for each of the stations in the network.</span>
+
+<span class="sd">    If ``target_timeseries`` and ``target_model`` are passed, the function adds</span>
+<span class="sd">    step models to the respective station&#39;s timeseries and models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    network : Network</span>
+<span class="sd">        Network instance whose stations should be used.</span>
+<span class="sd">    catalog_path : str</span>
+<span class="sd">        File name of the earthquake catalog to load. Currently, only the Japanese</span>
+<span class="sd">        NIED&#39;s F-net earthquake mechanism catalog format is supported.</span>
+<span class="sd">    target_timeseries : str, optional</span>
+<span class="sd">        Name of the timeseries to add the model to.</span>
+<span class="sd">    target_model : str, optional</span>
+<span class="sd">        Name of the earthquake model added to ``target_timeseries``.</span>
+<span class="sd">        Has to be passed if ``target_timeseries`` is passed.</span>
+<span class="sd">    target_model_regularize : bool, optional</span>
+<span class="sd">        Whether to mark the model for regularization or not.</span>
+<span class="sd">    catalog_prior_kw_args : dict, optional</span>
+<span class="sd">        A dictionary fine-tuning the displacement calculation and modeling, see</span>
+<span class="sd">        :attr:`~disstans.config.defaults` for explanations and defaults.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eq_steps_dict : dict</span>
+<span class="sd">        Dictionary of that maps the station names to a list of steptimes.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function uses Okada&#39;s [okada92]_ dislocation calculation subroutines coded in</span>
+<span class="sd">    Fortran and wrapped by the Python package `okada_wrapper`_.</span>
+
+<span class="sd">    The catalog format needs to have the following named columns:</span>
+<span class="sd">    *Date,Origin_Time(JST),Latitude(°),Longitude(°),JMA_Depth(km),JMA_Magnitude(Mj),*</span>
+<span class="sd">    *Region_Name,Strike,Dip,Rake,Mo(Nm),MT_Depth(km),MT_Magnitude(Mw),Var._Red.,*</span>
+<span class="sd">    *mxx,mxy,mxz,myy,myz,mzz,Unit(Nm),Number_of_Stations*</span>
+
+<span class="sd">    The keywords in ``catalog_prior_kw_args`` are:</span>
+
+<span class="sd">    ============= ====== ==============================================================</span>
+<span class="sd">    Keyword       Units  Description</span>
+<span class="sd">    ============= ====== ==============================================================</span>
+<span class="sd">    ``mu``        GPa    Shear modulus μ of the elastic half space</span>
+<span class="sd">    ``alpha``     \-     Medium constant α=(λ+μ)/(λ+2μ), where λ is the first Lamé</span>
+<span class="sd">                         parameter and μ the second one (shear modulus)</span>
+<span class="sd">    ``threshold`` mm     Minimum amount of calculated displacement that a station needs</span>
+<span class="sd">                         to surpass in order for a step to be added to the model.</span>
+<span class="sd">    ============= ====== ==============================================================</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. _`okada_wrapper`: https://github.com/tbenthompson/okada_wrapper</span>
+<span class="sd">    .. [okada92] Okada, Y. (1992).</span>
+<span class="sd">       *Internal deformation due to shear and tensile faults in a half-space*.</span>
+<span class="sd">       Bulletin of the Seismological Society of America, 82(2), 1018–1040.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check whether to add the steps to the stations</span>
+    <span class="k">if</span> <span class="n">target_timeseries</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">target_model</span><span class="p">,</span> <span class="s2">&quot;If steps should be added to the stations, both &quot;</span> \
+            <span class="s2">&quot;&#39;target_timeseries&#39; and &#39;target_model&#39; need to be specified.&quot;</span>
+        <span class="n">do_add</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">do_add</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># update catalog settings</span>
+    <span class="n">catalog_prior_settings</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;prior&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">catalog_prior_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">catalog_prior_kw_args</span><span class="p">)</span>
+    <span class="c1"># get station locations and convert height from m to km</span>
+    <span class="n">stations_lla</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">network</span><span class="p">])</span>
+    <span class="n">stations_lla</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="c1"># load earthquake catalog</span>
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">eq_times</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="s1">&#39;Date_Origin_Time(JST)&#39;</span><span class="p">]</span>
+    <span class="n">eq_lla</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[[</span><span class="s1">&#39;Latitude(°)&#39;</span><span class="p">,</span> <span class="s1">&#39;Longitude(°)&#39;</span><span class="p">,</span>  <span class="s1">&#39;MT_Depth(km)&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">eq_lla</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">n_eq</span> <span class="o">=</span> <span class="n">eq_lla</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># relative position in lla</span>
+    <span class="n">stations_rel</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stations_lla</span> <span class="o">-</span> <span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eq</span><span class="p">)]</span>
+    <span class="c1"># transform to xyz space, coarse approximation, ignores z-component of stations</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eq</span><span class="p">):</span>
+        <span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">111.13292</span> <span class="o">-</span> <span class="mf">0.55982</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">111.41284</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># stations_rel is now in km, just like depth</span>
+
+    <span class="c1"># compute station displacements</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">((</span><span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">catalog_prior_settings</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">],</span>
+                                     <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                     <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                     <span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="s1">&#39;Strike&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+                                     <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="s1">&#39;Dip&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+                                     <span class="s1">&#39;potency&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">catalog</span><span class="p">[</span><span class="s1">&#39;Mo(Nm)&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                                                 <span class="o">/</span> <span class="n">catalog_prior_settings</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]})</span>
+                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eq</span><span class="p">))</span>
+    <span class="n">station_disp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_eq</span><span class="p">,</span> <span class="n">stations_lla</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">_okada_get_displacements</span><span class="p">,</span>
+                                                <span class="n">parameters</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>
+                                    <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">n_eq</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;eq&quot;</span><span class="p">,</span>
+                                    <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Simulating Earthquake Displacements&quot;</span><span class="p">)):</span>
+        <span class="n">station_disp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">result</span>
+
+    <span class="c1"># add steps to station timeseries if they exceed the threshold</span>
+    <span class="n">station_names</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">station_names</span>
+    <span class="n">eq_steps_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">cumdisp_parameters</span> <span class="o">=</span> <span class="p">((</span><span class="n">eq_times</span><span class="p">,</span>
+                           <span class="n">network</span><span class="o">.</span><span class="n">stations</span><span class="p">[</span><span class="n">stat_name</span><span class="p">]</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">target_timeseries</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                           <span class="n">station_disp</span><span class="p">[:,</span> <span class="n">istat</span><span class="p">,</span> <span class="p">:],</span> <span class="n">catalog_prior_settings</span><span class="p">[</span><span class="s2">&quot;threshold&quot;</span><span class="p">])</span>
+                          <span class="k">for</span> <span class="n">istat</span><span class="p">,</span> <span class="n">stat_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">station_names</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">_okada_get_cumdisp</span><span class="p">,</span> <span class="n">cumdisp_parameters</span><span class="p">),</span>
+                                    <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">stations</span><span class="p">),</span>
+                                    <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Adding steps where necessary&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">)):</span>
+        <span class="n">eq_steps_dict</span><span class="p">[</span><span class="n">station_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">if</span> <span class="n">do_add</span><span class="p">:</span>
+            <span class="n">stepmodel</span> <span class="o">=</span> <span class="n">Step</span><span class="p">(</span><span class="n">steptimes</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">regularize</span><span class="o">=</span><span class="n">target_model_regularize</span><span class="p">)</span>
+            <span class="n">network</span><span class="p">[</span><span class="n">station_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">target_timeseries</span><span class="p">,</span> <span class="n">target_model</span><span class="p">,</span>
+                                                      <span class="n">stepmodel</span><span class="p">)</span>
+
+    <span class="c1"># return the dictionary of steps {site: [steptimes]}</span>
+    <span class="k">return</span> <span class="n">eq_steps_dict</span></div>
+
+
+<div class="viewcode-block" id="empirical_prior"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.empirical_prior">[docs]</a><span class="k">def</span> <span class="nf">empirical_prior</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">,</span> <span class="n">target_timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">target_model_regularize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_add</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a catalog of earthquakes, compute whether a station is expected to</span>
+<span class="sd">    see a step with the following empirical formula (used by the Geodesy group at</span>
+<span class="sd">    UNR, see `unr_steps`_):</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        d &lt; 10^{\text{M}_\text{w} / 2 - 0.8} ~\text{km}</span>
+
+<span class="sd">    where :math:`d` is the distance between the earthquake and the station</span>
+<span class="sd">    and :math:`\text{M}_\text{w}` is the moment magnitude.</span>
+
+<span class="sd">    If ``target_timeseries`` and ``target_model`` are passed, the function adds</span>
+<span class="sd">    step models to the respective station&#39;s timeseries and models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    network : Network</span>
+<span class="sd">        Network instance whose stations should be used.</span>
+<span class="sd">    catalog_path : str</span>
+<span class="sd">        File name of the earthquake catalog to load. Currently, only the Japanese</span>
+<span class="sd">        NIED&#39;s F-net earthquake mechanism catalog format is supported.</span>
+<span class="sd">    target_timeseries : str, optional</span>
+<span class="sd">        Name of the timeseries to add the model to.</span>
+<span class="sd">    target_model : str, optional</span>
+<span class="sd">        Name of the earthquake model added to ``target_timeseries``.</span>
+<span class="sd">        Has to be passed if ``target_timeseries`` is passed.</span>
+<span class="sd">    target_model_regularize : bool, optional</span>
+<span class="sd">        Whether to mark the model for regularization or not.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eq_steps_dict : dict</span>
+<span class="sd">        Dictionary of that maps the station names to a list of steptimes.</span>
+
+
+<span class="sd">    .. _`unr_steps`: http://geodesy.unr.edu/NGLStationPages/steps_readme.txt</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check whether to add the steps to the stations</span>
+    <span class="k">if</span> <span class="n">target_timeseries</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">target_model</span><span class="p">,</span> <span class="s2">&quot;If steps should be added to the stations, both &quot;</span> \
+            <span class="s2">&quot;&#39;target_timeseries&#39; and &#39;target_model&#39; need to be specified.&quot;</span>
+        <span class="n">do_add</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">do_add</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># get distances</span>
+    <span class="n">stations_lla</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">network</span><span class="p">])</span>
+    <span class="c1"># convert height from m to km</span>
+    <span class="n">stations_lla</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="c1"># load earthquake catalog</span>
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">eq_times</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="s1">&#39;Date_Origin_Time(JST)&#39;</span><span class="p">]</span>
+    <span class="n">eq_lla</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[[</span><span class="s1">&#39;Latitude(°)&#39;</span><span class="p">,</span> <span class="s1">&#39;Longitude(°)&#39;</span><span class="p">,</span>  <span class="s1">&#39;MT_Depth(km)&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">eq_lla</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">n_eq</span> <span class="o">=</span> <span class="n">eq_lla</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># relative position in lla</span>
+    <span class="n">stations_rel</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stations_lla</span> <span class="o">-</span> <span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eq</span><span class="p">)]</span>
+    <span class="c1"># transform to xyz space, coarse approximation</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eq</span><span class="p">):</span>
+        <span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">111.13292</span> <span class="o">-</span> <span class="mf">0.55982</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">111.41284</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">eq_lla</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="c1"># stations_rel is now in km, just like depth</span>
+        <span class="c1"># get scalar distances</span>
+        <span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">stations_rel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">stations_rel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">stations_rel</span><span class="p">)</span>
+
+    <span class="c1"># get moment magnitudes and for each station and earthquake, apply formula</span>
+    <span class="n">eq_mw</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="s1">&#39;MT_Magnitude(Mw)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">needs_steps</span> <span class="o">=</span> <span class="n">stations_rel</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">eq_mw</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">0.8</span><span class="p">)</span>
+
+    <span class="c1"># loop over stations and add a step where necessary:</span>
+    <span class="n">eq_steps_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">station_names</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">station_names</span>
+    <span class="k">for</span> <span class="n">istation</span><span class="p">,</span> <span class="n">station</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">station_names</span><span class="p">):</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">eq_times</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eq</span><span class="p">)</span> <span class="k">if</span> <span class="n">needs_steps</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">istation</span><span class="p">]]</span>
+        <span class="n">eq_steps_dict</span><span class="p">[</span><span class="n">station</span><span class="p">]</span> <span class="o">=</span> <span class="n">steps</span>
+        <span class="k">if</span> <span class="n">do_add</span><span class="p">:</span>
+            <span class="n">stepmodel</span> <span class="o">=</span> <span class="n">Step</span><span class="p">(</span><span class="n">steptimes</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">regularize</span><span class="o">=</span><span class="n">target_model_regularize</span><span class="p">)</span>
+            <span class="n">network</span><span class="p">[</span><span class="n">station</span><span class="p">]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">target_timeseries</span><span class="p">,</span> <span class="n">target_model</span><span class="p">,</span>
+                                             <span class="n">stepmodel</span><span class="p">)</span>
+
+    <span class="c1"># return the dictionary of steps {site: [steptimes]}</span>
+    <span class="k">return</span> <span class="n">eq_steps_dict</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Tobias Köhne.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

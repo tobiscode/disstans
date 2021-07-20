@@ -1,7 +1,7 @@
 Tutorial 4: The use and estimation of covariance
 ================================================
 
-As seen in Tutorial 3, GeoNAT can also make use of data variance and covariance if provided
+As seen in Tutorial 3, disstans can also make use of data variance and covariance if provided
 in the timeseries. While this was not specifically addressed in the previous tutorial,
 taking advantage of that information can improve the fit to the data, especially when
 there is a large amount of correlation across components. This tutorial
@@ -19,7 +19,7 @@ The setup should be familiar:
     >>> import numpy as np
     >>> rng = np.random.default_rng(0)
     >>> # create network in shape of a circle
-    >>> from geonat import Network, Station
+    >>> from disstans import Network, Station
     >>> net_name = "CircleVolcano"
     >>> num_stations = 8
     >>> station_names = [f"S{i:1d}" for i in range(1, num_stations + 1)]
@@ -82,16 +82,16 @@ The function will look like this:
     ...     return p_sec, p_vol_rot, noise_cor, var_en, cov_en
 
 Now we can create the "true" timeseries, as well as a "data" timeseries that contains
-noise. As before, we first create the :class:`~geonat.models.Model` objects, then evaluate
-them to get the two timeseries, then make :class:`~geonat.timeseries.Timeseries` objects
+noise. As before, we first create the :class:`~disstans.models.Model` objects, then evaluate
+them to get the two timeseries, then make :class:`~disstans.timeseries.Timeseries` objects
 out of them, add them to the station as the two timeseries ``'Truth'`` and
 ``'Displacement'``, and finally add the model objects to the station as well.
 
 .. doctest::
 
     >>> from copy import deepcopy
-    >>> from geonat import Timeseries
-    >>> from geonat.models import Arctangent, Polynomial, SplineSet
+    >>> from disstans import Timeseries
+    >>> from disstans.models import Arctangent, Polynomial, SplineSet
     >>> mdl_coll, mdl_coll_synth = {}, {}  # containers for the model objects
     >>> synth_coll = {}  # dictionary of synthetic data & noise for each stations
     >>> for station, angle in zip(net, angles):
@@ -156,7 +156,7 @@ Fitting the models with the spatial L0 solver
 ---------------------------------------------
 
 The following steps are nothing new - we will solve for model parameters with the
-:class:`~geonat.solvers.SpatialSolver` class. However, this time we're explicitly
+:class:`~disstans.solvers.SpatialSolver` class. However, this time we're explicitly
 specifying if we want the solver to use data (co)variance.
 
 This first run doesn't use either the data variance or covariance, and we will save
@@ -166,10 +166,10 @@ comparison.
 .. doctest::
 
     >>> # define a reweighting function
-    >>> from geonat.solvers import LogarithmicReweighting
+    >>> from disstans.solvers import LogarithmicReweighting
     >>> rw_func = LogarithmicReweighting(1e-8, scale=10)
     >>> # preparations
-    >>> from geonat.solvers import SpatialSolver
+    >>> from disstans.solvers import SpatialSolver
     >>> spatsol = SpatialSolver(net, "Displacement")
     >>> vel_en_est = {}
     >>> # solve without using the data variance
@@ -333,8 +333,8 @@ Correlation of parameters
 
 Let's have a closer look at how we can estimate the error in our prediction (i.e. fitted
 timeseries). By default, if the formal covariance is estimated by the solver, that formal
-uncertainty is passed on to the :class:`~geonat.models.ModelCollection` object where
-we can look at it in the :attr:`~geonat.models.ModelCollection.cov` property.
+uncertainty is passed on to the :class:`~disstans.models.ModelCollection` object where
+we can look at it in the :attr:`~disstans.models.ModelCollection.cov` property.
 We can save it for later like this:
 
 .. doctest::
@@ -355,7 +355,7 @@ function:
 
     >>> import matplotlib.pyplot as plt
     >>> from cmcrameri import cm as scm
-    >>> from geonat.tools import cov2corr
+    >>> from disstans.tools import cov2corr
     >>> # define a plotting function for repeatability
     >>> def corr_plot(cov, title, fname_corr):
     ...     plt.imshow(cov2corr(cov), cmap=scm.roma, vmin=-1, vmax=1)
@@ -366,7 +366,7 @@ function:
     ...     plt.savefig(fname_corr)
     ...     plt.close()
 
-(We don't want to use :meth:`~geonat.models.ModelCollection.plot_covariance` here since
+(We don't want to use :meth:`~disstans.models.ModelCollection.plot_covariance` here since
 later we will have an empirical covariance that we have to plot ourselves anyways.)
 
 And now running it::
@@ -383,7 +383,7 @@ zero-valued parameters, so the uncertainty is not directly visible in the timese
 
     The empty columns and rows in the correlation matrix are a result of how the
     model parameter covariance matrix is estimated by
-    :func:`~geonat.solvers.lasso_regression`. Because the computation requires a
+    :func:`~disstans.solvers.lasso_regression`. Because the computation requires a
     matrix inverse, but the problem is not full rank (because the splines are an
     overcomplete dictionary), some entries have to be set to zero before the inversion,
     yielding in empty correlation rows. This threshold can be set with the
@@ -405,7 +405,7 @@ parameters trade off with each other, even when they have been estimated to be z
 because of our regularization. If we only wanted to see how the *non-zero*
 parameters trade off with each other, we can "freeze" the models based on the absolute
 value of their parameters. This is accomplished with the
-:meth:`~geonat.models.Model.freeze` method:
+:meth:`~disstans.models.Model.freeze` method:
 
 .. doctest::
 
