@@ -2,7 +2,7 @@ Example 1: Long Valley Caldera Transient Motions
 ================================================
 
 The `Long Valley Caldera <https://en.wikipedia.org/wiki/Long_Valley_Caldera>`_ region in
-California is a good example to show the capabilities of disstans of separating different signals
+California is a good example to show the capabilities of DISSTANS of separating different signals
 from geodetic timeseries. Most prominently, it exhibits transient motions associated with
 magmatic activity, and includes sometimes large seasonal signals due to hydrological loading.
 Because of the geophysical interest, it has been monitored with GNSS since the late 1990s.
@@ -69,7 +69,7 @@ need to make on your own machine):
 Getting data
 ............
 
-disstans includes the :func:`~disstans.tools.download_unr_data` function to automatically
+DISSTANS includes the :func:`~disstans.tools.download_unr_data` function to automatically
 download timeseries files from the UNR servers, the
 :class:`~disstans.timeseries.UNRTimeseries` class to load the files, and the
 :func:`~disstans.tools.parse_unr_steps` function to parse the steps file.
@@ -232,7 +232,7 @@ This means we have to add models to the ``'final'`` timeseries at all stations.
 In the :doc:`Tutorials </tutorials>`, this was done individually for each station using
 a loop and explicitly instantiating :class:`~disstans.models.Model` objects, and then
 adding them to the stations using :meth:`~disstans.station.Station.add_local_model_dict`.
-This was both desired to illustrate the object-based nature of disstans, as well as
+This was both desired to illustrate the object-based nature of DISSTANS, as well as
 necessary since we needed direct access to the model objects anyway to read in
 parameters and then evaluate the models to create synthetic timeseries.
 
@@ -277,7 +277,7 @@ one by one and writing down the dates on which to add steps that need to be esti
 and removed before we're able to accurately estimate transients and smaller-magnitude
 events.
 
-disstans provides a simple step detector to avoid having to look at all stations and
+DISSTANS provides a simple step detector to avoid having to look at all stations and
 all timespans, which instead tries to look for potential steps, and sorts them by
 probability and station, such that the user can start from the most likely ones,
 and then work their way down until all obvious steps (at least in this first stage)
@@ -453,7 +453,7 @@ we add some longterm, unregularized spline models:
 Where we know that CASA has the earliest observation, and CA99 (as well as many other stations)
 are active today and so will have the latest observation timestamp.
 (See :ref:`Tutorial 2 <tutorials/tutorial_2:Spline models for transients>` for an
-introduction to splines in disstans.)
+introduction to splines in DISSTANS.)
 
 Now, let's fit again:
 

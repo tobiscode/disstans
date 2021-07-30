@@ -1,4 +1,4 @@
-disstans
+DISSTANS
 ========
 
 .. automodule:: disstans

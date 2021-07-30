@@ -1,9 +1,9 @@
 Tutorials
 =========
 
-The tutorials' goal is to show the general usage of disstans, fully using synthetic data.
+The tutorials' goal is to show the general usage of DISSTANS, fully using synthetic data.
 Building on this knowledge, the :doc:`Examples <examples>` then show how to
-use real data with disstans.
+use real data with DISSTANS.
 
 .. toctree::
     :caption: Tutorials

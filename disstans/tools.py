@@ -1,6 +1,6 @@
 """
 This module contains helper functions and classes that are not dependent on
-any of disstans's classes.
+any of DISSTANS's classes.
 
 For more specialized processing functions, see :mod:`~disstans.processing`.
 """
@@ -31,7 +31,7 @@ from .config import defaults
 class Timedelta(pd.Timedelta):
     def __new__(cls, *args, **kwargs):
         """
-        disstans Timedelta subclassed from :class:`~pandas.Timedelta` but with support
+        DISSTANS Timedelta subclassed from :class:`~pandas.Timedelta` but with support
         for the ``'Y'`` year time unit, defined as always exactly 365.25 days.
         Other possible values are:
 
@@ -430,7 +430,7 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
     So, it is sadly currently up to the user to disable this behavior when using
     multiple Python threads as achieved with this function. For example,
     this snipped might be enough to put at the beginning of a script:
-    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of disstans cores
+    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of DISSTANS cores
     can be set by e.g. ``import disstans; disstans.defaults["general"]["num_threads"] = 10``.
     Another important note is that if you're experiencing problems when running a script,
     make sure the settings and the rest of the script are encapsulated in the standard

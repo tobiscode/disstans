@@ -2,7 +2,7 @@
 This is the initialization script.
 
 It also provides shorthand notations for the three most common
-classes of disstans, namely
+classes of DISSTANS, namely
 
 - ``disstans.defaults`` for ``disstans.config.defaults``,
 - ``disstans.Timeseries`` for ``disstans.timeseries.Timeseries``,

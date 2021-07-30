@@ -20,7 +20,7 @@ from disstans import __version__ as disstans_version  # noqa: E402
 
 # -- Project information -----------------------------------------------------
 
-project = 'disstans'
+project = 'DISSTANS'
 author = 'Tobias Köhne'
 copyright = f'{datetime.datetime.now().year}, {author}'
 version = disstans_version

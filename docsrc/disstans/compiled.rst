@@ -2,7 +2,7 @@ Compiled
 ========
 
 This module contains subroutines that are written in Fortran90 and compiled
-during the installation of disstans. They provide a significant speed boost
+during the installation of DISSTANS. They provide a significant speed boost
 compared to pure-Python implementations.
 
 maskedmedfilt2d

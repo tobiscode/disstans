@@ -1,6 +1,6 @@
 """
 This module contains some processing functions that while not belonging
-to a specific class, require them to already be loaded and disstans to
+to a specific class, require them to already be loaded and DISSTANS to
 be initialized.
 
 For general helper functions, see :mod:`~disstans.tools`.

@@ -80,7 +80,7 @@ We can evaluate them just like before:
 
 Our noise this time has two components: white and colored. For the white noise,
 we can just use NumPy's default functions, but for the colored noise, we have to use
-disstans's :func:`~disstans.tools.create_powerlaw_noise` function:
+DISSTANS's :func:`~disstans.tools.create_powerlaw_noise` function:
 
 .. doctest::
 

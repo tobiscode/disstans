@@ -1,6 +1,6 @@
 """
 This module contains the :class:`~disstans.network.Network` class, which is the
-highest-level container object in disstans.
+highest-level container object in DISSTANS.
 """
 
 import numpy as np
@@ -32,8 +32,8 @@ from .earthquakes import okada_displacement
 
 class Network():
     r"""
-    Main class of disstans. Contains information about the network, defines defaults,
-    and most improtantly, contains a dictionary of all stations in the network.
+    Main class of DISSTANS. Contains information about the network, defines defaults,
+    and most importantly, contains a dictionary of all stations in the network.
 
     Parameters
     ----------

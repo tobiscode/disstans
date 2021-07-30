@@ -1,6 +1,6 @@
 """
 This module contains the :class:`~Timeseries` base class and other
-formats included by default in disstans.
+formats included by default in DISSTANS.
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ from .tools import get_cov_dims, make_cov_index_map, get_cov_indices
 class Timeseries():
     """
     Object that expands the functionality of a :class:`~pandas.DataFrame` object
-    for better integration into disstans. Apart from the data itself, it contains
+    for better integration into DISSTANS. Apart from the data itself, it contains
     information about the source and units of the data. It also performs input
     checks and uses property setters/getters to ensure consistency.
 
