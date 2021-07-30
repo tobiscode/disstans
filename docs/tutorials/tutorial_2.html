@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Tutorial 2: Advanced Models and Fitting &mdash; disstans 0.9 documentation</title>
+  <title>Tutorial 2: Advanced Models and Fitting &mdash; DISSTANS 0.9 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> disstans
+            <a href="../index.html" class="icon icon-home"> DISSTANS
           
 
           
@@ -164,7 +164,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../disstans.html">disstans</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
@@ -280,7 +280,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">disstans</a>
+          <a href="../index.html">DISSTANS</a>
         
       </nav>
 
@@ -403,7 +403,7 @@ is hard, we’ll omit them here, and try to approximate them with other models l
 </div>
 <p>Our noise this time has two components: white and colored. For the white noise,
 we can just use NumPy’s default functions, but for the colored noise, we have to use
-disstans’s <a class="reference internal" href="../disstans/tools.html#disstans.tools.create_powerlaw_noise" title="disstans.tools.create_powerlaw_noise"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_powerlaw_noise()</span></code></a> function:</p>
+DISSTANS’s <a class="reference internal" href="../disstans/tools.html#disstans.tools.create_powerlaw_noise" title="disstans.tools.create_powerlaw_noise"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_powerlaw_noise()</span></code></a> function:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.tools</span> <span class="kn">import</span> <span class="n">create_powerlaw_noise</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">white_noise</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>

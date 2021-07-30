@@ -1,4 +1,4 @@
-Welcome to disstans's documentation!
+Welcome to DISSTANS's documentation!
 ====================================
 
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Example 1: Long Valley Caldera Transient Motions &mdash; disstans 0.9 documentation</title>
+  <title>Example 1: Long Valley Caldera Transient Motions &mdash; DISSTANS 0.9 documentation</title>
   
 
   
@@ -42,7 +42,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="disstans" href="../disstans.html" />
+    <link rel="next" title="DISSTANS" href="../disstans.html" />
     <link rel="prev" title="Examples" href="../examples.html" /> 
 </head>
 
@@ -57,7 +57,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> disstans
+            <a href="../index.html" class="icon icon-home"> DISSTANS
           
 
           
@@ -164,7 +164,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../disstans.html">disstans</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
@@ -280,7 +280,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">disstans</a>
+          <a href="../index.html">DISSTANS</a>
         
       </nav>
 
@@ -337,7 +337,7 @@
   <div class="section" id="example-1-long-valley-caldera-transient-motions">
 <h1>Example 1: Long Valley Caldera Transient Motions<a class="headerlink" href="#example-1-long-valley-caldera-transient-motions" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference external" href="https://en.wikipedia.org/wiki/Long_Valley_Caldera">Long Valley Caldera</a> region in
-California is a good example to show the capabilities of disstans of separating different signals
+California is a good example to show the capabilities of DISSTANS of separating different signals
 from geodetic timeseries. Most prominently, it exhibits transient motions associated with
 magmatic activity, and includes sometimes large seasonal signals due to hydrological loading.
 Because of the geophysical interest, it has been monitored with GNSS since the late 1990s.
@@ -414,7 +414,7 @@ need to make on your own machine):</p>
 </div>
 <div class="section" id="getting-data">
 <h3><a class="toc-backref" href="#id4">Getting data</a><a class="headerlink" href="#getting-data" title="Permalink to this headline">¶</a></h3>
-<p>disstans includes the <a class="reference internal" href="../disstans/tools.html#disstans.tools.download_unr_data" title="disstans.tools.download_unr_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">download_unr_data()</span></code></a> function to automatically
+<p>DISSTANS includes the <a class="reference internal" href="../disstans/tools.html#disstans.tools.download_unr_data" title="disstans.tools.download_unr_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">download_unr_data()</span></code></a> function to automatically
 download timeseries files from the UNR servers, the
 <a class="reference internal" href="../disstans/timeseries.html#disstans.timeseries.UNRTimeseries" title="disstans.timeseries.UNRTimeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">UNRTimeseries</span></code></a> class to load the files, and the
 <a class="reference internal" href="../disstans/tools.html#disstans.tools.parse_unr_steps" title="disstans.tools.parse_unr_steps"><code class="xref py py-func docutils literal notranslate"><span class="pre">parse_unr_steps()</span></code></a> function to parse the steps file.
@@ -554,7 +554,7 @@ timeseries: the seasonal (sinusoidal) and secular (linear plate motion) componen
 In the <a class="reference internal" href="../tutorials.html"><span class="doc">Tutorials</span></a>, this was done individually for each station using
 a loop and explicitly instantiating <a class="reference internal" href="../disstans/models.html#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> objects, and then
 adding them to the stations using <a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_local_model_dict" title="disstans.station.Station.add_local_model_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_local_model_dict()</span></code></a>.
-This was both desired to illustrate the object-based nature of disstans, as well as
+This was both desired to illustrate the object-based nature of DISSTANS, as well as
 necessary since we needed direct access to the model objects anyway to read in
 parameters and then evaluate the models to create synthetic timeseries.</p>
 <p>Here, the models we’re using will change throughout the examples, and we don’t need
@@ -592,7 +592,7 @@ step detector. In a fully manual framework, we would now click through the stati
 one by one and writing down the dates on which to add steps that need to be estimated
 and removed before we’re able to accurately estimate transients and smaller-magnitude
 events.</p>
-<p>disstans provides a simple step detector to avoid having to look at all stations and
+<p>DISSTANS provides a simple step detector to avoid having to look at all stations and
 all timespans, which instead tries to look for potential steps, and sorts them by
 probability and station, such that the user can start from the most likely ones,
 and then work their way down until all obvious steps (at least in this first stage)
@@ -732,7 +732,7 @@ we add some longterm, unregularized spline models:</p>
 <p>Where we know that CASA has the earliest observation, and CA99 (as well as many other stations)
 are active today and so will have the latest observation timestamp.
 (See <a class="reference internal" href="../tutorials/tutorial_2.html#spline-models-for-transients"><span class="std std-ref">Tutorial 2</span></a> for an
-introduction to splines in disstans.)</p>
+introduction to splines in DISSTANS.)</p>
 <p>Now, let’s fit again:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fitevalres</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;linear_regression&quot;</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;model_noreg_2&quot;</span><span class="p">,</span>
@@ -1204,7 +1204,7 @@ doi:<a class="reference external" href="https://doi.org/10.1002/2015JB012552">10
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../disstans.html" class="btn btn-neutral float-right" title="disstans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../disstans.html" class="btn btn-neutral float-right" title="DISSTANS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="../examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

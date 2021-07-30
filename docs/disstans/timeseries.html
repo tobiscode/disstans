@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Timeseries &mdash; disstans 0.9 documentation</title>
+  <title>Timeseries &mdash; DISSTANS 0.9 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> disstans
+            <a href="../index.html" class="icon icon-home"> DISSTANS
           
 
           
@@ -165,7 +165,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">disstans</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
@@ -281,7 +281,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">disstans</a>
+          <a href="../index.html">DISSTANS</a>
         
       </nav>
 
@@ -314,7 +314,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../disstans.html">disstans</a> &raquo;</li>
+          <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
         
       <li>Timeseries</li>
     
@@ -338,14 +338,14 @@
   <div class="section" id="module-disstans.timeseries">
 <span id="timeseries"></span><h1>Timeseries<a class="headerlink" href="#module-disstans.timeseries" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> base class and other
-formats included by default in disstans.</p>
+formats included by default in DISSTANS.</p>
 <div class="section" id="timeseries-parent-class">
 <h2>Timeseries (Parent Class)<a class="headerlink" href="#timeseries-parent-class" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object that expands the functionality of a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object
-for better integration into disstans. Apart from the data itself, it contains
+for better integration into DISSTANS. Apart from the data itself, it contains
 information about the source and units of the data. It also performs input
 checks and uses property setters/getters to ensure consistency.</p>
 <p>Also enables the ability to perform math on timeseries directly.</p>

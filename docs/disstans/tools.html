@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Tools &mdash; disstans 0.9 documentation</title>
+  <title>Tools &mdash; DISSTANS 0.9 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> disstans
+            <a href="../index.html" class="icon icon-home"> DISSTANS
           
 
           
@@ -164,7 +164,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">disstans</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
@@ -280,7 +280,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">disstans</a>
+          <a href="../index.html">DISSTANS</a>
         
       </nav>
 
@@ -313,7 +313,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../disstans.html">disstans</a> &raquo;</li>
+          <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
         
       <li>Tools</li>
     
@@ -337,7 +337,7 @@
   <div class="section" id="module-disstans.tools">
 <span id="tools"></span><h1>Tools<a class="headerlink" href="#module-disstans.tools" title="Permalink to this headline">¶</a></h1>
 <p>This module contains helper functions and classes that are not dependent on
-any of disstans’s classes.</p>
+any of DISSTANS’s classes.</p>
 <p>For more specialized processing functions, see <a class="reference internal" href="processing.html#module-disstans.processing" title="disstans.processing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">processing</span></code></a>.</p>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
@@ -362,7 +362,7 @@ NumPy uses, see <a class="reference external" href="https://github.com/numpy/num
 So, it is sadly currently up to the user to disable this behavior when using
 multiple Python threads as achieved with this function. For example,
 this snipped might be enough to put at the beginning of a script:
-<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">os;</span> <span class="pre">os.environ['OMP_NUM_THREADS']</span> <span class="pre">=</span> <span class="pre">'1'</span></code>. Then, the number of disstans cores
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">os;</span> <span class="pre">os.environ['OMP_NUM_THREADS']</span> <span class="pre">=</span> <span class="pre">'1'</span></code>. Then, the number of DISSTANS cores
 can be set by e.g. <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">disstans;</span> <span class="pre">disstans.defaults[&quot;general&quot;][&quot;num_threads&quot;]</span> <span class="pre">=</span> <span class="pre">10</span></code>.
 Another important note is that if you’re experiencing problems when running a script,
 make sure the settings and the rest of the script are encapsulated in the standard
@@ -1299,7 +1299,7 @@ altitude [m]) coordinates.</p>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="disstans.tools.Timedelta.__new__">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#Timedelta.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.Timedelta.__new__" title="Permalink to this definition">¶</a></dt>
-<dd><p>disstans Timedelta subclassed from <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timedelta.html#pandas.Timedelta" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a> but with support
+<dd><p>DISSTANS Timedelta subclassed from <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timedelta.html#pandas.Timedelta" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a> but with support
 for the <code class="docutils literal notranslate"><span class="pre">'Y'</span></code> year time unit, defined as always exactly 365.25 days.
 Other possible values are:</p>
 <p><code class="docutils literal notranslate"><span class="pre">W</span></code>, <code class="docutils literal notranslate"><span class="pre">D</span></code>, <code class="docutils literal notranslate"><span class="pre">days</span></code>, <code class="docutils literal notranslate"><span class="pre">day</span></code>, <code class="docutils literal notranslate"><span class="pre">hours</span></code>, <code class="docutils literal notranslate"><span class="pre">hour</span></code>, <code class="docutils literal notranslate"><span class="pre">hr</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>,

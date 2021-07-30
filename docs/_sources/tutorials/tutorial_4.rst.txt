@@ -1,7 +1,7 @@
 Tutorial 4: The use and estimation of covariance
 ================================================
 
-As seen in Tutorial 3, disstans can also make use of data variance and covariance if provided
+As seen in Tutorial 3, DISSTANS can also make use of data variance and covariance if provided
 in the timeseries. While this was not specifically addressed in the previous tutorial,
 taking advantage of that information can improve the fit to the data, especially when
 there is a large amount of correlation across components. This tutorial

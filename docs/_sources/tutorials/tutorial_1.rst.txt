@@ -96,7 +96,7 @@ the tutorial:
     >>> noise = np.random.randn(*synth_stat["Data"].shape)*0.01
     >>> synth_stat["Data"].data += noise
 
-Finally, let's have a look at the timeseries we created. disstans provides a straightforward
+Finally, let's have a look at the timeseries we created. DISSTANS provides a straightforward
 interface to plot timeseries with Matplotlib::
 
     >>> import matplotlib.pyplot as plt

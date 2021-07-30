@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>disstans.tools &mdash; disstans 0.8 documentation</title>
+  <title>disstans.tools &mdash; DISSTANS 0.9 documentation</title>
   
 
   
@@ -55,7 +55,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> disstans
+            <a href="../../index.html" class="icon icon-home"> DISSTANS
           
 
           
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.8
+                0.9
               </div>
             
           
@@ -162,7 +162,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../disstans.html">disstans</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
@@ -278,7 +278,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">disstans</a>
+          <a href="../../index.html">DISSTANS</a>
         
       </nav>
 
@@ -331,7 +331,7 @@
   <h1>Source code for disstans.tools</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains helper functions and classes that are not dependent on</span>
-<span class="sd">any of disstans&#39;s classes.</span>
+<span class="sd">any of DISSTANS&#39;s classes.</span>
 
 <span class="sd">For more specialized processing functions, see :mod:`~disstans.processing`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -362,7 +362,7 @@
 <div class="viewcode-block" id="Timedelta"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.Timedelta">[docs]</a><span class="k">class</span> <span class="nc">Timedelta</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">):</span>
 <div class="viewcode-block" id="Timedelta.__new__"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.Timedelta.__new__">[docs]</a>    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        disstans Timedelta subclassed from :class:`~pandas.Timedelta` but with support</span>
+<span class="sd">        DISSTANS Timedelta subclassed from :class:`~pandas.Timedelta` but with support</span>
 <span class="sd">        for the ``&#39;Y&#39;`` year time unit, defined as always exactly 365.25 days.</span>
 <span class="sd">        Other possible values are:</span>
 
@@ -761,7 +761,7 @@
 <span class="sd">    So, it is sadly currently up to the user to disable this behavior when using</span>
 <span class="sd">    multiple Python threads as achieved with this function. For example,</span>
 <span class="sd">    this snipped might be enough to put at the beginning of a script:</span>
-<span class="sd">    ``import os; os.environ[&#39;OMP_NUM_THREADS&#39;] = &#39;1&#39;``. Then, the number of disstans cores</span>
+<span class="sd">    ``import os; os.environ[&#39;OMP_NUM_THREADS&#39;] = &#39;1&#39;``. Then, the number of DISSTANS cores</span>
 <span class="sd">    can be set by e.g. ``import disstans; disstans.defaults[&quot;general&quot;][&quot;num_threads&quot;] = 10``.</span>
 <span class="sd">    Another important note is that if you&#39;re experiencing problems when running a script,</span>
 <span class="sd">    make sure the settings and the rest of the script are encapsulated in the standard</span>

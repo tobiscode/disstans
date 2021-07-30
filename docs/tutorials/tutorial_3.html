@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Tutorial 3: Incorporating Spatial Coherence &mdash; disstans 0.9 documentation</title>
+  <title>Tutorial 3: Incorporating Spatial Coherence &mdash; DISSTANS 0.9 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> disstans
+            <a href="../index.html" class="icon icon-home"> DISSTANS
           
 
           
@@ -165,7 +165,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../disstans.html">disstans</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
@@ -281,7 +281,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">disstans</a>
+          <a href="../index.html">DISSTANS</a>
         
       </nav>
 
@@ -337,7 +337,7 @@
             
   <div class="section" id="tutorial-3-incorporating-spatial-coherence">
 <h1>Tutorial 3: Incorporating Spatial Coherence<a class="headerlink" href="#tutorial-3-incorporating-spatial-coherence" title="Permalink to this headline">¶</a></h1>
-<p>One of the main goals of disstans that should make it stand out from other timeseries analysis
+<p>One of the main goals of DISSTANS that should make it stand out from other timeseries analysis
 software/routines is its ability to use spatial coherence as an additional source of
 information and constrain. In general, signals like earthquakes, slip events, or seasonal
 signals are spatially correlated, as the process have the same sources but affect multiple
@@ -358,7 +358,7 @@ at the station with the singular maintenance step) as well as over the entire ne
 evaluating will be done in parallel to achieve a significant speed-up.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>By default, disstans does not use parallelization because of the intricacies
+<p>By default, DISSTANS does not use parallelization because of the intricacies
 between Python, NumPy/SciPy, and the low-level math libraries like BLAS/LAPACK
 (which can differ from machine to machine). For more information, including how
 to properly set up parallelization, see <a class="reference internal" href="../disstans/tools.html#disstans.tools.parallelize" title="disstans.tools.parallelize"><code class="xref py py-func docutils literal notranslate"><span class="pre">parallelize()</span></code></a>.</p>
@@ -803,7 +803,7 @@ network), we need to think of a better way to reduce the number of unique spline
 <h2>Fitting the data using a spatially-aware L1 reweighting<a class="headerlink" href="#fitting-the-data-using-a-spatially-aware-l1-reweighting" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../disstans/solvers.html#riel14" id="id1"><span>[riel14]</span></a> solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
-updated based on a weighting scheme. In disstans, this is handled by the
+updated based on a weighting scheme. In DISSTANS, this is handled by the
 <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.SpatialSolver" title="disstans.solvers.SpatialSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialSolver</span></code></a> class, where more information about its algorithm
 can be found. In this tutorial, we just want to show how it is used and how it can improve
 the quality of the fit.</p>
@@ -1240,7 +1240,7 @@ parameters as well as the unique ones in both components have converged.</p>
 parameters falls below 10 <sup>-2</sup>, and around less than 10 parameters change
 between each iteration. Towards 20 iterations, no parameters actually change between
 being close-to-zero or non-zero, they just change their value slightly.
-This shows that the spatial reweighting scheme employed by disstans converges nicely
+This shows that the spatial reweighting scheme employed by DISSTANS converges nicely
 and fulfills the goal of reducing the number of unique splines used by the entire network.</p>
 <img alt="../_images/tutorial_3e_diffs.png" src="../_images/tutorial_3e_diffs.png" />
 <p>Now, let’s pick up on the correlation matrices saved throughout this tutorial

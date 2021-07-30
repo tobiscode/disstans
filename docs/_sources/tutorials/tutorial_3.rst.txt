@@ -1,7 +1,7 @@
 Tutorial 3: Incorporating Spatial Coherence
 ===========================================
 
-One of the main goals of disstans that should make it stand out from other timeseries analysis
+One of the main goals of DISSTANS that should make it stand out from other timeseries analysis
 software/routines is its ability to use spatial coherence as an additional source of
 information and constrain. In general, signals like earthquakes, slip events, or seasonal
 signals are spatially correlated, as the process have the same sources but affect multiple
@@ -24,7 +24,7 @@ at the station with the singular maintenance step) as well as over the entire ne
 evaluating will be done in parallel to achieve a significant speed-up.
 
 .. note::
-    By default, disstans does not use parallelization because of the intricacies
+    By default, DISSTANS does not use parallelization because of the intricacies
     between Python, NumPy/SciPy, and the low-level math libraries like BLAS/LAPACK
     (which can differ from machine to machine). For more information, including how
     to properly set up parallelization, see :func:`~disstans.tools.parallelize`.
@@ -566,7 +566,7 @@ Fitting the data using a spatially-aware L1 reweighting
 
 [riel14]_ solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
-updated based on a weighting scheme. In disstans, this is handled by the
+updated based on a weighting scheme. In DISSTANS, this is handled by the
 :class:`~disstans.solvers.SpatialSolver` class, where more information about its algorithm
 can be found. In this tutorial, we just want to show how it is used and how it can improve
 the quality of the fit.
@@ -1110,7 +1110,7 @@ The second figure shows that around the same time, the RMS difference of fitted
 parameters falls below 10 :sup:`-2`, and around less than 10 parameters change
 between each iteration. Towards 20 iterations, no parameters actually change between
 being close-to-zero or non-zero, they just change their value slightly.
-This shows that the spatial reweighting scheme employed by disstans converges nicely
+This shows that the spatial reweighting scheme employed by DISSTANS converges nicely
 and fulfills the goal of reducing the number of unique splines used by the entire network.
 
 .. image:: ../img/tutorial_3e_diffs.png
