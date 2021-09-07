@@ -2141,8 +2141,8 @@ class Network():
              for name in rel_disp_x.keys()}
         lines = \
             {name: ax_map.scatter(disp_latlon[name][:, 0], disp_latlon[name][:, 1],
-                                  facecolor=relcolors, edgecolor="none", zorder=1,
-                                  transform=proj_lla)
+                                  facecolor=relcolors, edgecolor="none", zorder=10,
+                                  transform=proj_lla, rasterized=True)
              for name in rel_disp_x.keys()}
 
         # add static background image and gridlines

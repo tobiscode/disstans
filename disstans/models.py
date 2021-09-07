@@ -1260,16 +1260,16 @@ class SplineSet(Model):
                     ax[k].fill_between(t_plot,
                                        y_off + y_norm[:, j]*dy_scale,
                                        y_off + y_norm[:, j+1]*dy_scale,
-                                       facecolor=facecol)
+                                       facecolor=facecol, zorder=-2)
             # plot vertical lines at centerpoints
             for j, k in product(range(model.num_parameters), range(num_components)):
                 ax[k].axvline(model.t_reference
                               + Timedelta(j*model.spacing, model.time_unit),
-                              y_off, y_off + dy_scale, c='0.5', lw=0.5)
+                              y_off, y_off + dy_scale, c='0.5', lw=0.5, zorder=-1)
         # finish plot by adding relevant gridlines and labels
         for k in range(num_components):
             for i in range(1, num_scales):
-                ax[k].axhline(i*dy_scale, c='0.5', lw=0.5)
+                ax[k].axhline(i*dy_scale, c='0.5', lw=0.5, zorder=-1)
             ax[k].set_xlim(t_left, t_right)
             ax[k].set_ylim(0, 1)
             ax[k].set_yticks([i*dy_scale for i in range(num_scales + 1)])
@@ -1278,6 +1278,7 @@ class SplineSet(Model):
                                            for model in self.splines]), minor=True)
             ax[k].tick_params(axis='both', labelleft=False, direction='out')
             ax[k].tick_params(axis='y', left=False, which='minor')
+            ax[k].set_rasterization_zorder(0)
         fig.colorbar(cmap, cax=ax[-1], orientation='horizontal',
                      label='Coefficient Value')
         return fig, ax
