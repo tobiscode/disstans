@@ -14,6 +14,8 @@ from copy import deepcopy
 from tqdm import tqdm
 from warnings import warn
 from matplotlib.animation import FuncAnimation
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
 
@@ -1366,8 +1368,8 @@ class Network():
         return fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons
 
-    def graphical_cme(self, ts_in, ts_out=None, annotate_stations=True,
-                      save=False, gui_kw_args={}, **cme_kw_args):
+    def graphical_cme(self, ts_in, ts_out=None, annotate_stations=True, save=False,
+                      save_kw_args={"format": "png"}, gui_kw_args={}, **cme_kw_args):
         """
         Calculates the Common Mode Error (CME) of the network and shows its spatial
         and temporal pattern. Optionally saves the model for each station.
@@ -1384,6 +1386,9 @@ class Network():
         save : bool, optional
             If ``True``, save the map and timeseries plots to the current folder.
             Defaults to ``False``.
+        save_kw_args : dict, optional
+            Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
+            used when ``save=True``.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~disstans.config.defaults`.
         **cme_kw_args : dict
@@ -1442,10 +1447,8 @@ class Network():
             ax_ts[icomp].grid()
         # show plots or save
         if save:
-            fig_map.tight_layout()
-            fig_ts.tight_layout()
-            fig_map.savefig("cme_spatial")
-            fig_ts.savefig("cme_temporal")
+            fig_map.savefig(f"cme_spatial.{save_kw_args['format']}", **save_kw_args)
+            fig_ts.savefig(f"cme_temporal.{save_kw_args['format']}", **save_kw_args)
             plt.close(fig_map)
             plt.close(fig_ts)
         else:
@@ -1453,8 +1456,9 @@ class Network():
 
     def gui(self, station=None, timeseries=None, fit_list=None, sum_models=True,
             verbose=False, annotate_stations=True, save=False, save_map=False,
-            scalogram_kw_args=None, mark_events=None, stepdetector={}, trend_kw_args={},
-            analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
+            save_kw_args={"format": "png"}, scalogram_kw_args=None, mark_events=None,
+            stepdetector={}, trend_kw_args={}, analyze_kw_args={}, rms_on_map={},
+            gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -1506,6 +1510,9 @@ class Network():
             Defaults to ``False``.
         save_map : bool, optional
             If ``True``, also save a map if ``save=True``. Defaults to ``False``.
+        save_kw_args : dict, optional
+            Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
+            used when ``save=True``.
         scalogram_kw_args : dict, optional
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
@@ -1957,11 +1964,11 @@ class Network():
             # save figure (and map)
             if save and not stepdetector:
                 nowtime = pd.Timestamp.now().isoformat()[:19].replace(":", "")
-                plotfname = f"{station_name}{fname_add}_{nowtime}"
-                fig_ts.savefig(f"ts_{plotfname}")
+                plotfname = f"{station_name}{fname_add}_{nowtime}.{save_kw_args['format']}"
+                fig_ts.savefig(f"ts_{plotfname}", **save_kw_args)
                 plt.close(fig_ts)
                 if save_map:
-                    fig_map.savefig(f"map_{plotfname}")
+                    fig_map.savefig(f"map_{plotfname}", **save_kw_args)
                     plt.close(fig_map)
 
             # get scalogram
@@ -1974,7 +1981,7 @@ class Network():
                                                                 **scalogram_kw_args)
                     # save figure or show
                     if save and not stepdetector:
-                        fig_scalo.savefig(f"scalo_{plotfname}")
+                        fig_scalo.savefig(f"scalo_{plotfname}", **save_kw_args)
                         plt.close(fig_scalo)
                     else:
                         fig_scalo.show()
@@ -2019,7 +2026,7 @@ class Network():
     def wormplot(self, ts_description, fname=None, fname_animation=None, subset_stations=None,
                  t_min=None, t_max=None, lon_min=None, lon_max=None, lat_min=None, lat_max=None,
                  en_col_names=[0, 1], scale=1e2, interval=10, annotate_stations=True,
-                 gui_kw_args={}):
+                 save_kw_args={"format": "png"}, colorbar_kw_args=None, gui_kw_args={}):
         """
         Creates an animated worm plot given the data in a timeseries.
 
@@ -2062,6 +2069,13 @@ class Network():
             The number of milliseconds each frame is shown (default: ``10``).
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
+        save_kw_args : dict, optional
+            Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
+            used when ``fname`` is specified.
+        colorbar_kw_args : dict, optional
+            If ``None`` (default), no colorbar is added to the plot. If a dictionary is passed,
+            a colorbar is added, with the dictionary containing additional keyword arguments
+            to the :meth:`~matplotlib.figure.Figure.colorbar` method.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
@@ -2127,6 +2141,9 @@ class Network():
         relcolors = scm.batlow(reltimes)
         relcolors[:, 3] = 0
 
+        # add time span as title
+        ax_map.set_title(f"{disp_x.time[0].date()} to {disp_x.time[-1].date()}")
+
         # get direction of displacement
         geoid = cgeod.Geodesic()
         stat_lonlats = {name: np.array(self[name].location)[[1, 0]].reshape(1, 2)
@@ -2160,26 +2177,34 @@ class Network():
                 print(exc)
         ax_map.gridlines(draw_labels=True)
 
+        # add a colorbar
+        if isinstance(colorbar_kw_args, dict):
+            colorbar_kw_args.update({"orientation": "horizontal", "ticks": [0, 1]})
+            cbar = fig_map.colorbar(ScalarMappable(norm=Normalize(vmin=0, vmax=1),
+                                                   cmap=scm.batlow),
+                                    ax=ax_map, **colorbar_kw_args)
+            cbar.ax.set_xticklabels([str(disp_x.time[0].date()), str(disp_x.time[-1].date())])
+
         # only animate if respective output filename is set
         if fname_animation:
 
             # define animation functions
             def init():
                 relcolors[:, 3] = 0
-                return lines.values()
+                ax_map.set_title(f"{disp_x.time[0].date()} to {disp_x.time[0].date()}")
 
             def update(i):
                 relcolors[:i+1, 3] = 1
                 for name in rel_disp_x.keys():
                     lines[name].set_facecolors(relcolors)
-                return lines.values()
+                ax_map.set_title(f"{disp_x.time[0].date()} to {disp_x.time[i].date()}")
 
             # make actual animation
             try:
                 pbar = tqdm(desc="Rendering animation", unit="frame",
                             total=relcolors.shape[0], ascii=True)
                 ani = FuncAnimation(fig_map, update, frames=relcolors.shape[0],
-                                    init_func=init, interval=interval, blit=True)
+                                    init_func=init, interval=interval, blit=False)
                 ani.save(fname_animation, progress_callback=lambda i, n: pbar.update())
             finally:
                 pbar.close()
@@ -2189,7 +2214,7 @@ class Network():
         for name in rel_disp_x.keys():
             lines[name].set_facecolors(relcolors)
         if fname:
-            fig_map.savefig(fname)
+            fig_map.savefig(f"{fname}.{save_kw_args['format']}", **save_kw_args)
         else:
             plt.show()
 

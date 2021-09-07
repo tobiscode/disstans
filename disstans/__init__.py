@@ -14,6 +14,7 @@ classes of DISSTANS, namely
 # imports for preparations later
 import multiprocessing
 from pandas.plotting import register_matplotlib_converters
+from matplotlib import rcParams
 
 # import submodules
 from . import compiled
@@ -39,3 +40,4 @@ __version__ = '0.9'
 # preparational steps
 multiprocessing.set_start_method('spawn', True)
 register_matplotlib_converters()
+rcParams['figure.constrained_layout.use'] = "True"

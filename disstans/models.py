@@ -2228,7 +2228,8 @@ class ModelCollection():
         else:
             return GtWG, GtWd
 
-    def plot_covariance(self, title=None, fname=None, use_corr_coef=False, plot_empty=True):
+    def plot_covariance(self, title=None, fname=None, use_corr_coef=False, plot_empty=True,
+                        save_kw_args={"format": "png"}):
         """
         Plotting method that displays the covariance (or correlation coefficient) matrix.
         The axes are labeled by model names for easier interpretation.
@@ -2249,6 +2250,9 @@ class ModelCollection():
             hard to identify the interplay between the different parameters. Therefore,
             setting ``plot_empty=False`` will only plot the rows and columns corresponding
             to nonzero parameters.
+        save_kw_args : dict, optional
+            Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
+            used when ``fname`` is provided.
         """
         # make a list of model names as well as the indices of the parameter boundaries
         # and the location of where to put the label
@@ -2343,5 +2347,5 @@ class ModelCollection():
         if fname is None:
             plt.show()
         else:
-            fig.savefig(fname)
+            fig.savefig(f"{fname}.{save_kw_args['format']}", **save_kw_args)
             plt.close(fig)
