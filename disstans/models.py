@@ -163,7 +163,7 @@ class Model():
     def cov(self):
         r"""
         Square array property with dimensions
-        :math:`\text{num_elements} * \text{num_components}` that contains the parameter's
+        :math:`\text{num_parameters} * \text{num_components}` that contains the parameter's
         full covariance matrix as a NumPy array. The rows (and columns) are ordered such
         that they first correspond to the covariances between all components for the first
         parameter, then the covariance between all components for the second parameter,

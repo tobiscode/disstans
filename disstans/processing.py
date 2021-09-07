@@ -13,6 +13,7 @@ from functools import wraps
 from sklearn.decomposition import PCA, FastICA
 from scipy.signal import find_peaks
 from tqdm import tqdm
+from warnings import warn
 
 from .config import defaults
 from .timeseries import Timeseries
@@ -294,6 +295,11 @@ def clean(station, ts_in, reference, ts_out=None,
     """
     clean_settings = defaults["clean"].copy()
     clean_settings.update(clean_kw_args)
+    # check if timeseries is present
+    if ts_in not in station.timeseries:
+        warn(f"Could not find timeseries '{ts_in}' in station {station.name}.",
+             category=RuntimeWarning)
+        return
     # check if we're modifying in-place or copying
     if ts_out is None:
         ts = station[ts_in]

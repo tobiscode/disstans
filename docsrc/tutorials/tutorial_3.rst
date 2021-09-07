@@ -1217,8 +1217,8 @@ For each transient timeseries that we saved, we can produce a wormplot like this
     >>> for case, trans_ts in \
     ...     zip(["local", "spatial20"], ["Trans_L1R5", "Trans_L1R1S20"]):
     ...     net.wormplot(ts_description=trans_ts,
-                         fname=f"tutorial_3h_worm_{case}.png",
-                         scale=1e3, annotate_stations=False)
+    ...                  fname=f"tutorial_3h_worm_{case}.png",
+    ...                  scale=1e3, annotate_stations=False)
 
 Which yields the following two maps:
 

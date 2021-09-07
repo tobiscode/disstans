@@ -43,6 +43,13 @@ Exponential
    :members:
    :special-members:
 
+Hyperbolic Tangent
+..................
+
+.. autoclass:: disstans.models.HyperbolicTangent
+   :members:
+   :special-members:
+
 Logarithmic
 ...........
 

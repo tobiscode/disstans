@@ -1120,12 +1120,13 @@ class Network():
         else:
             assert isinstance(ts_out, str), \
                 f"'ts_out' must be None or a string, got {type(ts_out)}."
-        iterable_inputs = ((func, station, ts_in, kw_args) for station in self)
-        station_names = self.station_names
+        station_names = [stat_name for stat_name, stat in self.stations.items()
+                         if ts_in in stat.timeseries]
+        iterable_inputs = ((func, self[name], ts_in, kw_args) for name in station_names)
         for i, result in enumerate(tqdm(parallelize(self._single_call_func_ts_return,
                                                     iterable_inputs),
                                         desc="Processing station timeseries with "
-                                        f"'{func.__name__}'", total=len(self.stations),
+                                        f"'{func.__name__}'", total=len(station_names),
                                         ascii=True, unit="station")):
             self[station_names[i]].add_timeseries(ts_out, result)
 

@@ -91,7 +91,7 @@ class Station():
             if len(self.models[ts_description]) > 0:
                 info += f"\n - Models: {self.models[ts_description].model_names}"
             if len(self.fits[ts_description]) > 0:
-                info += f"\n - Fits: {[key for key in self.fits[ts_description]]}"
+                info += f"\n - Fits: {[str(key) for key in self.fits[ts_description]]}"
         return info
 
     def __getitem__(self, ts_description):
