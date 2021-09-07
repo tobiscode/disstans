@@ -278,7 +278,8 @@ def get_cov_indices(icomp, index_map=None, num_components=None):
     return sorted(indices)
 
 
-def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
+def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False,
+                            return_single=False):
     r"""
     Converts a full variance(-covariance) matrix with multiple components into a
     column-based representation like the one used by :class:`~disstans.models.Model` or
@@ -300,15 +301,22 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
     num_components : int
         Number of components `cov_mat` contains.
     include_covariance : bool, optional
-        If ``True``, also extract the off-diagonal covariances. Defaults to ``False``,
-        i.e. only the diagonal covariances.
+        If ``True``, also extract the off-diagonal covariances of each element between
+        its components. Defaults to ``False``, i.e. only the diagonal covariances.
+    return_single : bool, optional
+        If ``False`` (default), return two arrays; if ``True``, concatenate the two.
+
     Returns
     -------
     variance : numpy.ndarray
         Array of shape :math:`(\text{num_elements}, \text{num_components})`.
+        If ``include_covariance=True`` and ``return_single=True``, this array
+        is concatenated horizontally with ``covariance``, leading to
+        :math:`(\text{num_elements}, (\text{num_components}*(\text{num_components}-1))/2)`
+        columns instead.
     covariance : numpy.ndarray
-        If ``include_covariance=True``, array of shape
-        :math:`(\text{num_parameters}, (\text{num_elements}*(\text{num_elements}-1))/2)`.
+        If ``include_covariance=True`` and ``return_single=False``, array of shape
+        :math:`\text{num_components}) + (\text{num_components}*(\text{num_components}-1))/2`.
     """
     assert (cov_mat.ndim == 2) and (cov_mat.shape[0] == cov_mat.shape[1]), \
         f"'cov_mat' must be a 2D square matrix, got array of shape {cov_mat.shape}."
@@ -330,7 +338,10 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False):
             covariance[iobs, :] = sub_mat.ravel()[raveled_indices]
     else:
         covariance = None
-    return variance, covariance
+    if include_covariance and return_single:
+        return np.concatenate((variance, covariance), axis=1)
+    else:
+        return variance, covariance
 
 
 def block_permutation(n_outer, n_inner):
