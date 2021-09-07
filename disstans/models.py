@@ -1469,6 +1469,45 @@ class Arctangent(Model):
         return coefs
 
 
+class HyperbolicTangent(Model):
+    r"""
+    Subclasses :class:`~disstans.models.Model`.
+
+    This model provides the hyprbolic tangent :math:`\arctan(\mathbf{t}/\tau)`,
+    stretched with a given time constant and normalized to be between
+    :math:`(0, 1)` at the limits.
+
+    Parameters
+    ----------
+    tau : float
+        Time constant :math:`\tau`.
+        To determine the constant from a characteristic time scale :math:`T` and a
+        percentage :math:`0<q<1` of the fraction of magnitude change to have happened
+        in that time scale (as counted in both directions from the reference time,
+        and given the specified time unit), use the following formula:
+        :math:`\tau = T / \left(2 \tanh^{-1} q \right)`.
+
+
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    """
+    def __init__(self, tau, t_reference,
+                 time_unit="D", zero_before=False, zero_after=False, **model_kw_args):
+        super().__init__(num_parameters=1, t_reference=t_reference, time_unit=time_unit,
+                         zero_before=zero_before, zero_after=zero_after, **model_kw_args)
+        self.tau = float(tau)
+        """ Time constant. """
+
+    def _get_arch(self):
+        arch = {"type": "HyperbolicTangent",
+                "kw_args": {"tau": self.tau}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        dt = self.tvec_to_numpycol(timevector)
+        coefs = np.tanh(dt / self.tau).reshape(-1, 1) / 2 + 0.5
+        return coefs
+
+
 def check_model_dict(models):
     """
     Checks whether a dictionary has the appropriate structure to be used to
