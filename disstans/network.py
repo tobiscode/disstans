@@ -4,6 +4,7 @@ highest-level container object in DISSTANS.
 """
 
 import numpy as np
+import scipy as sp
 import pandas as pd
 import json
 import matplotlib as mpl
@@ -28,8 +29,9 @@ from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
 from .processing import common_mode
-from .tools import parallelize, Timedelta, Click
+from .tools import parallelize, Timedelta, Click, weighted_median
 from .earthquakes import okada_displacement
+from .solvers import Solution, ReweightingFunction
 
 
 class Network():
@@ -893,6 +895,455 @@ class Network():
         solver, station_time, station_models, kw_args = parameter_tuple
         return solver(station_time, station_models, **kw_args)
 
+    def spatialfit(self, ts_description, penalty, spatial_reweight_models,
+                   spatial_reweight_iters, spatial_reweight_percentile=0.5,
+                   spatial_reweight_max_rms=1e-9, spatial_reweight_max_changed=0,
+                   continuous_reweight_models=[], local_reweight_iters=1,
+                   local_reweight_func=None, local_reweight_coupled=True,
+                   formal_covariance=False, use_data_variance=True, use_data_covariance=True,
+                   use_internal_scales=True, cov_zero_threshold=1e-6, verbose=False,
+                   return_stats=True, extended_stats=False, return_solutions=False,
+                   zero_threshold=1e-6, num_threads_evaluate=None, roll_mean_kernel=30,
+                   cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
+        r"""
+        Fit the models for a specific timeseries at all stations using the
+        spatiotemporal capabilities of :func:`~disstans.solvers.lasso_regression`,
+        and read the fitted parameters into the station's model collection.
+        Also provides a progress bar.
+        Will automatically use multiprocessing if parallelization has been enabled in
+        the configuration (defaults to parallelization if possible).
+
+        The function solve the network-wide fitting problem as proposed by [riel14]_:
+
+            1.  Fit the models individually using a single iteration step from
+                :func:`~disstans.solvers.lasso_regression`.
+            2.  Collect the L0 weights :math:`\mathbf{w}^{(i)}` from each station.
+            3.  Spatially combine (e.g. take the median of) the weights,
+                and redistribute them to the stations for the next iteration.
+            4.  Repeat from 1.
+
+        The iteration can stop early if either the conditions set by
+        ``spatial_reweight_max_rms`` *or* ``spatial_reweight_max_changed`` are satisfied,
+        for all models in ``spatial_reweight_models``.
+
+        Parameters
+        ----------
+        ts_description : str
+            Description of the timeseries to fit.
+        penalty : float
+            Penalty hyperparameter :math:`\lambda`. If ``local_reweight_coupled=True``
+            (default), this is just the penalty at the first iteration. After that, the
+            penalties are largely controlled by ``local_reweight_func``.
+        spatial_reweight_models : list
+            Names of models to use in the spatial reweighting.
+        spatial_reweight_iters : int
+            Number of spatial reweighting iterations.
+        spatial_reweight_percentile : float, optional
+            Percentile used in the spatial reweighting.
+            Defaults to ``0.5``.
+        spatial_reweight_max_rms : float, optional
+            Stop the spatial iterations early if the difference in the RMS (Root Mean Square)
+            of the change of the parameters between reweighting iterations is less than
+            ``spatial_reweight_max_rms``.
+        spatial_reweight_max_changed : float, optional
+            Stop the spatial iterations early if the number of changed parameters (i.e.,
+            flipped between zero and non-zero) falls below a threshold. The threshold
+            ``spatial_reweight_max_changed`` is given as the percentage of changed over total
+            parameters (including all models and components). Defaults to no early stopping.
+        continuous_reweight_models : list
+            Names of models that should carry over their weights from one solver iteration
+            to the next, but should not be reweighted.
+        local_reweight_iters : int, optional
+            Number of local reweighting iterations, see ``reweight_max_iters`` in
+            :func:`~disstans.solvers.lasso_regression`.
+        local_reweight_func : ReweightingFunction, optional
+            An instance of a reweighting function that will be used by
+            :func:`~disstans.solvers.lasso_regression`.
+            Defaults to an inverse reweighting with stability parameter ``eps=1e-4``.
+        local_reweight_coupled : bool, optional
+            If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
+            is coupled with the reweighting weights (see Notes in
+            :func:`~disstans.solvers.lasso_regression`).
+        formal_covariance : bool, optional
+            If ``True``, calculate the formal model covariance. Defaults to ``False``.
+        use_data_variance : bool, optional
+            If ``True`` (default) and ``ts_description`` contains variance information, this
+            uncertainty information will be used.
+        use_data_covariance : bool, optional
+            If ``True`` (default), ``ts_description`` contains variance and covariance
+            information, and ``use_data_variance`` is also ``True``, this uncertainty
+            information will be used.
+        use_internal_scales : bool, optional
+            Sets whether internal scaling should be used when reweighting, see
+            ``use_internal_scales`` in :func:`~disstans.solvers.lasso_regression`.
+        verbose : bool, optional
+            If ``True`` (default: ``False``), print progress and statistics along the way.
+        extended_stats : bool, optional
+            If ``True`` (default: ``False``), the fitted models are evaluated at each iteration
+            to calculate residual and fit statistics. These extended statistics are added to
+            ``last_statistics`` (see Returns below).
+        zero_threshold : float, optional
+            When extracting the formal covariance matrix or calculating statistics, assume
+            parameters with absolute values smaller than ``zero_threshold`` are effectively zero.
+        num_threads_evaluate : int, optional
+            If ``extended_stats=True`` and ``formal_covariance=True``, there will be calls to
+            :meth:`~evaluate` that will estimate the predicted variance,
+            which will be memory-intensive if the timeseries are long. Using the same number
+            of threads as defined in :attr:`~disstans.config.defaults` might therefore exceed
+            the available memory on the system. This option allows to set a different number
+            of threads or disable parallelized processing entirely for those calls.
+            Defaults to ``None``, which uses the same setting as in the defaults.
+        roll_mean_kernel : int, optional
+            Only used if ``verbose=2``. This is the kernel size that gets used in the analysis
+            of the residuals between each fitting step.
+        cvxpy_kw_args : dict
+            Additional keyword arguments passed on to CVXPY's ``solve()`` function,
+            see ``cvxpy_kw_args`` in :func:`~disstans.solvers.lasso_regression`.
+
+        Returns
+        -------
+
+        statistics : dict
+            See the Notes for an explanation of the solution and convergence statistics
+            that are returned.
+        solutions : dict, optional
+            If ``return_solutions=True``, a dictionary that contains the
+            :class:`~disstans.solvers.Solution` objects for each station.
+
+        Notes
+        -----
+
+        The ``statistics`` dictionary contains the following entries:
+
+        - ``'num_total'`` (:class:`~int`):
+          Total number of parameters that were reweighted.
+        - ``'arr_uniques'`` (:class:`~numpy.ndarray`):
+          Array of shape :math:`(\text{spatial_reweight_iters}+1, \text{num_components})`
+          of the number of unique (i.e., over all stations) parameters that are non-zero
+          for each iteration.
+        - ``'list_nonzeros'`` (:class:`~list`):
+          List of the total number of non-zero parameters for each iteration.
+        - ``'dict_rms_diff'`` (:class:`~dict`):
+          Dictionary that for each reweighted model and contains a list (of length
+          ``spatial_reweight_iters``) of the RMS differences of the reweighted parameter
+          values between spatial iterations.
+        - ``'dict_num_changed'`` (:class:`~dict`):
+          Dictionary that for each reweighted model and contains a list (of length
+          ``spatial_reweight_iters``) of the number of reweighted parameters that changed
+          from zero to non-zero or vice-versa.
+        - ``'list_res_stats'`` (:class:`~list`):
+          (Only present if ``extended_stats=True``.) List of the results dataframe returned
+          by :meth:`~analyze_residuals` for each iteration.
+        - ``'dict_cors'`` (:class:`~dict`):
+          (Only present if ``extended_stats=True``.)
+          For each of the reweighting models, contains a list of spatial correlation
+          matrices for each iteration and component. E.g., the correlation matrix
+          for model ``'my_model'`` after ``5`` reweighting iterations (i.e. the sixth
+          solution, taking into account the initial unweighted solution) for the first
+          component can be found in ``statistics['dict_cors']['my_model'][5][0]``
+          and has a shape of :math:`(\text{num_stations}, \text{num_stations})`.
+        - ``'dict_cors_means'`` (:class:`~dict`):
+          (Only present if ``extended_stats=True``.) Same shape as ``'dict_cors'``,
+          but containing the average of the upper triagonal parts of the spatial
+          correlation matrices (i.e. for each model, iteration, and component).
+
+        References
+        ----------
+
+        .. [riel14] Riel, B., Simons, M., Agram, P., & Zhan, Z. (2014). *Detecting transient
+           signals in geodetic time series using sparse estimation techniques*.
+           Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
+           doi:`10.1002/2014JB011077 <https://doi.org/10.1002/2014JB011077>`_
+        """
+
+        # input tests
+        valid_stations = {name: station for name, station in self.stations.items()
+                          if ts_description in station.timeseries}
+        station_names = list(valid_stations.keys())
+        num_stations = len(station_names)
+        assert num_stations > 1, "The number of stations in the network that " \
+            "contain the timeseries must be more than one."
+        assert isinstance(spatial_reweight_models, list) and \
+            all([isinstance(mdl, str) for mdl in spatial_reweight_models]), \
+            "'spatial_reweight_models' must be a list of model name strings, got " + \
+            f"{spatial_reweight_models}."
+        assert isinstance(spatial_reweight_iters, int) and (spatial_reweight_iters > 0), \
+            "'spatial_reweight_iters' must be an integer greater than 0, got " + \
+            f"{spatial_reweight_iters}."
+        assert float(spatial_reweight_max_rms) >= 0, "'spatial_reweight_max_rms' needs " \
+            f"to be greater or equal to 0, got {spatial_reweight_max_rms}."
+        assert 0 <= float(spatial_reweight_max_changed) <= 1, "'spatial_reweight_max_changed' " \
+            f"needs to be between 0 and 1, got {spatial_reweight_max_changed}."
+        if continuous_reweight_models != []:
+            assert isinstance(continuous_reweight_models, list) and \
+                all([isinstance(mdl, str) for mdl in continuous_reweight_models]), \
+                "'continuous_reweight_models' must be a list of model name strings, got " + \
+                f"{continuous_reweight_models}."
+        all_reweight_models = set(spatial_reweight_models + continuous_reweight_models)
+        assert len(all_reweight_models) == len(spatial_reweight_models) + \
+            len(continuous_reweight_models), "'spatial_reweight_models' " + \
+            "and 'continuous_reweight_models' can not have shared elements"
+
+        # set up reweighting function
+        if local_reweight_func is None:
+            rw_func = ReweightingFunction.from_name("inv", 1e-4)
+        else:
+            assert isinstance(local_reweight_func, ReweightingFunction), "'local_reweight_func' " \
+                f"needs to be None or a ReweightingFunction, got {type(local_reweight_func)}."
+            rw_func = local_reweight_func
+
+        # get scale lengths (correlation lengths)
+        # using the average distance to the closest 4 stations
+        if verbose:
+            tqdm.write("Calculating scale lengths")
+        geoid = cgeod.Geodesic()
+        station_lonlat = np.stack([np.array(self[name].location)[[1, 0]]
+                                   for name in station_names])
+        all_distances = np.empty((num_stations, num_stations))
+        net_avg_closests = []
+        for i, name in enumerate(station_names):
+            all_distances[i, :] = np.array(geoid.inverse(station_lonlat[i, :].reshape(1, 2),
+                                                         station_lonlat))[:, 0]
+            net_avg_closests.append(np.sort(all_distances[i, :])
+                                    [1:min(num_stations, 1 + 4)].mean())
+        distance_weights = np.exp(-all_distances / np.array(net_avg_closests).reshape(1, -1))
+        # distance_weights is ignoring whether (1) a station actually has data, and
+        # (2) if the spatial extent of the signal we're trying to estimate is correlated
+        # to the station geometry
+
+        # first solve, default initial weights
+        if verbose:
+            tqdm.write("Initial fit")
+        solutions = self.fit(ts_description,
+                             solver="lasso_regression",
+                             return_solutions=True,
+                             progress_desc=None if verbose else "Initial fit",
+                             penalty=penalty,
+                             reweight_max_iters=local_reweight_iters,
+                             reweight_func=rw_func,
+                             reweight_coupled=local_reweight_coupled,
+                             return_weights=True,
+                             formal_covariance=formal_covariance,
+                             use_data_variance=use_data_variance,
+                             use_data_covariance=use_data_covariance,
+                             use_internal_scales=use_internal_scales,
+                             cov_zero_threshold=cov_zero_threshold,
+                             cvxpy_kw_args=cvxpy_kw_args)
+        num_total = sum([s.models[ts_description][m].parameters.size
+                         for s in valid_stations.values() for m in all_reweight_models])
+        num_uniques = np.sum(np.stack(
+            [np.sum(np.any(np.stack([np.abs(s.models[ts_description][m].parameters)
+                                     > zero_threshold for s in valid_stations.values()]),
+                           axis=0), axis=0) for m in all_reweight_models]), axis=0)
+        num_nonzero = sum([(s.models[ts_description][m].parameters.ravel()
+                            > zero_threshold).sum()
+                           for s in valid_stations.values() for m in all_reweight_models])
+        if verbose:
+            tqdm.write(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
+            tqdm.write("Number of unique reweighted non-zero parameters per component: "
+                       + str(num_uniques.tolist()))
+
+        # initialize the other statistics objects
+        num_components = num_uniques.size
+        arr_uniques = np.empty((spatial_reweight_iters + 1, num_components))
+        arr_uniques[:] = np.NaN
+        arr_uniques[0, :] = num_uniques
+        list_nonzeros = [np.NaN for _ in range(spatial_reweight_iters + 1)]
+        list_nonzeros[0] = num_nonzero
+        dict_rms_diff = {m: [np.NaN for _ in range(spatial_reweight_iters)]
+                         for m in all_reweight_models}
+        dict_num_changed = {m: [np.NaN for _ in range(spatial_reweight_iters)]
+                            for m in all_reweight_models}
+
+        # track parameters of weights of the reweighted models for early stopping
+        old_params = {mdl_description:
+                      Solution.aggregate_models(results_dict=solutions,
+                                                mdl_description=mdl_description,
+                                                key_list=station_names,
+                                                stack_parameters=True,
+                                                zeroed=True)[0]
+                      for mdl_description in all_reweight_models}
+
+        if extended_stats:
+            # initialize extra statistics variables
+            list_res_stats = []
+            dict_cors = {mdl_description: [] for mdl_description in all_reweight_models}
+            dict_cors_means = {mdl_description: [] for mdl_description in all_reweight_models}
+            dict_cors_det = {mdl_description: [] for mdl_description in all_reweight_models}
+            dict_cors_det_means = {mdl_description: [] for mdl_description in all_reweight_models}
+
+            # define a function to save space
+            def save_extended_stats():
+                iter_name_fit = ts_description + "_extendedstats_fit"
+                iter_name_res = ts_description + "_extendedstats_res"
+                # evaluate model fit to timeseries
+                if num_threads_evaluate is not None:
+                    curr_num_threads = defaults["general"]["num_threads"]
+                    defaults["general"]["num_threads"] = int(num_threads_evaluate)
+                self.evaluate(ts_description, output_description=iter_name_fit)
+                if num_threads_evaluate is not None:
+                    defaults["general"]["num_threads"] = curr_num_threads
+                # calculate residuals
+                self.math(iter_name_res, ts_description, "-", iter_name_fit)
+                # analyze the residuals
+                list_res_stats.append(
+                    self.analyze_residuals(iter_name_res, mean=True, std=True,
+                                           max_rolling_dev=roll_mean_kernel))
+                # for each reweighted model fit, for each component,
+                # get its spatial correlation matrix and average value
+                for mdl_description in all_reweight_models:
+                    net_mdl_df = list(self.export_network_ts((ts_description,
+                                                              mdl_description)).values())
+                    cormats = [mdl_df.df.corr().abs().values for mdl_df in net_mdl_df]
+                    cormats_means = [np.nanmean(np.ma.masked_equal(np.triu(cormat, 1), 0))
+                                     for cormat in cormats]
+                    dict_cors[mdl_description].append(cormats)
+                    dict_cors_means[mdl_description].append(cormats_means)
+                    for i in range(len(net_mdl_df)):
+                        raw_values = net_mdl_df[i].data.values
+                        index_valid = np.isfinite(raw_values)
+                        for j in range(raw_values.shape[1]):
+                            raw_values[index_valid[:, j], j] = \
+                                sp.signal.detrend(raw_values[index_valid[:, j], j])
+                        net_mdl_df[i].data = raw_values
+                    cormats = [mdl_df.df.corr().abs().values for mdl_df in net_mdl_df]
+                    cormats_means = [np.nanmean(np.ma.masked_equal(np.triu(cormat, 1), 0))
+                                     for cormat in cormats]
+                    dict_cors_det[mdl_description].append(cormats)
+                    dict_cors_det_means[mdl_description].append(cormats_means)
+                # delete temporary timeseries
+                self.remove_timeseries(iter_name_fit, iter_name_res)
+
+            # run the function for the first time to capture the initial fit
+            save_extended_stats()
+
+        # iterate
+        for i in range(spatial_reweight_iters):
+            if verbose:
+                tqdm.write("Updating weights")
+            new_net_weights = {statname: {"reweight_init": {}} for statname in station_names}
+            # reweighting spatial models
+            for mdl_description in spatial_reweight_models:
+                stacked_weights, = \
+                    Solution.aggregate_models(results_dict=solutions,
+                                              mdl_description=mdl_description,
+                                              key_list=station_names,
+                                              stack_weights=True)
+                # if not None, stacking succeeded
+                if np.any(stacked_weights):
+                    if verbose:
+                        tqdm.write(f"Stacking model {mdl_description}")
+                        # print percentiles
+                        percs = [np.nanpercentile(stacked_weights, q) for q in [5, 50, 95]]
+                        tqdm.write("Weight percentiles (5-50-95): "
+                                   f"[{percs[0]:.11g}, {percs[1]:.11g}, {percs[2]:.11g}]")
+                    # now apply the spatial median to parameter weights
+                    for station_index, name in enumerate(station_names):
+                        new_net_weights[name]["reweight_init"][mdl_description] = \
+                            weighted_median(stacked_weights,
+                                            distance_weights[station_index, :],
+                                            percentile=spatial_reweight_percentile)
+                else:  # stacking failed, keep old weights
+                    warn(f"{mdl_description} cannot be stacked, reusing old weights.")
+                    for name in station_names:
+                        if mdl_description in solutions[name]:
+                            new_net_weights[name]["reweight_init"][mdl_description] = \
+                                solutions[name][mdl_description].weights
+            # copying over the old weights for the continuous models
+            for mdl_description in continuous_reweight_models:
+                for name in station_names:
+                    if mdl_description in solutions[name]:
+                        new_net_weights[name]["reweight_init"][mdl_description] = \
+                            solutions[name][mdl_description].weights
+            # next solver step
+            if verbose:
+                tqdm.write(f"Fit after {i+1} reweightings")
+            solutions = self.fit(ts_description,
+                                 solver="lasso_regression",
+                                 return_solutions=True,
+                                 local_input=new_net_weights,
+                                 progress_desc=None if verbose
+                                 else f"Fit after {i+1} reweightings",
+                                 penalty=penalty,
+                                 reweight_max_iters=local_reweight_iters,
+                                 reweight_func=rw_func,
+                                 reweight_coupled=local_reweight_coupled,
+                                 return_weights=True,
+                                 formal_covariance=formal_covariance,
+                                 use_data_variance=use_data_variance,
+                                 use_data_covariance=use_data_covariance,
+                                 cov_zero_threshold=cov_zero_threshold,
+                                 cvxpy_kw_args=cvxpy_kw_args)
+            # get statistics
+            num_nonzero = sum([(s.models[ts_description][m].parameters.ravel()
+                                > zero_threshold).sum()
+                               for s in valid_stations.values() for m in all_reweight_models])
+            num_uniques = np.sum(np.stack(
+                [np.sum(np.any(np.stack([np.abs(s.models[ts_description][m].parameters)
+                                        > zero_threshold for s in valid_stations.values()]),
+                               axis=0), axis=0) for m in all_reweight_models]), axis=0)
+            # save statistics
+            arr_uniques[i+1, :] = num_uniques
+            list_nonzeros[i+1] = num_nonzero
+            # print
+            if verbose:
+                tqdm.write("Number of reweighted non-zero parameters: "
+                           f"{num_nonzero}/{num_total}")
+                tqdm.write("Number of unique reweighted non-zero parameters per component: "
+                           + str(num_uniques.tolist()))
+            # save extended statistics
+            if extended_stats:
+                save_extended_stats()
+            # check for early stopping by comparing parameters that were reweighted
+            early_stop = True
+            for mdl_description in all_reweight_models:
+                stacked_params, = \
+                    Solution.aggregate_models(results_dict=solutions,
+                                              mdl_description=mdl_description,
+                                              key_list=station_names,
+                                              stack_parameters=True,
+                                              zeroed=True)
+                # check for early stopping criterion and save current parameters
+                rms_diff = np.linalg.norm(old_params[mdl_description] - stacked_params)
+                num_changed = np.logical_xor(np.abs(old_params[mdl_description]) < zero_threshold,
+                                             np.abs(stacked_params) < zero_threshold).sum()
+                early_stop &= (rms_diff < spatial_reweight_max_rms) or \
+                              (num_changed/num_total < spatial_reweight_max_changed)
+                old_params[mdl_description] = stacked_params
+                # save statistics
+                dict_rms_diff[mdl_description][i] = rms_diff
+                dict_num_changed[mdl_description][i] = num_changed
+                # print
+                if verbose:
+                    tqdm.write(f"RMS difference of '{mdl_description}' parameters = "
+                               f"{rms_diff:.11g} ({num_changed} changed)")
+            # check if early stopping was triggered
+            if early_stop:
+                if verbose:
+                    tqdm.write("Stopping iteration early.")
+                break
+
+        if verbose:
+            tqdm.write("Done")
+
+        # save statistics to dictionary
+        stats_names = ["num_total", "arr_uniques", "list_nonzeros",
+                       "dict_rms_diff", "dict_num_changed"]
+        stats_values = [num_total, arr_uniques, list_nonzeros,
+                        dict_rms_diff, dict_num_changed]
+        if extended_stats:
+            stats_names.extend(["list_res_stats", "dict_cors", "dict_cors_means",
+                                "dict_cors_det", "dict_cors_det_means"])
+            stats_values.extend([list_res_stats, dict_cors, dict_cors_means,
+                                 dict_cors_det, dict_cors_det_means])
+        statistics = {n: v for n, v in zip(stats_names, stats_values)}
+
+        # return
+        if return_solutions:
+            return statistics, solutions
+        else:
+            return statistics
+
     def evaluate(self, ts_description, timevector=None, output_description=None,
                  progress_desc=None):
         """
@@ -1058,7 +1509,7 @@ class Network():
         # residual
         if residual_description:
             self.math(residual_description, ts_description, "-", output_description)
-        # return either None or the results dictionary of self.fit():
+        # return either None or the solutions dictionary of self.fit():
         return possible_output
 
     def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
