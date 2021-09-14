@@ -511,9 +511,12 @@ class Model():
         if covariances is None:
             self._cov = None
         else:
-            assert covariances.shape == (parameters.size, parameters.size), \
-                "Covariance matrix must have shape " \
-                f"{(parameters.size, parameters.size)}, got {covariances.shape}."
+            if covariances.shape == self._par.shape:
+                covariances = np.diag(covariances.ravel())
+            elif not covariances.shape == (parameters.size, parameters.size):
+                raise ValueError("Covariance matrix must either have shape "
+                                 f"{(parameters.size, parameters.size)} or "
+                                 f"{self._par.shape}, got {covariances.shape}.")
             if act_params is not None:
                 active_ix = np.repeat(act_params, self._par.shape[1])
                 assert np.all(covariances[np.ix_(~active_ix, ~active_ix)] == 0), \
