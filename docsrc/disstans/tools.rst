@@ -6,40 +6,35 @@ Tools
 Functions
 ---------
 
-parallelize
-...........
+block_permutation
+.................
 
-.. autofunction:: disstans.tools.parallelize
+.. autofunction:: disstans.tools.block_permutation
 
-tvec_to_numpycol
-................
+cov2corr
+........
 
-.. autofunction:: disstans.tools.tvec_to_numpycol
+.. autofunction:: disstans.tools.cov2corr
 
 create_powerlaw_noise
 .....................
 
 .. autofunction:: disstans.tools.create_powerlaw_noise
 
-parse_maintenance_table
-.......................
+date2decyear
+............
 
-.. autofunction:: disstans.tools.parse_maintenance_table
-
-weighted_median
-...............
-
-.. autofunction:: disstans.tools.weighted_median
+.. autofunction:: disstans.tools.date2decyear
 
 download_unr_data
 .................
 
 .. autofunction:: disstans.tools.download_unr_data
 
-parse_unr_steps
-...............
+full_cov_mat_to_columns
+.......................
 
-.. autofunction:: disstans.tools.parse_unr_steps
+.. autofunction:: disstans.tools.full_cov_mat_to_columns
 
 get_cov_dims
 ............
@@ -56,23 +51,38 @@ get_cov_indices
 
 .. autofunction:: disstans.tools.get_cov_indices
 
-full_cov_mat_to_columns
+parallelize
+...........
+
+.. autofunction:: disstans.tools.parallelize
+
+parse_maintenance_table
 .......................
 
-.. autofunction:: disstans.tools.full_cov_mat_to_columns
+.. autofunction:: disstans.tools.parse_maintenance_table
 
-block_permutation
-.................
+parse_unr_steps
+...............
 
-.. autofunction:: disstans.tools.block_permutation
+.. autofunction:: disstans.tools.parse_unr_steps
 
-cov2corr
-........
+tvec_to_numpycol
+................
 
-.. autofunction:: disstans.tools.cov2corr
+.. autofunction:: disstans.tools.tvec_to_numpycol
+
+weighted_median
+...............
+
+.. autofunction:: disstans.tools.weighted_median
 
 Classes
 -------
+
+Click
+.....
+
+.. autoclass:: disstans.tools.Click
 
 RINEXDataHolding
 ................
@@ -87,8 +97,3 @@ Timedelta
 .. autoclass:: disstans.tools.Timedelta
    :members:
    :special-members:
-
-Click
-.....
-
-.. autoclass:: disstans.tools.Click

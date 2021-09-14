@@ -130,6 +130,32 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     return ((timevector - t_reference) / Timedelta(1, time_unit)).values
 
 
+def date2decyear(dates):
+    """
+    Convert dates (just year, month, day, each day assumed to be centered at noon)
+    to decimal years, assuming all years have 365.25 years (JPL convention for
+    GIPSY timeseries, also used by UNR NGL).
+
+    Parameters
+    ----------
+    dates : pandas.Series, pandas.DatetimeIndex, pandas.Timestamp, datetime.datetime
+        Input date(s). If a Series, needs to be a series of Timestamp-convertible
+        data types.
+
+    Returns
+    -------
+    numpy.ndarray
+        Date(s) as sorted decimal year(s).
+    """
+    if isinstance(dates, pd.Series):
+        tdelta = dates.dt.normalize() - pd.Timestamp(2000, 1, 1)
+    elif isinstance(dates, pd.DatetimeIndex) or isinstance(dates, pd.Timestamp):
+        tdelta = dates.normalize() - pd.Timestamp(2000, 1, 1)
+    elif isinstance(dates, datetime):
+        tdelta = datetime(dates.year, dates.month, dates.day) - datetime(2000, 1, 1)
+    return np.sort(np.array(2000 + tdelta.total_seconds() / 86400 / 365.25))
+
+
 def get_cov_dims(num_components):
     r"""
     Given a number of components, return the number of covariances that

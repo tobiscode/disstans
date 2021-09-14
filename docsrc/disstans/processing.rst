@@ -26,6 +26,11 @@ median
 
 .. autofunction:: disstans.processing.median
 
+midas
+.....
+
+.. autofunction:: disstans.processing.midas
+
 Classes
 -------
 

@@ -17,8 +17,9 @@ from warnings import warn
 
 from .config import defaults
 from .timeseries import Timeseries
-from .compiled import maskedmedfilt2d
-from .tools import Timedelta, parallelize, tvec_to_numpycol
+from .compiled import maskedmedfilt2d, selectpair
+from .tools import Timedelta, parallelize, tvec_to_numpycol, date2decyear
+from .models import Polynomial
 
 
 def unwrap_dict_and_ts(func):
@@ -350,6 +351,130 @@ def clean(station, ts_in, reference, ts_out=None,
     # if we made a copy, add it to the station, otherwise we're already done
     if ts_out is not None:
         station.add_timeseries(ts_out, ts)
+
+
+def midas(ts, steps=None, tolerance=0.001):
+    """
+    This function performs the MIDAS estimate as described by [blewitt16]_.
+    It is adapted from the Fortran code provided by the author (see
+    :func:`~disstans.compiled.selectpair` for more details and original copyright).
+
+    MIDAS returns the median estimate of secular (constant) velocities in all data
+    components using data pairs spanning exactly one year. By not including pairs
+    crossing known step epochs and using a fixed period, the influence of unmodeled
+    jumps and seasonal variations can be minimized. At the end, an empirical estimate
+    of the velocities' uncertainty is calculated as well.
+
+    Parameters
+    ----------
+    ts : disstans.timeseries.Timeseries
+        Timeseries to perform the MIDAS algorithm on.
+    steps : pandas.Series, pandas.DatetimeIndex, optional
+        If given, a pandas Series or Index of step times, across which no pairs
+        should be formed.
+    tolerance : float, optional
+        Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).
+
+    Returns
+    -------
+    mdl : disstans.models.Polynomial
+        Fitted polynomial (offset & constant velocity) model.
+    res : disstans.timeseries.Timeseries
+        Residual timeseries.
+    stats : dict
+        Fittings statistics computed along the way.
+        ``'num_epochs'``, ``'num_used'``, ``'num_pairs'``, and ``'nstep'`` are the number of
+        epochs in ``ts``, the number of epochs used in the velocity pairs, the number of pairs
+        formed, and the number of included steps, respectively. ``'frac_removed'`` and
+        ``'sd_velpairs'`` are the fraction of removed pairs (because of velocity pairs more
+        than two standard deviations away from their medians) and the estimated standard
+        deviation of the velocity pairs, respectively, and for each component.
+
+    References
+    ----------
+
+    .. [blewitt16] Blewitt, G., Kreemer, C., Hammond, W. C., & Gazeaux, J. (2016).
+       *MIDAS robust trend estimator for accurate GPS station velocities without step detection.*
+       Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.
+       doi:`10.1002/2015JB012552 <https://doi.org/10.1002/2015JB012552>`_
+    """
+    # extract timeseries data, adjust zero-crossing to first epoch
+    x = ts.data.values - ts.data.iloc[0, :].values
+    # convert timeseries index and step times to decimal years
+    t = date2decyear(ts.time)
+    tstep = np.zeros(1)  # need at least one entry for selectpair
+    if steps is not None:
+        steps_decyear = date2decyear(steps)
+        tstep_back = np.concatenate([-steps_decyear[::-1], tstep])
+        tstep = np.concatenate([steps_decyear, tstep])
+    # get forward and backwards time pairs
+    num_pairs, ip = selectpair(t, tstep, tolerance)
+    if num_pairs >= ip.shape[1]:
+        warn(f"Forward call to selectpair returned maximum number of pairs ({num_pairs} "
+             f"with a maximum of {ip.shape[1]}). Consider re-compiling DISSTANS "
+             "with a higher maxn constant in compiled.f90.")
+    nb, ipb = selectpair(-t[::-1], tstep_back, tolerance)
+    if nb >= ipb.shape[1]:
+        warn(f"Backward call to selectpair returned maximum number of pairs ({nb} "
+             f"with a maximum of {ipb.shape[1]}). Consider re-compiling DISSTANS "
+             "with a higher maxn constant in compiled.f90.")
+    if num_pairs + nb < 10:
+        warn(f"Only found {num_pairs} forward and {nb} backward pairs; solution will be bad.")
+    # convert backward indices to forward ones
+    ipb = t.size - ipb[[1, 0], :nb]
+    # combine the two index collections, and make them more readable
+    ip = np.concatenate([ip[:, :num_pairs] - 1, ipb], axis=1)
+    ip_from, ip_to = ip[0, :], ip[1, :]
+    num_pairs += nb
+    # calculate number of points used in pairing
+    num_used = np.unique(ip).size
+    # compute velocity for all pairs
+    v = (x[ip_to, :] - x[ip_from, :]) / (t[ip_to] - t[ip_from]).reshape(-1, 1)
+    # median of the velocities
+    v50 = np.nanmedian(v, axis=0, keepdims=True)
+    # absolute deviation from the median
+    d = np.abs(v - v50)
+    # median absolute deviation (MAD)
+    d50 = np.nanmedian(d, axis=0, keepdims=True)
+    # estimated standard deviation of velocities
+    # (based on theoretical factor 1.4826)
+    sd_velpairs = 1.4826 * d50
+    # delete velocities more than 2 s.d. from MAD
+    v[d >= 2*sd_velpairs] = np.NaN
+    num_kept = (~np.isnan(v)).sum(axis=0, keepdims=True)
+    # recompute median, absolute deviation, MAD, and estimated s.d.
+    v50 = np.nanmedian(v, axis=0, keepdims=True)
+    d = np.abs(v - v50)
+    d50 = np.nanmedian(d, axis=0, keepdims=True)
+    sd_velpairs = 1.4826 * d50
+    # Standard errors for the median velocity
+    # Multiply by theoretical factor of sqrt(pi/2) = 1.2533
+    # Divide number of data by 4 since we use coordinate data a nominal 4 times
+    # Also scale standard errors by ad hoc factor of 3 to be realistic
+    sv = 1.2533 * sd_velpairs / np.sqrt(num_kept / 4) * 3
+    # compute intercepts
+    r = x - v50 * (t.reshape(-1, 1) - t[0])
+    x50 = np.nanmedian(r, axis=0, keepdims=True)
+    # compute residuals
+    r -= x50
+    # fraction of pairs removed
+    frac_removed = (num_pairs - num_kept) / num_pairs
+    # return offet & velocity as linear Polynomial model
+    # intercept uncertainty is "perfect" since it wasn't estimated at all,
+    # it's just relative to a reference time
+    mdl = Polynomial(order=1, t_reference=ts.time[0], time_unit="Y")
+    mdl.read_parameters(parameters=np.concatenate([x50, v50], axis=0),
+                        covariances=np.concatenate([np.zeros_like(x50), sv], axis=0))
+    # return residual as a Timeseries
+    res = Timeseries.from_array(timevector=ts.time, data=r, src="midas",
+                                data_unit=ts.data_unit,
+                                data_cols=[f"{dcol}_midasres" for dcol in ts.data_cols])
+    # all other stats are returned in a dictionary
+    stats = {"num_epochs": t.size, "num_used": num_used, "num_pairs": num_pairs,
+             "frac_removed": frac_removed.ravel(), "sd_velpairs": sd_velpairs.ravel(),
+             "nstep": tstep.size - 1}
+    # return
+    return mdl, res, stats
 
 
 class StepDetector():
