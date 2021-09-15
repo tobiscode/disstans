@@ -156,7 +156,7 @@ Fitting the models with the spatial L0 solver
 ---------------------------------------------
 
 The following steps are nothing new - we will solve for model parameters with the
-:class:`~disstans.solvers.SpatialSolver` class. However, this time we're explicitly
+:meth:`~disstans.network.network.spatialfit` method. However, this time we're explicitly
 specifying if we want the solver to use data (co)variance.
 
 This first run doesn't use either the data variance or covariance, and we will save
@@ -168,24 +168,22 @@ comparison.
     >>> # define a reweighting function
     >>> from disstans.solvers import LogarithmicReweighting
     >>> rw_func = LogarithmicReweighting(1e-8, scale=10)
-    >>> # preparations
-    >>> from disstans.solvers import SpatialSolver
-    >>> spatsol = SpatialSolver(net, "Displacement")
-    >>> vel_en_est = {}
     >>> # solve without using the data variance
-    >>> spatsol.solve(penalty=5,
-    ...               spatial_reweight_models=["Transient"],
-    ...               spatial_reweight_iters=20,
-    ...               local_reweight_func=rw_func,
-    ...               use_data_variance=False,
-    ...               use_data_covariance=False,
-    ...               formal_covariance=True,
-    ...               verbose=True)
+    >>> stats = net.spatialfit("Displacement",
+    ...                        penalty=5,
+    ...                        spatial_reweight_models=["Transient"],
+    ...                        spatial_reweight_iters=20,
+    ...                        local_reweight_func=rw_func,
+    ...                        use_data_variance=False,
+    ...                        use_data_covariance=False,
+    ...                        formal_covariance=True,
+    ...                        verbose=True)
     Calculating scale lengths
     ...
     Done
     >>> net.evaluate("Displacement", output_description="Fit_onlydata")
     >>> # save estimated velocity components
+    >>> vel_en_est = {}
     >>> vel_en_est["onlydata"] = \
     ...     np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
 
@@ -195,14 +193,15 @@ for future comparison, we save the estimated parameters and covariance.
 .. doctest::
 
     >>> # solve using the data variance
-    >>> spatsol.solve(penalty=5,
-    ...               spatial_reweight_models=["Transient"],
-    ...               spatial_reweight_iters=20,
-    ...               local_reweight_func=rw_func,
-    ...               use_data_variance=True,
-    ...               use_data_covariance=False,
-    ...               formal_covariance=True,
-    ...               verbose=True)
+    >>> stats = net.spatialfit("Displacement",
+    ...                        penalty=5,
+    ...                        spatial_reweight_models=["Transient"],
+    ...                        spatial_reweight_iters=20,
+    ...                        local_reweight_func=rw_func,
+    ...                        use_data_variance=True,
+    ...                        use_data_covariance=False,
+    ...                        formal_covariance=True,
+    ...                        verbose=True)
     Calculating scale lengths
     ...
     Done
@@ -211,14 +210,15 @@ for future comparison, we save the estimated parameters and covariance.
     >>> vel_en_est["withvar"] = \
     ...     np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
     >>> # solve with the data variance and covariance
-    >>> spatsol.solve(penalty=5,
-    ...               spatial_reweight_models=["Transient"],
-    ...               spatial_reweight_iters=20,
-    ...               local_reweight_func=rw_func,
-    ...               use_data_variance=True,
-    ...               use_data_covariance=True,
-    ...               formal_covariance=True,
-    ...               verbose=True)
+    >>> stats = net.spatialfit("Displacement",
+    ...                        penalty=5,
+    ...                        spatial_reweight_models=["Transient"],
+    ...                        spatial_reweight_iters=20,
+    ...                        local_reweight_func=rw_func,
+    ...                        use_data_variance=True,
+    ...                        use_data_covariance=True,
+    ...                        formal_covariance=True,
+    ...                        verbose=True)
     Calculating scale lengths
     ...
     Done

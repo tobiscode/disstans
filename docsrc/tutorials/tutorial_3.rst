@@ -454,7 +454,7 @@ and count the number of total, non-zero, and unique non-zero parameters:
 
 .. doctest::
 
-    >>> ZERO = 1e-4  # this is from the default in SpatialSolver
+    >>> ZERO = 1e-4  # this is from the default in Network.spatialfit
     >>> num_total = sum([s.models["Displacement"]["Transient"].parameters.size for s in net])
     >>> num_uniques = \
     ...     np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
@@ -567,34 +567,27 @@ Fitting the data using a spatially-aware L1 reweighting
 [riel14]_ solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
 updated based on a weighting scheme. In DISSTANS, this is handled by the
-:class:`~disstans.solvers.SpatialSolver` class, where more information about its algorithm
+:class:`~disstans.network.Network.spatialfit` method, where more information about its algorithm
 can be found. In this tutorial, we just want to show how it is used and how it can improve
 the quality of the fit.
 
-First, we create a solver object for our network (``net``) and the timeseries we're looking
-at (``'Displacement'``) that will be used for the next couple of solution calls:
+:class:`~disstans.network.Network.spatialfit` takes some important arguments, but at its core
+it's essentially a wrapper for :meth:`~disstans.network.Network.fit`. Just like the latter,
+we give it an (initial) ``penalty`` parameter, and our ``cvxpy_kw_args`` solver settings.
+Additionally, we can now specify the models which we want to combine spatially
+(``spatial_reweight_models``), and how many spatial iterations we want
+(``spatial_reweight_iters``). We can also specify the ``verbose`` option so that we get some
+interesting statistics along the way (plus some progress bars that aren't shown here).
+Let's start by running only one spatial iteration, and evaluating its solution:
 
 .. doctest::
 
-    >>> from disstans.solvers import SpatialSolver
-    >>> spatsol = SpatialSolver(net, "Displacement")
-
-Now, we use the :meth:`~disstans.solvers.SpatialSolver.solve` method, which takes some
-important arguments, and passes the rest onto the general :meth:`~disstans.network.Network.fit`
-method. Just like the latter, we give it an (initial) ``penalty`` parameter, and our
-``cvxpy_kw_args`` solver settings. Additionally, we can now specify the models which we
-want to combine spatially (``spatial_reweight_models``), and how many spatial iterations
-we want (``spatial_reweight_iters``). We can also specify the ``verbose`` option so that
-we get some interesting statistics along the way (plus some progress bars that aren't shown
-here). Let's start by running only one spatial iteration, and evaluating its solution:
-
-.. doctest::
-
-    >>> spatsol.solve(penalty=10,
-    ...               spatial_reweight_models=["Transient"],
-    ...               spatial_reweight_iters=1,
-    ...               formal_covariance=True,
-    ...               verbose=True)
+    >>> stats = net.spatialfit("Displacement",
+    ...                        penalty=10,
+    ...                        spatial_reweight_models=["Transient"],
+    ...                        spatial_reweight_iters=1,
+    ...                        formal_covariance=True,
+    ...                        verbose=True)
     Calculating scale lengths
     Initial fit
     ...
@@ -661,11 +654,12 @@ steps:
 
 .. doctest::
 
-    >>> spatsol.solve(penalty=10,
-    ...               spatial_reweight_models=["Transient"],
-    ...               spatial_reweight_iters=20,
-    ...               formal_covariance=True,
-    ...               verbose=True)
+    >>> stats = net.spatialfit("Displacement",
+    ...                        penalty=10,
+    ...                        spatial_reweight_models=["Transient"],
+    ...                        spatial_reweight_iters=20,
+    ...                        formal_covariance=True,
+    ...                        verbose=True)
     Calculating scale lengths
     Initial fit
     ...
@@ -707,7 +701,7 @@ Jeckle station, for example, we can see that some left-over signal can be found
 in the residual North timeseries around the first SSE.
 This can probably be tuned by changing the L1 ``penalty``, or by choosing a different
 ``local_reweight_func``, or many other configuration settings that are present in
-:meth:`~disstans.solvers.SpatialSolver.solve`.
+:meth:`~disstans.network.Network.spatialfit`.
 Another way that could potentially mitigate the problem would be to use more splines
 that will then better match the onset times of the transients we generated. However,
 we won't spend time on it here since the effects of the tuning will depend a lot on the
@@ -793,10 +787,10 @@ for both error timeseries ``'Err_L1R5'`` and ``'Err_L1R1S20'``:
 
 Giving us (again, approximately)::
 
-    >>> for err_ts, stats in stats_dict.items():
+    >>> for err_ts, stat in stats_dict.items():
     ...     print(f"Errors for {err_ts}:")
-    ...     print(stats)
-    ...     print(stats.mean())
+    ...     print(stat)
+    ...     print(stat.mean())
     Errors for Err_L1R5:
     Metrics                      Mean                                           RMS
     Components Displacement_Model_E-E Displacement_Model_N-N Displacement_Model_E-E Displacement_Model_N-N
@@ -1046,9 +1040,8 @@ on that day.
 Statistics of spatial reweighting
 ---------------------------------
 
-Let's have a look at the statistics saved by ourselves as well as those saved
-by :class:`~disstans.solvers.SpatialSolver` into its attribute
-:attr:`~disstans.solvers.SpatialSolver.last_statistics`.
+Let's have a look at the statistics saved by ourselves as well as those returned
+by :meth:`~disstans.network.Network.spatialfit` into the ``stats`` dictionary.
 The first three variables contain the key numbers we used before to show how
 the spatial reweighting not only reduces the total number of splines used, but
 also the number of *unique* splines used across the network.
@@ -1057,16 +1050,14 @@ the iterations.
 
 Let's make two figures that show how they evolve and converge::
 
-    >>> num_total, arr_uniques, list_nonzeros, dict_rms_diff, dict_num_changed = \
-    ...     spatsol.last_statistics
     >>> # first figure is for num_total, arr_uniques, list_nonzeros
     >>> fig, ax1 = plt.subplots()
     >>> ax2 = ax1.twinx()
-    >>> ax1.plot(list_nonzeros, c="k", marker=".")
+    >>> ax1.plot(stats["list_nonzeros"], c="k", marker=".")
     >>> ax1.set_ylim([0, 500])
     >>> ax1.set_yticks(range(0, 600, 100))
-    >>> ax2.plot(arr_uniques[:, 0], c="C0", marker=".")
-    >>> ax2.plot(arr_uniques[:, 1], c="C1", marker=".")
+    >>> ax2.plot(stats["arr_uniques"][:, 0], c="C0", marker=".")
+    >>> ax2.plot(stats["arr_uniques"][:, 1], c="C1", marker=".")
     >>> ax2.set_ylim([0, 150])
     >>> ax2.set_yticks(range(0, 180, 30))
     >>> ax1.set_xticks([0, 1, 5, 10, 15, 20])
@@ -1077,16 +1068,16 @@ Let's make two figures that show how they evolve and converge::
     ...                 Line2D([0], [0], c="C0", marker="."),
     ...                 Line2D([0], [0], c="C1", marker=".")]
     >>> ax1.legend(custom_lines, ["Total", "Unique East", "Unique North"])
-    >>> ax1.set_title(f"Number of available parameters: {num_total}")
+    >>> ax1.set_title(f"Number of available parameters: {stats['num_total']}")
     >>> fig.savefig("tutorial_3e_numparams.png")
     >>> plt.close(fig)
     >>> # second figure is for dict_rms_diff, dict_num_changed
     >>> fig, ax1 = plt.subplots()
     >>> ax2 = ax1.twinx()
-    >>> ax1.plot(range(1, 21), dict_rms_diff["Transient"], c="C0", marker=".")
+    >>> ax1.plot(range(1, 21), stats["dict_rms_diff"]["Transient"], c="C0", marker=".")
     >>> ax1.set_yscale("log")
     >>> ax1.set_ylim([1e-4, 10])
-    >>> ax2.plot(range(1, 21), dict_num_changed["Transient"], c="C1", marker=".")
+    >>> ax2.plot(range(1, 21), stats["dict_num_changed"]["Transient"], c="C1", marker=".")
     >>> ax2.set_yscale("symlog", linthresh=10)
     >>> ax2.set_ylim([0, 1000])
     >>> ax2.set_yticks([0, 2, 4, 6, 8, 10, 100, 1000])
