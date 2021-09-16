@@ -442,7 +442,7 @@ class Network():
             del self.stations[name]
 
     @classmethod
-    def from_json(cls, path, add_default_local_models=True,
+    def from_json(cls, path, add_default_local_models=True, no_pbar=False,
                   station_kw_args={}, timeseries_kw_args={}):
         """
         Create a :class:`~disstans.network.Network` instance from a JSON configuration file.
@@ -453,6 +453,8 @@ class Network():
             Path of input JSON file.
         add_default_local_models : bool, optional
             If false, skip the adding of any default local model found in a station.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
         station_kw_args : dict, optional
             Additional keyword arguments passed on to the
             :class:`~disstans.station.Station` constructor.
@@ -479,7 +481,8 @@ class Network():
                   default_local_models=net_arch["default_local_models"])
         # create stations
         for station_name, station_cfg in tqdm(net_arch["stations"].items(), ascii=True,
-                                              desc="Building Network", unit="station"):
+                                              desc="Building Network", unit="station",
+                                              disable=no_pbar):
             if "location" in station_cfg:
                 station_loc = station_cfg["location"]
             elif station_name in net._network_locations:
@@ -802,7 +805,7 @@ class Network():
                 station.models[ts_description].unfreeze(model_list=model_list)
 
     def fit(self, ts_description, solver='linear_regression', local_input={},
-            return_solutions=False, progress_desc=None, **kw_args):
+            return_solutions=False, progress_desc=None, no_pbar=False, **kw_args):
         """
         Fit the models for a specific timeseries at all stations,
         and read the fitted parameters into the station's model collection.
@@ -827,6 +830,8 @@ class Network():
             by the calls to the solver function.
         progress_desc : str, optional
             If provided, override the description of the progress bar.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
         **kw_args : dict
             Additional keyword arguments that are passed on to the solver function.
 
@@ -877,7 +882,7 @@ class Network():
             solutions = {}
         for i, sol in enumerate(tqdm(parallelize(self._fit_single_station, iterable_inputs),
                                      desc=progress_desc, total=len(station_names),
-                                     ascii=True, unit="station")):
+                                     ascii=True, unit="station", disable=no_pbar)):
             # print warning if the solver didn't converge
             if not sol.converged:
                 warn(f"Fitting did not converge for timeseries {ts_description} "
@@ -900,10 +905,11 @@ class Network():
                    spatial_reweight_max_rms=1e-9, spatial_reweight_max_changed=0,
                    continuous_reweight_models=[], local_reweight_iters=1,
                    local_reweight_func=None, local_reweight_coupled=True,
-                   formal_covariance=False, use_data_variance=True, use_data_covariance=True,
-                   use_internal_scales=True, cov_zero_threshold=1e-6, verbose=False,
+                   formal_covariance=False, use_data_variance=True,
+                   use_data_covariance=True, use_internal_scales=True,
+                   cov_zero_threshold=1e-6, verbose=False, no_pbar=False,
                    return_stats=True, extended_stats=False, return_solutions=False,
-                   zero_threshold=1e-6, num_threads_evaluate=None, roll_mean_kernel=30,
+                   zero_threshold=1e-4, num_threads_evaluate=None, roll_mean_kernel=30,
                    cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
         r"""
         Fit the models for a specific timeseries at all stations using the
@@ -977,11 +983,13 @@ class Network():
             Sets whether internal scaling should be used when reweighting, see
             ``use_internal_scales`` in :func:`~disstans.solvers.lasso_regression`.
         verbose : bool, optional
-            If ``True`` (default: ``False``), print progress and statistics along the way.
+            If ``True`` (default: ``False``), print statistics along the way.
+        no_pbar : bool, optional
+            Suppress the progress bars with ``True`` (default: ``False``).
         extended_stats : bool, optional
             If ``True`` (default: ``False``), the fitted models are evaluated at each iteration
             to calculate residual and fit statistics. These extended statistics are added to
-            ``last_statistics`` (see Returns below).
+            ``statistics`` (see Returns below).
         zero_threshold : float, optional
             When extracting the formal covariance matrix or calculating statistics, assume
             parameters with absolute values smaller than ``zero_threshold`` are effectively zero.
@@ -994,8 +1002,8 @@ class Network():
             of threads or disable parallelized processing entirely for those calls.
             Defaults to ``None``, which uses the same setting as in the defaults.
         roll_mean_kernel : int, optional
-            Only used if ``verbose=2``. This is the kernel size that gets used in the analysis
-            of the residuals between each fitting step.
+            Only used if ``extended_stats=True``. This is the kernel size that gets used in the
+            analysis of the residuals between each fitting step.
         cvxpy_kw_args : dict
             Additional keyword arguments passed on to CVXPY's ``solve()`` function,
             see ``cvxpy_kw_args`` in :func:`~disstans.solvers.lasso_regression`.
@@ -1118,6 +1126,7 @@ class Network():
                              solver="lasso_regression",
                              return_solutions=True,
                              progress_desc=None if verbose else "Initial fit",
+                             no_pbar=no_pbar,
                              penalty=penalty,
                              reweight_max_iters=local_reweight_iters,
                              reweight_func=rw_func,
@@ -1180,7 +1189,7 @@ class Network():
                 if num_threads_evaluate is not None:
                     curr_num_threads = defaults["general"]["num_threads"]
                     defaults["general"]["num_threads"] = int(num_threads_evaluate)
-                self.evaluate(ts_description, output_description=iter_name_fit)
+                self.evaluate(ts_description, output_description=iter_name_fit, no_pbar=no_pbar)
                 if num_threads_evaluate is not None:
                     defaults["general"]["num_threads"] = curr_num_threads
                 # calculate residuals
@@ -1264,6 +1273,7 @@ class Network():
                                  local_input=new_net_weights,
                                  progress_desc=None if verbose
                                  else f"Fit after {i+1} reweightings",
+                                 no_pbar=no_pbar,
                                  penalty=penalty,
                                  reweight_max_iters=local_reweight_iters,
                                  reweight_func=rw_func,
@@ -1345,7 +1355,7 @@ class Network():
             return statistics
 
     def evaluate(self, ts_description, timevector=None, output_description=None,
-                 progress_desc=None):
+                 progress_desc=None, no_pbar=False):
         """
         Evaluate a timeseries' models at all stations and adds them as a fit to
         the timeseries. Can optionally add the aggregate model as an independent
@@ -1368,6 +1378,8 @@ class Network():
             the model as a fit *to* the timeseries).
         progress_desc : str, optional
             If provided, override the description of the progress bar.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
 
         Example
         -------
@@ -1408,7 +1420,7 @@ class Network():
         for i, (sumfit, mdlfit) in enumerate(tqdm(parallelize(self._evaluate_single_station,
                                                               iterable_inputs),
                                                   desc=progress_desc, total=len(station_names),
-                                                  ascii=True, unit="station")):
+                                                  ascii=True, unit="station", disable=no_pbar)):
             stat = self[station_names[i]]
             # add overall model
             ts = stat.add_fit(ts_description, ALLFITS, sumfit,
@@ -1431,7 +1443,7 @@ class Network():
 
     def fitevalres(self, ts_description, solver='linear_regression', local_input={},
                    return_solutions=False, timevector=None, output_description=None,
-                   residual_description=None, progress_desc=None, **kw_args):
+                   residual_description=None, progress_desc=None, no_pbar=False, **kw_args):
         """
         Convenience method that combines the calls for :meth:`~fit`, :meth:`~evaluate`
         and :meth:`~math` (to compute the fit residual) into one method call.
@@ -1457,6 +1469,8 @@ class Network():
             If provided, set ``progress_desc`` of :meth:`~fit` and :meth:`~evaluate`
             using the first or second element of a tuple or list, respectively.
             Leave ``None`` if only overriding one of them.
+        no_pbar : bool, optional
+            Suppress the progress bars with ``True`` (default: ``False``).
         **kw_args : dict
             Additional keyword arguments that are passed on to the solver function,
             see :meth:`~fit`.
@@ -1502,9 +1516,10 @@ class Network():
         possible_output = self.fit(ts_description=ts_description,
                                    solver=solver, local_input=local_input,
                                    return_solutions=return_solutions,
-                                   progress_desc=progress_desc[0], **kw_args)
+                                   progress_desc=progress_desc[0],
+                                   no_pbar=no_pbar, **kw_args)
         # evaluate
-        self.evaluate(ts_description=ts_description, timevector=timevector,
+        self.evaluate(ts_description=ts_description, timevector=timevector, no_pbar=no_pbar,
                       output_description=output_description, progress_desc=progress_desc[0])
         # residual
         if residual_description:
@@ -1512,7 +1527,7 @@ class Network():
         # return either None or the solutions dictionary of self.fit():
         return possible_output
 
-    def call_func_ts_return(self, func, ts_in, ts_out=None, **kw_args):
+    def call_func_ts_return(self, func, ts_in, ts_out=None, no_pbar=False, **kw_args):
         """
         A convenience wrapper that for each station in the network, calls a given
         function which takes timeseries as input and returns a timeseries (which
@@ -1531,6 +1546,8 @@ class Network():
         ts_out : str, optional
             Name of the timeseries that the output of ``func`` should be assigned to.
             Defaults to overwriting ``ts_in``.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
         **kw_args : dict
             Additional keyword arguments to be passed onto ``func``.
 
@@ -1580,7 +1597,7 @@ class Network():
                                                     iterable_inputs),
                                         desc="Processing station timeseries with "
                                         f"'{func.__name__}'", total=len(station_names),
-                                        ascii=True, unit="station")):
+                                        ascii=True, unit="station", disable=no_pbar)):
             self[station_names[i]].add_timeseries(ts_out, result)
 
     @staticmethod
@@ -1650,7 +1667,7 @@ class Network():
         net_out = func(net_in, **kw_args)
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
 
-    def call_func_no_return(self, func, **kw_args):
+    def call_func_no_return(self, func, no_pbar=False, **kw_args):
         """
         A convenience wrapper that for each station in the network, calls a given function on
         each station. Also provides a progress bar.
@@ -1661,6 +1678,8 @@ class Network():
             Function to use. If provided with a string, will check for that function in
             :mod:`~disstans.processing`, otherwise the function will be assumed to adhere to the
             same input format than the included ones.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
         **kw_args : dict
             Additional keyword arguments to be passed onto ``func``.
 
@@ -1691,7 +1710,7 @@ class Network():
                                    "(if loaded from disstans.processing).")
         for name, station in tqdm(self.stations.items(),
                                   desc=f"Calling function '{func.__name__}' on stations",
-                                  ascii=True, unit="station"):
+                                  ascii=True, unit="station", disable=no_pbar):
             func(station, **kw_args)
 
     def math(self, result, left, operator, right):
@@ -2477,7 +2496,8 @@ class Network():
     def wormplot(self, ts_description, fname=None, fname_animation=None, subset_stations=None,
                  t_min=None, t_max=None, lon_min=None, lon_max=None, lat_min=None, lat_max=None,
                  en_col_names=[0, 1], scale=1e2, interval=10, annotate_stations=True,
-                 save_kw_args={"format": "png"}, colorbar_kw_args=None, gui_kw_args={}):
+                 no_pbar=False, save_kw_args={"format": "png"}, colorbar_kw_args=None,
+                 gui_kw_args={}):
         """
         Creates an animated worm plot given the data in a timeseries.
 
@@ -2520,6 +2540,9 @@ class Network():
             The number of milliseconds each frame is shown (default: ``10``).
         annotate_stations : bool, optional
             If ``True`` (default), add the station names to the map.
+        no_pbar : bool, optional
+            Suppress the progress bar when creating the animation with ``True``
+            (default: ``False``).
         save_kw_args : dict, optional
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``fname`` is specified.
@@ -2653,7 +2676,7 @@ class Network():
             # make actual animation
             try:
                 pbar = tqdm(desc="Rendering animation", unit="frame",
-                            total=relcolors.shape[0], ascii=True)
+                            total=relcolors.shape[0], ascii=True, disable=no_pbar)
                 ani = FuncAnimation(fig_map, update, frames=relcolors.shape[0],
                                     init_func=init, interval=interval, blit=False)
                 ani.save(fname_animation, progress_callback=lambda i, n: pbar.update())

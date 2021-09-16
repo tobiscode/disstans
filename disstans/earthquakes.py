@@ -103,7 +103,7 @@ def _okada_get_cumdisp(time_station_settings):
 
 
 def okada_prior(network, catalog_path, target_timeseries=None, target_model=None,
-                target_model_regularize=False, catalog_prior_kw_args={}):
+                target_model_regularize=False, no_pbar=False, catalog_prior_kw_args={}):
     r"""
     Given a catalog of earthquakes (including moment tensors), calculate an approximate
     displacement for each of the stations in the network.
@@ -125,6 +125,8 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
         Has to be passed if ``target_timeseries`` is passed.
     target_model_regularize : bool, optional
         Whether to mark the model for regularization or not.
+    no_pbar : bool, optional
+        Suppress the progress bar with ``True`` (default: ``False``).
     catalog_prior_kw_args : dict, optional
         A dictionary fine-tuning the displacement calculation and modeling, see
         :attr:`~disstans.config.defaults` for explanations and defaults.
@@ -204,7 +206,7 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
     station_disp = np.zeros((n_eq, stations_lla.shape[0], 3))
     for i, result in enumerate(tqdm(parallelize(_okada_get_displacements,
                                                 parameters, chunksize=100),
-                                    ascii=True, total=n_eq, unit="eq",
+                                    ascii=True, total=n_eq, unit="eq", disable=no_pbar,
                                     desc="Simulating Earthquake Displacements")):
         station_disp[i, :, :] = result
 
@@ -216,7 +218,7 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
                            station_disp[:, istat, :], catalog_prior_settings["threshold"])
                           for istat, stat_name in enumerate(station_names))
     for i, result in enumerate(tqdm(parallelize(_okada_get_cumdisp, cumdisp_parameters),
-                                    ascii=True, total=len(network.stations),
+                                    ascii=True, total=len(network.stations), disable=no_pbar,
                                     desc="Adding steps where necessary", unit="station")):
         eq_steps_dict[station_names[i]] = result
         if do_add:

@@ -806,7 +806,7 @@ class StepDetector():
                                      self.kernel_size_min, maxdel))
 
     def search_network(self, net, ts_description, maxdel=10, threshold=20,
-                       gap=2, gap_unit="D"):
+                       gap=2, gap_unit="D", no_pbar=False):
         r"""
         Function that searches for steps in an entire network (possibly in parallel),
         thresholds those probabilities, and identifies all the consecutive ranges in which
@@ -828,6 +828,8 @@ class StepDetector():
             of possible steps.
         gap_unit : str, optional
             Time unit of ``gap``.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
 
         Returns
         -------
@@ -854,8 +856,9 @@ class StepDetector():
                           for station in valid_stations.values())
         for name, station, (probs, var0, var1) in \
             zip(valid_stations.keys(), valid_stations.values(),
-                tqdm(parallelize(StepDetector._search, iterable_input), ascii=True,
-                     total=len(valid_stations), unit="station", desc="Searching for steps")):
+                tqdm(parallelize(StepDetector._search, iterable_input),
+                     ascii=True, total=len(valid_stations), unit="station",
+                     desc="Searching for steps", disable=no_pbar)):
             # find steps given the just calculated probabilities
             # setting the maximum number of steps to infinite to not miss anything
             steps = StepDetector.steps(probs, threshold, np.inf, False)
@@ -895,7 +898,7 @@ class StepDetector():
         return step_table, step_ranges
 
     def search_catalog(self, net, ts_description, catalog, threshold=None,
-                       gap=2, gap_unit="D", keep_nan_probs=True):
+                       gap=2, gap_unit="D", keep_nan_probs=True, no_pbar=False):
         r"""
         Search a dictionary of potential step times for each station in the dictionary
         and assess the probability for each one.
@@ -924,6 +927,8 @@ class StepDetector():
             and the results will contain NaNs.
             If ``True`` (default), those entries will be kept in the output, and if
             ``False``, they will be dropped.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
 
         Returns
         -------
@@ -985,7 +990,7 @@ class StepDetector():
                           for sta_name in stations_overlap)
         results_iterator = tqdm(parallelize(StepDetector._search, iterable_input),
                                 ascii=True, total=len(stations_overlap), unit="station",
-                                desc="Searching for steps")
+                                desc="Searching for steps", disable=no_pbar)
         for name, (probs, var0, var1) in zip(stations_overlap, results_iterator):
             # probs now contains a row for each catalog item
             # if the probability is NaN, AIC does not see evidence for a step,

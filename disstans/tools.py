@@ -817,7 +817,7 @@ def weighted_median(values, weights, axis=0, percentile=0.5,
 
 def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                       rate="24h", reference=None, min_solutions=100,
-                      t_min=None, t_max=None, verbose=1):
+                      t_min=None, t_max=None, verbose=False, no_pbar=False):
     """
     Downloads GNSS timeseries data from the University of Nevada at Reno's
     `Nevada Geodetic Laboratory`_. When using this data, please cite [blewitt18]_,
@@ -857,9 +857,10 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         Only consider stations that have data on or after ``t_min``.
     t_max : str or pandas.Timestamp, optional
         Only consider stations that have data on or before ``t_max``.
-    verbose : bool, int, optional
-        Sets the verbosity level. If ``0``, the function is quiet. If ``1`` (default),
-        a progress bar is shown. If ``2``, also the individual actions are printed.
+    verbose : bool, optional
+        If ``True`` (dault: ``False``), individual actions are printed.
+    no_pbar : bool, optional
+        Suppress the progress bar with ``True`` (default: ``False``).
 
     Returns
     -------
@@ -917,7 +918,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
     # make the necessary folders
     atr_dir = os.path.join(data_dir, "attributions")
-    if verbose > 1:
+    if verbose:
         print(f"Making sure '{data_dir}' and '{atr_dir}' exist.")
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(atr_dir, exist_ok=True)
@@ -955,7 +956,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsUltra5min.txt"
     station_list_path = os.path.join(data_dir, station_list_url.split("/")[-1])
     # download the station list and parse to a DataFrame
-    if verbose > 1:
+    if verbose:
         print(f"Downloading station list from {station_list_url} to {station_list_path}.")
     try:
         request.urlretrieve(station_list_url, station_list_path)
@@ -1010,14 +1011,14 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         stations = stations[stations["Dtbeg"] <= pd.Timestamp(t_max)]
     # this is now the final list of stations we're trying to download
     stations_list = stations["Sta"].to_list()
-    if verbose > 1:
+    if verbose:
         print(f"List of stations to download: {stations_list}.")
     if len(stations_list) == 0:
         raise RuntimeError("No stations to download after applying all filters.")
     # prepare list of URLs to download
     if rate == "24h":
         list_urls = [get_sta_url(sta) for sta in stations_list]
-        if verbose > 1:
+        if verbose:
             print("No parsing of index pages necessary.")
     else:
         # if it's a 5min sampling rate, there's multiple files per station,
@@ -1028,8 +1029,8 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                 index_url = base_url + "kenv/"
             else:
                 index_url = base_url + "rapids_5min/kenv/"
-            iter_stations_list = (tqdm(stations_list, desc="Parsing index pages", ascii=True,
-                                       unit="station") if verbose > 0 else stations_list)
+            iter_stations_list = tqdm(stations_list, desc="Parsing index pages",
+                                      ascii=True, unit="station", disable=no_pbar)
             for sta in iter_stations_list:
                 pattern = r'(?<=<a href=")' + str(sta) + \
                           r'\.(\d{4})\.kenv\.zip(?=">)'
@@ -1046,15 +1047,15 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
             extractor_y = re.compile(pattern_y, re.IGNORECASE)
             extractor_d = re.compile(pattern_d, re.IGNORECASE)
             extractor_f = re.compile(pattern_f, re.IGNORECASE)
-            if verbose > 1:
+            if verbose:
                 print("Parsing main index page... ", end="", flush=True)
             with request.urlopen(index_url) as f:
                 index_page = f.read().decode("windows-1252")
                 avail_years = extractor_y.findall(index_page)
-            if verbose > 1:
+            if verbose:
                 print("Done")
-            iter_avail_years = (tqdm(avail_years, desc="Parsing daily index pages", ascii=True,
-                                     unit="year") if verbose > 0 else avail_years)
+            iter_avail_years = tqdm(avail_years, desc="Parsing daily index pages",
+                                    ascii=True, unit="year", disable=no_pbar)
             for year in iter_avail_years:
                 with request.urlopen(index_url + f"{year}/") as f:
                     index_page = f.read().decode("windows-1252")
@@ -1069,7 +1070,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                             list_urls.append(get_sta_url(sta, year, doy, date))
     if len(list_urls) == 0:
         raise RuntimeError("No files to download after looking on the server.")
-    elif (len(list_urls) > 10000) and (verbose > 0):
+    elif (len(list_urls) > 10000) and (not no_pbar):
         answer = input("WARNING: The current selection criteria would lead to "
                        f"downloading {len(list_urls)} files (from "
                        f"{len(stations_list)} stations).\nPress ENTER to continue, "
@@ -1080,12 +1081,12 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     atr_base_url = "http://geodesy.unr.edu/NGLStationPages/attributions/"
     pattern_atr = r'(?<=<a href=")(\w{4}\.atr\d?)(?=">)'
     extractor_atr = re.compile(pattern_atr, re.IGNORECASE)
-    if verbose > 1:
+    if verbose:
         print("Parsing attributions index page... ", end="", flush=True)
     with request.urlopen(atr_base_url) as f:
         index_page = f.read().decode("windows-1252")
         avail_atr_files = extractor_atr.findall(index_page)
-    if verbose > 1:
+    if verbose:
         print("Done")
     list_atr_urls = []
     for sta in stations_list:
@@ -1093,7 +1094,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                               if sta in atr_file])
     # loop over list of URLs
     iter_list_urls = tqdm(list_urls, desc="Downloading station timeseries",
-                          ascii=True, unit="station") if verbose > 0 else list_urls
+                          ascii=True, unit="station", disable=no_pbar)
     for staurl, atrurls in zip(iter_list_urls, list_atr_urls):
         # local target path
         local_path = os.path.join(data_dir, staurl.split("/")[-1])
@@ -1122,7 +1123,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
             warn(f"Failed to download the remote file from {staurl}.\n"
                  f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning)
         else:
-            if verbose > 1:
+            if verbose:
                 tqdm.write(f"[{status}] '{staurl}' ({remote_time.isoformat()})"
                            f" -> '{local_path}' ({local_time_str})")
         # repeat the same procedure for the attribution files
@@ -1148,7 +1149,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                 warn(f"Failed to download the remote attribution file from {atrurl}.\n"
                      f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning)
             else:
-                if verbose > 1:
+                if verbose:
                     tqdm.write(f"[{status}] '{atrurl}' ({remote_atr_time.isoformat()})"
                                f" -> '{local_atr_path}' ({local_atr_time_str})")
     # return the DataFrame with the downloaded stations
@@ -1409,18 +1410,18 @@ class RINEXDataHolding():
         self._metrics = metrics
 
     @classmethod
-    def from_folders(cls, folders, verbose=False):
+    def from_folders(cls, folders, verbose=False, no_pbar=False):
         """
         Convenience class method that creates a new RINEXDataHolding object and directly
         calls :meth:`~load_db_from_folders`.
 
-        For parameter explanations, see the aboce method documention.
+        For parameter explanations, see the above method documention.
         """
         instance = cls()
-        instance.load_db_from_folders(folders, verbose=verbose)
+        instance.load_db_from_folders(folders, verbose=verbose, no_pbar=no_pbar)
         return instance
 
-    def load_db_from_folders(self, folders, verbose=False):
+    def load_db_from_folders(self, folders, verbose=False, no_pbar=False):
         """
         Loads a RINEX database from folders in the file system.
         The data should be located in one or multiple folder structure(s) organized by
@@ -1434,8 +1435,10 @@ class RINEXDataHolding():
             single tuple or a list of tuples with name and respective folder
             (``[('network1', '/folder/one/'), ...]``).
         verbose : bool, optional
-            If ``True``, print loading progress, final database size and a sample entry.
+            If ``True``, print final database size and a sample entry.
             Defaults to ``False``.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default: ``False``).
         """
         # input checks
         if isinstance(folders, tuple):
@@ -1450,7 +1453,7 @@ class RINEXDataHolding():
         dfdict = {col: [] for col in self.COLUMNS}
         # determine iterator based on verbosity
         iterfolders = tqdm(folders, desc="Loading folders", ascii=True,
-                           unit="folder") if verbose else folders
+                           unit="folder", disable=no_pbar)
         # loop over folder(s)
         for network, folder in iterfolders:
             # initialize pattern extraction
@@ -1576,7 +1579,7 @@ class RINEXDataHolding():
         # save to attribute
         self.df = df
 
-    def load_locations_from_rinex(self, keep='last', replace_not_found=False, verbose=False):
+    def load_locations_from_rinex(self, keep='last', replace_not_found=False, no_pbar=True):
         """
         Scan the RINEX files' headers for approximate locations for
         plotting purposes.
@@ -1594,8 +1597,8 @@ class RINEXDataHolding():
             the location of Null Island (0° Longitude, 0° Latitude) is used
             and a warning is issued.
             If ``False`` (default), an error is raised instead.
-        verbose : bool, optional
-            If ``True`` (default: ``False``), show loading progress.
+        no_pbar : bool, optional
+            Suppress the progress bar with ``True`` (default).
         """
         # prepare
         assert keep in ["first", "last", "mean"], \
@@ -1605,7 +1608,7 @@ class RINEXDataHolding():
         df = df.join(pd.DataFrame(np.zeros((self.num_stations, 3)), columns=XYZ))
         # get xyz for each station
         iterfiles = tqdm(df.itertuples(), total=df.shape[0], ascii=True, unit="file",
-                         desc="Reading RINEX headers") if verbose else df.itertuples()
+                         desc="Reading RINEX headers", disable=no_pbar)
         for row in iterfiles:
             subset = self.get_files_by(station=row.station).sort_values(by=["date"])
             filenames = self.make_filenames(subset)
