@@ -746,15 +746,7 @@ And we add a new Transient model with a larger range of timescales:
     ...                                "list_num_knots": [int(1+2**n) for n in range(3, 8)]}}}
     >>> net.add_local_models(models=mdl_trans, ts_description="final")
 
-Similar to
-:ref:`Tutorial 3 <tutorials/tutorial_3:Fitting the data using a spatially-aware L1 reweighting>`
-we now create the :class:`~disstans.solvers.SpatialSolver` object:
-
-.. doctest::
-
-    >>> spatsol = disstans.solvers.SpatialSolver(net, "final")
-
-This time, we also specify our reweighting function explicitly:
+This time, we specify a reweighting function explicitly for the spatial solution:
 
 .. doctest::
 
@@ -764,14 +756,15 @@ Finally, we can run the estimation:
 
 .. doctest::
 
-    >>> spatsol.solve(penalty=1,
-    ...               spatial_reweight_models=["Transient"],
-    ...               spatial_reweight_iters=20,
-    ...               local_reweight_func=rw_func,
-    ...               use_data_covariance=False,
-    ...               formal_covariance=True,
-    ...               verbose=True,
-    ...               extended_stats=True)
+    >>> stats = net.spatialfit("final",
+    ...                        penalty=1,
+    ...                        spatial_reweight_models=["Transient"],
+    ...                        spatial_reweight_iters=20,
+    ...                        local_reweight_func=rw_func,
+    ...                        use_data_covariance=False,
+    ...                        formal_covariance=True,
+    ...                        verbose=True,
+    ...                        extended_stats=True)
     Calculating scale lengths
     Initial fit
     ...
@@ -847,7 +840,7 @@ And animation:
 This is a relatively long timespan, so we can nicely see individual periods of coherent motion
 of the network; the strongest one most notable being the radial outwards motion of the stations
 from the center of the caldera. If we only wanted to show individual slow slip events, we could
-identify the interesting periods from the timeseries, and then use mutliple wormplots with
+identify the interesting periods from the timeseries, and then use multiple wormplots with
 shorter timespan.
 
 On top of the largest transient motion, there are also smaller coherent motions visible in the
@@ -895,12 +888,11 @@ Final considerations
 Let's conclude with two remarks:
 
 #. The choice of the hyperparameters (e.g. starting ``penalty``; the type and ``eps``,
-   ``scale`` values for :class:`~disstans.solvers.SpatialSolver`; the number and timescales
+   ``scale`` values for :meth:`~disstans.network.Network.spatialfit`; the number and timescales
    of the splines) are of course informed by me debugging and testing my code over and over
    again. Different dataset, and possibly different questions wanted to be solved, will
-   likely warrant a systematic exploration of those. The
-   :attr:`~disstans.solvers.SpatialSolver.last_statistics` attribute can be helpful to track
-   the performance of different estimation hyperparameters.
+   likely warrant a systematic exploration of those. The ``statistics`` return variable can be
+   helpful to track the performance of different estimation hyperparameters.
 #. For the best model fit, additional cleaning (outlier removal) and common mode estimation
    steps might be useful.
 
@@ -912,9 +904,3 @@ References
    offsets in GPS experiment*.
    Journal of Geophysical Research: Solid Earth, 118(5), 2397–2407.
    doi:`10.1002/jgrb.50152 <https://doi.org/10.1002/jgrb.50152>`_
-
-.. [blewitt16] Blewitt, G., Kreemer, C., Hammond, W. C., & Gazeaux, J. (2016).
-   *MIDAS robust trend estimator for accurate GPS station velocities without step detection.*
-   Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.
-   doi:`10.1002/2015JB012552 <https://doi.org/10.1002/2015JB012552>`_
-

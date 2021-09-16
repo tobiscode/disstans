@@ -156,7 +156,7 @@ Fitting the models with the spatial L0 solver
 ---------------------------------------------
 
 The following steps are nothing new - we will solve for model parameters with the
-:meth:`~disstans.network.network.spatialfit` method. However, this time we're explicitly
+:meth:`~disstans.network.Network.spatialfit` method. However, this time we're explicitly
 specifying if we want the solver to use data (co)variance.
 
 This first run doesn't use either the data variance or covariance, and we will save

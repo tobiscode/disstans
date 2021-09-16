@@ -28,7 +28,6 @@ from .models import ALLFITS
 from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
-from .processing import common_mode
 from .tools import parallelize, Timedelta, Click, weighted_median
 from .earthquakes import okada_displacement
 from .solvers import Solution, ReweightingFunction
@@ -1638,7 +1637,7 @@ class Network():
             # short version
             net.call_netwide_func(func, ts_in='input, ts_out='output', **kw_args)
             # the short version also knows about the functions in disstans.processing
-            net.call_netwide_func('common_mode', ts_in='input, ts_out='output', **kw_args)
+            net.call_netwide_func('decompose', ts_in='input, ts_out='output', **kw_args)
 
         See Also
         --------
@@ -1796,6 +1795,61 @@ class Network():
                             index=list(valid_stations.keys()),
                             columns=metrics_components).rename_axis("Station")
 
+    def decompose(self, ts_in, ts_out=None, **decompose_kw_args):
+        r"""
+        Decomposes a timeseries in the network and returns its best-fit models
+        and spatiotemporal sources.
+
+        Parameters
+        ----------
+        ts_in : str
+            Name of the timeseries to analyze.
+        ts_out : str, optional
+            If provided, save the model as a timeseries called ``ts_out`` to
+            the stations in the network.
+        **decompose_kw_args : dict
+            Additional keyword arguments passed to :func:`~disstans.processing.decompose`.
+
+        Returns
+        -------
+        model : dict
+            Dictionary of best-fit models at each station and for each data component.
+            The keys are the data components of the ``ts_in`` timeseries, and
+            the values are :class:`~disstans.timeseries.Timeseries` objects.
+            The Timeseries objects have the station names as columns, and their observation
+            record length is the joint length of all stations in the network,
+            :math:`\text{num_observations}`. If a station is missing a certain timestamp,
+            that value is ``NaN``.
+        spatial : numpy.ndarray
+            Dictionary of the spatial sources. Each key is one of the data components,
+            and the values are :class:`~numpy.ndarray` objects of shape
+            :math:`(\text{num_components},\text{n_stations})`.
+        temporal : dict
+            Dictionary of the temporal sources. Each key is one of the data components,
+            and the values are :class:`~numpy.ndarray` objects of shape
+            :math:`(\text{num_observations},\text{num_components})`.
+
+        See Also
+        --------
+        disstans.processing.decompose : Function to get the individual components.
+        """
+        # prepare
+        net_in = self.export_network_ts(ts_in)
+        comps = list(net_in.keys())
+        ndim = len(comps)
+        assert ndim > 0, f"No components found in '{ts_in}'."
+        decompose_kw_args.update({'return_sources': True})
+        # run decomposer
+        model, temp_spat = disstans_processing.decompose(net_in, **decompose_kw_args)
+        spatial, temporal = {}, {}
+        for comp in model:
+            spatial[comp] = temp_spat[comp][1]
+            temporal[comp] = temp_spat[comp][0]
+        # assign model to network if desired
+        if ts_out is not None:
+            self.import_network_ts(ts_out, model)
+        return model, spatial, temporal
+
     def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
         # get location data and projections
         if subset_stations:
@@ -1839,7 +1893,7 @@ class Network():
             stat_points, stat_lats, stat_lons
 
     def graphical_cme(self, ts_in, ts_out=None, annotate_stations=True, save=False,
-                      save_kw_args={"format": "png"}, gui_kw_args={}, **cme_kw_args):
+                      save_kw_args={"format": "png"}, gui_kw_args={}, **decompose_kw_args):
         """
         Calculates the Common Mode Error (CME) of the network and shows its spatial
         and temporal pattern. Optionally saves the model for each station.
@@ -1861,31 +1915,21 @@ class Network():
             used when ``save=True``.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~disstans.config.defaults`.
-        **cme_kw_args : dict
-            Additional keyword arguments passed to :func:`~disstans.processing.common_mode`.
+        **decompose_kw_args : dict
+            Additional keyword arguments passed to :func:`~decompose`.
 
         See Also
         --------
-        disstans.processing.common_mode : CME calculation function.
+        decompose : Decomposer method to calculate the CME.
         """
-        # get common mode and make sure to return spatial and temporal models
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
-        net_in = self.export_network_ts(ts_in)
-        comps = list(net_in.keys())
+        # get common mode and make sure to return spatial and temporal models
+        model, temporal, spatial = self.decompose(ts_in, ts_out=ts_out, **decompose_kw_args)
+        comps = list(model.keys())
         ndim = len(comps)
-        ndim_max2 = min(ndim, 2)
-        assert ndim > 0, f"No components found in '{ts_in}'."
-        cme_kw_args.update({'plot': True})
-        model, temp_spat = common_mode(net_in, **cme_kw_args)
-        temporal, spatial = {}, {}
-        for comp in model:
-            temporal[comp] = temp_spat[comp][0]
-            spatial[comp] = temp_spat[comp][1]
-        # assign model to network
-        if ts_out is not None:
-            self.import_network_ts(ts_out, model)
         # extract spatial components
+        ndim_max2 = min(ndim, 2)
         fitted_stations = model[comps[0]].data_cols
         latlonenu = np.zeros((len(fitted_stations), 2 + ndim_max2))
         for i, station_name in enumerate(fitted_stations):

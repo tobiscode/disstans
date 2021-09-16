@@ -315,7 +315,7 @@ In code, the first three steps will look like this:
     >>> # high-pass filtered timeseries will be in "Residual"
     >>> net.math("Residual", "Raw", "-", "Filtered")
     >>> # estimate the common mode
-    >>> net.call_netwide_func("common_mode", ts_in="Residual", ts_out="CME", method="ica")
+    >>> net.call_netwide_func("decompose", ts_in="Residual", ts_out="CME", method="ica")
 
 To have a closer look at the estimated common mode, one can also use the
 :meth:`~disstans.network.Network.graphical_cme` method, which will show plots of the temporal
@@ -371,7 +371,7 @@ To inspect the result, we can again have a look at the network with
      - Variances: ['E_var', 'N_var']
      - Covariances: ['E_N_cov']
     Displacement
-     - Source: synthetic-common_mode
+     - Source: synthetic-decompose
      - Units: mm
      - Shape: (3654, 2)
      - Data: ['E', 'N']

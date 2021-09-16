@@ -153,10 +153,9 @@ def median(array, kernel_size):
 
 
 @unwrap_dict_and_ts
-def common_mode(array, method, num_components=1, plot=False):
+def decompose(array, method, num_components=1, return_sources=False):
     r"""
-    Computes the Common Mode Error (CME) with the given method.
-    The input array should already be a residual.
+    Decomposes the input signal into different components using PCA or ICA.
 
     Parameters
     ----------
@@ -165,26 +164,27 @@ def common_mode(array, method, num_components=1, plot=False):
         (can contain NaNs).
         Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept
         :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
-        dictionaries of them as input.
+        dictionaries of them as input (i.e. the output of
+        :meth:`~disstans.network.Network.export_network_ts`).
     method : str
-        Method to use to decompose the array. Possible values are ``'pca'`` and ``'ica'}.
-        ``'pca'`` uses `Principal Component Analysis`_ (motivated by [dong06]_), whereas
-        ``'ica'`` uses `Independent Component Analysis`_ (motivated by [huang12]_).
+        Method to use to decompose the array. Possible values are ``'pca'`` and ``'ica'``:
+        ``'pca'`` uses :class:`~sklearn.decomposition.PCA` (motivated by [dong06]_), whereas
+        ``'ica'`` uses :class:`~sklearn.decomposition.FastICA` (motivated by [huang12]_).
     num_components : int, optional
-        Number of CME bases to estimate. Defaults to ``1``.
-    plot : bool, optional
-        If ``True``, include not only the modeled CME, but also the components
+        Number of components to estimate. Defaults to ``1``. If ``None``, all are used.
+    return_sources : bool, optional
+        If ``True``, return not only the best-fit model, but also the sources
         themselves in space and time. Defaults to ``False``.
 
     Returns
     -------
     model : numpy.ndarray
-        Modeled CME of shape :math:`(\text{num_observations},\text{n_stations})`.
+        Best-fit model with shape :math:`(\text{num_observations},\text{n_stations})`.
     temporal : numpy.ndarray
-        (Only if ``plot=True``.) CME in time of shape
+        Only if ``return_sources=True``: Temporal source with shape
         :math:`(\text{num_observations},\text{num_components})`.
     spatial : numpy.ndarray
-        (Only if ``plot=True``.) CME in space of shape
+        Only if ``return_sources=True``: Spatial source with shape
         :math:`(\text{num_components},\text{n_stations})`.
 
 
@@ -201,11 +201,6 @@ def common_mode(array, method, num_components=1, plot=False):
        Applied Mechanics and Materials, 204–208, 2806–2812.
        doi:`10.4028/www.scientific.net/AMM.204-208.2806
        <http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_.
-
-    .. _Principal Component Analysis:
-       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
-    .. _Independent Component Analysis:
-       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.FastICA.html
     """
     # ignore all only-NaN columns
     array_nanind = np.isnan(array)
@@ -216,10 +211,10 @@ def common_mode(array, method, num_components=1, plot=False):
     array_nanmean = np.nanmean(array, axis=0)
     array_nansd = np.nanstd(array, axis=0)
     array_nanind = np.isnan(array)
+    rng = np.random.default_rng()
     for icol in range(array.shape[1]):
-        array[array_nanind[:, icol], icol] = array_nansd[icol] \
-                                             * np.random.randn(array_nanind[:, icol].sum()) \
-                                             + array_nanmean[icol]
+        array[array_nanind[:, icol], icol] = array_nanmean[icol] + \
+            array_nansd[icol] * rng.normal(size=array_nanind[:, icol].sum())
     # decompose using the specified solver
     if method == 'pca':
         decomposer = PCA(n_components=num_components, whiten=True)
@@ -238,7 +233,7 @@ def common_mode(array, method, num_components=1, plot=False):
         newmod[:, finite_cols] = model
         newmod[:, nan_cols] = np.NaN
         model = newmod
-    if plot:
+    if return_sources:
         spatial = decomposer.components_
         if nan_cols != []:
             newspat = np.empty((spatial.shape[0], len(finite_cols) + len(nan_cols)))
