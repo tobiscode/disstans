@@ -1925,7 +1925,7 @@ class Network():
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
         # get common mode and make sure to return spatial and temporal models
-        model, temporal, spatial = self.decompose(ts_in, ts_out=ts_out, **decompose_kw_args)
+        model, spatial, temporal = self.decompose(ts_in, ts_out=ts_out, **decompose_kw_args)
         comps = list(model.keys())
         ndim = len(comps)
         # extract spatial components
