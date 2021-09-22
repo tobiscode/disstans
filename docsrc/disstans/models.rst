@@ -20,11 +20,11 @@ Model Collection
    :members:
    :special-members:
 
-Helper class and constant for combined fits of models:
+Fit Collection
+--------------
 
-.. autoclass:: disstans.models.AllFits
-
-.. autoattribute:: disstans.models.ALLFITS
+.. autoclass:: disstans.models.FitCollection
+   :members:
 
 Basic Models
 ------------

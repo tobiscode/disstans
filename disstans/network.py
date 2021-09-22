@@ -24,7 +24,6 @@ from . import timeseries as disstans_ts
 from . import models as disstans_models
 from . import solvers as disstans_solvers
 from . import processing as disstans_processing
-from .models import ALLFITS
 from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
@@ -1389,10 +1388,10 @@ class Network():
             for station in net:
                 station_ts = station.timeseries['mydata']
                 fit_all = station_models.evaluate(station_ts)
-                station.add_fit('mydata', ALLFITS, fit_all)
+                station.add_fit('mydata', fit_all)
                 for (model_description, model) in station_models.items():
                     fit = model.evaluate(station_ts)
-                    station.add_fit('mydata', model_description, fit)
+                    station.add_fit('mydata', fit, model_description)
             # short version, automatically parallelizes according to disstans.defaults,
             # and creating a new timeseries
             net.evaluate('mydata', output_description='evaluated')
@@ -1401,7 +1400,6 @@ class Network():
         --------
         fit : Fit models at all stations.
         :attr:`~disstans.config.defaults` : Dictionary of settings, including parallelization.
-        :attr:`~disstans.models.ALLFITS` : Key used to denote the joint fit using all models.
         disstans.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         assert isinstance(ts_description, str), \
@@ -1422,14 +1420,13 @@ class Network():
                                                   ascii=True, unit="station", disable=no_pbar)):
             stat = self[station_names[i]]
             # add overall model
-            ts = stat.add_fit(ts_description, ALLFITS, sumfit,
-                              return_ts=(output_description is not None))
+            ts = stat.add_fit(ts_description, sumfit, return_ts=(output_description is not None))
             # if desired, add as timeseries
             if output_description is not None:
                 stat.add_timeseries(output_description, ts)
             # add individual fits
             for model_description, fit in mdlfit.items():
-                stat.add_fit(ts_description, model_description, fit)
+                stat.add_fit(ts_description, fit, model_description)
 
     @staticmethod
     def _evaluate_single_station(parameter_tuple):
@@ -1481,20 +1478,11 @@ class Network():
         contain the model fit, and the residuals should be put into the timeseries
         ``'myres'``, then the following two are equivalent::
 
-            # long version, not parallelized, defaulting to all models
-            for station in net:
-                station_ts = station.timeseries['mydata']
-                station_models = station.models['mydata']
-                model_params_var = mysolver(station_ts, station_models, **kw_args)
-                for model_description, (params, covs) in model_params_var.items():
-                    station_models[model_description].read_parameters(params, covs)
-                    fit = station_models[model_description].evaluate(station_ts)
-                    station.add_fit('mydata', model_description, fit)
+            # three-line version
             net.fit('mydata', solver=mysolver, **kw_args)
             net.evaluate('mydata', output_description='myfit')
             net.math('myres', 'mydata', '-', 'myfit')
-            # shot version, combining everything into one call, using parallelization,
-            # offering easy access to subsetting models, reusing previous fits, etc.
+            # one-liner
             net.fitevalres('mydata', solver=mysolver, output_description='myfit',
                            residual_description='myres')
 
@@ -2298,8 +2286,8 @@ class Network():
                     ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data"
                             if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
-                    if sum_models and (ALLFITS in self[station_name].fits[ts_description]):
-                        fit = self[station_name].fits[ts_description][ALLFITS]
+                    if sum_models and self[station_name].fits[ts_description].allfits:
+                        fit = self[station_name].fits[ts_description].allfits
                         if (fit.var_cols is not None) and (gui_settings["plot_sigmas"] > 0):
                             fill_upper = fit.df[fit.data_cols[icol]] \
                                 + gui_settings["plot_sigmas"] \
@@ -2315,9 +2303,8 @@ class Network():
                         # get model subset
                         fits_to_plot = {model_description: fit for model_description, fit
                                         in self[station_name].fits[ts_description].items()
-                                        if (((fit_list is None)
-                                             or (model_description in fit_list))
-                                            and model_description != ALLFITS)}
+                                        if ((fit_list is None) or
+                                            (model_description in fit_list))}
                         for model_description, fit in fits_to_plot.items():
                             if (fit.var_cols is not None) \
                                and (gui_settings["plot_sigmas"] > 0):

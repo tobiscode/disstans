@@ -164,19 +164,14 @@ We can do this in the following way:
     >>> for model_description in stat_coll.model_names:
     ...     modeled = stat_coll[model_description].evaluate(timevector)
     ...     fit_ts = synth_stat.add_fit(ts_description="Data",
-    ...                                 model_description=model_description,
-    ...                                 fit=modeled)
+    ...                                 fit=modeled,
+    ...                                 model_description=model_description)
     >>> # evaluate the entire model collection at once
     >>> modeled = stat_coll.evaluate(timevector)
-    >>> from disstans.models import ALLFITS
-    >>> fit_ts = synth_stat.add_fit(ts_description="Data", model_description=ALLFITS,
-    ...                             fit=modeled)
+    >>> fit_ts = synth_stat.add_fit(ts_description="Data", fit=modeled)
 
-Why didn't we use a regular string name for the fit that used all models?
-Later function will take advantage of this, such as the plotting functions,
-to "know" which one is the joint fit, and which ones are the individual ones.
-The ``ALLFITS`` constant is therefore provided in the main module to serve as
-the key for that.
+Not providing a model description to :meth:`~disstans.station.Station.add_fit`
+implies that this is the fit of all models jointly.
 
 .. note::
 
@@ -185,13 +180,13 @@ the key for that.
     overwritten. If we want to keep them, we can either create the models again
     without giving them parameters, or create a (deep) copy of the model dictionary.
 
-Lastly, we want to make a timeseries object from the joint model fit for plotting
-purposes. We can do that by directly accessing the ``ALLFITS`` fit:
+Lastly, we want to make a timeseries object from the joint model fit for plotting purposes.
+We can do that by directly accessing :attr:`~disstans.models.FitCollection.allfits`:
 
 .. doctest::
 
     >>> synth_stat.add_timeseries(ts_description="Modeled",
-    ...                           timeseries=synth_stat.fits["Data"][ALLFITS],
+    ...                           timeseries=synth_stat.fits["Data"].allfits,
     ...                           override_src="model", override_data_cols=synth_ts.data_cols)
 
 .. note::

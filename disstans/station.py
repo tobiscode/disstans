@@ -14,7 +14,7 @@ from warnings import warn
 
 from . import models as disstans_models
 from .timeseries import Timeseries
-from .models import Model, ModelCollection, AllFits
+from .models import Model, ModelCollection, FitCollection
 from .tools import tvec_to_numpycol
 
 
@@ -63,7 +63,7 @@ class Station():
         """
         self.fits = {}
         """
-        Dictionary of dictionaries of fitted :class:`~disstans.timeseries.Timeseries`
+        Dictionary of :class:`~disstans.models.FitCollection` objects
         associated with a timeseries saved in :attr:`~timeseries`.
 
         Example
@@ -289,7 +289,7 @@ class Station():
         if override_cov_cols is not None:
             timeseries.var_cols = override_cov_cols
         self.timeseries[ts_description] = timeseries
-        self.fits[ts_description] = {}
+        self.fits[ts_description] = FitCollection()
         self.models[ts_description] = ModelCollection()
         if add_models is not None:
             self.add_local_model_dict(ts_description=ts_description, model_kw_args=add_models)
@@ -430,7 +430,7 @@ class Station():
                      f"couldn't delete local model '{mdl_desc}'.",
                      category=RuntimeWarning)
 
-    def add_fit(self, ts_description, model_description, fit, return_ts=False):
+    def add_fit(self, ts_description, fit, model_description=None, return_ts=False):
         """
         Add a fit dictionary to a timeseries' model (overwrites the fit if it has
         already been added for the model).
@@ -439,11 +439,12 @@ class Station():
         ----------
         ts_description : str
             Timeseries to add the fit to.
-        model_description : str
-            Model description the fit applies to.
         fit : dict
             Dictionary with the keys ``'time'``, ``'fit'``, ``'var'`` and ``'cov'``
             (the latter two can be set to ``None``).
+        model_description : str, optional
+            Model description the fit applies to.
+            If ``None``, the fit is the sum of all individual model fits.
         return_ts : bool, optional
             If ``True`` (default: ``False``), return the created timeseries.
 
@@ -459,20 +460,25 @@ class Station():
         """
         if not isinstance(ts_description, str):
             raise TypeError("Cannot add new fit: 'ts_description' is not a string.")
-        if not (isinstance(model_description, str) or
-                isinstance(model_description, AllFits)):
+        if not (isinstance(model_description, str) or (model_description is None)):
             raise TypeError("Cannot add new fit: 'model_description' is not a string.")
         assert ts_description in self.timeseries, \
             f"Station {self.name}: Cannot find timeseries '{ts_description}' " \
             f"to add fit for model '{model_description}'."
-        if not isinstance(model_description, AllFits):
+        if model_description is None:
+            data_cols = [ts_description + "_Model_" + dcol
+                         for dcol in self.timeseries[ts_description].data_cols]
+        else:
+            data_cols = [ts_description + "_" + str(model_description) + "_" + dcol
+                         for dcol in self.timeseries[ts_description].data_cols]
             assert model_description in self.models[ts_description], \
                 f"Station {self.name}, timeseries {ts_description}: " \
                 f"Cannot find local model '{model_description}', couldn't add fit."
-        data_cols = [ts_description + "_" + str(model_description) + "_" + dcol
-                     for dcol in self.timeseries[ts_description].data_cols]
         fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
-        self.fits[ts_description].update({model_description: fit_ts})
+        if model_description is None:
+            self.fits[ts_description].allfits = fit_ts
+        else:
+            self.fits[ts_description][model_description] = fit_ts
         if return_ts:
             return fit_ts
 
@@ -527,8 +533,7 @@ class Station():
         # get model subset
         fits_to_sum = {model_description: fit
                        for model_description, fit in self.fits[ts_description].items()
-                       if ((fit_list is None) or (model_description in fit_list)
-                           and not isinstance(model_description, AllFits))}
+                       if ((fit_list is None) or (model_description in fit_list))}
         assert fits_to_sum, \
             f"Station {self.name}, timeseries {ts_description}: Can't find fits for models."
         # sum models and uncertainties

@@ -200,7 +200,7 @@ we estimate and remove the Common Mode Error:
 .. doctest::
 
     >>> # calculate common mode
-    >>> net.call_netwide_func("common_mode", ts_in="raw_filt_res", ts_out="common", method="ica")
+    >>> net.call_netwide_func("decompose", ts_in="raw_filt_res", ts_out="common", method="ica")
     >>> # now remove the common mode, call it the "intermed" timeseries,
     >>> for station in net:
     ...     station.add_timeseries("intermed", station["raw"] - station["common"],

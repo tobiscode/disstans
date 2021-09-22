@@ -13,6 +13,7 @@ from warnings import warn
 from scipy.special import comb, factorial
 from itertools import product
 from cmcrameri import cm as scm
+from collections import UserDict
 
 from .tools import tvec_to_numpycol, Timedelta, full_cov_mat_to_columns, cov2corr
 
@@ -1548,13 +1549,20 @@ def check_model_dict(models):
 
 
 # make a custom object that serves as the "all models" fit key
-class AllFits():
-    def __str__(self):
-        return "Model"
+class FitCollection(UserDict):
+    """
+    Class that contains :class:`~disstans.timeseries.Timeseries` model fits,
+    and can be used just like a :class:`~python.dict`.
+    Has an additional :attr:`~allfits` attribute that stores the sum of all
+    fits.
+    """
 
-
-# this object is hashable, and we will create one instance that users can import
-ALLFITS = AllFits()
+    def __init__(self, *args, **kw_args):
+        super().__init__(*args, **kw_args)
+        self.allfits = None
+        """
+        Attribute that contains the sum of all fits in :class:`~FitCollection`.
+        """
 
 
 class ModelCollection():

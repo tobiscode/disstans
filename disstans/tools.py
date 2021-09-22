@@ -540,6 +540,8 @@ def create_powerlaw_noise(size, exponent, seed=None):
         the remaining dimensions.
     exponent : int
         Exponent of the power law noise model.
+        E.g. ``0`` corresponds to white (Gaussian) noise, ``1`` to flicker (pink)
+        noise, and ``2`` to random walk (red, Brownian) noise.
     seed : int, numpy.random.Generator, optional
         Pass an initial seed to the random number generator, or pass
         a :class:`~numpy.random.Generator` instance.
