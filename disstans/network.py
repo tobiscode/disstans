@@ -901,6 +901,7 @@ class Network():
     def spatialfit(self, ts_description, penalty, spatial_reweight_models,
                    spatial_reweight_iters, spatial_reweight_percentile=0.5,
                    spatial_reweight_max_rms=1e-9, spatial_reweight_max_changed=0,
+                   dist_num_avg=4, dist_weight_min=None, dist_weight_max=None,
                    continuous_reweight_models=[], local_reweight_iters=1,
                    local_reweight_func=None, local_reweight_coupled=True,
                    formal_covariance=False, use_data_variance=True,
@@ -921,14 +922,25 @@ class Network():
 
             1.  Fit the models individually using a single iteration step from
                 :func:`~disstans.solvers.lasso_regression`.
-            2.  Collect the L0 weights :math:`\mathbf{w}^{(i)}` from each station.
-            3.  Spatially combine (e.g. take the median of) the weights,
-                and redistribute them to the stations for the next iteration.
+            2.  Collect the L0 weights :math:`\mathbf{w}^{(i)}_j` after iteration
+                :math:`i` from each station :math:`j`.
+            3.  Spatially combine the weights, and redistribute them to the stations
+                for the next iteration.
             4.  Repeat from 1.
 
         The iteration can stop early if either the conditions set by
         ``spatial_reweight_max_rms`` *or* ``spatial_reweight_max_changed`` are satisfied,
         for all models in ``spatial_reweight_models``.
+
+        In the third step, a distance-weighted median is used at each station to combine
+        the L0 regularization weights :math:`\mathbf{w}^{(i)}_j`. The distance weights
+        :math:`v_{j,k}` from station :math:`j` to station :math:`k` are based on the
+        average distance :math:`D_j` from the station in question to the
+        ``dist_num_avg`` clostest stations, following an exponential curve:
+        :math:`v_{j,k}=\exp \left( - r_{j,k} / D_j \right)` where
+        :math:`r_{j,k}` is the distance between the stations :math:`j` and :math:`k`.
+        ``dist_weight_min`` and ``dist_weight_max`` allow to set boundaries for
+        :math:`D_j`.
 
         Parameters
         ----------
@@ -954,6 +966,13 @@ class Network():
             flipped between zero and non-zero) falls below a threshold. The threshold
             ``spatial_reweight_max_changed`` is given as the percentage of changed over total
             parameters (including all models and components). Defaults to no early stopping.
+        dist_num_avg : int, optional
+            Calculate the characteristic distance for the drop-off of station weights
+            as the average of the ``dist_num_avg`` closest stations (default: ``4``).
+        dist_weight_min : float, optional
+            Enforce a minimum value of :math:`D_j` (in kilometers).
+        dist_weight_max : float, optional
+            Enforce a maximum value of :math:`D_j` (in kilometers).
         continuous_reweight_models : list
             Names of models that should carry over their weights from one solver iteration
             to the next, but should not be reweighted.
@@ -1098,11 +1117,13 @@ class Network():
                 f"needs to be None or a ReweightingFunction, got {type(local_reweight_func)}."
             rw_func = local_reweight_func
 
-        # get scale lengths (correlation lengths)
-        # using the average distance to the closest 4 stations
+        # get scale lengths (correlation lengths) using the average distance to the
+        # closest dist_num_avg stations and optional boundaries
         if verbose:
             tqdm.write("Calculating scale lengths")
         geoid = cgeod.Geodesic()
+        dist_weight_min = 0 if dist_weight_min is None else dist_weight_min * 1e3
+        dist_weight_max = None if dist_weight_max is None else dist_weight_max * 1e3
         station_lonlat = np.stack([np.array(self[name].location)[[1, 0]]
                                    for name in station_names])
         all_distances = np.empty((num_stations, num_stations))
@@ -1111,8 +1132,10 @@ class Network():
             all_distances[i, :] = np.array(geoid.inverse(station_lonlat[i, :].reshape(1, 2),
                                                          station_lonlat))[:, 0]
             net_avg_closests.append(np.sort(all_distances[i, :])
-                                    [1:min(num_stations, 1 + 4)].mean())
-        distance_weights = np.exp(-all_distances / np.array(net_avg_closests).reshape(1, -1))
+                                    [1:min(num_stations, 1 + dist_num_avg)].mean())
+        distance_weights = np.exp(-all_distances /
+                                  np.clip(np.array(net_avg_closests), a_min=dist_weight_min,
+                                          a_max=dist_weight_max).reshape(1, -1))
         # distance_weights is ignoring whether (1) a station actually has data, and
         # (2) if the spatial extent of the signal we're trying to estimate is correlated
         # to the station geometry
