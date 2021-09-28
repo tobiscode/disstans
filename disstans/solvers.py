@@ -408,6 +408,10 @@ class InverseReweighting(ReweightingFunction):
         .. math::
             w(m_j) = \frac{1}{|m_j| + \text{eps}}
 
+        The maximum penalty (:math:`y`-intercept) can be approximated as
+        :math:`\frac{1}{\text{eps}}`, and the minimum penalty approaches zero
+        asymptotically.
+
         Parameters
         ----------
         m : numpy.ndarray
@@ -423,6 +427,10 @@ class InverseSquaredReweighting(ReweightingFunction):
 
         .. math::
             w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}
+
+        The maximum penalty (:math:`y`-intercept) can be approximated as
+        :math:`\frac{1}{\text{eps}^2}`, and the minimum penalty approaches zero
+        asymptotically.
 
         Parameters
         ----------
@@ -442,6 +450,15 @@ class LogarithmicReweighting(ReweightingFunction):
             \text{num_reg} \cdot \text{eps}}{|m_j| + \text{eps}}
 
         (where :math:`0 < \text{eps} \ll \frac{1}{\text{num_reg}}`).
+        This reweighting function's calculated penalties for individual elements
+        depends on the overall size and 1-norm of the input weight vector.
+
+        The maximum penalty (:math:`y`-intercept) can be approximated as
+        :math:`\log_\text{num_reg} \frac{\| \mathbf{m} \|_1}{\text{eps}}`.
+        If there is only a single nonzero value, its penalty will be zero (at
+        :math:`|m_j|=\| \mathbf{m} \|_1`).
+        In the intermediate cases where multiple values are nonzero, their penalties will
+        be distributed on a logarithmic slope between the :math:`y`-intercept and zero.
 
         Parameters
         ----------
