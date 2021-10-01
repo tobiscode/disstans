@@ -454,7 +454,7 @@ tutorial, the transients created by the noise are fit by our spline dictionary.
 
 Second, especially for the time without the colored noise, we can see that apart from a couple
 splines that are the closest in time and period to the true slow slip events (SSEs)
-arctangents, most splines that are non-zero in one station are (close to) zero at the other,
+hyperbolic tangents, most splines that are non-zero in one station are (close to) zero at the other,
 even though we know that both stations experience the same signal (only with a slightly
 varying amplitude).
 
@@ -582,18 +582,18 @@ Fitting the data using a spatially-aware L1 reweighting
 [riel14]_ solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
 updated based on a weighting scheme. In DISSTANS, this is handled by the
-:class:`~disstans.network.Network.spatialfit` method, where more information about its algorithm
+:meth:`~disstans.network.Network.spatialfit` method, where more information about its algorithm
 can be found. In this tutorial, we just want to show how it is used and how it can improve
 the quality of the fit.
 
-:class:`~disstans.network.Network.spatialfit` takes some important arguments, but at its core
+:meth:`~disstans.network.Network.spatialfit` takes some important arguments, but at its core
 it's essentially a wrapper for :meth:`~disstans.network.Network.fit`. Just like the latter,
 we give it an (initial) ``penalty`` parameter, and our ``cvxpy_kw_args`` solver settings.
 Additionally, we can now specify the models which we want to combine spatially
 (``spatial_reweight_models``), how many spatial iterations we want
 (``spatial_reweight_iters``), and what reweighting function we want to use
 (``local_reweight_func``). The choice of the reweighting function and its hyperparameters
-is crucial for good results, much like the choie of the penalty parameter for simple
+is crucial for good results, much like the choice of the penalty parameter for simple
 L2-regularized least squares. At this stage, there is no perfect way to know the best
 choice before looking at the result, so some trial-and-error is required. An empirically
 derived, decent starting point for such a search would put the ``penalty`` of a similar
@@ -1068,7 +1068,7 @@ phases of the transients, the higher the coefficients will be.
 
 We can use these matrices now to plot the (symmetric) correlation matrices for the two
 main cases we considered above, and also to compute the median spatial correlation.
-If we successfully fitted the our synthetic transients, which we know are the same
+If we successfully fitted our synthetic transients, which we know are the same
 everywhere, we should see that the median correlation increases when using the
 spatial reweighting. Here's some example code::
 
@@ -1175,9 +1175,5 @@ Which yields the following two maps:
 
 We can see that in general, the transients that were estimated through the spatial
 L0 estimation process show a more homogenous direction of the motion to the southeast,
-which we know to be the true direction of motion. This is also visible in the far east
-of the network, where the signal is close or below the noise floor.
-
-One very visible outlier is the station Corko: it contains the unmodeled maintenance
-step that can only be fit by the short-term splines. In a second iteration of analyzing this
-synthetic network, one would of course model the step at Corko for a better fit.
+which we know to be the true direction of motion. This is also (although less) visible in
+the far east of the network, where the signal is close or below the noise floor.
