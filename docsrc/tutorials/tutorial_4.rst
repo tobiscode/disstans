@@ -1,12 +1,19 @@
 Tutorial 4: The use and estimation of covariance
 ================================================
 
+.. sidebar:: Download full script
+
+   :download:`tutorial_4_covariances.py <../../scripts/tutorial_4_covariances.py>`
+
 As seen in Tutorial 3, DISSTANS can also make use of data variance and covariance if provided
 in the timeseries. While this was not specifically addressed in the previous tutorial,
 taking advantage of that information can improve the fit to the data, especially when
 there is a large amount of correlation across components. This tutorial
 will explore this with a small synthetic network that has large but strongly
 correlated errors.
+
+.. contents:: Table of contents
+    :local:
 
 Making a noisy network
 ----------------------

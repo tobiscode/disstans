@@ -1,14 +1,18 @@
 Tutorial 2: Advanced Models and Fitting
 =======================================
 
-.. note::
+.. sidebar:: Download full script
 
-    This tutorial recreates the basics of the synthetic timeseries example
-    as described in Bryan Riel's [riel14]_ paper on detecting geodetic transients.
+   :download:`tutorial_2_detect_transients.py <../../scripts/tutorial_2_detect_transients.py>`
 
-For this tutorial, we'll be building on and expanding the workflow from the first one.
+This tutorial recreates the basics of the synthetic timeseries example as described in
+Bryan Riel's [riel14]_ paper on detecting geodetic transients.
+To do this, we'll be building on and expanding the workflow from the first one.
 This time though, we'll first focus a bit more on making the synthetic data, before
 creating the station itself.
+
+.. contents:: Table of contents
+    :local:
 
 Creating more complex synthetic data
 ------------------------------------

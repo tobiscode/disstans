@@ -1552,7 +1552,7 @@ def check_model_dict(models):
 class FitCollection(UserDict):
     """
     Class that contains :class:`~disstans.timeseries.Timeseries` model fits,
-    and can be used just like a :class:`~python.dict`.
+    and can be used just like a :class:`~dict`.
     Has an additional :attr:`~allfits` attribute that stores the sum of all
     fits.
     """

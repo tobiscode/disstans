@@ -1,6 +1,10 @@
 Tutorial 3: Incorporating Spatial Coherence
 ===========================================
 
+.. sidebar:: Download full script
+
+   :download:`tutorial_3_spatial_sparsity.py <../../scripts/tutorial_3_spatial_sparsity.py>`
+
 One of the main goals of DISSTANS that should make it stand out from other timeseries analysis
 software/routines is its ability to use spatial coherence as an additional source of
 information and constrain. In general, signals like earthquakes, slip events, or seasonal
@@ -17,7 +21,7 @@ the time in question, and it is easier to therefore detect processes that need t
 In this tutorial, we will therefore create a synthetic network of 16 stations, seeing two
 data components (East and North) each, that are affected by both regional processes (slow slip
 events, an earthquake, and seasonal variations) as well as local ones (a maintenance step
-and some local colored noise). Common Mode noise is added and estimated as well.
+and some local flicker noise). Common mode noise is added and estimated as well.
 We will assess the incorporation of spatial coherence on a station-by-station basis (misfit
 at the station with the singular maintenance step) as well as over the entire network
 (by looking at the parameter correlation matrix between stations). The fitting and
@@ -28,6 +32,9 @@ evaluating will be done in parallel to achieve a significant speed-up.
     between Python, NumPy/SciPy, and the low-level math libraries like BLAS/LAPACK
     (which can differ from machine to machine). For more information, including how
     to properly set up parallelization, see :func:`~disstans.tools.parallelize`.
+
+.. contents:: Table of contents
+    :local:
 
 Preparations
 ------------
@@ -121,21 +128,22 @@ define those first:
 Here, we have defined (1) a covariance matrix from which to generate normally-distributed
 noise for the observations, (2) :math:`\alpha` and scale parameters for an
 inverse-gamma-distributed sampling of observation variances, and (3) a laplacian-distributed
-sampling of observation covariances. With these variables, and the common mode error,
-we can create the actual function introduced above:
+sampling of observation covariances. (These particular values were derived from simple histogram
+fitting of real data from the Long Valley Caldera region.) With these variables, and the common
+mode error, we can create the actual function introduced above:
 
 .. doctest::
 
     >>> def generate_parameters_noise(loc, rng):
     ...     lon, lat = loc[1], loc[0]
     ...     p_sec = np.array([[0, 0], [1, -1]])
-    ...     p_seas = rng.uniform(-0.1, 0.1, size=(2, 2))
-    ...     p_sse1 = np.array([[8, -8]])*np.exp(-(4 * lon**2))  # from the left
-    ...     p_sse2 = np.array([[6, -6]])*np.exp(-(4 * lon**2))  # from the left
-    ...     p_sse3 = np.array([[10, -10]])*np.exp(-(4 * lon**2))  # from the left
-    ...     p_eq = np.array([[-5, 5]])
+    ...     p_seas = rng.uniform(-0.3, 0.3, size=(2, 2))
+    ...     p_sse1 = np.array([[6, -6]])*np.exp(-(3 * lon**2))  # from the west
+    ...     p_sse2 = np.array([[4, -4]])*np.exp(-(3 * lon**2))  # from the west
+    ...     p_sse3 = np.array([[8, -8]])*np.exp(-(3 * lon**2))  # from the west
+    ...     p_eq = np.array([[-3, 3]])
     ...     meas_noise = rng.multivariate_normal(mean=(0, 0), cov=noise_cov,
-    ...                                          size=timevector.size) * 0.5
+    ...                                          size=timevector.size)
     ...     noisevec = meas_noise + cme_noise
     ...     estim_var_cov = np.stack([invgamma.rvs(invgamma_e_alpha, loc=var_e,
     ...                                            scale=invgamma_e_scale,
@@ -160,7 +168,7 @@ but rather a cleaner timeseries after we remove the CME.
 
     >>> from copy import deepcopy
     >>> from disstans import Timeseries
-    >>> from disstans.models import Arctangent, Polynomial, Sinusoidal, Step, \
+    >>> from disstans.models import HyperbolicTangent, Polynomial, Sinusoidal, Step, \
     ...     SplineSet, Logarithmic
     >>> from disstans.tools import create_powerlaw_noise
     >>> mdl_coll, mdl_coll_synth = {}, {}  # containers for the model objects
@@ -174,13 +182,13 @@ but rather a cleaner timeseries after we remove the CME.
     ...     mdl_seas = Sinusoidal(period=1, time_unit="Y", t_reference=t_start_str)
     ...     mdl_eq = Step(["2002-07-01"])
     ...     mdl_post = Logarithmic(tau=20, t_reference="2002-07-01")
-    ...     # Arctangent is for the truth, SplineSet are for how we will estimate them
-    ...     mdl_sse1 = Arctangent(tau=40, t_reference="2001-07-01")
-    ...     mdl_sse2 = Arctangent(tau=40, t_reference="2003-07-01")
-    ...     mdl_sse3 = Arctangent(tau=400, t_reference="2007-01-01")
-    ...     # we could align the Arctangents with the spline center times
-    ...     # (e.g. 2001-07-24, 2003-06-09, 2007-07-02) but that would never happen in
-    ...     # real life so it would just unrealistically embellish our results
+    ...     # HyperbolicTangent (no long tails!) is for the truth, SplineSet are for how
+    ...     # we will estimate them.
+    ...     # We could align the HyperbolicTangents with the spline center times but that would
+    ...     # never happen in real life so it would just unrealistically embellish our results
+    ...     mdl_sse1 = HyperbolicTangent(tau=50, t_reference="2001-07-01")
+    ...     mdl_sse2 = HyperbolicTangent(tau=50, t_reference="2003-07-01")
+    ...     mdl_sse3 = HyperbolicTangent(tau=300, t_reference="2007-01-01")
     ...     mdl_trans = SplineSet(degree=2,
     ...                           t_center_start=t_start_str,
     ...                           t_center_end=t_end_str,
@@ -215,21 +223,25 @@ but rather a cleaner timeseries after we remove the CME.
     ...                    mdl_sse2.evaluate(timevector)["fit"] +
     ...                    mdl_sse3.evaluate(timevector)["fit"]),
     ...          "noise": noisevec}
-    ...     # for one station, we'll add a significant colored noise process
-    ...     # but only after the first third, where there are no strong, short-term signals
+    ...     # for one station, we'll add a colored noise process such that the resulting
+    ...     # noise variance is the same as before
+    ...     # but: only in the second half, where there are no strong, short-term signals
     ...     if station.name == "Cylon":
-    ...         gen_data["noise"][timevector.size//3:, :] += \
-    ...             create_powerlaw_noise(size=(2 * timevector.size // 3, 2),
-    ...                                   exponent=1.6, seed=rng) * np.array([[0.3, 0.4]])
+    ...         gen_data["noise"][timevector.size//2:, :] = \
+    ...             (gen_data["noise"][timevector.size//2:, :] +
+    ...              create_powerlaw_noise(size=(timevector.size // 2, 2),
+    ...                                    exponent=1, seed=rng
+    ...                                    ) * np.sqrt(np.array([[var_e, var_n]]))
+    ...              ) / np.sqrt(2)
     ...     # for one special station, we add the maintenance step
     ...     # repeating all steps above
     ...     if station.name == "Corko":
     ...         # time and amplitude
+    ...         p_maint = np.array([[-2, 0]])
     ...         mdl_maint = Step(["2005-01-01"])
-    ...         p_maint = np.array([[-5, 0]])
+    ...         mdl_maint.read_parameters(p_maint)
     ...         # add to station and synthetic data
     ...         mdl_coll_synth[station.name].update({"Maintenance": mdl_maint})
-    ...         mdl_maint.read_parameters(p_maint)
     ...         gen_data["seas+sec+eq"] += mdl_maint.evaluate(timevector)["fit"]
     ...     # now we sum the components up...
     ...     gen_data["truth"] = gen_data["seas+sec+eq"] + gen_data["trans"]
@@ -251,6 +263,8 @@ but rather a cleaner timeseries after we remove the CME.
     ...                               data_unit="mm",
     ...                               data_cols=["E", "N"])
 
+Of course, this code could be much shorter if we didn't want to keep all the
+intermediate results and temporary objects.
 Let's have a look at the summary of the first station to see what we added:
 
 .. doctest::
@@ -299,7 +313,7 @@ Removing the Common Mode Error
 ------------------------------
 
 To remove the common mode error that we added, we first need a high-pass filtered
-version of our ``'Raw'`` timeseries. We can do this effectively and step-sensitive
+version of our ``'Raw'`` timeseries. We can do this effectively and step-insensitive
 by calculating the running median of the timeseries, and then removing this
 smoothed timeseries from the original one.
 
@@ -392,7 +406,7 @@ We'll start with a single, non-iterative L1-regularized solution:
 .. doctest::
 
     >>> net.fitevalres(ts_description="Displacement", solver="lasso_regression",
-    ...                penalty=10, output_description="Fit_L1", residual_description="Res_L1")
+    ...                penalty=1, output_description="Fit_L1", residual_description="Res_L1")
 
 We'll also calculate the true errors that we only know because we created the data ourselves,
 and save the transient fitted model as a new timeseries (we'll use them later):
@@ -456,32 +470,32 @@ and count the number of total, non-zero, and unique non-zero parameters:
 
     >>> ZERO = 1e-4  # this is from the default in Network.spatialfit
     >>> num_total = sum([s.models["Displacement"]["Transient"].parameters.size for s in net])
-    >>> num_uniques = \
+    >>> num_uniques_base = \
     ...     np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
     ...                             > ZERO for s in net]), axis=0), axis=0)
-    >>> num_nonzero = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO).sum()
-    ...                    for s in net])
+    >>> num_nonzero_base = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO
+    ...                          ).sum() for s in net])
 
 .. doctest::
     :hide:
 
-    >>> assert num_nonzero < 500
-    >>> assert all([num < 150 for num in num_uniques])
+    >>> assert num_nonzero_base < 1000
+    >>> assert all([num < 250 for num in num_uniques_base])
 
 Giving us (the exact numbers might differ slightly)::
 
-    >>> print(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
-    Number of reweighted non-zero parameters: 478/8416
+    >>> print(f"Number of reweighted non-zero parameters: {num_nonzero_base}/{num_total}")
+    Number of reweighted non-zero parameters: 977/8416
     >>> print("Number of unique reweighted non-zero parameters per component: "
-    ...       + str(num_uniques.tolist()))
-    Number of unique reweighted non-zero parameters per component: [115, 102]
+    ...       + str(num_uniques_base.tolist()))
+    Number of unique reweighted non-zero parameters per component: [234, 223]
 
 Let's keep track of these numbers: All 16 stations (and both components) combined are
-fit by 480 splines (out of the total possible 8416). Of a total of 526 possible splines
-at any given station (including both components), 115 in the East and 102 in the North
+fit by 977 splines (out of the total possible 8416). Of a total of 263 possible splines
+at any given station and for each component, 234 in the East and 223 in the North
 component are non-zero at least at one station. That is not terribly sparse for three
 slow-slip events (SSEs), since the coseismic, postseismic, and seasonal signal should not
-be fitted by the splines.
+be fitted by the splines (or noise, for that matter).
 
 This effectively means that wherever there is not a strong enough signal, the solver will
 follow the noise realization at that station to fit the data best given the L1 penalty,
@@ -499,13 +513,14 @@ but for now, let's just save the data:*)
     >>> cor_base = np.corrcoef(np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1]
     ...                                  for s in net]))
 
-Using L1 iteration at each station independently (=locally) does not solve the problem,
-either, but let's still have a look at the same two stations when we add that:
+Using L1 iteration (which approximates the L0 norm) at each station independently (=locally)
+does not solve the problem, either, but let's still have a look at the same two stations when
+we add that:
 
 .. doctest::
 
     >>> net.fitevalres(ts_description="Displacement", solver="lasso_regression",
-    ...                penalty=10, reweight_max_iters=5,
+    ...                penalty=1, reweight_max_iters=5,
     ...                output_description="Fit_L1R5", residual_description="Res_L1R5")
     >>> for stat in net:
     ...     stat["Trans_L1R5"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
@@ -513,26 +528,26 @@ either, but let's still have a look at the same two stations when we add that:
     >>> # get spatial correlation matrix for later
     >>> cor_localiters = np.corrcoef(np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1]
     ...                                        for s in net]))
-    >>> num_total = sum([s.models["Displacement"]["Transient"].parameters.size for s in net])
-    >>> num_uniques = \
+    >>> # get number of (unique) non-zero parameters
+    >>> num_uniques_local = \
     ...     np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
     ...                             > ZERO for s in net]), axis=0), axis=0)
-    >>> num_nonzero = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO).sum()
-    ...                    for s in net])
+    >>> num_nonzero_local = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO
+    ...                           ).sum() for s in net])
 
 .. doctest::
     :hide:
 
-    >>> assert num_nonzero < 350
-    >>> assert all([num < 120 for num in num_uniques])
+    >>> assert num_nonzero_local < 500
+    >>> assert all([num < 200 for num in num_uniques_local])
 
 Giving approximately::
 
-    >>> print(f"Number of reweighted non-zero parameters: {num_nonzero}/{num_total}")
-    Number of reweighted non-zero parameters: 301/8416
+    >>> print(f"Number of reweighted non-zero parameters: {num_nonzero_local}/{num_total}")
+    Number of reweighted non-zero parameters: 384/8416
     >>> print("Number of unique reweighted non-zero parameters per component: "
-    ...       + str(num_uniques.tolist()))
-    Number of unique reweighted non-zero parameters per component: [96, 87]
+    ...       + str(num_uniques_local.tolist()))
+    Number of unique reweighted non-zero parameters per component: [176, 151]
 
 Which gives the following figures (see the plotting code above):
 
@@ -552,7 +567,7 @@ Which gives the following figures (see the plotting code above):
 .. |3c_ts_Cylon_local| image:: ../img/tutorial_3c_ts_Cylon_local.png
     :width: 49%
 
-We can see that while the total number of non-zero splines decreased by around a third,
+We can see that while the total number of non-zero splines decreased by around half,
 the number of *unique* non-zero splines decreased by far less. Furthermore, we still
 see that different splines are used throughout the stations for the same domminant signals.
 
@@ -575,17 +590,28 @@ the quality of the fit.
 it's essentially a wrapper for :meth:`~disstans.network.Network.fit`. Just like the latter,
 we give it an (initial) ``penalty`` parameter, and our ``cvxpy_kw_args`` solver settings.
 Additionally, we can now specify the models which we want to combine spatially
-(``spatial_reweight_models``), and how many spatial iterations we want
-(``spatial_reweight_iters``). We can also specify the ``verbose`` option so that we get some
-interesting statistics along the way (plus some progress bars that aren't shown here).
-Let's start by running only one spatial iteration, and evaluating its solution:
+(``spatial_reweight_models``), how many spatial iterations we want
+(``spatial_reweight_iters``), and what reweighting function we want to use
+(``local_reweight_func``). The choice of the reweighting function and its hyperparameters
+is crucial for good results, much like the choie of the penalty parameter for simple
+L2-regularized least squares. At this stage, there is no perfect way to know the best
+choice before looking at the result, so some trial-and-error is required. An empirically
+derived, decent starting point for such a search would put the ``penalty`` of a similar
+order of magnitude to the expected noise variance of the data. For the reweighting function
+that then kicks in after the first iteration, the default reweighting function can be used.
+
+We can also specify the ``verbose`` option so that we get some interesting statistics along
+the way (plus some progress bars that aren't shown here). Let's start by defining the
+reweighting function, running only one spatial iteration, and evaluating its solution:
 
 .. doctest::
 
+    >>> rw_func = disstans.solvers.InverseReweighting(eps=1e-4, scale=0.1)
     >>> stats = net.spatialfit("Displacement",
-    ...                        penalty=10,
+    ...                        penalty=1,
     ...                        spatial_reweight_models=["Transient"],
     ...                        spatial_reweight_iters=1,
+    ...                        local_reweight_func=rw_func,
     ...                        formal_covariance=True,
     ...                        verbose=True)
     Calculating scale lengths
@@ -608,19 +634,17 @@ Where the solver will give us (approximately) the following statistics::
 
     Calculating scale lengths
     Initial fit
-    Number of reweighted non-zero parameters: 478/8416
-    Number of unique reweighted non-zero parameters per component: [115, 102]
+    Number of reweighted non-zero parameters: 977/8416
+    Number of unique reweighted non-zero parameters per component: [234, 223]
     Updating weights
     Stacking model Transient
-    Weight percentiles (5-50-95): [8.7902000814, 9999.689285, 9999.9902768]
+    Weight percentiles (5-50-95): [0.2756785592, 999.53268504, 999.99131448]
     Fit after 1 reweightings
-    Number of reweighted non-zero parameters: 243/8416
-    Number of unique reweighted non-zero parameters per component: [53, 48]
-    RMS difference of 'Transient' parameters = 5.753307113 (507 changed)
+    Number of reweighted non-zero parameters: 446/8416
+    Number of unique reweighted non-zero parameters per component: [129, 101]
+    RMS difference of 'Transient' parameters = 10.058841646 (1129 changed)
     Done
 
-We can look at the characteristic numbers we calculated above by providing the solver
-the ``verbose`` option.
 The numbers before the first reweighting are exactly the same from before we iterated
 at all - which makes sense since the initial solve is before any reweighting can be
 done, and we did not specify any local L1 reweighting iterations.
@@ -655,9 +679,10 @@ steps:
 .. doctest::
 
     >>> stats = net.spatialfit("Displacement",
-    ...                        penalty=10,
+    ...                        penalty=1,
     ...                        spatial_reweight_models=["Transient"],
     ...                        spatial_reweight_iters=20,
+    ...                        local_reweight_func=rw_func,
     ...                        formal_covariance=True,
     ...                        verbose=True)
     Calculating scale lengths
@@ -698,7 +723,7 @@ we looked at before:
 We can now see that this effect is much stronger now: only a handful of splines
 are used by the two stations. Unavoidably, the fit has become a bit worse: for the
 Jeckle station, for example, we can see that some left-over signal can be found
-in the residual North timeseries around the first SSE.
+in the residual North timeseries around the first SSE, and there is also some overfitting.
 This can probably be tuned by changing the L1 ``penalty``, or by choosing a different
 ``local_reweight_func``, or many other configuration settings that are present in
 :meth:`~disstans.network.Network.spatialfit`.
@@ -781,7 +806,7 @@ for both error timeseries ``'Err_L1R5'`` and ``'Err_L1R1S20'``:
 .. doctest::
     :hide:
 
-    >>> assert all([(stats_dict["Err_L1R1S20"].loc["Cylon", ("RMS", comp)]
+    >>> assert any([(stats_dict["Err_L1R1S20"].loc["Cylon", ("RMS", comp)]
     ...              < stats_dict["Err_L1R5"].loc["Cylon", ("RMS", comp)] * 0.97)
     ...             for comp in ["Displacement_Model_E-E", "Displacement_Model_N-N"]])
 
@@ -790,62 +815,50 @@ Giving us (again, approximately)::
     >>> for err_ts, stat in stats_dict.items():
     ...     print(f"Errors for {err_ts}:")
     ...     print(stat)
-    ...     print(stat.mean())
     Errors for Err_L1R5:
     Metrics                      Mean                                           RMS
     Components Displacement_Model_E-E Displacement_Model_N-N Displacement_Model_E-E Displacement_Model_N-N
     Station
-    Jeckle                  -0.000491               0.004247               0.047617               0.054745
-    Cylon                   -0.013340              -0.073916               0.182140               0.244717
-    Marper                   0.000150               0.009685               0.052781               0.065970
-    Timble                  -0.003361              -0.009412               0.047401               0.056194
-    Macnaw                   0.013679               0.002058               0.049528               0.059661
-    Colzyy                  -0.008207              -0.009420               0.052918               0.047769
-    Mrror                    0.005841               0.002133               0.042675               0.048494
-    Mankith                 -0.002962               0.015497               0.032748               0.042579
-    Lingo                    0.001484              -0.013256               0.048957               0.048060
-    Marvish                  0.003773              -0.002676               0.037533               0.039151
-    Corko                   -0.008459              -0.002010               0.148405               0.037812
-    Kogon                   -0.006207               0.000764               0.043394               0.034810
-    Malool                  -0.000250               0.006225               0.023989               0.039196
-    Aarla                    0.002147              -0.001871               0.031010               0.037852
-    Tygrar                   0.019808              -0.007456               0.038625               0.035975
-    Jozga                   -0.006202               0.002822               0.031258               0.037786
-    Metrics  Components
-    Mean     Displacement_Model_E-E   -0.000162
-             Displacement_Model_N-N   -0.004787
-    RMS      Displacement_Model_E-E    0.056936
-             Displacement_Model_N-N    0.058173
-    dtype: float64
+    Jeckle                   0.001789               0.011520               0.076381               0.089996
+    Cylon                   -0.014557              -0.023176               0.202408               0.211186
+    Marper                  -0.007907               0.013339               0.067371               0.104947
+    Timble                  -0.019144              -0.020908               0.067921               0.084032
+    Macnaw                  -0.005710               0.029705               0.088304               0.083938
+    Colzyy                  -0.014511              -0.015330               0.074303               0.101280
+    Mrror                    0.004584               0.003457               0.085858               0.067818
+    Mankith                 -0.028832               0.029474               0.062641               0.093013
+    Lingo                    0.001315              -0.018743               0.082246               0.109537
+    Marvish                  0.005598              -0.007535               0.065737               0.075180
+    Corko                   -0.001646              -0.010658               0.095140               0.069532
+    Kogon                   -0.009032              -0.008998               0.079364               0.097043
+    Malool                  -0.007767               0.009422               0.059471               0.101091
+    Aarla                   -0.008577               0.009010               0.072254               0.075050
+    Tygrar                   0.025358              -0.010280               0.066368               0.070089
+    Jozga                   -0.001868              -0.013079               0.056579               0.073994
     Errors for Err_L1R1S20:
     Metrics                      Mean                                           RMS
     Components Displacement_Model_E-E Displacement_Model_N-N Displacement_Model_E-E Displacement_Model_N-N
     Station
-    Jeckle                  -0.000761               0.004266               0.059535               0.081529
-    Cylon                   -0.013613              -0.073966               0.168762               0.232670
-    Marper                   0.000199               0.009608               0.059188               0.083246
-    Timble                  -0.003364              -0.009068               0.058463               0.075741
-    Macnaw                   0.013499               0.002391               0.054904               0.070136
-    Colzyy                  -0.008323              -0.009570               0.049136               0.060753
-    Mrror                    0.005573               0.002426               0.057697               0.049647
-    Mankith                 -0.003031               0.015523               0.047270               0.047615
-    Lingo                    0.001706              -0.012213               0.069547               0.083686
-    Marvish                  0.003819              -0.002441               0.037920               0.055211
-    Corko                   -0.006929               0.001102               0.884932               0.054108
-    Kogon                   -0.006141               0.001367               0.051069               0.081481
-    Malool                  -0.000201               0.006488               0.035133               0.040612
-    Aarla                    0.002082              -0.001654               0.021539               0.032675
-    Tygrar                   0.019632              -0.007462               0.030916               0.026622
-    Jozga                   -0.006513               0.002785               0.024586               0.022031
-    Metrics  Components
-    Mean     Displacement_Model_E-E   -0.000148
-             Displacement_Model_N-N   -0.004401
-    RMS      Displacement_Model_E-E    0.106912
-             Displacement_Model_N-N    0.068610
-    dtype: float64
+    Jeckle                   0.001726               0.011756               0.076691               0.105085
+    Cylon                   -0.014118              -0.022802               0.170231               0.204496
+    Marper                  -0.007720               0.013229               0.061732               0.096883
+    Timble                  -0.019041              -0.020433               0.058748               0.136849
+    Macnaw                  -0.005457               0.029680               0.077605               0.083117
+    Colzyy                  -0.014377              -0.015487               0.065579               0.088715
+    Mrror                    0.004560               0.003531               0.060917               0.067936
+    Mankith                 -0.028723               0.029478               0.084800               0.084733
+    Lingo                    0.001418              -0.018726               0.078456               0.091549
+    Marvish                  0.005602              -0.007613               0.077573               0.083145
+    Corko                   -0.002285              -0.010194               0.173590               0.083748
+    Kogon                   -0.009033              -0.008620               0.069861               0.075361
+    Malool                  -0.007590               0.009453               0.092742               0.093743
+    Aarla                   -0.008417               0.008916               0.076819               0.067584
+    Tygrar                   0.025537              -0.010260               0.084290               0.062617
+    Jozga                   -0.001885              -0.013221               0.062932               0.055925
 
-If you look at the lines for Cylon, the standard deviation reduced slightly from
-``0.182140`` and ``0.244717`` to ``0.168762`` and ``0.232670``, respectively.
+If you look at the lines for Cylon, the RMS in the East component reduced significantly from
+``0.202408`` to ``0.170231``, and the North RMS decreased slightly as well, from ``0.211186``
+to ``0.204496``.
 
 .. warning::
 
@@ -890,109 +903,28 @@ will fit the smallest spline as close to the unmodeled jump with a high amplitud
 The result is an overall good fit, with some larger residuals around the time of
 the jump (since even the smallest spline is not as short as a day).
 
-If we enforce spatial coherence, the other stations "forbid" the use of the spline
-closest to the maintenance jump, such that Corko can't use it, resulting in large
-residuals before and after the jump. All other modeled signals are contorted
-to try to minimize the rest of the residual: for example, the splines that are
-associated with the SSEs are fit to a much larger amplitude to compensate for the
-maintenance step.
+If we enforce spatial coherence, the resulting behavior will depend on the strength
+of th regularization and reweighting. If it isn't too strong, then we get a similar
+behavior to the one that we talked about: the smallest spline will be used to fit the
+unmodeled jump.
 
-Let's look at the residuals more quantitatively, similar to above:
+If, however, the reweighting is strong enough such that the other
+stations "forbid" the use of the spline closest to the maintenance jump, then Corko
+can't use it, resulting in large residuals before and after the jump. All other modeled
+signals are contorted to try to minimize the rest of the residual: for example, the
+splines that are associated with the SSEs are fit to a much larger amplitude to
+compensate for the maintenance step. In this case, one could examine the RMS of the
+residuals, and immediately see a strong outlier for Corko. This can be accomplished
+with the :meth:`~disstans.network.Network.analyze_residuals` method, and the
+``rms_on_map`` option for :meth:`~disstans.network.Network.gui`.
+Once a user recognizes that a station has a significantly larger residual RMS than
+most other stations this, they can check out the timeseries of that station and/or consult
+a maintenance dictionary and/or check an earthquake catalog to see if there is a step
+signal that should be modeled. Then, a step model can be added to the station, and the
+entire network can be fit again, producing an even better fit to the data.
 
-.. doctest::
-
-    >>> stats_dict = {}
-    >>> for res_ts in ["Res_L1R5", "Res_L1R1S20"]:
-    ...     stats_dict[res_ts] = net.analyze_residuals(res_ts, mean=True, rms=True)
-
-.. doctest::
-    :hide:
-
-    >>> assert (stats_dict["Res_L1R5"].loc["Corko", ("RMS", "E-Displacement_Model_E")] * 1.5
-    ...         < stats_dict["Res_L1R1S20"].loc["Corko", ("RMS", "E-Displacement_Model_E")])
-
-Which yields::
-
-    >>> for res_ts, stats in stats_dict.items():
-    ...     print(f"Residuals for {res_ts}:")
-    ...     print(stats)
-    ...     print(stats.mean())
-    Residuals for Res_L1R5:
-    Metrics                      Mean                                           RMS
-    Components E-Displacement_Model_E N-Displacement_Model_N E-Displacement_Model_E N-Displacement_Model_N
-    Station
-    Jeckle                   0.000289              -0.000376               0.298429               0.364957
-    Cylon                    0.001167              -0.000911               0.318695               0.385978
-    Marper                  -0.001412               0.000706               0.297877               0.372178
-    Timble                   0.000150               0.000376               0.304567               0.367052
-    Macnaw                  -0.002235               0.000175               0.301741               0.371671
-    Colzyy                   0.000569              -0.000532               0.298693               0.366651
-    Mrror                    0.000364              -0.001178               0.298302               0.365291
-    Mankith                 -0.000738               0.000531               0.296764               0.361432
-    Lingo                   -0.000707               0.000500               0.304847               0.369540
-    Marvish                  0.000648               0.001028               0.294572               0.365542
-    Corko                   -0.001142              -0.000326               0.325757               0.363515
-    Kogon                   -0.002234               0.000040               0.297231               0.369583
-    Malool                   0.001695              -0.000980               0.297162               0.363995
-    Aarla                   -0.000677              -0.000603               0.294081               0.368550
-    Tygrar                  -0.001584              -0.001595               0.302404               0.362925
-    Jozga                    0.001297              -0.002277               0.297551               0.369949
-    Metrics  Components
-    Mean     E-Displacement_Model_E   -0.000284
-             N-Displacement_Model_N   -0.000339
-    RMS      E-Displacement_Model_E    0.301792
-             N-Displacement_Model_N    0.368051
-    dtype: float64
-    Residuals for Res_L1R1S20:
-    Metrics                      Mean                                           RMS
-    Components E-Displacement_Model_E N-Displacement_Model_N E-Displacement_Model_E N-Displacement_Model_N
-    Station
-    Jeckle                   0.000559              -0.000396               0.302239               0.371825
-    Cylon                    0.001440              -0.000860               0.332546               0.403983
-    Marper                  -0.001461               0.000783               0.301469               0.378728
-    Timble                   0.000153               0.000032               0.307061               0.372174
-    Macnaw                  -0.002054              -0.000157               0.303219               0.375472
-    Colzyy                   0.000685              -0.000382               0.300941               0.370224
-    Mrror                    0.000632              -0.001471               0.303317               0.366791
-    Mankith                 -0.000670               0.000505               0.298210               0.363107
-    Lingo                   -0.000929              -0.000543               0.309568               0.377019
-    Marvish                  0.000602               0.000793               0.296313               0.368489
-    Corko                   -0.002671              -0.003438               0.932213               0.365678
-    Kogon                   -0.002299              -0.000563               0.301393               0.378165
-    Malool                   0.001646              -0.001243               0.298285               0.365840
-    Aarla                   -0.000612              -0.000821               0.295696               0.369827
-    Tygrar                  -0.001408              -0.001589               0.303370               0.364032
-    Jozga                    0.001608              -0.002241               0.298941               0.371406
-    Metrics  Components
-    Mean     E-Displacement_Model_E   -0.000299
-             N-Displacement_Model_N   -0.000724
-    RMS      E-Displacement_Model_E    0.342799
-             N-Displacement_Model_N    0.372672
-    dtype: float64
-
-While in the first case, the residual in the North component is at ``0.325757`` (comparable
-in magnitude to the other stations), in the second case, it is significantly larger at
-``0.932213``, making it clearly stand out.
-
-In fact, we can use :meth:`~disstans.network.Network.gui` to visualize this
-(using the ``rms_on_map`` option)::
-
-    >>> net.gui(station="Corko", save=True, save_map=True,
-    ...         timeseries=["Displacement", "Res_L1R1S20"],
-    ...         rms_on_map={"ts": "Res_L1R1S20", "comps": [0], "c_max": 1})
-
-Which gives:
-
-.. image:: ../img/tutorial_3c_map_Corko_spatial20.png
-
-The station definitely stands out. Once a user sees this, they can check out the
-timeseries of that station and/or consult a maintenance dictionary and/or
-check an earthquake catalog to see if there is a step signal that should be modeled.
-Then, a step model can be added to the station, and the entire network can be fit again,
-producing an even better fit to the data.
-
-The :class:`~disstans.processing.StepDetector` class is a simple method to check for these
-large unmodeled jumps in the residuals (see its documentation for more details).
+The :class:`~disstans.processing.StepDetector` class is a simple method to check for
+unmodeled jumps in the residuals (see its documentation for more details).
 If we use it to find steps in the two residual timeseries, we can skip the manual labor
 of clicking through all the stations and looking for jumps, and focus on those that are
 identified by the algorithm:
@@ -1000,7 +932,7 @@ identified by the algorithm:
 .. doctest::
 
     >>> from disstans.processing import StepDetector
-    >>> stepdet = StepDetector(kernel_size=31)
+    >>> stepdet = StepDetector(kernel_size=51)
     >>> steps_dict = {}
     >>> for res_ts in ["Res_L1R5", "Res_L1R1S20"]:
     ...     steps_dict[res_ts] = stepdet.search_network(net, res_ts)[0]
@@ -1012,10 +944,9 @@ identified by the algorithm:
     >>> for res_ts, steps in steps_dict.items():
     ...     print(steps)
       station       time  probability ...
-    0   Corko 2005-01-01  ...
+    ... Corko 2005-01-01  ...
       station       time  probability ...
     ... Corko 2005-01-01  ...
-    ... Corko 2002-07-01  ...
 
 Which gives::
 
@@ -1024,18 +955,27 @@ Which gives::
     ...     print(steps)
     Possible steps for Res_L1R5:
       station       time  probability      var0      var1    varred
-    0   Corko 2005-01-01    91.067621  1.532238  0.074541  0.951352
+    0   Corko 2005-01-01    35.183175  0.455094  0.217976  0.521031
     Possible steps for Res_L1R1S20:
       station       time  probability      var0      var1    varred
-    1   Corko 2005-01-01    95.731499  1.606585  0.067241  0.958147
-    0   Corko 2002-07-01    86.455304  0.916521  0.051740  0.943547
+    0   Corko 2005-01-01    39.707077  0.510561  0.223785  0.561688
 
 In this case, both residual timeseries contain a strong enough jump for the detector to
-isolate the missing maintenance step on 2005-01-01. Furthermore, we also see in numbers
-what we mentioned before: that other models far away from the actual maintenance step
-are modified to reduce the overall misfit. Here, the earthquake step that we are modeling
-on 2002-07-01 is changed in amplitude so that there is still a significant residual
-on that day.
+isolate the missing maintenance step on 2005-01-01. In this case, the probability is
+higher in the case where we used spatial information, suggesting that the spatial
+reweighting has indeed made it harder for the solver to accurately fit the signal
+- this is desired since we didn't include the correct model for this jump, and we want
+to enhance the misfit to be able to better find these unmodeled jumps.
+
+For the remainder of this tutorial, let's add the maintenance step at Corko as a model,
+and rerun the local and spatial L0 fits.
+
+.. doctest::
+
+    >>> new_maint_mdl = {"Maintenance": Step(["2005-01-01"])}
+    >>> mdl_coll["Corko"].update(new_maint_mdl)
+    >>> net["Corko"].add_local_model_dict("Displacement", new_maint_mdl)
+    >>> # run net.fitevalres and/or net.spatialfit now just as above
 
 Statistics of spatial reweighting
 ---------------------------------
@@ -1054,22 +994,33 @@ Let's make two figures that show how they evolve and converge::
     >>> fig, ax1 = plt.subplots()
     >>> ax2 = ax1.twinx()
     >>> ax1.plot(stats["list_nonzeros"], c="k", marker=".")
-    >>> ax1.set_ylim([0, 500])
-    >>> ax1.set_yticks(range(0, 600, 100))
+    >>> ax1.scatter(-1, num_nonzero_base_M, s=100, c="k")
+    >>> ax1.scatter(-1, num_nonzero_local_M, s=60, c="k", marker="D")
+    >>> ax1.set_ylim([0, 1000])
+    >>> ax1.set_yticks(range(0, 1200, 200))
     >>> ax2.plot(stats["arr_uniques"][:, 0], c="C0", marker=".")
     >>> ax2.plot(stats["arr_uniques"][:, 1], c="C1", marker=".")
-    >>> ax2.set_ylim([0, 150])
-    >>> ax2.set_yticks(range(0, 180, 30))
+    >>> ax2.scatter(21, num_uniques_base_M[0], s=100, c="C0")
+    >>> ax2.scatter(21, num_uniques_local_M[0], s=60, c="C0", marker="D")
+    >>> ax2.scatter(21, num_uniques_base_M[1], s=100, c="C1")
+    >>> ax2.scatter(21, num_uniques_local_M[1], s=60, c="C1", marker="D")
+    >>> ax2.set_ylim([0, 250])
+    >>> ax2.set_yticks(range(0, 300, 50))
+    >>> ax1.set_xlim([-1, 21])
     >>> ax1.set_xticks([0, 1, 5, 10, 15, 20])
     >>> ax1.set_xlabel("Iteration")
     >>> ax1.set_ylabel("Total number of non-zero parameters")
     >>> ax2.set_ylabel("Unique number of non-zero parameters")
-    >>> custom_lines = [Line2D([0], [0], c="k", marker="."),
-    ...                 Line2D([0], [0], c="C0", marker="."),
-    ...                 Line2D([0], [0], c="C1", marker=".")]
-    >>> ax1.legend(custom_lines, ["Total", "Unique East", "Unique North"])
+    >>> custom_lines = [Patch(color="k",),
+    ...                 Patch(color="C0"),
+    ...                 Patch(color="C1"),
+    ...                 Line2D([0], [0], c=[1, 1, 1, 0], mfc="0.7", marker="o"),
+    ...                 Line2D([0], [0], c=[1, 1, 1, 0], mfc="0.7", marker="D"),
+    ...                 Line2D([0], [0], c="0.7", marker=".")]
+    >>> ax1.legend(custom_lines, ["Total", "Unique East", "Unique North",
+    ...                           "L1", "Local L0", "Spatial L0"], loc=9, ncol=2)
     >>> ax1.set_title(f"Number of available parameters: {stats['num_total']}")
-    >>> fig.savefig("tutorial_3e_numparams.png")
+    >>> fig.savefig(f"tutorial_3e_numparams.png")
     >>> plt.close(fig)
     >>> # second figure is for dict_rms_diff, dict_num_changed
     >>> fig, ax1 = plt.subplots()
@@ -1089,18 +1040,18 @@ Let's make two figures that show how they evolve and converge::
     >>> custom_lines = [Line2D([0], [0], c="C0", marker="."),
     ...                 Line2D([0], [0], c="C1", marker=".")]
     >>> ax1.legend(custom_lines, ["RMS Difference", "Changed Parameters"])
-    >>> fig.savefig("tutorial_3e_diffs.png")
+    >>> fig.savefig(f"tutorial_3e_diffs.png")
     >>> plt.close(fig)
 
-The first figure shows that at around 10 iterations, both the total number of
+The first figure shows that between 15 and 20 iterations, both the total number of
 parameters as well as the unique ones in both components have converged.
 
 .. image:: ../img/tutorial_3e_numparams.png
 
 The second figure shows that around the same time, the RMS difference of fitted
-parameters falls below 10 :sup:`-2`, and around less than 10 parameters change
-between each iteration. Towards 20 iterations, no parameters actually change between
-being close-to-zero or non-zero, they just change their value slightly.
+parameters falls below 10 :sup:`-2`, and less than 10 parameters change
+between each iteration. At 20 iterations, no parameters actually change between
+being close-to-zero or non-zero, they just change their values slightly.
 This shows that the spatial reweighting scheme employed by DISSTANS converges nicely
 and fulfills the goal of reducing the number of unique splines used by the entire network.
 
@@ -1108,26 +1059,25 @@ and fulfills the goal of reducing the number of unique splines used by the entir
 
 Now, let's pick up on the correlation matrices saved throughout this tutorial
 without explaining you why:
-``cor_base, cor_localiters, cor_spatialiters1, cor_spatialiters20``.
-What are they? For the North component (the one without the unmodeled maintenance step),
-we computed the correlation coefficients (between -1 and 1) of the modeled signal (timeseries)
-from only the transient :class:`~disstans.models.SplineSet` model between station.
-This means that the more similar the fitted transients are in shape (amplitude does not
-influence the correlation coefficient), i.e. in timing and phases of the transients,
-the higher the coefficients will be.
+``cor_base, cor_localiters, cor_spatialiters1, cor_spatialiters20``. What are they?
+For the North component, we computed the correlation coefficients (between -1 and 1)
+of the modeled signal (timeseries) from only the transient :class:`~disstans.models.SplineSet`
+model between station. This means that the more similar the fitted transients are in shape
+(the total amplitude does not influence the correlation coefficient), i.e. in timing and
+phases of the transients, the higher the coefficients will be.
 
 We can use these matrices now to plot the (symmetric) correlation matrices for the two
-main cases we considered above, and also to compute an "average" spatial correlation.
+main cases we considered above, and also to compute the median spatial correlation.
 If we successfully fitted the our synthetic transients, which we know are the same
-everywhere, we should see that the average correlation increases when using the
+everywhere, we should see that the median correlation increases when using the
 spatial reweighting. Here's some example code::
 
     >>> for title, case, cormat in \
     ...     zip(["5 Local Reweightings", "1 Local, 20 Spatial Reweighting"],
     ...         ["local", "spatial20"], [cor_localiters, cor_spatialiters20]):
-    ...     # average spatial correlation of transient timeseries
-    ...     avgcor = np.mean(np.ma.masked_equal(np.triu(cormat, 1), 0))
-    ...     print(f"\nAverage spatial correlation = {avgcor}\n")
+    ...     # median spatial correlation of transient timeseries
+    ...     medcor = np.ma.median(np.ma.masked_equal(np.triu(cormat, 1), 0))
+    ...     print(f"\nMedian spatial correlation = {medcor}\n")
     ...     # spatial correlation visualization
     ...     plt.figure()
     ...     plt.title(title)
@@ -1139,15 +1089,15 @@ spatial reweighting. Here's some example code::
     ...     plt.savefig(f"tutorial_3f_corr_{case}.png")
     ...     plt.close()
 
-In fact, our average spatial correlation increased from ``0.559811635602448``
-to ``0.8484197775591782``. We can see this visually in the plots we just saved:
+In fact, our median spatial correlation increased from ``0.886115352768189``
+to ``0.9885053905861687``. We can see this visually in the plots we just saved:
 
 |3f_corr_local| |3f_corr_spatial20|
 
-.. |3f_corr_local| image:: ../img/tutorial_3f_corr_local.png
+.. |3f_corr_local| image:: ../img/tutorial_3f_corr_localM.png
     :width: 49%
 
-.. |3f_corr_spatial20| image:: ../img/tutorial_3f_corr_spatial20.png
+.. |3f_corr_spatial20| image:: ../img/tutorial_3f_corr_spatial20M.png
     :width: 49%
 
 We can see that especially in the far-east stations, where the signal has fallen close
@@ -1156,9 +1106,10 @@ correlation. (Keep in mind that this is just for the transient model: the overal
 timeseries will obviously correlate much less because of the different SSEs, maintenance
 steps, etc.)
 
-This did not come with a meaningfully different residuals. As we printed out above
-when we we're looking for the unmodeled maintenance step, we saw that the mean of
-the residuals' RMS in the North component only changed from ``0.368051`` to ``0.372672``.
+This did not come with a meaningfully different residuals. If we use
+:meth:`~disstans.network.Network.analyze_residuals`, we can see that the mean of the
+residuals' RMS in the East and North components only changed from ``0.579811`` and
+``0.714766`` to ``0.585447`` and ``0.720693``, respectively.
 Also, keep in mind that something we're fitting less now is the non-spatially-coherent
 colored noise; by principle, our *residuals* will be slightly larger, in the hopes
 that our *errors* are smaller.
@@ -1172,7 +1123,7 @@ The following code will produce the annotated correlation plot using the
 :meth:`~disstans.models.ModelCollection.plot_covariance` method::
 
     >>> net["Jeckle"].models["Displacement"].plot_covariance(
-    ...     fname="tutorial_3g_Jeckle_corr_sparse.png", use_corr_coef=True)
+    ...     fname="tutorial_3g_Jeckle_corr_sparse, use_corr_coef=True)
 
 Which yields the following figure:
 
@@ -1185,7 +1136,7 @@ will show the interactive plot window, where one can zoom in. However, using the
 are omitted, yielding the following plot::
 
     >>> net["Jeckle"].models["Displacement"].plot_covariance(
-    ...     fname="tutorial_3g_Jeckle_corr_dense.png",
+    ...     fname="tutorial_3g_Jeckle_corr_dense,
     ...     plot_empty=False, use_corr_coef=True)
 
 .. image:: ../img/tutorial_3g_Jeckle_corr_dense.png
@@ -1208,17 +1159,18 @@ For each transient timeseries that we saved, we can produce a wormplot like this
     >>> for case, trans_ts in \
     ...     zip(["local", "spatial20"], ["Trans_L1R5", "Trans_L1R1S20"]):
     ...     net.wormplot(ts_description=trans_ts,
-    ...                  fname=f"tutorial_3h_worm_{case}.png",
+    ...                  fname=f"tutorial_3h_worm_{case},
+    ...                  colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
     ...                  scale=1e3, annotate_stations=False)
 
 Which yields the following two maps:
 
 |3h_worm_local| |3h_worm_spatial20|
 
-.. |3h_worm_local| image:: ../img/tutorial_3h_worm_local.png
+.. |3h_worm_local| image:: ../img/tutorial_3h_worm_localM.png
     :width: 49%
 
-.. |3h_worm_spatial20| image:: ../img/tutorial_3h_worm_spatial20.png
+.. |3h_worm_spatial20| image:: ../img/tutorial_3h_worm_spatial20M.png
     :width: 49%
 
 We can see that in general, the transients that were estimated through the spatial

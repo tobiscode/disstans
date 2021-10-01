@@ -1,6 +1,19 @@
 Tutorial 1: The first synthetic station
 =======================================
 
+.. sidebar:: Download full script
+
+   :download:`tutorial_1_simple_timeseries.py <../../scripts/tutorial_1_simple_timeseries.py>`
+
+This tutorial will give the very first insight into the basic workings of DISSTANS.
+We will have a look at the :class:`~disstans.timeseries.Timeseries`,
+:class:`~disstans.models.Model`, and :class:`~disstans.station.Station` objects,
+and show how standard Python, NumPy and Matplotlib procedures can be used directly
+with DISSTANS.
+
+.. contents:: Table of contents
+    :local:
+
 Building a Model collection
 ---------------------------
 
