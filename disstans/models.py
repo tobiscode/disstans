@@ -805,14 +805,18 @@ class BSpline(Model):
         return arch
 
     def _get_mapping(self, timevector):
+        # get relative and normalized time
         trel = self.tvec_to_numpycol(timevector).reshape(-1, 1, 1) \
                - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
         tnorm = trel / self.scale
+        # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
         in_power = tnorm + self.order/2 - krange
         in_sum = ((-1)**krange * comb(self.order, krange)
                   * (in_power * (in_power >= 0))**(self.degree))
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
+        # to avoid numerical issues, set to zero manually outside of valid domains
+        coefs[np.abs(tnorm.squeeze()) > self.order / 2] = 0
         return coefs
 
     def get_transient_period(self, timevector):
@@ -903,14 +907,19 @@ class ISpline(Model):
         return arch
 
     def _get_mapping(self, timevector):
+        # get relative and normalized time
         trel = self.tvec_to_numpycol(timevector).reshape(-1, 1, 1) \
                - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
         tnorm = trel / self.scale
+        # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
         in_power = tnorm + self.order/2 - krange
         in_sum = ((-1)**krange * comb(self.order, krange)
                   * (in_power * (in_power >= 0))**(self.degree + 1))
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree + 1)
+        # to avoid numerical issues, set to zero or one manually outside of valid domains
+        coefs[tnorm.squeeze() < - self.order / 2] = 0
+        coefs[tnorm.squeeze() > self.order / 2] = 1
         return coefs
 
     def get_transient_period(self, timevector):
