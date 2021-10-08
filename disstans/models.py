@@ -381,7 +381,11 @@ class Model():
                 maxamps = np.max(np.abs(coefs), axis=0, keepdims=True)
                 maxamps[maxamps == 0] = 1
                 numnotzero = np.sum(~np.isclose(coefs / maxamps, 0), axis=0)
-                observable = numnotzero > 1 if self.regularize else numnotzero > 0
+                obsnonzero = numnotzero > 1 if self.regularize else numnotzero > 0
+                numunique = np.array([np.unique(coefs[:, i]).size
+                                      for i in range(self.num_parameters)])
+                obsunique = numunique > 1 if self.regularize else numunique > 0
+                observable = np.logical_and(obsnonzero, obsunique)
             # build before- and after-matrices
             # either use zeros or the values at the active boundaries for padding
             if self.zero_before:
