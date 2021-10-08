@@ -907,7 +907,8 @@ class Network():
                    formal_covariance=False, use_data_variance=True,
                    use_data_covariance=True, use_internal_scales=True,
                    cov_zero_threshold=1e-6, verbose=False, no_pbar=False,
-                   return_stats=True, extended_stats=False, return_solutions=False,
+                   return_stats=True, extended_stats=False,
+                   keep_mdl_res_as=None, return_solutions=False,
                    zero_threshold=1e-4, num_threads_evaluate=None, roll_mean_kernel=30,
                    cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
         r"""
@@ -1007,6 +1008,14 @@ class Network():
             If ``True`` (default: ``False``), the fitted models are evaluated at each iteration
             to calculate residual and fit statistics. These extended statistics are added to
             ``statistics`` (see Returns below).
+        keep_mdl_res_as : tuple, optional
+            If ``extended_stats=True``, the network's models are evaluated, and a model fit and
+            residuals timeseries are created. Between iterations, they are removed by default,
+            but passing this parameter a 2-element tuple of strings keeps the evaluated model
+            and residual timeseries after the last iteration. This effectively allows the user
+            to skip :meth:`~disstans.network.Network.evaluate` (for ``output_description``)
+            and the calculation of the residual as done with ``residual_description`` by
+            :meth:`~disstans.network.Network.fitevalres` after finishing the spatial fitting.
         zero_threshold : float, optional
             When extracting the formal covariance matrix or calculating statistics, assume
             parameters with absolute values smaller than ``zero_threshold`` are effectively zero.
@@ -1139,6 +1148,12 @@ class Network():
         # distance_weights is ignoring whether (1) a station actually has data, and
         # (2) if the spatial extent of the signal we're trying to estimate is correlated
         # to the station geometry
+        if verbose:
+            nonzero_distances = np.sort(np.triu(all_distances, k=1).ravel()
+                                        )[int(num_stations * (num_stations + 1) / 2):]
+            percs = [np.percentile(nonzero_distances, q) / 1e3 for q in [5, 50, 95]]
+            tqdm.write("Distance percentiles in km (5-50-95): "
+                       f"[{percs[0]:.1f}, {percs[1]:.1f}, {percs[2]:.1f}]")
 
         # first solve, default initial weights
         if verbose:
@@ -1203,9 +1218,16 @@ class Network():
             dict_cors_det_means = {mdl_description: [] for mdl_description in all_reweight_models}
 
             # define a function to save space
-            def save_extended_stats():
-                iter_name_fit = ts_description + "_extendedstats_fit"
-                iter_name_res = ts_description + "_extendedstats_res"
+            def save_extended_stats(is_last=False):
+                if is_last and isinstance(keep_mdl_res_as, tuple) and \
+                   (len(keep_mdl_res_as) == 2):
+                    keep_last = True
+                    iter_name_fit = str(keep_mdl_res_as[0])
+                    iter_name_res = str(keep_mdl_res_as[1])
+                else:
+                    keep_last = False
+                    iter_name_fit = ts_description + "_extendedstats_fit"
+                    iter_name_res = ts_description + "_extendedstats_res"
                 # evaluate model fit to timeseries
                 if num_threads_evaluate is not None:
                     curr_num_threads = defaults["general"]["num_threads"]
@@ -1241,8 +1263,9 @@ class Network():
                                      for cormat in cormats]
                     dict_cors_det[mdl_description].append(cormats)
                     dict_cors_det_means[mdl_description].append(cormats_means)
-                # delete temporary timeseries
-                self.remove_timeseries(iter_name_fit, iter_name_res)
+                # delete temporary timeseries if in between iterations
+                if not keep_last:
+                    self.remove_timeseries(iter_name_fit, iter_name_res)
 
             # run the function for the first time to capture the initial fit
             save_extended_stats()
@@ -1322,9 +1345,6 @@ class Network():
                            f"{num_nonzero}/{num_total}")
                 tqdm.write("Number of unique reweighted non-zero parameters per component: "
                            + str(num_uniques.tolist()))
-            # save extended statistics
-            if extended_stats:
-                save_extended_stats()
             # check for early stopping by comparing parameters that were reweighted
             early_stop = True
             for mdl_description in all_reweight_models:
@@ -1348,6 +1368,9 @@ class Network():
                 if verbose:
                     tqdm.write(f"RMS difference of '{mdl_description}' parameters = "
                                f"{rms_diff:.11g} ({num_changed} changed)")
+            # save extended statistics
+            if extended_stats:
+                save_extended_stats(is_last=early_stop or (i == spatial_reweight_iters - 1))
             # check if early stopping was triggered
             if early_stop:
                 if verbose:
