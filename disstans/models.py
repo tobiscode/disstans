@@ -806,7 +806,8 @@ class BSpline(Model):
                 "kw_args": {"degree": self.degree,
                             "scale": self.scale,
                             "num_splines": self.num_parameters,
-                            "spacing": self.spacing}}
+                            "spacing": self.spacing,
+                            "obs_scale": self.observability_scale}}
         return arch
 
     def _get_mapping(self, timevector):
@@ -917,7 +918,8 @@ class ISpline(Model):
                 "kw_args": {"degree": self.degree,
                             "scale": self.scale,
                             "num_splines": self.num_parameters,
-                            "spacing": self.spacing}}
+                            "spacing": self.spacing,
+                            "obs_scale": self.observability_scale}}
         return arch
 
     def _get_mapping(self, timevector):
