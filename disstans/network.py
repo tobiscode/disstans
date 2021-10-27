@@ -949,9 +949,14 @@ class Network():
         ts_description : str
             Description of the timeseries to fit.
         penalty : float
-            Penalty hyperparameter :math:`\lambda`. If ``local_reweight_coupled=True``
-            (default), this is just the penalty at the first iteration. After that, the
-            penalties are largely controlled by ``local_reweight_func``.
+            Penalty hyperparameter :math:`\lambda`. For non-reweighted models (i.e.,
+            regularized models that are neither in ``spatial_reweight_models`` nor in
+            ``continuous_reweight_models``), this is the constant penalty applied for
+            every iteration. For the reweighted models, and if ``local_reweight_coupled=True``
+            (default), this is just the penalty at the first iteration. After that,
+            the penalties are largely controlled by ``local_reweight_func``. If
+            ``local_reweight_coupled=False``, the penalty is applied on top of the updated
+            weights at each iteration.
         spatial_reweight_models : list
             Names of models to use in the spatial reweighting.
         spatial_reweight_iters : int
@@ -1303,13 +1308,20 @@ class Network():
                     for name in station_names:
                         if mdl_description in solutions[name]:
                             new_net_weights[name]["reweight_init"][mdl_description] = \
-                                solutions[name][mdl_description].weights
+                                solutions[name].weights_by_models(mdl_description)
             # copying over the old weights for the continuous models
             for mdl_description in continuous_reweight_models:
                 for name in station_names:
                     if mdl_description in solutions[name]:
                         new_net_weights[name]["reweight_init"][mdl_description] = \
-                            solutions[name][mdl_description].weights
+                            solutions[name].weights_by_models(mdl_description)
+            # for models that were regularized but not spatially or continuously reweighted,
+            # set the initial weights to penalty (such that it keeps a constant penalty)
+            for name in station_names:
+                for mdl_description, mdl in self[name].models[ts_description].collection.items():
+                    if mdl.regularize and mdl_description not in all_reweight_models:
+                        new_net_weights[name]["reweight_init"][mdl_description] = \
+                            penalty * np.ones((mdl.num_parameters, num_components))
             # next solver step
             if verbose:
                 tqdm.write(f"Fit after {i+1} reweightings")

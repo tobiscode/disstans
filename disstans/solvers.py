@@ -724,12 +724,17 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         been reached, let the iteration stop early if the solutions do not change much
         anymore (see Notes).
         Set to ``0`` to deactivate early stopping.
-    reweight_init : numpy.ndarray, optional
+    reweight_init : numpy.ndarray, dict, list, optional
         When reweighting is active, use this array to initialize the weights.
         It has to have size :math:`\text{num_components} * \text{num_reg}`, where
         :math:`\text{num_components}=1` if covariances are not used (and the actual
         number of timeseries components otherwise) and :math:`\text{num_reg}` is the
         number of regularized model parameters.
+        It can be a single NumPy array or a list of NumPy arrays, in which case it
+        (or the array created by concatenating the list) need to already have the right
+        output shape (no check is performed). If it is a dictionary, the keys need to be
+        model names, and the values are then the NumPy arrays which will be arranged
+        properly to match the mapping matrix.
     reweight_coupled : bool, optional
         If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
         is coupled with the reweighting weights (see Notes).

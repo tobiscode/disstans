@@ -104,9 +104,9 @@ class Model():
         """ Stores the time unit of the parameters as a string. """
         self.t_start_str = None if t_start is None else str(t_start)
         """ String representation of the start time (or ``None``). """
-        self.t_end_str = None if t_start is None else str(t_end)
+        self.t_end_str = None if t_end is None else str(t_end)
         """ String representation of the end time (or ``None``). """
-        self.t_reference_str = None if t_start is None else str(t_reference)
+        self.t_reference_str = None if t_reference is None else str(t_reference)
         """ String representation of the reference time (or ``None``). """
         self.t_start = None if t_start is None else pd.Timestamp(t_start)
         """ :class:`~pandas.Timestamp` representation of the start time (or ``None``). """
@@ -1305,13 +1305,13 @@ class Sinusoidal(Model):
     r"""
     Subclasses :class:`~disstans.models.Model`.
 
-    This model provides a sinusoidal of a fixed period, with amplitude and phase
-    to be fitted.
+    This model defines a fixed-frequency periodic sinusoidal signal with
+    constant amplitude and phase to be estimated.
 
     Parameters
     ----------
     period : float
-        Period length in :attr:`~disstans.models.Model.time_unit` units.
+        Period length :math:`T` in :attr:`~disstans.models.Model.time_unit` units.
 
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
@@ -1322,7 +1322,7 @@ class Sinusoidal(Model):
     Implements the relationship
 
     .. math::
-        \mathbf{g}(\mathbf{t}) =
+        \mathbf{g}(\mathbf{t}) = A \cos ( 2 \pi \mathbf{t} / T - \phi )
         a \cos ( 2 \pi \mathbf{t} / T ) + b \sin ( 2 \pi \mathbf{t} / T )
 
     with :attr:`~period` :math:`T`, :attr:`~phase` :math:`\phi=\text{atan2}(b,a)`
@@ -1350,14 +1350,14 @@ class Sinusoidal(Model):
         """ Amplitude of the sinusoid. """
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return np.sqrt(np.sum(self.par ** 2))
+        return np.sqrt(np.sum(self.par ** 2, axis=0))
 
     @property
     def phase(self):
         """ Phase of the sinusoid. """
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return np.arctan2(self.par[1], self.par[0])[0]
+        return np.arctan2(self.par[1, :], self.par[0, :])
 
 
 class Logarithmic(Model):
@@ -2106,7 +2106,7 @@ class ModelCollection():
             # now, we need the regularization mask reg_mask for the reduced G matrix, which
             # will only contain observable columns, has therefore shape (sum(obs_mask), )
             reg_mask = np.array(reg_mask_full)[obs_mask]
-            # sum_reg is the number of parameters that are both observable and regularized
+            # num_reg is the number of parameters that are both observable and regularized
             num_reg = sum(reg_mask)
             if num_reg == 0:
                 warn("Regularized solver got no models to regularize.", stacklevel=2)
