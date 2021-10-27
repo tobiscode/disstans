@@ -14,6 +14,7 @@ from scipy.special import comb, factorial
 from itertools import product
 from cmcrameri import cm as scm
 from collections import UserDict
+from scipy.interpolate import BSpline as sp_bspl
 
 from .tools import tvec_to_numpycol, Timedelta, full_cov_mat_to_columns, cov2corr
 
@@ -1381,6 +1382,156 @@ class Sinusoid(Model):
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         return np.arctan2(self.par[1, :], self.par[0, :])
+
+
+class AmpPhModulatedSinusoid(Model):
+    r"""
+    Subclasses :class:`~disstans.models.Model`.
+
+    This model defines a periodic sinusoid signal with a nominal frequency that allows
+    the amplitude and phase (and therefore instantaneous frequency) to vary. This is
+    accomplished by treating th :math`a` and :math:`b` parameters of the
+    :class:`~Sinusoid` model to vary over time.
+    The functional form of the parameters is a full B-Spline basis set, defined by
+    :class:`~scipy.interpolate.BSpline.basis_element` (not a :class:`~SplineSet` of
+    purely cardinal splines).
+
+    Parameters
+    ----------
+    period : float
+        Nominal period length :math:`T` in :attr:`~disstans.models.Model.time_unit` units.
+    degree : int
+        Degree :math:`p` of the B-spline to be used.
+    num_bases : int
+        Number of basis functions in the B-Spline.
+        Needs to be at least ``2``.
+    obs_scale : float, optional
+        Determines how many factors of the average scale should be sampled by the
+        ``timevector`` input to :meth:`~get_mapping` to accept an individual B-spline
+        as observable. Defaults to ``2``.
+
+    See Also
+    --------
+    Sinusoid : For the definition of the functional form of the sinusoid.
+    """
+    def __init__(self, period, degree, num_bases, t_start, t_end, time_unit="D",
+                 t_reference=None, obs_scale=2, **model_kw_args):
+        # input tests
+        assert num_bases > 1, "'num_bases' needs to be at least 2."
+        num_parameters = 2 * num_bases
+        if t_reference is None:
+            t_reference = t_start
+        # initialize Model
+        super().__init__(num_parameters=num_parameters, t_start=t_start, t_end=t_end,
+                         t_reference=t_reference, time_unit=time_unit, **model_kw_args)
+        # save some important parameters
+        self.period = float(period)
+        """ Nominal period of the sinusoid. """
+        self.degree = int(degree)
+        """ Degree :math:`p` of the B-Spline. """
+        self.order = self.degree + 1
+        """ Order :math:`n=p+1` of the B-Splines. """
+        self.num_bases = int(num_bases)
+        """ Number of basis functons in the B-Spline """
+        self.observability_scale = float(obs_scale)
+        """ Observability scale factor. """
+        # define basis functions
+        num_knots = int(num_bases) - int(degree) + 1
+        inner_knots = np.linspace(0, 1, num=num_knots)
+        full_knots = np.concatenate([[0]*self.degree, inner_knots, [1]*self.degree])
+        self._bases = [sp_bspl.basis_element(full_knots[i:i + self.degree + 2],
+                                             extrapolate=False)
+                       for i in range(self.num_bases)]
+
+    def _get_arch(self):
+        arch = {"type": "AmpPhModulatedSinusoid",
+                "kw_args": {"period": self.period,
+                            "degree": self.degree,
+                            "num_bases": self.num_bases,
+                            "obs_scale": self.observability_scale}}
+        return arch
+
+    def _get_mapping(self, timevector):
+        # get phase and normalized [0, 1) phase
+        dt = self.tvec_to_numpycol(timevector)
+        phase = 2*np.pi * dt.reshape(-1, 1) / self.period
+        t_span = self.t_end - self.t_start
+        phase_norm = np.linspace((timevector[0] - self.t_start) / t_span,
+                                 (timevector[-1] - self.t_start) / t_span - 1e-16,
+                                 num=timevector.size)
+        # get the mapping matrices of the sinusoid
+        coef_cosine = np.cos(phase)
+        coef_sine = np.sin(phase)
+        # get the mapping matrix defined by the splines
+        coef_bspl = np.stack([base_fn(phase_norm) for base_fn in self._bases], axis=1)
+        coef_bspl[np.isnan(coef_bspl)] = 0
+        # problem: if we're only observing a small fraction of a basis function, we don't
+        # want to try to estimate it, since it's only going to make our solving process less
+        # stable. so: if we only observe < obs_scale * average scale length, we ignore it.
+        num_bases = len(self._bases)
+        avg_scale = t_span / (num_bases - 1)
+        is_nonzero = np.abs(coef_bspl) > 0
+        t_min_max = np.empty((num_bases, 2))
+        t_min_max[:] = np.NaN
+        for i in range(num_bases):
+            if np.any(is_nonzero[:, i]):
+                t_min_max[i, :] = [dt[is_nonzero[:, i]].min(), dt[is_nonzero[:, i]].max()]
+        del_t = t_min_max[:, 1] - t_min_max[:, 0]
+        set_unobservable = del_t < (self.observability_scale *
+                                    avg_scale / Timedelta(1, self.time_unit))
+        coef_bspl[:, set_unobservable] = 0
+        # modulate the sine and cosine mapping matrix with the basis functions
+        coefs = np.concatenate([coef_bspl * coef_cosine, coef_bspl * coef_sine], axis=1)
+        return coefs
+
+    def get_inst_amplitude_phase(self, num_points=1000):
+        r"""
+        Calculate the instantaenous (time-varying) amplitude and phase of the sinusoid
+        over its entire fitted domain.
+
+        Parameters
+        ----------
+        num_points : int
+            Number of points to use in the discretized, normalized phase vector
+            used in the evaluation of the basis functions. For plotting purposes,
+            this value should be the length of the timeseries to which this
+            model was fitted.
+
+        Returns
+        -------
+        amplitude : numpy.ndarray
+            Amplitude timeseries for each point (rows) and component (columns).
+        phase : numpy.ndarray
+            Phase timeseries in radians (with the same shape as ``amplitude``).
+        """
+        if self.par is None:
+            RuntimeError("Cannot evaluate the model before reading in parameters.")
+        # get normalized phase
+        phase_norm = np.linspace(0, 1 - 1e-16, num=num_points)
+        # get the mapping matrix defined by the splines
+        coef_bspl = np.stack([base_fn(phase_norm) for base_fn in self._bases], axis=1)
+        coef_bspl[np.isnan(coef_bspl)] = 0
+        # calculate the timeseries of a and b
+        a_mat = (coef_bspl @ self.par[:coef_bspl.shape[1], :]).reshape(num_points, -1)
+        b_mat = (coef_bspl @ self.par[coef_bspl.shape[1]:, :]).reshape(num_points, -1)
+        # calculate amplitude and phase
+        amplitude = np.sqrt(a_mat**2 + b_mat**2)
+        phase = np.arctan2(b_mat, a_mat)
+        return amplitude, phase
+
+    @property
+    def amplitude(self):
+        """ Average amplitude of the sinusoid. """
+        if self.par is None:
+            RuntimeError("Cannot evaluate the model before reading in parameters.")
+        return np.mean(self.get_inst_amplitude_phase()[0], axis=0)
+
+    @property
+    def phase(self):
+        """ Average phase of the sinusoid. """
+        if self.par is None:
+            RuntimeError("Cannot evaluate the model before reading in parameters.")
+        return np.mean(self.get_inst_amplitude_phase()[1], axis=0)
 
 
 class Logarithmic(Model):
