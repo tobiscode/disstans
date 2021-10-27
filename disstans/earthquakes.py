@@ -74,7 +74,8 @@ def _okada_get_displacements(station_and_parameters):
         if success == 0:
             disp[i, :] = u / 10**12  # output is now in mm
         else:
-            warn(f"Success = {success} for station {i}!", category=RuntimeWarning)
+            warn(f"Success = {success} for station {i}!",
+                 category=RuntimeWarning, stacklevel=2)
     # transform back to lat, lon, alt
     # yes this is the same matrix
     disp = disp @ R

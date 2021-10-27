@@ -275,7 +275,7 @@ class Station():
                             "'timeseries' is not a Timeseries object.")
         if warn_existing and (ts_description in self.timeseries):
             warn(f"Station {self.name}: Overwriting time series '{ts_description}'.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         if uncertainties_from is not None:
             timeseries.add_uncertainties(timeseries=uncertainties_from)
         if override_src is not None:
@@ -318,7 +318,7 @@ class Station():
         if ts_description not in self.timeseries:
             warn(f"Station {self.name}: "
                  f"Cannot find time series '{ts_description}', couldn't delete.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         else:
             del self.timeseries[ts_description]
             del self.fits[ts_description]
@@ -350,7 +350,7 @@ class Station():
         if model_description in self.models[ts_description].model_names:
             warn(f"Station {self.name}, timeseries {ts_description}: "
                  f"Overwriting local model '{model_description}'.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         self.models[ts_description][model_description] = model
 
     def add_local_model_dict(self, ts_description, model_dict):
@@ -424,11 +424,11 @@ class Station():
                 elif verbose:
                     warn(f"Station {self.name}, timeseries {ts_description}: "
                          f"Cannot find local model '{mdl_desc}', couldn't delete.",
-                         category=RuntimeWarning)
+                         category=RuntimeWarning, stacklevel=2)
             elif verbose:
                 warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
                      f"couldn't delete local model '{mdl_desc}'.",
-                     category=RuntimeWarning)
+                     category=RuntimeWarning, stacklevel=2)
 
     def add_fit(self, ts_description, fit, model_description=None, return_ts=False):
         """
@@ -496,15 +496,15 @@ class Station():
         if ts_description not in self.timeseries:
             warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
                  f"couldn't delete fit for model '{model_description}'.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         elif model_description not in self.models[ts_description]:
             warn(f"Station {self.name}, timeseries {ts_description}: "
                  f"Cannot find local model '{model_description}', couldn't delete fit.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         elif model_description not in self.fits[ts_description]:
             warn(f"Station {self.name}, timeseries {ts_description}: "
                  f"Cannot find fit for local model '{model_description}', couldn't delete.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         else:
             del self.fits[ts_description][model_description]
 

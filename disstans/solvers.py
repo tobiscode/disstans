@@ -620,7 +620,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
     """
     if penalty == 0.0:
         warn(f"Ridge Regression (L2-regularized) solver got a penalty of {penalty}, "
-             "which effectively removes the regularization.")
+             "which effectively removes the regularization.", stacklevel=2)
 
     # get mapping and regularization matrix and sizes
     G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, _, _ = \
@@ -816,7 +816,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     """
     if penalty == 0:
         warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, "
-             "which removes the regularization.")
+             "which removes the regularization.", stacklevel=2)
     assert float(cov_zero_threshold) > 0, \
         f"'cov_zero_threshold needs to be non-negative, got {cov_zero_threshold}."
 
@@ -883,7 +883,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 problem.solve(enforce_dpp=True, **cvxpy_kw_args)
             except cp.error.SolverError as e:
                 # no solution found, but actually a more serious problem
-                warn(str(e))
+                warn(str(e), stacklevel=2)
                 converged = False
                 break
             else:

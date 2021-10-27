@@ -294,7 +294,7 @@ def clean(station, ts_in, reference, ts_out=None,
     # check if timeseries is present
     if ts_in not in station.timeseries:
         warn(f"Could not find timeseries '{ts_in}' in station {station.name}.",
-             category=RuntimeWarning)
+             category=RuntimeWarning, stacklevel=2)
         return
     # check if we're modifying in-place or copying
     if ts_out is None:
@@ -407,14 +407,15 @@ def midas(ts, steps=None, tolerance=0.001):
     if num_pairs >= ip.shape[1]:
         warn(f"Forward call to selectpair returned maximum number of pairs ({num_pairs} "
              f"with a maximum of {ip.shape[1]}). Consider re-compiling DISSTANS "
-             "with a higher maxn constant in compiled.f90.")
+             "with a higher maxn constant in compiled.f90.", stacklevel=2)
     nb, ipb = selectpair(-t[::-1], tstep_back, tolerance)
     if nb >= ipb.shape[1]:
         warn(f"Backward call to selectpair returned maximum number of pairs ({nb} "
              f"with a maximum of {ipb.shape[1]}). Consider re-compiling DISSTANS "
-             "with a higher maxn constant in compiled.f90.")
+             "with a higher maxn constant in compiled.f90.", stacklevel=2)
     if num_pairs + nb < 10:
-        warn(f"Only found {num_pairs} forward and {nb} backward pairs; solution will be bad.")
+        warn(f"Only found {num_pairs} forward and {nb} backward pairs; solution will be bad.",
+             stacklevel=2)
     # convert backward indices to forward ones
     ipb = t.size - ipb[[1, 0], :nb]
     # combine the two index collections, and make them more readable
@@ -1073,7 +1074,7 @@ class StepDetector():
             # warn if a large number of steps have been detected
             if verbose and (peaks.size / probabilities.shape[0] > 0.1):
                 warnings.warn(f"In component {icomp}, using threshold={threshold} leads to "
-                              f"{peaks.size / probabilities.shape[0]:.2%} of timestamps "
-                              "being steps. Consider setting a higher threshold.")
+                              f"{peaks.size / probabilities.shape[0]:.2%} of timestamps being "
+                              "steps. Consider setting a higher threshold.", stacklevel=2)
             steps.append(peaks)
         return steps

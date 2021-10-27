@@ -1138,11 +1138,12 @@ repro2018a/raw/position/envseries/0000_README.format
         num_duplicates = int(df.duplicated(subset="time").sum())
         if show_warnings and (num_duplicates > 0):
             warn(f"Timeseries file {self._path} contains data for {num_duplicates} "
-                 "duplicate dates. Keeping first occurrences.")
+                 "duplicate dates. Keeping first occurrences.", stacklevel=2)
         df = df.drop_duplicates(subset="time").set_index("time")
         # check for monotonic time index
         if not df.index.is_monotonic_increasing:
-            warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.")
+            warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.",
+                 stacklevel=2)
             df.sort_index(inplace=True)
         # construct Timeseries object
         super().__init__(dataframe=df, src=".tseries", data_unit="mm",
@@ -1230,7 +1231,7 @@ class UNRTimeseries(Timeseries):
                          usecols=[0, 3] + list(range(6, 13)) + list(range(14, 20)))
         if show_warnings and len(df['site'].unique()) > 1:
             warn(f"Timeseries file {self._path} contains multiple site codes: "
-                 f"{df['site'].unique()}")
+                 f"{df['site'].unique()}", stacklevel=2)
         if len(df['reflon'].unique()) > 1:
             raise NotImplementedError(f"Timeseries file {self._path} contains "
                                       "multiple reference longitudes: "
@@ -1238,21 +1239,21 @@ class UNRTimeseries(Timeseries):
         if len(df['_e0(m)'].unique()) > 1:
             if show_warnings:
                 warn(f"Timeseries file {self._path} contains multiple integer "
-                     f"Eastings: {df['_e0(m)'].unique()}")
+                     f"Eastings: {df['_e0(m)'].unique()}", stacklevel=2)
             offsets_east = df["_e0(m)"].values - df["_e0(m)"].values[0]
         else:
             offsets_east = 0
         if len(df['____n0(m)'].unique()) > 1:
             if show_warnings:
                 warn(f"Timeseries file {self._path} contains multiple integer "
-                     f"Northings: {df['____n0(m)'].unique()}")
+                     f"Northings: {df['____n0(m)'].unique()}", stacklevel=2)
             offsets_north = df["____n0(m)"].values - df["____n0(m)"].values[0]
         else:
             offsets_north = 0
         if len(df['u0(m)'].unique()) > 1:
             if show_warnings:
                 warn(f"Timeseries file {self._path} contains multiple integer "
-                     f"Verticals: {df['u0(m)'].unique()}")
+                     f"Verticals: {df['u0(m)'].unique()}", stacklevel=2)
             offsets_up = df["u0(m)"].values - df["u0(m)"].values[0]
         else:
             offsets_up = 0
@@ -1279,14 +1280,15 @@ class UNRTimeseries(Timeseries):
         num_duplicates = int(df.duplicated(subset="__MJD").sum())
         if show_warnings and (num_duplicates > 0):
             warn(f"Timeseries file {self._path} contains data for {num_duplicates} "
-                 "duplicate dates. Keeping first occurrences.")
+                 "duplicate dates. Keeping first occurrences.", stacklevel=2)
         df.drop_duplicates(subset="__MJD", inplace=True)
         df["__MJD"] = pd.to_datetime(df["__MJD"] + 2400000.5, unit="D", origin='julian')
         df.rename(columns={"__MJD": "time"}, inplace=True)
         df.set_index("time", inplace=True)
         # check for monotonic time index
         if not df.index.is_monotonic_increasing:
-            warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.")
+            warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.",
+                 stacklevel=2)
             df.sort_index(inplace=True)
         # construct Timeseries object
         super().__init__(dataframe=df, src=".tenv3", data_unit="mm",

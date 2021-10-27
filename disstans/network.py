@@ -380,7 +380,7 @@ class Network():
         if not isinstance(station, Station):
             raise TypeError("Cannot add new station: 'station' is not a Station object.")
         if name in self.stations:
-            warn(f"Overwriting station '{name}'.", category=RuntimeWarning)
+            warn(f"Overwriting station '{name}'.", category=RuntimeWarning, stacklevel=2)
         self.stations[name] = station
 
     def create_station(self, name, location=None):
@@ -435,7 +435,8 @@ class Network():
             del net[name]
         """
         if name not in self.stations:
-            warn(f"Cannot find station '{name}', couldn't delete.", category=RuntimeWarning)
+            warn(f"Cannot find station '{name}', couldn't delete.",
+                 category=RuntimeWarning, stacklevel=2)
         else:
             del self.stations[name]
 
@@ -486,8 +487,8 @@ class Network():
             elif station_name in net._network_locations:
                 station_loc = net._network_locations[station_name]
             else:
-                warn(f"Skipped station '{station_name}' "
-                     "because location information is missing.")
+                warn(f"Skipped station '{station_name}'  because location information "
+                     "is missing.", stacklevel=2)
                 continue
             station = Station(name=station_name, location=station_loc, **station_kw_args)
             # add timeseries to station
@@ -884,7 +885,7 @@ class Network():
             # print warning if the solver didn't converge
             if not sol.converged:
                 warn(f"Fitting did not converge for timeseries {ts_description} "
-                     f"at {station_names[i]}", category=RuntimeWarning)
+                     f"at {station_names[i]}", category=RuntimeWarning, stacklevel=2)
             self[station_names[i]].models[ts_description] \
                 .read_parameters(sol.parameters_zeroed, sol.covariances_zeroed)
             # if raw output is requested, save it
@@ -1297,7 +1298,8 @@ class Network():
                                             distance_weights[station_index, :],
                                             percentile=spatial_reweight_percentile)
                 else:  # stacking failed, keep old weights
-                    warn(f"{mdl_description} cannot be stacked, reusing old weights.")
+                    warn(f"{mdl_description} cannot be stacked, reusing old weights.",
+                         stacklevel=2)
                     for name in station_names:
                         if mdl_description in solutions[name]:
                             new_net_weights[name]["reweight_init"][mdl_description] = \
@@ -2535,7 +2537,7 @@ class Network():
                 except KeyError:
                     warn(f"Could not find scalogram model {scalo_model} "
                          f"in timeseries {scalo_ts} for station {station_name}.",
-                         category=RuntimeWarning)
+                         category=RuntimeWarning, stacklevel=2)
 
         click = Click(ax_map, update_timeseries)
         if station is not None:

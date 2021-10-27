@@ -1123,7 +1123,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                     status = "SKIPPED"
         except error.HTTPError as e:
             warn(f"Failed to download the remote file from {staurl}.\n"
-                 f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning)
+                 f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning, stacklevel=2)
         else:
             if verbose:
                 tqdm.write(f"[{status}] '{staurl}' ({remote_time.isoformat()})"
@@ -1149,7 +1149,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
                         status = "SKIPPED"
             except error.HTTPError as e:
                 warn(f"Failed to download the remote attribution file from {atrurl}.\n"
-                     f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning)
+                     f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning, stacklevel=2)
             else:
                 if verbose:
                     tqdm.write(f"[{status}] '{atrurl}' ({remote_atr_time.isoformat()})"
@@ -1340,7 +1340,7 @@ class RINEXDataHolding():
         if not all([station in self._locations_xyz["station"].values
                     for station in self.list_stations]):
             warn("Locations have likely not been updated since the database changed, "
-                 "there are stations missing.", category=RuntimeWarning)
+                 "there are stations missing.", category=RuntimeWarning, stacklevel=2)
         return self._locations_xyz
 
     @locations_xyz.setter
@@ -1351,7 +1351,7 @@ class RINEXDataHolding():
                              "Pandas DataFrame with the columns ['station', 'x', 'y', 'z'].")
         if not all([station in new_xyz["station"].values for station in self.list_stations]):
             warn("The new location DataFrame does not contain all stations "
-                 "that are currently in the database.", category=RuntimeWarning)
+                 "that are currently in the database.", category=RuntimeWarning, stacklevel=2)
         all_xyz = new_xyz[["x", "y", "z"]].values
         all_lla = ccrs.Geodetic().transform_points(ccrs.Geocentric(), all_xyz[:, 0],
                                                    all_xyz[:, 1], all_xyz[:, 2])
@@ -1371,7 +1371,7 @@ class RINEXDataHolding():
         if not all([station in self._locations_lla["station"].values
                     for station in self.list_stations]):
             warn("Locations have likely not been updated since the database changed, "
-                 "there are stations missing.", category=RuntimeWarning)
+                 "there are stations missing.", category=RuntimeWarning, stacklevel=2)
         return self._locations_lla
 
     @locations_lla.setter
@@ -1383,7 +1383,7 @@ class RINEXDataHolding():
                              "['station', 'lon', 'lat', 'alt'].")
         if not all([station in new_lla["station"].values for station in self.list_stations]):
             warn("The new location DataFrame does not contain all stations "
-                 "that are currently in the database.", category=RuntimeWarning)
+                 "that are currently in the database.", category=RuntimeWarning, stacklevel=2)
         all_lla = new_lla[["lon", "lat", "alt"]].values
         all_xyz = ccrs.Geocentric().transform_points(ccrs.Geodetic(), all_lla[:, 0],
                                                      all_lla[:, 1], all_lla[:, 2])
@@ -1402,7 +1402,7 @@ class RINEXDataHolding():
         if not all([station in self._metrics["station"].values
                     for station in self.list_stations]):
             warn("Metrics have likely not been updated since the database changed, "
-                 "there are stations missing.", category=RuntimeWarning)
+                 "there are stations missing.", category=RuntimeWarning, stacklevel=2)
         return self._metrics
 
     @metrics.setter
@@ -1473,23 +1473,23 @@ class RINEXDataHolding():
                         if len(year) == 2:
                             year = "20" + year
                             warn(f"Parsing {str(pathobj)} assumes a two-digit year is "
-                                 "post-2000.", category=RuntimeWarning)
+                                 "post-2000.", category=RuntimeWarning, stacklevel=2)
                         else:
                             warn(f"File {str(pathobj)} doesn't have a recognizable year, "
-                                 "skipping file.", category=RuntimeWarning)
+                                 "skipping file.", category=RuntimeWarning, stacklevel=2)
                             continue
                     day = re.findall(r"\d+", day)[0]
                     day = f"{int(day):03d}"
                     if not (0 < int(day) < 367):
                         warn(f"File {str(pathobj)} doesn't have a valid day, "
-                             "skipping file.", category=RuntimeWarning)
+                             "skipping file.", category=RuntimeWarning, stacklevel=2)
                         continue
                 # only continue if this is a valid file extension
                 if filename.endswith(self.COMPRFILEEXTS):
                     info = rinex_pattern.match(filename)
                     if info is None:
                         warn(f"File {str(pathobj)} can't match RINEX filename pattern, "
-                             "skipping file.", category=RuntimeWarning)
+                             "skipping file.", category=RuntimeWarning, stacklevel=2)
                         continue
                     info = info.groupdict()
                     if (info["yy"] != year[-2:] or info["day"] != day):
@@ -1502,7 +1502,7 @@ class RINEXDataHolding():
                             skipmsg += f"(but {str(tryfile)} exists)."
                         else:
                             skipmsg += f"(and {str(tryfile)} also doesn't exist)."
-                        warn(skipmsg, category=RuntimeWarning)
+                        warn(skipmsg, category=RuntimeWarning, stacklevel=2)
                         continue
                     if verbose and (cur_year != year):
                         tqdm.write(f" {year}")
@@ -1628,7 +1628,7 @@ class RINEXDataHolding():
             if len(approx_xyz) == 0:
                 if replace_not_found:
                     warn("Couldn't find an approximate location in the RINEX "
-                         f"headers for {row.station}. Using Null Island.")
+                         f"headers for {row.station}. Using Null Island.", stacklevel=2)
                     approx_xyz.append([0, 6378137, 0])
                 else:
                     raise RuntimeError("Couldn't find an approximate location in "
@@ -1997,7 +1997,8 @@ class RINEXDataHolding():
             cbar.set_ticks(cticks)
             cbar.set_label(metric)
         elif metric is not None:
-            warn(f"Could not interpret '{metric}' as a metric to use for plotting.")
+            warn(f"Could not interpret '{metric}' as a metric to use for plotting.",
+                 stacklevel=2)
         # save
         if saveas is not None:
             fig.savefig(saveas)

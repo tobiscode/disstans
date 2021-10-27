@@ -629,7 +629,7 @@ class Step(Model):
             Datetime-like string of the step time to add
         """
         if step in self.steptimes:
-            warn(f"Step '{step}' already present.", category=RuntimeWarning)
+            warn(f"Step '{step}' already present.", category=RuntimeWarning, stacklevel=2)
         else:
             self.steptimes.append(step)
             self._update_from_steptimes()
@@ -647,7 +647,7 @@ class Step(Model):
             self.steptimes.remove(step)
             self._update_from_steptimes()
         except ValueError:
-            warn(f"Step '{step}' not present.", category=RuntimeWarning)
+            warn(f"Step '{step}' not present.", category=RuntimeWarning, stacklevel=2)
 
     def _get_mapping(self, timevector):
         coefs = np.array(timevector.values.reshape(-1, 1) >=
@@ -772,7 +772,7 @@ class BSpline(Model):
                 f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
             if num_splines == 1:
                 warn(f"'spacing' ({self.spacing} {time_unit}) is given, but "
-                     "'num_splines' = 1 splines are requested.")
+                     "'num_splines' = 1 splines are requested.", stacklevel=2)
         elif num_splines > 1:
             self.spacing = self.scale
         else:
@@ -873,7 +873,7 @@ class ISpline(Model):
                 f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
             if num_splines == 1:
                 warn(f"'spacing' ({self.spacing} {time_unit}) is given, "
-                     "but 'num_splines' = 1 splines are requested.")
+                     "but 'num_splines' = 1 splines are requested.", stacklevel=2)
         elif num_splines > 1:
             self.spacing = self.scale
         else:
@@ -1644,7 +1644,7 @@ class ModelCollection():
             f"got {(type(model_description), type(model))}."
         if model_description in self.collection:
             warn(f"ModelCollection: Overwriting model '{model_description}'.",
-                 category=RuntimeWarning)
+                 category=RuntimeWarning, stacklevel=2)
         self._par = None
         self._cov = None
         self.collection[model_description] = model
@@ -1827,18 +1827,19 @@ class ModelCollection():
         test_par_anynone = any([p is None for p in test_par])
         if (self._par is None) and not test_par_anynone:
             warn("Discrepancy between ModelCollection parameters and individual "
-                 "parameters: collection is not fitted.")
+                 "parameters: collection is not fitted.", stacklevel=2)
         elif self._par is not None:
             assert self._par.shape[0] == self.num_parameters, \
                 "Saved parameter matrix does not match the model list in the collection."
             if test_par_anynone:
                 warn("Discrepancy between ModelCollection parameters and individual "
-                     "parameters: individual models are not fitted.")
+                     "parameters: individual models are not fitted.", stacklevel=2)
             else:
                 test_par = np.concatenate(test_par, axis=0)
                 if not np.allclose(self._par, test_par):
                     warn("Discrepancy between ModelCollection parameters and individual "
-                         "parameters: not matching (returning collection values).")
+                         "parameters: not matching (returning collection values).",
+                         stacklevel=2)
         return self._par
 
     @property
@@ -1871,14 +1872,14 @@ class ModelCollection():
         test_cov_anynone = any([p is None for p in test_cov])
         if (self._cov is None) and not test_cov_anynone:
             warn("Discrepancy between ModelCollection covariance and individual "
-                 "covariances: collection is not fitted.")
+                 "covariances: collection is not fitted.", stacklevel=2)
         elif self._cov is not None:
             par_size = self.par.shape[0] * self.par.shape[1]
             assert self._cov.shape == (par_size, par_size), \
                 "Saved covariance matrix does not match the model list in the collection."
             if test_cov_anynone:
                 warn("Discrepancy between ModelCollection covariance and individual "
-                     "covariances: individual models are not fitted.")
+                     "covariances: individual models are not fitted.", stacklevel=2)
             else:
                 test_cov = sp.linalg.block_diag(*test_cov).ravel()
                 test_cov_nonzero = np.nonzero(test_cov)
@@ -1886,7 +1887,8 @@ class ModelCollection():
                 cov_nooffdiag = self._cov.ravel()[test_cov_nonzero]
                 if not np.allclose(cov_nooffdiag, test_cov, equal_nan=True):
                     warn("Discrepancy between ModelCollection covariance and individual "
-                         "covariance: not matching (returning collection values).")
+                         "covariance: not matching (returning collection values).",
+                         stacklevel=2)
         return self._cov
 
     @property
@@ -2107,7 +2109,7 @@ class ModelCollection():
             # sum_reg is the number of parameters that are both observable and regularized
             num_reg = sum(reg_mask)
             if num_reg == 0:
-                warn("Regularized solver got no models to regularize.")
+                warn("Regularized solver got no models to regularize.", stacklevel=2)
             # if use_internal_scales, we still need the scales for all the observable and
             # regularized parameters
             # self.internal_scales has shape (self.num_parameters, ) so we can use the
