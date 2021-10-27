@@ -89,7 +89,7 @@ if __name__ == "__main__":
     # now add them to all stations
     from copy import deepcopy
     from disstans import Timeseries
-    from disstans.models import HyperbolicTangent, Polynomial, Sinusoidal, Step, \
+    from disstans.models import HyperbolicTangent, Polynomial, Sinusoid, Step, \
         SplineSet, Logarithmic
     from disstans.tools import create_powerlaw_noise
     mdl_coll, mdl_coll_synth = {}, {}  # containers for the model objects
@@ -100,7 +100,7 @@ if __name__ == "__main__":
             generate_parameters_noise(station.location, rng)
         # create model objects
         mdl_sec = Polynomial(order=1, time_unit="Y", t_reference=t_start_str)
-        mdl_seas = Sinusoidal(period=1, time_unit="Y", t_reference=t_start_str)
+        mdl_seas = Sinusoid(period=1, time_unit="Y", t_reference=t_start_str)
         mdl_eq = Step(["2002-07-01"])
         mdl_post = Logarithmic(tau=20, t_reference="2002-07-01")
         # HyperbolicTangent (no long tails!) is for the truth, SplineSet are for how

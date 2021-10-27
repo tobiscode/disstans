@@ -201,9 +201,9 @@ class Model():
         Example
         -------
 
-        >>> from disstans.models import Step, Sinusoidal
+        >>> from disstans.models import Step, Sinusoid
         >>> step1, step2 = Step(["2020-01-01"]), Step(["2020-01-02"])
-        >>> sin1, sin2 = Sinusoidal(1, "2020-01-01"), Sinusoidal(1, "2020-01-01")
+        >>> sin1, sin2 = Sinusoid(1, "2020-01-01"), Sinusoid(1, "2020-01-01")
         >>> step1 == step2
         False
         >>> sin1 == sin2
@@ -1322,11 +1322,11 @@ class SplineSet(Model):
         return fig, ax
 
 
-class Sinusoidal(Model):
+class Sinusoid(Model):
     r"""
     Subclasses :class:`~disstans.models.Model`.
 
-    This model defines a fixed-frequency periodic sinusoidal signal with
+    This model defines a fixed-frequency periodic sinusoid signal with
     constant amplitude and phase to be estimated.
 
     Parameters
@@ -1356,7 +1356,7 @@ class Sinusoidal(Model):
         """ Period of the sinusoid. """
 
     def _get_arch(self):
-        arch = {"type": "Sinusoidal",
+        arch = {"type": "Sinusoid",
                 "kw_args": {"period": self.period}}
         return arch
 

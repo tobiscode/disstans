@@ -20,10 +20,10 @@ t_end_str = "2020-01-01"
 timevector = pd.date_range(start=t_start_str, end=t_end_str, freq="1D")
 
 # create a model collection (see Tutorial)
-from disstans.models import Arctangent, Polynomial, Sinusoidal  # noqa: E402
+from disstans.models import Arctangent, Polynomial, Sinusoid  # noqa: E402
 mdl_secular = Polynomial(order=1, t_reference=t_start_str)
-mdl_annual = Sinusoidal(period=365.25, t_reference=t_start_str)
-mdl_semiannual = Sinusoidal(period=365.25/2, t_reference=t_start_str)
+mdl_annual = Sinusoid(period=365.25, t_reference=t_start_str)
+mdl_semiannual = Sinusoid(period=365.25/2, t_reference=t_start_str)
 mdl_transient_1 = Arctangent(tau=100, t_reference="2002-07-01")
 mdl_transient_2 = Arctangent(tau=50, t_reference="2010-01-01")
 mdl_transient_3 = Arctangent(tau=300, t_reference="2016-01-01")

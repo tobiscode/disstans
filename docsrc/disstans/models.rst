@@ -71,10 +71,10 @@ Step
    :members:
    :special-members:
 
-Sinusoidal
+Sinusoid
 ..........
 
-.. autoclass:: disstans.models.Sinusoidal
+.. autoclass:: disstans.models.Sinusoid
    :members:
    :special-members:
 

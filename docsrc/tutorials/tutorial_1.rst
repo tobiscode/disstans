@@ -32,10 +32,10 @@ sinusoid and some steps.
 .. doctest::
 
     >>> import numpy as np
-    >>> from disstans.models import Polynomial, Sinusoidal, Step
+    >>> from disstans.models import Polynomial, Sinusoid, Step
     >>> mdl_secular = Polynomial(order=1, time_unit="D", t_reference="2000-01-01")
     >>> mdl_secular.read_parameters(np.array([-1, 5e-3]))
-    >>> mdl_annual = Sinusoidal(period=365.25, time_unit="D", t_reference="2000-01-01")
+    >>> mdl_annual = Sinusoid(period=365.25, time_unit="D", t_reference="2000-01-01")
     >>> mdl_annual.read_parameters(np.array([0.3, 0]))
     >>> mdl_steps = Step(steptimes=["2000-03-01", "2000-10-10", "2000-10-15"])
     >>> mdl_steps.read_parameters(np.array([0.5, 0.2, -0.01]))

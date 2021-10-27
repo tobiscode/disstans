@@ -81,9 +81,9 @@ class Network():
         -------
 
         If ``net`` is a Network instance, the following adds an annual
-        :class:`~disstans.models.Sinusoidal` model::
+        :class:`~disstans.models.Sinusoid` model::
 
-            models = {"Annual": {"type": "Sinusoidal",
+            models = {"Annual": {"type": "Sinusoid",
                                  "kw_args": {"period": 365.25,
                                              "t_reference": "2000-01-01"}}}
             net.update_default_local_models(models)
