@@ -718,7 +718,10 @@ class BSpline(Model):
     spacing : float, optional
         Spacing between the center times when multiple splines are created.
         Defaults to ``scale``.
-
+    obs_scale : float, optional
+        Determines how many factors of ``scale`` should be sampled by the ``timevector``
+        input to :meth:`~get_mapping` to accept an individual spline as observable.
+        Defaults to ``1``.
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
 
@@ -756,8 +759,8 @@ class BSpline(Model):
        Society for Industrial and Applied Mathematics.
        doi:`10.1137/1.9781611970555 <https://doi.org/10.1137/1.9781611970555>`_
     """
-    def __init__(self, degree, scale, t_reference, regularize=True,
-                 time_unit="D", num_splines=1, spacing=None, **model_kw_args):
+    def __init__(self, degree, scale, t_reference, regularize=True, time_unit="D",
+                 num_splines=1, spacing=None, obs_scale=1, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         assert self.degree >= 0, "'degree' needs to be greater or equal to 0."
@@ -777,6 +780,8 @@ class BSpline(Model):
             self.spacing = self.scale
         else:
             self.spacing = None
+        self.observability_scale = float(obs_scale)
+        """ Observability scale factor. """
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
             model_kw_args["t_start"] = (pd.Timestamp(t_reference)
                                         - Timedelta(self.scale, time_unit)
@@ -817,6 +822,13 @@ class BSpline(Model):
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
         # to avoid numerical issues, set to zero manually outside of valid domains
         coefs[np.abs(tnorm.squeeze()) > self.order / 2] = 0
+        # to avoid even more numerical issues, set a basis function to zero if we only
+        # observe (somewhat arbitrarily) < 20% of a spline
+        # (setting an entire column to zero will make the calling get_mapping() method
+        # flag this parameter as unobservable)
+        del_t = np.max(trel.squeeze(), axis=0) - np.min(trel.squeeze(), axis=0)
+        set_unobservable = del_t < self.scale * self.observability_scale
+        coefs[:, set_unobservable] = 0
         return coefs
 
     def get_transient_period(self, timevector):
@@ -857,8 +869,8 @@ class ISpline(Model):
     --------
     disstans.models.BSpline : More details about B-Splines.
     """
-    def __init__(self, degree, scale, t_reference, regularize=True,
-                 time_unit="D", num_splines=1, spacing=None, zero_after=False, **model_kw_args):
+    def __init__(self, degree, scale, t_reference, regularize=True, time_unit="D",
+                 num_splines=1, spacing=None, zero_after=False, obs_scale=1, **model_kw_args):
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         assert self.degree >= 0, "'degree' needs to be greater or equal to 0."
@@ -878,6 +890,8 @@ class ISpline(Model):
             self.spacing = self.scale
         else:
             self.spacing = None
+        self.observability_scale = float(obs_scale)
+        """ Observability scale factor. """
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
             model_kw_args["t_start"] = (pd.Timestamp(t_reference)
                                         - Timedelta(self.scale, time_unit)
@@ -920,6 +934,13 @@ class ISpline(Model):
         # to avoid numerical issues, set to zero or one manually outside of valid domains
         coefs[tnorm.squeeze() < - self.order / 2] = 0
         coefs[tnorm.squeeze() > self.order / 2] = 1
+        # to avoid even more numerical issues, set a basis function to zero if we only
+        # observe (somewhat arbitrarily) < a scale length
+        # (setting an entire column to zero will make the calling get_mapping() method
+        # flag this parameter as unobservable)
+        del_t = np.max(trel.squeeze(), axis=0) - np.min(trel.squeeze(), axis=0)
+        set_unobservable = del_t < self.scale * self.observability_scale
+        coefs[:, set_unobservable] = 0
         return coefs
 
     def get_transient_period(self, timevector):
