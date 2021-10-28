@@ -948,7 +948,7 @@ class Network():
         ----------
         ts_description : str
             Description of the timeseries to fit.
-        penalty : float
+        penalty : float, list, numpy.ndarray
             Penalty hyperparameter :math:`\lambda`. For non-reweighted models (i.e.,
             regularized models that are neither in ``spatial_reweight_models`` nor in
             ``continuous_reweight_models``), this is the constant penalty applied for
@@ -957,6 +957,8 @@ class Network():
             the penalties are largely controlled by ``local_reweight_func``. If
             ``local_reweight_coupled=False``, the penalty is applied on top of the updated
             weights at each iteration.
+            ``penalty`` can either be a single value used for all components, or a list
+            or NumPy array specifying a penalty for each component in the data.
         spatial_reweight_models : list
             Names of models to use in the spatial reweighting.
         spatial_reweight_iters : int

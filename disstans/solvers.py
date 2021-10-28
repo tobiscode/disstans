@@ -602,8 +602,10 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
         Timeseries to fit.
     models : disstans.models.ModelCollection
         Model collection used for fitting.
-    penalty : float
+    penalty : float, list, numpy.ndarray
         Penalty hyperparameter :math:`\lambda`.
+        It can either be a single value used for all components, or a list or NumPy array
+        specifying a penalty for each component in the data.
     formal_covariance : bool, optional
         If ``True``, calculate the formal model covariance. Defaults to ``False``.
     use_data_variance : bool, optional
@@ -618,9 +620,18 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
     Solution
         Result of the regression.
     """
-    if penalty == 0.0:
-        warn(f"Ridge Regression (L2-regularized) solver got a penalty of {penalty}, "
-             "which effectively removes the regularization.", stacklevel=2)
+    # check input penalty shape and value
+    penalty = np.array(penalty).ravel()
+    if penalty.size == 1:
+        penalty = np.repeat(penalty, ts.num_components)
+    elif penalty.size != ts.num_components:
+        raise ValueError(f"'penalty' has a size of {penalty.size}, but needs to either "
+                         "be a single value, or one value per timeseries component "
+                         f"({ts.num_components}).")
+    if np.any(penalty < 0) or np.all(penalty == 0):
+        warn("Ridge Regression (L2-regularized) solver got an invalid penalty of "
+             f"{penalty}; penalties should be non-negative, and at least contain "
+             "one value larger than 0.", stacklevel=2)
 
     # get mapping and regularization matrix and sizes
     G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, _, _ = \
@@ -631,14 +642,14 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
     if not formal_covariance:
         cov = None
     if (ts.cov_cols is None) or (not use_data_covariance):
-        reg = np.diag(reg_indices) * penalty
+        reg = np.diag(reg_indices)
         params = np.zeros((num_obs, num_comps))
         if formal_covariance:
             cov = []
         for i in range(num_comps):
             GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
                                          use_data_var=use_data_variance)
-            GtWGreg = GtWG + reg
+            GtWGreg = GtWG + reg * penalty[i]
             params[:, i] = sp.linalg.lstsq(GtWGreg, GtWd)[0].squeeze()
             if formal_covariance:
                 cov.append(sp.linalg.pinvh(GtWGreg))
@@ -650,7 +661,7 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
     else:
         GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
                                      use_data_cov=use_data_covariance)
-        reg = np.diag(np.repeat(reg_indices, num_comps)) * penalty
+        reg = np.diag((reg_indices.reshape(-1, 1) * penalty.reshape(1, -1)).ravel())
         GtWGreg = GtWG + reg
         params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_obs, num_comps)
         if formal_covariance:
@@ -711,8 +722,10 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         Timeseries to fit.
     models : disstans.models.ModelCollection
         Model collection used for fitting.
-    penalty : float
+    penalty : float, list, numpy.ndarray
         Penalty hyperparameter :math:`\lambda`.
+        It can either be a single value used for all components, or a list or NumPy array
+        specifying a penalty for each component in the data.
     reweight_max_iters : int, optional
         If an integer, number of solver iterations (see Notes), resulting in reweighting.
         Defaults to no reweighting (``None``).
@@ -819,9 +832,18 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
        Journal of Fourier Analysis and Applications, 14(5), 877–905.
        doi:`10.1007/s00041-008-9045-x <https://doi.org/10.1007/s00041-008-9045-x>`_.
     """
-    if penalty == 0:
-        warn(f"Lasso Regression (L1-regularized) solver got a penalty of {penalty}, "
-             "which removes the regularization.", stacklevel=2)
+    # check input penalty shape and value
+    penalty = np.array(penalty).ravel()
+    if penalty.size == 1:
+        penalty = np.repeat(penalty, ts.num_components)
+    elif penalty.size != ts.num_components:
+        raise ValueError(f"'penalty' has a size of {penalty.size}, but needs to either "
+                         "be a single value, or one value per timeseries component "
+                         f"({ts.num_components}).")
+    if np.any(penalty < 0) or np.all(penalty == 0):
+        warn("Lasso Regression (L1-regularized) solver got an invalid penalty of "
+             f"{penalty}; penalties should be non-negative, and at least contain "
+             "one value larger than 0.", stacklevel=2)
     assert float(cov_zero_threshold) > 0, \
         f"'cov_zero_threshold needs to be non-negative, got {cov_zero_threshold}."
 
@@ -830,7 +852,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         reweight_init, weights_scaling = models.prepare_LS(
             ts, reweight_init=reweight_init, use_internal_scales=True)
     # determine if a shortcut is possible
-    regularize = (num_reg > 0) and (penalty > 0)
+    regularize = (num_reg > 0) and (np.any(penalty > 0))
     if (not regularize) or (reweight_max_iters is None):
         return_weights = False
     # determine number of maximum iterations, and check reweighting function
@@ -851,18 +873,18 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         weights_scaling = np.repeat(weights_scaling, num_comps)
 
     # solve CVXPY problem while checking for convergence
-    def solve_problem(GtWG, GtWd, num_comps, init_weights):
+    def solve_problem(GtWG, GtWd, pen, num_comps, init_weights):
         # build objective function
         m = cp.Variable(GtWd.size)
         objective = cp.norm2(GtWG @ m - GtWd)
         constraints = None
         if regularize:
             if reweight_max_iters is not None:
-                reweight_size = num_reg*num_comps
+                reweight_size = num_reg * num_comps
                 if init_weights is None:
                     init_weights = np.ones(reweight_size)
                     if reweight_coupled:
-                        init_weights *= penalty
+                        init_weights *= pen
                 else:
                     assert init_weights.size == reweight_size, \
                         f"'init_weights' must have a size of {reweight_size}, " + \
@@ -873,12 +895,12 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 if reweight_coupled:
                     objective = objective + cp.norm1(z)
                 else:
-                    lambd = cp.Parameter(value=penalty, pos=True)
+                    lambd = cp.Parameter(value=pen, pos=True)
                     objective = objective + lambd * cp.norm1(z)
                 constraints = [z == cp.multiply(weights, m[reg_indices])]
                 old_m = np.zeros(m.shape)
             else:
-                lambd = cp.Parameter(value=penalty, pos=True)
+                lambd = cp.Parameter(value=pen, pos=True)
                 objective = objective + lambd * cp.norm1(m[reg_indices])
         # define problem
         problem = cp.Problem(cp.Minimize(objective), constraints)
@@ -936,7 +958,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             # build and solve problem
             Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
                 ts, G, obs_indices, icomp=i, return_W_G=True, use_data_var=use_data_variance)
-            solution, wts = solve_problem(GtWG, GtWd, num_comps=1,
+            solution, wts = solve_problem(GtWG, GtWd, pen=penalty[i], num_comps=1,
                                           init_weights=reweight_init[:, i]
                                           if reweight_init is not None else None)
             # store results
@@ -975,7 +997,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         Gnonan, Wnonan, GtWG, GtWd = models.build_LS(ts, G, obs_indices, return_W_G=True,
                                                      use_data_var=use_data_variance,
                                                      use_data_cov=use_data_covariance)
-        solution, wts = solve_problem(GtWG, GtWd, num_comps=num_comps,
+        solution, wts = solve_problem(GtWG, GtWd, pen=np.tile(penalty, num_reg),
+                                      num_comps=num_comps,
                                       init_weights=reweight_init.ravel()
                                       if reweight_init is not None else None)
         # store results
