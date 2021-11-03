@@ -83,6 +83,7 @@ if __name__ == "__main__":
     max_num_stations = 20
     station_names = [f"S{i:02d}" for i in range(1, max_num_stations + 1)]
     latlons = rng.uniform([-1, -1], [1, 1], (max_num_stations, 2))
+    x_range = np.arange(1, max_num_stations+1)
 
     # create timevector
     t_start_str = "2000-01-01"
@@ -159,7 +160,6 @@ if __name__ == "__main__":
 
     # loop over cases
     results = {}
-    x_range = np.arange(1, max_num_stations+1)
     all_noise_pen_rw_combos = list(product(noise_sds, penalties, rw_func_scales))
     for noise_sd, pen, rw_func_scale in tqdm(all_noise_pen_rw_combos, ascii=True,
                                              desc="Looping over noise/penalty combos"):
@@ -219,12 +219,16 @@ if __name__ == "__main__":
                 mean_sd = np.array([np.std(np.mean(rr, axis=1)) for rr in last_rmse])
                 ax.errorbar(x=x_range, y=mean_mean, yerr=mean_sd, color=col, ecolor=ecol,
                             label=f"$\\sigma$={noise_sd}, $\\alpha$={rw_func_scale}")
-        ax.plot(x_range_small, 1/np.sqrt(x_range_small) + 0.5, "k:", lw=1)
-        ax.axhline(np.sqrt(np.mean(truth**2)), color="k", linewidth=1, linestyle="--", zorder=10)
-        ax.set_xlim([0.5, max_num_stations+0.5])
-        ax.set_xticks([1, 5, 10, 15, 20])
+        ax.plot(x_range_small, 1/np.sqrt(x_range_small) * 2, c="0.5", ls=":", lw=1)
+        ax.axhline(np.sqrt(np.mean(truth**2)), color="0.5", linewidth=1, linestyle="--", zorder=-1)
+        ax.set_xscale("log")
+        ax.set_xlim([0.8, max_num_stations + 3])
+        ax.set_xticks([1, 5, 10, 20])
+        ax.set_xticklabels(["1", "5", "10", "20"])
         ax.set_yscale("log")
         ax.set_ylim([1e-2, 3])
+        ax.set_yticks([0.01, 0.1, 1])
+        ax.set_yticklabels(["0.01", "0.1", "1"])
         ax.set_xlabel("Number of Stations")
         ax.set_ylabel("Mean of Transient RMS Error")
         ax.set_title(f"Penalty = {pen}")
