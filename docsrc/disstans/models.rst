@@ -101,3 +101,10 @@ SplineSet
 .. autoclass:: disstans.models.SplineSet
    :members:
    :special-members:
+
+AmpPhModulatedSinusoid
+......................
+
+.. autoclass:: disstans.models.AmpPhModulatedSinusoid
+   :members:
+   :special-members:
