@@ -17,13 +17,14 @@ dependencies:
   - tqdm
   - sqlalchemy
   - ffmpeg
-  - jupyterlab
-  - sphinx>=4
-  - docutils
-  - doc8
-  - rstcheck
-  - flake8
+  - jupyterlab  # optional
+  - sphinx>=4  # optional
+  - docutils  # optional
+  - doc8  # optional
+  - rstcheck  # optional
+  - flake8  # optional
+  - pip
   - pip:
-    - sphinx-rtd-theme
-    - git+https://github.com/sphinx-contrib/video.git
     - git+https://github.com/tbenthompson/okada_wrapper.git
+    - sphinx-rtd-theme  # optional
+    - git+https://github.com/sphinx-contrib/video.git  # optional
