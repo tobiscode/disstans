@@ -653,4 +653,15 @@ if __name__ == "__main__":
                      if case[-1] == "M" else None,
                      save_kw_args={"format": fmt, "dpi": 300},
                      colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
-                     scale=1e3, annotate_stations=False)
+                     scale=1e3, annotate_stations=False,
+                     lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)
+
+    # make a difference wormplot
+    net.math("diff-local-spatial", "Trans_L1R5M", "-", "Trans_L1R1S20M")
+    print("Wormplot for Local-Spatial")
+    net.wormplot(ts_description="diff-local-spatial",
+                 fname=outdir / "tutorial_3h_worm_diff",
+                 save_kw_args={"format": fmt, "dpi": 300},
+                 colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
+                 scale=1e3, annotate_stations=False,
+                 lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)

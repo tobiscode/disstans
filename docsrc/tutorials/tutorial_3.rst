@@ -868,7 +868,10 @@ to ``0.204496``.
     removing the common mode error, and some of it with the spatial reweighting presented
     here, but don't expect it to solve all issues with colored and/or station-individual
     noise. This will also all be sensitive to the penalty parameter, the reweighting
-    function, and much more.
+    function, and much more, which all could potentially make the spatially-aware fit
+    worse than the local-L0 counterpart.
+    A more rigorous exploration for the case of different normally-distributed noise
+    levels is presented in :doc:`Tutorial 5 <tutorial_5>`.
 
 Finding unmodeled jumps
 -----------------------
@@ -1161,7 +1164,8 @@ For each transient timeseries that we saved, we can produce a wormplot like this
     ...     net.wormplot(ts_description=trans_ts,
     ...                  fname=f"tutorial_3h_worm_{case},
     ...                  colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
-    ...                  scale=1e3, annotate_stations=False)
+    ...                  scale=1e3, annotate_stations=False,
+    ...                  lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)
 
 Which yields the following two maps:
 
@@ -1172,6 +1176,19 @@ Which yields the following two maps:
 
 .. |3h_worm_spatial20| image:: ../img/tutorial_3h_worm_spatial20M.png
     :width: 49%
+
+We can also calculate the difference between the two transients::
+
+    >>> net.math("diff-local-spatial", "Trans_L1R5M", "-", "Trans_L1R1S20M")
+    >>> net.wormplot(ts_description="diff-local-spatial",
+    ...              fname="tutorial_3h_worm_diff",
+    ...              colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
+    ...              scale=1e3, annotate_stations=False,
+    ...              lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)
+
+Which maps out to:
+
+.. image:: ../img/tutorial_3h_worm_diff.png
 
 We can see that in general, the transients that were estimated through the spatial
 L0 estimation process show a more homogenous direction of the motion to the southeast,
