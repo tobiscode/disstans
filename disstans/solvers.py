@@ -895,13 +895,15 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 if reweight_coupled:
                     objective = objective + cp.norm1(z)
                 else:
-                    lambd = cp.Parameter(value=pen, pos=True)
-                    objective = objective + lambd * cp.norm1(z)
+                    lambd = cp.Parameter(shape=(1, ) if num_comps == 1 else pen.size,
+                                         value=pen, pos=True)
+                    objective = objective + cp.norm1(cp.multiply(lambd, z))
                 constraints = [z == cp.multiply(weights, m[reg_indices])]
                 old_m = np.zeros(m.shape)
             else:
-                lambd = cp.Parameter(value=pen, pos=True)
-                objective = objective + lambd * cp.norm1(m[reg_indices])
+                lambd = cp.Parameter(shape=(1, ) if num_comps == 1 else pen.size,
+                                     value=pen, pos=True)
+                objective = objective + cp.norm1(cp.multiply(lambd, m[reg_indices]))
         # define problem
         problem = cp.Problem(cp.Minimize(objective), constraints)
         # solve

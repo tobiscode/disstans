@@ -406,7 +406,7 @@ class Timeseries():
         respectively) one is used (i.e., the more restrictive one).
         Also provides the reverse operation, i.e. only removing data between dates.
 
-        This operation is changes the timeseries in-place; if it should be done on a
+        This operation changes the timeseries in-place; if it should be done on a
         new timeseries, use :meth:`~copy` first.
 
         Parameters

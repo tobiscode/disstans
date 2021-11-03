@@ -2348,8 +2348,11 @@ class Network():
                     ax.plot(ts.time, ts.df[data_col], marker='.', color='k', label="Data"
                             if len(self[station_name].fits[ts_description]) > 0 else None)
                     # overlay models
-                    if sum_models and self[station_name].fits[ts_description].allfits:
+                    if sum_models and (fit_list is None) and \
+                       self[station_name].fits[ts_description].allfits:
+                        # get joint model
                         fit = self[station_name].fits[ts_description].allfits
+                        # plot all at once
                         if (fit.var_cols is not None) and (gui_settings["plot_sigmas"] > 0):
                             fill_upper = fit.df[fit.data_cols[icol]] \
                                 + gui_settings["plot_sigmas"] \
@@ -2361,12 +2364,42 @@ class Network():
                                             alpha=gui_settings["plot_sigmas_alpha"],
                                             linewidth=0)
                         ax.plot(fit.time, fit.df[fit.data_cols[icol]], label="Model")
+                    elif sum_models:
+                        # get model subset
+                        fits_to_plot = {model_description: fit for model_description, fit
+                                        in self[station_name].fits[ts_description].items()
+                                        if ((fit_list is None) or
+                                            (model_description in fit_list))}
+                        # sum fit
+                        sum_fit, sum_var = None, None
+                        for model_description, fit in fits_to_plot.items():
+                            # initialize
+                            if sum_fit is None:
+                                sum_fit = fit.df[fit.data_cols[icol]]
+                                if (fit.var_cols is not None) \
+                                   and (gui_settings["plot_sigmas"] > 0):
+                                    sum_var = fit.df[fit.var_cols[icol]]
+                            # do all other models
+                            else:
+                                sum_fit = sum_fit + fit.df[fit.data_cols[icol]]
+                                if (fit.var_cols is not None) \
+                                   and (gui_settings["plot_sigmas"] > 0):
+                                    sum_var = sum_var + fit.df[fit.var_cols[icol]]
+                        # plot everything
+                        if sum_var is not None:
+                            fill_upper = sum_fit + (sum_var ** 0.5) * gui_settings["plot_sigmas"]
+                            fill_lower = sum_fit - (sum_var ** 0.5) * gui_settings["plot_sigmas"]
+                            ax.fill_between(fit.time, fill_upper, fill_lower,
+                                            alpha=gui_settings["plot_sigmas_alpha"],
+                                            linewidth=0)
+                        ax.plot(fit.time, sum_fit, label="Model")
                     else:
                         # get model subset
                         fits_to_plot = {model_description: fit for model_description, fit
                                         in self[station_name].fits[ts_description].items()
                                         if ((fit_list is None) or
                                             (model_description in fit_list))}
+                        # plot individually
                         for model_description, fit in fits_to_plot.items():
                             if (fit.var_cols is not None) \
                                and (gui_settings["plot_sigmas"] > 0):

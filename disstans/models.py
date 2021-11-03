@@ -721,8 +721,9 @@ class BSpline(Model):
         Defaults to ``scale``.
     obs_scale : float, optional
         Determines how many factors of ``scale`` should be sampled by the ``timevector``
-        input to :meth:`~get_mapping` to accept an individual spline as observable.
+        input to :meth:`~Model.get_mapping` to accept an individual spline as observable.
         Defaults to ``1``.
+
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
 
@@ -1390,10 +1391,10 @@ class AmpPhModulatedSinusoid(Model):
 
     This model defines a periodic sinusoid signal with a nominal frequency that allows
     the amplitude and phase (and therefore instantaneous frequency) to vary. This is
-    accomplished by treating th :math`a` and :math:`b` parameters of the
-    :class:`~Sinusoid` model to vary over time.
-    The functional form of the parameters is a full B-Spline basis set, defined by
-    :class:`~scipy.interpolate.BSpline.basis_element` (not a :class:`~SplineSet` of
+    accomplished by enabling the :math:`a` and :math:`b` parameters of the
+    :class:`~Sinusoid` model to be time-varying.
+    The functional form of these parameters is a full B-Spline basis set, defined by
+    :meth:`~scipy.interpolate.BSpline.basis_element` (not a :class:`~SplineSet` of
     purely cardinal splines).
 
     Parameters
@@ -1407,15 +1408,16 @@ class AmpPhModulatedSinusoid(Model):
         Needs to be at least ``2``.
     obs_scale : float, optional
         Determines how many factors of the average scale should be sampled by the
-        ``timevector`` input to :meth:`~get_mapping` to accept an individual B-spline
+        ``timevector`` input to :meth:`~Model.get_mapping` to accept an individual B-spline
         as observable. Defaults to ``2``.
+
 
     See Also
     --------
     Sinusoid : For the definition of the functional form of the sinusoid.
     """
-    def __init__(self, period, degree, num_bases, t_start, t_end, time_unit="D",
-                 t_reference=None, obs_scale=2, **model_kw_args):
+    def __init__(self, period, degree, num_bases, t_start, t_end, t_reference=None,
+                 time_unit="D", obs_scale=2, regularize=True, **model_kw_args):
         # input tests
         assert num_bases > 1, "'num_bases' needs to be at least 2."
         num_parameters = 2 * num_bases
@@ -1423,7 +1425,8 @@ class AmpPhModulatedSinusoid(Model):
             t_reference = t_start
         # initialize Model
         super().__init__(num_parameters=num_parameters, t_start=t_start, t_end=t_end,
-                         t_reference=t_reference, time_unit=time_unit, **model_kw_args)
+                         t_reference=t_reference, time_unit=time_unit, regularize=regularize,
+                         **model_kw_args)
         # save some important parameters
         self.period = float(period)
         """ Nominal period of the sinusoid. """
