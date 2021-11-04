@@ -615,6 +615,7 @@ reweighting function, running only one spatial iteration, and evaluating its sol
     ...                        formal_covariance=True,
     ...                        verbose=True)
     Calculating scale lengths
+    Distance percentiles in km (5-50-95): [12.6, 38.3, 89.7]
     Initial fit
     ...
     Fit after 1 reweightings
@@ -686,6 +687,7 @@ steps:
     ...                        formal_covariance=True,
     ...                        verbose=True)
     Calculating scale lengths
+    Distance percentiles in km (5-50-95): [12.6, 38.3, 89.7]
     Initial fit
     ...
     Fit after 20 reweightings

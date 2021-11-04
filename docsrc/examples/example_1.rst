@@ -347,6 +347,7 @@ restrict ourselves to a subset of the table where the variance reduction is more
     :hide:
     :options: +NORMALIZE_WHITESPACE
 
+    >>> step_table_above90 = step_table[step_table["varred"] > 0.9]
     >>> print(step_table_above90)
          station       time  probability           var0        var1    varred
     ... TILC 2008-07-27 ...
@@ -848,6 +849,7 @@ Finally, we can run the estimation. Note that we're doing a couple of things:
     ...                        extended_stats=True,
     ...                        keep_mdl_res_as=("model_srw", "resid_srw"))
     Calculating scale lengths
+    Distance percentiles in km (5-50-95): [7.5, 41.6, 104.2]
     Initial fit
     ...
     Done
