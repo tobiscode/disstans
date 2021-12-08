@@ -49,9 +49,9 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # complain about broken links, check every once in a while
-# nitpicky = True
-# nitpick_ignore = [('py:class', 'optional'), ('py:class', 'function'),
-#                   ('py:class', 'iterable')]
+nitpicky = True
+nitpick_ignore = [('py:class', 'optional'), ('py:class', 'function'),
+                  ('py:class', 'iterable')]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -80,7 +80,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.9/', None),
                        'numpy': ('https://numpy.org/doc/1.20/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy-1.6.3/reference/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.2.4/', None),
-                       'matplotlib': ('https://matplotlib.org/3.4.2/', None),
+                       'matplotlib': ('https://matplotlib.org/3.5.0/', None),
                        'scikit-learn': ('https://scikit-learn.org/0.24/', None)}
 
 # ReadTheDocs theme settings

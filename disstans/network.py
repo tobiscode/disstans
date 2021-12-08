@@ -1961,7 +1961,7 @@ class Network():
         annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
-            as required by :class:`~matplotlib.test.Text`.
+            as required by :class:`~matplotlib.text.Text`.
         save : bool, optional
             If ``True``, save the map and timeseries plots to the current folder.
             Defaults to ``False``.
@@ -2071,7 +2071,7 @@ class Network():
         annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
-            as required by :class:`~matplotlib.test.Text`.
+            as required by :class:`~matplotlib.text.Text`.
         save : bool, str, optional
             If ``True``, save the figure of the selected timeseries. If a scalogram
             is also created, save this as well. The output directory is the current folder.
@@ -2676,7 +2676,7 @@ class Network():
         annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
-            as required by :class:`~matplotlib.test.Text`.
+            as required by :class:`~matplotlib.text.Text`.
         no_pbar : bool, optional
             Suppress the progress bar when creating the animation with ``True``
             (default: ``False``).
@@ -2914,7 +2914,7 @@ class Network():
         annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
-            as required by :class:`~matplotlib.test.Text`.
+            as required by :class:`~matplotlib.text.Text`.
         legend_refs : list, optional
             If set, a list of amplitudes that will be used to generate legend entries.
         legend_labels : list, optional
