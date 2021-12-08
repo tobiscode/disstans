@@ -19,6 +19,11 @@ from disstans.tools import parallelize
 from disstans.solvers import InverseReweighting
 from disstans.models import ISpline
 
+# make it prettier
+from matplotlib import rcParams
+rcParams['font.sans-serif'] = ["NewComputerModernSans10"]
+rcParams['font.size'] = "14"
+
 # output
 outdir = "out/tutorial_5"
 os.makedirs(outdir, exist_ok=True)
@@ -232,7 +237,39 @@ if __name__ == "__main__":
         ax.set_xlabel("Number of Stations")
         ax.set_ylabel("Mean of Transient RMS Error")
         ax.set_title(f"Penalty = {pen}")
-        ax.legend(ncol=len(noise_sds), loc="upper right", fontsize="xx-small")
+        ax.legend(ncol=len(noise_sds), loc="upper right", fontsize=6)
         fig.savefig(f"{outdir}/tutorial_5_S{max_num_stations}N{num_samples}_{pen}.png", dpi=300)
         fig.savefig(f"{outdir}/tutorial_5_S{max_num_stations}N{num_samples}_{pen}.pdf", dpi=300)
         plt.close(fig)
+
+    # use only j=1, rw_func_scale=1e-1 for single plot
+    pen = penalties[0]
+    j = 1
+    rw_func_scale = rw_func_scales[j]
+    fig, ax = plt.subplots(figsize=(4, 4))
+    for i, noise_sd in enumerate(noise_sds):
+        if i == 0:
+            continue
+        col = cycleable_colors[i*4 + j]
+        ecol = col + "30"
+        last_rmse = results[f"{noise_sd}_{pen}_{rw_func_scale}"]
+        mean_mean = np.array([np.mean(np.mean(rr, axis=1)) for rr in last_rmse])
+        mean_sd = np.array([np.std(np.mean(rr, axis=1)) for rr in last_rmse])
+        ax.errorbar(x=x_range, y=mean_mean, yerr=mean_sd, color=col, ecolor=ecol,
+                    label=f"$\\sigma$={noise_sd}")
+    ax.plot(x_range_small, 1/np.sqrt(x_range_small) * 2, c="0.5", ls=":", lw=1)
+    ax.axhline(np.sqrt(np.mean(truth**2)), color="0.5", linewidth=1, linestyle="--", zorder=-1)
+    ax.set_xscale("log")
+    ax.set_xlim([0.8, max_num_stations + 3])
+    ax.set_xticks([1, 5, 10, 20])
+    ax.set_xticklabels(["1", "5", "10", "20"])
+    ax.set_yscale("log")
+    ax.set_ylim([0.02, 3])
+    ax.set_yticks([0.1, 1])
+    ax.set_yticklabels(["0.1", "1"])
+    ax.set_xlabel("Number of Stations")
+    ax.set_ylabel("Mean of Transient RMS Error")
+    ax.legend(ncol=2, loc="upper right", fontsize=10)
+    fig.savefig(f"{outdir}/tutorial_5_single.png", dpi=300)
+    fig.savefig(f"{outdir}/tutorial_5_single.pdf", dpi=300)
+    plt.close(fig)
