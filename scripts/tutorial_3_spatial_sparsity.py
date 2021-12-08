@@ -9,12 +9,16 @@ if __name__ == "__main__":
     import os
     os.environ['OMP_NUM_THREADS'] = '1'
     import disstans
-    disstans.defaults["general"]["num_threads"] = 10
+    disstans.defaults["general"]["num_threads"] = 16
 
     # decide output quality, looks & folder
     from pathlib import Path
+    from matplotlib import rcParams
     outdir = Path("out/tutorial_3")
+    rcParams['font.sans-serif'] = ["NewComputerModernSans10"]
+    rcParams['font.size'] = "14"
     fmt = "png"
+    include_resids = True
     os.makedirs(outdir, exist_ok=True)
 
     # initialize RNG
@@ -240,7 +244,8 @@ if __name__ == "__main__":
     figure_stations = ["Jeckle", "Cylon", "Marvish", "Mankith", "Corko", "Tygrar", "Jozga"]
     for s in figure_stations:
         net.gui(station=s, save="base",
-                timeseries=["Displacement", "Res_L1"],
+                timeseries=["Displacement", "Res_L1"]
+                if include_resids else ["Displacement"],
                 save_kw_args={"format": fmt, "dpi": 300},
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
@@ -277,7 +282,8 @@ if __name__ == "__main__":
     # quick looks
     for s in figure_stations:
         net.gui(station=s, save="local", save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R5"],
+                timeseries=["Displacement", "Res_L1R5"]
+                if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
 
@@ -319,7 +325,8 @@ if __name__ == "__main__":
     # plot
     for s in figure_stations:
         net.gui(station=s, save="spatial1", save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R1S1"],
+                timeseries=["Displacement", "Res_L1R1S1"]
+                if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
 
@@ -349,7 +356,8 @@ if __name__ == "__main__":
     for s in figure_stations:
         net.gui(station=s, save="spatial20",
                 save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R1S20"],
+                timeseries=["Displacement", "Res_L1R1S20"]
+                if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
 
@@ -377,7 +385,8 @@ if __name__ == "__main__":
     # quick looks
     for s in figure_stations:
         net.gui(station=s, save="baseM", save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1M"],
+                timeseries=["Displacement", "Res_L1M"]
+                if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
     # get number of (unique) non-zero parameters
@@ -407,7 +416,8 @@ if __name__ == "__main__":
     # quick looks
     for s in figure_stations:
         net.gui(station=s, save="localM", save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R5M"],
+                timeseries=["Displacement", "Res_L1R5M"]
+                if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
     # get number of (unique) non-zero parameters
@@ -443,14 +453,16 @@ if __name__ == "__main__":
         if s == "Corko":
             net.gui(station=s, save="spatial20M", save_map=True,
                     save_kw_args={"format": fmt, "dpi": 300},
-                    timeseries=["Displacement", "Res_L1R1S20M"],
+                    timeseries=["Displacement", "Res_L1R1S20M"]
+                    if include_resids else ["Displacement"],
                     scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                        "cmaprange": 2},
                     rms_on_map={"ts": "Res_L1R1S20M", "comps": [0], "c_max": 1})
         else:
             net.gui(station=s, save="spatial20M",
                     save_kw_args={"format": fmt, "dpi": 300},
-                    timeseries=["Displacement", "Res_L1R1S20M"],
+                    timeseries=["Displacement", "Res_L1R1S20M"]
+                    if include_resids else ["Displacement"],
                     scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                        "cmaprange": 2})
 
@@ -539,20 +551,22 @@ if __name__ == "__main__":
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.plot(stats["list_nonzeros"], c="k", marker=".")
-    ax1.scatter(-1, num_nonzero_base_M, s=100, c="k")
-    ax1.scatter(-1, num_nonzero_local_M, s=60, c="k", marker="D")
+    ax1.scatter(-0.1, num_nonzero_base_M, s=100, c="k")
+    ax1.scatter(-0.1, num_nonzero_local_M, s=60, c="k", marker="D")
     ax1.set_ylim([0, 1000])
     ax1.set_yticks(range(0, 1200, 200))
     ax2.plot(stats["arr_uniques"][:, 0], c="C0", marker=".")
     ax2.plot(stats["arr_uniques"][:, 1], c="C1", marker=".")
-    ax2.scatter(21, num_uniques_base_M[0], s=100, c="C0")
-    ax2.scatter(21, num_uniques_local_M[0], s=60, c="C0", marker="D")
-    ax2.scatter(21, num_uniques_base_M[1], s=100, c="C1")
-    ax2.scatter(21, num_uniques_local_M[1], s=60, c="C1", marker="D")
+    ax2.scatter(23, num_uniques_base_M[0], s=100, c="C0")
+    ax2.scatter(23, num_uniques_local_M[0], s=60, c="C0", marker="D")
+    ax2.scatter(23, num_uniques_base_M[1], s=100, c="C1")
+    ax2.scatter(23, num_uniques_local_M[1], s=60, c="C1", marker="D")
     ax2.set_ylim([0, 250])
     ax2.set_yticks(range(0, 300, 50))
-    ax1.set_xlim([-1, 21])
+    ax1.set_xscale("symlog", linthresh=1)
+    ax1.set_xlim([-0.1, 23])
     ax1.set_xticks([0, 1, 5, 10, 15, 20])
+    ax1.set_xticklabels(["0", "1", "5", "10", "15", "20"])
     ax1.set_xlabel("Iteration")
     ax1.set_ylabel("Total number of non-zero parameters")
     ax2.set_ylabel("Unique number of non-zero parameters")
@@ -562,9 +576,9 @@ if __name__ == "__main__":
                     Line2D([0], [0], c=[1, 1, 1, 0], mfc="0.7", marker="o"),
                     Line2D([0], [0], c=[1, 1, 1, 0], mfc="0.7", marker="D"),
                     Line2D([0], [0], c="0.7", marker=".")]
-    ax1.legend(custom_lines, ["Total", "Unique East", "Unique North",
-                              "L1", "Local L0", "Spatial L0"], loc=9, ncol=2)
     ax1.set_title(f"Number of available parameters: {stats['num_total']}")
+    ax1.legend(custom_lines, ["Total", "Unique East", "Unique North",
+                              "L1", "Local L0", "Spatial L0"], loc=(0.56, 0.53), ncol=1)
     fig.savefig(outdir / f"tutorial_3e_numparams.{fmt}")
     plt.close(fig)
     # second figure is for dict_rms_diff, dict_num_changed
@@ -578,7 +592,9 @@ if __name__ == "__main__":
     ax2.set_ylim([0, 1000])
     ax2.set_yticks([0, 2, 4, 6, 8, 10, 100, 1000])
     ax2.set_yticklabels([0, 2, 4, 6, 8, 10, 100, 1000])
-    ax1.set_xticks([0, 1, 5, 10, 15, 20])
+    ax1.set_xscale("symlog", linthresh=1)
+    ax1.set_xlim([-0.1, 23])
+    ax1.set_xticks([0, 1, 5, 10, 20])
     ax1.set_xlabel("Iteration")
     ax1.set_ylabel("RMS difference of parameters")
     ax2.set_ylabel("Number of changed parameters")
@@ -586,6 +602,26 @@ if __name__ == "__main__":
                     Line2D([0], [0], c="C1", marker=".")]
     ax1.legend(custom_lines, ["RMS Difference", "Changed Parameters"])
     fig.savefig(outdir / f"tutorial_3e_diffs.{fmt}")
+    plt.close(fig)
+    # third figure is just the total number of parameters
+    # can use horizontal line instead of markers on the side
+    fig, ax = plt.subplots(figsize=(4, 3))
+    ax.plot(stats["list_nonzeros"], c="k", marker=".")
+    ax.axhline(num_nonzero_local_M, ls="--", lw=1, c="0.5", zorder=-1)
+    ax.axhline(num_nonzero_base_M, ls=":", lw=1, c="0.5", zorder=-1)
+    ax.set_ylim([0, 1000])
+    ax.set_yticks(range(0, 1200, 200))
+    ax.set_xscale("symlog", linthresh=1)
+    ax.set_xlim([-0.1, 23])
+    ax.set_xticks([0, 1, 5, 10, 20])
+    ax.set_xticklabels(["0", "1", "5", "10", "20"])
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Non-zero parameters")
+    custom_lines = [Line2D([0], [0], c="0.5", ls=":", lw=1),
+                    Line2D([0], [0], c="0.5", ls="--", lw=1),
+                    Line2D([0], [0], c="k", marker=".")]
+    ax.legend(custom_lines, ["L1", "Local L0", "Spatial L0"], loc=(0.49, 0.55))
+    fig.savefig(outdir / f"tutorial_3e_numparams_total.{fmt}")
     plt.close(fig)
 
     # make correlation plot, showing the sparsity
@@ -661,6 +697,22 @@ if __name__ == "__main__":
     print("Wormplot for Local-Spatial")
     net.wormplot(ts_description="diff-local-spatial",
                  fname=outdir / "tutorial_3h_worm_diff",
+                 save_kw_args={"format": fmt, "dpi": 300},
+                 colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
+                 scale=1e3, annotate_stations=False,
+                 lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)
+
+    # make a truth wormplot
+    for station in net:
+        station["truth-trans"] = \
+            Timeseries.from_array(timevector=timevector,
+                                  data=synth_coll[station.name]["trans"],
+                                  src="synthetic",
+                                  data_unit="mm",
+                                  data_cols=["E", "N"])
+    print("Wormplot for Truth")
+    net.wormplot(ts_description="truth-trans",
+                 fname=outdir / "tutorial_3h_worm_truth",
                  save_kw_args={"format": fmt, "dpi": 300},
                  colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
                  scale=1e3, annotate_stations=False,
