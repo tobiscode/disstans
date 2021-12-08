@@ -17,6 +17,7 @@ from warnings import warn
 from matplotlib.animation import FuncAnimation
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
+from matplotlib.patches import Rectangle
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
 
@@ -1916,16 +1917,18 @@ class Network():
         fig_map = plt.figure()
         ax_map = fig_map.add_subplot(projection=proj_gui)
         default_station_edges = ['none'] * len(stat_names)
-        stat_points = ax_map.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
-                                     linestyle='None', marker='.', transform=proj_lla,
-                                     edgecolor=default_station_edges, zorder=1000)
+        stat_points = ax_map.scatter(stat_lons, stat_lats, s=20, facecolor='C0',
+                                     edgecolor=default_station_edges, marker='o',
+                                     transform=proj_lla, zorder=1000)
         # add labels
         if annotate_stations:
+            anno_kw_args = {"xycoords": proj_lla._as_mpl_transform(ax_map),
+                            "annotation_clip": True, "textcoords": "offset pixels",
+                            "xytext": (0, 5), "ha": "center"}
+            if isinstance(annotate_stations, float) or isinstance(annotate_stations, str):
+                anno_kw_args["fontsize"] = annotate_stations
             for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
-                ax_map.annotate(sname, (slon, slat),
-                                xycoords=proj_lla._as_mpl_transform(ax_map),
-                                annotation_clip=True, textcoords="offset pixels",
-                                xytext=(0, 5), ha="center")
+                ax_map.annotate(sname, (slon, slat), **anno_kw_args)
         # create underlay
         map_underlay = False
         if gui_settings["wmts_show"]:
@@ -1955,8 +1958,10 @@ class Network():
         ts_out : str, optional
             If provided, save the model as a timeseries called ``ts_out`` to
             the stations in the network.
-        annotate_stations : bool, optional
+        annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
+            If a float or a string, add the station names to the map with the font size set
+            as required by :class:`~matplotlib.test.Text`.
         save : bool, optional
             If ``True``, save the map and timeseries plots to the current folder.
             Defaults to ``False``.
@@ -2063,8 +2068,10 @@ class Network():
         verbose : bool, optional
             If ``True``, when clicking on a station, print its details (see
             :meth:`~disstans.station.Station.__str__`). Defaults to ``False``.
-        annotate_stations : bool, optional
+        annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
+            If a float or a string, add the station names to the map with the font size set
+            as required by :class:`~matplotlib.test.Text`.
         save : bool, str, optional
             If ``True``, save the figure of the selected timeseries. If a scalogram
             is also created, save this as well. The output directory is the current folder.
@@ -2392,7 +2399,8 @@ class Network():
                             ax.fill_between(fit.time, fill_upper, fill_lower,
                                             alpha=gui_settings["plot_sigmas_alpha"],
                                             linewidth=0)
-                        ax.plot(fit.time, sum_fit, label="Model")
+                        if sum_fit is not None:
+                            ax.plot(fit.time, sum_fit, label="Model")
                     else:
                         # get model subset
                         fits_to_plot = {model_description: fit for model_description, fit
@@ -2622,8 +2630,8 @@ class Network():
     def wormplot(self, ts_description, fname=None, fname_animation=None, subset_stations=None,
                  t_min=None, t_max=None, lon_min=None, lon_max=None, lat_min=None, lat_max=None,
                  en_col_names=[0, 1], scale=1e2, interval=10, annotate_stations=True,
-                 no_pbar=False, save_kw_args={"format": "png"}, colorbar_kw_args=None,
-                 gui_kw_args={}):
+                 no_pbar=False, return_figure=False, save_kw_args={"format": "png"},
+                 colorbar_kw_args=None, legend_ref_dict=None, gui_kw_args={}):
         """
         Creates an animated worm plot given the data in a timeseries.
 
@@ -2634,7 +2642,8 @@ class Network():
             directly associated with a station, and if a tuple, specifies the timeseries
             and name of a fitted model for the timeseries.
         fname : str, optional
-            If set, save the map to this filename, if not (default), show the map interactively.
+            If set, save the map to this filename, if not (default), show the map interactively
+            (unless ``return_figure=True``).
         fname_animation : str, optional
             If specified, make an animation and save the video to this filename.
         subset_stations : list, optional
@@ -2664,11 +2673,16 @@ class Network():
             will result in a mapped displacement of 100 meters.
         interval : int, optional
             The number of milliseconds each frame is shown (default: ``10``).
-        annotate_stations : bool, optional
+        annotate_stations : bool, float, str, optional
             If ``True`` (default), add the station names to the map.
+            If a float or a string, add the station names to the map with the font size set
+            as required by :class:`~matplotlib.test.Text`.
         no_pbar : bool, optional
             Suppress the progress bar when creating the animation with ``True``
             (default: ``False``).
+        return_figure : bool, optional
+            If ``True`` (default: ``False``), return the figure and axis objects instead of
+            showing the plot interactively. Only used if ``fname`` is not set.
         save_kw_args : dict, optional
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``fname`` is specified.
@@ -2676,6 +2690,15 @@ class Network():
             If ``None`` (default), no colorbar is added to the plot. If a dictionary is passed,
             a colorbar is added, with the dictionary containing additional keyword arguments
             to the :meth:`~matplotlib.figure.Figure.colorbar` method.
+        legend_ref_dict : dict, optional
+            If ``legend_ref_dict`` is provided and contains all of the following information,
+            a reference line will be plotted at the specified location to act as a legend.
+            Necessary keys: ``location`` (a tuple containing the longitude and latitude of the
+            reference line), ``length`` (the length of the line in meters) and ``label``
+            (a label placed below the line).
+            The dictionary can optionally include ``rect_args`` and ``rect_kw_args`` entries
+            for arguments and parameters that will be passed onto the creation of the
+            background :class:`~matplotlib.patches.Rectangle`.
         gui_kw_args : dict, optional
             Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
@@ -2732,19 +2755,21 @@ class Network():
         for name in disp_x.data_cols:
             if name in nan_stations:
                 continue
-            rel_disp_x[name] = disp_x[name] - disp_x[name][~np.isnan(disp_x[name])][0]
-            rel_disp_y[name] = disp_y[name] - disp_y[name][~np.isnan(disp_y[name])][0]
+            xy_notnan = np.logical_and(~np.isnan(disp_x[name]), ~np.isnan(disp_y[name]))
+            rel_disp_x[name] = disp_x[name] - disp_x[name][xy_notnan][0]
+            rel_disp_y[name] = disp_y[name] - disp_y[name][xy_notnan][0]
 
         # get times and respective colors
         reltimes = ((disp_x.time - disp_x.time[0]) / pd.Timedelta(1, "D")).values
         reltimes = (reltimes - reltimes[0])/(reltimes[-1] - reltimes[0])
         relcolors = scm.batlow(reltimes)
         relcolors[:, 3] = 0
+        num_timesteps = relcolors.shape[0]
 
         # add time span as title
         ax_map.set_title(f"{disp_x.time[0].date()} to {disp_x.time[-1].date()}")
 
-        # get direction of displacement
+        # get displacement lines
         geoid = cgeod.Geodesic()
         stat_lonlats = {name: np.array(self[name].location)[[1, 0]].reshape(1, 2)
                         for name in rel_disp_x.keys()}
@@ -2785,6 +2810,26 @@ class Network():
                                     ax=ax_map, **colorbar_kw_args)
             cbar.ax.set_xticklabels([str(disp_x.time[0].date()), str(disp_x.time[-1].date())])
 
+        # add the legend
+        if isinstance(legend_ref_dict, dict):
+            if not all([k in legend_ref_dict for k in ["location", "length", "label"]]):
+                print("'legend_ref_dict' does not contain all valid keys to create a legend.")
+            else:
+                ref_disp = np.linspace(0, legend_ref_dict["length"], num=num_timesteps)
+                ref_lonlat = np.array(legend_ref_dict["location"]).reshape(1, 2)
+                ref_loc = np.array(geoid.direct(ref_lonlat, 90, ref_disp * scale)[:, :2])
+                ax_map.scatter(ref_loc[:, 0], ref_loc[:, 1],
+                               facecolor=relcolors[:, :3], edgecolor="none",
+                               zorder=10, transform=proj_lla, rasterized=True)
+                ax_map.annotate(legend_ref_dict["label"], ref_loc[num_timesteps//2, :],
+                                xytext=(0, -6), textcoords="offset points",
+                                ha="center", va="top", zorder=10, transform=proj_lla,
+                                xycoords=proj_lla._as_mpl_transform(ax_map))
+                if ("rect_args" in legend_ref_dict) and ("rect_kw_args" in legend_ref_dict):
+                    ax_map.add_patch(Rectangle(*legend_ref_dict["rect_args"],
+                                               **legend_ref_dict["rect_kw_args"],
+                                               transform=proj_lla, zorder=9))
+
         # only animate if respective output filename is set
         if fname_animation:
 
@@ -2802,21 +2847,25 @@ class Network():
             # make actual animation
             try:
                 pbar = tqdm(desc="Rendering animation", unit="frame",
-                            total=relcolors.shape[0], ascii=True, disable=no_pbar)
-                ani = FuncAnimation(fig_map, update, frames=relcolors.shape[0],
+                            total=num_timesteps, ascii=True, disable=no_pbar)
+                ani = FuncAnimation(fig_map, update, frames=num_timesteps,
                                     init_func=init, interval=interval, blit=False)
                 ani.save(fname_animation, progress_callback=lambda i, n: pbar.update())
             finally:
                 pbar.close()
 
-        # save figure at the last stage if output filename is set, otherwise show
+        # if we didn't animate, we now need to make the entire worms visible
         relcolors[:, 3] = 1
         for name in rel_disp_x.keys():
             lines[name].set_facecolors(relcolors)
+
+        # finish up
         if fname:
             fig_map.savefig(f"{fname}.{save_kw_args['format']}", **save_kw_args)
+            if return_figure:
+                warn("'fname' was specified, so 'return_figure=True' is ignored.")
         else:
-            plt.show()
-
-        # close figure
-        plt.close(fig_map)
+            if return_figure:
+                return fig_map, ax_map
+            else:
+                plt.show()
