@@ -2869,3 +2869,163 @@ class Network():
                 return fig_map, ax_map
             else:
                 plt.show()
+
+    def ampphaseplot(self, ts_description, mdl_description, components=None, phase=True,
+                     fname=None, subset_stations=None, lon_min=None, lon_max=None,
+                     lat_min=None, lat_max=None, scale=1, annotate_stations=True,
+                     legend_refs=None, legend_labels=None, return_figure=False,
+                     save_kw_args={"format": "png"}, colorbar_kw_args=None, gui_kw_args={}):
+        """
+        Plot the amplitude and phase of a :class:`~disstans.models.Sinusoid`
+        model on a network map.
+
+        Parameters
+        ----------
+        ts_description : str
+            The name of the timeseries to be used.
+        mdl_description : str
+            The name of the model to be plotted.
+        components : int, list, optional
+            Specify the components to be used.
+            By default (``None``), all available components are combined.
+            If an integer, only a single component is used (in which case the phase
+            can be used to color the marker).
+            If a list, the indices of the list specify the components to be
+            combined.
+        phase : bool, optional
+            (Only used if a single component is selected.)
+            If ``True`` (default), use the phase of the sinusoid to color the
+            station markers.
+        fname : str, optional
+            If set, save the map to this filename, if not (default), show the map interactively
+            (unless ``return_figure=True``).
+        subset_stations : list, optional
+            If set, a list of strings that contains the names of stations to be shown.
+        lon_min : float, optional
+            Specify the map's minimum longitude (in degrees).
+        lon_max : float, optional
+            Specify the map's maximum longitude (in degrees).
+        lat_min : float, optional
+            Specify the map's minimum latitude (in degrees).
+        lat_max : float, optional
+            Specify the map's maximum latitude (in degrees).
+        scale : float, optional
+            Scale factor for the markers. Defaults to ``1``.
+        annotate_stations : bool, float, str, optional
+            If ``True`` (default), add the station names to the map.
+            If a float or a string, add the station names to the map with the font size set
+            as required by :class:`~matplotlib.test.Text`.
+        legend_refs : list, optional
+            If set, a list of amplitudes that will be used to generate legend entries.
+        legend_labels : list, optional
+            If set, a list of labels that will be used for ``legend_refs``.
+        return_figure : bool, optional
+            If ``True`` (default: ``False``), return the figure and axis objects instead of
+            showing the plot interactively. Only used if ``fname`` is not set.
+        save_kw_args : dict, optional
+            Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
+            used when ``fname`` is specified.
+        colorbar_kw_args : dict, optional
+            (Only used if a phases are plotted.)
+            If ``None`` (default), no colorbar is added to the plot. If a dictionary is passed,
+            a colorbar is added, with the dictionary containing additional keyword arguments
+            to the :meth:`~matplotlib.figure.Figure.colorbar` method.
+        gui_kw_args : dict, optional
+            Override default GUI settings of :attr:`~disstans.config.defaults`.
+        """
+        # preparations
+        gui_settings = defaults["gui"].copy()
+        gui_settings.update(gui_kw_args)
+        fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
+            stat_points, stat_lats, stat_lons = \
+            self._create_map_figure(gui_settings, annotate_stations, subset_stations)
+
+        # set map extent
+        ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
+        cur_lon_min, cur_lat_min = \
+            proj_lla.transform_point(ax_map_xmin, ax_map_ymin, proj_gui)
+        cur_lon_max, cur_lat_max = \
+            proj_lla.transform_point(ax_map_xmax, ax_map_ymax, proj_gui)
+        map_extent_lonlat = [cur_lon_min, cur_lon_max, cur_lat_min, cur_lat_max]
+        if any([lon_min, lon_max, lat_min, lat_max]):
+            map_extent_lonlat = [new_val if new_val else cur_val for cur_val, new_val in
+                                 zip(map_extent_lonlat, [lon_min, lon_max, lat_min, lat_max])]
+            ax_map.set_extent(map_extent_lonlat, crs=proj_lla)
+
+        # collect all the relevant data
+        amps = []
+        if phase:
+            phases = []
+        if subset_stations is None:
+            subset_stations = self.station_names
+        for stat_name in subset_stations:
+            mdl = self[stat_name].models[ts_description][mdl_description]
+            if components is None:
+                components = list(range(mdl.par.shape[1]))
+            elif isinstance(components, int):
+                components = [components]
+            try:
+                amps.append(mdl.amplitude[components])
+            except AttributeError as e:
+                if not isinstance(mdl, disstans_models.Sinusoid):
+                    raise RuntimeError("'mdl_description' refers to a model object that "
+                                       "does not have an 'amplitude' attribute."
+                                       ).with_traceback(e.__traceback__) from e
+                else:
+                    raise e
+            if len(components) > 1:
+                amps.append(np.sqrt(np.sum(amps[stat_name]**2)))
+            elif phase:
+                try:
+                    phases.append(mdl.phase[components[0]])
+                except AttributeError as e:
+                    if not isinstance(mdl, disstans_models.Sinusoid):
+                        raise RuntimeError("'mdl_description' refers to a model object that "
+                                           "does not have a 'phase' attribute."
+                                           ).with_traceback(e.__traceback__) from e
+                    else:
+                        raise e
+
+        # update the station marker sizes
+        stat_points.set_zorder(1)
+        stat_points.set_sizes(20*scale*np.array(amps).ravel()**2)
+
+        # update the marker colors
+        if phase and (len(phases) > 0):
+            stat_points.set_facecolor(scm.romaO((np.array(phases) % (2*np.pi)) / (2*np.pi)))
+
+        # add gridlines
+        ax_map.gridlines(draw_labels=True)
+
+        # add a legend
+        if isinstance(legend_refs, list):
+            if legend_labels is None:
+                legend_labels = legend_refs
+            num_legends = len(legend_refs)
+            ref_lons = [(map_extent_lonlat[0] + map_extent_lonlat[1]) / 2] * num_legends
+            ref_lats = [(map_extent_lonlat[2] + map_extent_lonlat[3]) / 2] * num_legends
+            ref_scatter = ax_map.scatter(ref_lons, ref_lats,
+                                         s=20*scale*np.array(legend_refs)**2,
+                                         visible=False, marker='o', transform=proj_lla)
+            ref_handles = ref_scatter.legend_elements(
+                prop="sizes", num=None,
+                markerfacecolor="none", markeredgecolor="k", visible=True,
+                func=lambda s: np.sqrt(s / (20*scale)))[0]
+            ax_map.legend(ref_handles, legend_labels)
+
+        # add a colorbar
+        if isinstance(colorbar_kw_args, dict):
+            fig_map.colorbar(ScalarMappable(norm=Normalize(vmin=1, vmax=13-1e-10),
+                                            cmap=scm.romaO),
+                             ax=ax_map, **colorbar_kw_args)
+
+        # finish up
+        if fname:
+            fig_map.savefig(f"{fname}.{save_kw_args['format']}", **save_kw_args)
+            if return_figure:
+                warn("'fname' was specified, so 'return_figure=True' is ignored.")
+        else:
+            if return_figure:
+                return fig_map, ax_map
+            else:
+                plt.show()
