@@ -10,7 +10,7 @@ Installation
 .. note::
 
     There aren't any prebuilt packages (yet?); you'll have to install DISSTANS
-    from the Github repository.
+    from the GitHub repository.
 
 DISSTANS depends on many packages, which in turn depend on even more, so I highly
 recommend using a package manager and virtual Python environments.

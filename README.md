@@ -34,10 +34,17 @@ needs.
 
 ## Documentation
 
-DISSTANS contains full code annotation, an API documentation, as well as tutorials
-and real-data examples that show the usage of the package.
+A peer-reviewed study is currently in the works (see _Using and citing this work_ below)
+that explains the concept, inner workings, goals, and successes of DISSTANS in detail.
+Until a manuscript can be published, please see the poster presented at AGU's Fall
+Meeting 2021 for an introduction to DISSTANS:
+[Decomposition and Inference of Sources through Spatiotemporal Analysis of Network
+Signals: The DISSTANS Python Package](https://doi.org/10.1002/essoar.10509232.1).
 
-The documentation can be found in the `docs/` folder. It is hosted on Github publicly
+Furthermore, DISSTANS contains full code annotation, an API documentation, as well as
+tutorials and real-data examples that show the usage of the package.
+
+The documentation can be found in the `docs/` folder. It is hosted on GitHub publicly
 at [tobiscode.github.io/disstans](https://tobiscode.github.io/disstans), but you can
 also read it locally, e.g., by running `python -m http.server 8080 --bind 127.0.0.1`
 from with the documentation folder and then opening a browser.
@@ -86,7 +93,7 @@ This code would not be possible without the work of others, such as:
 
 ## Reporting bugs and getting involved
 
-If you find a bug or have a question about the code, please raise an issue on Github.
+If you find a bug or have a question about the code, please raise an issue on GitHub.
 If you have any other comment, feedback, or suggestion, feel free to send me an email
 to [tkoehne@caltech.edu](mailto:tkoehne@caltech.edu).
 Similarly, if you want to contribute to any part of the code (functions, classes,
