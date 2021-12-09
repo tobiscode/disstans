@@ -13,8 +13,18 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
+from scipy.linalg import lstsq
+from matplotlib.lines import Line2D
 import disstans
-from disstans.tools import full_cov_mat_to_columns
+from disstans.tools import tvec_to_numpycol, full_cov_mat_to_columns
+
+# make it look better
+from matplotlib import rcParams
+rcParams['font.sans-serif'] = ["NewComputerModernSans10"]
+rcParams['font.size'] = "14"
+disstans.defaults["gui"]["wmts_show"] = True
+disstans.defaults["gui"]["wmts_alpha"] = 0.5
+fmt = "png"
 
 # Python is petty about this format, this is somehow super important
 if __name__ == "__main__":
@@ -26,11 +36,10 @@ if __name__ == "__main__":
     plot_dir = Path("../img").resolve()
     os.makedirs(plot_dir, exist_ok=True)
     os.chdir(plot_dir)
-    fmt = "png"
 
     # let's have multiprocessing
     os.environ['OMP_NUM_THREADS'] = '1'
-    disstans.config.defaults["general"]["num_threads"] = 8
+    disstans.defaults["general"]["num_threads"] = 30
 
     # let's define a region of interest
     center_lon = -118.884167  # [°]
@@ -66,8 +75,7 @@ if __name__ == "__main__":
     net.gui(save=True, save_map=True,
             station="CASA",
             annotate_stations=False,
-            save_kw_args={"format": fmt, "dpi": 300},
-            gui_kw_args={"wmts_show": True, "wmts_alpha": 0.5})
+            save_kw_args={"format": fmt, "dpi": 300})
     os.rename(next(plot_dir.glob(f"ts_CASA*.{fmt}")),
               (plot_dir / f"example_1a_ts.{fmt}"))
     os.rename(next(plot_dir.glob(f"map_CASA*.{fmt}")),
@@ -380,23 +388,258 @@ if __name__ == "__main__":
     all_poly_df["corr_vel_nu"] /= (all_poly_df["sig_vel_n"] * all_poly_df["sig_vel_u"])
     all_poly_df.to_csv(plot_dir / "secular_velocities.csv", index_label="station")
 
-    # make worm plot
+    # make wormplot
     subset_stations = ["RDOM", "KRAC", "SAWC", "MWTP", "CASA", "CA99", "P639", "HOTK",
                        "P646", "P638", "DDMN", "P634", "KNOL", "MINS", "LINC", "P630",
                        "SHRC", "P631", "TILC", "P642", "BALD", "P648", "WATC", "P632",
-                       "P643", "P647", "P648", "PMTN", "P635", "JNPR", "P645"]
+                       "P643", "P647", "PMTN", "P635", "P645"]
     plot_t_start, plot_t_end = "2012-01-01", "2015-01-01"
+    # if colorbar is added, the animation is a bit buggy, so make the animation
+    # without it, then overwrite the final image with one that has a colorbar
     net.wormplot(ts_description=("final", "Transient"),
                  fname=plot_dir / "example_1f",
                  save_kw_args={"format": fmt, "dpi": 300},
                  fname_animation=plot_dir / "example_1f.mp4",
-                 t_min=plot_t_start, t_max=plot_t_end, scale=1e2,
+                 t_min=plot_t_start, t_max=plot_t_end, scale=2e2,
                  subset_stations=subset_stations,
-                 gui_kw_args={"wmts_show": True, "wmts_alpha": 0.5},
-                 colorbar_kw_args={"shrink": 0.5})
+                 lat_min=37.52, lat_max=37.87, lon_min=-119.18, lon_max=-118.56,
+                 annotate_stations="small",
+                 legend_ref_dict={"location": [-118.685, 37.832],
+                                  "length": 30,
+                                  "label": "30 mm",
+                                  "rect_args": [(-118.7, 37.8), 0.1, 0.05],
+                                  "rect_kw_args": {"facecolor": [1, 1, 1, 0.15],
+                                                   "edgecolor": [0, 0, 0, 0.6]}})
+    net.wormplot(ts_description=("final", "Transient"),
+                 fname=plot_dir / "example_1f",
+                 save_kw_args={"format": fmt, "dpi": 300},
+                 t_min=plot_t_start, t_max=plot_t_end, scale=2e2,
+                 subset_stations=subset_stations,
+                 lat_min=37.52, lat_max=37.87, lon_min=-119.18, lon_max=-118.56,
+                 annotate_stations="small",
+                 colorbar_kw_args={"shrink": 0.5},
+                 legend_ref_dict={"location": [-118.685, 37.832],
+                                  "length": 30,
+                                  "label": "30 mm",
+                                  "rect_args": [(-118.7, 37.8), 0.1, 0.05],
+                                  "rect_kw_args": {"facecolor": [1, 1, 1, 0.15],
+                                                   "edgecolor": [0, 0, 0, 0.6]}})
 
     # print some secular linear velocities
     print(f"{'Station':>10s} {'East [m/a]':>12s} {'North [m/a]':>12s} {'Up [m/a]':>12s}")
     for stat_name in ["P308", "DOND", "KRAC", "CASA", "CA99", "P724", "P469", "P627"]:
         ve, vn, vu = net[stat_name].models["final"]["Linear"].par[1, :] / 1000
         print(f"{stat_name:>10s} {ve:>12f} {vn:>12f} {vu:>12f}")
+
+    # define rotation matrix function
+    def R(angle):
+        angle = np.deg2rad(angle)
+        return np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+
+    # make a plot of the displacement in the dominant direction during the timespan
+    # of the wormplot
+    # first, get relevant timeseries
+    lvc_names = ["TILC", "SHRC", "MWTP", "KNOL", "CASA", "CA99", "DDMN",
+                 "BALD", "SAWC", "HOTK", "RDOM", "KRAC", "LINC", "WATC"]
+    # now, get quick access to data
+    lvc_data = {name: net[name]["final"].data for name in lvc_names}
+    # quick access to Linear + Unknown + Earthquake + Maintenance + Offset
+    lvc_background = {name: net[name].fits["final"]["Linear"].data.values.copy()
+                      for name in lvc_names}
+    for name in lvc_names:
+        for test_ts in ["Unknown", "Earthquake", "Maintenance", "Offset"]:
+            if test_ts in net[name].fits["final"]:
+                lvc_background[name] += net[name].fits["final"][test_ts].data.values
+    # quick access to transients and seasonals
+    lvc_transient = {name: net[name].fits["final"]["Transient"].data.values
+                     for name in lvc_names}
+    lvc_seasonal = {name: (net[name].fits["final"]["Annual"].data.values +
+                           net[name].fits["final"]["Biannual"].data.values +
+                           net[name].fits["final"]["AnnualDev"].data.values +
+                           net[name].fits["final"]["BiannualDev"].data.values)
+                    for name in lvc_names}
+    # remove fits from data
+    lvc_data_transient = {name: (lvc_data[name].values - lvc_background[name] -
+                                 lvc_seasonal[name])
+                          for name in lvc_names}
+    lvc_data_seasonal = {name: (lvc_data[name].values - lvc_background[name] -
+                                lvc_transient[name])
+                         for name in lvc_names}
+
+    # get the main direction of the transient displacements from the fits
+    rots = {}
+    for name in lvc_names:
+        if name == "CASA":
+            continue
+        intimespan = np.logical_and(pd.Timestamp(plot_t_start) <= net[name]["final"].time,
+                                    net[name]["final"].time <= pd.Timestamp(plot_t_end))
+        finitedata = np.all(np.isfinite(lvc_data_transient[name][:, :2]), axis=1)
+        valid = np.logical_and(intimespan, finitedata)
+        G = np.ones((lvc_data[name].index.size, 2))
+        G[:, 1] = tvec_to_numpycol(lvc_data[name].index)
+        G = G[valid, :]
+        GtWG = G.T @ G
+        GtWd_E = G.T @ lvc_data_transient[name][:, 0][valid]
+        GtWd_N = G.T @ lvc_data_transient[name][:, 1][valid]
+        trend = [lstsq(GtWG, GtWd_E)[0][1], lstsq(GtWG, GtWd_N)[0][1]]
+        rots[name] = (np.rad2deg(np.arctan2(trend[1], trend[0])) + 360) % 360
+    # give CASA the CA99 direction because it doesn't have data in that timespan
+    rots["CASA"] = rots["CA99"]
+    rots_keys = list(rots.keys())
+    # sort by azimuth
+    rots_sort_azim = dict(sorted(rots.items(), key=lambda kv: kv[1]))
+
+    # rotate east-north to main direction
+    lvc_data_main = {name: (lvc_data[name].values[:, :2] @ R(rots[name]))[:, 0]
+                     for name in lvc_names}
+    lvc_background_main = {name: (lvc_background[name][:, :2] @ R(rots[name]))[:, 0]
+                           for name in lvc_names}
+    lvc_transient_main = {name: (lvc_transient[name][:, :2] @ R(rots[name]))[:, 0]
+                          for name in lvc_names}
+    lvc_data_transient_main = {name: (lvc_data_transient[name][:, :2] @ R(rots[name]))[:, 0]
+                               for name in lvc_names}
+    # start transient plot by azimuth
+    offsets = [0, 65, 80, 110, 140, 180, 235, 265, 295, 285, 380, 395, 425, 455]
+    fig, ax = plt.subplots(figsize=(5, 8))
+    for i, name in enumerate(rots_sort_azim.keys()):
+        ax.plot(lvc_data[name].index,
+                lvc_data_transient_main[name] - lvc_data_transient_main[name][0] + offsets[i],
+                "k.", markersize=3, rasterized=True)
+        ax.plot(lvc_data[name].index,
+                lvc_transient_main[name] - lvc_data_transient_main[name][0] + offsets[i])
+        if name == "CASA":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"), offsets[i] + 30),
+                        ha="left", va="bottom")
+        elif name == "CA99":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"), offsets[i] + 10),
+                        ha="center", va="bottom")
+        else:
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"), offsets[i]),
+                        ha="right", va="center")
+        if name != "CASA":
+            ax.annotate(f"{rots[name]:.0f}°",
+                        (lvc_data[name].index[-1] + pd.Timedelta(100, "D"),
+                         lvc_transient_main[name][-1] - lvc_data_transient_main[name][0]
+                         + offsets[i]),
+                        ha="left", va="center", color="0.3")
+    ax.set_xlim([pd.Timestamp("1993-01-01"), pd.Timestamp("2025-01-01")])
+    yearticks = ["1996", "2000", "2004", "2008", "2012", "2016", "2020"]
+    ax.set_xticks([pd.Timestamp(f"{year}-01-01") for year in yearticks])
+    ax.set_xticklabels(yearticks)
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Displacement [mm]")
+    ax.grid(axis="x", color="0.8")
+    fig.savefig(plot_dir / f"example_1g_expansion_azim.{fmt}", dpi=300)
+    plt.close(fig)
+
+    # for all plotted stations from the wormplot, get the transient, detrended and
+    # seasonal model fits, as well as the residuals
+    ylabels_data = ["East [mm]", "North [mm]", "Up [mm]"]
+    ylabels_comp = ["Nominal [mm]", "Deviation [mm]", "Total [mm]"]
+    for stat_name in subset_stations:
+        # get the noisy data, subtract seasonal, secular and steps
+        temp_ts = net[stat_name]["final"]
+        temp_fits = net[stat_name].fits["final"]
+        temp_mdl = net[stat_name].models["final"]
+        seas_ann = temp_fits["Annual"].data.values + temp_fits["AnnualDev"].data.values
+        seas_biann = temp_fits["Biannual"].data.values + temp_fits["BiannualDev"].data.values
+        trans_data = (temp_ts.data.values - seas_ann - seas_biann -
+                      temp_fits["Linear"].data.values)
+        trans_fit = temp_fits["Transient"].data.values.copy()
+        detrend_data = temp_ts.data.values - temp_fits["Linear"].data.values
+        detrend_fit = temp_fits.allfits.data.values - temp_fits["Linear"].data.values
+        temp_offsets = []
+        for other_model in ["Unknown", "Earthquake", "Maintenance", "Offset"]:
+            if other_model in temp_fits:
+                trans_fit += temp_fits[other_model].data.values
+                detrend_fit -= temp_fits[other_model].data.values
+                detrend_data -= temp_fits[other_model].data.values
+                if other_model == "Offset":
+                    temp_offsets.extend([temp_mdl[other_model].t_start,
+                                         temp_mdl[other_model].t_end])
+                else:
+                    temp_offsets.extend(temp_mdl[other_model].steptimes)
+        # plot transient
+        fig, ax = plt.subplots(nrows=3, sharex=True)
+        for i in range(3):
+            for step in temp_offsets:
+                ax[i].axvline(pd.Timestamp(step), color="C0", linewidth=1, zorder=-1)
+            ax[i].plot(temp_ts.time, trans_data[:, i], rasterized=True,
+                       c="k", ls="none", marker=".", markersize=1)
+            ax[i].plot(temp_ts.time, trans_fit[:, i], c="C1")
+            ax[i].set_ylabel(ylabels_data[i])
+        ax[2].set_xlabel("Time")
+        custom_lines = [Line2D([0], [0], c="k", marker=".", markersize=5, linestyle='none'),
+                        Line2D([0], [0], c="C1")]
+        ax[2].legend(custom_lines, ["Transient + Steps Residual", "Transient + Steps Model"])
+        fig.suptitle(stat_name)
+        fig.savefig(plot_dir / f"example_1h_transient_{stat_name}.{fmt}", dpi=300)
+        plt.close(fig)
+        # plot detrended fit
+        fig, ax = plt.subplots(nrows=3, sharex=True)
+        for i in range(3):
+            for step in temp_offsets:
+                ax[i].axvline(pd.Timestamp(step), color="C0", linewidth=1, zorder=-1)
+            ax[i].plot(temp_ts.time, detrend_data[:, i], rasterized=True,
+                       c="k", ls="none", marker=".", markersize=1)
+            ax[i].plot(temp_ts.time, detrend_fit[:, i], c="C2")
+            ax[i].set_ylabel(ylabels_data[i])
+        ax[2].set_xlabel("Time")
+        custom_lines = [Line2D([0], [0], c="k", marker=".", markersize=5, linestyle='none'),
+                        Line2D([0], [0], c="C2")]
+        ax[2].legend(custom_lines, ["Detrended Residual", "Detrended Model"])
+        fig.suptitle(stat_name)
+        fig.savefig(plot_dir / f"example_1h_detrended_{stat_name}.{fmt}", dpi=300)
+        plt.close(fig)
+        # plot seasonal
+        fig, ax = plt.subplots(nrows=3, sharex=True)
+        seas_max = np.ceil(np.amax(np.abs(seas_ann + seas_biann)))
+        for i in range(3):
+            ax[i].plot(temp_ts.time, seas_ann[:, i], "C0", alpha=0.5)
+            ax[i].plot(temp_ts.time, seas_biann[:, i], "C1", alpha=0.5)
+            ax[i].plot(temp_ts.time, seas_ann[:, i] + seas_biann[:, i], "k")
+            ax[i].set_ylim(-seas_max, seas_max)
+            ax[i].set_ylabel(ylabels_data[i])
+        ax[2].set_xlabel("Time")
+        ax[2].legend([Line2D([0], [0], c="C0", alpha=0.5), Line2D([0], [0], c="C1", alpha=0.5),
+                      Line2D([0], [0], c="k")], ["Annual", "Biannual", "Sum"])
+        fig.suptitle(stat_name)
+        fig.savefig(plot_dir / f"example_1h_seasonal_{stat_name}.{fmt}", dpi=300)
+        plt.close(fig)
+        # plot seasonal by component
+        for i in range(3):
+            fig, ax = plt.subplots(nrows=3, sharex=True)
+            seas_max = np.ceil(np.amax(np.abs(seas_ann[:, i] + seas_biann[:, i])))
+            ax[0].plot(temp_ts.time, temp_fits["Annual"].data.values[:, i], "C0", alpha=0.5)
+            ax[0].plot(temp_ts.time, temp_fits["Biannual"].data.values[:, i], "C1", alpha=0.5)
+            ax[0].plot(temp_ts.time, temp_fits["Annual"].data.values[:, i] +
+                       temp_fits["Biannual"].data.values[:, i], "k")
+            ax[1].plot(temp_ts.time, temp_fits["AnnualDev"].data.values[:, i], "C0", alpha=0.5)
+            ax[1].plot(temp_ts.time, temp_fits["BiannualDev"].data.values[:, i], "C1", alpha=0.5)
+            ax[1].plot(temp_ts.time, temp_fits["AnnualDev"].data.values[:, i] +
+                       temp_fits["BiannualDev"].data.values[:, i], "k")
+            ax[2].plot(temp_ts.time, temp_fits["Annual"].data.values[:, i] +
+                       temp_fits["AnnualDev"].data.values[:, i], "C0", alpha=0.5)
+            ax[2].plot(temp_ts.time, temp_fits["Biannual"].data.values[:, i] +
+                       temp_fits["BiannualDev"].data.values[:, i], "C1", alpha=0.5)
+            ax[2].plot(temp_ts.time, seas_ann[:, i] + seas_biann[:, i], "k")
+            for j in range(3):
+                ax[j].set_ylim(-seas_max, seas_max)
+                ax[j].set_ylabel(ylabels_comp[j])
+            ax[2].set_xlabel("Time")
+            ax[1].legend([Line2D([0], [0], c="C0", alpha=0.5), Line2D([0], [0], c="C1", alpha=0.5),
+                         Line2D([0], [0], c="k")], ["Annual", "Biannual", "Sum"])
+            fig.suptitle(f"{stat_name}: {ylabels_data[i][:-5]}")
+            fig.savefig(plot_dir / (f"example_1h_seasonal_{stat_name}_" +
+                                    f"{ylabels_data[i][:-5].lower()}.{fmt}"), dpi=300)
+            plt.close(fig)
+        # plot residuals
+        fig, ax = plt.subplots(nrows=3, sharex=True)
+        for i in range(3):
+            ax[i].plot(temp_ts.time, net[stat_name]["resid_srw"].data.values[:, i],
+                       linestyle="None", color="0.3", marker="o", markersize=1)
+            ax[i].set_ylabel(ylabels_data[i])
+        ax[2].set_xlabel("Time")
+        fig.suptitle(stat_name)
+        fig.savefig(plot_dir / f"example_1h_residuals_{stat_name}.{fmt}", dpi=300)
+        plt.close(fig)

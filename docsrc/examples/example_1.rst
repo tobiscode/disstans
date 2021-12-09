@@ -38,7 +38,6 @@ Here are the imports we will need throughout the example:
     >>> import numpy as np
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt
-    >>> import cartopy.geodesic as cgeod
     >>> from pathlib import Path
     >>> from scipy.linalg import lstsq
     >>> from matplotlib.lines import Line2D
@@ -69,7 +68,7 @@ need to make on your own machine):
 .. doctest::
 
     >>> os.environ['OMP_NUM_THREADS'] = '1'
-    >>> disstans.config.defaults["general"]["num_threads"] = 8
+    >>> disstans.config.defaults["general"]["num_threads"] = 30
 
 Getting data
 ............
@@ -910,6 +909,9 @@ and the other models, let's have a look at the correlation matrix for the CASA s
 
 .. image:: ../img/example_1e_corr.png
 
+Modeled horizontal transient motion
+-----------------------------------
+
 We can also use the :meth:`~disstans.network.Network.wormplot` method
 (also see :ref:`Tutorial 3 <tutorials/tutorial_3:Transient visualization with worm plots>`)
 to have a closer look at one of the transient periods at the center of the network::
@@ -917,15 +919,23 @@ to have a closer look at one of the transient periods at the center of the netwo
     >>> subset_stations = ["RDOM", "KRAC", "SAWC", "MWTP", "CASA", "CA99", "P639", "HOTK",
     ...                    "P646", "P638", "DDMN", "P634", "KNOL", "MINS", "LINC", "P630",
     ...                    "SHRC", "P631", "TILC", "P642", "BALD", "P648", "WATC", "P632",
-    ...                    "P643", "P647", "P648", "PMTN", "P635", "JNPR", "P645"]
+    ...                    "P643", "P647", "PMTN", "P635", "P645"]
     >>> plot_t_start, plot_t_end = "2012-01-01", "2015-01-01"
     >>> net.wormplot(ts_description=("final", "Transient"),
-                     fname="example_1f",
-                     fname_animation="example_1f.mp4",
-                     t_min=plot_t_start, t_max=plot_t_end, scale=1e2,
-                     subset_stations=subset_stations,
-                     gui_kw_args={"wmts_show": True, "wmts_alpha": 0.5},
-                     colorbar_kw_args={"shrink": 0.5})
+    ...              fname=plot_dir / "example_1f",
+    ...              save_kw_args={"format": fmt, "dpi": 300},
+    ...              fname_animation=plot_dir / "example_1f.mp4",
+    ...              t_min=plot_t_start, t_max=plot_t_end, scale=2e2,
+    ...              subset_stations=subset_stations,
+    ...              lat_min=37.52, lat_max=37.87, lon_min=-119.18, lon_max=-118.56,
+    ...              annotate_stations="small",
+    ...              colorbar_kw_args={"shrink": 0.5},
+    ...              legend_ref_dict={"location": [-118.685, 37.832],
+    ...                               "length": 30,
+    ...                               "label": "30 mm",
+    ...                               "rect_args": [(-118.7, 37.8), 0.1, 0.05],
+    ...                               "rect_kw_args": {"facecolor": [1, 1, 1, 0.15],
+    ...                                                "edgecolor": [0, 0, 0, 0.6]}})
 
 Which yields the following map:
 
@@ -949,6 +959,32 @@ the amplitude and phase from year to year - if we didn't, every significant seas
 captured by the simple :class:`~disstans.models.Sinusoid` model would have been fitted by
 our transient :class:`~disstans.models.SplineSet` model (given the appropriate regularization
 penalty).
+
+We can look at the same information in a different way: by projecting the horizontal motion
+onto the direction of maximum displacement, we can look at many timeseries at the same time
+in a frame that allows a direct comparison (code in the script file).
+The following figure shows the relative transient displacement for selected stations in the
+Long Valley Caldera. The station names are on the left, and the direction of maximum
+displacement is given on the right. (The time period used for the projection is 2012-2015.)
+The colored lines are the model fit, and the black dots are the residuals (centered on the
+transient model fit).
+The temporally coherent expansion is clearly visible:
+
+.. image:: ../img/example_1g_expansion_azim.png
+
+Modeled vertical seasonal motion
+--------------------------------
+
+We can also look at how the seasonal signal ends up being modeled by our
+time-varying-amplitude sinusoid (again, code in the script file).
+Here is just an example plot for the vertical component at station KNOL:
+
+.. image:: ../img/example_1h_seasonal_KNOL_up.png
+
+The nominal component in the top panel, the deviation in the middle panel, and the sum of the
+two in the bottom panel.
+Clearly, the model adapts to yearly amplitude variations, and even allows for shortterm phase
+changes.
 
 
 Comparison of secular velocities
