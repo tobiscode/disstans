@@ -1,78 +1,38 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Example 1: Long Valley Caldera Transient Motions &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Example 1: Long Valley Caldera Transient Motions &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="DISSTANS" href="../disstans.html" />
     <link rel="prev" title="Examples" href="../examples.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,22 +40,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -138,6 +90,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
@@ -154,6 +113,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
@@ -162,11 +123,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -175,19 +137,22 @@
 <li class="toctree-l2"><a class="reference internal" href="../disstans/models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -197,8 +162,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#classes">Classes</a><ul>
@@ -208,17 +174,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -240,25 +202,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -267,75 +230,37 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../examples.html">Examples</a> &raquo;</li>
-        
       <li>Example 1: Long Valley Caldera Transient Motions</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/examples/example_1.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="example-1-long-valley-caldera-transient-motions">
-<h1>Example 1: Long Valley Caldera Transient Motions<a class="headerlink" href="#example-1-long-valley-caldera-transient-motions" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="example-1-long-valley-caldera-transient-motions">
+<h1>Example 1: Long Valley Caldera Transient Motions<a class="headerlink" href="#example-1-long-valley-caldera-transient-motions" title="Permalink to this headline"></a></h1>
+<aside class="sidebar">
+<p class="sidebar-title">Download full script</p>
+<p><a class="reference download internal" download="" href="../_downloads/9be36589c021d054ce504486aa37fab6/example_1_longvalleycaldera.py"><code class="xref download docutils literal notranslate"><span class="pre">example_1_longvalleycaldera.py</span></code></a></p>
+</aside>
 <p>The <a class="reference external" href="https://en.wikipedia.org/wiki/Long_Valley_Caldera">Long Valley Caldera</a> region in
 California is a good example to show the capabilities of DISSTANS of separating different signals
 from geodetic timeseries. Most prominently, it exhibits transient motions associated with
@@ -346,7 +271,7 @@ that arise due to equipment changes or earthquakes, even though they appear to b
 as we will see later. Today, the data is for example accessible through the
 University of Nevada at Reno’s <a class="reference external" href="http://geodesy.unr.edu/">Nevada Geodetic Laboratory</a>.</p>
 <div class="contents local topic" id="table-of-contents">
-<p class="topic-title first">Table of contents</p>
+<p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id3">Preparations</a></p>
 <ul>
@@ -362,9 +287,11 @@ University of Nevada at Reno’s <a class="reference external" href="http://geod
 </ul>
 </li>
 <li><p><a class="reference internal" href="#model-parameter-estimation" id="id10">Model parameter estimation</a></p></li>
-<li><p><a class="reference internal" href="#comparison-of-secular-velocities" id="id11">Comparison of secular velocities</a></p></li>
-<li><p><a class="reference internal" href="#final-considerations" id="id12">Final considerations</a></p></li>
-<li><p><a class="reference internal" href="#references" id="id13">References</a></p></li>
+<li><p><a class="reference internal" href="#modeled-horizontal-transient-motion" id="id11">Modeled horizontal transient motion</a></p></li>
+<li><p><a class="reference internal" href="#modeled-vertical-seasonal-motion" id="id12">Modeled vertical seasonal motion</a></p></li>
+<li><p><a class="reference internal" href="#comparison-of-secular-velocities" id="id13">Comparison of secular velocities</a></p></li>
+<li><p><a class="reference internal" href="#final-considerations" id="id14">Final considerations</a></p></li>
+<li><p><a class="reference internal" href="#references" id="id15">References</a></p></li>
 </ul>
 </div>
 <div class="admonition note">
@@ -376,16 +303,18 @@ of our abilities and then perform a fit, that fit might not be the best one.
 Using the fit to get a better understanding of our noise, and how to model
 signals, can in turn motivate another cleaning and fitting step.</p>
 </div>
-<div class="section" id="preparations">
-<h2><a class="toc-backref" href="#id3">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this headline">¶</a></h2>
+<section id="preparations">
+<h2><a class="toc-backref" href="#id3">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this headline"></a></h2>
 <p>Here are the imports we will need throughout the example:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">disstans</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">lstsq</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="kn">import</span> <span class="n">Line2D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">disstans</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.tools</span> <span class="kn">import</span> <span class="n">tvec_to_numpycol</span><span class="p">,</span> <span class="n">full_cov_mat_to_columns</span>
 </pre></div>
 </div>
 <p>We will also need two folders, one parent one, and one where the individual timeseries
@@ -394,26 +323,24 @@ files will be downloaded into:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">main_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;proj_dir&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">main_dir</span> <span class="o">/</span> <span class="s2">&quot;data/gnss&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gnss_dir</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;longvalley&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;../img&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">plot_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">plot_dir</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is recommended that you use an absolute path for <code class="docutils literal notranslate"><span class="pre">main_dir</span></code> since this path will
 be part of the internal database we keep of the downloaded files, and executing this
-example code then in a different folder will break the relative links.</p>
+example code then in a different folder will break the relative links.
+(In my test system, <code class="docutils literal notranslate"><span class="pre">proj_dir</span></code> is a symbolic link.)</p>
 </div>
 <p>To use multiple threads, we use the same code as in
 <a class="reference internal" href="../tutorials/tutorial_3.html#preparations"><span class="std std-ref">Tutorial 3</span></a> (see there for changes you might
 need to make on your own machine):</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">disstans</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;num_threads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">disstans</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;num_threads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
 </pre></div>
 </div>
-<div class="section" id="getting-data">
-<h3><a class="toc-backref" href="#id4">Getting data</a><a class="headerlink" href="#getting-data" title="Permalink to this headline">¶</a></h3>
+<section id="getting-data">
+<h3><a class="toc-backref" href="#id4">Getting data</a><a class="headerlink" href="#getting-data" title="Permalink to this headline"></a></h3>
 <p>DISSTANS includes the <a class="reference internal" href="../disstans/tools.html#disstans.tools.download_unr_data" title="disstans.tools.download_unr_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">download_unr_data()</span></code></a> function to automatically
 download timeseries files from the UNR servers, the
 <a class="reference internal" href="../disstans/timeseries.html#disstans.timeseries.UNRTimeseries" title="disstans.timeseries.UNRTimeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">UNRTimeseries</span></code></a> class to load the files, and the
@@ -429,7 +356,7 @@ Feel free to check out their documentation for options used or not used here.</p
 <p>We now download the data into the data directory, only using stations that have a minimum
 number of observations:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stations_df</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">download_unr_data</span><span class="p">(</span><span class="n">station_bbox</span><span class="p">,</span> <span class="n">gnss_dir</span><span class="p">,</span>
-<span class="gp">... </span>                                             <span class="n">min_solutions</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>                                               <span class="n">min_solutions</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">Making sure ...</span>
 <span class="go">Downloading station list ...</span>
 <span class="go">List of stations to download: ...</span>
@@ -448,9 +375,9 @@ save the dataframe now, and load it the next time we use the data:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stations_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gnss_dir</span><span class="si">}</span><span class="s2">/downloaded.pkl.gz&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="building-the-network">
-<h3><a class="toc-backref" href="#id5">Building the network</a><a class="headerlink" href="#building-the-network" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="building-the-network">
+<h3><a class="toc-backref" href="#id5">Building the network</a><a class="headerlink" href="#building-the-network" title="Permalink to this headline"></a></h3>
 <p>First off, we instantiate a <a class="reference internal" href="../disstans/network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> object:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s2">&quot;LVC&quot;</span><span class="p">)</span>
 </pre></div>
@@ -492,18 +419,18 @@ strongly affected by seasonal signals.</p></li>
 P628, P723) also exhibit unphysical behavior in the winter times, possible related to
 snowfall.</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="cleaning-the-timeseries">
-<h2><a class="toc-backref" href="#id6">Cleaning the timeseries</a><a class="headerlink" href="#cleaning-the-timeseries" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="cleaning-the-timeseries">
+<h2><a class="toc-backref" href="#id6">Cleaning the timeseries</a><a class="headerlink" href="#cleaning-the-timeseries" title="Permalink to this headline"></a></h2>
 <p>In this step, we want to make sure that we will not use data with either a high noise floor,
 or exhibiting behavior that we do not want to (or are not able) to model properly.
 Both conditions would deteriorate our solution process later on, and while in general,
 singular bad fits at individual stations can just be ignored afterwards, the fact that
 we want to use a spatially-coherent solver, means that extremely bad fits at one station
 can affect other stations as well.</p>
-<div class="section" id="outlier-and-cme-removal">
-<h3><a class="toc-backref" href="#id7">Outlier and CME removal</a><a class="headerlink" href="#outlier-and-cme-removal" title="Permalink to this headline">¶</a></h3>
+<section id="outlier-and-cme-removal">
+<h3><a class="toc-backref" href="#id7">Outlier and CME removal</a><a class="headerlink" href="#outlier-and-cme-removal" title="Permalink to this headline"></a></h3>
 <p>Outlier removal is done with the <a class="reference internal" href="../disstans/processing.html#disstans.processing.clean" title="disstans.processing.clean"><code class="xref py py-func docutils literal notranslate"><span class="pre">clean()</span></code></a> function using the raw
 timeseries and a reference timeseries, accessed as a one-liner through
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_func_no_return" title="disstans.network.Network.call_func_no_return"><code class="xref py py-meth docutils literal notranslate"><span class="pre">call_func_no_return()</span></code></a>.
@@ -518,18 +445,19 @@ at all stations with <a class="reference internal" href="../disstans/network.htm
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># get the residual for each station</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">math</span><span class="p">(</span><span class="s2">&quot;raw_filt_res&quot;</span><span class="p">,</span> <span class="s2">&quot;raw_clean&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;raw_filt&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># remove obsolete timeseries</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">remove_timeseries</span><span class="p">(</span><span class="s2">&quot;raw_clean&quot;</span><span class="p">,</span> <span class="s2">&quot;raw_filt&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">remove_timeseries</span><span class="p">(</span><span class="s2">&quot;raw_filt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, similar to <a class="reference internal" href="../tutorials/tutorial_3.html#removing-the-common-mode-error"><span class="std std-ref">Tutorial 3</span></a>,
 we estimate and remove the Common Mode Error:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># calculate common mode</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">call_netwide_func</span><span class="p">(</span><span class="s2">&quot;common_mode&quot;</span><span class="p">,</span> <span class="n">ts_in</span><span class="o">=</span><span class="s2">&quot;raw_filt_res&quot;</span><span class="p">,</span> <span class="n">ts_out</span><span class="o">=</span><span class="s2">&quot;common&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ica&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">call_netwide_func</span><span class="p">(</span><span class="s2">&quot;decompose&quot;</span><span class="p">,</span> <span class="n">ts_in</span><span class="o">=</span><span class="s2">&quot;raw_filt_res&quot;</span><span class="p">,</span> <span class="n">ts_out</span><span class="o">=</span><span class="s2">&quot;common&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ica&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># now remove the common mode, call it the &quot;intermed&quot; timeseries,</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">net</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">station</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="s2">&quot;intermed&quot;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;common&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">station</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="s2">&quot;intermed&quot;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;raw_clean&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;common&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                           <span class="n">override_data_cols</span><span class="o">=</span><span class="n">station</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="k">del</span> <span class="n">station</span><span class="p">[</span><span class="s2">&quot;common&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># remove obsolete timeseries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">remove_timeseries</span><span class="p">(</span><span class="s2">&quot;common&quot;</span><span class="p">,</span> <span class="s2">&quot;raw_clean&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># clean again</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">call_func_ts_return</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">ts_in</span><span class="o">=</span><span class="s2">&quot;intermed&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                        <span class="n">ts_out</span><span class="o">=</span><span class="s2">&quot;intermed_filt&quot;</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -543,13 +471,13 @@ than the original one, so we copy it over:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">copy_uncertainties</span><span class="p">(</span><span class="n">origin_ts</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="n">target_ts</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="first-pass-major-steps-and-noisy-periods">
-<h3><a class="toc-backref" href="#id8">First pass: major steps and noisy periods</a><a class="headerlink" href="#first-pass-major-steps-and-noisy-periods" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="first-pass-major-steps-and-noisy-periods">
+<h3><a class="toc-backref" href="#id8">First pass: major steps and noisy periods</a><a class="headerlink" href="#first-pass-major-steps-and-noisy-periods" title="Permalink to this headline"></a></h3>
 <p>Now that we have a cleaner timeseries to start from, we will try to identify as many
 steps in the timeseries as possible, with the least amount of user interaction.
-In order to do that, we first have to estimate and remove the dominant signal in the
-timeseries: the seasonal (sinusoidal) and secular (linear plate motion) component.</p>
+In order to do that, we first have to estimate and remove the dominant signals in the
+timeseries: the seasonal (sinusoid) and secular (linear plate motion) components.</p>
 <p>This means we have to add models to the <code class="docutils literal notranslate"><span class="pre">'final'</span></code> timeseries at all stations.
 In the <a class="reference internal" href="../tutorials.html"><span class="doc">Tutorials</span></a>, this was done individually for each station using
 a loop and explicitly instantiating <a class="reference internal" href="../disstans/models.html#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> objects, and then
@@ -562,10 +490,10 @@ explicit access to the individual fitted parameters anytime soon, so we can skip
 of the work and instead just define the models using keyword dictionaries, taking
 advantage of the <a class="reference internal" href="../disstans/network.html#disstans.network.Network.add_local_models" title="disstans.network.Network.add_local_models"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_local_models()</span></code></a> that will do all
 of the instantiating and assigning for us:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Annual&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Sinusoidal&quot;</span><span class="p">,</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Annual&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Sinusoid&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                     <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mf">365.25</span><span class="p">,</span>
 <span class="gp">... </span>                                 <span class="s2">&quot;t_reference&quot;</span><span class="p">:</span> <span class="s2">&quot;2000-01-01&quot;</span><span class="p">}},</span>
-<span class="gp">... </span>          <span class="s2">&quot;Biannual&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Sinusoidal&quot;</span><span class="p">,</span>
+<span class="gp">... </span>          <span class="s2">&quot;Biannual&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Sinusoid&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mf">365.25</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>                                   <span class="s2">&quot;t_reference&quot;</span><span class="p">:</span> <span class="s2">&quot;2000-01-01&quot;</span><span class="p">}},</span>
 <span class="gp">... </span>          <span class="s2">&quot;Linear&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Polynomial&quot;</span><span class="p">,</span>
@@ -609,20 +537,20 @@ works and keyword descriptions):</p>
 <p>There are two ways of inspecting the outputs now. First, we can of course just
 print the results:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">step_table</span><span class="p">)</span>
-<span class="go">     station       time  probability           var0        var1    varred</span>
-<span class="go">2810    TILC 2008-07-27   430.576096   16394.763582   13.578651  0.999172</span>
-<span class="go">558     LINC 1998-09-15   406.045023  433110.331209    6.933579  0.999984</span>
-<span class="go">318     DOND 2016-04-20   226.769239     469.398525   10.982792  0.976602</span>
-<span class="go">2835    WATC 2002-06-18   214.373441     414.922101   11.895713  0.971330</span>
-<span class="go">2833    WATC 2002-04-04   197.731203     420.311464   15.830000  0.962337</span>
-<span class="gp">... </span>     <span class="o">...</span>        <span class="o">...</span>          <span class="o">...</span>            <span class="o">...</span>         <span class="o">...</span>       <span class="o">...</span>
-<span class="go">2465    P723 2014-04-15    20.018362       1.391209    0.965035  0.306333</span>
-<span class="go">942     MWTP 2009-12-22    20.011034       1.954425    1.355882  0.306250</span>
-<span class="go">1645    P636 2012-03-29    20.007697       4.041380    2.803860  0.306212</span>
-<span class="go">2279    P651 2009-10-14    20.003098       0.767700    0.532661  0.306160</span>
-<span class="go">813     MUSB 2001-03-02    20.002943     982.519810  681.713457  0.306158</span>
+<span class="go">     station       time  probability           var0       var1    varred</span>
+<span class="go">2803    TILC 2008-07-27   432.592147   16398.517922  13.140219  0.999199</span>
+<span class="go">554     LINC 1998-09-15   407.113500  433129.225394   6.736510  0.999984</span>
+<span class="go">323     DOND 2016-04-20   226.227819     469.133121  11.074441  0.976394</span>
+<span class="go">2828    WATC 2002-06-18   214.896877     414.423305  11.779896  0.971575</span>
+<span class="go">2826    WATC 2002-04-04   194.728898     421.507356  16.675928  0.960437</span>
+<span class="gp">... </span>     <span class="o">...</span>        <span class="o">...</span>          <span class="o">...</span>            <span class="o">...</span>        <span class="o">...</span>       <span class="o">...</span>
+<span class="go">1254    P627 2007-12-17    20.007536       1.051037   0.729199  0.306210</span>
+<span class="go">114     CA99 2008-11-04    20.005889      16.810578  11.663321  0.306192</span>
+<span class="go">1085    P311 2011-05-25    20.002984      15.671794  10.873741  0.306159</span>
+<span class="go">2238    P650 2010-04-13    20.002579       1.763096   1.223317  0.306154</span>
+<span class="go">524     KRAC 2010-03-17    20.001845      26.343070  18.278256  0.306146</span>
 
-<span class="go">[2886 rows x 6 columns]</span>
+<span class="go">[2883 rows x 6 columns]</span>
 </pre></div>
 </div>
 <p>To get an intuition what those numbers translate to in the timeseries, we can use
@@ -633,19 +561,19 @@ we will see that the low probabilities are most likely false detections:</p>
 </pre></div>
 </div>
 <p>So instead, for a first look at the major steps that we will need to model, let’s
-restrict ourselves to a subset of th table where the variance reduction is more than 90%:</p>
+restrict ourselves to a subset of the table where the variance reduction is more than 90%:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">step_table_above90</span> <span class="o">=</span> <span class="n">step_table</span><span class="p">[</span><span class="n">step_table</span><span class="p">[</span><span class="s2">&quot;varred&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.9</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">step_table_above90</span><span class="p">)</span>
 <span class="go">     station       time  probability           var0        var1    varred</span>
-<span class="go">2810    TILC 2008-07-27   430.576096   16394.763582   13.578651  0.999172</span>
-<span class="go">558     LINC 1998-09-15   406.045023  433110.331209    6.933579  0.999984</span>
-<span class="go">318     DOND 2016-04-20   226.769239     469.398525   10.982792  0.976602</span>
-<span class="go">2835    WATC 2002-06-18   214.373441     414.922101   11.895713  0.971330</span>
-<span class="go">2833    WATC 2002-04-04   197.731203     420.311464   15.830000  0.962337</span>
-<span class="go">1372    P628 2017-01-08   167.892556    1898.938320  116.643148  0.938575</span>
-<span class="go">1373    P628 2017-01-09   151.101501    1867.769472  151.083464  0.919110</span>
-<span class="go">1644    P636 2011-09-15   145.391462      646.48758   57.425784  0.911173</span>
-<span class="go">1388    P628 2019-04-28   144.992411    1410.977951  126.156042  0.910590</span>
+<span class="go">2803    TILC 2008-07-27   432.592147   16398.517922   13.140219  0.999199</span>
+<span class="go">554     LINC 1998-09-15   407.113500  433129.225394    6.736510  0.999984</span>
+<span class="go">323     DOND 2016-04-20   226.227819     469.133121   11.074441  0.976394</span>
+<span class="go">2828    WATC 2002-06-18   214.896877     414.423305   11.779896  0.971575</span>
+<span class="go">2826    WATC 2002-04-04   194.728898     421.507356   16.675928  0.960437</span>
+<span class="go">1367    P628 2017-01-08   168.021602    1902.333674  116.604770  0.938704</span>
+<span class="go">1368    P628 2017-01-09   151.188220    1871.194656  151.145501  0.919225</span>
+<span class="go">1642    P636 2011-09-15   145.406735     645.981933   57.366504  0.911195</span>
+<span class="go">1383    P628 2019-04-28   144.924585    1412.259909  126.411142  0.910490</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">timeseries</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">mark_events</span><span class="o">=</span><span class="n">step_table_above90</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -669,14 +597,15 @@ be more complete.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;TILC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                            <span class="n">model_description</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                            <span class="n">model</span><span class="o">=</span><span class="n">disstans</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Step</span><span class="p">([</span><span class="s2">&quot;2008-07-26&quot;</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;LINC&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                            <span class="n">model_description</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                            <span class="n">model</span><span class="o">=</span><span class="n">disstans</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Step</span><span class="p">([</span><span class="s2">&quot;1998-09-13&quot;</span><span class="p">]))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;DOND&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                            <span class="n">model_description</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                            <span class="n">model</span><span class="o">=</span><span class="n">disstans</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Step</span><span class="p">([</span><span class="s2">&quot;2016-04-20&quot;</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;LINC&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;1998-09-13&quot;</span><span class="p">,</span> <span class="n">keep_inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Note that here, we’ve just removed the little bit of early data at LINC instead of adding a
+step, because we don’t expect the early data to significantly improve our model inversion
+as a whole.</p>
 <p>Slightly different is WATC with a clear offset, but then also returning to its previous value:</p>
 <img alt="../_images/example_1b_WATC.png" src="../_images/example_1b_WATC.png" />
 <p>Where we can add the two steps as follows</p>
@@ -717,7 +646,7 @@ to problems if we have cases like P636 and P628, where adding a step would be wr
 <p>After adding those major steps and removing noisy parts of the data, we are almost ready
 to fit the models again. However, by clicking through the stations (and potentially
 aided by the GUI’s <code class="docutils literal notranslate"><span class="pre">rms_on_map</span></code> option), we see that there are sometimes significant
-longterm transients that aren’t captured by the purely linear and sinusoidal models.
+longterm transients that aren’t captured by the purely linear and sinusoid models.
 To estimate the major trends as well (again to allow for a better step detecting process),
 we add some longterm, unregularized spline models:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">longterm_transient_mdl</span> <span class="o">=</span> \
@@ -750,11 +679,11 @@ understanding of how large the residuals are by looking at their root-mean-squar
 station, and then sort the stations according to that. The first five entries are now:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resids_df</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 <span class="go">Station</span>
-<span class="go">P723    19.295915</span>
-<span class="go">CASA    13.522229</span>
-<span class="go">MUSB    11.264618</span>
-<span class="go">JNPR    10.026878</span>
-<span class="go">KNOL     9.999189</span>
+<span class="go">P723    19.298688</span>
+<span class="go">CASA    13.519355</span>
+<span class="go">MUSB    11.264231</span>
+<span class="go">KNOL     9.993418</span>
+<span class="go">JNPR     9.973603</span>
 <span class="go">Name: total, dtype: float64</span>
 </pre></div>
 </div>
@@ -791,9 +720,21 @@ but no strong, coherent periods of noise offsets like before.</p>
 of each other, and it’s impossible to select CASA by clicking on it. We can use
 the GUI’s <code class="docutils literal notranslate"><span class="pre">station</span></code> keyword though to pre-select a station.</p>
 </div>
+<p>Finally, just like we had the case of LINC earlier where there was a little bit of data and
+a gap at the very beginning of our timeseries, we can see with the GUI that a couple of other
+stations have these early gaps after noisy data as well. Let’s remove them so that they don’t
+unnecessarily confuse the rest of the model inversion (alternatively, we could include a Step
+model to fit the potential offset that is there):</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;MINS&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;1997-06-01&quot;</span><span class="p">,</span> <span class="n">keep_inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;MWTP&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;1999-01-01&quot;</span><span class="p">,</span> <span class="n">keep_inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;KNOL&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;1999-01-01&quot;</span><span class="p">,</span> <span class="n">keep_inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;RDOM&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;1999-09-01&quot;</span><span class="p">,</span> <span class="n">keep_inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;SHRC&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;2006-03-01&quot;</span><span class="p">,</span> <span class="n">keep_inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="second-pass-minor-catalog-based-steps">
-<h3><a class="toc-backref" href="#id9">Second pass: minor, catalog-based steps</a><a class="headerlink" href="#second-pass-minor-catalog-based-steps" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="second-pass-minor-catalog-based-steps">
+<h3><a class="toc-backref" href="#id9">Second pass: minor, catalog-based steps</a><a class="headerlink" href="#second-pass-minor-catalog-based-steps" title="Permalink to this headline"></a></h3>
 <p>After removing major steps and noisy periods in the previous section, we will now do one
 last unregularized fit to the data, which we will use to look for minor steps, this time
 aided by UNR’s step file.</p>
@@ -811,8 +752,8 @@ aided by UNR’s step file.</p>
 two separate tables - one for the maintenance events, and one for potential earthquake events:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">unr_maint_table</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">unr_eq_table</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
 <span class="gp">... </span>    <span class="n">disstans</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">parse_unr_steps</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">/unr_steps.txt&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="gp">... </span>                                 <span class="n">only_stations</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">station_names</span><span class="p">)</span>
+<span class="gp">... </span>                                   <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="n">only_stations</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">station_names</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="go">Maintenance descriptions:</span>
 <span class="gp">...</span>
@@ -856,21 +797,20 @@ pairs that are present in both:</p>
 <code class="docutils literal notranslate"><span class="pre">merged_table[merged_table[&quot;merged&quot;]</span> <span class="pre">!=</span> <span class="pre">&quot;left_only&quot;]</span></code>, which are:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">merged_table</span><span class="p">[</span><span class="n">merged_table</span><span class="p">[</span><span class="s2">&quot;merged&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;left_only&quot;</span><span class="p">])</span>
 <span class="go">     station       time  probability       var0      var1    varred merged</span>
-<span class="go">3       P469 2019-07-06    89.776302   2.702982  0.597512  0.778943   both</span>
-<span class="go">14      P652 2020-05-15    64.012249   1.312560  0.442641  0.662765   both</span>
-<span class="go">28      P627 2020-05-15    57.215089   2.348083  0.885195  0.623014   both</span>
-<span class="go">38      P726 2019-07-06    52.866674   1.905756  0.771528  0.595159   both</span>
-<span class="go">130     P627 2020-10-13    41.986505  16.479038  7.974044  0.516110   both</span>
-<span class="go">196     P652 2019-07-06    38.507224   1.119373  0.573446  0.487708   both</span>
-<span class="go">633     P651 2020-05-15    29.852991   1.533274  0.905215  0.409619   both</span>
-<span class="go">636     P653 2019-07-06    29.824847   1.007099  0.594846  0.409347   both</span>
-<span class="go">891     P650 2020-05-15    27.183701   0.882732  0.544460  0.383211   both</span>
-<span class="go">1581    P311 2019-07-06    23.548194   0.464483  0.304081  0.345334   both</span>
-<span class="go">2360    P651 2019-07-06    21.000839   0.955014  0.651877  0.317416   both</span>
-<span class="go">2626    WATC 2019-07-06    20.285183   1.235032  0.852961  0.309361   both</span>
+<span class="go">3       P469 2019-07-06    89.232324   2.665930  0.594600  0.776963   both</span>
+<span class="go">13      P652 2020-05-15    63.770193   1.314950  0.445210  0.661424   both</span>
+<span class="go">27      P627 2020-05-15    57.036696   2.352315  0.889388  0.621910   both</span>
+<span class="go">42      P726 2019-07-06    51.874552   1.888100  0.776914  0.588521   both</span>
+<span class="go">123     P627 2020-10-13    42.560855  16.570964  7.943382  0.520645   both</span>
+<span class="go">217     P652 2019-07-06    37.581517   1.104752  0.574610  0.479874   both</span>
+<span class="go">596     P651 2020-05-15    30.160953   1.543170  0.906470  0.412592   both</span>
+<span class="go">762     P653 2019-07-06    28.413357   0.996481  0.602353  0.395520   both</span>
+<span class="go">879     P650 2020-05-15    27.262764   0.880887  0.542617  0.384010   both</span>
+<span class="go">1946    P311 2019-07-06    22.124524   0.447579  0.299934  0.329875   both</span>
+<span class="go">2703    P651 2019-07-06    20.063574   0.941452  0.652570  0.306847   both</span>
 </pre></div>
 </div>
-<p>So only 12 entries in our <code class="docutils literal notranslate"><span class="pre">step_table</span></code> have an easy explanation, leaving the entries
+<p>So only a couple of entries in our <code class="docutils literal notranslate"><span class="pre">step_table</span></code> have an easy explanation, leaving the entries
 in <code class="docutils literal notranslate"><span class="pre">unknown_table</span></code> either as false detections, or steps with unknown causes.</p>
 <p>Because there are too many events in all three tables now to look at all of them
 individually (already for this relatively small network), we need to start making
@@ -936,7 +876,7 @@ just a day or two off from maintenance steps which we will take care of, and mos
 them, even above a probability of 60 or 70, are actually false or uncertain detections
 we should probably skip. One exception is KRAC, where we have another step-and-reverse
 event similar to the previous section. We could again just cut out the affected timespan,
-but for purely example reasons, we’re instead going to add a model that will model
+but for purely example reasons, we’re instead going to add a model that will estimate
 this temporary offset. We craft this particular model with a constant
 <a class="reference internal" href="../disstans/models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a> with a set start and end date, and setting it to zero
 outside it’s active period. (We could also use a <a class="reference internal" href="../disstans/models.html#disstans.models.Step" title="disstans.models.Step"><code class="xref py py-class docutils literal notranslate"><span class="pre">Step</span></code></a> model with
@@ -955,10 +895,10 @@ an end date, or write a new <a class="reference internal" href="../disstans/mode
 <p>We could loop back now and do a fourth unregularized linear regression solution,
 checking again for too many or too few steps, which may be necessary for publication-grade
 fitting quality. For the purposes of this example, we will move on, however.</p>
-</div>
-</div>
-<div class="section" id="model-parameter-estimation">
-<h2><a class="toc-backref" href="#id10">Model parameter estimation</a><a class="headerlink" href="#model-parameter-estimation" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="model-parameter-estimation">
+<h2><a class="toc-backref" href="#id10">Model parameter estimation</a><a class="headerlink" href="#model-parameter-estimation" title="Permalink to this headline"></a></h2>
 <p>Now we’re ready to do a full, spatially-coherent estimation of model parameters.
 For that, we first remove the unregularized long-term transient model we added in
 the previous section for a better step detection:</p>
@@ -966,46 +906,79 @@ the previous section for a better step detection:</p>
 <span class="gp">... </span>    <span class="n">stat</span><span class="o">.</span><span class="n">remove_local_models</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;Longterm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>And we add a new Transient model with a larger range of timescales:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_trans</span> <span class="o">=</span> \
+<p>We now add two two types of models. First, a new Transient model with a larger range of
+timescales, that will be used to fit all the non-seasonal transient deformation.
+Second, we want to be able to capture variations in the amplitude and phase of the
+seasonal signal we’re estimating (since they vary significantly with the weather
+conditions, and would otherwise just contaminate our Transient model).</p>
+<p>For the first model, we already know that we can use the <a class="reference internal" href="../disstans/models.html#disstans.models.SplineSet" title="disstans.models.SplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineSet</span></code></a>
+class, just like we did above. For the second model, we use the
+<a class="reference internal" href="../disstans/models.html#disstans.models.AmpPhModulatedSinusoid" title="disstans.models.AmpPhModulatedSinusoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">AmpPhModulatedSinusoid</span></code></a> class, which doesn’t estimate a single
+pair of amplitude and phase for the entire timespan, but models the time history of
+amplitude and phase using a full B-Spline basis function set. We will regularize this
+model as well, but keep it at the standard L1-regularization without any L0 sparsity
+constraint, because we don’t expect the signal to be sparse in the first place, but want
+to keep some sort of regularization to not make the fit explode. The number of bases,
+as well as the total timespan, is set so that there is exactly one basis per year.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_models</span> <span class="o">=</span> \
 <span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;Transient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SplineSet&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                   <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="s2">&quot;t_center_start&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="s2">&quot;CASA&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
 <span class="gp">... </span>                               <span class="s2">&quot;t_center_end&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">[</span><span class="s2">&quot;CA99&quot;</span><span class="p">][</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
-<span class="gp">... </span>                               <span class="s2">&quot;list_num_knots&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]}}}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_local_models</span><span class="p">(</span><span class="n">models</span><span class="o">=</span><span class="n">mdl_trans</span><span class="p">,</span> <span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">)</span>
+<span class="gp">... </span>                               <span class="s2">&quot;list_num_knots&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]}},</span>
+<span class="gp">... </span>     <span class="s2">&quot;AnnualDev&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;AmpPhModulatedSinusoid&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mf">365.25</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="s2">&quot;num_bases&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="s2">&quot;t_start&quot;</span><span class="p">:</span> <span class="s2">&quot;1994-01-01&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                               <span class="s2">&quot;t_end&quot;</span><span class="p">:</span> <span class="s2">&quot;2022-01-01&quot;</span><span class="p">}},</span>
+<span class="gp">... </span>     <span class="s2">&quot;BiannualDev&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;AmpPhModulatedSinusoid&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mf">365.25</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;num_bases&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;t_start&quot;</span><span class="p">:</span> <span class="s2">&quot;1994-01-01&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;t_end&quot;</span><span class="p">:</span> <span class="s2">&quot;2022-01-01&quot;</span><span class="p">}}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_local_models</span><span class="p">(</span><span class="n">new_models</span><span class="p">,</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Similar to
-<a class="reference internal" href="../tutorials/tutorial_3.html#fitting-the-data-using-a-spatially-aware-l1-reweighting"><span class="std std-ref">Tutorial 3</span></a>
-we now create the <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.SpatialSolver" title="disstans.solvers.SpatialSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialSolver</span></code></a> object:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spatsol</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">SpatialSolver</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span>
+<p>This time, we specify a reweighting function explicitly for the spatial solution:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">InverseReweighting</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This time, we also specify our reweighting function explicitly:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">InverseReweighting</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Finally, we can run the estimation:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spatsol</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">penalty</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
-<span class="gp">... </span>              <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">extended_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>Finally, we can run the estimation. Note that we’re doing a couple of things:</p>
+<ul class="simple">
+<li><p>We have a different penalty parameter for every component, based on the fact that
+the Up component is usually much noisier.</p></li>
+<li><p>We do not include the seasonal deviation models in either <code class="docutils literal notranslate"><span class="pre">spatial_reweight_models</span></code>
+(or <code class="docutils literal notranslate"><span class="pre">continuous_reweight_models</span></code>, not discussed here), which means that this model
+will be L1-regularized.</p></li>
+<li><p>We want to see the <code class="docutils literal notranslate"><span class="pre">extended_stats</span></code> during the fit, and save them in the <code class="docutils literal notranslate"><span class="pre">stats</span></code>
+variable.</p></li>
+<li><p>We save ourselves the follow-up calls to evaluate the model to get a fit, and to
+calculate the residual timeseries, by specifying <code class="docutils literal notranslate"><span class="pre">keep_mdl_res_as</span></code> (because
+<code class="docutils literal notranslate"><span class="pre">extended_stats</span></code> already has to calculate those anyway, but wouldn’t otherwise
+keep them).</p></li>
+</ul>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">spatialfit</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">extended_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">keep_mdl_res_as</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;model_srw&quot;</span><span class="p">,</span> <span class="s2">&quot;resid_srw&quot;</span><span class="p">))</span>
 <span class="go">Calculating scale lengths</span>
+<span class="go">Distance percentiles in km (5-50-95): [7.5, 41.6, 104.2]</span>
 <span class="go">Initial fit</span>
 <span class="gp">...</span>
 <span class="go">Done</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;model_srw&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">math</span><span class="p">(</span><span class="s2">&quot;resid_srw&quot;</span><span class="p">,</span> <span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;model_srw&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We again see from the verbose progress output how the spatial sparsity is
 well enforced, and the solver converges.</p>
-<p>For a (relatively) quick first fit, we used <code class="docutils literal notranslate"><span class="pre">use_data_covariance=False</span></code>, but for a
+<p>For a (relatively) quick first fit, we can use <code class="docutils literal notranslate"><span class="pre">use_data_covariance=False</span></code>, but for a
 final result, the data covariance should be taken into account. Using the GUI, we can
 again get a first impression of the quality of the fit:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">station</span><span class="o">=</span><span class="s2">&quot;CASA&quot;</span><span class="p">,</span>
@@ -1026,25 +999,49 @@ which makes the transient periods very obvious:</p>
 <img alt="../_images/example_1e_transient.png" src="../_images/example_1e_transient.png" />
 <p>(We suppressed the plotting of the uncertainty since the formal variance for only a single
 model has limited interpretability.)</p>
+<p>We can do the same to have a look at the joint seasonal models:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">station</span><span class="o">=</span><span class="s2">&quot;CASA&quot;</span><span class="p">,</span> <span class="n">timeseries</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">sum_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">fit_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">,</span> <span class="s2">&quot;AnnualDev&quot;</span><span class="p">,</span> <span class="s2">&quot;Biannual&quot;</span><span class="p">,</span> <span class="s2">&quot;BiannualDev&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">gui_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;plot_sigmas&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Giving us:</p>
+<img alt="../_images/example_1e_seasonal.png" src="../_images/example_1e_seasonal.png" />
+<p>Even though in this plot it is somewhat hard to see, the seasonal signal has an amplitude
+that changes slightly based on the observations, just as desired.</p>
 <p>To once again remind that there is always a trade-off between the transient spline signal
 and the other models, let’s have a look at the correlation matrix for the CASA station:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;CASA&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot_covariance</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">plot_dir</span> <span class="o">/</span> <span class="s2">&quot;example_1e_corr.png&quot;</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;CASA&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;final&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">plot_covariance</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;example_1e_corr.png&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                                            <span class="n">plot_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_corr_coef</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/example_1e_corr.png" src="../_images/example_1e_corr.png" />
+</section>
+<section id="modeled-horizontal-transient-motion">
+<h2><a class="toc-backref" href="#id11">Modeled horizontal transient motion</a><a class="headerlink" href="#modeled-horizontal-transient-motion" title="Permalink to this headline"></a></h2>
 <p>We can also use the <a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot" title="disstans.network.Network.wormplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wormplot()</span></code></a> method
 (also see <a class="reference internal" href="../tutorials/tutorial_3.html#transient-visualization-with-worm-plots"><span class="std std-ref">Tutorial 3</span></a>)
 to have a closer look at one of the transient periods at the center of the network:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">subset_stations</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RDOM&quot;</span><span class="p">,</span> <span class="s2">&quot;KRAC&quot;</span><span class="p">,</span> <span class="s2">&quot;SAWC&quot;</span><span class="p">,</span> <span class="s2">&quot;MWTP&quot;</span><span class="p">,</span> <span class="s2">&quot;CASA&quot;</span><span class="p">,</span> <span class="s2">&quot;CA99&quot;</span><span class="p">,</span> <span class="s2">&quot;P639&quot;</span><span class="p">,</span> <span class="s2">&quot;HOTK&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                   <span class="s2">&quot;P646&quot;</span><span class="p">,</span> <span class="s2">&quot;P638&quot;</span><span class="p">,</span> <span class="s2">&quot;DDMN&quot;</span><span class="p">,</span> <span class="s2">&quot;P634&quot;</span><span class="p">,</span> <span class="s2">&quot;KNOL&quot;</span><span class="p">,</span> <span class="s2">&quot;MINS&quot;</span><span class="p">,</span> <span class="s2">&quot;LINC&quot;</span><span class="p">,</span> <span class="s2">&quot;P630&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                   <span class="s2">&quot;SHRC&quot;</span><span class="p">,</span> <span class="s2">&quot;P631&quot;</span><span class="p">,</span> <span class="s2">&quot;TILC&quot;</span><span class="p">,</span> <span class="s2">&quot;P642&quot;</span><span class="p">,</span> <span class="s2">&quot;BALD&quot;</span><span class="p">,</span> <span class="s2">&quot;P648&quot;</span><span class="p">,</span> <span class="s2">&quot;WATC&quot;</span><span class="p">,</span> <span class="s2">&quot;P632&quot;</span><span class="p">]</span>
+<span class="gp">... </span>                   <span class="s2">&quot;SHRC&quot;</span><span class="p">,</span> <span class="s2">&quot;P631&quot;</span><span class="p">,</span> <span class="s2">&quot;TILC&quot;</span><span class="p">,</span> <span class="s2">&quot;P642&quot;</span><span class="p">,</span> <span class="s2">&quot;BALD&quot;</span><span class="p">,</span> <span class="s2">&quot;P648&quot;</span><span class="p">,</span> <span class="s2">&quot;WATC&quot;</span><span class="p">,</span> <span class="s2">&quot;P632&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="s2">&quot;P643&quot;</span><span class="p">,</span> <span class="s2">&quot;P647&quot;</span><span class="p">,</span> <span class="s2">&quot;PMTN&quot;</span><span class="p">,</span> <span class="s2">&quot;P635&quot;</span><span class="p">,</span> <span class="s2">&quot;P645&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_t_start</span><span class="p">,</span> <span class="n">plot_t_end</span> <span class="o">=</span> <span class="s2">&quot;2012-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2015-01-01&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">wormplot</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;Transient&quot;</span><span class="p">),</span>
-<span class="gp">... </span>             <span class="n">fname</span><span class="o">=</span><span class="n">plot_dir</span> <span class="o">/</span> <span class="s2">&quot;example_1f.png&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">fname</span><span class="o">=</span><span class="n">plot_dir</span> <span class="o">/</span> <span class="s2">&quot;example_1f&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">save_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="n">fmt</span><span class="p">,</span> <span class="s2">&quot;dpi&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">},</span>
 <span class="gp">... </span>             <span class="n">fname_animation</span><span class="o">=</span><span class="n">plot_dir</span> <span class="o">/</span> <span class="s2">&quot;example_1f.mp4&quot;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">t_min</span><span class="o">=</span><span class="s2">&quot;2011-07-01&quot;</span><span class="p">,</span> <span class="n">t_max</span><span class="o">=</span><span class="s2">&quot;2015-01-01&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e2</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">t_min</span><span class="o">=</span><span class="n">plot_t_start</span><span class="p">,</span> <span class="n">t_max</span><span class="o">=</span><span class="n">plot_t_end</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">2e2</span><span class="p">,</span>
 <span class="gp">... </span>             <span class="n">subset_stations</span><span class="o">=</span><span class="n">subset_stations</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">gui_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;wmts_show&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;wmts_alpha&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">})</span>
+<span class="gp">... </span>             <span class="n">lat_min</span><span class="o">=</span><span class="mf">37.52</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=</span><span class="mf">37.87</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=-</span><span class="mf">119.18</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=-</span><span class="mf">118.56</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">annotate_stations</span><span class="o">=</span><span class="s2">&quot;small&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">colorbar_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+<span class="gp">... </span>             <span class="n">legend_ref_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">118.685</span><span class="p">,</span> <span class="mf">37.832</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;30 mm&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                              <span class="s2">&quot;rect_args&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="o">-</span><span class="mf">118.7</span><span class="p">,</span> <span class="mf">37.8</span><span class="p">),</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="s2">&quot;rect_kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;facecolor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">],</span>
+<span class="gp">... </span>                                               <span class="s2">&quot;edgecolor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]}})</span>
 </pre></div>
 </div>
 <p>Which yields the following map:</p>
@@ -1058,22 +1055,46 @@ to have a closer look at one of the transient periods at the center of the netwo
     <p>This is a relatively long timespan, so we can nicely see individual periods of coherent motion
 of the network; the strongest one most notable being the radial outwards motion of the stations
 from the center of the caldera. If we only wanted to show individual slow slip events, we could
-identify the interesting periods from the timeseries, and then use mutliple wormplots with
+identify the interesting periods from the timeseries, and then use multiple wormplots with
 shorter timespan.</p>
-<p>On top of the largest transient motion, there are also smaller coherent motions visible in the
-animation, e.g. at TILC or P642. A proper investigations into the causes for these fitted motions
-(or whether they are “real” in the first place) would probably include a look at the non-sinusoidal,
-long-term varying seasonal hydrological signal, as well as periods of increased seismicity, but
-this is beyond the scope of this example.</p>
-</div>
-<div class="section" id="comparison-of-secular-velocities">
-<h2><a class="toc-backref" href="#id11">Comparison of secular velocities</a><a class="headerlink" href="#comparison-of-secular-velocities" title="Permalink to this headline">¶</a></h2>
+<p>There are two key reasons as to why our wormplot looks as smooth as it does.
+Naturally, the right penalty parameter for the regularized models took some trial-and-error not
+pictured in this example.
+Just as important though is the fact that we added seasonal models that allowed variations of
+the amplitude and phase from year to year - if we didn’t, every significant seasonal motion not
+captured by the simple <a class="reference internal" href="../disstans/models.html#disstans.models.Sinusoid" title="disstans.models.Sinusoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sinusoid</span></code></a> model would have been fitted by
+our transient <a class="reference internal" href="../disstans/models.html#disstans.models.SplineSet" title="disstans.models.SplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineSet</span></code></a> model (given the appropriate regularization
+penalty).</p>
+<p>We can look at the same information in a different way: by projecting the horizontal motion
+onto the direction of maximum displacement, we can look at many timeseries at the same time
+in a frame that allows a direct comparison (code in the script file).
+The following figure shows the relative transient displacement for selected stations in the
+Long Valley Caldera. The station names are on the left, and the direction of maximum
+displacement is given on the right. (The time period used for the projection is 2012-2015.)
+The colored lines are the model fit, and the black dots are the residuals (centered on the
+transient model fit).
+The temporally coherent expansion is clearly visible:</p>
+<img alt="../_images/example_1g_expansion_azim.png" src="../_images/example_1g_expansion_azim.png" />
+</section>
+<section id="modeled-vertical-seasonal-motion">
+<h2><a class="toc-backref" href="#id12">Modeled vertical seasonal motion</a><a class="headerlink" href="#modeled-vertical-seasonal-motion" title="Permalink to this headline"></a></h2>
+<p>We can also look at how the seasonal signal ends up being modeled by our
+time-varying-amplitude sinusoid (again, code in the script file).
+Here is just an example plot for the vertical component at station KNOL:</p>
+<img alt="../_images/example_1h_seasonal_KNOL_up.png" src="../_images/example_1h_seasonal_KNOL_up.png" />
+<p>The nominal component in the top panel, the deviation in the middle panel, and the sum of the
+two in the bottom panel.
+Clearly, the model adapts to yearly amplitude variations, and even allows for shortterm phase
+changes.</p>
+</section>
+<section id="comparison-of-secular-velocities">
+<h2><a class="toc-backref" href="#id13">Comparison of secular velocities</a><a class="headerlink" href="#comparison-of-secular-velocities" title="Permalink to this headline"></a></h2>
 <p>Finally, as the last “sanity check” that our models are correctly disentangling secular motion from
 other signals, let’s compare some of our estimated linear velocity vectors of the network stations
-with the published MIDAS velocities in <a class="reference internal" href="#blewitt16" id="id2"><span>[blewitt16]</span></a> (everything in [m/a]):</p>
+with the published MIDAS velocities in <a class="reference internal" href="../disstans/processing.html#blewitt16" id="id2"><span>[blewitt16]</span></a> (everything in [m/a]):</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 10%" />
+<col style="width: 12%" />
 <col style="width: 15%" />
 <col style="width: 15%" />
 <col style="width: 15%" />
@@ -1094,65 +1115,65 @@ with the published MIDAS velocities in <a class="reference internal" href="#blew
 <td><p>Up</p></td>
 </tr>
 <tr class="row-odd"><td><p>P308</p></td>
-<td><p>-0.022067</p></td>
-<td><p>-0.004061</p></td>
-<td><p>-0.001997</p></td>
+<td><p>-0.022020</p></td>
+<td><p>-0.002283</p></td>
+<td><p>-0.000174</p></td>
 <td><p>-0.022473</p></td>
 <td><p>-0.002419</p></td>
 <td><p>+0.000957</p></td>
 </tr>
 <tr class="row-even"><td><p>DOND</p></td>
-<td><p>-0.016032</p></td>
-<td><p>-0.004899</p></td>
-<td><p>-0.006095</p></td>
+<td><p>-0.019113</p></td>
+<td><p>-0.003761</p></td>
+<td><p>+0.003988</p></td>
 <td><p>-0.022462</p></td>
 <td><p>-0.002837</p></td>
 <td><p>+0.001112</p></td>
 </tr>
 <tr class="row-odd"><td><p>KRAC</p></td>
-<td><p>-0.018828</p></td>
-<td><p>-0.003319</p></td>
-<td><p>+0.004523</p></td>
+<td><p>-0.019325</p></td>
+<td><p>-0.001209</p></td>
+<td><p>+0.005940</p></td>
 <td><p>-0.018233</p></td>
 <td><p>-0.000377</p></td>
 <td><p>+0.005676</p></td>
 </tr>
 <tr class="row-even"><td><p>CASA</p></td>
-<td><p>-0.021165</p></td>
-<td><p>-0.006569</p></td>
-<td><p>-0.004468</p></td>
+<td><p>-0.022449</p></td>
+<td><p>-0.007270</p></td>
+<td><p>-0.001678</p></td>
 <td><p>-0.022905</p></td>
 <td><p>-0.007212</p></td>
 <td><p>+0.003864</p></td>
 </tr>
 <tr class="row-odd"><td><p>CA99</p></td>
-<td><p>-0.024153</p></td>
-<td><p>-0.006422</p></td>
-<td><p>-0.000914</p></td>
+<td><p>-0.023492</p></td>
+<td><p>-0.004736</p></td>
+<td><p>+0.003763</p></td>
 <td><p>-0.023294</p></td>
 <td><p>-0.006609</p></td>
 <td><p>+0.004616</p></td>
 </tr>
 <tr class="row-even"><td><p>P724</p></td>
-<td><p>-0.021189</p></td>
-<td><p>-0.004674</p></td>
-<td><p>-0.000033</p></td>
+<td><p>-0.019636</p></td>
+<td><p>-0.002419</p></td>
+<td><p>-0.000284</p></td>
 <td><p>-0.019328</p></td>
 <td><p>-0.003772</p></td>
 <td><p>+0.000314</p></td>
 </tr>
 <tr class="row-odd"><td><p>P469</p></td>
-<td><p>-0.017439</p></td>
-<td><p>-0.005994</p></td>
-<td><p>+0.000604</p></td>
+<td><p>-0.017844</p></td>
+<td><p>-0.006150</p></td>
+<td><p>-0.000317</p></td>
 <td><p>-0.017806</p></td>
 <td><p>-0.006302</p></td>
 <td><p>+0.000086</p></td>
 </tr>
 <tr class="row-even"><td><p>P627</p></td>
-<td><p>-0.014218</p></td>
-<td><p>-0.005800</p></td>
-<td><p>-0.000741</p></td>
+<td><p>-0.016661</p></td>
+<td><p>-0.006193</p></td>
+<td><p>-0.000305</p></td>
 <td><p>-0.016974</p></td>
 <td><p>-0.005181</p></td>
 <td><p>-0.000166</p></td>
@@ -1161,25 +1182,32 @@ with the published MIDAS velocities in <a class="reference internal" href="#blew
 </table>
 <p>In general, the two solutions are very similar, and differences might very well be because our
 processing is not fully automatic and might therefore provide better (or worse) fits than MIDAS.
-Again, a systematic comparison is beyond the scope of this example.</p>
-</div>
-<div class="section" id="final-considerations">
-<h2><a class="toc-backref" href="#id12">Final considerations</a><a class="headerlink" href="#final-considerations" title="Permalink to this headline">¶</a></h2>
+Again, a systematic comparison is beyond the scope of this example, but one crucial factor here
+is that the approaches to estimate the secular motion are fundamentally different.
+As we have seen above in the plot of the transient model fits at CASA, periods of rapid motion
+are embedded in periods of different, but slower transient motion. Some periods, even though
+they were fitted by our splines, look pretty linear. Naturally, there is a large ambiguity
+as to which period of slow and steady motion should be regarded as purely secular (if any at
+all). If we imposed, e.g., that the period between 1999 and 2001 should be purely secular,
+and the transient therefore should be zero, all we have to do is to increase our fitted linear
+model parameters, and remove that same linear trend from our transient estimate.</p>
+</section>
+<section id="final-considerations">
+<h2><a class="toc-backref" href="#id14">Final considerations</a><a class="headerlink" href="#final-considerations" title="Permalink to this headline"></a></h2>
 <p>Let’s conclude with two remarks:</p>
 <ol class="arabic simple">
 <li><p>The choice of the hyperparameters (e.g. starting <code class="docutils literal notranslate"><span class="pre">penalty</span></code>; the type and <code class="docutils literal notranslate"><span class="pre">eps</span></code>,
-<code class="docutils literal notranslate"><span class="pre">scale</span></code> values for <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.SpatialSolver" title="disstans.solvers.SpatialSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialSolver</span></code></a>; the number and timescales
+<code class="docutils literal notranslate"><span class="pre">scale</span></code> values for <a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a>; the number and timescales
 of the splines) are of course informed by me debugging and testing my code over and over
 again. Different dataset, and possibly different questions wanted to be solved, will
-likely warrant a systematic exploration of those. The
-<a class="reference internal" href="../disstans/solvers.html#disstans.solvers.SpatialSolver.last_statistics" title="disstans.solvers.SpatialSolver.last_statistics"><code class="xref py py-attr docutils literal notranslate"><span class="pre">last_statistics</span></code></a> attribute can be helpful to track
-the performance of different estimation hyperparameters.</p></li>
+likely warrant a systematic exploration of those. The <code class="docutils literal notranslate"><span class="pre">statistics</span></code> return variable can be
+helpful to track the performance of different estimation hyperparameters.</p></li>
 <li><p>For the best model fit, additional cleaning (outlier removal) and common mode estimation
 steps might be useful.</p></li>
 </ol>
-</div>
-<div class="section" id="references">
-<h2><a class="toc-backref" href="#id13">References</a><a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="references">
+<h2><a class="toc-backref" href="#id15">References</a><a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
 <dl class="citation">
 <dt class="label" id="gazeaux13"><span class="brackets"><a class="fn-backref" href="#id1">gazeaux13</a></span></dt>
 <dd><p>Gazeaux, J., Williams, S., King, M., Bos, M., Dach, R., Deo, M., et al. (2013).
@@ -1188,62 +1216,39 @@ offsets in GPS experiment</em>.
 Journal of Geophysical Research: Solid Earth, 118(5), 2397–2407.
 doi:<a class="reference external" href="https://doi.org/10.1002/jgrb.50152">10.1002/jgrb.50152</a></p>
 </dd>
-<dt class="label" id="blewitt16"><span class="brackets"><a class="fn-backref" href="#id2">blewitt16</a></span></dt>
-<dd><p>Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).
-<em>MIDAS robust trend estimator for accurate GPS station velocities without step detection.</em>
-Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.
-doi:<a class="reference external" href="https://doi.org/10.1002/2015JB012552">10.1002/2015JB012552</a></p>
-</dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../disstans.html" class="btn btn-neutral float-right" title="DISSTANS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../disstans.html" class="btn btn-neutral float-right" title="DISSTANS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

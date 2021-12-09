@@ -1,6 +1,19 @@
 Tutorial 1: The first synthetic station
 =======================================
 
+.. sidebar:: Download full script
+
+   :download:`tutorial_1_simple_timeseries.py <../../scripts/tutorial_1_simple_timeseries.py>`
+
+This tutorial will give the very first insight into the basic workings of DISSTANS.
+We will have a look at the :class:`~disstans.timeseries.Timeseries`,
+:class:`~disstans.models.Model`, and :class:`~disstans.station.Station` objects,
+and show how standard Python, NumPy and Matplotlib procedures can be used directly
+with DISSTANS.
+
+.. contents:: Table of contents
+    :local:
+
 Building a Model collection
 ---------------------------
 
@@ -19,10 +32,10 @@ sinusoid and some steps.
 .. doctest::
 
     >>> import numpy as np
-    >>> from disstans.models import Polynomial, Sinusoidal, Step
+    >>> from disstans.models import Polynomial, Sinusoid, Step
     >>> mdl_secular = Polynomial(order=1, time_unit="D", t_reference="2000-01-01")
     >>> mdl_secular.read_parameters(np.array([-1, 5e-3]))
-    >>> mdl_annual = Sinusoidal(period=365.25, time_unit="D", t_reference="2000-01-01")
+    >>> mdl_annual = Sinusoid(period=365.25, time_unit="D", t_reference="2000-01-01")
     >>> mdl_annual.read_parameters(np.array([0.3, 0]))
     >>> mdl_steps = Step(steptimes=["2000-03-01", "2000-10-10", "2000-10-15"])
     >>> mdl_steps.read_parameters(np.array([0.5, 0.2, -0.01]))
@@ -164,19 +177,14 @@ We can do this in the following way:
     >>> for model_description in stat_coll.model_names:
     ...     modeled = stat_coll[model_description].evaluate(timevector)
     ...     fit_ts = synth_stat.add_fit(ts_description="Data",
-    ...                                 model_description=model_description,
-    ...                                 fit=modeled)
+    ...                                 fit=modeled,
+    ...                                 model_description=model_description)
     >>> # evaluate the entire model collection at once
     >>> modeled = stat_coll.evaluate(timevector)
-    >>> from disstans.models import ALLFITS
-    >>> fit_ts = synth_stat.add_fit(ts_description="Data", model_description=ALLFITS,
-    ...                             fit=modeled)
+    >>> fit_ts = synth_stat.add_fit(ts_description="Data", fit=modeled)
 
-Why didn't we use a regular string name for the fit that used all models?
-Later function will take advantage of this, such as the plotting functions,
-to "know" which one is the joint fit, and which ones are the individual ones.
-The ``ALLFITS`` constant is therefore provided in the main module to serve as
-the key for that.
+Not providing a model description to :meth:`~disstans.station.Station.add_fit`
+implies that this is the fit of all models jointly.
 
 .. note::
 
@@ -185,13 +193,13 @@ the key for that.
     overwritten. If we want to keep them, we can either create the models again
     without giving them parameters, or create a (deep) copy of the model dictionary.
 
-Lastly, we want to make a timeseries object from the joint model fit for plotting
-purposes. We can do that by directly accessing the ``ALLFITS`` fit:
+Lastly, we want to make a timeseries object from the joint model fit for plotting purposes.
+We can do that by directly accessing :attr:`~disstans.models.FitCollection.allfits`:
 
 .. doctest::
 
     >>> synth_stat.add_timeseries(ts_description="Modeled",
-    ...                           timeseries=synth_stat.fits["Data"][ALLFITS],
+    ...                           timeseries=synth_stat.fits["Data"].allfits,
     ...                           override_src="model", override_data_cols=synth_ts.data_cols)
 
 .. note::
@@ -229,7 +237,7 @@ Timeseries object that can be added to the station.
     >>> stats_dict = synth_stat.analyze_residuals(ts_description="Residual",
     ...                                           mean=True, std=True, verbose=True)
     TUT: Residual          Mean  Standard Deviation
-    total-total    4.411018e-14            0.009595
+    total-total    4.420482e-14            0.009595
 
 And we can plot it like before::
 

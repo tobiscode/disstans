@@ -1,78 +1,38 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Tutorial 1: The first synthetic station &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Tutorial 1: The first synthetic station &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tutorial 2: Advanced Models and Fitting" href="tutorial_2.html" />
     <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,22 +40,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#building-a-model-collection">Building a Model collection</a></li>
@@ -138,6 +90,13 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -154,6 +113,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
@@ -162,11 +123,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -175,19 +137,22 @@
 <li class="toctree-l2"><a class="reference internal" href="../disstans/models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -197,8 +162,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#classes">Classes</a><ul>
@@ -208,17 +174,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -240,25 +202,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -267,77 +230,53 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../tutorials.html">Tutorials</a> &raquo;</li>
-        
       <li>Tutorial 1: The first synthetic station</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/tutorials/tutorial_1.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="tutorial-1-the-first-synthetic-station">
-<h1>Tutorial 1: The first synthetic station<a class="headerlink" href="#tutorial-1-the-first-synthetic-station" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="building-a-model-collection">
-<h2>Building a Model collection<a class="headerlink" href="#building-a-model-collection" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="tutorial-1-the-first-synthetic-station">
+<h1>Tutorial 1: The first synthetic station<a class="headerlink" href="#tutorial-1-the-first-synthetic-station" title="Permalink to this headline"></a></h1>
+<aside class="sidebar">
+<p class="sidebar-title">Download full script</p>
+<p><a class="reference download internal" download="" href="../_downloads/49753154ccfbec62c7540f4c62e8ff0e/tutorial_1_simple_timeseries.py"><code class="xref download docutils literal notranslate"><span class="pre">tutorial_1_simple_timeseries.py</span></code></a></p>
+</aside>
+<p>This tutorial will give the very first insight into the basic workings of DISSTANS.
+We will have a look at the <a class="reference internal" href="../disstans/timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>,
+<a class="reference internal" href="../disstans/models.html#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, and <a class="reference internal" href="../disstans/station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> objects,
+and show how standard Python, NumPy and Matplotlib procedures can be used directly
+with DISSTANS.</p>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title">Table of contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#building-a-model-collection" id="id1">Building a Model collection</a></p></li>
+<li><p><a class="reference internal" href="#creating-timeseries-objects" id="id2">Creating Timeseries objects</a></p></li>
+<li><p><a class="reference internal" href="#fitting-the-models" id="id3">Fitting the models</a></p></li>
+<li><p><a class="reference internal" href="#plotting-the-fit-and-residuals" id="id4">Plotting the fit and residuals</a></p></li>
+</ul>
+</div>
+<section id="building-a-model-collection">
+<h2><a class="toc-backref" href="#id1">Building a Model collection</a><a class="headerlink" href="#building-a-model-collection" title="Permalink to this headline"></a></h2>
 <p>Let’s create an empty synthetic station “TUT” located in Los Angeles using
 <a class="reference internal" href="../disstans/station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a>:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans</span> <span class="kn">import</span> <span class="n">Station</span>
@@ -348,10 +287,10 @@
 like to use to create our synthetic timeseries. We’ll start with a linear trend, an annual
 sinusoid and some steps.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.models</span> <span class="kn">import</span> <span class="n">Polynomial</span><span class="p">,</span> <span class="n">Sinusoidal</span><span class="p">,</span> <span class="n">Step</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.models</span> <span class="kn">import</span> <span class="n">Polynomial</span><span class="p">,</span> <span class="n">Sinusoid</span><span class="p">,</span> <span class="n">Step</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_secular</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_secular</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">5e-3</span><span class="p">]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_annual</span> <span class="o">=</span> <span class="n">Sinusoidal</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">365.25</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_annual</span> <span class="o">=</span> <span class="n">Sinusoid</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">365.25</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_annual</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_steps</span> <span class="o">=</span> <span class="n">Step</span><span class="p">(</span><span class="n">steptimes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2000-03-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2000-10-10&quot;</span><span class="p">,</span> <span class="s2">&quot;2000-10-15&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl_steps</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">]))</span>
@@ -377,9 +316,9 @@ returns a dictionary and the modeled output can be found in the <code class="doc
 <span class="gp">... </span>    <span class="n">sum_models</span> <span class="o">+=</span> <span class="n">evaluated</span><span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="creating-timeseries-objects">
-<h2>Creating Timeseries objects<a class="headerlink" href="#creating-timeseries-objects" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="creating-timeseries-objects">
+<h2><a class="toc-backref" href="#id2">Creating Timeseries objects</a><a class="headerlink" href="#creating-timeseries-objects" title="Permalink to this headline"></a></h2>
 <p>A <a class="reference internal" href="../disstans/timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> can now be created using the data we just
 made up, and we can add it to our station:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans</span> <span class="kn">import</span> <span class="n">Timeseries</span>
@@ -425,9 +364,9 @@ interface to plot timeseries with Matplotlib:</p>
 </div>
 <p>This should give us an output like this:</p>
 <img alt="../_images/tutorial_1a.png" src="../_images/tutorial_1a.png" />
-</div>
-<div class="section" id="fitting-the-models">
-<h2>Fitting the models<a class="headerlink" href="#fitting-the-models" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="fitting-the-models">
+<h2><a class="toc-backref" href="#id3">Fitting the models</a><a class="headerlink" href="#fitting-the-models" title="Permalink to this headline"></a></h2>
 <p>We’ve successfully created a synthetic timeseries for a single station. Now, let’s see
 if a linear regression solver can estimate the model parameters we originally put
 in. To this end, we must first associate our models with the timeseries at the station.</p>
@@ -473,20 +412,15 @@ will not work if we want to estimate the predicted fit covariance.)</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">model_description</span> <span class="ow">in</span> <span class="n">stat_coll</span><span class="o">.</span><span class="n">model_names</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">modeled</span> <span class="o">=</span> <span class="n">stat_coll</span><span class="p">[</span><span class="n">model_description</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">fit_ts</span> <span class="o">=</span> <span class="n">synth_stat</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                                <span class="n">model_description</span><span class="o">=</span><span class="n">model_description</span><span class="p">,</span>
-<span class="gp">... </span>                                <span class="n">fit</span><span class="o">=</span><span class="n">modeled</span><span class="p">)</span>
+<span class="gp">... </span>                                <span class="n">fit</span><span class="o">=</span><span class="n">modeled</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">model_description</span><span class="o">=</span><span class="n">model_description</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># evaluate the entire model collection at once</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">modeled</span> <span class="o">=</span> <span class="n">stat_coll</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.models</span> <span class="kn">import</span> <span class="n">ALLFITS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fit_ts</span> <span class="o">=</span> <span class="n">synth_stat</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="n">model_description</span><span class="o">=</span><span class="n">ALLFITS</span><span class="p">,</span>
-<span class="gp">... </span>                            <span class="n">fit</span><span class="o">=</span><span class="n">modeled</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fit_ts</span> <span class="o">=</span> <span class="n">synth_stat</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="n">fit</span><span class="o">=</span><span class="n">modeled</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Why didn’t we use a regular string name for the fit that used all models?
-Later function will take advantage of this, such as the plotting functions,
-to “know” which one is the joint fit, and which ones are the individual ones.
-The <code class="docutils literal notranslate"><span class="pre">ALLFITS</span></code> constant is therefore provided in the main module to serve as
-the key for that.</p>
+<p>Not providing a model description to <a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_fit" title="disstans.station.Station.add_fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_fit()</span></code></a>
+implies that this is the fit of all models jointly.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Note that in this process, the model parameters we set in the beginning
@@ -494,10 +428,10 @@ to each model object instance (e.g. <code class="docutils literal notranslate"><
 overwritten. If we want to keep them, we can either create the models again
 without giving them parameters, or create a (deep) copy of the model dictionary.</p>
 </div>
-<p>Lastly, we want to make a timeseries object from the joint model fit for plotting
-purposes. We can do that by directly accessing the <code class="docutils literal notranslate"><span class="pre">ALLFITS</span></code> fit:</p>
+<p>Lastly, we want to make a timeseries object from the joint model fit for plotting purposes.
+We can do that by directly accessing <a class="reference internal" href="../disstans/models.html#disstans.models.FitCollection.allfits" title="disstans.models.FitCollection.allfits"><code class="xref py py-attr docutils literal notranslate"><span class="pre">allfits</span></code></a>:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">synth_stat</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Modeled&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                          <span class="n">timeseries</span><span class="o">=</span><span class="n">synth_stat</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="s2">&quot;Data&quot;</span><span class="p">][</span><span class="n">ALLFITS</span><span class="p">],</span>
+<span class="gp">... </span>                          <span class="n">timeseries</span><span class="o">=</span><span class="n">synth_stat</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="s2">&quot;Data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">allfits</span><span class="p">,</span>
 <span class="gp">... </span>                          <span class="n">override_src</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">override_data_cols</span><span class="o">=</span><span class="n">synth_ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -509,9 +443,9 @@ under the hood. For ease of use, the <a class="reference internal" href="../diss
 can do all of these things with its two methods <a class="reference internal" href="../disstans/network.html#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>
 and <a class="reference internal" href="../disstans/network.html#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>.</p>
 </div>
-</div>
-<div class="section" id="plotting-the-fit-and-residuals">
-<h2>Plotting the fit and residuals<a class="headerlink" href="#plotting-the-fit-and-residuals" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="plotting-the-fit-and-residuals">
+<h2><a class="toc-backref" href="#id4">Plotting the fit and residuals</a><a class="headerlink" href="#plotting-the-fit-and-residuals" title="Permalink to this headline"></a></h2>
 <p>At this point, we first want to have a look at the fit to see if everything worked
 before actually looking at the parameters themselves or residuals. The <code class="docutils literal notranslate"><span class="pre">evaluate</span></code>
 function already created a new timeseries object on the way, which we can now plot:</p>
@@ -531,7 +465,7 @@ Timeseries object that can be added to the station.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stats_dict</span> <span class="o">=</span> <span class="n">synth_stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Residual&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                                          <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">TUT: Residual          Mean  Standard Deviation</span>
-<span class="go">total-total    4.411018e-14            0.009595</span>
+<span class="go">total-total    4.420482e-14            0.009595</span>
 </pre></div>
 </div>
 <p>And we can plot it like before:</p>
@@ -548,55 +482,38 @@ some better plotting tools to use with larger networks or stations with more
 timeseries which we will explore later. This is again just intended to show how
 the data is accessible.</p>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="tutorial_2.html" class="btn btn-neutral float-right" title="Tutorial 2: Advanced Models and Fitting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial_2.html" class="btn btn-neutral float-right" title="Tutorial 2: Advanced Models and Fitting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -7,7 +7,6 @@ Welcome to DISSTANS's documentation!
    :maxdepth: 2
 
    installation
-   faq
    tutorials
    examples
 

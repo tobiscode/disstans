@@ -1,76 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>disstans.processing &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>disstans.processing &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -78,22 +37,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -136,6 +87,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a><ul>
@@ -152,6 +110,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
@@ -160,11 +120,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -173,19 +134,22 @@
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -195,8 +159,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#classes">Classes</a><ul>
@@ -206,17 +171,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -238,25 +199,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -265,69 +227,30 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>disstans.processing</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for disstans.processing</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains some processing functions that while not belonging</span>
@@ -344,11 +267,13 @@
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span><span class="p">,</span> <span class="n">FastICA</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
 <span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
-<span class="kn">from</span> <span class="nn">.compiled</span> <span class="kn">import</span> <span class="n">maskedmedfilt2d</span>
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">parallelize</span><span class="p">,</span> <span class="n">tvec_to_numpycol</span>
+<span class="kn">from</span> <span class="nn">.compiled</span> <span class="kn">import</span> <span class="n">maskedmedfilt2d</span><span class="p">,</span> <span class="n">selectpair</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">parallelize</span><span class="p">,</span> <span class="n">tvec_to_numpycol</span><span class="p">,</span> <span class="n">date2decyear</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Polynomial</span>
 
 
 <div class="viewcode-block" id="unwrap_dict_and_ts"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.unwrap_dict_and_ts">[docs]</a><span class="k">def</span> <span class="nf">unwrap_dict_and_ts</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
@@ -481,11 +406,10 @@
     <span class="k">return</span> <span class="n">filtered</span></div>
 
 
-<div class="viewcode-block" id="common_mode"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.common_mode">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
-<span class="k">def</span> <span class="nf">common_mode</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="decompose"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.decompose">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
+<span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">return_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes the Common Mode Error (CME) with the given method.</span>
-<span class="sd">    The input array should already be a residual.</span>
+<span class="sd">    Decomposes the input signal into different components using PCA or ICA.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -494,26 +418,27 @@
 <span class="sd">        (can contain NaNs).</span>
 <span class="sd">        Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept</span>
 <span class="sd">        :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and</span>
-<span class="sd">        dictionaries of them as input.</span>
+<span class="sd">        dictionaries of them as input (i.e. the output of</span>
+<span class="sd">        :meth:`~disstans.network.Network.export_network_ts`).</span>
 <span class="sd">    method : str</span>
-<span class="sd">        Method to use to decompose the array. Possible values are ``&#39;pca&#39;`` and ``&#39;ica&#39;}.</span>
-<span class="sd">        ``&#39;pca&#39;`` uses `Principal Component Analysis`_ (motivated by [dong06]_), whereas</span>
-<span class="sd">        ``&#39;ica&#39;`` uses `Independent Component Analysis`_ (motivated by [huang12]_).</span>
+<span class="sd">        Method to use to decompose the array. Possible values are ``&#39;pca&#39;`` and ``&#39;ica&#39;``:</span>
+<span class="sd">        ``&#39;pca&#39;`` uses :class:`~sklearn.decomposition.PCA` (motivated by [dong06]_), whereas</span>
+<span class="sd">        ``&#39;ica&#39;`` uses :class:`~sklearn.decomposition.FastICA` (motivated by [huang12]_).</span>
 <span class="sd">    num_components : int, optional</span>
-<span class="sd">        Number of CME bases to estimate. Defaults to ``1``.</span>
-<span class="sd">    plot : bool, optional</span>
-<span class="sd">        If ``True``, include not only the modeled CME, but also the components</span>
+<span class="sd">        Number of components to estimate. Defaults to ``1``. If ``None``, all are used.</span>
+<span class="sd">    return_sources : bool, optional</span>
+<span class="sd">        If ``True``, return not only the best-fit model, but also the sources</span>
 <span class="sd">        themselves in space and time. Defaults to ``False``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    model : numpy.ndarray</span>
-<span class="sd">        Modeled CME of shape :math:`(\text{num_observations},\text{n_stations})`.</span>
+<span class="sd">        Best-fit model with shape :math:`(\text{num_observations},\text{n_stations})`.</span>
 <span class="sd">    temporal : numpy.ndarray</span>
-<span class="sd">        (Only if ``plot=True``.) CME in time of shape</span>
+<span class="sd">        Only if ``return_sources=True``: Temporal source with shape</span>
 <span class="sd">        :math:`(\text{num_observations},\text{num_components})`.</span>
 <span class="sd">    spatial : numpy.ndarray</span>
-<span class="sd">        (Only if ``plot=True``.) CME in space of shape</span>
+<span class="sd">        Only if ``return_sources=True``: Spatial source with shape</span>
 <span class="sd">        :math:`(\text{num_components},\text{n_stations})`.</span>
 
 
@@ -530,11 +455,6 @@
 <span class="sd">       Applied Mechanics and Materials, 204–208, 2806–2812.</span>
 <span class="sd">       doi:`10.4028/www.scientific.net/AMM.204-208.2806</span>
 <span class="sd">       &lt;http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806&gt;`_.</span>
-
-<span class="sd">    .. _Principal Component Analysis:</span>
-<span class="sd">       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html</span>
-<span class="sd">    .. _Independent Component Analysis:</span>
-<span class="sd">       https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.FastICA.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># ignore all only-NaN columns</span>
     <span class="n">array_nanind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
@@ -545,10 +465,10 @@
     <span class="n">array_nanmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">array_nansd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">array_nanind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">icol</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-        <span class="n">array</span><span class="p">[</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">],</span> <span class="n">icol</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_nansd</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span> \
-                                             <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> \
-                                             <span class="o">+</span> <span class="n">array_nanmean</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">],</span> <span class="n">icol</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_nanmean</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="n">array_nansd</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
     <span class="c1"># decompose using the specified solver</span>
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;pca&#39;</span><span class="p">:</span>
         <span class="n">decomposer</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_components</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -567,7 +487,7 @@
         <span class="n">newmod</span><span class="p">[:,</span> <span class="n">finite_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
         <span class="n">newmod</span><span class="p">[:,</span> <span class="n">nan_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">newmod</span>
-    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">return_sources</span><span class="p">:</span>
         <span class="n">spatial</span> <span class="o">=</span> <span class="n">decomposer</span><span class="o">.</span><span class="n">components_</span>
         <span class="k">if</span> <span class="n">nan_cols</span> <span class="o">!=</span> <span class="p">[]:</span>
             <span class="n">newspat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">spatial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">finite_cols</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_cols</span><span class="p">)))</span>
@@ -625,6 +545,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clean_settings</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;clean&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">clean_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clean_kw_args</span><span class="p">)</span>
+    <span class="c1"># check if timeseries is present</span>
+    <span class="k">if</span> <span class="n">ts_in</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find timeseries &#39;</span><span class="si">{</span><span class="n">ts_in</span><span class="si">}</span><span class="s2">&#39; in station </span><span class="si">{</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+             <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span>
     <span class="c1"># check if we&#39;re modifying in-place or copying</span>
     <span class="k">if</span> <span class="n">ts_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ts</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">ts_in</span><span class="p">]</span>
@@ -675,6 +600,131 @@
     <span class="c1"># if we made a copy, add it to the station, otherwise we&#39;re already done</span>
     <span class="k">if</span> <span class="n">ts_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">station</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">ts_out</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="midas"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.midas">[docs]</a><span class="k">def</span> <span class="nf">midas</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function performs the MIDAS estimate as described by [blewitt16]_.</span>
+<span class="sd">    It is adapted from the Fortran code provided by the author (see</span>
+<span class="sd">    :func:`~disstans.compiled.selectpair` for more details and original copyright).</span>
+
+<span class="sd">    MIDAS returns the median estimate of secular (constant) velocities in all data</span>
+<span class="sd">    components using data pairs spanning exactly one year. By not including pairs</span>
+<span class="sd">    crossing known step epochs and using a fixed period, the influence of unmodeled</span>
+<span class="sd">    jumps and seasonal variations can be minimized. At the end, an empirical estimate</span>
+<span class="sd">    of the velocities&#39; uncertainty is calculated as well.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ts : disstans.timeseries.Timeseries</span>
+<span class="sd">        Timeseries to perform the MIDAS algorithm on.</span>
+<span class="sd">    steps : pandas.Series, pandas.DatetimeIndex, optional</span>
+<span class="sd">        If given, a pandas Series or Index of step times, across which no pairs</span>
+<span class="sd">        should be formed.</span>
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdl : disstans.models.Polynomial</span>
+<span class="sd">        Fitted polynomial (offset &amp; constant velocity) model.</span>
+<span class="sd">    res : disstans.timeseries.Timeseries</span>
+<span class="sd">        Residual timeseries.</span>
+<span class="sd">    stats : dict</span>
+<span class="sd">        Fittings statistics computed along the way.</span>
+<span class="sd">        ``&#39;num_epochs&#39;``, ``&#39;num_used&#39;``, ``&#39;num_pairs&#39;``, and ``&#39;nstep&#39;`` are the number of</span>
+<span class="sd">        epochs in ``ts``, the number of epochs used in the velocity pairs, the number of pairs</span>
+<span class="sd">        formed, and the number of included steps, respectively. ``&#39;frac_removed&#39;`` and</span>
+<span class="sd">        ``&#39;sd_velpairs&#39;`` are the fraction of removed pairs (because of velocity pairs more</span>
+<span class="sd">        than two standard deviations away from their medians) and the estimated standard</span>
+<span class="sd">        deviation of the velocity pairs, respectively, and for each component.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [blewitt16] Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).</span>
+<span class="sd">       *MIDAS robust trend estimator for accurate GPS station velocities without step detection.*</span>
+<span class="sd">       Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.</span>
+<span class="sd">       doi:`10.1002/2015JB012552 &lt;https://doi.org/10.1002/2015JB012552&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># extract timeseries data, adjust zero-crossing to first epoch</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">values</span>
+    <span class="c1"># convert timeseries index and step times to decimal years</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">date2decyear</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">tstep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># need at least one entry for selectpair</span>
+    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">steps_decyear</span> <span class="o">=</span> <span class="n">date2decyear</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+        <span class="n">tstep_back</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="o">-</span><span class="n">steps_decyear</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tstep</span><span class="p">])</span>
+        <span class="n">tstep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">steps_decyear</span><span class="p">,</span> <span class="n">tstep</span><span class="p">])</span>
+    <span class="c1"># get forward and backwards time pairs</span>
+    <span class="n">num_pairs</span><span class="p">,</span> <span class="n">ip</span> <span class="o">=</span> <span class="n">selectpair</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tstep</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_pairs</span> <span class="o">&gt;=</span> <span class="n">ip</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forward call to selectpair returned maximum number of pairs (</span><span class="si">{</span><span class="n">num_pairs</span><span class="si">}</span><span class="s2"> &quot;</span>
+             <span class="sa">f</span><span class="s2">&quot;with a maximum of </span><span class="si">{</span><span class="n">ip</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">). Consider re-compiling DISSTANS &quot;</span>
+             <span class="s2">&quot;with a higher maxn constant in compiled.f90.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">nb</span><span class="p">,</span> <span class="n">ipb</span> <span class="o">=</span> <span class="n">selectpair</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tstep_back</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nb</span> <span class="o">&gt;=</span> <span class="n">ipb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Backward call to selectpair returned maximum number of pairs (</span><span class="si">{</span><span class="n">nb</span><span class="si">}</span><span class="s2"> &quot;</span>
+             <span class="sa">f</span><span class="s2">&quot;with a maximum of </span><span class="si">{</span><span class="n">ipb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">). Consider re-compiling DISSTANS &quot;</span>
+             <span class="s2">&quot;with a higher maxn constant in compiled.f90.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_pairs</span> <span class="o">+</span> <span class="n">nb</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Only found </span><span class="si">{</span><span class="n">num_pairs</span><span class="si">}</span><span class="s2"> forward and </span><span class="si">{</span><span class="n">nb</span><span class="si">}</span><span class="s2"> backward pairs; solution will be bad.&quot;</span><span class="p">,</span>
+             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># convert backward indices to forward ones</span>
+    <span class="n">ipb</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="n">ipb</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">:</span><span class="n">nb</span><span class="p">]</span>
+    <span class="c1"># combine the two index collections, and make them more readable</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">ip</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_pairs</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ipb</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ip_from</span><span class="p">,</span> <span class="n">ip_to</span> <span class="o">=</span> <span class="n">ip</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ip</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">num_pairs</span> <span class="o">+=</span> <span class="n">nb</span>
+    <span class="c1"># calculate number of points used in pairing</span>
+    <span class="n">num_used</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+    <span class="c1"># compute velocity for all pairs</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ip_to</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">ip_from</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">ip_to</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">ip_from</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># median of the velocities</span>
+    <span class="n">v50</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># absolute deviation from the median</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">v50</span><span class="p">)</span>
+    <span class="c1"># median absolute deviation (MAD)</span>
+    <span class="n">d50</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># estimated standard deviation of velocities</span>
+    <span class="c1"># (based on theoretical factor 1.4826)</span>
+    <span class="n">sd_velpairs</span> <span class="o">=</span> <span class="mf">1.4826</span> <span class="o">*</span> <span class="n">d50</span>
+    <span class="c1"># delete velocities more than 2 s.d. from MAD</span>
+    <span class="n">v</span><span class="p">[</span><span class="n">d</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sd_velpairs</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="n">num_kept</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># recompute median, absolute deviation, MAD, and estimated s.d.</span>
+    <span class="n">v50</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">v50</span><span class="p">)</span>
+    <span class="n">d50</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sd_velpairs</span> <span class="o">=</span> <span class="mf">1.4826</span> <span class="o">*</span> <span class="n">d50</span>
+    <span class="c1"># Standard errors for the median velocity</span>
+    <span class="c1"># Multiply by theoretical factor of sqrt(pi/2) = 1.2533</span>
+    <span class="c1"># Divide number of data by 4 since we use coordinate data a nominal 4 times</span>
+    <span class="c1"># Also scale standard errors by ad hoc factor of 3 to be realistic</span>
+    <span class="n">sv</span> <span class="o">=</span> <span class="mf">1.2533</span> <span class="o">*</span> <span class="n">sd_velpairs</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">num_kept</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>
+    <span class="c1"># compute intercepts</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">v50</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">x50</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># compute residuals</span>
+    <span class="n">r</span> <span class="o">-=</span> <span class="n">x50</span>
+    <span class="c1"># fraction of pairs removed</span>
+    <span class="n">frac_removed</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_pairs</span> <span class="o">-</span> <span class="n">num_kept</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_pairs</span>
+    <span class="c1"># return offet &amp; velocity as linear Polynomial model</span>
+    <span class="c1"># intercept uncertainty is &quot;perfect&quot; since it wasn&#39;t estimated at all,</span>
+    <span class="c1"># it&#39;s just relative to a reference time</span>
+    <span class="n">mdl</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+    <span class="n">mdl</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x50</span><span class="p">,</span> <span class="n">v50</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                        <span class="n">covariances</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x50</span><span class="p">),</span> <span class="n">sv</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="c1"># return residual as a Timeseries</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">timevector</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;midas&quot;</span><span class="p">,</span>
+                                <span class="n">data_unit</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">data_unit</span><span class="p">,</span>
+                                <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dcol</span><span class="si">}</span><span class="s2">_midasres&quot;</span> <span class="k">for</span> <span class="n">dcol</span> <span class="ow">in</span> <span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">])</span>
+    <span class="c1"># all other stats are returned in a dictionary</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num_epochs&quot;</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s2">&quot;num_used&quot;</span><span class="p">:</span> <span class="n">num_used</span><span class="p">,</span> <span class="s2">&quot;num_pairs&quot;</span><span class="p">:</span> <span class="n">num_pairs</span><span class="p">,</span>
+             <span class="s2">&quot;frac_removed&quot;</span><span class="p">:</span> <span class="n">frac_removed</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="s2">&quot;sd_velpairs&quot;</span><span class="p">:</span> <span class="n">sd_velpairs</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+             <span class="s2">&quot;nstep&quot;</span><span class="p">:</span> <span class="n">tstep</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="c1"># return</span>
+    <span class="k">return</span> <span class="n">mdl</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">stats</span></div>
 
 
 <div class="viewcode-block" id="StepDetector"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector">[docs]</a><span class="k">class</span> <span class="nc">StepDetector</span><span class="p">():</span>
@@ -1006,7 +1056,7 @@
                                      <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span><span class="p">,</span> <span class="n">maxdel</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="StepDetector.search_network"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_network">[docs]</a>    <span class="k">def</span> <span class="nf">search_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">):</span>
+                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function that searches for steps in an entire network (possibly in parallel),</span>
 <span class="sd">        thresholds those probabilities, and identifies all the consecutive ranges in which</span>
@@ -1028,6 +1078,8 @@
 <span class="sd">            of possible steps.</span>
 <span class="sd">        gap_unit : str, optional</span>
 <span class="sd">            Time unit of ``gap``.</span>
+<span class="sd">        no_pbar : bool, optional</span>
+<span class="sd">            Suppress the progress bar with ``True`` (default: ``False``).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1054,8 +1106,9 @@
                           <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">valid_stations</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span><span class="p">)</span> <span class="ow">in</span> \
             <span class="nb">zip</span><span class="p">(</span><span class="n">valid_stations</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">valid_stations</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                <span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">,</span> <span class="n">iterable_input</span><span class="p">),</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_stations</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Searching for steps&quot;</span><span class="p">)):</span>
+                <span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">,</span> <span class="n">iterable_input</span><span class="p">),</span>
+                     <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_stations</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span>
+                     <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Searching for steps&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">)):</span>
             <span class="c1"># find steps given the just calculated probabilities</span>
             <span class="c1"># setting the maximum number of steps to infinite to not miss anything</span>
             <span class="n">steps</span> <span class="o">=</span> <span class="n">StepDetector</span><span class="o">.</span><span class="n">steps</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -1095,7 +1148,7 @@
         <span class="k">return</span> <span class="n">step_table</span><span class="p">,</span> <span class="n">step_ranges</span></div>
 
 <div class="viewcode-block" id="StepDetector.search_catalog"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_catalog">[docs]</a>    <span class="k">def</span> <span class="nf">search_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">keep_nan_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">keep_nan_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search a dictionary of potential step times for each station in the dictionary</span>
 <span class="sd">        and assess the probability for each one.</span>
@@ -1124,6 +1177,8 @@
 <span class="sd">            and the results will contain NaNs.</span>
 <span class="sd">            If ``True`` (default), those entries will be kept in the output, and if</span>
 <span class="sd">            ``False``, they will be dropped.</span>
+<span class="sd">        no_pbar : bool, optional</span>
+<span class="sd">            Suppress the progress bar with ``True`` (default: ``False``).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1185,7 +1240,7 @@
                           <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">stations_overlap</span><span class="p">)</span>
         <span class="n">results_iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">parallelize</span><span class="p">(</span><span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">,</span> <span class="n">iterable_input</span><span class="p">),</span>
                                 <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">stations_overlap</span><span class="p">),</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span>
-                                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Searching for steps&quot;</span><span class="p">)</span>
+                                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Searching for steps&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stations_overlap</span><span class="p">,</span> <span class="n">results_iterator</span><span class="p">):</span>
             <span class="c1"># probs now contains a row for each catalog item</span>
             <span class="c1"># if the probability is NaN, AIC does not see evidence for a step,</span>
@@ -1273,53 +1328,37 @@
             <span class="c1"># warn if a large number of steps have been detected</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In component </span><span class="si">{</span><span class="n">icomp</span><span class="si">}</span><span class="s2">, using threshold=</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> leads to &quot;</span>
-                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> of timestamps &quot;</span>
-                              <span class="s2">&quot;being steps. Consider setting a higher threshold.&quot;</span><span class="p">)</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> of timestamps being &quot;</span>
+                              <span class="s2">&quot;steps. Consider setting a higher threshold.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">steps</span></div></div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

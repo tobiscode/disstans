@@ -1,14 +1,18 @@
 Tutorial 2: Advanced Models and Fitting
 =======================================
 
-.. note::
+.. sidebar:: Download full script
 
-    This tutorial recreates the basics of the synthetic timeseries example
-    as described in Bryan Riel's [riel14]_ paper on detecting geodetic transients.
+   :download:`tutorial_2_detect_transients.py <../../scripts/tutorial_2_detect_transients.py>`
 
-For this tutorial, we'll be building on and expanding the workflow from the first one.
+This tutorial recreates the basics of the synthetic timeseries example as described in
+Bryan Riel's [riel14]_ paper on detecting geodetic transients.
+To do this, we'll be building on and expanding the workflow from the first one.
 This time though, we'll first focus a bit more on making the synthetic data, before
 creating the station itself.
+
+.. contents:: Table of contents
+    :local:
 
 Creating more complex synthetic data
 ------------------------------------
@@ -28,10 +32,10 @@ If you have any question about this, please refer to the previous tutorial.
 
 .. doctest::
 
-    >>> from disstans.models import Arctangent, Polynomial, Sinusoidal
+    >>> from disstans.models import Arctangent, Polynomial, Sinusoid
     >>> mdl_secular = Polynomial(order=1, t_reference=t_start_str)
-    >>> mdl_annual = Sinusoidal(period=365.25, t_reference=t_start_str)
-    >>> mdl_semiannual = Sinusoidal(period=365.25/2, t_reference=t_start_str)
+    >>> mdl_annual = Sinusoid(period=365.25, t_reference=t_start_str)
+    >>> mdl_semiannual = Sinusoid(period=365.25/2, t_reference=t_start_str)
     >>> mdl_transient_1 = Arctangent(tau=100, t_reference="2002-07-01")
     >>> mdl_transient_2 = Arctangent(tau=50, t_reference="2010-01-01")
     >>> mdl_transient_3 = Arctangent(tau=300, t_reference="2016-01-01")
@@ -201,19 +205,26 @@ least-squares we used in the previous tutorial:
 
     >>> net.fit(ts_description="Displacement", solver="linear_regression")
     >>> net.evaluate(ts_description="Displacement", output_description="Fit_noreg")
-
-We saved a lot of lines and hassle compared to the previous fitting by using the
-:class:`~disstans.network.Network` methods. Let's calculate the residuals and errors,
-and print some statistics:
-
-.. doctest::
-
     >>> stat["Res_noreg"] = stat["Displacement"] - stat["Fit_noreg"]
     >>> stat["Err_noreg"] = stat["Fit_noreg"] - stat["Truth"]
+
+We saved a lot of lines and hassle compared to the previous fitting by using the
+:class:`~disstans.network.Network` methods. We already calculated the residuals and
+errors, so let's print some statistics::
+
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg                          Mean  Standard Deviation
     Total-Displacement_Model_Total  1.622931e-08            2.046006
+
+.. doctest::
+    :hide:
+
+    >>> with pd.option_context("display.precision", 1):
+    ...     _ = stat.analyze_residuals(ts_description="Res_noreg",
+    ...                                mean=True, std=True, verbose=True)
+    TUT: Res_noreg                     Mean  Standard Deviation
+    Total-Displacement_Model_Total  1.6e-08                 2.0
 
 Advanced plotting
 -----------------
@@ -281,10 +292,22 @@ solver:
     >>> net.evaluate(ts_description="Displacement", output_description="Fit_L2")
     >>> stat["Res_L2"] = stat["Displacement"] - stat["Fit_L2"]
     >>> stat["Err_L2"] = stat["Fit_L2"] - stat["Truth"]
+
+Giving us the statistics::
+    
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2                             Mean  Standard Deviation
     Total-Displacement_Model_Total  1.503516e-09            2.087589
+
+.. doctest::
+    :hide:
+
+    >>> with pd.option_context("display.precision", 1):
+    ...     _ = stat.analyze_residuals(ts_description="Res_L2",
+    ...                                mean=True, std=True, verbose=True)
+    TUT: Res_L2                        Mean  Standard Deviation
+    Total-Displacement_Model_Total  1.5e-09                 2.1
 
 ::
 
@@ -339,10 +362,22 @@ basically-zero splines in the transient dictionary:
     >>> net.evaluate(ts_description="Displacement", output_description="Fit_L1")
     >>> stat["Res_L1"] = stat["Displacement"] - stat["Fit_L1"]
     >>> stat["Err_L1"] = stat["Fit_L1"] - stat["Truth"]
+
+Giving us the statistics::
+
     >>> _ = stat.analyze_residuals(ts_description="Res_L1",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1                         Mean  Standard Deviation
     Total-Displacement_Model_Total  0.000003            2.121952
+
+.. doctest::
+    :hide:
+
+    >>> with pd.option_context("display.precision", 1):
+    ...     _ = stat.analyze_residuals(ts_description="Res_L1",
+    ...                                mean=True, std=True, verbose=True)
+    TUT: Res_L1                        Mean  Standard Deviation
+    Total-Displacement_Model_Total  2.7e-06                 2.1
 
 ::
 
@@ -404,10 +439,22 @@ the notes of :func:`~disstans.solvers.lasso_regression`. Let's try it:
     >>> net.evaluate(ts_description="Displacement", output_description="Fit_L1R")
     >>> stat["Res_L1R"] = stat["Displacement"] - stat["Fit_L1R"]
     >>> stat["Err_L1R"] = stat["Fit_L1R"] - stat["Truth"]
+
+Giving us the statistics::
+
     >>> _ = stat.analyze_residuals(ts_description="Res_L1R",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1R                            Mean  Standard Deviation
     Total-Displacement_Model_Total  9.511043e-08            2.117921
+
+.. doctest::
+    :hide:
+
+    >>> with pd.option_context("display.precision", 1):
+    ...     _ = stat.analyze_residuals(ts_description="Res_L1R",
+    ...                                mean=True, std=True, verbose=True)
+    TUT: Res_L1R                       Mean  Standard Deviation
+    Total-Displacement_Model_Total  9.5e-08                 2.1
 
 ::
 
@@ -446,6 +493,7 @@ the notes of :func:`~disstans.solvers.lasso_regression`. Let's try it:
 As you can see, the significant components of the splines have now been emphasized when
 compared to the previous scalogram, and all the values that were small but not really
 zero in the previous case are now *really* close to zero.
+This did not come at a significant increase in residual variance.
 
 Comparing specific parameters
 -----------------------------
@@ -457,26 +505,26 @@ L1R-fitted model:
 
     >>> reldiff_sec = (mdl_coll_synth["Secular"].parameters
     ...                / stat.models["Displacement"]["Secular"].parameters).ravel() - 1
-    >>> reldiff_ann_amp = mdl_coll_synth["Annual"].amplitude \
-    ...                   / stat.models["Displacement"]["Annual"].amplitude - 1
-    >>> reldiff_sem_amp = mdl_coll_synth["Semi-Annual"].amplitude \
-    ...                   / stat.models["Displacement"]["Semi-Annual"].amplitude - 1
-    >>> absdiff_ann_ph = mdl_coll_synth["Annual"].phase \
-    ...                   - stat.models["Displacement"]["Annual"].phase
-    >>> absdiff_sem_ph = mdl_coll_synth["Semi-Annual"].phase \
-    ...                   - stat.models["Displacement"]["Semi-Annual"].phase
-    >>> print(f"Percent Error Constant:              {reldiff_sec[0]: %}\n"
-    ...       f"Percent Error Linear:                {reldiff_sec[1]: %}\n"
-    ...       f"Percent Error Annual Amplitude:      {reldiff_ann_amp: %}\n"
-    ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: %}\n"
-    ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: f} rad\n"
-    ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: f} rad")
-    Percent Error Constant:              -44.023921%
-    Percent Error Linear:                 20.780108%
-    Percent Error Annual Amplitude:      -0.233888%
-    Percent Error Semi-Annual Amplitude:  0.061881%
-    Absolute Error Annual Phase:          0.016006 rad
-    Absolute Error Semi-Annual Phase:    -0.017135 rad
+    >>> reldiff_ann_amp = (mdl_coll_synth["Annual"].amplitude
+    ...                    / stat.models["Displacement"]["Annual"].amplitude)[0]- 1
+    >>> reldiff_sem_amp = (mdl_coll_synth["Semi-Annual"].amplitude
+    ...                    / stat.models["Displacement"]["Semi-Annual"].amplitude)[0]- 1
+    >>> absdiff_ann_ph = np.rad2deg(mdl_coll_synth["Annual"].phase
+    ...                             - stat.models["Displacement"]["Annual"].phase)[0]
+    >>> absdiff_sem_ph = np.rad2deg(mdl_coll_synth["Semi-Annual"].phase
+    ...                             - stat.models["Displacement"]["Semi-Annual"].phase)[0]
+    >>> print(f"Percent Error Constant:              {reldiff_sec[0]: .3%}\n"
+    ...       f"Percent Error Linear:                {reldiff_sec[1]: .3%}\n"
+    ...       f"Percent Error Annual Amplitude:      {reldiff_ann_amp: .3%}\n"
+    ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: .3%}\n"
+    ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: .3f}°\n"
+    ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: .3f}°")
+    Percent Error Constant:              -44.024%
+    Percent Error Linear:                 20.780%
+    Percent Error Annual Amplitude:      -0.234%
+    Percent Error Semi-Annual Amplitude:  0.062%
+    Absolute Error Annual Phase:          0.917°
+    Absolute Error Semi-Annual Phase:    -0.982°
 
 Apart from the trade-off between the polynomial trend and long-term splines, which can be
 expected in this synthetic example, we got pretty close to our ground truth. Let's finish

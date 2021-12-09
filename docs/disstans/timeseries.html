@@ -1,79 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Timeseries &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Timeseries &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tools" href="tools.html" />
     <link rel="prev" title="Station" href="station.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -81,22 +41,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -139,6 +91,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -155,6 +114,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
@@ -163,11 +124,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -176,19 +138,22 @@
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -198,8 +163,9 @@
 <li class="toctree-l3"><a class="reference internal" href="processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#classes">Classes</a><ul>
@@ -209,17 +175,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -241,25 +203,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -268,82 +231,40 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
-        
       <li>Timeseries</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/disstans/timeseries.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="module-disstans.timeseries">
-<span id="timeseries"></span><h1>Timeseries<a class="headerlink" href="#module-disstans.timeseries" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="module-disstans.timeseries">
+<span id="timeseries"></span><h1>Timeseries<a class="headerlink" href="#module-disstans.timeseries" title="Permalink to this headline"></a></h1>
 <p>This module contains the <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> base class and other
 formats included by default in DISSTANS.</p>
-<div class="section" id="timeseries-parent-class">
-<h2>Timeseries (Parent Class)<a class="headerlink" href="#timeseries-parent-class" title="Permalink to this headline">¶</a></h2>
+<section id="timeseries-parent-class">
+<h2>Timeseries (Parent Class)<a class="headerlink" href="#timeseries-parent-class" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Object that expands the functionality of a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object
 for better integration into DISSTANS. Apart from the data itself, it contains
 information about the source and units of the data. It also performs input
@@ -399,7 +320,7 @@ three components:</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__add__">
-<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__add__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__add__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that allows two timeseries instances (or a timeseries and
 an equivalently shaped NumPy array) to be added together element-wise.</p>
 <dl class="field-list simple">
@@ -429,7 +350,7 @@ an equivalently shaped NumPy array) to be added together element-wise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__getitem__">
-<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__getitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__getitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that provides a shorthand notation
 to access the timeseries’ columns.</p>
 <dl class="field-list simple">
@@ -455,7 +376,7 @@ of column names, the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__mul__">
-<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__mul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__mul__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__mul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__mul__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that allows two timeseries instances (or a timeseries and
 an equivalently shaped NumPy array) to be multiplied together element-wise.</p>
 <dl class="field-list simple">
@@ -485,31 +406,31 @@ an equivalently shaped NumPy array) to be multiplied together element-wise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__radd__">
-<span class="sig-name descname"><span class="pre">__radd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__radd__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__radd__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__radd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__radd__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__radd__" title="Permalink to this definition"></a></dt>
 <dd><p>Reflected operation of <a class="reference internal" href="#disstans.timeseries.Timeseries.__add__" title="disstans.timeseries.Timeseries.__add__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__add__()</span></code></a> (necessary if first operand is a NumPy array).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__rmul__">
-<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__rmul__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__rmul__" title="Permalink to this definition"></a></dt>
 <dd><p>Reflected operation of <a class="reference internal" href="#disstans.timeseries.Timeseries.__mul__" title="disstans.timeseries.Timeseries.__mul__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__mul__()</span></code></a> (necessary if first operand is a NumPy array).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__rsub__">
-<span class="sig-name descname"><span class="pre">__rsub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__rsub__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__rsub__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__rsub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__rsub__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__rsub__" title="Permalink to this definition"></a></dt>
 <dd><p>Reflected operation of <a class="reference internal" href="#disstans.timeseries.Timeseries.__sub__" title="disstans.timeseries.Timeseries.__sub__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__sub__()</span></code></a> (necessary if first operand is a NumPy array).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__rtruediv__">
-<span class="sig-name descname"><span class="pre">__rtruediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__rtruediv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__rtruediv__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__rtruediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__rtruediv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__rtruediv__" title="Permalink to this definition"></a></dt>
 <dd><p>Reflected operation of <a class="reference internal" href="#disstans.timeseries.Timeseries.__truediv__" title="disstans.timeseries.Timeseries.__truediv__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__truediv__()</span></code></a> (necessary if first operand is a NumPy array).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__str__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__str__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that returns a readable summary of the timeseries.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
@@ -524,7 +445,7 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__sub__">
-<span class="sig-name descname"><span class="pre">__sub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__sub__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__sub__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__sub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__sub__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__sub__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that allows a timeseries instance (or a timeseries and
 an equivalently shaped NumPy array) to be subtracted from another element-wise.</p>
 <dl class="field-list simple">
@@ -554,7 +475,7 @@ an equivalently shaped NumPy array) to be subtracted from another element-wise.<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.__truediv__">
-<span class="sig-name descname"><span class="pre">__truediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__truediv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__truediv__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__truediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.__truediv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.__truediv__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that allows a timeseries instances (or a timeseries and
 an equivalently shaped NumPy array) to be divided by another element-wise.</p>
 <dl class="field-list simple">
@@ -584,7 +505,7 @@ an equivalently shaped NumPy array) to be divided by another element-wise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.add_uncertainties">
-<span class="sig-name descname"><span class="pre">add_uncertainties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.add_uncertainties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.add_uncertainties" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_uncertainties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.add_uncertainties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.add_uncertainties" title="Permalink to this definition"></a></dt>
 <dd><p>Add variance and covariance data and column names to the timeseries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -615,7 +536,7 @@ names by itself if none are specified.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">only_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.copy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">only_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.copy" title="Permalink to this definition"></a></dt>
 <dd><p>Return a deep copy of the timeseries instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -637,7 +558,7 @@ Uses the current one by default.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.cov_at">
-<span class="sig-name descname"><span class="pre">cov_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.cov_at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.cov_at" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">cov_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.cov_at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.cov_at" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the covariance matrix of the timeseries at a given time or index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -655,12 +576,12 @@ matrix for. Alternatively, an integer index.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.cut">
-<span class="sig-name descname"><span class="pre">cut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_inside</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.cut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.cut" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">cut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_inside</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.cut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.cut" title="Permalink to this definition"></a></dt>
 <dd><p>Cut the timeseries to contain only data between certain times or indices.
 If both a minimum (maximum) timestamp or index is provided, the later (earlier,
 respectively) one is used (i.e., the more restrictive one).
 Also provides the reverse operation, i.e. only removing data between dates.</p>
-<p>This operation is changes the timeseries in-place; if it should be done on a
+<p>This operation changes the timeseries in-place; if it should be done on a
 new timeseries, use <a class="reference internal" href="#disstans.timeseries.Timeseries.copy" title="disstans.timeseries.Timeseries.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a> first.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -680,7 +601,7 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.from_array">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.from_array" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.from_array" title="Permalink to this definition"></a></dt>
 <dd><p>Constructor method to create a <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> instance from a NumPy
 <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
 <dl class="field-list simple">
@@ -723,7 +644,7 @@ If <code class="docutils literal notranslate"><span class="pre">cov</span></code
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.from_fit">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.from_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.from_fit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.from_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.from_fit" title="Permalink to this definition"></a></dt>
 <dd><p>Import a fit dictionary and create a Timeseries instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -753,7 +674,7 @@ Uncertainty column names are generated by adding a ‘_var’.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.get_arch">
-<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.get_arch" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.get_arch" title="Permalink to this definition"></a></dt>
 <dd><p>Build a dictionary describing the architecture of this timeseries,
 to be used when creating a network JSON configuration file.</p>
 <p>Without subclassing <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, this function will return an
@@ -774,7 +695,7 @@ a general Timeseries object from just a JSON-compatible dictionary.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.mask_out">
-<span class="sig-name descname"><span class="pre">mask_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.mask_out"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.mask_out" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">mask_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.mask_out"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.mask_out" title="Permalink to this definition"></a></dt>
 <dd><p>Mask out an entire data column (and if present, its uncertainty column) by setting
 the entire column to <code class="docutils literal notranslate"><span class="pre">NaN</span></code>. Converts it to a sparse representation to save memory.</p>
 <dl class="field-list simple">
@@ -786,7 +707,7 @@ the entire column to <code class="docutils literal notranslate"><span class="pre
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.prepare_math">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">prepare_math</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.prepare_math"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.prepare_math" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prepare_math</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.prepare_math"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.prepare_math" title="Permalink to this definition"></a></dt>
 <dd><p>Tests two timeseries’ ability to be cast together in a mathematical operation,
 and returns output characteristics.
 Currently, only addition, subtraction, multiplication, and division are supported.</p>
@@ -860,68 +781,68 @@ with shape (<code class="docutils literal notranslate"><span class="pre">len(out
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.cov_cols">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">cov_cols</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.cov_cols" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cov_cols</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.cov_cols" title="Permalink to this definition"></a></dt>
 <dd><p>List of the column names in <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a> that contain data covariances.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.covs">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">covs</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.covs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">covs</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.covs" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the covariances from <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.data">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.data" title="Permalink to this definition"></a></dt>
 <dd><p>View of only the data columns in <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.data_cols">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">data_cols</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.data_cols" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_cols</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.data_cols" title="Permalink to this definition"></a></dt>
 <dd><p>List of the column names in <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a> that contain data.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.data_unit">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">data_unit</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.data_unit" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_unit</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.data_unit" title="Permalink to this definition"></a></dt>
 <dd><p>Data unit.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.df">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">df</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.df" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">df</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.df" title="Permalink to this definition"></a></dt>
 <dd><p>The entire timeseries’ DataFrame.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.index_map">
-<span class="sig-name descname"><span class="pre">index_map</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.index_map" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">index_map</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.index_map" title="Permalink to this definition"></a></dt>
 <dd><p>Matrix that contains the rolling indices of each matrix element used by
 <a class="reference internal" href="tools.html#disstans.tools.get_cov_indices" title="disstans.tools.get_cov_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_cov_indices()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.length">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.length" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.length" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the length of the timeseries.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.num_components">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_components</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.num_components" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_components</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.num_components" title="Permalink to this definition"></a></dt>
 <dd><p>Number of data columns.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.num_observations">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_observations</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.num_observations" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_observations</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.num_observations" title="Permalink to this definition"></a></dt>
 <dd><p>Number of observations (rows in <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.reliability">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reliability</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.reliability" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reliability</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.reliability" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the reliability (between 0 and 1) defined as the number of available
 observations divided by the the number of expected observations. The expected
 observations are calculated by taking the median timespan between observations,
@@ -933,65 +854,65 @@ daily observations.)</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.shape">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.shape" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.shape" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the shape tuple (similar to NumPy) of the timeseries, which is of shape
 <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.sigmas">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sigmas</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.sigmas" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sigmas</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.sigmas" title="Permalink to this definition"></a></dt>
 <dd><p>View of only the data standard deviation columns in <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.src">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">src</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.src" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">src</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.src" title="Permalink to this definition"></a></dt>
 <dd><p>Source information.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.time">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.time" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.time" title="Permalink to this definition"></a></dt>
 <dd><p>Timestamps of the timeseries (index of <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.var_cols">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">var_cols</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.var_cols" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var_cols</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.var_cols" title="Permalink to this definition"></a></dt>
 <dd><p>List of the column names in <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a> that contain data variance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.var_cov">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">var_cov</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.var_cov" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var_cov</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.var_cov" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the variance as well as covariance columns from <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>, to be indexed
 by <a class="reference internal" href="#disstans.timeseries.Timeseries.var_cov_map" title="disstans.timeseries.Timeseries.var_cov_map"><code class="xref py py-attr docutils literal notranslate"><span class="pre">var_cov_map</span></code></a> to yield the full variance-covariance matrix.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.var_cov_map">
-<span class="sig-name descname"><span class="pre">var_cov_map</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.var_cov_map" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">var_cov_map</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.var_cov_map" title="Permalink to this definition"></a></dt>
 <dd><p>Contains the column indices needed to create the full variance-covariance
 matrix for a single time.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.vars">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vars</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.vars" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vars</span></span><a class="headerlink" href="#disstans.timeseries.Timeseries.vars" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the variances from <a class="reference internal" href="#disstans.timeseries.Timeseries.df" title="disstans.timeseries.Timeseries.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a>.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="specialized-classes">
-<h2>Specialized Classes<a class="headerlink" href="#specialized-classes" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="gipsytimeseries">
-<h3>GipsyTimeseries<a class="headerlink" href="#gipsytimeseries" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="specialized-classes">
+<h2>Specialized Classes<a class="headerlink" href="#specialized-classes" title="Permalink to this headline"></a></h2>
+<section id="gipsytimeseries">
+<h3>GipsyTimeseries<a class="headerlink" href="#gipsytimeseries" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.GipsyTimeseries">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">GipsyTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">GipsyTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>.</p>
 <p>Timeseries subclass for GNSS measurements in JPL’s Gipsy <code class="docutils literal notranslate"><span class="pre">.tseries</span></code> file format.
 The data and (co)variances are converted into millimeters (squared).</p>
@@ -1042,7 +963,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
 as per personal communication with Angelyn Moore, JPL.)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.GipsyTimeseries.get_arch">
-<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries.get_arch" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries.get_arch" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a JSON-compatible dictionary with all the information necessary to recreate
 the Timeseries instance (provided the data file is available).</p>
 <dl class="field-list simple">
@@ -1064,12 +985,12 @@ the Timeseries instance (provided the data file is available).</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="unrtimeseries">
-<h3>UNRTimeseries<a class="headerlink" href="#unrtimeseries" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="unrtimeseries">
+<h3>UNRTimeseries<a class="headerlink" href="#unrtimeseries" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.UNRTimeseries">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">UNRTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">UNRTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>.</p>
 <p>Timeseries subclass for GNSS measurements in UNR’s <code class="docutils literal notranslate"><span class="pre">.tenv3</span></code> file format.
 The data and (co)variances are converted into millimeters (squared).</p>
@@ -1142,7 +1063,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
 <p>The time series are relative to each station’s first integer epoch.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.UNRTimeseries.get_arch">
-<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries.get_arch" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries.get_arch" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a JSON-compatible dictionary with all the information necessary to recreate
 the Timeseries instance (provided the data file is available).</p>
 <dl class="field-list simple">
@@ -1164,56 +1085,39 @@ the Timeseries instance (provided the data file is available).</p>
 
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="station.html" class="btn btn-neutral float-left" title="Station" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

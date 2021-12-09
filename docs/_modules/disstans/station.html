@@ -1,76 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>disstans.station &mdash; disstans 0.8 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>disstans.station &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="../../index.html" class="icon icon-home"> disstans
-          
-
-          
+            <a href="../../index.html" class="icon icon-home"> DISSTANS
           </a>
-
-          
-            
-            
               <div class="version">
-                0.8
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -78,22 +37,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -136,6 +87,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a><ul>
@@ -152,6 +110,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
@@ -160,11 +120,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../disstans.html">disstans</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -173,19 +134,22 @@
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -195,8 +159,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#classes">Classes</a><ul>
@@ -206,17 +171,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -238,25 +199,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -265,69 +227,30 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">disstans</a>
-        
+          <a href="../../index.html">DISSTANS</a>
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>disstans.station</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for disstans.station</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the :class:`~Station` class, which is the main</span>
@@ -345,7 +268,7 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">models</span> <span class="k">as</span> <span class="n">disstans_models</span>
 <span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelCollection</span><span class="p">,</span> <span class="n">AllFits</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">ModelCollection</span><span class="p">,</span> <span class="n">FitCollection</span>
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">tvec_to_numpycol</span>
 
 
@@ -394,7 +317,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fits</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Dictionary of dictionaries of fitted :class:`~disstans.timeseries.Timeseries`</span>
+<span class="sd">        Dictionary of :class:`~disstans.models.FitCollection` objects</span>
 <span class="sd">        associated with a timeseries saved in :attr:`~timeseries`.</span>
 
 <span class="sd">        Example</span>
@@ -422,7 +345,7 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Models: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">model_names</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Fits: </span><span class="si">{</span><span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Fits: </span><span class="si">{</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">info</span></div>
 
 <div class="viewcode-block" id="Station.__getitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">):</span>
@@ -606,7 +529,7 @@
                             <span class="s2">&quot;&#39;timeseries&#39; is not a Timeseries object.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">warn_existing</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ts_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">):</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Overwriting time series &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">,</span>
-                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">uncertainties_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeseries</span><span class="o">.</span><span class="n">add_uncertainties</span><span class="p">(</span><span class="n">timeseries</span><span class="o">=</span><span class="n">uncertainties_from</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">override_src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -620,7 +543,7 @@
         <span class="k">if</span> <span class="n">override_cov_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeseries</span><span class="o">.</span><span class="n">var_cols</span> <span class="o">=</span> <span class="n">override_cov_cols</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeseries</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">FitCollection</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">ModelCollection</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">add_models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_local_model_dict</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">model_kw_args</span><span class="o">=</span><span class="n">add_models</span><span class="p">)</span></div>
@@ -649,7 +572,7 @@
         <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: &quot;</span>
                  <span class="sa">f</span><span class="s2">&quot;Cannot find time series &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39;, couldn&#39;t delete.&quot;</span><span class="p">,</span>
-                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span>
@@ -681,7 +604,7 @@
         <span class="k">if</span> <span class="n">model_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">model_names</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, timeseries </span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">: &quot;</span>
                  <span class="sa">f</span><span class="s2">&quot;Overwriting local model &#39;</span><span class="si">{</span><span class="n">model_description</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">,</span>
-                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">model_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span></div>
 
 <div class="viewcode-block" id="Station.add_local_model_dict"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model_dict">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_dict</span><span class="p">):</span>
@@ -755,13 +678,13 @@
                 <span class="k">elif</span> <span class="n">verbose</span><span class="p">:</span>
                     <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, timeseries </span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">: &quot;</span>
                          <span class="sa">f</span><span class="s2">&quot;Cannot find local model &#39;</span><span class="si">{</span><span class="n">mdl_desc</span><span class="si">}</span><span class="s2">&#39;, couldn&#39;t delete.&quot;</span><span class="p">,</span>
-                         <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                         <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Cannot find timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                      <span class="sa">f</span><span class="s2">&quot;couldn&#39;t delete local model &#39;</span><span class="si">{</span><span class="n">mdl_desc</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">,</span>
-                     <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span></div>
+                     <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.add_fit"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_fit">[docs]</a>    <span class="k">def</span> <span class="nf">add_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_description</span><span class="p">,</span> <span class="n">fit</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.add_fit"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_fit">[docs]</a>    <span class="k">def</span> <span class="nf">add_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">fit</span><span class="p">,</span> <span class="n">model_description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a fit dictionary to a timeseries&#39; model (overwrites the fit if it has</span>
 <span class="sd">        already been added for the model).</span>
@@ -770,11 +693,12 @@
 <span class="sd">        ----------</span>
 <span class="sd">        ts_description : str</span>
 <span class="sd">            Timeseries to add the fit to.</span>
-<span class="sd">        model_description : str</span>
-<span class="sd">            Model description the fit applies to.</span>
 <span class="sd">        fit : dict</span>
 <span class="sd">            Dictionary with the keys ``&#39;time&#39;``, ``&#39;fit&#39;``, ``&#39;var&#39;`` and ``&#39;cov&#39;``</span>
 <span class="sd">            (the latter two can be set to ``None``).</span>
+<span class="sd">        model_description : str, optional</span>
+<span class="sd">            Model description the fit applies to.</span>
+<span class="sd">            If ``None``, the fit is the sum of all individual model fits.</span>
 <span class="sd">        return_ts : bool, optional</span>
 <span class="sd">            If ``True`` (default: ``False``), return the created timeseries.</span>
 
@@ -790,20 +714,25 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot add new fit: &#39;ts_description&#39; is not a string.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_description</span><span class="p">,</span> <span class="n">AllFits</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">model_description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot add new fit: &#39;model_description&#39; is not a string.&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">ts_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">,</span> \
             <span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Cannot find timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39; &quot;</span> \
             <span class="sa">f</span><span class="s2">&quot;to add fit for model &#39;</span><span class="si">{</span><span class="n">model_description</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_description</span><span class="p">,</span> <span class="n">AllFits</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">model_description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_description</span> <span class="o">+</span> <span class="s2">&quot;_Model_&quot;</span> <span class="o">+</span> <span class="n">dcol</span>
+                         <span class="k">for</span> <span class="n">dcol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_description</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">model_description</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">dcol</span>
+                         <span class="k">for</span> <span class="n">dcol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span>
             <span class="k">assert</span> <span class="n">model_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">],</span> \
                 <span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, timeseries </span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">: &quot;</span> \
                 <span class="sa">f</span><span class="s2">&quot;Cannot find local model &#39;</span><span class="si">{</span><span class="n">model_description</span><span class="si">}</span><span class="s2">&#39;, couldn&#39;t add fit.&quot;</span>
-        <span class="n">data_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_description</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">model_description</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">dcol</span>
-                     <span class="k">for</span> <span class="n">dcol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span>
         <span class="n">fit_ts</span> <span class="o">=</span> <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_unit</span><span class="p">,</span> <span class="n">data_cols</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">model_description</span><span class="p">:</span> <span class="n">fit_ts</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">model_description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">allfits</span> <span class="o">=</span> <span class="n">fit_ts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">model_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_ts</span>
         <span class="k">if</span> <span class="n">return_ts</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">fit_ts</span></div>
 
@@ -821,15 +750,15 @@
         <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Cannot find timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                  <span class="sa">f</span><span class="s2">&quot;couldn&#39;t delete fit for model &#39;</span><span class="si">{</span><span class="n">model_description</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">,</span>
-                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">model_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]:</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, timeseries </span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">: &quot;</span>
                  <span class="sa">f</span><span class="s2">&quot;Cannot find local model &#39;</span><span class="si">{</span><span class="n">model_description</span><span class="si">}</span><span class="s2">&#39;, couldn&#39;t delete fit.&quot;</span><span class="p">,</span>
-                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">model_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]:</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, timeseries </span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">: &quot;</span>
                  <span class="sa">f</span><span class="s2">&quot;Cannot find fit for local model &#39;</span><span class="si">{</span><span class="n">model_description</span><span class="si">}</span><span class="s2">&#39;, couldn&#39;t delete.&quot;</span><span class="p">,</span>
-                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                 <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">model_description</span><span class="p">]</span></div>
 
@@ -858,8 +787,7 @@
         <span class="c1"># get model subset</span>
         <span class="n">fits_to_sum</span> <span class="o">=</span> <span class="p">{</span><span class="n">model_description</span><span class="p">:</span> <span class="n">fit</span>
                        <span class="k">for</span> <span class="n">model_description</span><span class="p">,</span> <span class="n">fit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                       <span class="k">if</span> <span class="p">((</span><span class="n">fit_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">model_description</span> <span class="ow">in</span> <span class="n">fit_list</span><span class="p">)</span>
-                           <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_description</span><span class="p">,</span> <span class="n">AllFits</span><span class="p">))}</span>
+                       <span class="k">if</span> <span class="p">((</span><span class="n">fit_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">model_description</span> <span class="ow">in</span> <span class="n">fit_list</span><span class="p">))}</span>
         <span class="k">assert</span> <span class="n">fits_to_sum</span><span class="p">,</span> \
             <span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, timeseries </span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">: Can&#39;t find fits for models.&quot;</span>
         <span class="c1"># sum models and uncertainties</span>
@@ -1100,46 +1028,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

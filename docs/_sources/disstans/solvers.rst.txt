@@ -3,8 +3,16 @@ Solvers
 
 .. automodule:: disstans.solvers
 
-Local Solver Functions
-----------------------
+Solution Object
+---------------
+
+.. autoclass:: disstans.solvers.Solution
+   :members:
+
+Solver Functions
+----------------
+
+Either used directly, or through :meth:`~disstans.network.Network.fit`.
 
 lasso_regression
 ................
@@ -21,24 +29,10 @@ ridge_regression
 
 .. autofunction:: disstans.solvers.ridge_regression
 
-Global Solver Classes
----------------------
-
-SpatialSolver
-.............
-
-.. autoclass:: disstans.solvers.SpatialSolver
-   :members:
-   :special-members:
-
-Solution Object
----------------
-
-.. autoclass:: disstans.solvers.Solution
-   :members:
-
 Reweighting Functions
 ---------------------
+
+For use with :func:`~lasso_regression` and :meth:`~disstans.network.Network.spatialfit`.
 
 ReweightingFunction
 ...................

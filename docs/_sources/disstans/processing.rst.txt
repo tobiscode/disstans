@@ -16,15 +16,20 @@ clean
 
 .. autofunction:: disstans.processing.clean
 
-common_mode
-...........
+decompose
+.........
 
-.. autofunction:: disstans.processing.common_mode
+.. autofunction:: disstans.processing.decompose
 
 median
 ......
 
 .. autofunction:: disstans.processing.median
+
+midas
+.....
+
+.. autofunction:: disstans.processing.midas
 
 Classes
 -------

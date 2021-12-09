@@ -1,79 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Processing &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Processing &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Solvers" href="solvers.html" />
     <link rel="prev" title="Network" href="network.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -81,22 +41,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -139,6 +91,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -155,6 +114,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
@@ -163,11 +124,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -176,19 +138,22 @@
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -198,8 +163,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
@@ -209,17 +175,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -241,25 +203,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -268,84 +231,42 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
-        
       <li>Processing</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/disstans/processing.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="module-disstans.processing">
-<span id="processing"></span><h1>Processing<a class="headerlink" href="#module-disstans.processing" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="module-disstans.processing">
+<span id="processing"></span><h1>Processing<a class="headerlink" href="#module-disstans.processing" title="Permalink to this headline"></a></h1>
 <p>This module contains some processing functions that while not belonging
 to a specific class, require them to already be loaded and DISSTANS to
 be initialized.</p>
 <p>For general helper functions, see <a class="reference internal" href="tools.html#module-disstans.tools" title="disstans.tools"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tools</span></code></a>.</p>
-<div class="section" id="unwrap-dict-and-ts">
-<h2>unwrap_dict_and_ts<a class="headerlink" href="#unwrap-dict-and-ts" title="Permalink to this headline">¶</a></h2>
+<section id="unwrap-dict-and-ts">
+<h2>unwrap_dict_and_ts<a class="headerlink" href="#unwrap-dict-and-ts" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.processing.unwrap_dict_and_ts">
-<span class="sig-prename descclassname"><span class="pre">&#64;</span></span><span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">unwrap_dict_and_ts</span></span><a class="reference internal" href="../_modules/disstans/processing.html#unwrap_dict_and_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.unwrap_dict_and_ts" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">&#64;</span></span><span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">unwrap_dict_and_ts</span></span><a class="reference internal" href="../_modules/disstans/processing.html#unwrap_dict_and_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.unwrap_dict_and_ts" title="Permalink to this definition"></a></dt>
 <dd><p>A wrapper decorator that aims at simplifying the coding of processing functions.
 Ideally, a new function that doesn’t need to know if its input is a
 <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>,
@@ -372,14 +293,14 @@ to be able to also take and return all the other data forms:</p>
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="clean">
-<h3>clean<a class="headerlink" href="#clean" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<section id="clean">
+<h3>clean<a class="headerlink" href="#clean" title="Permalink to this headline"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.processing.clean">
-<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_callable_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.clean" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_callable_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.clean" title="Permalink to this definition"></a></dt>
 <dd><p>Function operating on a single station’s timeseries to clean it from outliers,
 and mask it out if the data is not good enough. The criteria are set by
 <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a> but can be overriden by providing <code class="docutils literal notranslate"><span class="pre">clean_kw_args</span></code>.
@@ -420,14 +341,13 @@ the raw input timeseries, specify <code class="docutils literal notranslate"><sp
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="common-mode">
-<h3>common_mode<a class="headerlink" href="#common-mode" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="decompose">
+<h3>decompose<a class="headerlink" href="#decompose" title="Permalink to this headline"></a></h3>
 <dl class="py function">
-<dt class="sig sig-object py" id="disstans.processing.common_mode">
-<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">common_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#common_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.common_mode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the Common Mode Error (CME) with the given method.
-The input array should already be a residual.</p>
+<dt class="sig sig-object py" id="disstans.processing.decompose">
+<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.decompose" title="Permalink to this definition"></a></dt>
+<dd><p>Decomposes the input signal into different components using PCA or ICA.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -435,21 +355,22 @@ The input array should already be a residual.</p>
 (can contain NaNs).
 Wrapped by <a class="reference internal" href="#disstans.processing.unwrap_dict_and_ts" title="disstans.processing.unwrap_dict_and_ts"><code class="xref py py-func docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a> to also accept
 <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> and
-dictionaries of them as input.</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Method to use to decompose the array. Possible values are <code class="docutils literal notranslate"><span class="pre">'pca'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ica'}.</span>
-<span class="pre">``'pca'</span></code> uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">Principal Component Analysis</a> (motivated by <a class="reference internal" href="#dong06" id="id1"><span>[dong06]</span></a>), whereas
-<code class="docutils literal notranslate"><span class="pre">'ica'</span></code> uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.FastICA.html">Independent Component Analysis</a> (motivated by <a class="reference internal" href="#huang12" id="id2"><span>[huang12]</span></a>).</p></li>
-<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of CME bases to estimate. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, include not only the modeled CME, but also the components
+dictionaries of them as input (i.e. the output of
+<a class="reference internal" href="network.html#disstans.network.Network.export_network_ts" title="disstans.network.Network.export_network_ts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">export_network_ts()</span></code></a>).</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Method to use to decompose the array. Possible values are <code class="docutils literal notranslate"><span class="pre">'pca'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ica'</span></code>:
+<code class="docutils literal notranslate"><span class="pre">'pca'</span></code> uses <a class="reference external" href="https://scikit-learn.org/0.24/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA" title="(in scikit-learn v0.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCA</span></code></a> (motivated by <a class="reference internal" href="#dong06" id="id1"><span>[dong06]</span></a>), whereas
+<code class="docutils literal notranslate"><span class="pre">'ica'</span></code> uses <a class="reference external" href="https://scikit-learn.org/0.24/modules/generated/sklearn.decomposition.FastICA.html#sklearn.decomposition.FastICA" title="(in scikit-learn v0.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastICA</span></code></a> (motivated by <a class="reference internal" href="#huang12" id="id2"><span>[huang12]</span></a>).</p></li>
+<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of components to estimate. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all are used.</p></li>
+<li><p><strong>return_sources</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, return not only the best-fit model, but also the sources
 themselves in space and time. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>model</strong> (<em>numpy.ndarray</em>) – Modeled CME of shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>.</p></li>
-<li><p><strong>temporal</strong> (<em>numpy.ndarray</em>) – (Only if <code class="docutils literal notranslate"><span class="pre">plot=True</span></code>.) CME in time of shape
+<li><p><strong>model</strong> (<em>numpy.ndarray</em>) – Best-fit model with shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>.</p></li>
+<li><p><strong>temporal</strong> (<em>numpy.ndarray</em>) – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Temporal source with shape
 <span class="math notranslate nohighlight">\((\text{num_observations},\text{num_components})\)</span>.</p></li>
-<li><p><strong>spatial</strong> (<em>numpy.ndarray</em>) – (Only if <code class="docutils literal notranslate"><span class="pre">plot=True</span></code>.) CME in space of shape
+<li><p><strong>spatial</strong> (<em>numpy.ndarray</em>) – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Spatial source with shape
 <span class="math notranslate nohighlight">\((\text{num_components},\text{n_stations})\)</span>.</p></li>
 </ul>
 </p>
@@ -473,12 +394,12 @@ doi:<a class="reference external" href="http://dx.doi.org/10.4028/www.scientific
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="median">
-<h3>median<a class="headerlink" href="#median" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="median">
+<h3>median<a class="headerlink" href="#median" title="Permalink to this headline"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.processing.median">
-<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.median" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.median" title="Permalink to this definition"></a></dt>
 <dd><p>Computes the median filter (ignoring NaNs) column-wise, either by calling
 <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.nanmedian.html#numpy.nanmedian" title="(in NumPy v1.20)"><code class="xref py py-func docutils literal notranslate"><span class="pre">nanmedian()</span></code></a> iteratively or by using the precompiled Fortran
 function <a class="reference internal" href="compiled.html#disstans.compiled.maskedmedfilt2d" title="disstans.compiled.maskedmedfilt2d"><code class="xref py py-func docutils literal notranslate"><span class="pre">maskedmedfilt2d()</span></code></a>.</p>
@@ -502,15 +423,64 @@ Has to be an odd number.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="stepdetector">
-<h3>StepDetector<a class="headerlink" href="#stepdetector" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="midas">
+<h3>midas<a class="headerlink" href="#midas" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.processing.midas">
+<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">midas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#midas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.midas" title="Permalink to this definition"></a></dt>
+<dd><p>This function performs the MIDAS estimate as described by <a class="reference internal" href="#blewitt16" id="id3"><span>[blewitt16]</span></a>.
+It is adapted from the Fortran code provided by the author (see
+<a class="reference internal" href="compiled.html#disstans.compiled.selectpair" title="disstans.compiled.selectpair"><code class="xref py py-func docutils literal notranslate"><span class="pre">selectpair()</span></code></a> for more details and original copyright).</p>
+<p>MIDAS returns the median estimate of secular (constant) velocities in all data
+components using data pairs spanning exactly one year. By not including pairs
+crossing known step epochs and using a fixed period, the influence of unmodeled
+jumps and seasonal variations can be minimized. At the end, an empirical estimate
+of the velocities’ uncertainty is calculated as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to perform the MIDAS algorithm on.</p></li>
+<li><p><strong>steps</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><em>pandas.DatetimeIndex</em></a><em>, </em><em>optional</em>) – If given, a pandas Series or Index of step times, across which no pairs
+should be formed.</p></li>
+<li><p><strong>tolerance</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>mdl</strong> (<em>disstans.models.Polynomial</em>) – Fitted polynomial (offset &amp; constant velocity) model.</p></li>
+<li><p><strong>res</strong> (<em>disstans.timeseries.Timeseries</em>) – Residual timeseries.</p></li>
+<li><p><strong>stats</strong> (<em>dict</em>) – Fittings statistics computed along the way.
+<code class="docutils literal notranslate"><span class="pre">'num_epochs'</span></code>, <code class="docutils literal notranslate"><span class="pre">'num_used'</span></code>, <code class="docutils literal notranslate"><span class="pre">'num_pairs'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'nstep'</span></code> are the number of
+epochs in <code class="docutils literal notranslate"><span class="pre">ts</span></code>, the number of epochs used in the velocity pairs, the number of pairs
+formed, and the number of included steps, respectively. <code class="docutils literal notranslate"><span class="pre">'frac_removed'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'sd_velpairs'</span></code> are the fraction of removed pairs (because of velocity pairs more
+than two standard deviations away from their medians) and the estimated standard
+deviation of the velocity pairs, respectively, and for each component.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="blewitt16"><span class="brackets"><a class="fn-backref" href="#id3">blewitt16</a></span></dt>
+<dd><p>Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).
+<em>MIDAS robust trend estimator for accurate GPS station velocities without step detection.</em>
+Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.
+doi:<a class="reference external" href="https://doi.org/10.1002/2015JB012552">10.1002/2015JB012552</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h2>
+<section id="stepdetector">
+<h3>StepDetector<a class="headerlink" href="#stepdetector" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">StepDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">StepDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector" title="Permalink to this definition"></a></dt>
 <dd><p>This class implements a step detector based on the Akaike Information Criterion (AIC).</p>
 <p>A window is moved over the input data, and two linear models are fit in the
 method <a class="reference internal" href="#disstans.processing.StepDetector.search" title="disstans.processing.StepDetector.search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search()</span></code></a>: one containing only a linear polynomial, and one containing an
@@ -537,9 +507,9 @@ Can contain NaNs.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.AIC_c">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">AIC_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.AIC_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.AIC_c" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AIC_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.AIC_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.AIC_c" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the Akaike Information Criterion for small samples for Least Squares
-regression results. Implementation is based on <a class="reference internal" href="#burnhamanderson02" id="id3"><span>[burnhamanderson02]</span></a> (ch. 2).</p>
+regression results. Implementation is based on <a class="reference internal" href="#burnhamanderson02" id="id4"><span>[burnhamanderson02]</span></a> (ch. 2).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -559,7 +529,7 @@ parameters (including the mean), then the degrees of freedom are
 </dl>
 <p class="rubric">References</p>
 <dl class="citation">
-<dt class="label" id="burnhamanderson02"><span class="brackets"><a class="fn-backref" href="#id3">burnhamanderson02</a></span></dt>
+<dt class="label" id="burnhamanderson02"><span class="brackets"><a class="fn-backref" href="#id4">burnhamanderson02</a></span></dt>
 <dd><p>(2002) <em>Information and Likelihood Theory:
 A Basis for Model Selection and Inference.</em> In: Burnham K.P., Anderson D.R. (eds)
 Model Selection and Multimodel Inference. Springer, New York, NY.
@@ -570,7 +540,7 @@ doi:<a class="reference external" href="https://doi.org/10.1007/978-0-387-22456-
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search" title="Permalink to this definition"></a></dt>
 <dd><p>Function that will search for steps in the data.
 Upon successful completion, it will return the relative step probabilities
 as well as the residuals variances of the two hypotheses tested
@@ -611,7 +581,7 @@ Has shape <span class="math notranslate nohighlight">\((\text{num_observations},
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search_catalog">
-<span class="sig-name descname"><span class="pre">search_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_nan_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_catalog" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">search_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_nan_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_catalog" title="Permalink to this definition"></a></dt>
 <dd><p>Search a dictionary of potential step times for each station in the dictionary
 and assess the probability for each one.</p>
 <dl class="field-list simple">
@@ -632,6 +602,7 @@ is after the available timeseries, no step probability can be calculated
 and the results will contain NaNs.
 If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), those entries will be kept in the output, and if
 <code class="docutils literal notranslate"><span class="pre">False</span></code>, they will be dropped.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -653,7 +624,7 @@ steps as determined by <code class="docutils literal notranslate"><span class="p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search_network">
-<span class="sig-name descname"><span class="pre">search_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_network" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">search_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_network" title="Permalink to this definition"></a></dt>
 <dd><p>Function that searches for steps in an entire network (possibly in parallel),
 thresholds those probabilities, and identifies all the consecutive ranges in which
 steps happen over the network.</p>
@@ -668,6 +639,7 @@ steps happen over the network.</p>
 <li><p><strong>gap</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum gap between identified steps to count as a continuous period
 of possible steps.</p></li>
 <li><p><strong>gap_unit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit of <code class="docutils literal notranslate"><span class="pre">gap</span></code>.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -688,7 +660,7 @@ steps as determined by <code class="docutils literal notranslate"><span class="p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.steps">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.steps" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.steps" title="Permalink to this definition"></a></dt>
 <dd><p>Threshold the probabilities to return a list of steps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -712,7 +684,7 @@ for each component.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.test_single">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">test_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xwindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ywindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.test_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.test_single" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xwindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ywindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.test_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.test_single" title="Permalink to this definition"></a></dt>
 <dd><p>For a single window (of arbitrary, but odd length), perform the AIC hypothesis test
 whether a step is likely present (H1) or not (H0) in the <code class="docutils literal notranslate"><span class="pre">y</span></code> data given
 <code class="docutils literal notranslate"><span class="pre">x</span></code> coordinates.</p>
@@ -755,68 +727,51 @@ Is <code class="docutils literal notranslate"><span class="pre">NaN</span></code
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.kernel_size">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kernel_size</span></span><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_size</span></span><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size" title="Permalink to this definition"></a></dt>
 <dd><p>Kernel (window) size of the detector.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.kernel_size_min">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kernel_size_min</span></span><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size_min" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_size_min</span></span><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size_min" title="Permalink to this definition"></a></dt>
 <dd><p>Minimum kernel (window) size of the detector.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="solvers.html" class="btn btn-neutral float-right" title="Solvers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="network.html" class="btn btn-neutral float-left" title="Network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solvers.html" class="btn btn-neutral float-right" title="Solvers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

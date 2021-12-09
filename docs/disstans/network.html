@@ -1,79 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Network &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Network &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Processing" href="processing.html" />
     <link rel="prev" title="Models" href="models.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -81,22 +41,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -139,6 +91,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -155,6 +114,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
@@ -163,11 +124,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -176,19 +138,22 @@
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -198,8 +163,9 @@
 <li class="toctree-l3"><a class="reference internal" href="processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#classes">Classes</a><ul>
@@ -209,17 +175,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -241,25 +203,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -268,80 +231,38 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
-        
       <li>Network</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/disstans/network.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="module-disstans.network">
-<span id="network"></span><h1>Network<a class="headerlink" href="#module-disstans.network" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="module-disstans.network">
+<span id="network"></span><h1>Network<a class="headerlink" href="#module-disstans.network" title="Permalink to this headline"></a></h1>
 <p>This module contains the <a class="reference internal" href="#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> class, which is the
 highest-level container object in DISSTANS.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.network.Network">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.network.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_location_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_add</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_add_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_local_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.network.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_location_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_add</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_add_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_local_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network" title="Permalink to this definition"></a></dt>
 <dd><p>Main class of DISSTANS. Contains information about the network, defines defaults,
 and most importantly, contains a dictionary of all stations in the network.</p>
 <dl class="field-list simple">
@@ -365,7 +286,7 @@ will only add stations within the latitude, longitude polygon defined by
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__contains__">
-<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__contains__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__contains__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that allows to check whether a certain station name
 is in the network.</p>
 <p class="rubric">Example</p>
@@ -381,7 +302,7 @@ is in the network.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__delitem__">
-<span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__delitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__delitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__delitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__delitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that allows a dictionary-like removing of stations
 from the network by wrapping <a class="reference internal" href="#disstans.network.Network.remove_station" title="disstans.network.Network.remove_station"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_station()</span></code></a>.</p>
 <div class="admonition seealso">
@@ -395,7 +316,7 @@ from the network by wrapping <a class="reference internal" href="#disstans.netwo
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__getitem__">
-<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__getitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__getitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that provides a shorthand notation
 to access the network’s stations.</p>
 <dl class="field-list simple">
@@ -420,7 +341,7 @@ the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__iter__">
-<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__iter__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__iter__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that allows for a shorthand notation to quickly
 iterate over all stations.</p>
 <p class="rubric">Example</p>
@@ -438,7 +359,7 @@ two loops are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__len__">
-<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__len__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__len__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that gives quick access to the number of stations in the
 network (<a class="reference internal" href="#disstans.network.Network.num_stations" title="disstans.network.Network.num_stations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_stations</span></code></a>) using Python’s built-in <code class="docutils literal notranslate"><span class="pre">len()</span></code> function
 to make interactions with iterators easier.</p>
@@ -446,7 +367,7 @@ to make interactions with iterators easier.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__setitem__">
-<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__setitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__setitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that allows a dictionary-like adding of stations to
 the network by wrapping <a class="reference internal" href="#disstans.network.Network.add_station" title="disstans.network.Network.add_station"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_station()</span></code></a>.</p>
 <div class="admonition seealso">
@@ -460,7 +381,7 @@ the network by wrapping <a class="reference internal" href="#disstans.network.Ne
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__str__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.__str__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that returns a readable summary of the network.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
@@ -475,7 +396,7 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.add_default_local_models">
-<span class="sig-name descname"><span class="pre">add_default_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_default_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_default_local_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_default_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_default_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_default_local_models" title="Permalink to this definition"></a></dt>
 <dd><p>Add the network’s default local models (or a subset thereof) to all stations.</p>
 <p>For example, this method can be used when instantiating a new network object
 from a JSON file using <a class="reference internal" href="#disstans.network.Network.from_json" title="disstans.network.Network.from_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_json()</span></code></a> but skipping the adding of local
@@ -500,7 +421,7 @@ local models to add. Defaults to all local models.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.add_local_models">
-<span class="sig-name descname"><span class="pre">add_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_local_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_local_models" title="Permalink to this definition"></a></dt>
 <dd><p>For each station in the network (or a subset thereof), add models
 to a timeseries using dictionary keywords.</p>
 <dl class="field-list simple">
@@ -518,7 +439,7 @@ to create each model object (see <a class="reference internal" href="models.html
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.add_station">
-<span class="sig-name descname"><span class="pre">add_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_station" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_station" title="Permalink to this definition"></a></dt>
 <dd><p>Add a station to the network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -547,7 +468,7 @@ two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.add_unused_local_models">
-<span class="sig-name descname"><span class="pre">add_unused_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_unused_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_unused_local_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_unused_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_unused_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_unused_local_models" title="Permalink to this definition"></a></dt>
 <dd><p>Add a station’s unused models (or subset thereof) to a target timeseries.</p>
 <p>Unused models are models that have been defined for a specific timeseries at the
 import of a JSON file, but there is no associated information for that timeseries
@@ -567,8 +488,54 @@ local models to add. Defaults to all hidden models.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="disstans.network.Network.ampphaseplot">
+<span class="sig-name descname"><span class="pre">ampphaseplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mdl_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_refs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'format':</span> <span class="pre">'png'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.ampphaseplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.ampphaseplot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the amplitude and phase of a <a class="reference internal" href="models.html#disstans.models.Sinusoid" title="disstans.models.Sinusoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sinusoid</span></code></a>
+model on a network map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the timeseries to be used.</p></li>
+<li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the model to be plotted.</p></li>
+<li><p><strong>components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Specify the components to be used.
+By default (<code class="docutils literal notranslate"><span class="pre">None</span></code>), all available components are combined.
+If an integer, only a single component is used (in which case the phase
+can be used to color the marker).
+If a list, the indices of the list specify the components to be
+combined.</p></li>
+<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – (Only used if a single component is selected.)
+If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), use the phase of the sinusoid to color the
+station markers.</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If set, save the map to this filename, if not (default), show the map interactively
+(unless <code class="docutils literal notranslate"><span class="pre">return_figure=True</span></code>).</p></li>
+<li><p><strong>subset_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – If set, a list of strings that contains the names of stations to be shown.</p></li>
+<li><p><strong>lon_min</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Specify the map’s minimum longitude (in degrees).</p></li>
+<li><p><strong>lon_max</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Specify the map’s maximum longitude (in degrees).</p></li>
+<li><p><strong>lat_min</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Specify the map’s minimum latitude (in degrees).</p></li>
+<li><p><strong>lat_max</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Specify the map’s maximum latitude (in degrees).</p></li>
+<li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Scale factor for the markers. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.
+If a float or a string, add the station names to the map with the font size set
+as required by <a class="reference external" href="https://matplotlib.org/3.5.0/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v3.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>.</p></li>
+<li><p><strong>legend_refs</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – If set, a list of amplitudes that will be used to generate legend entries.</p></li>
+<li><p><strong>legend_labels</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – If set, a list of labels that will be used for <code class="docutils literal notranslate"><span class="pre">legend_refs</span></code>.</p></li>
+<li><p><strong>return_figure</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), return the figure and axis objects instead of
+showing the plot interactively. Only used if <code class="docutils literal notranslate"><span class="pre">fname</span></code> is not set.</p></li>
+<li><p><strong>save_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments passed to <a class="reference external" href="https://matplotlib.org/3.5.0/api/figure_api.html#matplotlib.figure.Figure.savefig" title="(in Matplotlib v3.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savefig()</span></code></a>,
+used when <code class="docutils literal notranslate"><span class="pre">fname</span></code> is specified.</p></li>
+<li><p><strong>colorbar_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – (Only used if a phases are plotted.)
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), no colorbar is added to the plot. If a dictionary is passed,
+a colorbar is added, with the dictionary containing additional keyword arguments
+to the <a class="reference external" href="https://matplotlib.org/3.5.0/api/figure_api.html#matplotlib.figure.Figure.colorbar" title="(in Matplotlib v3.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">colorbar()</span></code></a> method.</p></li>
+<li><p><strong>gui_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Override default GUI settings of <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.analyze_residuals">
-<span class="sig-name descname"><span class="pre">analyze_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.analyze_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.analyze_residuals" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">analyze_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.analyze_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.analyze_residuals" title="Permalink to this definition"></a></dt>
 <dd><p>Analyze residual timeseries for all stations and components, calling
 <a class="reference internal" href="station.html#disstans.station.Station.analyze_residuals" title="disstans.station.Station.analyze_residuals"><code class="xref py py-meth docutils literal notranslate"><span class="pre">analyze_residuals()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -593,7 +560,7 @@ Pandas command <a class="reference external" href="https://pandas.pydata.org/pan
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.call_func_no_return">
-<span class="sig-name descname"><span class="pre">call_func_no_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.call_func_no_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.call_func_no_return" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">call_func_no_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.call_func_no_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.call_func_no_return" title="Permalink to this definition"></a></dt>
 <dd><p>A convenience wrapper that for each station in the network, calls a given function on
 each station. Also provides a progress bar.</p>
 <dl class="field-list simple">
@@ -602,6 +569,7 @@ each station. Also provides a progress bar.</p>
 <li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>function</em>) – Function to use. If provided with a string, will check for that function in
 <a class="reference internal" href="processing.html#module-disstans.processing" title="disstans.processing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">processing</span></code></a>, otherwise the function will be assumed to adhere to the
 same input format than the included ones.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments to be passed onto <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
 </ul>
 </dd>
@@ -622,7 +590,7 @@ then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.call_func_ts_return">
-<span class="sig-name descname"><span class="pre">call_func_ts_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.call_func_ts_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.call_func_ts_return" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">call_func_ts_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.call_func_ts_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.call_func_ts_return" title="Permalink to this definition"></a></dt>
 <dd><p>A convenience wrapper that for each station in the network, calls a given
 function which takes timeseries as input and returns a timeseries (which
 is then added to the station). Also provides a progress bar.
@@ -637,6 +605,7 @@ to the same input and output format than the included ones.</p></li>
 <li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the timeseries to use as input to <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
 <li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the timeseries that the output of <code class="docutils literal notranslate"><span class="pre">func</span></code> should be assigned to.
 Defaults to overwriting <code class="docutils literal notranslate"><span class="pre">ts_in</span></code>.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments to be passed onto <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
 </ul>
 </dd>
@@ -669,7 +638,7 @@ is the function to use, then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.call_netwide_func">
-<span class="sig-name descname"><span class="pre">call_netwide_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.call_netwide_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.call_netwide_func" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">call_netwide_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.call_netwide_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.call_netwide_func" title="Permalink to this definition"></a></dt>
 <dd><p>A convenience wrapper for functions that operate on an entire network’s timeseries
 at once.</p>
 <dl class="field-list simple">
@@ -696,7 +665,7 @@ then the following two are equivalent:</p>
 <span class="c1"># short version</span>
 <span class="n">net</span><span class="o">.</span><span class="n">call_netwide_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ts_in</span><span class="o">=</span><span class="s1">&#39;input, ts_out=&#39;</span><span class="n">output</span><span class="s1">&#39;, **kw_args)</span>
 <span class="c1"># the short version also knows about the functions in disstans.processing</span>
-<span class="n">net</span><span class="o">.</span><span class="n">call_netwide_func</span><span class="p">(</span><span class="s1">&#39;common_mode&#39;</span><span class="p">,</span> <span class="n">ts_in</span><span class="o">=</span><span class="s1">&#39;input, ts_out=&#39;</span><span class="n">output</span><span class="s1">&#39;, **kw_args)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">call_netwide_func</span><span class="p">(</span><span class="s1">&#39;decompose&#39;</span><span class="p">,</span> <span class="n">ts_in</span><span class="o">=</span><span class="s1">&#39;input, ts_out=&#39;</span><span class="n">output</span><span class="s1">&#39;, **kw_args)</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -712,7 +681,7 @@ then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.copy_uncertainties">
-<span class="sig-name descname"><span class="pre">copy_uncertainties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.copy_uncertainties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.copy_uncertainties" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">copy_uncertainties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin_ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.copy_uncertainties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.copy_uncertainties" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience function that copies the uncertainties of one timeseries
 to another for all stations.</p>
 <dl class="field-list simple">
@@ -727,7 +696,7 @@ to another for all stations.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.create_station">
-<span class="sig-name descname"><span class="pre">create_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.create_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.create_station" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.create_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.create_station" title="Permalink to this definition"></a></dt>
 <dd><p>Create a station and add it to the network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -745,8 +714,50 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="disstans.network.Network.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">decompose_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.decompose" title="Permalink to this definition"></a></dt>
+<dd><p>Decomposes a timeseries in the network and returns its best-fit models
+and spatiotemporal sources.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the timeseries to analyze.</p></li>
+<li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, save the model as a timeseries called <code class="docutils literal notranslate"><span class="pre">ts_out</span></code> to
+the stations in the network.</p></li>
+<li><p><strong>**decompose_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments passed to <a class="reference internal" href="processing.html#disstans.processing.decompose" title="disstans.processing.decompose"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompose()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>model</strong> (<em>dict</em>) – Dictionary of best-fit models at each station and for each data component.
+The keys are the data components of the <code class="docutils literal notranslate"><span class="pre">ts_in</span></code> timeseries, and
+the values are <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> objects.
+The Timeseries objects have the station names as columns, and their observation
+record length is the joint length of all stations in the network,
+<span class="math notranslate nohighlight">\(\text{num_observations}\)</span>. If a station is missing a certain timestamp,
+that value is <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p></li>
+<li><p><strong>spatial</strong> (<em>numpy.ndarray</em>) – Dictionary of the spatial sources. Each key is one of the data components,
+and the values are <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> objects of shape
+<span class="math notranslate nohighlight">\((\text{num_components},\text{n_stations})\)</span>.</p></li>
+<li><p><strong>temporal</strong> (<em>dict</em>) – Dictionary of the temporal sources. Each key is one of the data components,
+and the values are <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> objects of shape
+<span class="math notranslate nohighlight">\((\text{num_observations},\text{num_components})\)</span>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="processing.html#disstans.processing.decompose" title="disstans.processing.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disstans.processing.decompose</span></code></a></dt><dd><p>Function to get the individual components.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.evaluate">
-<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timevector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.evaluate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timevector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.evaluate" title="Permalink to this definition"></a></dt>
 <dd><p>Evaluate a timeseries’ models at all stations and adds them as a fit to
 the timeseries. Can optionally add the aggregate model as an independent
 timeseries to the station as well.
@@ -764,6 +775,7 @@ Defaults to the timestamps of the timeseries itself.</p></li>
 to each station with the provided description (instead of only adding
 the model as a fit <em>to</em> the timeseries).</p></li>
 <li><p><strong>progress_desc</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, override the description of the progress bar.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
 </dl>
@@ -774,10 +786,10 @@ to evaluate the models for, then the following two are equivalent:</p>
 <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">net</span><span class="p">:</span>
     <span class="n">station_ts</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="s1">&#39;mydata&#39;</span><span class="p">]</span>
     <span class="n">fit_all</span> <span class="o">=</span> <span class="n">station_models</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">station_ts</span><span class="p">)</span>
-    <span class="n">station</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">ALLFITS</span><span class="p">,</span> <span class="n">fit_all</span><span class="p">)</span>
+    <span class="n">station</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">fit_all</span><span class="p">)</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">model_description</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="ow">in</span> <span class="n">station_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">station_ts</span><span class="p">)</span>
-        <span class="n">station</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">model_description</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
+        <span class="n">station</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">fit</span><span class="p">,</span> <span class="n">model_description</span><span class="p">)</span>
 <span class="c1"># short version, automatically parallelizes according to disstans.defaults,</span>
 <span class="c1"># and creating a new timeseries</span>
 <span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s1">&#39;evaluated&#39;</span><span class="p">)</span>
@@ -790,8 +802,6 @@ to evaluate the models for, then the following two are equivalent:</p>
 </dd>
 <dt><a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a></dt><dd><p>Dictionary of settings, including parallelization.</p>
 </dd>
-<dt><a class="reference internal" href="models.html#disstans.models.ALLFITS" title="disstans.models.ALLFITS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ALLFITS</span></code></a></dt><dd><p>Key used to denote the joint fit using all models.</p>
-</dd>
 <dt><a class="reference internal" href="tools.html#disstans.tools.parallelize" title="disstans.tools.parallelize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disstans.tools.parallelize</span></code></a></dt><dd><p>Automatically execute a function in parallel or serial.</p>
 </dd>
 </dl>
@@ -800,7 +810,7 @@ to evaluate the models for, then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.export_network_ts">
-<span class="sig-name descname"><span class="pre">export_network_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.export_network_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.export_network_ts" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">export_network_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.export_network_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.export_network_ts" title="Permalink to this definition"></a></dt>
 <dd><p>Collects a specific timeseries from all stations and returns them in a dictionary
 of network-wide <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> objects.</p>
 <dl class="field-list simple">
@@ -833,7 +843,7 @@ as keys and <a class="reference internal" href="timeseries.html#disstans.timeser
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear_regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_solutions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear_regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_solutions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.fit" title="Permalink to this definition"></a></dt>
 <dd><p>Fit the models for a specific timeseries at all stations,
 and read the fitted parameters into the station’s model collection.
 Also provides a progress bar.
@@ -852,6 +862,7 @@ potentially overriding the (global) keywords in <code class="docutils literal no
 <li><p><strong>return_solutions</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), return a dictionary of all solutions produced
 by the calls to the solver function.</p></li>
 <li><p><strong>progress_desc</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, override the description of the progress bar.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments that are passed on to the solver function.</p></li>
 </ul>
 </dd>
@@ -892,7 +903,7 @@ and <code class="docutils literal notranslate"><span class="pre">mysolver</span>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.fitevalres">
-<span class="sig-name descname"><span class="pre">fitevalres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear_regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_solutions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timevector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.fitevalres"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.fitevalres" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">fitevalres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear_regression'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_solutions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timevector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.fitevalres"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.fitevalres" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience method that combines the calls for <a class="reference internal" href="#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, <a class="reference internal" href="#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>
 and <a class="reference internal" href="#disstans.network.Network.math" title="disstans.network.Network.math"><code class="xref py py-meth docutils literal notranslate"><span class="pre">math()</span></code></a> (to compute the fit residual) into one method call.</p>
 <dl class="field-list simple">
@@ -909,6 +920,7 @@ the model fit, and store it as the timeseries <code class="docutils literal notr
 <li><p><strong>progress_desc</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>optional</em>) – If provided, set <code class="docutils literal notranslate"><span class="pre">progress_desc</span></code> of <a class="reference internal" href="#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and <a class="reference internal" href="#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>
 using the first or second element of a tuple or list, respectively.
 Leave <code class="docutils literal notranslate"><span class="pre">None</span></code> if only overriding one of them.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bars with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments that are passed on to the solver function,
 see <a class="reference internal" href="#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.</p></li>
 </ul>
@@ -919,20 +931,11 @@ see <a class="reference internal" href="#disstans.network.Network.fit" title="di
 and evaluate the models for, <code class="docutils literal notranslate"><span class="pre">mysolver</span></code> is the solver to use, <code class="docutils literal notranslate"><span class="pre">'myfit'</span></code> should
 contain the model fit, and the residuals should be put into the timeseries
 <code class="docutils literal notranslate"><span class="pre">'myres'</span></code>, then the following two are equivalent:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># long version, not parallelized, defaulting to all models</span>
-<span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">net</span><span class="p">:</span>
-    <span class="n">station_ts</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="s1">&#39;mydata&#39;</span><span class="p">]</span>
-    <span class="n">station_models</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s1">&#39;mydata&#39;</span><span class="p">]</span>
-    <span class="n">model_params_var</span> <span class="o">=</span> <span class="n">mysolver</span><span class="p">(</span><span class="n">station_ts</span><span class="p">,</span> <span class="n">station_models</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">model_description</span><span class="p">,</span> <span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">covs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">model_params_var</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">station_models</span><span class="p">[</span><span class="n">model_description</span><span class="p">]</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">covs</span><span class="p">)</span>
-        <span class="n">fit</span> <span class="o">=</span> <span class="n">station_models</span><span class="p">[</span><span class="n">model_description</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">station_ts</span><span class="p">)</span>
-        <span class="n">station</span><span class="o">.</span><span class="n">add_fit</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">model_description</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># three-line version</span>
 <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">mysolver</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span>
 <span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s1">&#39;myfit&#39;</span><span class="p">)</span>
 <span class="n">net</span><span class="o">.</span><span class="n">math</span><span class="p">(</span><span class="s1">&#39;myres&#39;</span><span class="p">,</span> <span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;myfit&#39;</span><span class="p">)</span>
-<span class="c1"># shot version, combining everything into one call, using parallelization,</span>
-<span class="c1"># offering easy access to subsetting models, reusing previous fits, etc.</span>
+<span class="c1"># one-liner</span>
 <span class="n">net</span><span class="o">.</span><span class="n">fitevalres</span><span class="p">(</span><span class="s1">&#39;mydata&#39;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="n">mysolver</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s1">&#39;myfit&#39;</span><span class="p">,</span>
                <span class="n">residual_description</span><span class="o">=</span><span class="s1">&#39;myres&#39;</span><span class="p">)</span>
 </pre></div>
@@ -954,7 +957,7 @@ contain the model fit, and the residuals should be put into the timeseries
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.freeze">
-<span class="sig-name descname"><span class="pre">freeze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.freeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.freeze" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">freeze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.freeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.freeze" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience method that calls <a class="reference internal" href="models.html#disstans.models.Model.freeze" title="disstans.models.Model.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a>
 for the <a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> for a certain
 timeseries at every station.</p>
@@ -980,13 +983,14 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.from_json">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_default_local_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.from_json" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_default_local_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.from_json" title="Permalink to this definition"></a></dt>
 <dd><p>Create a <a class="reference internal" href="#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> instance from a JSON configuration file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path of input JSON file.</p></li>
 <li><p><strong>add_default_local_models</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If false, skip the adding of any default local model found in a station.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 <li><p><strong>station_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments passed on to the
 <a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> constructor.</p></li>
 <li><p><strong>timeseries_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments passed on to the
@@ -1011,7 +1015,7 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.graphical_cme">
-<span class="sig-name descname"><span class="pre">graphical_cme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cme_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.graphical_cme"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.graphical_cme" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">graphical_cme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'format':</span> <span class="pre">'png'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">decompose_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.graphical_cme"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.graphical_cme" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the Common Mode Error (CME) of the network and shows its spatial
 and temporal pattern. Optionally saves the model for each station.</p>
 <dl class="field-list simple">
@@ -1020,18 +1024,22 @@ and temporal pattern. Optionally saves the model for each station.</p>
 <li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the timeseries to analyze.</p></li>
 <li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, save the model as a timeseries called <code class="docutils literal notranslate"><span class="pre">ts_out</span></code> to
 the stations in the network.</p></li>
-<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.</p></li>
+<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.
+If a float or a string, add the station names to the map with the font size set
+as required by <a class="reference external" href="https://matplotlib.org/3.5.0/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v3.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>.</p></li>
 <li><p><strong>save</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, save the map and timeseries plots to the current folder.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>save_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments passed to <a class="reference external" href="https://matplotlib.org/3.5.0/api/figure_api.html#matplotlib.figure.Figure.savefig" title="(in Matplotlib v3.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savefig()</span></code></a>,
+used when <code class="docutils literal notranslate"><span class="pre">save=True</span></code>.</p></li>
 <li><p><strong>gui_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Override default GUI settings of <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>.</p></li>
-<li><p><strong>**cme_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments passed to <a class="reference internal" href="processing.html#disstans.processing.common_mode" title="disstans.processing.common_mode"><code class="xref py py-func docutils literal notranslate"><span class="pre">common_mode()</span></code></a>.</p></li>
+<li><p><strong>**decompose_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments passed to <a class="reference internal" href="#disstans.network.Network.decompose" title="disstans.network.Network.decompose"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompose()</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="processing.html#disstans.processing.common_mode" title="disstans.processing.common_mode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disstans.processing.common_mode</span></code></a></dt><dd><p>CME calculation function.</p>
+<dt><a class="reference internal" href="#disstans.network.Network.decompose" title="disstans.network.Network.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a></dt><dd><p>Decomposer method to calculate the CME.</p>
 </dd>
 </dl>
 </div>
@@ -1039,7 +1047,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.gui">
-<span class="sig-name descname"><span class="pre">gui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sum_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalogram_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepdetector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyze_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_on_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.gui" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sum_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'format':</span> <span class="pre">'png'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalogram_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepdetector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyze_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_on_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.gui" title="Permalink to this definition"></a></dt>
 <dd><p>Provides a Graphical User Interface (GUI) to visualize the network and all
 of its different stations, timeseries, and models.</p>
 <p>In its base form, this function will show</p>
@@ -1074,7 +1082,9 @@ to be plotted. Defaults to all fitted models.</p></li>
 model individually. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, when clicking on a station, print its details (see
 <a class="reference internal" href="station.html#disstans.station.Station.__str__" title="disstans.station.Station.__str__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__str__()</span></code></a>). Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.</p></li>
+<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.
+If a float or a string, add the station names to the map with the font size set
+as required by <a class="reference external" href="https://matplotlib.org/3.5.0/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v3.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>.</p></li>
 <li><p><strong>save</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, save the figure of the selected timeseries. If a scalogram
 is also created, save this as well. The output directory is the current folder.
 Ignored if <code class="docutils literal notranslate"><span class="pre">stepdetector</span></code> is set. Suppresses all interactive figures.
@@ -1082,6 +1092,8 @@ If <code class="docutils literal notranslate"><span class="pre">save</span></cod
 for easier referencing.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>save_map</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, also save a map if <code class="docutils literal notranslate"><span class="pre">save=True</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>save_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments passed to <a class="reference external" href="https://matplotlib.org/3.5.0/api/figure_api.html#matplotlib.figure.Figure.savefig" title="(in Matplotlib v3.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savefig()</span></code></a>,
+used when <code class="docutils literal notranslate"><span class="pre">save=True</span></code>.</p></li>
 <li><p><strong>scalogram_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – If passed, also plot a scalogram. Defaults to no scalogram shown.
 The dictionary has to contain <code class="docutils literal notranslate"><span class="pre">'ts'</span></code> and <code class="docutils literal notranslate"><span class="pre">'model'</span></code> keys. The string values
 are the names of the timeseries and associated model that are of the
@@ -1135,7 +1147,7 @@ and <code class="docutils literal notranslate"><span class="pre">'orientation'</
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.import_network_ts">
-<span class="sig-name descname"><span class="pre">import_network_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_of_timeseries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.import_network_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.import_network_ts" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">import_network_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_of_timeseries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.import_network_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.import_network_ts" title="Permalink to this definition"></a></dt>
 <dd><p>Distributes a dictionary of network-wide <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>
 objects onto the network stations.</p>
 <dl class="field-list simple">
@@ -1159,7 +1171,7 @@ as keys and <a class="reference internal" href="timeseries.html#disstans.timeser
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.load_maintenance_dict">
-<span class="sig-name descname"><span class="pre">load_maintenance_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maint_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.load_maintenance_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.load_maintenance_dict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load_maintenance_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">maint_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.load_maintenance_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.load_maintenance_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience wrapper to add <a class="reference internal" href="models.html#disstans.models.Step" title="disstans.models.Step"><code class="xref py py-class docutils literal notranslate"><span class="pre">Step</span></code></a> models to the stations
 in the network where they experienced maitenance and therefore likely a jump
 in station coordinates.</p>
@@ -1187,7 +1199,7 @@ and only add steps that fall inside it.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.math">
-<span class="sig-name descname"><span class="pre">math</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.math"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.math" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">math</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.math"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.math" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience method that performs simple math for all stations.
 Syntax is <code class="docutils literal notranslate"><span class="pre">result</span> <span class="pre">=</span> <span class="pre">left</span> <span class="pre">operator</span> <span class="pre">right</span></code>.</p>
 <dl class="field-list simple">
@@ -1217,7 +1229,7 @@ all supported operations).</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.remove_station">
-<span class="sig-name descname"><span class="pre">remove_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.remove_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.remove_station" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">remove_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.remove_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.remove_station" title="Permalink to this definition"></a></dt>
 <dd><p>Remove a station from the network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1242,7 +1254,7 @@ station, then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.remove_timeseries">
-<span class="sig-name descname"><span class="pre">remove_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">ts_to_remove</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.remove_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.remove_timeseries" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">remove_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">ts_to_remove</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.remove_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.remove_timeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience function that scans all stations for timeseries of given names
 and removes them (together with models and fits).</p>
 <dl class="field-list simple">
@@ -1260,8 +1272,171 @@ and removes them (together with models and fits).</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="disstans.network.Network.spatialfit">
+<span class="sig-name descname"><span class="pre">spatialfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_iters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_max_rms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_reweight_max_changed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_num_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_weight_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_weight_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continuous_reweight_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_reweight_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_reweight_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_reweight_coupled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_internal_scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extended_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_mdl_res_as</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_solutions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads_evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll_mean_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvxpy_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'kktsolver':</span> <span class="pre">'robust',</span> <span class="pre">'solver':</span> <span class="pre">'CVXOPT'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.spatialfit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.spatialfit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the models for a specific timeseries at all stations using the
+spatiotemporal capabilities of <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>,
+and read the fitted parameters into the station’s model collection.
+Also provides a progress bar.
+Will automatically use multiprocessing if parallelization has been enabled in
+the configuration (defaults to parallelization if possible).</p>
+<p>The function solve the network-wide fitting problem as proposed by <a class="reference internal" href="#riel14" id="id1"><span>[riel14]</span></a>:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Fit the models individually using a single iteration step from
+<a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p></li>
+<li><p>Collect the L0 weights <span class="math notranslate nohighlight">\(\mathbf{w}^{(i)}_j\)</span> after iteration
+<span class="math notranslate nohighlight">\(i\)</span> from each station <span class="math notranslate nohighlight">\(j\)</span>.</p></li>
+<li><p>Spatially combine the weights, and redistribute them to the stations
+for the next iteration.</p></li>
+<li><p>Repeat from 1.</p></li>
+</ol>
+</div></blockquote>
+<p>The iteration can stop early if either the conditions set by
+<code class="docutils literal notranslate"><span class="pre">spatial_reweight_max_rms</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">spatial_reweight_max_changed</span></code> are satisfied,
+for all models in <code class="docutils literal notranslate"><span class="pre">spatial_reweight_models</span></code>.</p>
+<p>In the third step, a distance-weighted median is used at each station to combine
+the L0 regularization weights <span class="math notranslate nohighlight">\(\mathbf{w}^{(i)}_j\)</span>. The distance weights
+<span class="math notranslate nohighlight">\(v_{j,k}\)</span> from station <span class="math notranslate nohighlight">\(j\)</span> to station <span class="math notranslate nohighlight">\(k\)</span> are based on the
+average distance <span class="math notranslate nohighlight">\(D_j\)</span> from the station in question to the
+<code class="docutils literal notranslate"><span class="pre">dist_num_avg</span></code> clostest stations, following an exponential curve:
+<span class="math notranslate nohighlight">\(v_{j,k}=\exp \left( - r_{j,k} / D_j \right)\)</span> where
+<span class="math notranslate nohighlight">\(r_{j,k}\)</span> is the distance between the stations <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(k\)</span>.
+<code class="docutils literal notranslate"><span class="pre">dist_weight_min</span></code> and <code class="docutils literal notranslate"><span class="pre">dist_weight_max</span></code> allow to set boundaries for
+<span class="math notranslate nohighlight">\(D_j\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Description of the timeseries to fit.</p></li>
+<li><p><strong>penalty</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>. For non-reweighted models (i.e.,
+regularized models that are neither in <code class="docutils literal notranslate"><span class="pre">spatial_reweight_models</span></code> nor in
+<code class="docutils literal notranslate"><span class="pre">continuous_reweight_models</span></code>), this is the constant penalty applied for
+every iteration. For the reweighted models, and if <code class="docutils literal notranslate"><span class="pre">local_reweight_coupled=True</span></code>
+(default), this is just the penalty at the first iteration. After that,
+the penalties are largely controlled by <code class="docutils literal notranslate"><span class="pre">local_reweight_func</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">local_reweight_coupled=False</span></code>, the penalty is applied on top of the updated
+weights at each iteration.
+<code class="docutils literal notranslate"><span class="pre">penalty</span></code> can either be a single value used for all components, or a list
+or NumPy array specifying a penalty for each component in the data.</p></li>
+<li><p><strong>spatial_reweight_models</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Names of models to use in the spatial reweighting.</p></li>
+<li><p><strong>spatial_reweight_iters</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of spatial reweighting iterations.</p></li>
+<li><p><strong>spatial_reweight_percentile</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Percentile used in the spatial reweighting.
+Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>spatial_reweight_max_rms</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Stop the spatial iterations early if the difference in the RMS (Root Mean Square)
+of the change of the parameters between reweighting iterations is less than
+<code class="docutils literal notranslate"><span class="pre">spatial_reweight_max_rms</span></code>.</p></li>
+<li><p><strong>spatial_reweight_max_changed</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Stop the spatial iterations early if the number of changed parameters (i.e.,
+flipped between zero and non-zero) falls below a threshold. The threshold
+<code class="docutils literal notranslate"><span class="pre">spatial_reweight_max_changed</span></code> is given as the percentage of changed over total
+parameters (including all models and components). Defaults to no early stopping.</p></li>
+<li><p><strong>dist_num_avg</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Calculate the characteristic distance for the drop-off of station weights
+as the average of the <code class="docutils literal notranslate"><span class="pre">dist_num_avg</span></code> closest stations (default: <code class="docutils literal notranslate"><span class="pre">4</span></code>).</p></li>
+<li><p><strong>dist_weight_min</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Enforce a minimum value of <span class="math notranslate nohighlight">\(D_j\)</span> (in kilometers).</p></li>
+<li><p><strong>dist_weight_max</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Enforce a maximum value of <span class="math notranslate nohighlight">\(D_j\)</span> (in kilometers).</p></li>
+<li><p><strong>continuous_reweight_models</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Names of models that should carry over their weights from one solver iteration
+to the next, but should not be reweighted.</p></li>
+<li><p><strong>local_reweight_iters</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of local reweighting iterations, see <code class="docutils literal notranslate"><span class="pre">reweight_max_iters</span></code> in
+<a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p></li>
+<li><p><strong>local_reweight_func</strong> (<a class="reference internal" href="solvers.html#disstans.solvers.ReweightingFunction" title="disstans.solvers.ReweightingFunction"><em>ReweightingFunction</em></a><em>, </em><em>optional</em>) – An instance of a reweighting function that will be used by
+<a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.
+Defaults to an inverse reweighting with stability parameter <code class="docutils literal notranslate"><span class="pre">eps=1e-4</span></code>.</p></li>
+<li><p><strong>local_reweight_coupled</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and reweighting is active, the L1 penalty hyperparameter
+is coupled with the reweighting weights (see Notes in
+<a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>).</p></li>
+<li><p><strong>formal_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, calculate the formal model covariance. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>use_data_variance</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">ts_description</span></code> contains variance information, this
+uncertainty information will be used.</p></li>
+<li><p><strong>use_data_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <code class="docutils literal notranslate"><span class="pre">ts_description</span></code> contains variance and covariance
+information, and <code class="docutils literal notranslate"><span class="pre">use_data_variance</span></code> is also <code class="docutils literal notranslate"><span class="pre">True</span></code>, this uncertainty
+information will be used.</p></li>
+<li><p><strong>use_internal_scales</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Sets whether internal scaling should be used when reweighting, see
+<code class="docutils literal notranslate"><span class="pre">use_internal_scales</span></code> in <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), print statistics along the way.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bars with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>extended_stats</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), the fitted models are evaluated at each iteration
+to calculate residual and fit statistics. These extended statistics are added to
+<code class="docutils literal notranslate"><span class="pre">statistics</span></code> (see Returns below).</p></li>
+<li><p><strong>keep_mdl_res_as</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">extended_stats=True</span></code>, the network’s models are evaluated, and a model fit and
+residuals timeseries are created. Between iterations, they are removed by default,
+but passing this parameter a 2-element tuple of strings keeps the evaluated model
+and residual timeseries after the last iteration. This effectively allows the user
+to skip <a class="reference internal" href="#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a> (for <code class="docutils literal notranslate"><span class="pre">output_description</span></code>)
+and the calculation of the residual as done with <code class="docutils literal notranslate"><span class="pre">residual_description</span></code> by
+<a class="reference internal" href="#disstans.network.Network.fitevalres" title="disstans.network.Network.fitevalres"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitevalres()</span></code></a> after finishing the spatial fitting.</p></li>
+<li><p><strong>zero_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – When extracting the formal covariance matrix or calculating statistics, assume
+parameters with absolute values smaller than <code class="docutils literal notranslate"><span class="pre">zero_threshold</span></code> are effectively zero.</p></li>
+<li><p><strong>num_threads_evaluate</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">extended_stats=True</span></code> and <code class="docutils literal notranslate"><span class="pre">formal_covariance=True</span></code>, there will be calls to
+<a class="reference internal" href="#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a> that will estimate the predicted variance,
+which will be memory-intensive if the timeseries are long. Using the same number
+of threads as defined in <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a> might therefore exceed
+the available memory on the system. This option allows to set a different number
+of threads or disable parallelized processing entirely for those calls.
+Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>, which uses the same setting as in the defaults.</p></li>
+<li><p><strong>roll_mean_kernel</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Only used if <code class="docutils literal notranslate"><span class="pre">extended_stats=True</span></code>. This is the kernel size that gets used in the
+analysis of the residuals between each fitting step.</p></li>
+<li><p><strong>cvxpy_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Additional keyword arguments passed on to CVXPY’s <code class="docutils literal notranslate"><span class="pre">solve()</span></code> function,
+see <code class="docutils literal notranslate"><span class="pre">cvxpy_kw_args</span></code> in <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>statistics</strong> (<em>dict</em>) – See the Notes for an explanation of the solution and convergence statistics
+that are returned.</p></li>
+<li><p><strong>solutions</strong> (<em>dict, optional</em>) – If <code class="docutils literal notranslate"><span class="pre">return_solutions=True</span></code>, a dictionary that contains the
+<a class="reference internal" href="solvers.html#disstans.solvers.Solution" title="disstans.solvers.Solution"><code class="xref py py-class docutils literal notranslate"><span class="pre">Solution</span></code></a> objects for each station.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">statistics</span></code> dictionary contains the following entries:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'num_total'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>):
+Total number of parameters that were reweighted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'arr_uniques'</span></code> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>):
+Array of shape <span class="math notranslate nohighlight">\((\text{spatial_reweight_iters}+1, \text{num_components})\)</span>
+of the number of unique (i.e., over all stations) parameters that are non-zero
+for each iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'list_nonzeros'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>):
+List of the total number of non-zero parameters for each iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'dict_rms_diff'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>):
+Dictionary that for each reweighted model and contains a list (of length
+<code class="docutils literal notranslate"><span class="pre">spatial_reweight_iters</span></code>) of the RMS differences of the reweighted parameter
+values between spatial iterations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'dict_num_changed'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>):
+Dictionary that for each reweighted model and contains a list (of length
+<code class="docutils literal notranslate"><span class="pre">spatial_reweight_iters</span></code>) of the number of reweighted parameters that changed
+from zero to non-zero or vice-versa.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'list_res_stats'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>):
+(Only present if <code class="docutils literal notranslate"><span class="pre">extended_stats=True</span></code>.) List of the results dataframe returned
+by <a class="reference internal" href="#disstans.network.Network.analyze_residuals" title="disstans.network.Network.analyze_residuals"><code class="xref py py-meth docutils literal notranslate"><span class="pre">analyze_residuals()</span></code></a> for each iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'dict_cors'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>):
+(Only present if <code class="docutils literal notranslate"><span class="pre">extended_stats=True</span></code>.)
+For each of the reweighting models, contains a list of spatial correlation
+matrices for each iteration and component. E.g., the correlation matrix
+for model <code class="docutils literal notranslate"><span class="pre">'my_model'</span></code> after <code class="docutils literal notranslate"><span class="pre">5</span></code> reweighting iterations (i.e. the sixth
+solution, taking into account the initial unweighted solution) for the first
+component can be found in <code class="docutils literal notranslate"><span class="pre">statistics['dict_cors']['my_model'][5][0]</span></code>
+and has a shape of <span class="math notranslate nohighlight">\((\text{num_stations}, \text{num_stations})\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'dict_cors_means'</span></code> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>):
+(Only present if <code class="docutils literal notranslate"><span class="pre">extended_stats=True</span></code>.) Same shape as <code class="docutils literal notranslate"><span class="pre">'dict_cors'</span></code>,
+but containing the average of the upper triagonal parts of the spatial
+correlation matrices (i.e. for each model, iteration, and component).</p></li>
+</ul>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="riel14"><span class="brackets"><a class="fn-backref" href="#id1">riel14</a></span></dt>
+<dd><p>Riel, B., Simons, M., Agram, P., &amp; Zhan, Z. (2014). <em>Detecting transient
+signals in geodetic time series using sparse estimation techniques</em>.
+Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
+doi:<a class="reference external" href="https://doi.org/10.1002/2014JB011077">10.1002/2014JB011077</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.to_json">
-<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.to_json" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.to_json" title="Permalink to this definition"></a></dt>
 <dd><p>Export network configuration to a JSON file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1279,7 +1454,7 @@ and removes them (together with models and fits).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.unfreeze">
-<span class="sig-name descname"><span class="pre">unfreeze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.unfreeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.unfreeze" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">unfreeze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.unfreeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.unfreeze" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience method that resets any frozen parameters for a certain timeseries
 at every station.</p>
 <dl class="field-list simple">
@@ -1302,7 +1477,7 @@ freeze the corresponding models in the collection.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.update_default_local_models">
-<span class="sig-name descname"><span class="pre">update_default_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.update_default_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.update_default_local_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_default_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.update_default_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.update_default_local_models" title="Permalink to this definition"></a></dt>
 <dd><p>Perform input checks for the structure of <code class="docutils literal notranslate"><span class="pre">models</span></code> and if successful,
 update <a class="reference internal" href="#disstans.network.Network.default_local_models" title="disstans.network.Network.default_local_models"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_local_models</span></code></a>.</p>
 <dl class="field-list simple">
@@ -1316,7 +1491,7 @@ to create each model object (see <a class="reference internal" href="models.html
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.wormplot">
-<span class="sig-name descname"><span class="pre">wormplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_animation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">en_col_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.wormplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.wormplot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">wormplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_animation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">en_col_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'format':</span> <span class="pre">'png'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_ref_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.wormplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.wormplot" title="Permalink to this definition"></a></dt>
 <dd><p>Creates an animated worm plot given the data in a timeseries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1324,7 +1499,8 @@ to create each model object (see <a class="reference internal" href="models.html
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Specifies the timeseries to plot. If a string, the name of a timeseries
 directly associated with a station, and if a tuple, specifies the timeseries
 and name of a fitted model for the timeseries.</p></li>
-<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If set, save the map to this filename, if not (default), show the map interactively.</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If set, save the map to this filename, if not (default), show the map interactively
+(unless <code class="docutils literal notranslate"><span class="pre">return_figure=True</span></code>).</p></li>
 <li><p><strong>fname_animation</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If specified, make an animation and save the video to this filename.</p></li>
 <li><p><strong>subset_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – If set, a list of strings that contains the names of stations to be shown.</p></li>
 <li><p><strong>t_min</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Start the plot at this time. Defaults to first observation.</p></li>
@@ -1343,7 +1519,26 @@ will be (timeseries assumed as meters) times (scale). E.g., for a timeseries
 in millimeters and a scale of <code class="docutils literal notranslate"><span class="pre">1e2</span></code> (default), one millimeter displacement
 will result in a mapped displacement of 100 meters.</p></li>
 <li><p><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of milliseconds each frame is shown (default: <code class="docutils literal notranslate"><span class="pre">10</span></code>).</p></li>
-<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.</p></li>
+<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.
+If a float or a string, add the station names to the map with the font size set
+as required by <a class="reference external" href="https://matplotlib.org/3.5.0/api/text_api.html#matplotlib.text.Text" title="(in Matplotlib v3.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Text</span></code></a>.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar when creating the animation with <code class="docutils literal notranslate"><span class="pre">True</span></code>
+(default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>return_figure</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), return the figure and axis objects instead of
+showing the plot interactively. Only used if <code class="docutils literal notranslate"><span class="pre">fname</span></code> is not set.</p></li>
+<li><p><strong>save_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional keyword arguments passed to <a class="reference external" href="https://matplotlib.org/3.5.0/api/figure_api.html#matplotlib.figure.Figure.savefig" title="(in Matplotlib v3.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savefig()</span></code></a>,
+used when <code class="docutils literal notranslate"><span class="pre">fname</span></code> is specified.</p></li>
+<li><p><strong>colorbar_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), no colorbar is added to the plot. If a dictionary is passed,
+a colorbar is added, with the dictionary containing additional keyword arguments
+to the <a class="reference external" href="https://matplotlib.org/3.5.0/api/figure_api.html#matplotlib.figure.Figure.colorbar" title="(in Matplotlib v3.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">colorbar()</span></code></a> method.</p></li>
+<li><p><strong>legend_ref_dict</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">legend_ref_dict</span></code> is provided and contains all of the following information,
+a reference line will be plotted at the specified location to act as a legend.
+Necessary keys: <code class="docutils literal notranslate"><span class="pre">location</span></code> (a tuple containing the longitude and latitude of the
+reference line), <code class="docutils literal notranslate"><span class="pre">length</span></code> (the length of the line in meters) and <code class="docutils literal notranslate"><span class="pre">label</span></code>
+(a label placed below the line).
+The dictionary can optionally include <code class="docutils literal notranslate"><span class="pre">rect_args</span></code> and <code class="docutils literal notranslate"><span class="pre">rect_kw_args</span></code> entries
+for arguments and parameters that will be passed onto the creation of the
+background <a class="reference external" href="https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle" title="(in Matplotlib v3.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rectangle</span></code></a>.</p></li>
 <li><p><strong>gui_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Override default GUI settings of <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>.</p></li>
 </ul>
 </dd>
@@ -1352,7 +1547,7 @@ will result in a mapped displacement of 100 meters.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.network.Network.default_local_models">
-<span class="sig-name descname"><span class="pre">default_local_models</span></span><a class="headerlink" href="#disstans.network.Network.default_local_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">default_local_models</span></span><a class="headerlink" href="#disstans.network.Network.default_local_models" title="Permalink to this definition"></a></dt>
 <dd><p>Dictionary of default station timeseries models of structure
 <code class="docutils literal notranslate"><span class="pre">{model_name:</span> <span class="pre">{&quot;type&quot;:</span> <span class="pre">modelclass,</span> <span class="pre">&quot;kw_args&quot;:</span> <span class="pre">{**kw_args}}}</span></code> that contains
 the names, types and necessary keyword arguments to create each model object.</p>
@@ -1362,8 +1557,8 @@ and will make the JSON export file cleaner.</p>
 input checks.</p>
 <p class="rubric">Example</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">net</span></code> is a Network instance, the following adds an annual
-<a class="reference internal" href="models.html#disstans.models.Sinusoidal" title="disstans.models.Sinusoidal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sinusoidal</span></code></a> model:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Annual&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Sinusoidal&quot;</span><span class="p">,</span>
+<a class="reference internal" href="models.html#disstans.models.Sinusoid" title="disstans.models.Sinusoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sinusoid</span></code></a> model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Annual&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Sinusoid&quot;</span><span class="p">,</span>
                      <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mf">365.25</span><span class="p">,</span>
                                  <span class="s2">&quot;t_reference&quot;</span><span class="p">:</span> <span class="s2">&quot;2000-01-01&quot;</span><span class="p">}}}</span>
 <span class="n">net</span><span class="o">.</span><span class="n">update_default_local_models</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
@@ -1373,85 +1568,68 @@ input checks.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.network.Network.default_location_path">
-<span class="sig-name descname"><span class="pre">default_location_path</span></span><a class="headerlink" href="#disstans.network.Network.default_location_path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">default_location_path</span></span><a class="headerlink" href="#disstans.network.Network.default_location_path" title="Permalink to this definition"></a></dt>
 <dd><p>Fallback path for station locations.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.network.Network.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#disstans.network.Network.name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#disstans.network.Network.name" title="Permalink to this definition"></a></dt>
 <dd><p>Network name.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.network.Network.num_stations">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_stations</span></span><a class="headerlink" href="#disstans.network.Network.num_stations" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_stations</span></span><a class="headerlink" href="#disstans.network.Network.num_stations" title="Permalink to this definition"></a></dt>
 <dd><p>Number of stations present in the network.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.network.Network.station_names">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">station_names</span></span><a class="headerlink" href="#disstans.network.Network.station_names" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">station_names</span></span><a class="headerlink" href="#disstans.network.Network.station_names" title="Permalink to this definition"></a></dt>
 <dd><p>Names of stations present in the network.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.network.Network.stations">
-<span class="sig-name descname"><span class="pre">stations</span></span><a class="headerlink" href="#disstans.network.Network.stations" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">stations</span></span><a class="headerlink" href="#disstans.network.Network.stations" title="Permalink to this definition"></a></dt>
 <dd><p>Dictionary of network stations, where the keys are their string names
 and the values are their <a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> objects.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="processing.html" class="btn btn-neutral float-right" title="Processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="models.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="processing.html" class="btn btn-neutral float-right" title="Processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

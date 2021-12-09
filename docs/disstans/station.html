@@ -1,79 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Station &mdash; DISSTANS 0.9 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Station &mdash; DISSTANS 0.10 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Timeseries" href="timeseries.html" />
     <link rel="prev" title="Solvers" href="solvers.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> DISSTANS
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.9
+                0.10
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -81,22 +41,14 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
@@ -139,6 +91,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a><ul>
@@ -155,6 +114,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#final-considerations">Final considerations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
@@ -163,11 +124,12 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
@@ -176,19 +138,22 @@
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-parent-class">Model (Parent Class)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#fit-collection">Fit Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#logarithmic">Logarithmic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#polynomial">Polynomial</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#step">Step</a></li>
-<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoidal">Sinusoidal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#sinusoid">Sinusoid</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
 </ul>
@@ -198,8 +163,9 @@
 <li class="toctree-l3"><a class="reference internal" href="processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#clean">clean</a></li>
-<li class="toctree-l4"><a class="reference internal" href="processing.html#common-mode">common_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#decompose">decompose</a></li>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#midas">midas</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#classes">Classes</a><ul>
@@ -209,17 +175,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#local-solver-functions">Local Solver Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#linear-regression">linear_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#ridge-regression">ridge_regression</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#global-solver-classes">Global Solver Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="solvers.html#spatialsolver">SpatialSolver</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="solvers.html#solution-object">Solution Object</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solvers.html#reweighting-functions">Reweighting Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#reweightingfunction">ReweightingFunction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="solvers.html#inversereweighting">InverseReweighting</a></li>
@@ -241,25 +203,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#download-unr-data">download_unr_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-indices">get_cov_indices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#rinexdataholding">RINEXDataHolding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#timedelta">Timedelta</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tools.html#click">Click</a></li>
 </ul>
 </li>
 </ul>
@@ -268,82 +231,40 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">DISSTANS</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
-        
       <li>Station</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/disstans/station.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="module-disstans.station">
-<span id="station"></span><h1>Station<a class="headerlink" href="#module-disstans.station" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="module-disstans.station">
+<span id="station"></span><h1>Station<a class="headerlink" href="#module-disstans.station" title="Permalink to this headline"></a></h1>
 <p>This module contains the <a class="reference internal" href="#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> class, which is the main
 component of a <a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> and contains
 <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference internal" href="models.html#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> and
 associated fits.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.station.Station">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">disstans.station.</span></span><span class="sig-name descname"><span class="pre">Station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.station.</span></span><span class="sig-name descname"><span class="pre">Station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station" title="Permalink to this definition"></a></dt>
 <dd><p>Representation of a station, which contains both metadata
 such as location as well as timeseries, models and fits.</p>
 <p>Timeseries are saved in the <a class="reference internal" href="#disstans.station.Station.timeseries" title="disstans.station.Station.timeseries"><code class="xref py py-attr docutils literal notranslate"><span class="pre">timeseries</span></code></a> dictionary, and their associated
@@ -359,7 +280,7 @@ dictionaries, respectively.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.__contains__">
-<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__contains__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__contains__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that allows to check whether a certain timeseries
 is in the station.</p>
 <p class="rubric">Example</p>
@@ -375,7 +296,7 @@ is in the station.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.__delitem__">
-<span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__delitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__delitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__delitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__delitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that allows a dictionary-like removing of timeseries from
 the station by wrapping <a class="reference internal" href="#disstans.station.Station.remove_timeseries" title="disstans.station.Station.remove_timeseries"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_timeseries()</span></code></a>.</p>
 <div class="admonition seealso">
@@ -389,7 +310,7 @@ the station by wrapping <a class="reference internal" href="#disstans.station.St
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.__getitem__">
-<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__getitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__getitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that provides a shorthand notation
 to access the station’s timeseries.</p>
 <dl class="field-list simple">
@@ -414,7 +335,7 @@ ts_description of a station, the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.__iter__">
-<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__iter__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__iter__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that allows for a shorthand notation to quickly
 iterate over all timeseries.</p>
 <p class="rubric">Example</p>
@@ -432,7 +353,7 @@ are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.__setitem__">
-<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__setitem__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__setitem__" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience special function that allows a dictionary-like adding of timeseries to
 the station by wrapping <a class="reference internal" href="#disstans.station.Station.add_timeseries" title="disstans.station.Station.add_timeseries"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_timeseries()</span></code></a>.</p>
 <div class="admonition seealso">
@@ -446,7 +367,7 @@ the station by wrapping <a class="reference internal" href="#disstans.station.St
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__str__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.__str__" title="Permalink to this definition"></a></dt>
 <dd><p>Special function that returns a readable summary of the station.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
@@ -461,16 +382,17 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.add_fit">
-<span class="sig-name descname"><span class="pre">add_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_fit" title="Permalink to this definition"></a></dt>
 <dd><p>Add a fit dictionary to a timeseries’ model (overwrites the fit if it has
 already been added for the model).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Timeseries to add the fit to.</p></li>
-<li><p><strong>model_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Model description the fit applies to.</p></li>
 <li><p><strong>fit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary with the keys <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, <code class="docutils literal notranslate"><span class="pre">'fit'</span></code>, <code class="docutils literal notranslate"><span class="pre">'var'</span></code> and <code class="docutils literal notranslate"><span class="pre">'cov'</span></code>
 (the latter two can be set to <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+<li><p><strong>model_description</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Model description the fit applies to.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the fit is the sum of all individual model fits.</p></li>
 <li><p><strong>return_ts</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), return the created timeseries.</p></li>
 </ul>
 </dd>
@@ -492,7 +414,7 @@ already been added for the model).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.add_local_model">
-<span class="sig-name descname"><span class="pre">add_local_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_local_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_local_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_local_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_local_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_local_model" title="Permalink to this definition"></a></dt>
 <dd><p>Add a model to a timeseries (overwrites the model if it has already
 been added with the same description).</p>
 <dl class="field-list simple">
@@ -508,7 +430,7 @@ been added with the same description).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.add_local_model_dict">
-<span class="sig-name descname"><span class="pre">add_local_model_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_local_model_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_local_model_dict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_local_model_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_local_model_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_local_model_dict" title="Permalink to this definition"></a></dt>
 <dd><p>Add a dictionary of models to a timeseries (overwrites the models if they have already
 been added with the same description).</p>
 <p>Wraps <a class="reference internal" href="#disstans.station.Station.add_local_model" title="disstans.station.Station.add_local_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_local_model()</span></code></a>.</p>
@@ -524,7 +446,7 @@ been added with the same description).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.add_local_model_kwargs">
-<span class="sig-name descname"><span class="pre">add_local_model_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_local_model_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_local_model_kwargs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_local_model_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_local_model_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_local_model_kwargs" title="Permalink to this definition"></a></dt>
 <dd><p>Add models to a timeseries from a dictionary of keyword arguments needed to create
 them (overwrites the models if they have already been added with the same description).</p>
 <p>Wraps <a class="reference internal" href="#disstans.station.Station.add_local_model" title="disstans.station.Station.add_local_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_local_model()</span></code></a>.</p>
@@ -542,7 +464,7 @@ to create each model object.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.add_timeseries">
-<span class="sig-name descname"><span class="pre">add_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainties_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_src</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_data_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_data_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_existing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_timeseries" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncertainties_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_src</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_data_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_data_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_existing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.add_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.add_timeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Add a timeseries to the station.</p>
 <p>Optionally, can override some Timeseries attributes when adding the object,
 and add models.</p>
@@ -587,7 +509,7 @@ then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.analyze_residuals">
-<span class="sig-name descname"><span class="pre">analyze_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_outlier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rolling_dev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.analyze_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.analyze_residuals" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">analyze_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_outlier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rolling_dev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.analyze_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.analyze_residuals" title="Permalink to this definition"></a></dt>
 <dd><p>Analyze, print and return the residuals of a station’s timeseries according
 to certain metrics defined in the arguments.</p>
 <dl class="field-list simple">
@@ -637,7 +559,7 @@ Empty by default.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.get_arch">
-<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.get_arch" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.get_arch" title="Permalink to this definition"></a></dt>
 <dd><p>Build a dictionary describing the architecture of this station,
 to be used when creating a network JSON configuration file.</p>
 <div class="admonition seealso">
@@ -655,7 +577,7 @@ to be used when creating a network JSON configuration file.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.get_trend">
-<span class="sig-name descname"><span class="pre">get_trend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.get_trend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.get_trend" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_trend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.get_trend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.get_trend" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates a linear trend through the desired model fits and over some time span.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -692,7 +614,7 @@ the trend estimate. Returns <code class="docutils literal notranslate"><span cla
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.remove_fit">
-<span class="sig-name descname"><span class="pre">remove_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.remove_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.remove_fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">remove_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.remove_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.remove_fit" title="Permalink to this definition"></a></dt>
 <dd><p>Remove a fit from a timeseries’ model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -706,7 +628,7 @@ the trend estimate. Returns <code class="docutils literal notranslate"><span cla
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.remove_local_models">
-<span class="sig-name descname"><span class="pre">remove_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.remove_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.remove_local_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">remove_local_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.remove_local_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.remove_local_models" title="Permalink to this definition"></a></dt>
 <dd><p>Remove models from a timeseries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -722,7 +644,7 @@ could not be found in the network.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.remove_timeseries">
-<span class="sig-name descname"><span class="pre">remove_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.remove_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.remove_timeseries" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">remove_timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.remove_timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.remove_timeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Remove a timeseries (including associated fits and models) from the station.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -747,7 +669,7 @@ of the timeseries to remove, then the following two are equivalent:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.sum_fits">
-<span class="sig-name descname"><span class="pre">sum_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.sum_fits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.sum_fits" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sum_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.sum_fits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.sum_fits" title="Permalink to this definition"></a></dt>
 <dd><p>Method to quickly sum fits of a timeseries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -770,8 +692,8 @@ Returns <code class="docutils literal notranslate"><span class="pre">None</span>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.station.Station.fits">
-<span class="sig-name descname"><span class="pre">fits</span></span><a class="headerlink" href="#disstans.station.Station.fits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dictionary of dictionaries of fitted <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>
+<span class="sig-name descname"><span class="pre">fits</span></span><a class="headerlink" href="#disstans.station.Station.fits" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary of <a class="reference internal" href="models.html#disstans.models.FitCollection" title="disstans.models.FitCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">FitCollection</span></code></a> objects
 associated with a timeseries saved in <a class="reference internal" href="#disstans.station.Station.timeseries" title="disstans.station.Station.timeseries"><code class="xref py py-attr docutils literal notranslate"><span class="pre">timeseries</span></code></a>.</p>
 <p class="rubric">Example</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">'myts'</span></code> is a timeseries saved in the station <code class="docutils literal notranslate"><span class="pre">stat</span></code>,
@@ -784,13 +706,13 @@ then the fitted timeseries is saved as:</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.station.Station.location">
-<span class="sig-name descname"><span class="pre">location</span></span><a class="headerlink" href="#disstans.station.Station.location" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">location</span></span><a class="headerlink" href="#disstans.station.Station.location" title="Permalink to this definition"></a></dt>
 <dd><p>Location of the station (Latitude [°], Longitude [°], Altitude [m]).</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.station.Station.models">
-<span class="sig-name descname"><span class="pre">models</span></span><a class="headerlink" href="#disstans.station.Station.models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">models</span></span><a class="headerlink" href="#disstans.station.Station.models" title="Permalink to this definition"></a></dt>
 <dd><p>Dictionary of <a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> objects associated
 with a timeseries saved in <a class="reference internal" href="#disstans.station.Station.timeseries" title="disstans.station.Station.timeseries"><code class="xref py py-attr docutils literal notranslate"><span class="pre">timeseries</span></code></a>.</p>
 <p class="rubric">Example</p>
@@ -803,80 +725,63 @@ then the model collection object for that timeseries is stored in:</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.station.Station.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#disstans.station.Station.name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#disstans.station.Station.name" title="Permalink to this definition"></a></dt>
 <dd><p>Name of the station.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.station.Station.timeseries">
-<span class="sig-name descname"><span class="pre">timeseries</span></span><a class="headerlink" href="#disstans.station.Station.timeseries" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">timeseries</span></span><a class="headerlink" href="#disstans.station.Station.timeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Dictionary of timeseries, where the keys are their string descriptions
 and the values are <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> instances.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.station.Station.ts">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ts</span></span><a class="headerlink" href="#disstans.station.Station.ts" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ts</span></span><a class="headerlink" href="#disstans.station.Station.ts" title="Permalink to this definition"></a></dt>
 <dd><p>Abbreviation for <a class="reference internal" href="#disstans.station.Station.timeseries" title="disstans.station.Station.timeseries"><code class="xref py py-attr docutils literal notranslate"><span class="pre">timeseries</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.station.Station.unused_models">
-<span class="sig-name descname"><span class="pre">unused_models</span></span><a class="headerlink" href="#disstans.station.Station.unused_models" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">unused_models</span></span><a class="headerlink" href="#disstans.station.Station.unused_models" title="Permalink to this definition"></a></dt>
 <dd><p>Same as <a class="reference internal" href="#disstans.station.Station.models" title="disstans.station.Station.models"><code class="xref py py-attr docutils literal notranslate"><span class="pre">models</span></code></a> but for models whose timeseries is not present
 in <a class="reference internal" href="#disstans.station.Station.timeseries" title="disstans.station.Station.timeseries"><code class="xref py py-attr docutils literal notranslate"><span class="pre">timeseries</span></code></a>.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="timeseries.html" class="btn btn-neutral float-right" title="Timeseries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="solvers.html" class="btn btn-neutral float-left" title="Solvers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="timeseries.html" class="btn btn-neutral float-right" title="Timeseries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Tobias Köhne.
-
-    </p>
+    <p>&#169; Copyright 2021, Tobias Köhne.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
