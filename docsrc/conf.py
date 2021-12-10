@@ -88,7 +88,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.9/', None),
                        'scikit-learn': ('https://scikit-learn.org/0.24/', None)}
 
 # ReadTheDocs theme settings
-html_theme_options = {'collapse_navigation': False}
+html_theme_options = {'collapse_navigation': False,
+                      'logo_only': True}
 
 # allow the reusing of 'Classes' and 'Functions' section labels by prefixing the document name
 autosectionlabel_prefix_document = True
