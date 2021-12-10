@@ -1347,7 +1347,7 @@ class Sinusoid(Model):
     Implements the relationship
 
     .. math::
-        \mathbf{g}(\mathbf{t}) = A \cos ( 2 \pi \mathbf{t} / T - \phi )
+        \mathbf{g}(\mathbf{t}) = A \cos ( 2 \pi \mathbf{t} / T - \phi ) =
         a \cos ( 2 \pi \mathbf{t} / T ) + b \sin ( 2 \pi \mathbf{t} / T )
 
     with :attr:`~period` :math:`T`, :attr:`~phase` :math:`\phi=\text{atan2}(b,a)`
@@ -1459,9 +1459,7 @@ class AmpPhModulatedSinusoid(Model):
         dt = self.tvec_to_numpycol(timevector)
         phase = 2*np.pi * dt.reshape(-1, 1) / self.period
         t_span = self.t_end - self.t_start
-        phase_norm = np.linspace((timevector[0] - self.t_start) / t_span,
-                                 (timevector[-1] - self.t_start) / t_span - 1e-16,
-                                 num=timevector.size)
+        phase_norm = (timevector - self.t_start) / t_span
         # get the mapping matrices of the sinusoid
         coef_cosine = np.cos(phase)
         coef_sine = np.sin(phase)
