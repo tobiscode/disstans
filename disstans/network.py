@@ -2862,6 +2862,7 @@ class Network():
         # finish up
         if fname:
             fig_map.savefig(f"{fname}.{save_kw_args['format']}", **save_kw_args)
+            plt.close(fig_map)
             if return_figure:
                 warn("'fname' was specified, so 'return_figure=True' is ignored.")
         else:
@@ -3022,6 +3023,7 @@ class Network():
         # finish up
         if fname:
             fig_map.savefig(f"{fname}.{save_kw_args['format']}", **save_kw_args)
+            plt.close(fig_map)
             if return_figure:
                 warn("'fname' was specified, so 'return_figure=True' is ignored.")
         else:
