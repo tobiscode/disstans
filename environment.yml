@@ -4,12 +4,12 @@ channels:
   - nodefaults
 dependencies:
   - python>=3.9
-  - numpy>=1.20
+  - numpy>=1.22
   - pandas>=1
   - scipy>=1.6
   - scikit-learn
-  - matplotlib>=3.4
-  - cartopy>=0.19
+  - matplotlib>=3.5
+  - cartopy>=0.20
   - owslib
   - cmcrameri
   - cvxpy>=1
