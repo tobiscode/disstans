@@ -309,6 +309,8 @@ signals, can in turn motivate another cleaning and fitting step.</p>
 <h2><a class="toc-backref" href="#id3">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this headline"></a></h2>
 <p>Here are the imports we will need throughout the example:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gzip</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -338,7 +340,7 @@ example code then in a different folder will break the relative links.
 <a class="reference internal" href="../tutorials/tutorial_3.html#preparations"><span class="std std-ref">Tutorial 3</span></a> (see there for changes you might
 need to make on your own machine):</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">disstans</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;num_threads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">disstans</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;num_threads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
 </pre></div>
 </div>
 <section id="getting-data">
@@ -921,7 +923,8 @@ amplitude and phase using a full B-Spline basis function set. We will regularize
 model as well, but keep it at the standard L1-regularization without any L0 sparsity
 constraint, because we don’t expect the signal to be sparse in the first place, but want
 to keep some sort of regularization to not make the fit explode. The number of bases,
-as well as the total timespan, is set so that there is exactly one basis per year.</p>
+as well as the total timespan, is set so that there is exactly one basis per year.
+(It is sufficient to only have an deviation component for the annual frequency.)</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_models</span> <span class="o">=</span> \
 <span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;Transient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SplineSet&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                   <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
@@ -933,18 +936,12 @@ as well as the total timespan, is set so that there is exactly one basis per yea
 <span class="gp">... </span>                               <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="s2">&quot;num_bases&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
 <span class="gp">... </span>                               <span class="s2">&quot;t_start&quot;</span><span class="p">:</span> <span class="s2">&quot;1994-01-01&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                               <span class="s2">&quot;t_end&quot;</span><span class="p">:</span> <span class="s2">&quot;2022-01-01&quot;</span><span class="p">}},</span>
-<span class="gp">... </span>     <span class="s2">&quot;BiannualDev&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;AmpPhModulatedSinusoid&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                     <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="mf">365.25</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>                                 <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-<span class="gp">... </span>                                 <span class="s2">&quot;num_bases&quot;</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span>
-<span class="gp">... </span>                                 <span class="s2">&quot;t_start&quot;</span><span class="p">:</span> <span class="s2">&quot;1994-01-01&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                                 <span class="s2">&quot;t_end&quot;</span><span class="p">:</span> <span class="s2">&quot;2022-01-01&quot;</span><span class="p">}}}</span>
+<span class="gp">... </span>                               <span class="s2">&quot;t_end&quot;</span><span class="p">:</span> <span class="s2">&quot;2022-01-01&quot;</span><span class="p">}}}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">add_local_models</span><span class="p">(</span><span class="n">new_models</span><span class="p">,</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This time, we specify a reweighting function explicitly for the spatial solution:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">InverseReweighting</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">InverseReweighting</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, we can run the estimation. Note that we’re doing a couple of things:</p>
@@ -962,7 +959,7 @@ calculate the residual timeseries, by specifying <code class="docutils literal n
 keep them).</p></li>
 </ul>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">spatialfit</span><span class="p">(</span><span class="s2">&quot;final&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
 <span class="gp">... </span>                       <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                       <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
@@ -979,10 +976,21 @@ keep them).</p></li>
 </pre></div>
 </div>
 <p>We again see from the verbose progress output how the spatial sparsity is
-well enforced, and the solver converges.</p>
-<p>For a (relatively) quick first fit, we can use <code class="docutils literal notranslate"><span class="pre">use_data_covariance=False</span></code>, but for a
-final result, the data covariance should be taken into account. Using the GUI, we can
-again get a first impression of the quality of the fit:</p>
+well enforced, and the solver converges.
+For a (relatively) quick first fit, we can use <code class="docutils literal notranslate"><span class="pre">use_data_covariance=False</span></code>, but for a
+final result, the data covariance should be taken into account.</p>
+<p>If we want to save the state of the entire network object right now (such that we can load it
+later without having to re-run the fitting process), we can save it efficiently like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;example_1_net.pkl.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can load it again using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;example_1_net.pkl.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">net</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using the GUI, we can again get a first impression of the quality of the fit:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">station</span><span class="o">=</span><span class="s2">&quot;CASA&quot;</span><span class="p">,</span>
 <span class="gp">... </span>        <span class="n">timeseries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;resid_srw&quot;</span><span class="p">],</span>
 <span class="gp">... </span>        <span class="n">rms_on_map</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="s2">&quot;resid_srw&quot;</span><span class="p">},</span>
@@ -1003,7 +1011,7 @@ which makes the transient periods very obvious:</p>
 model has limited interpretability.)</p>
 <p>We can do the same to have a look at the joint seasonal models:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">station</span><span class="o">=</span><span class="s2">&quot;CASA&quot;</span><span class="p">,</span> <span class="n">timeseries</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">sum_models</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="n">fit_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">,</span> <span class="s2">&quot;AnnualDev&quot;</span><span class="p">,</span> <span class="s2">&quot;Biannual&quot;</span><span class="p">,</span> <span class="s2">&quot;BiannualDev&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">fit_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">,</span> <span class="s2">&quot;AnnualDev&quot;</span><span class="p">,</span> <span class="s2">&quot;Biannual&quot;</span><span class="p">],</span>
 <span class="gp">... </span>        <span class="n">gui_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;plot_sigmas&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
 </pre></div>
 </div>
@@ -1082,12 +1090,13 @@ The temporally coherent expansion is clearly visible:</p>
 <h2><a class="toc-backref" href="#id12">Modeled vertical seasonal motion</a><a class="headerlink" href="#modeled-vertical-seasonal-motion" title="Permalink to this headline"></a></h2>
 <p>We can also look at how the seasonal signal ends up being modeled by our
 time-varying-amplitude sinusoid (again, code in the script file).
-Here is just an example plot for the vertical component at station KNOL:</p>
-<img alt="../_images/example_1h_seasonal_KNOL_up.png" src="../_images/example_1h_seasonal_KNOL_up.png" />
+Here is just an example plot for the vertical component at station P647:</p>
+<img alt="../_images/example_1h_seasonal_P647_up.png" src="../_images/example_1h_seasonal_P647_up.png" />
 <p>The nominal component in the top panel, the deviation in the middle panel, and the sum of the
-two in the bottom panel.
-Clearly, the model adapts to yearly amplitude variations, and even allows for shortterm phase
-changes.</p>
+two in the bottom panel. Clearly, the model adapts to yearly amplitude variations, and even
+allows for shortterm phase changes. We can also have a look at the nominal vertical component
+in map view using <a class="reference internal" href="../disstans/network.html#disstans.network.Network.ampphaseplot" title="disstans.network.Network.ampphaseplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ampphaseplot()</span></code></a>:</p>
+<img alt="../_images/example_1i_annual_vertical.png" src="../_images/example_1i_annual_vertical.png" />
 </section>
 <section id="comparison-of-secular-velocities">
 <h2><a class="toc-backref" href="#id13">Comparison of secular velocities</a><a class="headerlink" href="#comparison-of-secular-velocities" title="Permalink to this headline"></a></h2>
@@ -1233,7 +1242,7 @@ doi:<a class="reference external" href="https://doi.org/10.1002/jgrb.50152">10.1
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Tobias Köhne.</p>
+    <p>&#169; Copyright 2022, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

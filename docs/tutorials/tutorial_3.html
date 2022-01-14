@@ -315,7 +315,7 @@ in the script does the trick, and we can set the number of threads manually:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">disstans</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">disstans</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;num_threads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">disstans</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;num_threads&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span>
 </pre></div>
 </div>
 <p>And we can create a random number generator just like in the previous example:</p>
@@ -1258,7 +1258,7 @@ the far east of the network, where the signal is close or below the noise floor.
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Tobias Köhne.</p>
+    <p>&#169; Copyright 2022, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

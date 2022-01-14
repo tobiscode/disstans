@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     # don't let OpenMP mess with NumPy and set parallelization
     os.environ['OMP_NUM_THREADS'] = '1'
-    disstans.defaults["general"]["num_threads"] = 10
+    disstans.defaults["general"]["num_threads"] = 30
 
     # initialize stuff
     rng = np.random.default_rng(0)

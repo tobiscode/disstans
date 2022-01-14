@@ -3118,6 +3118,7 @@
         <span class="c1"># finish up</span>
         <span class="k">if</span> <span class="n">fname</span><span class="p">:</span>
             <span class="n">fig_map</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">save_kw_args</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">save_kw_args</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_map</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">return_figure</span><span class="p">:</span>
                 <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;&#39;fname&#39; was specified, so &#39;return_figure=True&#39; is ignored.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -3278,6 +3279,7 @@
         <span class="c1"># finish up</span>
         <span class="k">if</span> <span class="n">fname</span><span class="p">:</span>
             <span class="n">fig_map</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">save_kw_args</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">save_kw_args</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig_map</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">return_figure</span><span class="p">:</span>
                 <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;&#39;fname&#39; was specified, so &#39;return_figure=True&#39; is ignored.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -3294,7 +3296,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Tobias Köhne.</p>
+    <p>&#169; Copyright 2022, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

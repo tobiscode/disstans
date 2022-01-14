@@ -286,27 +286,27 @@ fig.savefig(f"{outdir}/tutorial_2i.png")
 # compare the secular and seasonal rates to the truth
 reldiff_sec = (mdl_coll_synth["Secular"].parameters
                / stat.models["Displacement"]["Secular"].parameters).ravel() - 1
-reldiff_ann_amp = mdl_coll_synth["Annual"].amplitude \
-                  / stat.models["Displacement"]["Annual"].amplitude - 1
-reldiff_sem_amp = mdl_coll_synth["Semi-Annual"].amplitude \
-                  / stat.models["Displacement"]["Semi-Annual"].amplitude - 1
-absdiff_ann_ph = mdl_coll_synth["Annual"].phase \
-                  - stat.models["Displacement"]["Annual"].phase
-absdiff_sem_ph = mdl_coll_synth["Semi-Annual"].phase \
-                  - stat.models["Displacement"]["Semi-Annual"].phase
-print(f"Percent Error Constant:              {reldiff_sec[0]: %}\n"
-      f"Percent Error Linear:                {reldiff_sec[1]: %}\n"
-      f"Percent Error Annual Amplitude:      {reldiff_ann_amp: %}\n"
-      f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: %}\n"
-      f"Absolute Error Annual Phase:         {absdiff_ann_ph: f} rad\n"
-      f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: f} rad")
+reldiff_ann_amp = (mdl_coll_synth["Annual"].amplitude
+                   / stat.models["Displacement"]["Annual"].amplitude)[0] - 1
+reldiff_sem_amp = (mdl_coll_synth["Semi-Annual"].amplitude
+                   / stat.models["Displacement"]["Semi-Annual"].amplitude)[0] - 1
+absdiff_ann_ph = np.rad2deg(mdl_coll_synth["Annual"].phase
+                            - stat.models["Displacement"]["Annual"].phase)[0]
+absdiff_sem_ph = np.rad2deg(mdl_coll_synth["Semi-Annual"].phase
+                            - stat.models["Displacement"]["Semi-Annual"].phase)[0]
+print(f"Percent Error Constant:              {reldiff_sec[0]: .3%}\n"
+      f"Percent Error Linear:                {reldiff_sec[1]: .3%}\n"
+      f"Percent Error Annual Amplitude:      {reldiff_ann_amp: .3%}\n"
+      f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: .3%}\n"
+      f"Absolute Error Annual Phase:         {absdiff_ann_ph: .3f}°\n"
+      f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: .3f}°")
 """
-Percent Error Constant:              -34.870393%
-Percent Error Linear:                 14.251579%
-Percent Error Annual Amplitude:      -1.046252%
-Percent Error Semi-Annual Amplitude: -0.037603%
-Absolute Error Annual Phase:          0.019479 rad
-Absolute Error Semi-Annual Phase:    -0.017371 rad
+Percent Error Constant:              -44.024%
+Percent Error Linear:                 20.780%
+Percent Error Annual Amplitude:      -0.234%
+Percent Error Semi-Annual Amplitude:  0.062%
+Absolute Error Annual Phase:          0.917°
+Absolute Error Semi-Annual Phase:    -0.982°
 """
 
 # get the trend for the time of rapid transient deformation

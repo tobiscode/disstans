@@ -35,6 +35,8 @@ Here are the imports we will need throughout the example:
 .. doctest::
 
     >>> import os
+    >>> import pickle
+    >>> import gzip
     >>> import numpy as np
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt
@@ -68,7 +70,7 @@ need to make on your own machine):
 .. doctest::
 
     >>> os.environ['OMP_NUM_THREADS'] = '1'
-    >>> disstans.config.defaults["general"]["num_threads"] = 30
+    >>> disstans.defaults["general"]["num_threads"] = 30
 
 Getting data
 ............
@@ -792,6 +794,7 @@ model as well, but keep it at the standard L1-regularization without any L0 spar
 constraint, because we don't expect the signal to be sparse in the first place, but want
 to keep some sort of regularization to not make the fit explode. The number of bases,
 as well as the total timespan, is set so that there is exactly one basis per year.
+(It is sufficient to only have an deviation component for the annual frequency.)
 
 .. doctest::
 
@@ -806,20 +809,14 @@ as well as the total timespan, is set so that there is exactly one basis per yea
     ...                                "degree": 2,
     ...                                "num_bases": 29,
     ...                                "t_start": "1994-01-01",
-    ...                                "t_end": "2022-01-01"}},
-    ...      "BiannualDev": {"type": "AmpPhModulatedSinusoid",
-    ...                      "kw_args": {"period": 365.25/2,
-    ...                                  "degree": 2,
-    ...                                  "num_bases": 29,
-    ...                                  "t_start": "1994-01-01",
-    ...                                  "t_end": "2022-01-01"}}}
+    ...                                "t_end": "2022-01-01"}}}
     >>> net.add_local_models(new_models, "final")
 
 This time, we specify a reweighting function explicitly for the spatial solution:
 
 .. doctest::
 
-    >>> rw_func = disstans.solvers.InverseReweighting(eps=1e-4, scale=1e-2)
+    >>> rw_func = disstans.solvers.InverseReweighting(eps=1e-5, scale=1e-3)
 
 Finally, we can run the estimation. Note that we're doing a couple of things:
 
@@ -838,7 +835,7 @@ Finally, we can run the estimation. Note that we're doing a couple of things:
 .. doctest::
 
     >>> stats = net.spatialfit("final",
-    ...                        penalty=[10, 10, 1],
+    ...                        penalty=[20, 20, 2],
     ...                        spatial_reweight_models=["Transient"],
     ...                        spatial_reweight_iters=20,
     ...                        local_reweight_func=rw_func,
@@ -855,10 +852,21 @@ Finally, we can run the estimation. Note that we're doing a couple of things:
 
 We again see from the verbose progress output how the spatial sparsity is
 well enforced, and the solver converges.
-
 For a (relatively) quick first fit, we can use ``use_data_covariance=False``, but for a
-final result, the data covariance should be taken into account. Using the GUI, we can
-again get a first impression of the quality of the fit::
+final result, the data covariance should be taken into account.
+
+If we want to save the state of the entire network object right now (such that we can load it
+later without having to re-run the fitting process), we can save it efficiently like this::
+
+    >>> with gzip.open("example_1_net.pkl.gz", "wb") as f:
+    >>>     pickle.dump(net, f)
+
+We can load it again using::
+
+    >>> with gzip.open("example_1_net.pkl.gz", "rb") as f:
+    >>>     net = pickle.load(f)
+
+Using the GUI, we can again get a first impression of the quality of the fit::
 
     >>> net.gui(station="CASA",
     ...         timeseries=["final", "resid_srw"],
@@ -891,7 +899,7 @@ model has limited interpretability.)
 We can do the same to have a look at the joint seasonal models::
 
     >>> net.gui(station="CASA", timeseries="final", sum_models=True,
-    ...         fit_list=["Annual", "AnnualDev", "Biannual", "BiannualDev"],
+    ...         fit_list=["Annual", "AnnualDev", "Biannual"],
     ...         gui_kw_args={"plot_sigmas": 0})
 
 Giving us:
@@ -977,15 +985,16 @@ Modeled vertical seasonal motion
 
 We can also look at how the seasonal signal ends up being modeled by our
 time-varying-amplitude sinusoid (again, code in the script file).
-Here is just an example plot for the vertical component at station KNOL:
+Here is just an example plot for the vertical component at station P647:
 
-.. image:: ../img/example_1h_seasonal_KNOL_up.png
+.. image:: ../img/example_1h_seasonal_P647_up.png
 
 The nominal component in the top panel, the deviation in the middle panel, and the sum of the
-two in the bottom panel.
-Clearly, the model adapts to yearly amplitude variations, and even allows for shortterm phase
-changes.
+two in the bottom panel. Clearly, the model adapts to yearly amplitude variations, and even
+allows for shortterm phase changes. We can also have a look at the nominal vertical component
+in map view using :meth:`~disstans.network.Network.ampphaseplot`:
 
+.. image:: ../img/example_1i_annual_vertical.png
 
 Comparison of secular velocities
 --------------------------------

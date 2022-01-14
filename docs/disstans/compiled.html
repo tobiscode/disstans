@@ -349,201 +349,201 @@ indices of the pairs to use in the MIDAS calculation.</p></li>
 <div class="highlight-Fortran notranslate"><div class="highlight"><pre><span></span><span class="c">! file compiled.f90</span>
 <span class="c">! contains subroutines that speed up some tasks if they are precompiled</span>
 
-<span class="k">SUBROUTINE </span><span class="n">maskedmedfilt2d</span><span class="p">(</span><span class="k">array</span><span class="p">,</span> <span class="n">mask_in</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">medians</span><span class="p">)</span>
-    <span class="c">! filters a 2-d input array columns wise given the kernel size</span>
-    <span class="c">! ignores masked-out values and returns</span>
+<span class="k">SUBROUTINE </span><span class="n">maskedmedfilt2d</span><span class="p">(</span><span class="k">array</span><span class="p">,</span><span class="w"> </span><span class="n">mask_in</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">medians</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">! filters a 2-d input array columns wise given the kernel size</span>
+<span class="w">    </span><span class="c">! ignores masked-out values and returns</span>
 
-    <span class="k">IMPLICIT NONE</span>
+<span class="w">    </span><span class="k">IMPLICIT NONE</span><span class="w"></span>
 
-    <span class="c">! inputs</span>
-    <span class="kt">INTEGER</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span> <span class="kd">::</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">kernel</span>
-    <span class="kt">REAL</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span> <span class="kd">::</span> <span class="k">array</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-    <span class="kt">LOGICAL</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mask_in</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="c">! inputs</span>
+<span class="w">    </span><span class="kt">INTEGER</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">kernel</span><span class="w"></span>
+<span class="w">    </span><span class="kt">REAL</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="k">array</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="kt">LOGICAL</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mask_in</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
 
-    <span class="c">! outputs</span>
-    <span class="kt">REAL</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span> <span class="kd">::</span> <span class="n">medians</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="c">! outputs</span>
+<span class="w">    </span><span class="kt">REAL</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">medians</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
 
-    <span class="c">! internal variables</span>
-    <span class="kt">INTEGER</span> <span class="kd">::</span> <span class="n">masksum</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">halfwindow</span>
-    <span class="kt">REAL</span> <span class="kd">::</span> <span class="n">subvec</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+<span class="w">    </span><span class="c">! internal variables</span>
+<span class="w">    </span><span class="kt">INTEGER</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">masksum</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"></span>
+<span class="w">    </span><span class="kt">REAL</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">subvec</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span><span class="w"></span>
 
-    <span class="c">! check for odd kernel size</span>
-    <span class="k">IF</span> <span class="p">(</span> <span class="nb">MOD</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span> <span class="p">)</span> <span class="k">STOP</span> <span class="s2">&quot;even&quot;</span>
+<span class="w">    </span><span class="c">! check for odd kernel size</span>
+<span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="nb">MOD</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">).</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">STOP</span><span class="w"> </span><span class="s2">&quot;even&quot;</span><span class="w"></span>
 
-    <span class="c">! process columns individually</span>
-    <span class="k">DO </span><span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
+<span class="w">    </span><span class="c">! process columns individually</span>
+<span class="w">    </span><span class="k">DO </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
 
-        <span class="c">! beginning of the column, need to start with small kernel window</span>
-        <span class="n">halfwindow</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">DO </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">kernel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-            <span class="n">masksum</span> <span class="o">=</span> <span class="nb">COUNT</span><span class="p">(</span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-            <span class="k">IF</span> <span class="p">(</span> <span class="n">masksum</span> <span class="p">.</span><span class="n">gt</span><span class="p">.</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">THEN</span>
-                <span class="c">! can proceed with median calculation</span>
-                <span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">)</span> <span class="o">=</span> <span class="nb">PACK</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">),</span> <span class="p">&amp;</span>
-                                         <span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-                <span class="k">CALL </span><span class="n">median</span><span class="p">(</span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">),</span> <span class="n">masksum</span><span class="p">,</span> <span class="n">medians</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-            <span class="k">END IF</span>
-<span class="k">            </span><span class="n">halfwindow</span> <span class="o">=</span> <span class="n">halfwindow</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">END DO</span>
+<span class="w">        </span><span class="c">! beginning of the column, need to start with small kernel window</span>
+<span class="w">        </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">        </span><span class="k">DO </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">kernel</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="w">            </span><span class="n">masksum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">COUNT</span><span class="p">(</span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">masksum</span><span class="w"> </span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span><span class="w"></span>
+<span class="w">                </span><span class="c">! can proceed with median calculation</span>
+<span class="w">                </span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">PACK</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                                         </span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">CALL </span><span class="n">median</span><span class="p">(</span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">),</span><span class="w"> </span><span class="n">masksum</span><span class="p">,</span><span class="w"> </span><span class="n">medians</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span>
+<span class="k">            </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">        </span><span class="k">END DO</span><span class="w"></span>
 
-        <span class="c">! bug check</span>
-        <span class="k">IF</span> <span class="p">(</span> <span class="n">halfwindow</span> <span class="p">.</span><span class="n">ne</span><span class="p">.</span> <span class="p">(</span><span class="n">kernel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">)</span> <span class="k">STOP</span> <span class="s2">&quot;bug&quot;</span>
-        <span class="c">! center of the column, can use full kernel</span>
-        <span class="k">DO </span><span class="n">i</span> <span class="o">=</span> <span class="n">halfwindow</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">-</span> <span class="n">halfwindow</span>
-            <span class="n">masksum</span> <span class="o">=</span> <span class="nb">COUNT</span><span class="p">(</span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-            <span class="k">IF</span> <span class="p">(</span> <span class="n">masksum</span> <span class="p">.</span><span class="n">gt</span><span class="p">.</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">THEN</span>
-                <span class="c">! can proceed with median calculation</span>
-                <span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">)</span> <span class="o">=</span> <span class="nb">PACK</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">),</span> <span class="p">&amp;</span>
-                                         <span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-                <span class="k">CALL </span><span class="n">median</span><span class="p">(</span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">),</span> <span class="n">masksum</span><span class="p">,</span> <span class="n">medians</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-            <span class="k">END IF</span>
-<span class="k">        END DO</span>
+<span class="w">        </span><span class="c">! bug check</span>
+<span class="w">        </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"> </span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="w"> </span><span class="p">(</span><span class="n">kernel</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">STOP</span><span class="w"> </span><span class="s2">&quot;bug&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="c">! center of the column, can use full kernel</span>
+<span class="w">        </span><span class="k">DO </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"></span>
+<span class="w">            </span><span class="n">masksum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">COUNT</span><span class="p">(</span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">masksum</span><span class="w"> </span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span><span class="w"></span>
+<span class="w">                </span><span class="c">! can proceed with median calculation</span>
+<span class="w">                </span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">PACK</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                                         </span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">CALL </span><span class="n">median</span><span class="p">(</span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">),</span><span class="w"> </span><span class="n">masksum</span><span class="p">,</span><span class="w"> </span><span class="n">medians</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span>
+<span class="k">        END DO</span><span class="w"></span>
 
-        <span class="c">! end of column, need to shrink kernel window successively</span>
-        <span class="k">DO </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="n">halfwindow</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span>
-            <span class="n">halfwindow</span> <span class="o">=</span> <span class="n">halfwindow</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="n">masksum</span> <span class="o">=</span> <span class="nb">COUNT</span><span class="p">(</span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-            <span class="k">IF</span> <span class="p">(</span> <span class="n">masksum</span> <span class="p">.</span><span class="n">gt</span><span class="p">.</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">THEN</span>
-                <span class="c">! can proceed with median calculation</span>
-                <span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">)</span> <span class="o">=</span> <span class="nb">PACK</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">),</span> <span class="p">&amp;</span>
-                                         <span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-                <span class="k">CALL </span><span class="n">median</span><span class="p">(</span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">),</span> <span class="n">masksum</span><span class="p">,</span> <span class="n">medians</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-            <span class="k">END IF</span>
+<span class="w">        </span><span class="c">! end of column, need to shrink kernel window successively</span>
+<span class="w">        </span><span class="k">DO </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">            </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">halfwindow</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="n">masksum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">COUNT</span><span class="p">(</span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">masksum</span><span class="w"> </span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span><span class="w"></span>
+<span class="w">                </span><span class="c">! can proceed with median calculation</span>
+<span class="w">                </span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">PACK</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                                         </span><span class="n">mask_in</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">CALL </span><span class="n">median</span><span class="p">(</span><span class="n">subvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">masksum</span><span class="p">),</span><span class="w"> </span><span class="n">masksum</span><span class="p">,</span><span class="w"> </span><span class="n">medians</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span>
 <span class="k">        END DO</span>
 
 <span class="k">    END DO</span>
 
 <span class="k">    CONTAINS</span>
 
-<span class="k">        SUBROUTINE </span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">xmed</span><span class="p">)</span>
-            <span class="c">! from https://jblevins.org/mirror/amiller/median.f90</span>
-            <span class="c">! Find the median of X(1), ... , X(N), using as much of the quicksort</span>
-            <span class="c">! algorithm as is needed to isolate it.</span>
-            <span class="c">! N.B. On exit, the array X is partially ordered.</span>
-        
-            <span class="c">!     Latest revision - 26 November 1996</span>
-            <span class="k">IMPLICIT NONE</span>
+<span class="k">        SUBROUTINE </span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">xmed</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">! from https://jblevins.org/mirror/amiller/median.f90</span>
+<span class="w">            </span><span class="c">! Find the median of X(1), ... , X(N), using as much of the quicksort</span>
+<span class="w">            </span><span class="c">! algorithm as is needed to isolate it.</span>
+<span class="w">            </span><span class="c">! N.B. On exit, the array X is partially ordered.</span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">!     Latest revision - 26 November 1996</span>
+<span class="w">            </span><span class="k">IMPLICIT NONE</span>
 <span class="k">        </span>
-<span class="k">            </span><span class="kt">INTEGER</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">n</span>
-            <span class="kt">REAL</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span> <span class="n">OUT</span><span class="p">),</span> <span class="k">DIMENSION</span><span class="p">(:)</span> <span class="kd">::</span> <span class="n">x</span>
-            <span class="kt">REAL</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span>                  <span class="kd">::</span> <span class="n">xmed</span>
-        
-            <span class="c">! Local variables</span>
-        
-            <span class="kt">REAL</span>    <span class="kd">::</span> <span class="n">temp</span><span class="p">,</span> <span class="n">xhi</span><span class="p">,</span> <span class="n">xlo</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">xmin</span>
-            <span class="kt">LOGICAL</span> <span class="kd">::</span> <span class="n">odd</span>
-            <span class="kt">INTEGER</span> <span class="kd">::</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">nby2</span><span class="p">,</span> <span class="n">nby2p1</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span>
-        
-            <span class="n">nby2</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">2</span>
-            <span class="n">nby2p1</span> <span class="o">=</span> <span class="n">nby2</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="n">odd</span> <span class="o">=</span> <span class="p">.</span><span class="n">true</span><span class="p">.</span>
-        
-            <span class="c">!     HI &amp; LO are position limits encompassing the median.</span>
-        
-            <span class="k">IF</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nby2</span><span class="p">)</span> <span class="n">odd</span> <span class="o">=</span> <span class="p">.</span><span class="n">false</span><span class="p">.</span>
-            <span class="n">lo</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">hi</span> <span class="o">=</span> <span class="n">n</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">xmed</span> <span class="o">=</span> <span class="mf">0.0</span>
-                <span class="k">RETURN</span>
+<span class="k">            </span><span class="kt">INTEGER</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="w">                </span><span class="kd">::</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
+<span class="w">            </span><span class="kt">REAL</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="w"> </span><span class="n">OUT</span><span class="p">),</span><span class="w"> </span><span class="k">DIMENSION</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="w"></span>
+<span class="w">            </span><span class="kt">REAL</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span><span class="w">                  </span><span class="kd">::</span><span class="w"> </span><span class="n">xmed</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">! Local variables</span>
+<span class="w">        </span>
+<span class="w">            </span><span class="kt">REAL</span><span class="w">    </span><span class="kd">::</span><span class="w"> </span><span class="n">temp</span><span class="p">,</span><span class="w"> </span><span class="n">xhi</span><span class="p">,</span><span class="w"> </span><span class="n">xlo</span><span class="p">,</span><span class="w"> </span><span class="n">xmax</span><span class="p">,</span><span class="w"> </span><span class="n">xmin</span><span class="w"></span>
+<span class="w">            </span><span class="kt">LOGICAL</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">odd</span><span class="w"></span>
+<span class="w">            </span><span class="kt">INTEGER</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">hi</span><span class="p">,</span><span class="w"> </span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="n">nby2</span><span class="p">,</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">,</span><span class="w"> </span><span class="n">mid</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="n">nby2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="w">            </span><span class="n">nby2p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nby2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="n">odd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">!     HI &amp; LO are position limits encompassing the median.</span>
+<span class="w">        </span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">nby2</span><span class="p">)</span><span class="w"> </span><span class="n">odd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span><span class="w"></span>
+<span class="w">            </span><span class="n">lo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="n">hi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w"></span>
+<span class="w">                </span><span class="k">RETURN</span>
 <span class="k">                END IF</span>
-<span class="k">                </span><span class="n">xmed</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">RETURN</span>
-<span class="k">                </span><span class="n">xmed</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">xmed</span> <span class="o">+</span> <span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-                <span class="k">RETURN</span>
-<span class="k">            END IF</span>
-        
-            <span class="c">!     Find median of 1st, middle &amp; last values.</span>
-        
-            <span class="mi">10</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
-            <span class="n">xmed</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span>
-            <span class="n">xlo</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span>
-            <span class="n">xhi</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">xhi</span> <span class="o">&lt;</span> <span class="n">xlo</span><span class="p">)</span> <span class="k">THEN</span>          <span class="c">! Swap xhi &amp; xlo</span>
-                <span class="n">temp</span> <span class="o">=</span> <span class="n">xhi</span>
-                <span class="n">xhi</span> <span class="o">=</span> <span class="n">xlo</span>
-                <span class="n">xlo</span> <span class="o">=</span> <span class="n">temp</span>
-            <span class="k">END IF</span>
-<span class="k">            IF</span> <span class="p">(</span><span class="n">xmed</span> <span class="o">&gt;</span> <span class="n">xhi</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">xmed</span> <span class="o">=</span> <span class="n">xhi</span>
-            <span class="k">ELSE IF</span> <span class="p">(</span><span class="n">xmed</span> <span class="o">&lt;</span> <span class="n">xlo</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">xmed</span> <span class="o">=</span> <span class="n">xlo</span>
-            <span class="k">END IF</span>
-        
-            <span class="c">! The basic quicksort algorithm to move all values &lt;= the sort key (XMED)</span>
-            <span class="c">! to the left-hand end, and all higher values to the other end.</span>
-        
-            <span class="n">i</span> <span class="o">=</span> <span class="n">lo</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="n">hi</span>
-            <span class="mi">50</span> <span class="k">DO</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">xmed</span><span class="p">)</span> <span class="k">EXIT</span>
-<span class="k">                </span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">END DO</span>
+<span class="k">                </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">RETURN</span>
+<span class="k">                </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">xmed</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">RETURN</span>
+<span class="k">            END IF</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">!     Find median of 1st, middle &amp; last values.</span>
+<span class="w">        </span>
+<span class="w">            </span><span class="mi">10</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">lo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">hi</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="w"></span>
+<span class="w">            </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">xlo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">xhi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">xhi</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">xlo</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span><span class="w">          </span><span class="c">! Swap xhi &amp; xlo</span>
+<span class="w">                </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xhi</span><span class="w"></span>
+<span class="w">                </span><span class="n">xhi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xlo</span><span class="w"></span>
+<span class="w">                </span><span class="n">xlo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span>
+<span class="k">            IF</span><span class="w"> </span><span class="p">(</span><span class="n">xmed</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">xhi</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xhi</span><span class="w"></span>
+<span class="w">            </span><span class="k">ELSE IF</span><span class="w"> </span><span class="p">(</span><span class="n">xmed</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">xlo</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xlo</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">! The basic quicksort algorithm to move all values &lt;= the sort key (XMED)</span>
+<span class="w">            </span><span class="c">! to the left-hand end, and all higher values to the other end.</span>
+<span class="w">        </span>
+<span class="w">            </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="w"></span>
+<span class="w">            </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hi</span><span class="w"></span>
+<span class="w">            </span><span class="mi">50</span><span class="w"> </span><span class="k">DO</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">xmed</span><span class="p">)</span><span class="w"> </span><span class="k">EXIT</span>
+<span class="k">                </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="k">END DO</span>
 <span class="k">            DO</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">xmed</span><span class="p">)</span> <span class="k">EXIT</span>
-<span class="k">                </span><span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="k">END DO</span>
-<span class="k">            IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">j</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">temp</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-                <span class="n">x</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">temp</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
-        
-            <span class="c">!     Decide which half the median is in.</span>
-        
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span><span class="p">)</span> <span class="n">GO</span> <span class="n">TO</span> <span class="mi">50</span>
-            <span class="k">END IF</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">xmed</span><span class="p">)</span><span class="w"> </span><span class="k">EXIT</span>
+<span class="k">                </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="k">END DO</span>
+<span class="k">            IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">x</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">                </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">!     Decide which half the median is in.</span>
+<span class="w">        </span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span>
 <span class="k">        </span>
-<span class="k">            IF</span> <span class="p">(.</span><span class="nb">NOT</span><span class="p">.</span> <span class="n">odd</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">j</span> <span class="o">==</span> <span class="n">nby2</span> <span class="p">.</span><span class="nb">AND</span><span class="p">.</span> <span class="n">i</span> <span class="o">==</span> <span class="n">nby2p1</span><span class="p">)</span> <span class="n">GO</span> <span class="n">TO</span> <span class="mi">130</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="n">nby2</span><span class="p">)</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">i</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">nby2p1</span><span class="p">)</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">j</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">/=</span> <span class="n">j</span><span class="p">)</span> <span class="n">GO</span> <span class="n">TO</span> <span class="mi">100</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">nby2</span><span class="p">)</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">nby2</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">j</span> <span class="o">==</span> <span class="n">nby2p1</span><span class="p">)</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">nby2p1</span>
-            <span class="k">ELSE</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="n">nby2p1</span><span class="p">)</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">i</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">nby2p1</span><span class="p">)</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">j</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">/=</span> <span class="n">j</span><span class="p">)</span> <span class="n">GO</span> <span class="n">TO</span> <span class="mi">100</span>
-        
-            <span class="c">! Test whether median has been isolated.</span>
-        
-                <span class="k">IF</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">nby2p1</span><span class="p">)</span> <span class="k">RETURN</span>
+<span class="k">            IF</span><span class="w"> </span><span class="p">(.</span><span class="nb">NOT</span><span class="p">.</span><span class="w"> </span><span class="n">odd</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">nby2</span><span class="w"> </span><span class="p">.</span><span class="nb">AND</span><span class="p">.</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">)</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="mi">130</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nby2</span><span class="p">)</span><span class="w"> </span><span class="n">lo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">)</span><span class="w"> </span><span class="n">hi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">nby2</span><span class="p">)</span><span class="w"> </span><span class="n">lo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nby2</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">)</span><span class="w"> </span><span class="n">hi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nby2p1</span><span class="w"></span>
+<span class="w">            </span><span class="k">ELSE</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">)</span><span class="w"> </span><span class="n">lo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">)</span><span class="w"> </span><span class="n">hi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">! Test whether median has been isolated.</span>
+<span class="w">        </span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">nby2p1</span><span class="p">)</span><span class="w"> </span><span class="k">RETURN</span>
 <span class="k">            END IF</span>
-<span class="k">            </span><span class="mi">100</span> <span class="k">IF</span> <span class="p">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="n">GO</span> <span class="n">TO</span> <span class="mi">10</span>
-        
-            <span class="k">IF</span> <span class="p">(.</span><span class="nb">NOT</span><span class="p">.</span> <span class="n">odd</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">xmed</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">nby2</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span><span class="p">(</span><span class="n">nby2p1</span><span class="p">))</span>
-                <span class="k">RETURN</span>
+<span class="k">            </span><span class="mi">100</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">lo</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">hi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">GO</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="mi">10</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(.</span><span class="nb">NOT</span><span class="p">.</span><span class="w"> </span><span class="n">odd</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">nby2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">nby2p1</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">RETURN</span>
 <span class="k">            END IF</span>
-<span class="k">            </span><span class="n">temp</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">temp</span> <span class="o">&gt;</span> <span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">))</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">x</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
-                <span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span> <span class="o">=</span> <span class="n">temp</span>
-            <span class="k">END IF</span>
-<span class="k">            </span><span class="n">xmed</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">nby2p1</span><span class="p">)</span>
-            <span class="k">RETURN</span>
-        
-            <span class="c">! Special case, N even, J = N/2 &amp; I = J + 1, so the median is</span>
-            <span class="c">! between the two halves of the series.   Find max. of the first</span>
-            <span class="c">! half &amp; min. of the second half, then average.</span>
-        
-            <span class="mi">130</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">DO </span><span class="n">k</span> <span class="o">=</span> <span class="n">lo</span><span class="p">,</span> <span class="n">j</span>
-                <span class="n">xmax</span> <span class="o">=</span> <span class="nb">MAX</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">x</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-            <span class="k">END DO</span>
-<span class="k">            </span><span class="n">xmin</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-            <span class="k">DO </span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> <span class="n">hi</span>
-                <span class="n">xmin</span> <span class="o">=</span> <span class="nb">MIN</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">x</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-            <span class="k">END DO</span>
-<span class="k">            </span><span class="n">xmed</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="n">xmax</span><span class="p">)</span>
-        
-            <span class="k">RETURN</span>
-<span class="k">        END SUBROUTINE </span><span class="n">median</span>
+<span class="k">            </span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">temp</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">))</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">x</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">x</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">temp</span><span class="w"></span>
+<span class="w">            </span><span class="k">END IF</span>
+<span class="k">            </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">nby2p1</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">RETURN</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="c">! Special case, N even, J = N/2 &amp; I = J + 1, so the median is</span>
+<span class="w">            </span><span class="c">! between the two halves of the series.   Find max. of the first</span>
+<span class="w">            </span><span class="c">! half &amp; min. of the second half, then average.</span>
+<span class="w">        </span>
+<span class="w">            </span><span class="mi">130</span><span class="w"> </span><span class="n">xmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">DO </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="w"></span>
+<span class="w">                </span><span class="n">xmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">MAX</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">END DO</span>
+<span class="k">            </span><span class="n">xmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">DO </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">hi</span><span class="w"></span>
+<span class="w">                </span><span class="n">xmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">MIN</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">END DO</span>
+<span class="k">            </span><span class="n">xmed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">xmin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">xmax</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">            </span><span class="k">RETURN</span>
+<span class="k">        END SUBROUTINE </span><span class="n">median</span><span class="w"></span>
 
-<span class="k">END SUBROUTINE </span><span class="n">maskedmedfilt2d</span>
+<span class="k">END SUBROUTINE </span><span class="n">maskedmedfilt2d</span><span class="w"></span>
 
 <span class="c">! This subroutine is taken from midas.f, downloaded from</span>
 <span class="c">! http://geodesy.unr.edu/MIDAS_release.tar on 2021-09-13,</span>
@@ -551,96 +551,96 @@ indices of the pairs to use in the MIDAS calculation.</p></li>
 <span class="c">! with Python/NumPy, and with hardcoded maxn.</span>
 <span class="c">! License of the original file:</span>
 <span class="c">! Author: Geoff Blewitt.  Copyright (C) 2015.</span>
-<span class="k">SUBROUTINE </span><span class="n">selectpair</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tstep</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">nstep</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
-    <span class="c">!</span>
-    <span class="c">! Given a time tag array t(m), select pairs ip(2,n)</span>
-    <span class="c">!</span>
-    <span class="c">! Moves forward in time: for each time tag, pair it with only</span>
-    <span class="c">! one future time tag.</span>
-    <span class="c">! First attempt to form a pair within tolerance tol of 1 year.</span>
-    <span class="c">! If this fails, then find next unused partner.</span>
-    <span class="c">! If this fails, cycle through all possible future partners again.</span>
-    <span class="c">!</span>
-    <span class="c">! MIDAS calls this twice -- firstly forward in time, and</span>
-    <span class="c">! secondly backward in time with negative tags and data.</span>
-    <span class="c">! This ensures a time symmetric solution.</span>
-    
-    <span class="c">! 2010-10-12: now allow for apriori list of step epochs</span>
-    <span class="c">! - do not select pairs that span or include the step epoch</span>
+<span class="k">SUBROUTINE </span><span class="n">selectpair</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">tstep</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">nstep</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">ip</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!</span>
+<span class="w">    </span><span class="c">! Given a time tag array t(m), select pairs ip(2,n)</span>
+<span class="w">    </span><span class="c">!</span>
+<span class="w">    </span><span class="c">! Moves forward in time: for each time tag, pair it with only</span>
+<span class="w">    </span><span class="c">! one future time tag.</span>
+<span class="w">    </span><span class="c">! First attempt to form a pair within tolerance tol of 1 year.</span>
+<span class="w">    </span><span class="c">! If this fails, then find next unused partner.</span>
+<span class="w">    </span><span class="c">! If this fails, cycle through all possible future partners again.</span>
+<span class="w">    </span><span class="c">!</span>
+<span class="w">    </span><span class="c">! MIDAS calls this twice -- firstly forward in time, and</span>
+<span class="w">    </span><span class="c">! secondly backward in time with negative tags and data.</span>
+<span class="w">    </span><span class="c">! This ensures a time symmetric solution.</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c">! 2010-10-12: now allow for apriori list of step epochs</span>
+<span class="w">    </span><span class="c">! - do not select pairs that span or include the step epoch</span>
 
-    <span class="k">IMPLICIT NONE</span>
+<span class="w">    </span><span class="k">IMPLICIT NONE</span><span class="w"></span>
 
-    <span class="c">! constant</span>
-    <span class="kt">INTEGER</span><span class="p">,</span> <span class="k">PARAMETER</span> <span class="kd">::</span> <span class="n">maxn</span> <span class="o">=</span> <span class="mi">19999</span>
-    
-    <span class="c">! input</span>
-    <span class="kt">INTEGER</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span> <span class="kd">::</span> <span class="n">m</span><span class="p">,</span> <span class="n">nstep</span>
-    <span class="kt">REAL</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span> <span class="kd">::</span> <span class="n">t</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">tstep</span><span class="p">(</span><span class="n">nstep</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">tol</span>
-    
-    <span class="c">! output</span>
-    <span class="kt">INTEGER</span><span class="p">,</span> <span class="k">INTENT</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span> <span class="n">ip</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxn</span><span class="p">)</span>
-    
-    <span class="c">! local</span>
-    <span class="kt">INTEGER</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">istep</span>
-    <span class="kt">REAL</span> <span class="kd">::</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fdt</span>
-     
-    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">istep</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">DO </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span>
-        <span class="k">IF</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span> <span class="n">maxn</span><span class="p">)</span> <span class="k">EXIT</span>
-<span class="k">        IF</span> <span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="n">tol</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span> <span class="k">EXIT</span>
-     
-        <span class="c">! scroll through steps until next step time is later than epoch 1</span>
-        <span class="k">DO</span>
-<span class="k">            IF</span> <span class="p">(</span><span class="n">istep</span> <span class="o">&gt;</span> <span class="n">nstep</span><span class="p">)</span> <span class="k">EXIT</span>
-<span class="k">            IF</span> <span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span> <span class="k">EXIT</span>
-<span class="k">            </span><span class="n">istep</span> <span class="o">=</span> <span class="n">istep</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">ENDDO</span>
-<span class="k">        IF</span> <span class="p">(</span><span class="n">istep</span> <span class="o">&lt;=</span> <span class="n">nstep</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">            IF</span> <span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span> <span class="o">+</span> <span class="n">tol</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span> <span class="k">CYCLE</span>
+<span class="w">    </span><span class="c">! constant</span>
+<span class="w">    </span><span class="kt">INTEGER</span><span class="p">,</span><span class="w"> </span><span class="k">PARAMETER</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">maxn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">19999</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c">! input</span>
+<span class="w">    </span><span class="kt">INTEGER</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">nstep</span><span class="w"></span>
+<span class="w">    </span><span class="kt">REAL</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">m</span><span class="p">),</span><span class="w"> </span><span class="n">tstep</span><span class="p">(</span><span class="n">nstep</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">tol</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c">! output</span>
+<span class="w">    </span><span class="kt">INTEGER</span><span class="p">,</span><span class="w"> </span><span class="k">INTENT</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">ip</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">maxn</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c">! local</span>
+<span class="w">    </span><span class="kt">INTEGER</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">i2</span><span class="p">,</span><span class="w"> </span><span class="n">istep</span><span class="w"></span>
+<span class="w">    </span><span class="kt">REAL</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">fdt</span><span class="w"></span>
+<span class="w">     </span>
+<span class="w">    </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="n">istep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">DO </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">        </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">maxn</span><span class="p">)</span><span class="w"> </span><span class="k">EXIT</span>
+<span class="k">        IF</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tol</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="p">))</span><span class="w"> </span><span class="k">EXIT</span><span class="w"></span>
+<span class="w">     </span>
+<span class="w">        </span><span class="c">! scroll through steps until next step time is later than epoch 1</span>
+<span class="w">        </span><span class="k">DO</span>
+<span class="k">            IF</span><span class="w"> </span><span class="p">(</span><span class="n">istep</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">nstep</span><span class="p">)</span><span class="w"> </span><span class="k">EXIT</span>
+<span class="k">            IF</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tol</span><span class="p">)</span><span class="w"> </span><span class="k">EXIT</span>
+<span class="k">            </span><span class="n">istep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">istep</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">        </span><span class="k">ENDDO</span>
+<span class="k">        IF</span><span class="w"> </span><span class="p">(</span><span class="n">istep</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">nstep</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">            IF</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tol</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="p">))</span><span class="w"> </span><span class="k">CYCLE</span>
 <span class="k">        ENDIF </span>
 <span class="k"> </span>
-<span class="k">        DO </span><span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">k</span> <span class="o">&lt;</span> <span class="n">j</span><span class="p">)</span> <span class="n">k</span> <span class="o">=</span> <span class="n">j</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">istep</span> <span class="o">&lt;=</span> <span class="n">nstep</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span> <span class="o">-</span> <span class="n">tol</span><span class="p">))</span> <span class="k">EXIT</span>
+<span class="k">        DO </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"></span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">istep</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">nstep</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tol</span><span class="p">))</span><span class="w"> </span><span class="k">EXIT</span>
 <span class="k">            ENDIF</span>
 <span class="k">           </span>
-<span class="k">            </span><span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
- 
-            <span class="c">! time difference from 1 year</span>
-            <span class="n">fdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">dt</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
-            
-            <span class="c">! keep searching IF pair less than one year</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">fdt</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">tol</span><span class="p">)</span> <span class="k">CYCLE</span>
+<span class="k">            </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+<span class="w"> </span>
+<span class="w">            </span><span class="c">! time difference from 1 year</span>
+<span class="w">            </span><span class="n">fdt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dt</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span>
+<span class="w">            </span><span class="c">! keep searching IF pair less than one year</span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">fdt</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">-</span><span class="n">tol</span><span class="p">)</span><span class="w"> </span><span class="k">CYCLE</span><span class="w"></span>
 
-            <span class="c">! try to find a matching pair within tolerance of 1 year</span>
-            <span class="k">IF</span> <span class="p">(</span><span class="n">fdt</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                </span><span class="n">i2</span> <span class="o">=</span> <span class="n">j</span>
-            <span class="k">ELSE</span>
-            <span class="c">! otherwise, if greater than 1 year, cycle through remaining data</span>
-                <span class="n">i2</span> <span class="o">=</span> <span class="n">k</span>
-                <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">i2</span><span class="p">)</span> <span class="o">-</span> <span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="k">IF</span> <span class="p">(</span><span class="n">istep</span> <span class="o">&lt;=</span> <span class="n">nstep</span><span class="p">)</span> <span class="k">THEN</span>
-<span class="k">                    IF</span> <span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span> <span class="o">-</span> <span class="n">tol</span><span class="p">))</span> <span class="k">THEN</span>
-<span class="k">                        </span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-                        <span class="k">CYCLE</span>
+<span class="w">            </span><span class="c">! try to find a matching pair within tolerance of 1 year</span>
+<span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">fdt</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tol</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                </span><span class="n">i2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"></span>
+<span class="w">            </span><span class="k">ELSE</span><span class="w"></span>
+<span class="w">            </span><span class="c">! otherwise, if greater than 1 year, cycle through remaining data</span>
+<span class="w">                </span><span class="n">i2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="w"></span>
+<span class="w">                </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">i2</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">IF</span><span class="w"> </span><span class="p">(</span><span class="n">istep</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">nstep</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                    IF</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">i2</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">tstep</span><span class="p">(</span><span class="n">istep</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tol</span><span class="p">))</span><span class="w"> </span><span class="k">THEN</span>
+<span class="k">                        </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">                        </span><span class="k">CYCLE</span>
 <span class="k">                    ENDIF</span>
 <span class="k">                ENDIF</span>
-<span class="k">                IF</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">m</span><span class="p">)</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">ENDIF</span>
+<span class="k">                IF</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">                </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="k">ENDIF</span><span class="w"></span>
 
-            <span class="c">! data pair has been found</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="n">ip</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
-            <span class="n">ip</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="n">i2</span>
-            <span class="k">EXIT</span>
+<span class="w">            </span><span class="c">! data pair has been found</span>
+<span class="w">            </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="n">ip</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"></span>
+<span class="w">            </span><span class="n">ip</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i2</span><span class="w"></span>
+<span class="w">            </span><span class="k">EXIT</span>
 <span class="k">        ENDDO</span>
 <span class="k">    ENDDO</span>
 
-<span class="k">END SUBROUTINE </span><span class="n">selectpair</span>
+<span class="k">END SUBROUTINE </span><span class="n">selectpair</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -657,7 +657,7 @@ indices of the pairs to use in the MIDAS calculation.</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Tobias Köhne.</p>
+    <p>&#169; Copyright 2022, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -506,9 +506,9 @@ L1R-fitted model:
     >>> reldiff_sec = (mdl_coll_synth["Secular"].parameters
     ...                / stat.models["Displacement"]["Secular"].parameters).ravel() - 1
     >>> reldiff_ann_amp = (mdl_coll_synth["Annual"].amplitude
-    ...                    / stat.models["Displacement"]["Annual"].amplitude)[0]- 1
+    ...                    / stat.models["Displacement"]["Annual"].amplitude)[0] - 1
     >>> reldiff_sem_amp = (mdl_coll_synth["Semi-Annual"].amplitude
-    ...                    / stat.models["Displacement"]["Semi-Annual"].amplitude)[0]- 1
+    ...                    / stat.models["Displacement"]["Semi-Annual"].amplitude)[0] - 1
     >>> absdiff_ann_ph = np.rad2deg(mdl_coll_synth["Annual"].phase
     ...                             - stat.models["Displacement"]["Annual"].phase)[0]
     >>> absdiff_sem_ph = np.rad2deg(mdl_coll_synth["Semi-Annual"].phase

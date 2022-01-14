@@ -1603,7 +1603,7 @@
 <span class="sd">    Implements the relationship</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \mathbf{g}(\mathbf{t}) = A \cos ( 2 \pi \mathbf{t} / T - \phi )</span>
+<span class="sd">        \mathbf{g}(\mathbf{t}) = A \cos ( 2 \pi \mathbf{t} / T - \phi ) =</span>
 <span class="sd">        a \cos ( 2 \pi \mathbf{t} / T ) + b \sin ( 2 \pi \mathbf{t} / T )</span>
 
 <span class="sd">    with :attr:`~period` :math:`T`, :attr:`~phase` :math:`\phi=\text{atan2}(b,a)`</span>
@@ -1715,9 +1715,7 @@
         <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tvec_to_numpycol</span><span class="p">(</span><span class="n">timevector</span><span class="p">)</span>
         <span class="n">phase</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dt</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span>
         <span class="n">t_span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_start</span>
-        <span class="n">phase_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">((</span><span class="n">timevector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">t_span</span><span class="p">,</span>
-                                 <span class="p">(</span><span class="n">timevector</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">t_span</span> <span class="o">-</span> <span class="mf">1e-16</span><span class="p">,</span>
-                                 <span class="n">num</span><span class="o">=</span><span class="n">timevector</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">phase_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">timevector</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_start</span><span class="p">)</span> <span class="o">/</span> <span class="n">t_span</span>
         <span class="c1"># get the mapping matrices of the sinusoid</span>
         <span class="n">coef_cosine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
         <span class="n">coef_sine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
@@ -2817,7 +2815,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Tobias Köhne.</p>
+    <p>&#169; Copyright 2022, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -50,7 +50,7 @@ in the script does the trick, and we can set the number of threads manually:
     >>> import os
     >>> os.environ['OMP_NUM_THREADS'] = '1'
     >>> import disstans
-    >>> disstans.defaults["general"]["num_threads"] = 10
+    >>> disstans.defaults["general"]["num_threads"] = 16
 
 And we can create a random number generator just like in the previous example:
 

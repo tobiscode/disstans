@@ -9,6 +9,8 @@ transient signals.
 
 # import the modules
 import os
+import pickle
+import gzip
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -317,19 +319,13 @@ if __name__ == "__main__":
                                    "degree": 2,
                                    "num_bases": 29,
                                    "t_start": "1994-01-01",
-                                   "t_end": "2022-01-01"}},
-         "BiannualDev": {"type": "AmpPhModulatedSinusoid",
-                         "kw_args": {"period": 365.25/2,
-                                     "degree": 2,
-                                     "num_bases": 29,
-                                     "t_start": "1994-01-01",
-                                     "t_end": "2022-01-01"}}}
+                                   "t_end": "2022-01-01"}}}
     net.add_local_models(new_models, "final")
 
     # make a single solution
-    rw_func = disstans.solvers.InverseReweighting(eps=1e-4, scale=1e-2)
+    rw_func = disstans.solvers.InverseReweighting(eps=1e-5, scale=1e-3)
     stats = net.spatialfit("final",
-                           penalty=[10, 10, 1],
+                           penalty=[20, 20, 2],
                            spatial_reweight_models=["Transient"],
                            spatial_reweight_iters=20,
                            local_reweight_func=rw_func,
@@ -338,6 +334,10 @@ if __name__ == "__main__":
                            verbose=True,
                            extended_stats=True,
                            keep_mdl_res_as=("model_srw", "resid_srw"))
+
+    # save to file
+    with gzip.open("example_1_net.pkl.gz", "wb") as f:
+        pickle.dump(net, f)
 
     # make CASA plots
     net.gui(station="CASA", timeseries="final", save=True,
@@ -354,7 +354,7 @@ if __name__ == "__main__":
               (plot_dir / f"example_1e_transient.{fmt}"))
     net.gui(station="CASA", timeseries="final", save=True,
             save_kw_args={"format": fmt, "dpi": 300}, sum_models=True,
-            fit_list=["Annual", "AnnualDev", "Biannual", "BiannualDev"],
+            fit_list=["Annual", "AnnualDev", "Biannual"],
             gui_kw_args={"plot_sigmas": 0})
     os.rename(next(plot_dir.glob(f"ts_CASA*.{fmt}")),
               (plot_dir / f"example_1e_seasonal.{fmt}"))
@@ -394,6 +394,7 @@ if __name__ == "__main__":
                        "SHRC", "P631", "TILC", "P642", "BALD", "P648", "WATC", "P632",
                        "P643", "P647", "PMTN", "P635", "P645"]
     plot_t_start, plot_t_end = "2012-01-01", "2015-01-01"
+    # make default wormplot
     # if colorbar is added, the animation is a bit buggy, so make the animation
     # without it, then overwrite the final image with one that has a colorbar
     net.wormplot(ts_description=("final", "Transient"),
@@ -454,9 +455,8 @@ if __name__ == "__main__":
     lvc_transient = {name: net[name].fits["final"]["Transient"].data.values
                      for name in lvc_names}
     lvc_seasonal = {name: (net[name].fits["final"]["Annual"].data.values +
-                           net[name].fits["final"]["Biannual"].data.values +
                            net[name].fits["final"]["AnnualDev"].data.values +
-                           net[name].fits["final"]["BiannualDev"].data.values)
+                           net[name].fits["final"]["Biannual"].data.values)
                     for name in lvc_names}
     # remove fits from data
     lvc_data_transient = {name: (lvc_data[name].values - lvc_background[name] -
@@ -498,8 +498,9 @@ if __name__ == "__main__":
                           for name in lvc_names}
     lvc_data_transient_main = {name: (lvc_data_transient[name][:, :2] @ R(rots[name]))[:, 0]
                                for name in lvc_names}
+
     # start transient plot by azimuth
-    offsets = [0, 65, 80, 110, 140, 180, 235, 265, 295, 285, 380, 395, 425, 455]
+    offsets = [0, 85, 100, 125, 195, 215, 245, 255, 285, 315, 380, 395, 435, 455]
     fig, ax = plt.subplots(figsize=(5, 8))
     for i, name in enumerate(rots_sort_azim.keys()):
         ax.plot(lvc_data[name].index,
@@ -542,7 +543,7 @@ if __name__ == "__main__":
         temp_fits = net[stat_name].fits["final"]
         temp_mdl = net[stat_name].models["final"]
         seas_ann = temp_fits["Annual"].data.values + temp_fits["AnnualDev"].data.values
-        seas_biann = temp_fits["Biannual"].data.values + temp_fits["BiannualDev"].data.values
+        seas_biann = temp_fits["Biannual"].data.values
         trans_data = (temp_ts.data.values - seas_ann - seas_biann -
                       temp_fits["Linear"].data.values)
         trans_fit = temp_fits["Transient"].data.values.copy()
@@ -615,13 +616,9 @@ if __name__ == "__main__":
             ax[0].plot(temp_ts.time, temp_fits["Annual"].data.values[:, i] +
                        temp_fits["Biannual"].data.values[:, i], "k")
             ax[1].plot(temp_ts.time, temp_fits["AnnualDev"].data.values[:, i], "C0", alpha=0.5)
-            ax[1].plot(temp_ts.time, temp_fits["BiannualDev"].data.values[:, i], "C1", alpha=0.5)
-            ax[1].plot(temp_ts.time, temp_fits["AnnualDev"].data.values[:, i] +
-                       temp_fits["BiannualDev"].data.values[:, i], "k")
             ax[2].plot(temp_ts.time, temp_fits["Annual"].data.values[:, i] +
                        temp_fits["AnnualDev"].data.values[:, i], "C0", alpha=0.5)
-            ax[2].plot(temp_ts.time, temp_fits["Biannual"].data.values[:, i] +
-                       temp_fits["BiannualDev"].data.values[:, i], "C1", alpha=0.5)
+            ax[2].plot(temp_ts.time, temp_fits["Biannual"].data.values[:, i], "C1", alpha=0.5)
             ax[2].plot(temp_ts.time, seas_ann[:, i] + seas_biann[:, i], "k")
             for j in range(3):
                 ax[j].set_ylim(-seas_max, seas_max)
@@ -643,3 +640,13 @@ if __name__ == "__main__":
         fig.suptitle(stat_name)
         fig.savefig(plot_dir / f"example_1h_residuals_{stat_name}.{fmt}", dpi=300)
         plt.close(fig)
+
+    # plot the annual amplitude and phase
+    net.ampphaseplot("final", "Annual", components=2,
+                     fname=plot_dir / "example_1i_annual_vertical",
+                     save_kw_args={"format": fmt, "dpi": 300},
+                     subset_stations=subset_stations, annotate_stations="small",
+                     lat_min=37.52, lat_max=37.87, lon_min=-119.18, lon_max=-118.56,
+                     legend_refs=[1, 5], legend_labels=["1 mm", "5 mm"], scale=0.5,
+                     colorbar_kw_args={"shrink": 0.7, "label": "Month",
+                                       "orientation": "horizontal"})
