@@ -840,11 +840,11 @@ class StepDetector():
             A list of lists containing continuous periods over all stations of the potential
             steps as determined by ``gap`` and ``gap_unit``.
         """
-        # initialize DataFrame
-        step_table = pd.DataFrame(columns=["station", "time", "probability"])
         # get the stations who have this timeseries
         valid_stations = {name: station for name, station in net.stations.items()
                           if ts_description in station.timeseries}
+        # make a list that will contain all individual result DataFrames
+        step_tables = []
         # run parallelized StepDetector._search
         iterable_input = ((tvec_to_numpycol(station[ts_description].time),
                            station[ts_description].data.values,
@@ -867,17 +867,18 @@ class StepDetector():
             maxstepprobs = np.take_along_axis(stepprobs, maxprobindices, axis=1).squeeze()
             maxstepvar0 = np.take_along_axis(stepsvar0, maxprobindices, axis=1).squeeze()
             maxstepvar1 = np.take_along_axis(stepsvar1, maxprobindices, axis=1).squeeze()
-            # isolate the actual timestamps and add to the DataFrame
+            # isolate the actual timestamps and add to the list of DataFrames
             steptimes = station[ts_description].time[unique_steps]
-            step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
-                                                         "time": steptimes,
-                                                         "probability": maxstepprobs,
-                                                         "var0": maxstepvar0,
-                                                         "var1": maxstepvar1}),
-                                           ignore_index=True)
+            step_tables.append(pd.DataFrame({"station": [name]*len(steptimes),
+                                             "time": steptimes,
+                                             "probability": maxstepprobs,
+                                             "var0": maxstepvar0,
+                                             "var1": maxstepvar1}))
             # this code could be used to create a model object and assign it to the station
             # mdl = disstans.models.Step(steptimes)
             # station.add_local_model(ts_description, "Detections", mdl)
+        # combine individual DataFrames to one
+        step_table = pd.concat(step_tables, ignore_index=True)
         # sort dataframe by probability
         step_table.sort_values(by="probability", ascending=False, inplace=True)
         # get coefficient of partial determination, i.e. how much the variance is reduced
@@ -954,8 +955,6 @@ class StepDetector():
             assert isinstance(catalog, dict), \
                 "'catalog' must be either a dictionary or DataFrame."
             augment_df = False
-        # initialize DataFrame
-        step_table = pd.DataFrame(columns=["station", "time", "probability"])
         # for each station, find the first time index after a catalogued event
         # (alternatively, we could "add" a timestamp without an observation if
         # there isn't a timestamp already present - probably better, but harder)
@@ -977,6 +976,8 @@ class StepDetector():
                     continue
                 else:
                     catalog_timeexists[sta_name][ist] = True
+        # make a list that will contain all individual result DataFrames
+        step_tables = []
         # run parallelized StepDetector._search
         stations_overlap = list(check_indices.keys())
         iterable_input = ((tvec_to_numpycol(net[sta_name][ts_description].time),
@@ -1001,15 +1002,16 @@ class StepDetector():
                 np.take_along_axis(probs[has_steps, :], maxprobindices, axis=1).squeeze(), \
                 np.take_along_axis(var0[has_steps, :], maxprobindices, axis=1).squeeze(), \
                 np.take_along_axis(var1[has_steps, :], maxprobindices, axis=1).squeeze()
-            # isolate the original timestamps and add to the DataFrame
+            # isolate the original timestamps and add to the list of DataFrames
             steptimes = [origtime for i, origtime in enumerate(catalog[name])
                          if catalog_timeexists[name][i]]
-            step_table = step_table.append(pd.DataFrame({"station": [name]*len(steptimes),
-                                                         "time": steptimes,
-                                                         "probability": maxstepprobs,
-                                                         "var0": maxstepvar0,
-                                                         "var1": maxstepvar1}),
-                                           ignore_index=True)
+            step_tables.append(pd.DataFrame({"station": [name]*len(steptimes),
+                                             "time": steptimes,
+                                             "probability": maxstepprobs,
+                                             "var0": maxstepvar0,
+                                             "var1": maxstepvar1}))
+        # combine individual DataFrames to one
+        step_table = pd.concat(step_tables, ignore_index=True)
         # merge it with the input dataframe, if provided
         if augment_df:
             catalog_df["probability"] = np.NaN
