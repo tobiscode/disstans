@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.tools &mdash; DISSTANS 0.10 documentation</title>
+  <title>disstans.tools &mdash; DISSTANS 1.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -30,7 +30,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.10
+                1.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1485,8 +1485,17 @@
     <span class="c1"># load the file</span>
     <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="s2">&quot;magnitude&quot;</span><span class="p">,</span> <span class="s2">&quot;usgsid&quot;</span><span class="p">]</span>
     <span class="c1"># (for earthquake events, the &quot;type&quot; column is actually the &quot;threshold&quot; column)</span>
-    <span class="n">raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span>
-                      <span class="n">date_parser</span><span class="o">=</span><span class="k">lambda</span> <span class="n">YYMMMDD</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">YYMMMDD</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;%y%b</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># we now have a locale-dependent time column in the non-standard format yymmmdd</span>
+    <span class="c1"># (%y%b%d in strptime language) which we need to convert in a hard-coded way, because we</span>
+    <span class="c1"># shouldn&#39;t change the locale temporarily as it affects the entire system</span>
+    <span class="n">unrmonthmap</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;JAN&quot;</span><span class="p">:</span> <span class="s2">&quot;01&quot;</span><span class="p">,</span> <span class="s2">&quot;FEB&quot;</span><span class="p">:</span> <span class="s2">&quot;02&quot;</span><span class="p">,</span> <span class="s2">&quot;MAR&quot;</span><span class="p">:</span> <span class="s2">&quot;03&quot;</span><span class="p">,</span> <span class="s2">&quot;APR&quot;</span><span class="p">:</span> <span class="s2">&quot;04&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;MAY&quot;</span><span class="p">:</span> <span class="s2">&quot;05&quot;</span><span class="p">,</span> <span class="s2">&quot;JUN&quot;</span><span class="p">:</span> <span class="s2">&quot;06&quot;</span><span class="p">,</span> <span class="s2">&quot;JUL&quot;</span><span class="p">:</span> <span class="s2">&quot;07&quot;</span><span class="p">,</span> <span class="s2">&quot;AUG&quot;</span><span class="p">:</span> <span class="s2">&quot;08&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;SEP&quot;</span><span class="p">:</span> <span class="s2">&quot;09&quot;</span><span class="p">,</span> <span class="s2">&quot;OCT&quot;</span><span class="p">:</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;NOV&quot;</span><span class="p">:</span> <span class="s2">&quot;11&quot;</span><span class="p">,</span> <span class="s2">&quot;DEC&quot;</span><span class="p">:</span> <span class="s2">&quot;12&quot;</span><span class="p">}</span>
+    <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+        <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">yymmmdd</span><span class="p">:</span>
+                          <span class="n">yymmmdd</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">unrmonthmap</span><span class="p">[</span><span class="n">yymmmdd</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">]]</span> <span class="o">+</span> <span class="n">yymmmdd</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]),</span>
+        <span class="nb">format</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;%y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># subset to specified stations</span>
     <span class="k">if</span> <span class="n">only_stations</span><span class="p">:</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">only_stations</span><span class="p">)]</span>

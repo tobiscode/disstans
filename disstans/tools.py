@@ -1229,8 +1229,17 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
     # load the file
     col_names = ["station", "time", "code", "type", "distance", "magnitude", "usgsid"]
     # (for earthquake events, the "type" column is actually the "threshold" column)
-    raw = pd.read_csv(filepath, names=col_names, delim_whitespace=True, parse_dates=["time"],
-                      date_parser=lambda YYMMMDD: datetime.strptime(YYMMMDD, r"%y%b%d"))
+    raw = pd.read_csv(filepath, names=col_names, delim_whitespace=True)
+    # we now have a locale-dependent time column in the non-standard format yymmmdd
+    # (%y%b%d in strptime language) which we need to convert in a hard-coded way, because we
+    # shouldn't change the locale temporarily as it affects the entire system
+    unrmonthmap = {"JAN": "01", "FEB": "02", "MAR": "03", "APR": "04",
+                   "MAY": "05", "JUN": "06", "JUL": "07", "AUG": "08",
+                   "SEP": "09", "OCT": "10", "NOV": "11", "DEC": "12"}
+    raw["time"] = pd.to_datetime(
+        raw["time"].apply(lambda yymmmdd:
+                          yymmmdd[:2] + unrmonthmap[yymmmdd[2:5]] + yymmmdd[-2:]),
+        format=r"%y%m%d")
     # subset to specified stations
     if only_stations:
         raw = raw[raw["station"].isin(only_stations)]
