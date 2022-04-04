@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 0.10 documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 1.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -30,7 +30,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.10
+                1.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1096,11 +1096,11 @@
 <span class="sd">            A list of lists containing continuous periods over all stations of the potential</span>
 <span class="sd">            steps as determined by ``gap`` and ``gap_unit``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># initialize DataFrame</span>
-        <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">])</span>
         <span class="c1"># get the stations who have this timeseries</span>
         <span class="n">valid_stations</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">station</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
                           <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">}</span>
+        <span class="c1"># make a list that will contain all individual result DataFrames</span>
+        <span class="n">step_tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># run parallelized StepDetector._search</span>
         <span class="n">iterable_input</span> <span class="o">=</span> <span class="p">((</span><span class="n">tvec_to_numpycol</span><span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
                            <span class="n">station</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
@@ -1123,17 +1123,18 @@
             <span class="n">maxstepprobs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">stepprobs</span><span class="p">,</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
             <span class="n">maxstepvar0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">stepsvar0</span><span class="p">,</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
             <span class="n">maxstepvar1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">stepsvar1</span><span class="p">,</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-            <span class="c1"># isolate the actual timestamps and add to the DataFrame</span>
+            <span class="c1"># isolate the actual timestamps and add to the list of DataFrames</span>
             <span class="n">steptimes</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">unique_steps</span><span class="p">]</span>
-            <span class="n">step_table</span> <span class="o">=</span> <span class="n">step_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
-                                                         <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
-                                                         <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
-                                                         <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
-                                                         <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}),</span>
-                                           <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">step_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
+                                             <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
+                                             <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
+                                             <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
+                                             <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}))</span>
             <span class="c1"># this code could be used to create a model object and assign it to the station</span>
             <span class="c1"># mdl = disstans.models.Step(steptimes)</span>
             <span class="c1"># station.add_local_model(ts_description, &quot;Detections&quot;, mdl)</span>
+        <span class="c1"># combine individual DataFrames to one</span>
+        <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">step_tables</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># sort dataframe by probability</span>
         <span class="n">step_table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># get coefficient of partial determination, i.e. how much the variance is reduced</span>
@@ -1210,8 +1211,6 @@
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> \
                 <span class="s2">&quot;&#39;catalog&#39; must be either a dictionary or DataFrame.&quot;</span>
             <span class="n">augment_df</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1"># initialize DataFrame</span>
-        <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">])</span>
         <span class="c1"># for each station, find the first time index after a catalogued event</span>
         <span class="c1"># (alternatively, we could &quot;add&quot; a timestamp without an observation if</span>
         <span class="c1"># there isn&#39;t a timestamp already present - probably better, but harder)</span>
@@ -1233,6 +1232,8 @@
                     <span class="k">continue</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ist</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># make a list that will contain all individual result DataFrames</span>
+        <span class="n">step_tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># run parallelized StepDetector._search</span>
         <span class="n">stations_overlap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">check_indices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">iterable_input</span> <span class="o">=</span> <span class="p">((</span><span class="n">tvec_to_numpycol</span><span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
@@ -1257,15 +1258,16 @@
                 <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">var0</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">var1</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-            <span class="c1"># isolate the original timestamps and add to the DataFrame</span>
+            <span class="c1"># isolate the original timestamps and add to the list of DataFrames</span>
             <span class="n">steptimes</span> <span class="o">=</span> <span class="p">[</span><span class="n">origtime</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">origtime</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
                          <span class="k">if</span> <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
-            <span class="n">step_table</span> <span class="o">=</span> <span class="n">step_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
-                                                         <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
-                                                         <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
-                                                         <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
-                                                         <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}),</span>
-                                           <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">step_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
+                                             <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
+                                             <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
+                                             <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
+                                             <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}))</span>
+        <span class="c1"># combine individual DataFrames to one</span>
+        <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">step_tables</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># merge it with the input dataframe, if provided</span>
         <span class="k">if</span> <span class="n">augment_df</span><span class="p">:</span>
             <span class="n">catalog_df</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>

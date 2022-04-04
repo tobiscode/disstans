@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Models &mdash; DISSTANS 1.0 documentation</title>
+  <title>Models &mdash; DISSTANS 1.0.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -34,7 +34,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.0
+                1.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -304,9 +304,9 @@ for expected in- and output).</p>
 parameters of this model.</p></li>
 <li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit for parameters.
 Refer to <a class="reference internal" href="tools.html#disstans.tools.Timedelta" title="disstans.tools.Timedelta"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a> for more details.</p></li>
-<li><p><strong>t_start</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Sets the model start time (attributes <a class="reference internal" href="#disstans.models.Model.t_start" title="disstans.models.Model.t_start"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_start</span></code></a> and <a class="reference internal" href="#disstans.models.Model.t_start_str" title="disstans.models.Model.t_start_str"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_start_str</span></code></a>).</p></li>
-<li><p><strong>t_end</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Sets the model end time (attributes <a class="reference internal" href="#disstans.models.Model.t_end" title="disstans.models.Model.t_end"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_end</span></code></a> and <a class="reference internal" href="#disstans.models.Model.t_end_str" title="disstans.models.Model.t_end_str"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_end_str</span></code></a>).</p></li>
-<li><p><strong>t_reference</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Sets the model reference time (attributes <a class="reference internal" href="#disstans.models.Model.t_reference" title="disstans.models.Model.t_reference"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_reference</span></code></a>
+<li><p><strong>t_start</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Sets the model start time (attributes <a class="reference internal" href="#disstans.models.Model.t_start" title="disstans.models.Model.t_start"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_start</span></code></a> and <a class="reference internal" href="#disstans.models.Model.t_start_str" title="disstans.models.Model.t_start_str"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_start_str</span></code></a>).</p></li>
+<li><p><strong>t_end</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Sets the model end time (attributes <a class="reference internal" href="#disstans.models.Model.t_end" title="disstans.models.Model.t_end"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_end</span></code></a> and <a class="reference internal" href="#disstans.models.Model.t_end_str" title="disstans.models.Model.t_end_str"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_end_str</span></code></a>).</p></li>
+<li><p><strong>t_reference</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Sets the model reference time (attributes <a class="reference internal" href="#disstans.models.Model.t_reference" title="disstans.models.Model.t_reference"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_reference</span></code></a>
 and <a class="reference internal" href="#disstans.models.Model.t_reference_str" title="disstans.models.Model.t_reference_str"><code class="xref py py-attr docutils literal notranslate"><span class="pre">t_reference_str</span></code></a>).</p></li>
 <li><p><strong>zero_before</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Defines whether the model is zero before <code class="docutils literal notranslate"><span class="pre">t_start</span></code>, or
 if the boundary value should be used (attribute <a class="reference internal" href="#disstans.models.Model.zero_before" title="disstans.models.Model.zero_before"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_before</span></code></a>).</p></li>
@@ -1247,6 +1247,11 @@ i.e. half of the one-sided amplitude.</p>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Arctangent.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.Arctangent.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Arctangent.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#disstans.models.Arctangent.tau" title="Permalink to this definition"></a></dt>
 <dd><p>Arctangent time constant.</p>
@@ -1275,6 +1280,11 @@ before model scaling) to be reached at given <span class="math notranslate nohig
 </dd>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Exponential.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.Exponential.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Exponential.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#disstans.models.Exponential.tau" title="Permalink to this definition"></a></dt>
@@ -1305,6 +1315,11 @@ and given the specified time unit), use the following formula:
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.HyperbolicTangent.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.HyperbolicTangent.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.HyperbolicTangent.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#disstans.models.HyperbolicTangent.tau" title="Permalink to this definition"></a></dt>
 <dd><p>Time constant.</p>
@@ -1329,6 +1344,11 @@ time, the logarithm reaches the value 1 (before model scaling).</p>
 </dd>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Logarithmic.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.Logarithmic.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Logarithmic.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#disstans.models.Logarithmic.tau" title="Permalink to this definition"></a></dt>
@@ -1355,6 +1375,11 @@ equals <code class="docutils literal notranslate"><span class="pre">order</span>
 </dd>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Polynomial.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.Polynomial.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1395,6 +1420,11 @@ Length of it equals the number of model parameters.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Step.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.Step.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Step.steptimes">
 <span class="sig-name descname"><span class="pre">steptimes</span></span><a class="headerlink" href="#disstans.models.Step.steptimes" title="Permalink to this definition"></a></dt>
 <dd><p>List of step times as datetime-like strings.</p>
@@ -1430,6 +1460,11 @@ constant amplitude and phase to be estimated.</p>
 a \cos ( 2 \pi \mathbf{t} / T ) + b \sin ( 2 \pi \mathbf{t} / T )\]</div>
 <p>with <a class="reference internal" href="#disstans.models.Sinusoid.period" title="disstans.models.Sinusoid.period"><code class="xref py py-attr docutils literal notranslate"><span class="pre">period</span></code></a> <span class="math notranslate nohighlight">\(T\)</span>, <a class="reference internal" href="#disstans.models.Sinusoid.phase" title="disstans.models.Sinusoid.phase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">phase</span></code></a> <span class="math notranslate nohighlight">\(\phi=\text{atan2}(b,a)\)</span>
 and <a class="reference internal" href="#disstans.models.Sinusoid.amplitude" title="disstans.models.Sinusoid.amplitude"><code class="xref py py-attr docutils literal notranslate"><span class="pre">amplitude</span></code></a> <span class="math notranslate nohighlight">\(A=\sqrt{a^2 + b^2}\)</span>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Sinusoid.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.Sinusoid.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.models.Sinusoid.amplitude">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">amplitude</span></span><a class="headerlink" href="#disstans.models.Sinusoid.amplitude" title="Permalink to this definition"></a></dt>
@@ -1529,6 +1564,11 @@ doi:<a class="reference external" href="https://doi.org/10.1137/1.9781611970555"
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.BSpline.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.BSpline.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.models.BSpline.centertimes">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">centertimes</span></span><a class="headerlink" href="#disstans.models.BSpline.centertimes" title="Permalink to this definition"></a></dt>
@@ -1605,6 +1645,11 @@ maximum value after a given time span.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.ISpline.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.ISpline.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.models.ISpline.centertimes">
@@ -1774,6 +1819,11 @@ are active again.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.SplineSet.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.SplineSet.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.SplineSet.complete">
 <span class="sig-name descname"><span class="pre">complete</span></span><a class="headerlink" href="#disstans.models.SplineSet.complete" title="Permalink to this definition"></a></dt>
 <dd><p>Sets whether the spline coverage of the time span is considered to be complete or not
@@ -1898,6 +1948,11 @@ model was fitted.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.AmpPhModulatedSinusoid.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.models.AmpPhModulatedSinusoid.__annotations__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="disstans.models.AmpPhModulatedSinusoid.amplitude">
