@@ -1,4 +1,4 @@
-name: disstans
+name: disstans-dev
 channels:
   - conda-forge
   - nodefaults
