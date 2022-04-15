@@ -52,20 +52,25 @@ from with the documentation folder and then opening a browser.
 
 The full installation instructions, including necessary prerequisites, can be found
 [in the documentation](https://tobiscode.github.io/disstans/installation.html).
-The short answer is:
+
+If you're happy with a minimal installation (no local documentation, not suited for
+modifications, without experimental newest commits), then the short answer is:
 
 ``` bash
-# clone repository to disstans/
-git clone https://github.com/tobiscode/disstans.git
-# change into folder
-cd disstans/
-# create the conda environment using the specification file,
-# installing all dependencies along the way
+# download the environment file
+wget https://raw.githubusercontent.com/tobiscode/disstans/main/environment.yml
+# create the environment, including all prerequisites
 conda env create -f environment.yml
 # activate the environment
 conda activate disstans
-# install the package into the environment
-pip install .
+# install DISSTANS from the Python Package Index (PyPI)
+pip install disstans
+```
+
+Updating the code is then just:
+
+``` bash
+pip install --upgrade disstans
 ```
 
 ## Using and citing this work

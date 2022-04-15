@@ -28,7 +28,7 @@ selectpair
 described in detail in [blewitt16]_. It selects pairs of timestamps for a
 one-year period (within a specified tolerance, and not crossing the specified
 step times), but relaxes that assumption if no match can be found. Since there
-is a lot of iteration, the (slightly modifiedfor NumPy) Fortran code provided
+is a lot of iteration, the (slightly modified for NumPy) Fortran code provided
 by the author is included here for speed.
 
 * *t* is the array of timestamps in decimal years,

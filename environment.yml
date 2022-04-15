@@ -1,0 +1,22 @@
+name: disstans
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.9
+  - numpy>=1.22
+  - pandas>=1
+  - scipy>=1.6
+  - scikit-learn
+  - matplotlib>=3.5
+  - cartopy>=0.20
+  - owslib
+  - cmcrameri
+  - cvxpy>=1
+  - cvxopt
+  - tqdm
+  - sqlalchemy
+  - ffmpeg
+  - pip
+  - pip:
+    - git+https://github.com/tbenthompson/okada_wrapper.git
