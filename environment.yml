@@ -23,6 +23,8 @@ dependencies:
   - doc8  # optional
   - rstcheck  # optional
   - flake8  # optional
+  - build  # optional
+  - twine  # optional
   - pip
   - pip:
     - git+https://github.com/tbenthompson/okada_wrapper.git
