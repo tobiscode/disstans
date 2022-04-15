@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; DISSTANS 1.0.1 documentation</title>
+  <title>Installation &amp; Updates &mdash; DISSTANS 1.0.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -33,7 +33,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.0.1
+                1.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -45,9 +45,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation &amp; Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-installation">Minimal installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#full-development-installation">Full development installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#minimal-environment">Minimal environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#updates">Updates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
@@ -246,7 +247,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation</li>
+      <li>Installation &amp; Updates</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -256,17 +257,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+  <section id="installation-updates">
+<h1>Installation &amp; Updates<a class="headerlink" href="#installation-updates" title="Permalink to this headline"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A Fortran 90 compiler is required to install DISSTANS and some of its
 external dependencies, e.g., the <a class="reference external" href="https://gcc.gnu.org/">GNU Compiler Collection (gcc)</a>.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>There aren’t any prebuilt packages (yet?); you’ll have to install DISSTANS
-from the GitHub repository.</p>
 </div>
 <p>DISSTANS depends on many packages, which in turn depend on even more, so I highly
 recommend using a package manager and virtual Python environments.
@@ -274,29 +270,53 @@ Some of the requirements aren’t found in the Python Package Index (PyPI) that 
 used by pip, but the conda channel <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> does. So, the easiest is to
 <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/install/index.html">install conda</a>
 and then go from there depending on your use case.</p>
+<section id="minimal-installation">
+<h2>Minimal installation<a class="headerlink" href="#minimal-installation" title="Permalink to this headline"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use this installation method if you only want to use the code, without adding or
+modifying functionality, if you don’t need a local copy of the documentation
+(including sample scripts), and if you’re not intending to try out the newest,
+potentially buggy, code changes. If you want to do any of these things, consider a
+full development installation as presented further down.</p>
+</div>
+<p>The easiest way to install DISSTANS is to first create a conda environment using
+the specification file provided in the repository, and then using pip to download
+and install DISSTANS directly from its PyPI
+<a class="reference external" href="https://pypi.org/project/disstans/">project homepage</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># download the environment file</span>
+wget https://raw.githubusercontent.com/tobiscode/disstans/main/environment.yml
+<span class="c1"># create the environment, including all prerequisites</span>
+conda env create -f environment.yml
+<span class="c1"># activate the environment</span>
+conda activate disstans
+<span class="c1"># install DISSTANS from the Python Package Index</span>
+pip install disstans
+</pre></div>
+</div>
+<p>Done!</p>
+</section>
 <section id="full-development-installation">
 <h2>Full development installation<a class="headerlink" href="#full-development-installation" title="Permalink to this headline"></a></h2>
-<p>The easiest installation option is just to recreate the environment that I use to
-write, develop and debug DISSTANS, and having a local version of the repository
-(from where the package can then be installed). This is also the best way if you
-think you might want to extend some of DISSTANS’s functionalities, and possibly
-feed them back into the main DISSTANS repository. Another benefit of this version
-is that you have a local copy of the HTML documentation.</p>
+<p>This installation method will recreate the environment that I use to write, develop
+and debug DISSTANS, and then having a local copy of the entire repository (from where
+the package can then be installed). This is the best way if you think you might want
+to extend some of DISSTANS’s functionalities, and possibly feed them back into the
+main DISSTANS repository. Another benefit of this version is that you have a local
+copy of the HTML documentation, and that you’ll be able to track the <code class="docutils literal notranslate"><span class="pre">development</span></code>
+branch to try out new features and fixes.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone repository to disstans/</span>
 git clone https://github.com/tobiscode/disstans.git
 <span class="c1"># change into folder</span>
 <span class="nb">cd</span> disstans/
-<span class="c1"># create the conda environment using the specification file,</span>
-<span class="c1"># installing all dependencies along the way</span>
-conda env create -f environment.yml
+<span class="c1"># create the environment, including all development prerequisites</span>
+conda env create -f environment-dev.yml
 <span class="c1"># activate the environment</span>
-conda activate disstans
+conda activate disstans-dev
 <span class="c1"># install the package into the environment</span>
 pip install .
 </pre></div>
 </div>
-<p>Done! You can now have a look at the tutorials to make sure the installation worked
-and to get started with DISSTANS.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you want to try out modifications to the code, but still be able to import
@@ -306,33 +326,36 @@ the package as it were installed fully, use pip’s <a class="reference external
 </div>
 <p>This only links the folder to the Python package installation location, and
 any changes you do will be available next time you load the package.</p>
+<p>This works especially well in conjunction with tracking the <code class="docutils literal notranslate"><span class="pre">development</span></code>
+branch of the repository, which you can switch to using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git checkout development
+</pre></div>
+</div>
+<p>as the editable install will always match the current state of the local
+repository.</p>
 </div>
 </section>
-<section id="minimal-environment">
-<h2>Minimal environment<a class="headerlink" href="#minimal-environment" title="Permalink to this headline"></a></h2>
-<p>If you don’t want a full development environment, but still want to use conda,
-you can manually create a conda environment. The packages you need are the ones in
-<a class="reference external" href="https://raw.githubusercontent.com/tobiscode/disstans/main/environment.yml">environment.yml</a>
-without the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">optional</span></code> comment at the end. Be sure to use the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code>
-channel for everything, since there are dependencies to be installed as well:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the environment with all packages defined at once</span>
-conda create -n my_env -c conda-forge --override-channels <span class="s2">&quot;python&gt;=3.9&quot;</span> <span class="s2">&quot;numpy&gt;=1.20&quot;</span> ...
-</pre></div>
+<section id="updates">
+<h2>Updates<a class="headerlink" href="#updates" title="Permalink to this headline"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To be notified of new releases, consider “watching” the project on GitHub!</p>
 </div>
-<p>(Alternatively, you can download the environment file, remove the unnecessary rows,
-and then follow the steps in the previous section.)</p>
-<p>Finally, use pip to install <code class="docutils literal notranslate"><span class="pre">okada_wrapper</span></code> (which isn’t on conda) and then the
-DISSTANS package after activating your new environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate the environment, replacing the environment name you used</span>
-conda activate my_env
-<span class="c1"># install non-conda prerequisite</span>
-pip install git+https://github.com/tbenthompson/okada_wrapper.git
-<span class="c1"># install the DISSTANS from the remote repository</span>
-pip install git+https://github.com/tobiscode/disstans.git
-</pre></div>
-</div>
-<p>This will still temporarily download the entire DISSTANS repository, but automatically
-delete it afterwards.</p>
+<p>Depending on your installation method, the update process will look slightly different:</p>
+<ol class="arabic simple">
+<li><p>If you’re on the minimal installation, just run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">disstans</span></code>
+to download and install the newest version from PyPI.</p></li>
+<li><p>If you’ve chosen the full development installation, a simple <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code> will be
+enough to match your local version with the remote one. If you’re on an editable
+install, you’re already done; if you’re not, simply run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">.</span></code>
+to upgrade the previously-installed package.</p></li>
+</ol>
+<p>Keep in mind that these update mechanisms might not always end up with the same version.
+The PyPI repository (used in the minimal installation) is only updated when I publish a
+new release with a new version number.
+The <code class="docutils literal notranslate"><span class="pre">main</span></code> branch of the GitHub repository (which is the default repository when
+cloning a repository, as done in the full installation) is supposed to track the PyPI
+version, but discrepancies may arise.</p>
 </section>
 </section>
 

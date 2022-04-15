@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compiled &mdash; DISSTANS 1.0.1 documentation</title>
+  <title>Compiled &mdash; DISSTANS 1.0.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -33,7 +33,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.0.1
+                1.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -45,9 +45,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation &amp; Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-installation">Minimal installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-environment">Minimal environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#updates">Updates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
@@ -306,7 +307,7 @@ everywhere except where there are NaNs in the original array
 described in detail in <a class="reference internal" href="processing.html#blewitt16" id="id1"><span>[blewitt16]</span></a>. It selects pairs of timestamps for a
 one-year period (within a specified tolerance, and not crossing the specified
 step times), but relaxes that assumption if no match can be found. Since there
-is a lot of iteration, the (slightly modifiedfor NumPy) Fortran code provided
+is a lot of iteration, the (slightly modified for NumPy) Fortran code provided
 by the author is included here for speed.</p>
 <ul class="simple">
 <li><p><em>t</em> is the array of timestamps in decimal years,</p></li>

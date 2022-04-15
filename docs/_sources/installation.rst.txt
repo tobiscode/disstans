@@ -1,16 +1,11 @@
-Installation
-============
+Installation & Updates
+======================
 
 .. note::
 
     A Fortran 90 compiler is required to install DISSTANS and some of its
     external dependencies, e.g., the `GNU Compiler Collection (gcc)
     <https://gcc.gnu.org/>`_.
-
-.. note::
-
-    There aren't any prebuilt packages (yet?); you'll have to install DISSTANS
-    from the GitHub repository.
 
 DISSTANS depends on many packages, which in turn depend on even more, so I highly
 recommend using a package manager and virtual Python environments.
@@ -19,15 +14,45 @@ used by pip, but the conda channel ``conda-forge`` does. So, the easiest is to
 `install conda <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
 and then go from there depending on your use case.
 
+Minimal installation
+--------------------
+
+.. note::
+
+    Use this installation method if you only want to use the code, without adding or
+    modifying functionality, if you don't need a local copy of the documentation
+    (including sample scripts), and if you're not intending to try out the newest,
+    potentially buggy, code changes. If you want to do any of these things, consider a
+    full development installation as presented further down.
+
+The easiest way to install DISSTANS is to first create a conda environment using
+the specification file provided in the repository, and then using pip to download
+and install DISSTANS directly from its PyPI
+`project homepage <https://pypi.org/project/disstans/>`_.
+
+.. code-block:: bash
+
+    # download the environment file
+    wget https://raw.githubusercontent.com/tobiscode/disstans/main/environment.yml
+    # create the environment, including all prerequisites
+    conda env create -f environment.yml
+    # activate the environment
+    conda activate disstans
+    # install DISSTANS from the Python Package Index
+    pip install disstans
+
+Done!
+
 Full development installation
 -----------------------------
 
-The easiest installation option is just to recreate the environment that I use to
-write, develop and debug DISSTANS, and having a local version of the repository
-(from where the package can then be installed). This is also the best way if you
-think you might want to extend some of DISSTANS's functionalities, and possibly
-feed them back into the main DISSTANS repository. Another benefit of this version
-is that you have a local copy of the HTML documentation.
+This installation method will recreate the environment that I use to write, develop
+and debug DISSTANS, and then having a local copy of the entire repository (from where
+the package can then be installed). This is the best way if you think you might want
+to extend some of DISSTANS's functionalities, and possibly feed them back into the
+main DISSTANS repository. Another benefit of this version is that you have a local
+copy of the HTML documentation, and that you'll be able to track the ``development``
+branch to try out new features and fixes.
 
 .. code-block:: bash
 
@@ -35,16 +60,12 @@ is that you have a local copy of the HTML documentation.
     git clone https://github.com/tobiscode/disstans.git
     # change into folder
     cd disstans/
-    # create the conda environment using the specification file,
-    # installing all dependencies along the way
-    conda env create -f environment.yml
+    # create the environment, including all development prerequisites
+    conda env create -f environment-dev.yml
     # activate the environment
-    conda activate disstans
+    conda activate disstans-dev
     # install the package into the environment
     pip install .
-
-Done! You can now have a look at the tutorials to make sure the installation worked
-and to get started with DISSTANS.
 
 .. note::
 
@@ -59,34 +80,36 @@ and to get started with DISSTANS.
     This only links the folder to the Python package installation location, and
     any changes you do will be available next time you load the package.
 
-Minimal environment
--------------------
+    This works especially well in conjunction with tracking the ``development``
+    branch of the repository, which you can switch to using
 
-If you don't want a full development environment, but still want to use conda,
-you can manually create a conda environment. The packages you need are the ones in
-`environment.yml <https://raw.githubusercontent.com/tobiscode/disstans/main/environment.yml>`_
-without the ``# optional`` comment at the end. Be sure to use the ``conda-forge``
-channel for everything, since there are dependencies to be installed as well:
+    .. code-block:: bash
 
-.. code-block:: bash
+        git checkout development
 
-    # create the environment with all packages defined at once
-    conda create -n my_env -c conda-forge --override-channels "python>=3.9" "numpy>=1.20" ...
+    as the editable install will always match the current state of the local
+    repository.
 
-(Alternatively, you can download the environment file, remove the unnecessary rows,
-and then follow the steps in the previous section.)
 
-Finally, use pip to install ``okada_wrapper`` (which isn't on conda) and then the
-DISSTANS package after activating your new environment:
+Updates
+-------
 
-.. code-block:: bash
+.. note::
 
-    # activate the environment, replacing the environment name you used
-    conda activate my_env
-    # install non-conda prerequisite
-    pip install git+https://github.com/tbenthompson/okada_wrapper.git
-    # install the DISSTANS from the remote repository
-    pip install git+https://github.com/tobiscode/disstans.git
+    To be notified of new releases, consider "watching" the project on GitHub!
 
-This will still temporarily download the entire DISSTANS repository, but automatically
-delete it afterwards.
+Depending on your installation method, the update process will look slightly different:
+
+1. If you're on the minimal installation, just run ``pip install --upgrade disstans``
+   to download and install the newest version from PyPI.
+2. If you've chosen the full development installation, a simple ``git pull`` will be
+   enough to match your local version with the remote one. If you're on an editable
+   install, you're already done; if you're not, simply run ``pip install --upgrade .``
+   to upgrade the previously-installed package.
+
+Keep in mind that these update mechanisms might not always end up with the same version.
+The PyPI repository (used in the minimal installation) is only updated when I publish a
+new release with a new version number.
+The ``main`` branch of the GitHub repository (which is the default repository when
+cloning a repository, as done in the full installation) is supposed to track the PyPI
+version, but discrepancies may arise.
