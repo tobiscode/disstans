@@ -461,11 +461,14 @@ def midas(ts, steps=None, tolerance=0.001):
        doi:`10.1002/2015JB012552 <https://doi.org/10.1002/2015JB012552>`_
     """
     # extract timeseries data, adjust zero-crossing to first epoch
-    x = ts.data.values - ts.data.iloc[0, :].values
+    x_off = ts.data.iloc[0, :].values.reshape(1, -1)
+    x = ts.data.values - x_off
     # convert timeseries index and step times to decimal years
     t = date2decyear(ts.time)
     tstep = np.zeros(1)  # need at least one entry for selectpair
-    if steps is not None:
+    if steps is None:
+        tstep_back = tstep
+    else:
         steps_decyear = date2decyear(steps)
         tstep_back = np.concatenate([-steps_decyear[::-1], tstep])
         tstep = np.concatenate([steps_decyear, tstep])
@@ -526,7 +529,7 @@ def midas(ts, steps=None, tolerance=0.001):
     # intercept uncertainty is "perfect" since it wasn't estimated at all,
     # it's just relative to a reference time
     mdl = Polynomial(order=1, t_reference=ts.time[0], time_unit="Y")
-    mdl.read_parameters(parameters=np.concatenate([x50, v50], axis=0),
+    mdl.read_parameters(parameters=np.concatenate([x50 + x_off, v50], axis=0),
                         covariances=np.concatenate([np.zeros_like(x50), sv], axis=0))
     # return residual as a Timeseries
     res = Timeseries.from_array(timevector=ts.time, data=r, src="midas",
