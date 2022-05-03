@@ -307,6 +307,9 @@ def clean(station, ts_in, reference, ts_out=None,
     - ``'min_obs'``: Minimum number of observations the timeseries has to contain.
     - ``'std_outlier'``: Classify as an outlier any observation that is this many
       standard deviations away from the reference.
+    - ``'iqr_outlier'``: Classify as an outlier any observation that is this many
+      inter-quartile ranges (IQR, difference between the 25th and 75th percentile)
+      away from the reference's 25th-75th percentile range.
     - ``'std_thresh'``: After the removal of outliers, the maximum standard deviation
       that the residual between reference and input timeseries is allowed to have.
     - ``'min_clean_obs'``: After the removal of outliers, the minimum number of
@@ -377,13 +380,26 @@ def clean(station, ts_in, reference, ts_out=None,
             continue
         # compute residuals
         if (clean_settings["std_outlier"] is not None) \
+           or (clean_settings["iqr_outlier"] is not None) \
            or (clean_settings["std_thresh"] is not None):
             residual = ts[dcol].values - ts_ref[dcol].values
             sd = np.nanstd(residual)
         # check for and remove outliers
-        if clean_settings["std_outlier"] is not None:
+        if (clean_settings["std_outlier"] is not None) \
+           or (clean_settings["iqr_outlier"] is not None):
             mask = ~np.isnan(residual)
-            mask[mask] &= np.abs(residual[mask]) > clean_settings["std_outlier"] * sd
+            mask_copy = mask.copy()
+            if clean_settings["std_outlier"] is not None:
+                mask[mask_copy] &= (np.abs(residual[mask_copy])
+                                    > clean_settings["std_outlier"] * sd)
+            if clean_settings["iqr_outlier"] is not None:
+                q1 = np.nanpercentile(residual, 25)
+                q3 = np.nanpercentile(residual, 75)
+                iqr = q3 - q1
+                mask[mask_copy] &= np.logical_or(residual[mask_copy]
+                                                 < q1 - clean_settings["iqr_outlier"] * iqr,
+                                                 residual[mask_copy]
+                                                 > q3 + clean_settings["iqr_outlier"] * iqr)
             ts[dcol][mask] = np.NaN
             residual = ts[dcol].values - ts_ref[dcol].values
             sd = np.nanstd(residual)

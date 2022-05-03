@@ -44,6 +44,12 @@ and explained as follows:
 |             |                        | ``std_outliers`` standard deviations away from    |
 |             |                        | the reference.                                    |
 +-------------+------------------------+---------------------------------------------------+
+|             | ``iqr_outlier``        | Outliers are defined by being at least            |
+|             |                        | ``iqr_outliers`` inter-quartile ranges (IQR,      |
+|             |                        | difference between the 25th and 75th percentile)  |
+|             |                        | away from the reference's 25th-75th percentile    |
+|             |                        | range.                                            |
++-------------+------------------------+---------------------------------------------------+
 |             | ``min_clean_obs``      | After cleaning, drop timeseries with less than    |
 |             |                        | ``min_clean_obs`` observations.                   |
 +-------------+------------------------+---------------------------------------------------+
@@ -88,6 +94,7 @@ defaults["gui"] = {"projection": "Mercator",
 # cleaning timeseries
 defaults["clean"] = {"min_obs": 100,
                      "std_outlier": 10,
+                     "iqr_outlier": None,
                      "min_clean_obs": 100,
                      "std_thresh": 100}
 # priors from earthquake catalogs
