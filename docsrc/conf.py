@@ -76,7 +76,7 @@ html_favicon = '_static/favicon.ico'
 # add_module_names = False
 autodoc_default_options = {'undoc-members': True,
                            'exclude-members': '__init__, __module__, __dict__, '
-                                              '__weakref__, __hash__',
+                                              '__weakref__, __hash__, __annotations__ ',
                            'member-order': 'groupwise'}
 
 # intersphinx settings
