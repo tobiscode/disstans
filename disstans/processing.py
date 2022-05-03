@@ -14,10 +14,11 @@ from sklearn.decomposition import PCA, FastICA
 from scipy.signal import find_peaks
 from tqdm import tqdm
 from warnings import warn
+from pandas.api.indexers import BaseIndexer
 
 from .config import defaults
 from .timeseries import Timeseries
-from .compiled import maskedmedfilt2d, selectpair
+from .compiled import selectpair
 from .tools import Timedelta, parallelize, tvec_to_numpycol, date2decyear
 from .models import Polynomial
 
@@ -102,12 +103,77 @@ def unwrap_dict_and_ts(func):
     return wrapper
 
 
+class ExpandingRollingIndexer(BaseIndexer):
+    """
+    Indexer class used in the pandas rolling calculations (e.g., rolling median).
+    This custom indexer behaves like a regular rolling window, except at the
+    start and end of the timeseries, where the window slowly grows or shrinks,
+    respectively. Specifically, at the first time step, the window is only one
+    element wide. At the second step, it is three elements wide; at the third,
+    five elements, and so forth, until the window has the defined window size.
+    As the window approaches the end of the timeseries, it starts to shrink again
+    until it is one element wide at the last time step.
+
+    The goal of this kind of rolling window is to reduce the influence of late
+    (early) observations when looking at the first (last) timesteps (respectively).
+
+    For more information, see the pandas documentation about `custom window rolling
+    <https://pandas.pydata.org/docs/user_guide/window.html#custom-window-rolling>`_.
+    """
+    def get_window_bounds(self, num_values, min_periods, center, closed):
+        """
+        This is the function that needs to be implemented for the
+        :class:`~pandas.api.indexers.BaseIndexer` class to be used for all
+        rolling pandas operations. It shouldn't be called manually.
+
+        The parameters ``min_periods``, ``center``, and ``closed`` have to
+        be included to match expected pandas behavior, but this function
+        does not implement their potential features.
+
+        Parameters
+        ----------
+        num_values : int
+            Total number of values in the array to be rolled through.
+
+        Returns
+        -------
+        start : np.ndarray
+            Start indices of individual windows.
+        end  : np.ndarray
+            End indices (exclusive) of individual windows.
+        """
+        # window_size is set by BaseIndexer.__init__
+        assert self.window_size % 2 == 1, \
+            f"'window_size' must be odd, got {self.window_size}."
+        self.window_size = self.window_size
+        # initialize index arrays
+        start = np.empty(num_values, dtype=int)
+        end = np.empty_like(start)
+        # left and right boundaries for the boundary intervals
+        max_ix_start = min(max(1, num_values // 2 + 1), self.window_size // 2)
+        max_ix_end = min(max(1, num_values // 2), self.window_size // 2)
+        # starting interval
+        start[:max_ix_start] = np.zeros(max_ix_start)
+        end[:max_ix_start] = 2*np.arange(max_ix_start)
+        # ending interval
+        start[-max_ix_end:] = num_values - 1 - 2 * np.arange(max_ix_end - 1, -1, -1)
+        end[-max_ix_end:] = (num_values - 1) * np.ones(max_ix_end)
+        # middle, regular interval
+        start[self.window_size//2:-(self.window_size//2)] = \
+            np.arange(0, num_values - self.window_size + 1)
+        end[self.window_size//2:-(self.window_size//2)] = \
+            np.arange(self.window_size - 1, num_values)
+        # return
+        return start, end + 1
+
+
 @unwrap_dict_and_ts
 def median(array, kernel_size):
     """
-    Computes the median filter (ignoring NaNs) column-wise, either by calling
-    :func:`~numpy.nanmedian` iteratively or by using the precompiled Fortran
-    function :func:`~disstans.compiled.maskedmedfilt2d`.
+    Computes the rolling median filter column-wise. Missing observations (NaNs) are
+    ignored during the median calculation, but missing observations are not imputed
+    from the rolling median (i.e., a NaN value remains a NaN value, but does not
+    affect surrounding values).
 
     Parameters
     ----------
@@ -125,30 +191,15 @@ def median(array, kernel_size):
     filtered : numpy.ndarray
         2D filtered array (may still contain NaNs).
     """
-    try:
-        filtered = maskedmedfilt2d(array, ~np.isnan(array), kernel_size)
-        filtered[np.isnan(array)] = np.NaN
-    except BaseException:
-        assert (kernel_size % 2) == 1, f"'kernel_size' has to be odd, got {kernel_size}."
-        num_obs = array.shape[0]
-        array = array.reshape(num_obs, 1 if array.ndim == 1 else -1)
-        filtered = np.NaN * np.empty(array.shape)
-        # Run filtering while suppressing warnings
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', 'All-NaN slice encountered')
-            # Beginning region
-            halfwindow = 0
-            for i in range(kernel_size // 2):
-                filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
-                halfwindow += 1
-            # Middle region
-            assert halfwindow == kernel_size // 2
-            for i in range(halfwindow, num_obs - halfwindow):
-                filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
-            # Ending region
-            for i in range(num_obs - halfwindow, num_obs):
-                halfwindow -= 1
-                filtered[i, :] = np.nanmedian(array[i-halfwindow:i+halfwindow+1, :], axis=0)
+    # make sure the array is 2D even if it's only a single column
+    num_obs = array.shape[0]
+    array = array.reshape(num_obs, 1 if array.ndim == 1 else -1)
+    # the indexer object will tell pandas over which windows to calculate the median
+    indexer = ExpandingRollingIndexer(window_size=kernel_size)
+    # now we calculate the rolling median (this is compiled-optimized by pandas)
+    filtered = pd.DataFrame(array).rolling(indexer, min_periods=1, axis=0).median().values
+    # add NaNs again to where they were initially
+    filtered[np.isnan(array)] = np.NaN
     return filtered
 
 
