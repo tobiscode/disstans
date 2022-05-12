@@ -151,12 +151,12 @@ class Station():
         Example
         -------
         If ``mystat`` is a :class:`~Station` instance, and we want to see whether
-        ``'myts`` is contained by the station, the following two are equivalent::
+        ``'myts'`` is contained by the station, the following two are equivalent::
 
             # long version
-            'myts` in station.timeseries
+            'myts' in station.timeseries
             # short version
-            'myts` in station
+            'myts' in station
         """
         return ts_description in self.timeseries
 

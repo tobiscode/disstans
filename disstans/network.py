@@ -1909,7 +1909,7 @@ class Network():
         return model, spatial, temporal
 
     def get_hom_vel_strain_rot(self, timeseries, model, comps=[0, 1], use_sigmas=True,
-                               utmzone=None):
+                               utmzone=None, subset_stations=None, extrapolate_sub=True):
         """
         Assuming the entire network (or a subset thereof) is located on the same rigid
         body undergoing homogenous translation, strain and rotation, calculate the predicted
@@ -1938,6 +1938,13 @@ class Network():
             If provided, the UTM zone to use for the horizontal approximation.
             By default (``None``), the average longitude will be calculated, and the
             respective UTM zone will be used.
+        subset_stations : list, optional
+            If set, a list of strings that contains the names of stations to be used.
+        extrapolate_sub : bool, optional
+            Only used if ``subset_stations`` is set.
+            If ``True`` (default), the velocity will be predicted for all stations in
+            the network. If ``False``, the prediction will only be made for the station
+            subset.
 
         Returns
         -------
@@ -1961,16 +1968,42 @@ class Network():
         assert (isinstance(comps, list) and len(comps) == 2 and
                 all([isinstance(c, int) for c in comps])), \
             f"'comps' needs to be a length-2 list of integers, got {comps}."
+        # get view of all stations in network
+        stat_names = self.station_names
+        # subset network for inversion
+        if subset_stations is None:
+            stat_names_sub = stat_names
+        else:
+            assert (isinstance(subset_stations, list) and
+                    all([isinstance(name, str) for name in subset_stations])), \
+                f"'subset_stations' needs to be a list of station names, got {subset_stations}."
+            stat_names_sub = subset_stations
+            # if we're also only predicting on the subset, forget about the entire network
+            if not extrapolate_sub:
+                stat_names = stat_names_sub
+        # make sure our subset list only contain stations that contain the timeseries and model
+        for name in stat_names_sub:
+            if (timeseries not in self[name]) or (model not in self[name].models[timeseries]):
+                stat_names_sub.remove(name)
+        # get quick access to station objects
+        stat_list = [self[name] for name in stat_names]
+        stat_list_sub = [self[name] for name in stat_names_sub]
+        # for the inversion, we need the indices of the subset in the main list
+        sub_ix = [main_name in stat_names_sub for main_name in stat_names]
+        num_sub = sum(sub_ix)
+        # make sure we're not inverting if we don't have enough data points
+        if num_sub < 6:
+            raise ValueError(f"The station list {stat_names_sub} used in the inversion has less "
+                             "elements than necessary (6) for a stable computation.")
         # convert network positions into UTM coordinates
         # prepare data and projections
-        net_lla = self.station_locations
-        lon = net_lla["Longitude [°]"].values
-        lat = net_lla["Latitude [°]"].values
+        lat = np.array([station.location[0] for station in stat_list])
+        lon = np.array([station.location[1] for station in stat_list])
         crs_lla = ccrs.Geodetic()
         # determine UTM zone if needed
         if utmzone is None:
-            lon_mean = np.rad2deg(circmean(np.deg2rad(lon)))
-            utmzone = int(np.ceil(lon_mean / 6))
+            lon_mean = np.rad2deg(circmean(np.deg2rad(lon[sub_ix]), low=-np.pi, high=np.pi))
+            utmzone = int(np.ceil(((lon_mean + 180) / 6)))
         # convert to UTM eastings & northings
         crs_utm = ccrs.UTM(zone=utmzone)
         ENU = crs_utm.transform_points(crs_lla, lon, lat)
@@ -1979,21 +2012,20 @@ class Network():
         EO, NO = crs_utm.transform_point(lon[0], lat[0], crs_lla)
         dEO, dNO = E - EO, N - NO
         dENO = np.stack([dEO, dNO], axis=1)
-        # get all velocities
-        linear_index = self[self.station_names[0]
-                            ].models[timeseries][model].get_exp_index(1)
+        # get all velocities for subset
+        linear_index = stat_list_sub[0].models[timeseries][model].get_exp_index(1)
         V = np.stack([station.models[timeseries][model].par[linear_index, :]
-                      for station in self], axis=0)
+                      for station in stat_list_sub], axis=0)
         VE, VN = V[:, 0], V[:, 1]
         # build individual G
-        GE = np.stack([dEO, dNO, np.zeros_like(dEO), np.zeros_like(dNO),
-                       np.ones_like(dEO), np.zeros_like(dNO)], axis=1)
-        GN = np.stack([np.zeros_like(dEO), np.zeros_like(dNO), dEO, dNO,
-                       np.zeros_like(dEO), np.ones_like(dNO)], axis=1)
+        GE = np.stack([dEO[sub_ix], dNO[sub_ix], np.zeros(num_sub), np.zeros(num_sub),
+                       np.ones_like(dEO[sub_ix]), np.zeros(num_sub)], axis=1)
+        GN = np.stack([np.zeros(num_sub), np.zeros(num_sub), dEO[sub_ix], dNO[sub_ix],
+                       np.zeros(num_sub), np.ones_like(dNO[sub_ix])], axis=1)
         # apply weights
         if use_sigmas:
             W = np.stack([station.models[timeseries][model].var[linear_index, :]
-                          for station in self], axis=0)
+                          for station in stat_list_sub], axis=0)
             WE, WN = 1 / np.sqrt(W[:, 0]), 1 / np.sqrt(W[:, 1])
             GE = np.diag(WE) @ GE
             GN = np.diag(WN) @ GN
@@ -2001,10 +2033,10 @@ class Network():
             VN = WN * VN
         # combine components
         G = np.concatenate([GE, GN], axis=0)
-        d = np.concatenate([VE, VN])
+        d = np.concatenate([VE, VN], axis=0)
         if use_sigmas:
-            G = G.T @ G
             d = G.T @ d
+            G = G.T @ G
         # solve Gm = d
         m = np.linalg.lstsq(G, d, rcond=None)[0]
         # extract wanted quantities
@@ -2014,7 +2046,8 @@ class Network():
         v_O = np.array([m[4], m[5]]).reshape(1, 2)  # velocity of origin
         # calculate predicted uniform velocity
         v_pred = dENO @ (epsilon + omega).T + v_O
-        df_v_pred = pd.DataFrame(data=v_pred, index=net_lla.index, columns=["E", "N"])
+        df_v_pred = pd.DataFrame(data=v_pred, index=stat_names,
+                                 columns=stat_list_sub[0][timeseries].data_cols)
         return df_v_pred, epsilon, omega
 
     def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
