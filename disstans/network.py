@@ -1972,7 +1972,7 @@ class Network():
         stat_names = self.station_names
         # subset network for inversion
         if subset_stations is None:
-            stat_names_sub = stat_names
+            stat_names_sub = stat_names.copy()
         else:
             assert (isinstance(subset_stations, list) and
                     all([isinstance(name, str) for name in subset_stations])), \
@@ -2046,8 +2046,9 @@ class Network():
         v_O = np.array([m[4], m[5]]).reshape(1, 2)  # velocity of origin
         # calculate predicted uniform velocity
         v_pred = dENO @ (epsilon + omega).T + v_O
-        df_v_pred = pd.DataFrame(data=v_pred, index=stat_names,
-                                 columns=stat_list_sub[0][timeseries].data_cols)
+        # return as DataFrame
+        v_pred_cols = [stat_list_sub[0][timeseries].data_cols[c] for c in comps]
+        df_v_pred = pd.DataFrame(data=v_pred, index=stat_names, columns=v_pred_cols)
         return df_v_pred, epsilon, omega
 
     def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
