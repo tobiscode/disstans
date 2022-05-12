@@ -66,6 +66,11 @@ parse_unr_steps
 
 .. autofunction:: disstans.tools.parse_unr_steps
 
+strain_rotation_invariants
+..........................
+
+.. autofunction:: disstans.tools.strain_rotation_invariants
+
 tvec_to_numpycol
 ................
 

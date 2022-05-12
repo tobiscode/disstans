@@ -305,7 +305,7 @@ class Station():
 
         See Also
         --------
-        __setitem__ : Shorthand notation wrapper.
+        __delitem__ : Shorthand notation wrapper.
 
         Example
         -------

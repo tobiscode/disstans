@@ -696,6 +696,34 @@ class Polynomial(Model):
         coefs = dt.reshape(-1, 1) ** exponents.reshape(1, -1)
         return coefs
 
+    def get_exp_index(self, exponent):
+        """
+        Return the row index for :attr:`~Model.par` and :attr:`~Model.var`
+        of a given exponent.
+
+        Parameters
+        ----------
+        exponent : int
+            Exponent for which to return the index. E.g., ``1`` would correspond
+            to the index of the linear term.
+
+        Returns
+        -------
+        int
+            Index of the exponent's term.
+
+        Raises
+        ------
+        ValueError
+            Raised if the desired exponent is not present in the model..
+        """
+        assert isinstance(exponent, int), \
+            f"'exponent' needs to be an integer', got {type(exponent)}."
+        if self.min_exponent <= exponent <= self.order:
+            return exponent - self.min_exponent
+        else:
+            raise ValueError(f"Exponent {exponent} is not included in the model.")
+
 
 class BSpline(Model):
     r"""

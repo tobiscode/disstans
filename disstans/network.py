@@ -20,6 +20,7 @@ from matplotlib.colors import Normalize
 from matplotlib.patches import Rectangle
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
+from scipy.stats import circmean
 
 from . import timeseries as disstans_ts
 from . import models as disstans_models
@@ -146,6 +147,12 @@ class Network():
     def station_names(self):
         """ Names of stations present in the network. """
         return list(self.stations.keys())
+
+    @property
+    def station_locations(self):
+        """ DataFrame of all locations for all stations in the network. """
+        return pd.DataFrame(data={station.name: station.location for station in self},
+                            index=["Latitude [°]", "Longitude [°]", "Altitude [m]"]).T
 
     def __str__(self):
         """
@@ -939,7 +946,7 @@ class Network():
         the L0 regularization weights :math:`\mathbf{w}^{(i)}_j`. The distance weights
         :math:`v_{j,k}` from station :math:`j` to station :math:`k` are based on the
         average distance :math:`D_j` from the station in question to the
-        ``dist_num_avg`` clostest stations, following an exponential curve:
+        ``dist_num_avg`` closest stations, following an exponential curve:
         :math:`v_{j,k}=\exp \left( - r_{j,k} / D_j \right)` where
         :math:`r_{j,k}` is the distance between the stations :math:`j` and :math:`k`.
         ``dist_weight_min`` and ``dist_weight_max`` allow to set boundaries for
@@ -1900,6 +1907,115 @@ class Network():
         if ts_out is not None:
             self.import_network_ts(ts_out, model)
         return model, spatial, temporal
+
+    def get_hom_vel_strain_rot(self, timeseries, model, comps=[0, 1], use_sigmas=True,
+                               utmzone=None):
+        """
+        Assuming the entire network (or a subset thereof) is located on the same rigid
+        body undergoing homogenous translation, strain and rotation, calculate the predicted
+        velocity field as well as the horizontal strain and rotation rate tensors.
+
+        This function requires a :class:`~disstans.models.Polynomial` model to have
+        been fitted to a timeseries in the network. It uses a local approximation to
+        the spherical Earth by converting all station locations into a suitable UTM zone,
+        and only considering the horizontal velocities.
+
+        Parameters
+        ----------
+        timeseries : str
+            Name of the timeseries to use.
+        model : str
+            Name of the :class:`~disstans.models.Polynomial` model that contains the
+            estimated linear station velocities.
+        comps : list, optional
+            Specifies the components of the fitted model to use as the East and North
+            directions, respectively. Defaults to the first two components.
+        use_sigmas : bool, optional
+            If ``True`` (default), use the formal parameter uncertainties in the
+            model during the inversion. If ``False``, all velocities will be weighted
+            equally.
+        utmzome : int, optional
+            If provided, the UTM zone to use for the horizontal approximation.
+            By default (``None``), the average longitude will be calculated, and the
+            respective UTM zone will be used.
+
+        Returns
+        -------
+        df_v_pred : pandas.DataFrame
+            DataFrame containing the predicted velocities at each station (rows) in
+            the East and North components (columns).
+        epsilon : numpy.ndarray
+            2D strain rate tensor.
+        omega : numpy.ndarray
+            2D rotation rate tensor.
+
+        See Also
+        --------
+        disstans.tools.strain_rotation_invariants : Use the strain and rotation rate
+            tensors to calculate invariants such as the dilatation or shearing rates.
+        """
+        # input check
+        assert isinstance(timeseries, str) and isinstance(model, str), \
+            "'timeseries' and 'model' need to be strings, got " + \
+            f"{type(timeseries)} and {type(model)}."
+        assert (isinstance(comps, list) and len(comps) == 2 and
+                all([isinstance(c, int) for c in comps])), \
+            f"'comps' needs to be a length-2 list of integers, got {comps}."
+        # convert network positions into UTM coordinates
+        # prepare data and projections
+        net_lla = self.station_locations
+        lon = net_lla["Longitude [°]"].values
+        lat = net_lla["Latitude [°]"].values
+        crs_lla = ccrs.Geodetic()
+        # determine UTM zone if needed
+        if utmzone is None:
+            lon_mean = np.rad2deg(circmean(np.deg2rad(lon)))
+            utmzone = int(np.ceil(lon_mean / 6))
+        # convert to UTM eastings & northings
+        crs_utm = ccrs.UTM(zone=utmzone)
+        ENU = crs_utm.transform_points(crs_lla, lon, lat)
+        E, N = ENU[:, 0], ENU[:, 1]
+        # get all positions relative to first station (this does not affect the result)
+        EO, NO = crs_utm.transform_point(lon[0], lat[0], crs_lla)
+        dEO, dNO = E - EO, N - NO
+        dENO = np.stack([dEO, dNO], axis=1)
+        # get all velocities
+        linear_index = self[self.station_names[0]
+                            ].models[timeseries][model].get_exp_index(1)
+        V = np.stack([station.models[timeseries][model].par[linear_index, :]
+                      for station in self], axis=0)
+        VE, VN = V[:, 0], V[:, 1]
+        # build individual G
+        GE = np.stack([dEO, dNO, np.zeros_like(dEO), np.zeros_like(dNO),
+                       np.ones_like(dEO), np.zeros_like(dNO)], axis=1)
+        GN = np.stack([np.zeros_like(dEO), np.zeros_like(dNO), dEO, dNO,
+                       np.zeros_like(dEO), np.ones_like(dNO)], axis=1)
+        # apply weights
+        if use_sigmas:
+            W = np.stack([station.models[timeseries][model].var[linear_index, :]
+                          for station in self], axis=0)
+            WE, WN = 1 / np.sqrt(W[:, 0]), 1 / np.sqrt(W[:, 1])
+            GE = np.diag(WE) @ GE
+            GN = np.diag(WN) @ GN
+            VE = WE * VE
+            VN = WN * VN
+        # combine components
+        G = np.concatenate([GE, GN], axis=0)
+        d = np.concatenate([VE, VN])
+        if use_sigmas:
+            G = G.T @ G
+            d = G.T @ d
+        # solve Gm = d
+        m = np.linalg.lstsq(G, d, rcond=None)[0]
+        # extract wanted quantities
+        L = np.array([[m[0], m[1]], [m[2], m[3]]])
+        epsilon = (L + L.T) / 2  # strain rate
+        omega = (L - L.T) / 2  # rotation rate
+        v_O = np.array([m[4], m[5]]).reshape(1, 2)  # velocity of origin
+        # calculate predicted uniform velocity
+        v_pred = dENO @ (epsilon + omega).T + v_O
+        df_v_pred = pd.DataFrame(data=v_pred, index=net_lla.index, columns=["E", "N"])
+        return df_v_pred, epsilon, omega
 
     def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
         # get location data and projections

@@ -1261,6 +1261,70 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
     return maint_table, maint_dict, eq_table, eq_dict
 
 
+def strain_rotation_invariants(epsilon=None, omega=None):
+    r"""
+    Given a strain (rate) and/or rotation (rate) tensor, calculate scalar
+    invariant quantities of interest. See [tape09]_ for an introduction.
+
+    Parameters
+    ----------
+    epsilon : numpy.ndarray
+        Strain (rate) tensor :math:`\mathbf{\varepsilon}`.
+    omega : numpy.ndarray
+        Rotation (rate) tensor :math:`\mathbf{\omega}`.
+
+    Returns
+    -------
+    dilatation : float
+        Only if ``epsilon`` is provided. Scalar dilatation (rate) as defined
+        by the first invariant of the strain (rate) tensor
+        :math:`\Theta = \text{Tr} \left( \mathbf{\varepsilon} \right)`.
+    strain : float
+        Only if ``epsilon`` is provided. Scalar strain (rate) as defined
+        by the Frobenius norm of the strain (rate) tensor
+        :math:`\Sigma = \lVert \mathbf{\varepsilon} \rVert_F`
+    shear : float
+        Only if ``epsilon`` is provided. Scalar shearing (rate) as defined
+        by the square root of the second invariant of the deviatoric strain (rate) tensor
+        :math:`\text{T} = \sqrt{\frac{1}{2} \text{Tr}(\mathbf{\varepsilon}^2)
+        - \frac{1}{6} \text{Tr}(\mathbf{\varepsilon})^2}`.
+    rotation : float
+        Only if ``omega`` is provided. Scalar rotation (rate) as defined
+        by :math:`\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F`.
+
+    References
+    ----------
+
+    .. [tape09] Tape, C., Musé, P., Simons, M., Dong, D., & Webb, F. (2009),
+       *Multiscale estimation of GPS velocity fields*,
+       Geophysical Journal International, 179(2), 945–971,
+       doi:`10.1111/j.1365-246X.2009.04337.x <https://doi.org/10.1111/j.1365-246X.2009.04337.x>`_.
+
+    """
+    if epsilon is not None:
+        assert isinstance(epsilon, np.ndarray) and (epsilon.ndim == 2), \
+            f"'epsilon' needs to be a 2D NumPy array, got {epsilon}."
+        # scalar dilatation (rate)
+        dilatation = np.trace(epsilon)
+        # scalar strain (rate)
+        strain = np.linalg.norm(epsilon, ord="fro")
+        # scalar shearing (rate)
+        shear = np.sqrt(np.trace(epsilon @ epsilon) / 2 - np.trace(epsilon)**2 / 6)
+    if omega is not None:
+        assert isinstance(omega, np.ndarray) and (omega.ndim == 2), \
+            f"'omega' needs to be a 2D NumPy array, got {omega}."
+        # scalar rotation (rate)
+        rotation = np.linalg.norm(omega, ord="fro") / np.sqrt(2)
+    # return quantities
+    if epsilon is not None:
+        if omega is not None:
+            return dilatation, strain, shear, rotation
+        else:
+            return dilatation, strain, shear
+    elif omega is not None:
+        return rotation
+
+
 class RINEXDataHolding():
     """
     Container class for a database of RINEX files.
