@@ -1078,6 +1078,8 @@ class GipsyTimeseries(Timeseries):
     show_warnings : bool, optional
         If ``True``, warn if there are data inconsistencies encountered while loading.
         Defaults to ``True``.
+    data_unit : str, optional
+        Can be ``'mm'`` (default) or ``'m'``.
 
     Notes
     -----
@@ -1109,8 +1111,14 @@ class GipsyTimeseries(Timeseries):
 repro2018a/raw/position/envseries/0000_README.format
 
     """
-    def __init__(self, path, show_warnings=True):
+    def __init__(self, path, show_warnings=True, data_unit="mm"):
         self._path = str(path)
+        if data_unit == "m":
+            factor = 1
+        elif data_unit == "mm":
+            factor = 1000
+        else:
+            raise ValueError(f"'data_unit' needs to be 'mm' or 'm', got {data_unit}.")
         # load data
         data_cols = ["east", "north", "up"]
         var_cols = ["east_var", "north_var", "up_var"]
@@ -1130,8 +1138,8 @@ repro2018a/raw/position/envseries/0000_README.format
         # convert standard deviation into variance, still in meters
         data.loc[:, var_cols] *= data.loc[:, var_cols]
         # now convert everything to millimeters
-        data.loc[:, data_cols] *= 1e3
-        data.loc[:, var_cols + cov_cols] *= 1e6
+        data.loc[:, data_cols] *= factor
+        data.loc[:, var_cols + cov_cols] *= factor**2
         # combine dataframe with time
         df = time.join(data)
         # check for duplicate timestamps and create time index
@@ -1146,7 +1154,7 @@ repro2018a/raw/position/envseries/0000_README.format
                  stacklevel=2)
             df.sort_index(inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src=".tseries", data_unit="mm",
+        super().__init__(dataframe=df, src=".tseries", data_unit=data_unit,
                          data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols)
 
     def get_arch(self):
@@ -1181,6 +1189,8 @@ class UNRTimeseries(Timeseries):
     show_warnings : bool, optional
         If ``True``, warn if there are data inconsistencies encountered while loading.
         Defaults to ``True``.
+    data_unit : str, optional
+        Can be ``'mm'`` (default) or ``'m'``.
 
     Notes
     -----
@@ -1234,8 +1244,14 @@ class UNRTimeseries(Timeseries):
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
 
     """
-    def __init__(self, path, show_warnings=True):
+    def __init__(self, path, show_warnings=True, data_unit="mm"):
         self._path = str(path)
+        if data_unit == "m":
+            factor = 1
+        elif data_unit == "mm":
+            factor = 1000
+        else:
+            raise ValueError(f"'data_unit' needs to be 'mm' or 'm', got {data_unit}.")
         # load data and check for some warnings
         df = pd.read_csv(self._path, delim_whitespace=True,
                          usecols=[0, 3] + list(range(6, 13)) + list(range(14, 20)))
@@ -1270,20 +1286,20 @@ class UNRTimeseries(Timeseries):
         # remove columns that are no longer needed
         df.drop(columns=["site", "reflon"], inplace=True)
         # make the data
-        df["east"] = (df["__east(m)"] + offsets_east) * 1e3
-        df["north"] = (df["_north(m)"] + offsets_north) * 1e3
-        df["up"] = (df["____up(m)"] + offsets_up) * 1e3
+        df["east"] = (df["__east(m)"] + offsets_east) * factor
+        df["north"] = (df["_north(m)"] + offsets_north) * factor
+        df["up"] = (df["____up(m)"] + offsets_up) * factor
         df.drop(columns=["_e0(m)", "__east(m)", "____n0(m)", "_north(m)",
                          "u0(m)", "____up(m)"], inplace=True)
         # make the covariance
-        df["__corr_en"] *= df["sig_e(m)"] * df["sig_n(m)"] * 1e6
-        df["__corr_eu"] *= df["sig_e(m)"] * df["sig_u(m)"] * 1e6
-        df["__corr_nu"] *= df["sig_n(m)"] * df["sig_u(m)"] * 1e6
+        df["__corr_en"] *= df["sig_e(m)"] * df["sig_n(m)"] * factor**2
+        df["__corr_eu"] *= df["sig_e(m)"] * df["sig_u(m)"] * factor**2
+        df["__corr_nu"] *= df["sig_n(m)"] * df["sig_u(m)"] * factor**2
         df.rename(columns={"__corr_en": "east_north_cov", "__corr_eu": "east_up_cov",
                            "__corr_nu": "north_up_cov"}, inplace=True)
         # make the variance
         old_sig_cols = ["sig_e(m)", "sig_n(m)", "sig_u(m)"]
-        df.loc[:, old_sig_cols] = (df.loc[:, old_sig_cols] * 1e3)**2
+        df.loc[:, old_sig_cols] = (df.loc[:, old_sig_cols] * factor)**2
         df.rename(columns={"sig_e(m)": "east_var", "sig_n(m)": "north_var",
                            "sig_u(m)": "up_var"}, inplace=True)
         # check for duplicate timestamps and create time index
@@ -1301,7 +1317,7 @@ class UNRTimeseries(Timeseries):
                  stacklevel=2)
             df.sort_index(inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src=".tenv3", data_unit="mm",
+        super().__init__(dataframe=df, src=".tenv3", data_unit=data_unit,
                          data_cols=["east", "north", "up"],
                          var_cols=["east_var", "north_var", "up_var"],
                          cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"])
