@@ -303,6 +303,29 @@ class Model():
             mdl.active_parameters = self.active_parameters.copy()
         return mdl
 
+    def convert_units(self, factor):
+        """
+        Convert the parameter and covariances to a new unit by providing a
+        conversion factor.
+
+        Parameters
+        ----------
+        factor : float
+            Factor to multiply the parameters by to obtain the parameters in the new units.
+        """
+        # input checks
+        try:
+            factor = float(factor)
+        except TypeError as e:
+            raise TypeError(f"'factor' and has to be a scalar, got {type(factor)}."
+                            ).with_traceback(e.__traceback__) from e
+        # convert parameters
+        if self._par is not None:
+            self._par *= factor
+        # convert covariances
+        if self._cov is not None:
+            self._cov *= factor**2
+
     def freeze(self, zero_threshold=1e-10):
         """
         In case some parameters are estimated to be close to zero and should not
@@ -2016,6 +2039,32 @@ class ModelCollection():
         """
         return ModelCollection.from_model_dict(
             {mdl_desc: mdl.copy() for mdl_desc, mdl in self.collection.items()})
+
+    def convert_units(self, factor):
+        """
+        Convert the parameter and covariances to a new unit by providing a
+        conversion factor.
+
+        Parameters
+        ----------
+        factor : float
+            Factor to multiply the parameters by to obtain the parameters in the new units.
+        """
+        # input checks
+        try:
+            factor = float(factor)
+        except TypeError as e:
+            raise TypeError(f"'factor' and has to be a scalar, got {type(factor)}."
+                            ).with_traceback(e.__traceback__) from e
+        # convert parameters
+        if self._par is not None:
+            self._par *= factor
+        # convert covariances
+        if self._cov is not None:
+            self._cov *= factor**2
+        # update individual models
+        for model in self.collection.values():
+            model.convert_units(factor)
 
     @property
     def num_parameters(self):

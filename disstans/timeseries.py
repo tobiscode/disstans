@@ -579,6 +579,35 @@ class Timeseries():
             return Timeseries(self._df[self._data_cols].copy(), new_name,
                               deepcopy(self._data_unit), deepcopy(self._data_cols), None, None)
 
+    def convert_units(self, factor, new_data_unit):
+        """
+        Convert the data and covariances to a new data unit by providing a
+        conversion factor.
+
+        Parameters
+        ----------
+        factor : float
+            Factor to multiply the data by to obtain the data in the new units.
+        new_data_unit : str
+            New data unit to be saved in the :attr:`~data_cols` attribute.
+        """
+        # input checks
+        try:
+            factor = float(factor)
+        except TypeError as e:
+            raise TypeError(f"'factor' and has to be a scalar, got {type(factor)}."
+                            ).with_traceback(e.__traceback__) from e
+        # update data unit (contains input check)
+        self.data_unit = new_data_unit
+        # convert data
+        self._df.loc[:, self._data_cols] *= factor
+        # convert variances
+        if self._var_cols is not None:
+            self._df.loc[:, self._var_cols] *= factor**2
+        # convert covariances
+        if self._cov_cols is not None:
+            self._df.loc[:, self._cov_cols] *= factor**2
+
     def mask_out(self, dcol):
         """
         Mask out an entire data column (and if present, its uncertainty column) by setting
