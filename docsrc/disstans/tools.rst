@@ -31,6 +31,16 @@ download_unr_data
 
 .. autofunction:: disstans.tools.download_unr_data
 
+R_ecef2enu
+..........
+
+.. autofunction:: disstans.tools.R_ecef2enu
+
+R_enu2ecef
+..........
+
+.. autofunction:: disstans.tools.R_enu2ecef
+
 full_cov_mat_to_columns
 .......................
 

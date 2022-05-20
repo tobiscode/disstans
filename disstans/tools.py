@@ -1325,6 +1325,76 @@ def strain_rotation_invariants(epsilon=None, omega=None):
         return rotation
 
 
+def R_ecef2enu(lon, lat):
+    """
+    Generate the rotation matrix used to express a vector written in ECEF (XYZ)
+    coordinates as a vector written in local east, north, up (ENU) coordinates
+    at the position defined by geodetic latitude and longitude. See Chapter 4
+    and Appendix 4.A in [misraenge2010]_ for details.
+
+    Parameters
+    ----------
+    lon : float
+        Longitude [rad] of vector position.
+    lat : loat
+        Latitude [rad] of vector position.
+
+    Returns
+    -------
+    numpy.ndarray
+        The 3-by-3 rotation matrix.
+
+    See Also
+    --------
+    R_enu2ecef : The inverse matrix.
+
+    References
+    ----------
+
+    .. [misraenge2010] Misra, P., & Enge, P. (2010),
+       *Global Positioning System: Signals, Measurements, and Performance*,
+       Lincoln, Mass: Ganga-Jamuna Press.
+
+    """
+    try:
+        lon, lat = float(lon), float(lat)
+    except (TypeError, ValueError) as e:
+        raise ValueError("Input longitude & latitude are not convertible to scalars "
+                         f"(got {lon} and {lat}).").with_traceback(e.__traceback__) from e
+    if (lat < -np.pi / 2) or (lat > np.pi / 2) or (lon < -2*np.pi) or (lon > 2*np.pi):
+        warn(f"Latitude and/or longitude outside of usual ranges (longitude {lon}, "
+             f"latitude {lat}) - did you switch latitude/longitude or radians/degrees?")
+    return np.array([[-np.sin(lon), np.cos(lon), 0],
+                     [-np.sin(lat)*np.cos(lon), -np.sin(lat)*np.sin(lon), np.cos(lat)],
+                     [np.cos(lat)*np.cos(lon), np.cos(lat)*np.sin(lon), np.sin(lat)]])
+
+
+def R_enu2ecef(lon, lat):
+    """
+    Generate the rotation matrix used to express a vector written in local ENU
+    coordinates as a vector written ECEF (XYZ) coordinates at the position defined
+    by geodetic latitude and longitude. This is the transpose of the rotation matrix
+    computed by :func:`~disstans.tools.R_ecef2enu`.
+
+    Parameters
+    ----------
+    lon : float
+        Longitude [rad] of vector position.
+    lat : float
+        Latitude [rad] of vector position.
+
+    Returns
+    -------
+    numpy.ndarray
+        The 3-by-3 rotation matrix.
+
+    See Also
+    --------
+    R_ecef2enu : The inverse matrix.
+    """
+    return R_ecef2enu(lon, lat).T
+
+
 class RINEXDataHolding():
     """
     Container class for a database of RINEX files.
