@@ -270,6 +270,39 @@ class Model():
         raise NotImplementedError("Instantiated model was not subclassed or "
                                   "it does not overwrite the '_get_arch' method.")
 
+    def copy(self, parameters=True, covariances=True, active_parameters=True):
+        """
+        Copy the model object.
+
+        Parameters
+        ----------
+        parameters : bool, optional
+            If ``True`` (default), include the read-in parameters in the copy
+            (:attr:`~par`), otherwise leave empty.
+        covariances : bool, optional
+            If ``True`` (default), include the read-in (co)variances in the copy
+            (:attr:`~cov`), otherwise leave empty.
+        active_parameters : bool, optional
+            If ``True`` (default), include the active parameter setting in the copy
+            (:attr:`~active_parameters`), otherwise leave empty.
+
+        Returns
+        -------
+        disstans.model.Model
+            A copy of the model, based on :meth:`~get_arch`.
+        """
+        # instantiate
+        arch = self.get_arch()
+        mdl = globals()[arch["type"]](**arch["kw_args"])
+        # update read-in parameters and settings
+        if parameters and (self._par is not None):
+            mdl._par = self._par.copy()
+        if covariances and (self._cov is not None):
+            mdl._cov = self._cov.copy()
+        if active_parameters and (self.active_parameters is not None):
+            mdl.active_parameters = self.active_parameters.copy()
+        return mdl
+
     def freeze(self, zero_threshold=1e-10):
         """
         In case some parameters are estimated to be close to zero and should not
@@ -506,7 +539,8 @@ class Model():
         # check and set parameters
         assert self.num_parameters == parameters.shape[0], \
             "Read-in parameters have different size than the instantiated model. " + \
-            f"Expected {self.num_parameters}, got {parameters.shape}[0]."
+            f"Expected {self.num_parameters}, got {parameters.shape[0]}. The input " + \
+            f"shape was {parameters.shape[0]}, is there a dimension missing?"
         par = parameters.reshape((self.num_parameters, -1))
         act_params = self.active_parameters
         if act_params is not None:
@@ -1957,6 +1991,31 @@ class ModelCollection():
         Convenience function that returns a key-value-iterator from :attr:`~collection`.
         """
         return self.collection.items()
+
+    def copy(self, parameters=True, covariances=True, active_parameters=True):
+        """
+        Copy the model collection object.
+
+        Parameters
+        ----------
+        parameters : bool, optional
+            If ``True`` (default), include the read-in parameters in the copy
+            (:attr:`~par`), otherwise leave empty.
+        covariances : bool, optional
+            If ``True`` (default), include the read-in (co)variances in the copy
+            (:attr:`~cov`), otherwise leave empty.
+        active_parameters : bool, optional
+            If ``True`` (default), include the active parameter setting in the copy
+            (:attr:`~active_parameters`), otherwise leave empty.
+
+        Returns
+        -------
+        disstans.model.ModelCollection
+            A copy of the model collection, based on the individual models'
+            :meth:`~disstans.Model.copy` method.
+        """
+        return ModelCollection.from_model_dict(
+            {mdl_desc: mdl.copy() for mdl_desc, mdl in self.collection.items()})
 
     @property
     def num_parameters(self):
