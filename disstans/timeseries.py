@@ -1219,6 +1219,16 @@ class UNRTimeseries(Timeseries):
     | Column 20     | North-Vertical correlation coefficient [-]        |
     +---------------+---------------------------------------------------+
 
+    Newer files also contain the following three columns:
+
+    +---------------+---------------------------------------------------+
+    | Column 21     | Latitude [°]                                      |
+    +---------------+---------------------------------------------------+
+    | Column 22     | Longitude [°]                                     |
+    +---------------+---------------------------------------------------+
+    | Column 23     | Altitude [m]                                      |
+    +---------------+---------------------------------------------------+
+
     The time series are relative to each station's first integer epoch.
 
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
