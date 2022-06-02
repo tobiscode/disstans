@@ -910,7 +910,8 @@ class Network():
     def spatialfit(self, ts_description, penalty, spatial_reweight_models,
                    spatial_reweight_iters, spatial_reweight_percentile=0.5,
                    spatial_reweight_max_rms=1e-9, spatial_reweight_max_changed=0,
-                   dist_num_avg=4, dist_weight_min=None, dist_weight_max=None,
+                   spatial_reweight_agg_comps=False, dist_num_avg=4,
+                   dist_weight_min=None, dist_weight_max=None,
                    continuous_reweight_models=[], local_reweight_iters=1,
                    local_reweight_func=None, local_reweight_coupled=True,
                    formal_covariance=False, use_data_variance=True,
@@ -983,6 +984,11 @@ class Network():
             flipped between zero and non-zero) falls below a threshold. The threshold
             ``spatial_reweight_max_changed`` is given as the percentage of changed over total
             parameters (including all models and components). Defaults to no early stopping.
+        spatial_reweight_agg_comps : bool, optional
+            If ``False`` (default), the spatial reweighting is done individually for each
+            component, i.e., the distance-weighted median of the weights will be calculated
+            for each component. If ``True, a single median is calculated from the aggregated
+            weights in all data components, and then used for all components.
         dist_num_avg : int, optional
             Calculate the characteristic distance for the drop-off of station weights
             as the average of the ``dist_num_avg`` closest stations (default: ``4``).
@@ -1111,6 +1117,7 @@ class Network():
                           if ts_description in station.timeseries}
         station_names = list(valid_stations.keys())
         num_stations = len(station_names)
+        num_components = valid_stations[station_names[0]][ts_description].num_components
         assert num_stations > 1, "The number of stations in the network that " \
             "contain the timeseries must be more than one."
         assert isinstance(spatial_reweight_models, list) and \
@@ -1164,6 +1171,10 @@ class Network():
         # distance_weights is ignoring whether (1) a station actually has data, and
         # (2) if the spatial extent of the signal we're trying to estimate is correlated
         # to the station geometry
+        # repeat the weights for all data components if the weights are being aggregated
+        if spatial_reweight_agg_comps:
+            distance_weights = np.tile(distance_weights, [1, num_components])
+        # print stats for distances distribution
         if verbose:
             nonzero_distances = np.sort(np.triu(all_distances, k=1).ravel()
                                         )[int(num_stations * (num_stations + 1) / 2):]
@@ -1205,7 +1216,8 @@ class Network():
                        + str(num_uniques.tolist()))
 
         # initialize the other statistics objects
-        num_components = num_uniques.size
+        assert num_components == num_uniques.size, f"Expected {num_components} data " \
+            f"components from statistics, got {num_uniques.size}."
         arr_uniques = np.empty((spatial_reweight_iters + 1, num_components))
         arr_uniques[:] = np.NaN
         arr_uniques[0, :] = num_uniques
@@ -1306,12 +1318,20 @@ class Network():
                         percs = [np.nanpercentile(stacked_weights, q) for q in [5, 50, 95]]
                         tqdm.write("Weight percentiles (5-50-95): "
                                    f"[{percs[0]:.11g}, {percs[1]:.11g}, {percs[2]:.11g}]")
+                    # if aggregating components, reshape and concatenate axes
+                    if spatial_reweight_agg_comps:
+                        stacked_weights = (stacked_weights.transpose(0, 2, 1)
+                                           ).reshape(num_stations * num_components, -1)
                     # now apply the spatial median to parameter weights
                     for station_index, name in enumerate(station_names):
-                        new_net_weights[name]["reweight_init"][mdl_description] = \
+                        new_weights = \
                             weighted_median(stacked_weights,
                                             distance_weights[station_index, :],
                                             percentile=spatial_reweight_percentile)
+                        if spatial_reweight_agg_comps:
+                            new_weights = np.repeat(new_weights.reshape(-1, 1),
+                                                    num_components, axis=1)
+                        new_net_weights[name]["reweight_init"][mdl_description] = new_weights
                 else:  # stacking failed, keep old weights
                     warn(f"{mdl_description} cannot be stacked, reusing old weights.",
                          stacklevel=2)
@@ -1911,8 +1931,8 @@ class Network():
     def get_hom_vel_strain_rot(self, timeseries, model, comps=[0, 1], use_sigmas=True,
                                utmzone=None, subset_stations=None, extrapolate=True):
         """
-        Assuming the entire network (or a subset thereof) is located on the same rigid
-        body undergoing homogenous translation, strain and rotation, calculate the predicted
+        Assuming the entire network (or a subset thereof) is located on the same body
+        undergoing homogenous translation, strain and rotation, calculate the predicted
         velocity field as well as the horizontal strain and rotation rate tensors.
 
         This function requires a :class:`~disstans.models.Polynomial` model to have
