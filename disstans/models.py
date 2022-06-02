@@ -173,6 +173,29 @@ class Model():
         """
         return self._cov
 
+    def get_cov_by_index(self, index):
+        """
+        Return the covariance matrix for a given parameter.
+
+        Parameters
+        ----------
+        index : int
+            Parameter index.
+
+        Returns
+        -------
+        cov : numpy.ndarray
+            Covariance matrix for the selected parameter.
+        """
+        assert isinstance(index, int) and (0 <= index < self.num_parameters), \
+            f"'index' needs to be an integer less than the number of parameters, got {index}."
+        if self._cov is not None:
+            num_comps = self._par.shape[1]
+            return self._cov[index*num_comps:(index+1)*num_comps,
+                             index*num_comps:(index+1)*num_comps]
+        else:
+            return None
+
     def __str__(self):
         """
         Special function that returns a readable summary of the Model.
