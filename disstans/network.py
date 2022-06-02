@@ -262,6 +262,36 @@ class Network():
         """
         return self.num_stations
 
+    def get_stations_with(self, ts_description, mdl_description=None):
+        """
+        Return the list of all station names that contain a given timeseries
+        (and optionally, a model).
+
+        Parameters
+        ----------
+        ts_description : str
+            Name of the timeseries that the stations should contain.
+        mdl_description : str, optional
+            Name of the model that the stations' timeseries should contain.
+
+        Returns
+        -------
+        station_list : Names of stations.
+        """
+        assert isinstance(ts_description, str), \
+            f"'ts_description' needs to be a string, got {type(ts_description)}."
+        assert (mdl_description is None) or isinstance(mdl_description, str), \
+            f"'mdl_description' needs to be a string, got {type(mdl_description)}."
+        # get view of all stations in network
+        station_list = self.station_names.copy()
+        # remove all stations that do not contain our timeseries and model
+        for name in station_list:
+            if ((ts_description not in self[name]) or
+                ((mdl_description is not None) and
+                 (mdl_description not in self[name].models[ts_description]))):
+                station_list.remove(name)
+        return station_list
+
     def export_network_ts(self, ts_description, subset_stations=None):
         """
         Collects a specific timeseries from all stations and returns them in a dictionary
