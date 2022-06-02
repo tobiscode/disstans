@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 from warnings import warn
 from matplotlib.ticker import FuncFormatter
 from cmcrameri import cm as scm
+from scipy.stats import circmean
 
 from .config import defaults
 
@@ -1262,6 +1263,153 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
     return maint_table, maint_dict, eq_table, eq_dict
 
 
+def best_utmzone(longitudes):
+    """
+    Given a list of longitudes, find the UTM zone that is appropriate.
+
+    Parameters
+    ----------
+    longitudes : numpy.ndarray
+        Array of longitudes [°].
+
+    Returns
+    -------
+    utmzone : int
+        UTM zone at the average input longitude.
+    """
+    lon_mean = np.rad2deg(circmean(np.deg2rad(longitudes),
+                                   low=-np.pi, high=np.pi))
+    utmzone = int(np.ceil(((lon_mean + 180) / 6)))
+    return utmzone
+
+
+def get_hom_vel_strain_rot(locations, velocities, covariances=None, utmzone=None,
+                           reference=0):
+    r"""
+    For a set of horizontal velocities on a 2D cartesian grid, estimate the
+    best-fit displacement gradient matrix to calculate a homogenous velocity
+    field characterized by a single translation vector, strain tensor, and
+    rotation tensor. See [tape09]_ for an introduction.
+
+    This function uses a local approximation to the spherical Earth by
+    converting all station locations into a suitable UTM zone, and only
+    considering the horizontal velocities.
+
+    Parameters
+    ----------
+    locations : numpy.ndarray
+        Array of shape :math:`(\text{num_stations}, 2)` containing the
+        longitude and latitude [°] of the observations (stations).
+    velocities : numpy.ndarray
+        Array of shape :math:`(\text{num_stations}, 2)` containing the
+        East and North velocities [m/time] of the observations
+    covariances : numpy.ndarray, optional
+        Array of shape :math:`(\text{num_stations}, 2)` containing the
+        variances in the East and North velocities [m^2/time^2]. Alternatively,
+        array of shape :math:`(\text{num_stations}, 3)` additionally
+        containing the East-North covariance [m2/time^2].
+    utmzome : int, optional
+        If provided, the UTM zone to use for the horizontal approximation.
+        By default (``None``), the average longitude will be calculated, and the
+        respective UTM zone will be used.
+    reference : list, int, optional
+        Reference station to be used by the calculation. This can be either a
+        longitude-latitude [°] list, or the index of the reference station in
+        ``locations``.
+
+    Returns
+    -------
+    v_O : numpy.ndarray
+        Velocity of the origin :math:`\mathbf{v}_O`.
+    epsilon : numpy.ndarray
+        :math:`2 \times 2` strain tensor :math:`\mathbf{\varepsilon}`.
+    omega : numpy.ndarray
+        :math:`2 \times 2` rotation tensor :math:`\mathbf{\omega}`.
+
+    See Also
+    --------
+    strain_rotation_invariants : For calculation of invariants of the tensors.
+
+    References
+    ----------
+
+    .. [tape09] Tape, C., Musé, P., Simons, M., Dong, D., & Webb, F. (2009),
+       *Multiscale estimation of GPS velocity fields*,
+       Geophysical Journal International, 179(2), 945–971,
+       doi:`10.1111/j.1365-246X.2009.04337.x <https://doi.org/10.1111/j.1365-246X.2009.04337.x>`_.
+    """
+    # input checks
+    assert (isinstance(locations, np.ndarray) and locations.ndim == 2 and
+            locations.shape[1] == 2), \
+        "'locations' needs to be a NumPy array with two columns."
+    assert (isinstance(velocities, np.ndarray) and velocities.ndim == 2 and
+            velocities.shape[1] == 2), \
+        "'velocities' needs to be a NumPy array with two columns."
+    assert locations.shape[0] == velocities.shape[0], \
+        f"Mismatch between locations shape {locations.shape} and velocities " \
+        f"shape {velocities.shape}."
+    num_stations = locations.shape[0]
+    if covariances is not None:
+        assert (isinstance(covariances, np.ndarray) and covariances.ndim == 2 and
+                covariances.shape[0] == num_stations and
+                covariances.shape[1] in [2, 3]), \
+            "Invalid covariance input type or shape."
+    # parse reference
+    if isinstance(reference, int):
+        assert 0 <= reference < num_stations, \
+            f"{reference} is not an integer index less than {num_stations}."
+        lon0, lat0 = locations[reference, :]
+    elif isinstance(reference, list) and (len(reference) >= 2):
+        lon0, lat0 = float(reference[0]), float(reference[1])
+    else:
+        raise ValueError(f"Invalid input for 'reference': {reference}.")
+    # make sure we're not inverting if we don't have enough data points
+    if num_stations < 6:
+        raise ValueError(f"{num_stations} stations are less stations than "
+                         "necessary (6) for a stable computation.")
+    # determine UTM zone if needed
+    if utmzone is None:
+        utmzone = best_utmzone(locations[:, 0])
+    # convert to UTM eastings & northings
+    crs_lla = ccrs.Geodetic()
+    crs_utm = ccrs.UTM(zone=utmzone)
+    ENU = crs_utm.transform_points(crs_lla, locations[:, 0], locations[:, 1])
+    E, N = ENU[:, 0], ENU[:, 1]
+    # get all positions relative to reference station
+    EO, NO = crs_utm.transform_point(lon0, lat0, crs_lla)
+    dEO, dNO = E - EO, N - NO
+    # build individual G
+    GE = np.stack([dEO, dNO, np.zeros(num_stations), np.zeros(num_stations),
+                   np.ones_like(dEO), np.zeros(num_stations)], axis=1)
+    GN = np.stack([np.zeros(num_stations), np.zeros(num_stations), dEO, dNO,
+                   np.zeros(num_stations), np.ones_like(dNO)], axis=1)
+    # combine components
+    G = np.concatenate([GE, GN], axis=0)
+    d = np.concatenate([velocities[:, 0], velocities[:, 1]], axis=0)
+    # build weight matrix
+    if covariances is not None:
+        if covariances.shape[1] == 2:
+            W = sparse.diags(1/np.concatenate([covariances[:, 0], covariances[:, 1]]))
+        elif covariances.shape[1] == 3:
+            Wblocks = [sp.linalg.pinvh(np.reshape(covariances[i, [0, 2, 2, 1]], (2, 2)))
+                       for i in range(num_stations)]
+            main_diag = np.concatenate([[block[0, 0] for block in Wblocks],
+                                        [block[1, 1] for block in Wblocks]])
+            off_diag = np.array([block[0, 1] for block in Wblocks])
+            W = sparse.diags(diagonals=[main_diag, off_diag, off_diag],
+                             offsets=[0, -num_stations, num_stations], format='csr')
+        d = G.T @ W @ d
+        G = G.T @ W @ G
+    # solve
+    m = sp.linalg.lstsq(G, d)[0]
+    # extract wanted quantities
+    L = np.array([[m[0], m[1]], [m[2], m[3]]])
+    epsilon = (L + L.T) / 2  # strain rate
+    omega = (L - L.T) / 2  # rotation rate
+    v_O = np.array([m[4], m[5]])  # velocity of origin
+    return v_O, epsilon, omega
+
+
 def strain_rotation_invariants(epsilon=None, omega=None):
     r"""
     Given a strain (rate) and/or rotation (rate) tensor, calculate scalar
@@ -1292,15 +1440,6 @@ def strain_rotation_invariants(epsilon=None, omega=None):
     rotation : float
         Only if ``omega`` is provided. Scalar rotation (rate) as defined
         by :math:`\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F`.
-
-    References
-    ----------
-
-    .. [tape09] Tape, C., Musé, P., Simons, M., Dong, D., & Webb, F. (2009),
-       *Multiscale estimation of GPS velocity fields*,
-       Geophysical Journal International, 179(2), 945–971,
-       doi:`10.1111/j.1365-246X.2009.04337.x <https://doi.org/10.1111/j.1365-246X.2009.04337.x>`_.
-
     """
     if epsilon is not None:
         assert isinstance(epsilon, np.ndarray) and (epsilon.ndim == 2), \
@@ -1334,14 +1473,14 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
     Parameters
     ----------
     locations : numpy.ndarray
-        Array of shape :math:`(\text{num_observations}, \text{num_components})`
+        Array of shape :math:`(\text{num_stations}, \text{num_components})`
         containing the locations of each station (observation), where
         :math:`\text{num_components}=2` if the locations are given by longitudes and
-        latitudes [rad] (``enu=True``, default) or :math:`\text{num_components}=3`
+        latitudes [°] (``enu=True``, default) or :math:`\text{num_components}=3`
         if the locations are given in the cartesian Earth-Centered, Earth-Fixed
         (ECEF) reference frame [m] (``enu=False``).
     velocities : numpy.ndarray
-        Array of shape :math:`(\text{num_observations}, \text{num_components})`
+        Array of shape :math:`(\text{num_stations}, \text{num_components})`
         containing the velocities [m/time] at different stations (observations), where
         :math:`\text{num_components}=2` if the velocities are given in the
         East-North local geodetic reference frame (``enu=True``, default) or
@@ -1351,14 +1490,14 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
         Array containing the (co)variances of the velocities [m^2/time^2], allowing for
         different input shapes depending on what uncertainties are available.
         If ``None`` (default), all observations are weighted equally.
-        If ``enu=True``, the array should have shape :math:`(\text{num_observations}, 2)`
-        if only variances are present, :math:`(\text{num_observations}, 3)` if also
+        If ``enu=True``, the array should have shape :math:`(\text{num_stations}, 2)`
+        if only variances are present, :math:`(\text{num_stations}, 3)` if also
         the covariances are present but are given as a column, or
-        :math:`(\text{num_observations}, 2, 2)` if the :math:`2 \times 2`covariance
+        :math:`(\text{num_stations}, 2, 2)` if the :math:`2 \times 2`covariance
         matrix is given for each observation.
         If ``enu=False``, the arrays should be of shapes
-        :math:`(\text{num_observations}, 3)`, :math:`(\text{num_observations}, 6)`,
-        or :math:`(\text{num_observations}, 3, 3)`, respectively.
+        :math:`(\text{num_stations}, 3)`, :math:`(\text{num_stations}, 6)`,
+        or :math:`(\text{num_stations}, 3, 3)`, respectively.
     enu : bool, optional
         See ``locations`` and ``velocities``.
 
@@ -1404,24 +1543,24 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
         "'velocities' needs to be a NumPy Array with either 2 or 3 columns."
     assert locations.shape[0] == velocities.shape[0], "Shape mismatch between " \
         f"locations {locations.shape} and velocities {velocities.shape}."
-    num_observations, num_components = velocities.shape
+    num_stations, num_components = velocities.shape
     if covariances is not None:
         assert isinstance(covariances, np.ndarray), \
             "If specified, 'covariances' needs to be a NumPy array."
         if enu:
-            if covariances.shape == (num_observations, 2):
+            if covariances.shape == (num_stations, 2):
                 use_covs = False
-            elif (covariances.shape == (num_observations, 3) or
-                  covariances.shape == (num_observations, 2, 2)):
+            elif (covariances.shape == (num_stations, 3) or
+                  covariances.shape == (num_stations, 2, 2)):
                 use_covs = True
             else:
                 raise ValueError("'covariances' is not a compatible shape "
                                  f"for ENU: {covariances.shape}.")
         else:
-            if covariances.shape == (num_observations, 3):
+            if covariances.shape == (num_stations, 3):
                 use_covs = False
-            elif (covariances.shape == (num_observations, 6) or
-                  covariances.shape == (num_observations, 3, 3)):
+            elif (covariances.shape == (num_stations, 6) or
+                  covariances.shape == (num_stations, 3, 3)):
                 use_covs = True
             else:
                 raise ValueError("'covariances' is not a compatible shape "
@@ -1430,22 +1569,18 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
     d = velocities.reshape(-1, 1)
     # build mapping matrix
     if enu:
-        lon, lat = locations[:, 0], locations[:, 1]
-        if np.any(lat < -np.pi / 2) or np.any(lat > np.pi / 2) \
-           or np.any(lon < -2*np.pi) or np.any(lon > 2*np.pi):
-            warn("Latitude and/or longitude are outside of usual ranges, "
-                 "did you specify them in degrees?")
+        lon, lat = np.deg2rad(locations[:, 0]), np.deg2rad(locations[:, 1])
         # stacking of eq. 11 (note difference row ordering to match input format)
         G = np.stack([-np.sin(lat)*np.cos(lon), -np.sin(lat)*np.sin(lon), np.cos(lat),
-                      np.sin(lon), -np.cos(lon), np.zeros(num_observations)],
-                     axis=1).reshape(2*num_observations, 3) * 6378137
+                      np.sin(lon), -np.cos(lon), np.zeros(num_stations)],
+                     axis=1).reshape(2*num_stations, 3) * 6378137
     else:
         x, y, z = locations[:, 0], locations[:, 1], locations[:, 2]
         # stacking of eq. 2
-        G = np.stack([np.zeros(num_observations), z, -y,
-                      -z, np.zeros(num_observations), x,
-                      y, -x, np.zeros(num_observations)],
-                     axis=1).reshape(3*num_observations, 3)
+        G = np.stack([np.zeros(num_stations), z, -y,
+                      -z, np.zeros(num_stations), x,
+                      y, -x, np.zeros(num_stations)],
+                     axis=1).reshape(3*num_stations, 3)
     # add uncertainties
     if covariances is not None:
         if not use_covs:
@@ -1457,11 +1592,11 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
                 _, var_cov_map = make_cov_index_map(num_components)
                 Wblocks = [sp.linalg.pinvh(np.reshape(covariances[iobs, var_cov_map],
                                                       (num_components, num_components)))
-                           for iobs in range(num_observations)]
+                           for iobs in range(num_stations)]
             elif covariances.ndim == 3:
                 # off-diagonals included, in third dimension
                 Wblocks = [sp.linalg.pinvh(covariances[iobs, :, :])
-                           for iobs in range(num_observations)]
+                           for iobs in range(num_stations)]
             W = sparse.block_diag(Wblocks, format='csr')
             W.eliminate_zeros()
         d = G.T @ W @ d
@@ -1581,9 +1716,9 @@ def R_ecef2enu(lon, lat):
     Parameters
     ----------
     lon : float
-        Longitude [rad] of vector position.
+        Longitude [°] of vector position.
     lat : loat
-        Latitude [rad] of vector position.
+        Latitude [°] of vector position.
 
     Returns
     -------
@@ -1603,13 +1738,10 @@ def R_ecef2enu(lon, lat):
 
     """
     try:
-        lon, lat = float(lon), float(lat)
+        lon, lat = np.deg2rad(float(lon)), np.deg2rad(float(lat))
     except (TypeError, ValueError) as e:
         raise ValueError("Input longitude & latitude are not convertible to scalars "
                          f"(got {lon} and {lat}).").with_traceback(e.__traceback__) from e
-    if (lat < -np.pi / 2) or (lat > np.pi / 2) or (lon < -2*np.pi) or (lon > 2*np.pi):
-        warn(f"Latitude and/or longitude outside of usual ranges (longitude {lon}, "
-             f"latitude {lat}) - did you switch latitude/longitude or radians/degrees?")
     return np.array([[-np.sin(lon), np.cos(lon), 0],
                      [-np.sin(lat)*np.cos(lon), -np.sin(lat)*np.sin(lon), np.cos(lat)],
                      [np.cos(lat)*np.cos(lon), np.cos(lat)*np.sin(lon), np.sin(lat)]])
@@ -1625,9 +1757,9 @@ def R_enu2ecef(lon, lat):
     Parameters
     ----------
     lon : float
-        Longitude [rad] of vector position.
+        Longitude [°] of vector position.
     lat : float
-        Latitude [rad] of vector position.
+        Latitude [°] of vector position.
 
     Returns
     -------

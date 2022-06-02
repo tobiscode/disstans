@@ -20,7 +20,6 @@ from matplotlib.colors import Normalize
 from matplotlib.patches import Rectangle
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
-from scipy.stats import circmean
 
 from . import timeseries as disstans_ts
 from . import models as disstans_models
@@ -29,7 +28,8 @@ from . import processing as disstans_processing
 from .config import defaults
 from .timeseries import Timeseries
 from .station import Station
-from .tools import parallelize, Timedelta, Click, weighted_median
+from .tools import (parallelize, Timedelta, Click, weighted_median, R_ecef2enu,
+                    get_hom_vel_strain_rot, best_utmzone, estimate_euler_pole)
 from .earthquakes import okada_displacement
 from .solvers import Solution, ReweightingFunction
 
@@ -1958,32 +1958,81 @@ class Network():
             self.import_network_ts(ts_out, model)
         return model, spatial, temporal
 
-    def get_hom_vel_strain_rot(self, timeseries, model, comps=[0, 1], use_sigmas=True,
-                               utmzone=None, subset_stations=None, extrapolate=True):
+    def _subset_stations(self, stations_valid, subset_stations, extrapolate):
+        # subset network for inversion
+        if subset_stations is None:
+            stat_names_in = stations_valid.copy()
+        else:
+            assert (isinstance(subset_stations, list) and
+                    all([isinstance(name, str) for name in subset_stations])), \
+                f"'subset_stations' needs to be a list of station names, got {subset_stations}."
+            stat_names_in = sorted(list(set(stations_valid).intersection(set(subset_stations))))
+        # parse the extrapolate option
+        if isinstance(extrapolate, list):
+            assert all([isinstance(name, str) for name in extrapolate]), \
+                f"The 'extrapolate' list contains non-string entries: {extrapolate}."
+            stat_names_out = sorted(list(set(stations_valid).intersection(set(extrapolate))))
+        elif not extrapolate:
+            stat_names_out = stat_names_in.copy()
+        else:
+            stat_names_out = stations_valid.copy()
+        # forgt about all stations not in in- or output
+        stations_valid = sorted(list(set(stat_names_in).union(set(stat_names_out))))
+        return stations_valid, stat_names_in, stat_names_out
+
+    def _get_2comp_pars_covs(self, stat_list_in, ts_description, mdl_description,
+                             index, comps, num_mdl_comps, use_vars, use_covs):
+        # stack parameters
+        pars = np.stack([station
+                         .models[ts_description][mdl_description]
+                         .par[index, comps]
+                         for station in stat_list_in], axis=0)
+        # apply weights
+        if use_vars:
+            covs = np.stack([station
+                             .models[ts_description][mdl_description]
+                             .var[index, comps]
+                             for station in stat_list_in], axis=0)
+            if use_covs:
+                linear_index_cov = index * num_mdl_comps
+                covlist = [station
+                           .models[ts_description][mdl_description]
+                           .cov[linear_index_cov + comps[0], linear_index_cov + comps[1]]
+                           for station in stat_list_in]
+                covs = np.concatenate([covs, np.array(covlist).reshape(-1, 1)], axis=1)
+        else:
+            covs = None
+        return pars, covs
+
+    def hom_velocity_field(self, ts_description, mdl_description, comps=[0, 1], use_vars=True,
+                           use_covs=True, utmzone=None, subset_stations=None,
+                           extrapolate=True, reference_station=None,
+                           use_parts=[True, True, True]):
         """
         Assuming the entire network (or a subset thereof) is located on the same body
-        undergoing homogenous translation, strain and rotation, calculate the predicted
+        undergoing translation, strain and rotation, calculate the homogenous
         velocity field as well as the horizontal strain and rotation rate tensors.
-
         This function requires a :class:`~disstans.models.Polynomial` model to have
-        been fitted to a timeseries in the network. It uses a local approximation to
-        the spherical Earth by converting all station locations into a suitable UTM zone,
-        and only considering the horizontal velocities.
+        been fitted to a timeseries in the network.
+
+        Wraps :func:`~disstans.tools.get_hom_vel_strain_rot`.
 
         Parameters
         ----------
-        timeseries : str
+        ts_description : str
             Name of the timeseries to use.
-        model : str
+        mdl_description : str
             Name of the :class:`~disstans.models.Polynomial` model that contains the
             estimated linear station velocities.
         comps : list, optional
             Specifies the components of the fitted model to use as the East and North
             directions, respectively. Defaults to the first two components.
-        use_sigmas : bool, optional
-            If ``True`` (default), use the formal parameter uncertainties in the
-            model during the inversion. If ``False``, all velocities will be weighted
-            equally.
+        use_vars : bool, optional
+            If ``True`` (default), use the formal parameter variances in the model
+            during the inversion. If ``False``, all velocities will be weighted equally.
+        use_covs : bool, optional
+            If ``True`` (default) and ``use_vars=True``, also use the formal parameter
+            covariance for the inversion.
         utmzome : int, optional
             If provided, the UTM zone to use for the horizontal approximation.
             By default (``None``), the average longitude will be calculated, and the
@@ -1998,7 +2047,18 @@ class Network():
             if ``subset_stations`` is set.
             If a list, the prediction will be made for the stations in the list.
             Note that no output will be made for stations that do not contain the
-            passed ``'timeseries'`` and ``'model'``.
+            passed ``'ts_description'`` and ``'mdl_description'``.
+        reference_station : str, optional
+            Reference station to be used by the calculation. If all parts are removed
+            (translation, rotation, strain), the reference station is not relevant,
+            otherwise, it changes the results significantly.
+        use_parts : list, optional
+            By default, all three parts are used in the calculation of the best-fit
+            average velocity field: translation, strain relative to the origin, and
+            rotation about the origin. By changing this list of booleans, the individual
+            parts can be turned on and off, e.g., setting the third element to ``False``
+            will return a predicted velocity only composed of the translation and
+            strain parts.
 
         Returns
         -------
@@ -2016,99 +2076,168 @@ class Network():
             tensors to calculate invariants such as the dilatation or shearing rates.
         """
         # input check
-        assert isinstance(timeseries, str) and isinstance(model, str), \
-            "'timeseries' and 'model' need to be strings, got " + \
-            f"{type(timeseries)} and {type(model)}."
         assert (isinstance(comps, list) and len(comps) == 2 and
                 all([isinstance(c, int) for c in comps])), \
             f"'comps' needs to be a length-2 list of integers, got {comps}."
-        # get view of all stations in network
-        stat_names_out = self.station_names.copy()
-        # remove all stations that do not contain our timeseries and model
-        for name in stat_names_out:
-            if (timeseries not in self[name]) or (model not in self[name].models[timeseries]):
-                stat_names_out.remove(name)
-        # subset network for inversion
-        if subset_stations is None:
-            stat_names_in = stat_names_out.copy()
-        else:
-            assert (isinstance(subset_stations, list) and
-                    all([isinstance(name, str) for name in subset_stations])), \
-                f"'subset_stations' needs to be a list of station names, got {subset_stations}."
-            stat_names_in = [name for name in stat_names_out if name in subset_stations]
-        # parse the extrapolate option
-        if isinstance(extrapolate, list):
-            assert all([isinstance(name, str) for name in extrapolate]), \
-                f"The 'extrapolate' list contains non-string entries: {extrapolate}."
-            stat_names_out = [name for name in stat_names_out if name in extrapolate]
-        elif not extrapolate:
-            stat_names_out = stat_names_in
+        assert (isinstance(use_parts, list) and (len(use_parts) == 3) and
+                all([isinstance(p, bool) for p in use_parts]) and any(use_parts)), \
+            "'use_parts' needs to be a boolean list of length three with at least " \
+            f"one True element, got {use_parts}."
+        stat_names_valid = sorted(self.get_stations_with(ts_description))
+        stat_names_valid, stat_names_in, stat_names_out = \
+            self._subset_stations(stat_names_valid, subset_stations, extrapolate)
         # get quick access to station objects
+        stat_list_valid = [self[name] for name in stat_names_valid]
         stat_list_in = [self[name] for name in stat_names_in]
-        stat_list_out = [self[name] for name in stat_names_out]
-        # for the inversion, we need the indices of the subset in the input list
-        sub_ix = [main_name in stat_names_in for main_name in stat_names_out]
-        num_sub = sum(sub_ix)
-        # make sure we're not inverting if we don't have enough data points
-        if num_sub < 6:
-            raise ValueError(f"The station list {stat_names_in} used in the inversion has less "
-                             "elements than necessary (6) for a stable computation.")
+        # check if our reference station is in stat_list_in
+        if reference_station is not None:
+            if reference_station in stat_names_in:
+                reference_index = stat_names_in.index(reference_station)
+            else:
+                reference_index = 0
+                warn(f"Reference station '{reference_station}' is not included in the input "
+                     f"station list, using '{stat_names_in[reference_index]}' instead.")
+        else:
+            reference_index = 0
+        # get quantities from the reference station
+        ref_stat = stat_list_in[reference_index]
+        lat0, lon0 = ref_stat.location[0], ref_stat.location[1]
+        linear_index = ref_stat.models[ts_description][mdl_description].get_exp_index(1)
+        use_vars &= ref_stat.models[ts_description][mdl_description].cov is not None
+        num_mdl_comps = ref_stat.models[ts_description][mdl_description].num_parameters
+        v_pred_cols = [ref_stat[ts_description].data_cols[c] for c in comps]
+        # for the inversion, we need the indices of the subsets
+        ix_in = [n in stat_names_in for n in stat_names_valid]
+        ix_out = [n in stat_names_out for n in stat_names_valid]
         # convert network positions into UTM coordinates
         # prepare data and projections
-        lat = np.array([station.location[0] for station in stat_list_out])
-        lon = np.array([station.location[1] for station in stat_list_out])
-        crs_lla = ccrs.Geodetic()
+        lat = np.array([station.location[0] for station in stat_list_valid])
+        lon = np.array([station.location[1] for station in stat_list_valid])
+        lon_lat_in = np.stack([lon[ix_in], lat[ix_in]], axis=1)
         # determine UTM zone if needed
         if utmzone is None:
-            lon_mean = np.rad2deg(circmean(np.deg2rad(lon[sub_ix]), low=-np.pi, high=np.pi))
-            utmzone = int(np.ceil(((lon_mean + 180) / 6)))
-        # convert to UTM eastings & northings
+            utmzone = best_utmzone(lon[ix_in])
+        # get all velocities and weights for subset
+        vels, weights = self._get_2comp_pars_covs(stat_list_in, ts_description,
+                                                  mdl_description, linear_index, comps,
+                                                  num_mdl_comps, use_vars, use_covs)
+        # calculate homogenous translation, strain, and rotation
+        v_O, epsilon, omega = get_hom_vel_strain_rot(lon_lat_in, vels, weights,
+                                                     utmzone=utmzone, reference=[lon0, lat0])
+        # convert output locations to UTM eastings & northings
+        crs_lla = ccrs.Geodetic()
         crs_utm = ccrs.UTM(zone=utmzone)
-        ENU = crs_utm.transform_points(crs_lla, lon, lat)
-        E, N = ENU[:, 0], ENU[:, 1]
-        # get all positions relative to first station (this does not affect the result)
-        EO, NO = crs_utm.transform_point(lon[0], lat[0], crs_lla)
-        dEO, dNO = E - EO, N - NO
+        ENU = crs_utm.transform_points(crs_lla, lon[ix_out], lat[ix_out])
+        # get all positions relative to reference station
+        EO, NO = crs_utm.transform_point(lon0, lat0, crs_lla)
+        dEO, dNO = ENU[:, 0] - EO, ENU[:, 1] - NO
         dENO = np.stack([dEO, dNO], axis=1)
-        # get all velocities for subset
-        linear_index = stat_list_in[0].models[timeseries][model].get_exp_index(1)
-        V = np.stack([station.models[timeseries][model].par[linear_index, :]
-                      for station in stat_list_in], axis=0)
-        VE, VN = V[:, comps[0]], V[:, comps[1]]
-        # build individual G
-        GE = np.stack([dEO[sub_ix], dNO[sub_ix], np.zeros(num_sub), np.zeros(num_sub),
-                       np.ones_like(dEO[sub_ix]), np.zeros(num_sub)], axis=1)
-        GN = np.stack([np.zeros(num_sub), np.zeros(num_sub), dEO[sub_ix], dNO[sub_ix],
-                       np.zeros(num_sub), np.ones_like(dNO[sub_ix])], axis=1)
-        # apply weights
-        use_sigmas &= stat_list_in[0].models[timeseries][model].var is not None
-        if use_sigmas:
-            W = np.stack([station.models[timeseries][model].var[linear_index, :]
-                          for station in stat_list_in], axis=0)
-            WE, WN = 1 / np.sqrt(W[:, comps[0]]), 1 / np.sqrt(W[:, comps[1]])
-            GE = np.diag(WE) @ GE
-            GN = np.diag(WN) @ GN
-            VE = WE * VE
-            VN = WN * VN
-        # combine components
-        G = np.concatenate([GE, GN], axis=0)
-        d = np.concatenate([VE, VN], axis=0)
-        if use_sigmas:
-            d = G.T @ d
-            G = G.T @ G
-        # solve Gm = d
-        m = np.linalg.lstsq(G, d, rcond=None)[0]
-        # extract wanted quantities
-        L = np.array([[m[0], m[1]], [m[2], m[3]]])
-        epsilon = (L + L.T) / 2  # strain rate
-        omega = (L - L.T) / 2  # rotation rate
-        v_O = np.array([m[4], m[5]]).reshape(1, 2)  # velocity of origin
         # calculate predicted uniform velocity
-        v_pred = dENO @ (epsilon + omega).T + v_O
+        v_pred = (int(use_parts[0]) * v_O +
+                  dENO @ (int(use_parts[1]) * epsilon + int(use_parts[2]) * omega).T)
         # return as DataFrame
-        v_pred_cols = [stat_list_in[0][timeseries].data_cols[c] for c in comps]
         df_v_pred = pd.DataFrame(data=v_pred, index=stat_names_out, columns=v_pred_cols)
-        return df_v_pred, epsilon, omega
+        return df_v_pred, v_O, epsilon, omega
+
+    def euler_rot_field(self, ts_description, mdl_description, comps=[0, 1], use_vars=True,
+                        use_covs=True, subset_stations=None, extrapolate=True):
+        r"""
+        Calculate the best-fit Euler pole for a given timeseries' model in the network,
+        and compute the resulting velocities at each station.
+        This function requires a :class:`~disstans.models.Polynomial` model to have
+        been fitted to a timeseries in the network.
+
+        Wraps :func:`~disstans.tools.estimate_euler_pole`.
+
+        Parameters
+        ----------
+        ts_description : str
+            Name of the ts_description to use.
+        mdl_description : str
+            Name of the :class:`~disstans.models.Polynomial` model that contains the
+            estimated linear station velocities.
+        comps : list, optional
+            Specifies the components of the fitted model to use as the East and North
+            directions, respectively. Defaults to the first two components.
+        use_vars : bool, optional
+            If ``True`` (default), use the formal parameter variances in the model
+            during the inversion. If ``False``, all velocities will be weighted equally.
+        use_covs : bool, optional
+            If ``True`` (default) and ``use_vars=True``, also use the formal parameter
+            covariance for the inversion.
+        subset_stations : list, optional
+            If set, a list of strings that contains the names of stations to be used.
+        extrapolate : bool, list, optional
+            If ``True`` (default), the velocity will be predicted for all stations in
+            the network.
+            If ``False``, the prediction will only be made for the station subset being
+            used in the inversion. Note that ``False`` is only different from ``True``
+            if ``subset_stations`` is set.
+            If a list, the prediction will be made for the stations in the list.
+            Note that no output will be made for stations that do not contain the
+            passed ``'ts_description'`` and ``'mdl_description'``.
+
+        Returns
+        -------
+        df_v_pred : pandas.DataFrame
+            DataFrame containing the Euler pole modeled velocities at each station (rows)
+            in the East and North components (columns).
+        rotation_vector : numpy.ndarray
+            Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
+            rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
+        rotation_covariance : numpy.ndarray
+            Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+
+        See Also
+        --------
+        disstans.tools.rotvec2eulerpole : Convert from rotation vector and covariance
+            matrix to Euler pole and covariance notation
+        """
+        # input check
+        assert (isinstance(comps, list) and len(comps) == 2 and
+                all([isinstance(c, int) for c in comps])), \
+            f"'comps' needs to be a length-2 list of integers, got {comps}."
+        stat_names_valid = sorted(self.get_stations_with(ts_description))
+        stat_names_valid, stat_names_in, stat_names_out = \
+            self._subset_stations(stat_names_valid, subset_stations, extrapolate)
+        # get quick access to station objects
+        stat_list_valid = [self[name] for name in stat_names_valid]
+        stat_list_in = [self[name] for name in stat_names_in]
+        # get quantities from the reference station
+        reference_index = 0
+        ref_stat = stat_list_in[reference_index]
+        linear_index = ref_stat.models[ts_description][mdl_description].get_exp_index(1)
+        use_vars &= ref_stat.models[ts_description][mdl_description].cov is not None
+        num_mdl_comps = ref_stat.models[ts_description][mdl_description].num_parameters
+        v_pred_cols = [ref_stat[ts_description].data_cols[c] for c in comps]
+        # for the inversion, we need the indices of the subsets
+        ix_in = [n in stat_names_in for n in stat_names_valid]
+        ix_out = [n in stat_names_out for n in stat_names_valid]
+        # convert network positions into UTM coordinates
+        # prepare data and projections
+        lat = np.array([station.location[0] for station in stat_list_valid])
+        lon = np.array([station.location[1] for station in stat_list_valid])
+        alt = np.array([station.location[2] for station in stat_list_valid])
+        lon_lat_in = np.stack([lon[ix_in], lat[ix_in]], axis=1)
+        # get all velocities and weights for subset
+        vels, weights = self._get_2comp_pars_covs(stat_list_in, ts_description,
+                                                  mdl_description, linear_index, comps,
+                                                  num_mdl_comps, use_vars, use_covs)
+        # calculate Euler pole from input list
+        rotation_vector, rotation_covariance = \
+            estimate_euler_pole(lon_lat_in, vels, weights)
+        # get ECEF coordinates for all output stations
+        crs_lla = ccrs.Geodetic()
+        crs_xyz = ccrs.Geocentric()
+        stat_xyz = crs_xyz.transform_points(crs_lla, lon[ix_out], lat[ix_out], alt[ix_out])
+        # predict rotation on surface of sphere
+        v_pred_xyz = np.cross(rotation_vector, stat_xyz)
+        v_pred_enu = np.stack([(R_ecef2enu(lo, la) @ v_pred_xyz[i, :]) for i, (lo, la)
+                               in enumerate(zip(lon[ix_out], lat[ix_out]))])
+        # return as DataFrame
+        df_v_pred = pd.DataFrame(data=v_pred_enu[:, :2],
+                                 index=stat_names_out, columns=v_pred_cols)
+        return df_v_pred, rotation_vector, rotation_covariance
 
     def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
         # get location data and projections
