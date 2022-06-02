@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import numpy as np
+import scipy as sp
 import scipy.sparse as sparse
 import pandas as pd
 import matplotlib as mpl
@@ -1323,6 +1324,251 @@ def strain_rotation_invariants(epsilon=None, omega=None):
             return dilatation, strain, shear
     elif omega is not None:
         return rotation
+
+
+def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
+    r"""
+    Estimate a best-fit Euler pole assuming all velocities lie on the same
+    rigid plate on a sphere. The calculations are based on [goudarzi14]_.
+
+    Parameters
+    ----------
+    locations : numpy.ndarray
+        Array of shape :math:`(\text{num_observations}, \text{num_components})`
+        containing the locations of each station (observation), where
+        :math:`\text{num_components}=2` if the locations are given by longitudes and
+        latitudes [rad] (``enu=True``, default) or :math:`\text{num_components}=3`
+        if the locations are given in the cartesian Earth-Centered, Earth-Fixed
+        (ECEF) reference frame [m] (``enu=False``).
+    velocities : numpy.ndarray
+        Array of shape :math:`(\text{num_observations}, \text{num_components})`
+        containing the velocities [m/time] at different stations (observations), where
+        :math:`\text{num_components}=2` if the velocities are given in the
+        East-North local geodetic reference frame (``enu=True``, default) or
+        :math:`\text{num_components}=3` if the velocities are given in the cartesian
+        Earth-Centered, Earth-Fixed (ECEF) reference frame (``enu=False``).
+    covariances : numpy.ndarray, optional
+        Array containing the (co)variances of the velocities [m^2/time^2], allowing for
+        different input shapes depending on what uncertainties are available.
+        If ``None`` (default), all observations are weighted equally.
+        If ``enu=True``, the array should have shape :math:`(\text{num_observations}, 2)`
+        if only variances are present, :math:`(\text{num_observations}, 3)` if also
+        the covariances are present but are given as a column, or
+        :math:`(\text{num_observations}, 2, 2)` if the :math:`2 \times 2`covariance
+        matrix is given for each observation.
+        If ``enu=False``, the arrays should be of shapes
+        :math:`(\text{num_observations}, 3)`, :math:`(\text{num_observations}, 6)`,
+        or :math:`(\text{num_observations}, 3, 3)`, respectively.
+    enu : bool, optional
+        See ``locations`` and ``velocities``.
+
+    Returns
+    -------
+    rotation_vector : numpy.ndarray
+        Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
+        rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
+    rotation_covariance : numpy.ndarray
+        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+
+    Notes
+    -----
+
+    The ENU solution assumes a spherical Earth with radius 6378137 meters.
+
+    If the covariances are given in columns, the formatting of
+    :class:`~disstans.timeseries.Timeseries` is being used.
+
+    Contrary to [goudarzi14]_, the estimated covariance matrix is not scaled by the a
+    posteriori sigma, to match the covariance definition throughout the rest of DISSTANS.
+    The time unit is also not assumed to be in years, and then scaled to millions
+    of years.
+
+    See Also
+    --------
+    euler_rot_xyz2llm : Convert the rotation vector into an Euler pole and magnitude.
+
+    References
+    ----------
+
+    .. [goudarzi14] Goudarzi, M. A., Cocard, M., & Santerre, R. (2014),
+       *EPC: Matlab software to estimate Euler pole parameters*,
+       GPS Solutions, 18(1), 153–162,
+       doi:`10.1007/s10291-013-0354-4 <https://doi.org/10.1007/s10291-013-0354-4>`_.
+    """
+    # input checks
+    assert (isinstance(locations, np.ndarray) and locations.ndim == 2 and
+            locations.shape[1] == 2 if enu else 3), \
+        "'locations' needs to be a NumPy Array with either 2 or 3 columns."
+    assert (isinstance(velocities, np.ndarray) and velocities.ndim == 2 and
+            velocities.shape[1] == 2 if enu else 3), \
+        "'velocities' needs to be a NumPy Array with either 2 or 3 columns."
+    assert locations.shape[0] == velocities.shape[0], "Shape mismatch between " \
+        f"locations {locations.shape} and velocities {velocities.shape}."
+    num_observations, num_components = velocities.shape
+    if covariances is not None:
+        assert isinstance(covariances, np.ndarray), \
+            "If specified, 'covariances' needs to be a NumPy array."
+        if enu:
+            if covariances.shape == (num_observations, 2):
+                use_covs = False
+            elif (covariances.shape == (num_observations, 3) or
+                  covariances.shape == (num_observations, 2, 2)):
+                use_covs = True
+            else:
+                raise ValueError("'covariances' is not a compatible shape "
+                                 f"for ENU: {covariances.shape}.")
+        else:
+            if covariances.shape == (num_observations, 3):
+                use_covs = False
+            elif (covariances.shape == (num_observations, 6) or
+                  covariances.shape == (num_observations, 3, 3)):
+                use_covs = True
+            else:
+                raise ValueError("'covariances' is not a compatible shape "
+                                 f"for ECEF: {covariances.shape}.")
+    # stack velocities
+    d = velocities.reshape(-1, 1)
+    # build mapping matrix
+    if enu:
+        lon, lat = locations[:, 0], locations[:, 1]
+        if np.any(lat < -np.pi / 2) or np.any(lat > np.pi / 2) \
+           or np.any(lon < -2*np.pi) or np.any(lon > 2*np.pi):
+            warn("Latitude and/or longitude are outside of usual ranges, "
+                 "did you specify them in degrees?")
+        # stacking of eq. 11 (note difference row ordering to match input format)
+        G = np.stack([-np.sin(lat)*np.cos(lon), -np.sin(lat)*np.sin(lon), np.cos(lat),
+                      np.sin(lon), -np.cos(lon), np.zeros(num_observations)],
+                     axis=1).reshape(2*num_observations, 3) * 6378137
+    else:
+        x, y, z = locations[:, 0], locations[:, 1], locations[:, 2]
+        # stacking of eq. 2
+        G = np.stack([np.zeros(num_observations), z, -y,
+                      -z, np.zeros(num_observations), x,
+                      y, -x, np.zeros(num_observations)],
+                     axis=1).reshape(3*num_observations, 3)
+    # add uncertainties
+    if covariances is not None:
+        if not use_covs:
+            # only diagonals
+            W = sparse.diags(1 / covariances.ravel())
+        else:
+            if covariances.ndim == 2:
+                # off-diagonals included, in column notation
+                _, var_cov_map = make_cov_index_map(num_components)
+                Wblocks = [sp.linalg.pinvh(np.reshape(covariances[iobs, var_cov_map],
+                                                      (num_components, num_components)))
+                           for iobs in range(num_observations)]
+            elif covariances.ndim == 3:
+                # off-diagonals included, in third dimension
+                Wblocks = [sp.linalg.pinvh(covariances[iobs, :, :])
+                           for iobs in range(num_observations)]
+            W = sparse.block_diag(Wblocks, format='csr')
+            W.eliminate_zeros()
+        d = G.T @ W @ d
+        G = G.T @ W @ G
+    # solve
+    rotation_vector = sp.linalg.lstsq(G, d)[0].ravel()
+    # calculate formal covariance
+    rotation_covariance = sp.linalg.pinvh(G.T @ G if covariances is None else G)
+    return rotation_vector, rotation_covariance
+
+
+def rotvec2eulerpole(rotation_vector, rotation_covariance=None):
+    r"""
+    Convert a rotation vector containing the diagonals of a :math:`3 \times 3`
+    rotation matrix (and optionally, its formal covariance) into an Euler
+    Pole and associated magnitude. Based on [goudarzi14]_.
+
+    Parameters
+    ----------
+    rotation_vector : numpy.ndarray
+        Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
+        rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
+    rotation_covariance : numpy.ndarray
+        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+
+    Returns
+    -------
+    euler_pole : numpy.ndarray
+        NumPy Array containing the longitude [rad], latitude [rad], and rotation
+        rate [rad/time] of the Euler pole.
+    euler_pole_covariance : numpy.ndarray
+        If ``rotation_covariance`` was given, the propagated uncertainty for the Euler
+        Pole for all three components.
+
+    See Also
+    --------
+    eulerpole2rotvec : Inverse function
+    """
+    # readability
+    ω_x, ω_y, ω_z = rotation_vector
+    ω_xy_mag = np.linalg.norm(rotation_vector[:2])
+    ω_mag = np.linalg.norm(rotation_vector)
+    # Euler pole, eq. 15
+    euler_pole = np.array([np.arctan(ω_y / ω_x),
+                           np.arctan(ω_z / ω_xy_mag),
+                           ω_mag])
+    # uncertainty, eq. 18
+    if rotation_covariance is not None:
+        jac = np.array([[-ω_y / ω_xy_mag**2, ω_x / ω_xy_mag**2, 0],
+                        [-ω_x*ω_z / (ω_xy_mag * ω_mag**2),
+                         -ω_y*ω_z / (ω_xy_mag * ω_mag**2),
+                         -ω_xy_mag / ω_mag**2],
+                        [ω_x / ω_mag, ω_y / ω_mag, ω_z / ω_mag]])
+        euler_pole_covariance = jac @ rotation_covariance @ jac.T
+    # return
+    if rotation_covariance is not None:
+        return euler_pole, euler_pole_covariance
+    else:
+        return euler_pole
+
+
+def eulerpole2rotvec(euler_pole, euler_pole_covariance=None):
+    r"""
+    Convert an Euler pole (and optionally, its formal covariance) into a rotation
+    vector and associated covariance matrix. Based on [goudarzi14]_.
+
+    Parameters
+    ----------
+    euler_pole : numpy.ndarray
+        NumPy Array containing the longitude [rad], latitude [rad], and rotation
+        rate [rad/time] of the Euler pole.
+    euler_pole_covariance : numpy.ndarray
+        If ``rotation_covariance`` was given, the propagated uncertainty for the Euler
+        Pole for all three components.
+
+    Returns
+    -------
+    rotation_vector : numpy.ndarray
+        Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
+        rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
+    rotation_covariance : numpy.ndarray
+        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+
+    See Also
+    --------
+    rotvec2eulerpole : Inverse function
+    """
+    # readability
+    Ω = euler_pole[2]
+    sinΩlat, cosΩlat = np.sin(euler_pole[1]), np.cos(euler_pole[1])
+    sinΩlon, cosΩlon = np.sin(euler_pole[0]), np.cos(euler_pole[0])
+    # rotation vector, eq. 5 (no scaling)
+    ω_x = Ω * cosΩlat * cosΩlon
+    ω_y = Ω * cosΩlat * sinΩlon
+    ω_z = Ω * sinΩlat
+    rotation_vector = np.array([ω_x, ω_y, ω_z])
+    # uncertainty, eq. 6 (no scaling)
+    if euler_pole_covariance is not None:
+        jac = np.array([[-Ω*cosΩlat*sinΩlon, -Ω*sinΩlat*cosΩlon, cosΩlat*cosΩlon],
+                        [Ω*cosΩlat*cosΩlon, -Ω*sinΩlat*sinΩlon, cosΩlat*sinΩlon],
+                        [0, Ω*cosΩlat, sinΩlat]])
+        rotation_covariance = jac @ euler_pole_covariance @ jac.T
+    # return
+    if euler_pole_covariance is not None:
+        return rotation_vector, rotation_covariance
+    else:
+        return rotation_vector
 
 
 def R_ecef2enu(lon, lat):
