@@ -31,15 +31,15 @@ download_unr_data
 
 .. autofunction:: disstans.tools.download_unr_data
 
-R_ecef2enu
-..........
+estimate_euler_pole
+...................
 
-.. autofunction:: disstans.tools.R_ecef2enu
+.. autofunction:: disstans.tools.estimate_euler_pole
 
-R_enu2ecef
-..........
+eulerpole2rotvec
+................
 
-.. autofunction:: disstans.tools.R_enu2ecef
+.. autofunction:: disstans.tools.eulerpole2rotvec
 
 full_cov_mat_to_columns
 .......................
@@ -61,6 +61,11 @@ get_cov_indices
 
 .. autofunction:: disstans.tools.get_cov_indices
 
+get_hom_vel_strain_rot
+......................
+
+.. autofunction:: disstans.tools.get_hom_vel_strain_rot
+
 parallelize
 ...........
 
@@ -75,6 +80,21 @@ parse_unr_steps
 ...............
 
 .. autofunction:: disstans.tools.parse_unr_steps
+
+R_ecef2enu
+..........
+
+.. autofunction:: disstans.tools.R_ecef2enu
+
+R_enu2ecef
+..........
+
+.. autofunction:: disstans.tools.R_enu2ecef
+
+rotvec2eulerpole
+................
+
+.. autofunction:: disstans.tools.rotvec2eulerpole
 
 strain_rotation_invariants
 ..........................
