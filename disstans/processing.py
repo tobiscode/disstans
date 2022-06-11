@@ -270,7 +270,7 @@ def decompose(array, method, num_components=1, return_sources=False):
     if method == 'pca':
         decomposer = PCA(n_components=num_components, whiten=True)
     elif method == 'ica':
-        decomposer = FastICA(n_components=num_components, whiten=True)
+        decomposer = FastICA(n_components=num_components, whiten="unit-variance")
     else:
         raise NotImplementedError("Cannot estimate the common mode error "
                                   f"using the '{method}' method.")

@@ -1,6 +1,6 @@
 numpy
 scipy
-scikit-learn
+scikit-learn>=1.1
 matplotlib
 cartopy
 pandas>=1

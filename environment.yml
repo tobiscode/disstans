@@ -7,7 +7,7 @@ dependencies:
   - numpy>=1.22
   - pandas>=1
   - scipy>=1.6
-  - scikit-learn
+  - scikit-learn>=1.1
   - matplotlib>=3.5
   - cartopy>=0.20
   - owslib
