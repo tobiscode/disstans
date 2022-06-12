@@ -311,7 +311,7 @@ class Model():
 
         Returns
         -------
-        disstans.model.Model
+        disstans.models.Model
             A copy of the model, based on :meth:`~get_arch`.
         """
         # instantiate
@@ -2056,12 +2056,14 @@ class ModelCollection():
 
         Returns
         -------
-        disstans.model.ModelCollection
+        disstans.models.ModelCollection
             A copy of the model collection, based on the individual models'
-            :meth:`~disstans.Model.copy` method.
+            :meth:`~disstans.models.Model.copy` method.
         """
         return ModelCollection.from_model_dict(
-            {mdl_desc: mdl.copy() for mdl_desc, mdl in self.collection.items()})
+            {mdl_desc: mdl.copy(parameters=parameters, covariances=covariances,
+                                active_parameters=active_parameters)
+             for mdl_desc, mdl in self.collection.items()})
 
     def convert_units(self, factor):
         """

@@ -276,7 +276,8 @@ class Network():
 
         Returns
         -------
-        station_list : Names of stations.
+        station_list : list
+            Names of stations.
         """
         assert isinstance(ts_description, str), \
             f"'ts_description' needs to be a string, got {type(ts_description)}."
@@ -1017,7 +1018,7 @@ class Network():
         spatial_reweight_agg_comps : bool, optional
             If ``False`` (default), the spatial reweighting is done individually for each
             component, i.e., the distance-weighted median of the weights will be calculated
-            for each component. If ``True, a single median is calculated from the aggregated
+            for each component. If ``True``, a single median is calculated from the aggregated
             weights in all data components, and then used for all components.
         dist_num_avg : int, optional
             Calculate the characteristic distance for the drop-off of station weights
@@ -2065,6 +2066,8 @@ class Network():
         df_v_pred : pandas.DataFrame
             DataFrame containing the predicted velocities at each station (rows) in
             the East and North components (columns).
+        v_O : numpy.ndarray
+            1D translation vector.
         epsilon : numpy.ndarray
             2D strain rate tensor.
         omega : numpy.ndarray

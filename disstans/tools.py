@@ -1524,7 +1524,7 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
 
     See Also
     --------
-    euler_rot_xyz2llm : Convert the rotation vector into an Euler pole and magnitude.
+    rotvec2eulerpole : Convert the rotation vector into an Euler pole and magnitude.
 
     References
     ----------
@@ -1717,7 +1717,7 @@ def R_ecef2enu(lon, lat):
     ----------
     lon : float
         Longitude [°] of vector position.
-    lat : loat
+    lat : float
         Latitude [°] of vector position.
 
     Returns
