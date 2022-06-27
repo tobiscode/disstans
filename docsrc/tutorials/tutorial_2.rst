@@ -215,7 +215,7 @@ errors, so let's print some statistics::
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg                          Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.622931e-08            2.046006
+    Total-Displacement_Model_Total  1.624258e-08            2.046006
 
 .. doctest::
     :hide:
@@ -298,7 +298,7 @@ Giving us the statistics::
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2                             Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.503516e-09            2.087589
+    Total-Displacement_Model_Total  1.656468e-09            2.087589
 
 .. doctest::
     :hide:
@@ -307,7 +307,7 @@ Giving us the statistics::
     ...     _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                                mean=True, std=True, verbose=True)
     TUT: Res_L2                        Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.5e-09                 2.1
+    Total-Displacement_Model_Total  1.7e-09                 2.1
 
 ::
 
@@ -368,7 +368,7 @@ Giving us the statistics::
     >>> _ = stat.analyze_residuals(ts_description="Res_L1",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1                         Mean  Standard Deviation
-    Total-Displacement_Model_Total  0.000003            2.121952
+    Total-Displacement_Model_Total  0.000003            2.121951
 
 .. doctest::
     :hide:
@@ -445,7 +445,7 @@ Giving us the statistics::
     >>> _ = stat.analyze_residuals(ts_description="Res_L1R",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1R                            Mean  Standard Deviation
-    Total-Displacement_Model_Total  9.511043e-08            2.117921
+    Total-Displacement_Model_Total  9.511036e-08            2.117921
 
 .. doctest::
     :hide:

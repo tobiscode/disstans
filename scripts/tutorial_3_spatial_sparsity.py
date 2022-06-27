@@ -19,6 +19,7 @@ if __name__ == "__main__":
     rcParams['font.size'] = "14"
     fmt = "png"
     include_resids = True
+    include_vids = True
     os.makedirs(outdir, exist_ok=True)
 
     # initialize RNG
@@ -140,14 +141,15 @@ if __name__ == "__main__":
         # now, evaluate the models
         # noise will be white + colored
         gen_data = \
-            {"seas+sec+eq": (mdl_sec.evaluate(timevector)["fit"] +
-                             mdl_seas.evaluate(timevector)["fit"] +
-                             mdl_eq.evaluate(timevector)["fit"] +
-                             mdl_post.evaluate(timevector)["fit"]),
+            {"sec": mdl_sec.evaluate(timevector)["fit"],
              "trans": (mdl_sse1.evaluate(timevector)["fit"] +
                        mdl_sse2.evaluate(timevector)["fit"] +
                        mdl_sse3.evaluate(timevector)["fit"]),
              "noise": noisevec}
+        gen_data["seas+sec+eq"] = (gen_data["sec"] +
+                                   mdl_seas.evaluate(timevector)["fit"] +
+                                   mdl_eq.evaluate(timevector)["fit"] +
+                                   mdl_post.evaluate(timevector)["fit"])
         # for one station, we'll add a colored noise process such that the resulting
         # noise variance is the same as before
         # but: only in the second half, where there are no strong, short-term signals
@@ -430,6 +432,12 @@ if __name__ == "__main__":
     print("Number of unique reweighted non-zero parameters per component: "
           + str(num_uniques_local_M.tolist()))
 
+    # save secular velocity estimates for later
+    vels_locl0 = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+                           for stat in net])
+    secfits_locl0 = {name: stat.fits["Displacement"]["Secular"].data
+                     for name, stat in net.stations.items()}
+
     # and now for 20 spatial iterations
     print()
     stats = net.spatialfit("Displacement",
@@ -637,42 +645,45 @@ if __name__ == "__main__":
 
     # plot example comparison between truth & fit
     sta = net["Jeckle"]
-    fig, axes = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
-    # top left is overall fit
-    axes[0, 0].plot(timevector, synth_coll["Jeckle"]["data"][:, 0], "k.", markersize=3,
-                    label="Data")
-    axes[0, 0].plot(timevector, synth_coll["Jeckle"]["truth"][:, 0], "C1")
-    axes[0, 0].plot(timevector, sta.fits["Displacement"].allfits.data.iloc[:, 0], "C0")
-    axes[0, 0].legend(loc="lower right")
-    axes[0, 0].set_ylabel("Displacement [mm]")
-    axes[0, 0].set_title("Total")
-    # bottom left is secular + seasonal
-    axes[1, 0].plot(timevector,
-                    mdl_coll_synth["Jeckle"]["Secular"].evaluate(timevector)["fit"][:, 0] +
-                    mdl_coll_synth["Jeckle"]["Seasonal"].evaluate(timevector)["fit"][:, 0], "C1")
-    axes[1, 0].plot(timevector,
-                    sta.fits["Displacement"]["Seasonal"].data.iloc[:, 0] +
-                    sta.fits["Displacement"]["Secular"].data.iloc[:, 0], "C0")
-    axes[1, 0].set_xlabel("Time")
-    axes[1, 0].set_ylabel("Displacement [mm]")
-    axes[1, 0].set_title("Secular + Seasonal")
-    # top right is transient
-    axes[0, 1].plot(timevector, synth_coll["Jeckle"]["trans"][:, 0], "C1")
-    axes[0, 1].plot(timevector, sta.fits["Displacement"]["Transient"].data.iloc[:, 0], "C0")
-    axes[0, 1].set_title("Transient")
-    # bottom right is earthquake (incl. postseismic)
-    axes[1, 1].plot(timevector,
-                    mdl_coll_synth["Jeckle"]["Earthquake"].evaluate(timevector)["fit"][:, 0] +
-                    mdl_coll_synth["Jeckle"]["Postseismic"].evaluate(timevector)["fit"][:, 0],
-                    "C1", label="Truth")
-    axes[1, 1].plot(timevector,
-                    sta.fits["Displacement"]["Earthquake"].data.iloc[:, 0] +
-                    sta.fits["Displacement"]["Postseismic"].data.iloc[:, 0], "C0", label="Fit")
-    axes[1, 1].legend(loc="upper right")
-    axes[1, 1].set_xlabel("Time")
-    axes[1, 1].set_title("Earthquake")
-    fig.savefig(outdir / f"tutorial_3i_fits_Jeckle.{fmt}")
-    plt.close(fig)
+    synth_mdls = mdl_coll_synth["Jeckle"]
+    synth_data = synth_coll["Jeckle"]
+    for i, dcomp in enumerate(sta["Displacement"].data_cols):
+        fig, axes = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+        # top left is overall fit
+        axes[0, 0].plot(timevector, synth_data["data"][:, i], "k.", markersize=3,
+                        label="Data")
+        axes[0, 0].plot(timevector, synth_data["truth"][:, i], "C1")
+        axes[0, 0].plot(timevector, sta.fits["Displacement"].allfits.data.iloc[:, i], "C0")
+        axes[0, 0].legend()
+        axes[0, 0].set_ylabel(f"{dcomp} [mm]")
+        axes[0, 0].set_title("Total")
+        # bottom left is secular + seasonal
+        axes[1, 0].plot(timevector,
+                        synth_mdls["Secular"].evaluate(timevector)["fit"][:, i] +
+                        synth_mdls["Seasonal"].evaluate(timevector)["fit"][:, i], "C1")
+        axes[1, 0].plot(timevector,
+                        sta.fits["Displacement"]["Seasonal"].data.iloc[:, i] +
+                        sta.fits["Displacement"]["Secular"].data.iloc[:, i], "C0")
+        axes[1, 0].set_xlabel("Time")
+        axes[1, 0].set_ylabel(f"{dcomp} [mm]")
+        axes[1, 0].set_title("Secular + Seasonal")
+        # top right is transient
+        axes[0, 1].plot(timevector, synth_data["trans"][:, i], "C1")
+        axes[0, 1].plot(timevector, sta.fits["Displacement"]["Transient"].data.iloc[:, i], "C0")
+        axes[0, 1].set_title("Transient")
+        # bottom right is earthquake (incl. postseismic)
+        axes[1, 1].plot(timevector,
+                        synth_mdls["Earthquake"].evaluate(timevector)["fit"][:, i] +
+                        synth_mdls["Postseismic"].evaluate(timevector)["fit"][:, i],
+                        "C1", label="Truth")
+        axes[1, 1].plot(timevector,
+                        sta.fits["Displacement"]["Earthquake"].data.iloc[:, i] +
+                        sta.fits["Displacement"]["Postseismic"].data.iloc[:, i], "C0", label="Fit")
+        axes[1, 1].legend()
+        axes[1, 1].set_xlabel("Time")
+        axes[1, 1].set_title("Earthquake")
+        fig.savefig(outdir / f"tutorial_3i_fits_Jeckle_{dcomp}.{fmt}")
+        plt.close(fig)
 
     # worm plots (animated only for the final cases with the maintenance step)
     for title, case, trans_ts in \
@@ -686,7 +697,7 @@ if __name__ == "__main__":
         net.wormplot(ts_description=trans_ts,
                      fname=outdir / f"tutorial_3h_worm_{case}",
                      fname_animation=outdir / f"tutorial_3h_worm_{case}.mp4"
-                     if case[-1] == "M" else None,
+                     if case[-1] == "M" and include_vids else None,
                      save_kw_args={"format": fmt, "dpi": 300},
                      colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
                      scale=1e3, annotate_stations=False,
@@ -717,3 +728,105 @@ if __name__ == "__main__":
                  colorbar_kw_args={"orientation": "horizontal", "shrink": 0.5},
                  scale=1e3, annotate_stations=False,
                  lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)
+
+    # make an almost-from-scratch network object for comparisons
+    net_basic = deepcopy(net)
+    # delete all unnecessary timeseries and the Transient model
+    for stat in net_basic:
+        for ts in [t for t in stat.timeseries.keys()
+                   if t != "Displacement"]:
+            del stat[ts]
+        del stat.models["Displacement"]["Transient"]
+        del stat.fits["Displacement"]["Transient"]
+
+    # we'll compare our spatial-L0 results to a model with steps instead of transients
+    net_steps = deepcopy(net_basic)
+
+    # add true center times as steps (reality is going to be worse)
+    for stat in net_steps:
+        stat.models["Displacement"]["SSESteps"] = \
+            Step(["2001-07-01", "2003-07-01", "2007-01-01"])
+    # fit both the basic network and the one with added steps
+    net_basic.fitevalres(ts_description="Displacement", solver="linear_regression",
+                         output_description="Fit", residual_description="Res")
+    net_steps.fitevalres(ts_description="Displacement", solver="linear_regression",
+                         output_description="Fit", residual_description="Res")
+    # extract velocities
+    vels_basic = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+                           for stat in net_basic])
+    vels_steps = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+                           for stat in net_steps])
+
+    # we'll also compare to MIDAS
+    # run MIDAS (on main network object, doesn't matter)
+    from disstans.tools import parallelize
+    from disstans.processing import midas
+    midas_in = [stat["Displacement"] for stat in net]
+    midas_out = {sta_name: result for sta_name, result
+                 in zip(net.station_names, parallelize(midas, midas_in))}
+    # this will return a dictionary with the MIDAS output for each stations,
+    # let's extract the velocity and compute the model timeseries
+    mdls_midas = {sta_name: m_out[0] for sta_name, m_out in midas_out.items()}
+    vels_midas = np.stack([mdl.par[1, :] for mdl in mdls_midas.values()])
+    ts_midas = {sta_name: mdl.evaluate(timevector)["fit"]
+                for sta_name, mdl in mdls_midas.items()}
+
+    # get noisy secular + transient data for comparison
+    sec = synth_data["sec"] + synth_data["noise"]
+    sectrans = sec + synth_data["trans"]
+
+    # plot comparison between fits for linear component only
+    for i, dcomp in enumerate(sta["Displacement"].data_cols):
+        # sta = net["Jeckle"] from before
+        # synth_data = synth_coll["Jeckle"] from before
+        fig, ax = plt.subplots(figsize=(6, 4))
+        # data
+        ax.plot(timevector, sectrans[:, i],
+                ls="none", marker=".", markersize=3, color="0.6")
+        ax.plot(timevector, sec[:, i],
+                ls="none", marker=".", markersize=3, color="0.3")
+        # models
+        ax.plot(timevector,
+                synth_mdls["Secular"].evaluate(timevector)["fit"][:, i],
+                "C1", label="Truth")
+        ax.plot(timevector,
+                sta.fits["Displacement"]["Secular"].data.iloc[:, i],
+                "C0", label="Spatial L0")
+        ax.plot(timevector,
+                secfits_locl0["Jeckle"].iloc[:, i],
+                "C2", label="Local L0")
+        ax.plot(timevector,
+                net_steps["Jeckle"].fits["Displacement"]["Secular"].data.iloc[:, i],
+                "C3", label="Linear + Steps")
+        ax.plot(timevector,
+                net_basic["Jeckle"].fits["Displacement"]["Secular"].data.iloc[:, i],
+                "C4", label="Linear")
+        ax.plot(timevector, ts_midas["Jeckle"][:, i], "C5", label="MIDAS")
+        # labels etc.
+        ax.set_xlabel("Time")
+        ax.set_ylabel(f"{dcomp} [mm]")
+        ax.set_title("Secular")
+        ax.legend()
+        # save
+        fig.savefig(outdir / f"tutorial_3j_seccomp_Jeckle_{dcomp}.{fmt}")
+        plt.close(fig)
+
+    # get true and spatial L0 velocities from beginning
+    vels_true = np.stack([mdl["Secular"].par[1, :]
+                          for mdl in mdl_coll_synth.values()])
+    vels_spatl0 = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+                            for stat in net])
+
+    # get RMSE stats
+    rmse_spatl0 = np.sqrt(np.mean((vels_spatl0 - vels_true)**2, axis=0))
+    rmse_locl0 = np.sqrt(np.mean((vels_locl0 - vels_true)**2, axis=0))
+    rmse_steps = np.sqrt(np.mean((vels_steps - vels_true)**2, axis=0))
+    rmse_basic = np.sqrt(np.mean((vels_basic - vels_true)**2, axis=0))
+    rmse_midas = np.sqrt(np.mean((vels_midas - vels_true)**2, axis=0))
+    vel_rmses = pd.DataFrame({"Spatial L0": rmse_spatl0, "Local L0": rmse_locl0,
+                              "Linear + Steps": rmse_steps, "Linear": rmse_basic,
+                              "MIDAS": rmse_midas},
+                             index=sta["Displacement"].data_cols).T
+
+    # print
+    print(vel_rmses)
