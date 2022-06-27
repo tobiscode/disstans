@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.tools &mdash; DISSTANS 1.0.2 documentation</title>
+  <title>disstans.tools &mdash; DISSTANS 1.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -30,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.0.2
+                1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -120,6 +121,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -127,7 +141,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -207,13 +220,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -266,6 +286,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sparse</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
@@ -281,6 +302,7 @@
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">FuncFormatter</span>
 <span class="kn">from</span> <span class="nn">cmcrameri</span> <span class="kn">import</span> <span class="n">cm</span> <span class="k">as</span> <span class="n">scm</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">circmean</span>
 
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
 
@@ -1516,6 +1538,516 @@
     <span class="n">eq_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">eq_table</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">))</span>
     <span class="c1"># return everything</span>
     <span class="k">return</span> <span class="n">maint_table</span><span class="p">,</span> <span class="n">maint_dict</span><span class="p">,</span> <span class="n">eq_table</span><span class="p">,</span> <span class="n">eq_dict</span></div>
+
+
+<span class="k">def</span> <span class="nf">best_utmzone</span><span class="p">(</span><span class="n">longitudes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a list of longitudes, find the UTM zone that is appropriate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    longitudes : numpy.ndarray</span>
+<span class="sd">        Array of longitudes [°].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    utmzone : int</span>
+<span class="sd">        UTM zone at the average input longitude.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lon_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">circmean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">longitudes</span><span class="p">),</span>
+                                   <span class="n">low</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">utmzone</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(((</span><span class="n">lon_mean</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">utmzone</span>
+
+
+<div class="viewcode-block" id="get_hom_vel_strain_rot"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.get_hom_vel_strain_rot">[docs]</a><span class="k">def</span> <span class="nf">get_hom_vel_strain_rot</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">velocities</span><span class="p">,</span> <span class="n">covariances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">utmzone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">reference</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a set of horizontal velocities on a 2D cartesian grid, estimate the</span>
+<span class="sd">    best-fit displacement gradient matrix to calculate a homogenous velocity</span>
+<span class="sd">    field characterized by a single translation vector, strain tensor, and</span>
+<span class="sd">    rotation tensor. See [tape09]_ for an introduction.</span>
+
+<span class="sd">    This function uses a local approximation to the spherical Earth by</span>
+<span class="sd">    converting all station locations into a suitable UTM zone, and only</span>
+<span class="sd">    considering the horizontal velocities.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    locations : numpy.ndarray</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, 2)` containing the</span>
+<span class="sd">        longitude and latitude [°] of the observations (stations).</span>
+<span class="sd">    velocities : numpy.ndarray</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, 2)` containing the</span>
+<span class="sd">        East and North velocities [m/time] of the observations</span>
+<span class="sd">    covariances : numpy.ndarray, optional</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, 2)` containing the</span>
+<span class="sd">        variances in the East and North velocities [m^2/time^2]. Alternatively,</span>
+<span class="sd">        array of shape :math:`(\text{num_stations}, 3)` additionally</span>
+<span class="sd">        containing the East-North covariance [m2/time^2].</span>
+<span class="sd">    utmzome : int, optional</span>
+<span class="sd">        If provided, the UTM zone to use for the horizontal approximation.</span>
+<span class="sd">        By default (``None``), the average longitude will be calculated, and the</span>
+<span class="sd">        respective UTM zone will be used.</span>
+<span class="sd">    reference : list, int, optional</span>
+<span class="sd">        Reference station to be used by the calculation. This can be either a</span>
+<span class="sd">        longitude-latitude [°] list, or the index of the reference station in</span>
+<span class="sd">        ``locations``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    v_O : numpy.ndarray</span>
+<span class="sd">        Velocity of the origin :math:`\mathbf{v}_O`.</span>
+<span class="sd">    epsilon : numpy.ndarray</span>
+<span class="sd">        :math:`2 \times 2` strain tensor :math:`\mathbf{\varepsilon}`.</span>
+<span class="sd">    omega : numpy.ndarray</span>
+<span class="sd">        :math:`2 \times 2` rotation tensor :math:`\mathbf{\omega}`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    strain_rotation_invariants : For calculation of invariants of the tensors.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [tape09] Tape, C., Musé, P., Simons, M., Dong, D., &amp; Webb, F. (2009),</span>
+<span class="sd">       *Multiscale estimation of GPS velocity fields*,</span>
+<span class="sd">       Geophysical Journal International, 179(2), 945–971,</span>
+<span class="sd">       doi:`10.1111/j.1365-246X.2009.04337.x &lt;https://doi.org/10.1111/j.1365-246X.2009.04337.x&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># input checks</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">locations</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+            <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;locations&#39; needs to be a NumPy array with two columns.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">velocities</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">velocities</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+            <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;velocities&#39; needs to be a NumPy array with two columns.&quot;</span>
+    <span class="k">assert</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> \
+        <span class="sa">f</span><span class="s2">&quot;Mismatch between locations shape </span><span class="si">{</span><span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and velocities &quot;</span> \
+        <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="n">num_stations</span> <span class="o">=</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">covariances</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+                <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_stations</span> <span class="ow">and</span>
+                <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> \
+            <span class="s2">&quot;Invalid covariance input type or shape.&quot;</span>
+    <span class="c1"># parse reference</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">reference</span> <span class="o">&lt;</span> <span class="n">num_stations</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2"> is not an integer index less than </span><span class="si">{</span><span class="n">num_stations</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span> <span class="o">=</span> <span class="n">locations</span><span class="p">[</span><span class="n">reference</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid input for &#39;reference&#39;: </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="c1"># make sure we&#39;re not inverting if we don&#39;t have enough data points</span>
+    <span class="k">if</span> <span class="n">num_stations</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_stations</span><span class="si">}</span><span class="s2"> stations are less stations than &quot;</span>
+                         <span class="s2">&quot;necessary (6) for a stable computation.&quot;</span><span class="p">)</span>
+    <span class="c1"># determine UTM zone if needed</span>
+    <span class="k">if</span> <span class="n">utmzone</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">utmzone</span> <span class="o">=</span> <span class="n">best_utmzone</span><span class="p">(</span><span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># convert to UTM eastings &amp; northings</span>
+    <span class="n">crs_lla</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geodetic</span><span class="p">()</span>
+    <span class="n">crs_utm</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">UTM</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">utmzone</span><span class="p">)</span>
+    <span class="n">ENU</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">E</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">ENU</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">ENU</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># get all positions relative to reference station</span>
+    <span class="n">EO</span><span class="p">,</span> <span class="n">NO</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_point</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">crs_lla</span><span class="p">)</span>
+    <span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span> <span class="o">=</span> <span class="n">E</span> <span class="o">-</span> <span class="n">EO</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="n">NO</span>
+    <span class="c1"># build individual G</span>
+    <span class="n">GE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dEO</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">GN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span><span class="p">,</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dNO</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># combine components</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">GE</span><span class="p">,</span> <span class="n">GN</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">velocities</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">velocities</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># build weight matrix</span>
+    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">covariances</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">covariances</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]))</span>
+        <span class="k">elif</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">Wblocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">covariances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+                       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)]</span>
+            <span class="n">main_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">]])</span>
+            <span class="n">off_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">])</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">diagonals</span><span class="o">=</span><span class="p">[</span><span class="n">main_diag</span><span class="p">,</span> <span class="n">off_diag</span><span class="p">,</span> <span class="n">off_diag</span><span class="p">],</span>
+                             <span class="n">offsets</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">num_stations</span><span class="p">,</span> <span class="n">num_stations</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">d</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">G</span>
+    <span class="c1"># solve</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">d</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># extract wanted quantities</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">3</span><span class="p">]]])</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># strain rate</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># rotation rate</span>
+    <span class="n">v_O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">5</span><span class="p">]])</span>  <span class="c1"># velocity of origin</span>
+    <span class="k">return</span> <span class="n">v_O</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span></div>
+
+
+<div class="viewcode-block" id="strain_rotation_invariants"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.strain_rotation_invariants">[docs]</a><span class="k">def</span> <span class="nf">strain_rotation_invariants</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a strain (rate) and/or rotation (rate) tensor, calculate scalar</span>
+<span class="sd">    invariant quantities of interest. See [tape09]_ for an introduction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epsilon : numpy.ndarray</span>
+<span class="sd">        Strain (rate) tensor :math:`\mathbf{\varepsilon}`.</span>
+<span class="sd">    omega : numpy.ndarray</span>
+<span class="sd">        Rotation (rate) tensor :math:`\mathbf{\omega}`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dilatation : float</span>
+<span class="sd">        Only if ``epsilon`` is provided. Scalar dilatation (rate) as defined</span>
+<span class="sd">        by the first invariant of the strain (rate) tensor</span>
+<span class="sd">        :math:`\Theta = \text{Tr} \left( \mathbf{\varepsilon} \right)`.</span>
+<span class="sd">    strain : float</span>
+<span class="sd">        Only if ``epsilon`` is provided. Scalar strain (rate) as defined</span>
+<span class="sd">        by the Frobenius norm of the strain (rate) tensor</span>
+<span class="sd">        :math:`\Sigma = \lVert \mathbf{\varepsilon} \rVert_F`</span>
+<span class="sd">    shear : float</span>
+<span class="sd">        Only if ``epsilon`` is provided. Scalar shearing (rate) as defined</span>
+<span class="sd">        by the square root of the second invariant of the deviatoric strain (rate) tensor</span>
+<span class="sd">        :math:`\text{T} = \sqrt{\frac{1}{2} \text{Tr}(\mathbf{\varepsilon}^2)</span>
+<span class="sd">        - \frac{1}{6} \text{Tr}(\mathbf{\varepsilon})^2}`.</span>
+<span class="sd">    rotation : float</span>
+<span class="sd">        Only if ``omega`` is provided. Scalar rotation (rate) as defined</span>
+<span class="sd">        by :math:`\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epsilon</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;epsilon&#39; needs to be a 2D NumPy array, got </span><span class="si">{</span><span class="n">epsilon</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="c1"># scalar dilatation (rate)</span>
+        <span class="n">dilatation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span>
+        <span class="c1"># scalar strain (rate)</span>
+        <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)</span>
+        <span class="c1"># scalar shearing (rate)</span>
+        <span class="n">shear</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">@</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">omega</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;omega&#39; needs to be a 2D NumPy array, got </span><span class="si">{</span><span class="n">omega</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="c1"># scalar rotation (rate)</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># return quantities</span>
+    <span class="k">if</span> <span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dilatation</span><span class="p">,</span> <span class="n">strain</span><span class="p">,</span> <span class="n">shear</span><span class="p">,</span> <span class="n">rotation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dilatation</span><span class="p">,</span> <span class="n">strain</span><span class="p">,</span> <span class="n">shear</span>
+    <span class="k">elif</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotation</span></div>
+
+
+<div class="viewcode-block" id="estimate_euler_pole"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.estimate_euler_pole">[docs]</a><span class="k">def</span> <span class="nf">estimate_euler_pole</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">velocities</span><span class="p">,</span> <span class="n">covariances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enu</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimate a best-fit Euler pole assuming all velocities lie on the same</span>
+<span class="sd">    rigid plate on a sphere. The calculations are based on [goudarzi14]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    locations : numpy.ndarray</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, \text{num_components})`</span>
+<span class="sd">        containing the locations of each station (observation), where</span>
+<span class="sd">        :math:`\text{num_components}=2` if the locations are given by longitudes and</span>
+<span class="sd">        latitudes [°] (``enu=True``, default) or :math:`\text{num_components}=3`</span>
+<span class="sd">        if the locations are given in the cartesian Earth-Centered, Earth-Fixed</span>
+<span class="sd">        (ECEF) reference frame [m] (``enu=False``).</span>
+<span class="sd">    velocities : numpy.ndarray</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, \text{num_components})`</span>
+<span class="sd">        containing the velocities [m/time] at different stations (observations), where</span>
+<span class="sd">        :math:`\text{num_components}=2` if the velocities are given in the</span>
+<span class="sd">        East-North local geodetic reference frame (``enu=True``, default) or</span>
+<span class="sd">        :math:`\text{num_components}=3` if the velocities are given in the cartesian</span>
+<span class="sd">        Earth-Centered, Earth-Fixed (ECEF) reference frame (``enu=False``).</span>
+<span class="sd">    covariances : numpy.ndarray, optional</span>
+<span class="sd">        Array containing the (co)variances of the velocities [m^2/time^2], allowing for</span>
+<span class="sd">        different input shapes depending on what uncertainties are available.</span>
+<span class="sd">        If ``None`` (default), all observations are weighted equally.</span>
+<span class="sd">        If ``enu=True``, the array should have shape :math:`(\text{num_stations}, 2)`</span>
+<span class="sd">        if only variances are present, :math:`(\text{num_stations}, 3)` if also</span>
+<span class="sd">        the covariances are present but are given as a column, or</span>
+<span class="sd">        :math:`(\text{num_stations}, 2, 2)` if the :math:`2 \times 2`covariance</span>
+<span class="sd">        matrix is given for each observation.</span>
+<span class="sd">        If ``enu=False``, the arrays should be of shapes</span>
+<span class="sd">        :math:`(\text{num_stations}, 3)`, :math:`(\text{num_stations}, 6)`,</span>
+<span class="sd">        or :math:`(\text{num_stations}, 3, 3)`, respectively.</span>
+<span class="sd">    enu : bool, optional</span>
+<span class="sd">        See ``locations`` and ``velocities``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rotation_vector : numpy.ndarray</span>
+<span class="sd">        Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`</span>
+<span class="sd">        rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</span>
+<span class="sd">    rotation_covariance : numpy.ndarray</span>
+<span class="sd">        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The ENU solution assumes a spherical Earth with radius 6378137 meters.</span>
+
+<span class="sd">    If the covariances are given in columns, the formatting of</span>
+<span class="sd">    :class:`~disstans.timeseries.Timeseries` is being used.</span>
+
+<span class="sd">    Contrary to [goudarzi14]_, the estimated covariance matrix is not scaled by the a</span>
+<span class="sd">    posteriori sigma, to match the covariance definition throughout the rest of DISSTANS.</span>
+<span class="sd">    The time unit is also not assumed to be in years, and then scaled to millions</span>
+<span class="sd">    of years.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    rotvec2eulerpole : Convert the rotation vector into an Euler pole and magnitude.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [goudarzi14] Goudarzi, M. A., Cocard, M., &amp; Santerre, R. (2014),</span>
+<span class="sd">       *EPC: Matlab software to estimate Euler pole parameters*,</span>
+<span class="sd">       GPS Solutions, 18(1), 153–162,</span>
+<span class="sd">       doi:`10.1007/s10291-013-0354-4 &lt;https://doi.org/10.1007/s10291-013-0354-4&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># input checks</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">locations</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+            <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">enu</span> <span class="k">else</span> <span class="mi">3</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;locations&#39; needs to be a NumPy Array with either 2 or 3 columns.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">velocities</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">velocities</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+            <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">enu</span> <span class="k">else</span> <span class="mi">3</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;velocities&#39; needs to be a NumPy Array with either 2 or 3 columns.&quot;</span>
+    <span class="k">assert</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;Shape mismatch between &quot;</span> \
+        <span class="sa">f</span><span class="s2">&quot;locations </span><span class="si">{</span><span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and velocities </span><span class="si">{</span><span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="n">num_stations</span><span class="p">,</span> <span class="n">num_components</span> <span class="o">=</span> <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">covariances</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> \
+            <span class="s2">&quot;If specified, &#39;covariances&#39; needs to be a NumPy array.&quot;</span>
+        <span class="k">if</span> <span class="n">enu</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">use_covs</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">covariances</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">or</span>
+                  <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+                <span class="n">use_covs</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;covariances&#39; is not a compatible shape &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;for ENU: </span><span class="si">{</span><span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="n">use_covs</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">covariances</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="ow">or</span>
+                  <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+                <span class="n">use_covs</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;covariances&#39; is not a compatible shape &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;for ECEF: </span><span class="si">{</span><span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="c1"># stack velocities</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">velocities</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># build mapping matrix</span>
+    <span class="k">if</span> <span class="n">enu</span><span class="p">:</span>
+        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">locations</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># stacking of eq. 11 (note difference row ordering to match input format)</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">),</span>
+                      <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)],</span>
+                     <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">6378137</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># stacking of eq. 2</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">z</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">,</span>
+                      <span class="o">-</span><span class="n">z</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span>
+                      <span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)],</span>
+                     <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="c1"># add uncertainties</span>
+    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">use_covs</span><span class="p">:</span>
+            <span class="c1"># only diagonals</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># off-diagonals included, in column notation</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">var_cov_map</span> <span class="o">=</span> <span class="n">make_cov_index_map</span><span class="p">(</span><span class="n">num_components</span><span class="p">)</span>
+                <span class="n">Wblocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">covariances</span><span class="p">[</span><span class="n">iobs</span><span class="p">,</span> <span class="n">var_cov_map</span><span class="p">],</span>
+                                                      <span class="p">(</span><span class="n">num_components</span><span class="p">,</span> <span class="n">num_components</span><span class="p">)))</span>
+                           <span class="k">for</span> <span class="n">iobs</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)]</span>
+            <span class="k">elif</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="c1"># off-diagonals included, in third dimension</span>
+                <span class="n">Wblocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">covariances</span><span class="p">[</span><span class="n">iobs</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+                           <span class="k">for</span> <span class="n">iobs</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)]</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="n">Wblocks</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
+            <span class="n">W</span><span class="o">.</span><span class="n">eliminate_zeros</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">d</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">G</span>
+    <span class="c1"># solve</span>
+    <span class="n">rotation_vector</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">d</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="c1"># calculate formal covariance</span>
+    <span class="n">rotation_covariance</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">G</span> <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">G</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span></div>
+
+
+<div class="viewcode-block" id="rotvec2eulerpole"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.rotvec2eulerpole">[docs]</a><span class="k">def</span> <span class="nf">rotvec2eulerpole</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a rotation vector containing the diagonals of a :math:`3 \times 3`</span>
+<span class="sd">    rotation matrix (and optionally, its formal covariance) into an Euler</span>
+<span class="sd">    Pole and associated magnitude. Based on [goudarzi14]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rotation_vector : numpy.ndarray</span>
+<span class="sd">        Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`</span>
+<span class="sd">        rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</span>
+<span class="sd">    rotation_covariance : numpy.ndarray</span>
+<span class="sd">        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    euler_pole : numpy.ndarray</span>
+<span class="sd">        NumPy Array containing the longitude [rad], latitude [rad], and rotation</span>
+<span class="sd">        rate [rad/time] of the Euler pole.</span>
+<span class="sd">    euler_pole_covariance : numpy.ndarray</span>
+<span class="sd">        If ``rotation_covariance`` was given, the propagated uncertainty for the Euler</span>
+<span class="sd">        Pole for all three components.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    eulerpole2rotvec : Inverse function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># readability</span>
+    <span class="n">ω_x</span><span class="p">,</span> <span class="n">ω_y</span><span class="p">,</span> <span class="n">ω_z</span> <span class="o">=</span> <span class="n">rotation_vector</span>
+    <span class="n">ω_xy_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">ω_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">)</span>
+    <span class="c1"># Euler pole, eq. 15</span>
+    <span class="n">euler_pole</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">ω_y</span> <span class="o">/</span> <span class="n">ω_x</span><span class="p">),</span>
+                           <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">ω_z</span> <span class="o">/</span> <span class="n">ω_xy_mag</span><span class="p">),</span>
+                           <span class="n">ω_mag</span><span class="p">])</span>
+    <span class="c1"># uncertainty, eq. 18</span>
+    <span class="k">if</span> <span class="n">rotation_covariance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">jac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="n">ω_y</span> <span class="o">/</span> <span class="n">ω_xy_mag</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">ω_x</span> <span class="o">/</span> <span class="n">ω_xy_mag</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="p">[</span><span class="o">-</span><span class="n">ω_x</span><span class="o">*</span><span class="n">ω_z</span> <span class="o">/</span> <span class="p">(</span><span class="n">ω_xy_mag</span> <span class="o">*</span> <span class="n">ω_mag</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                         <span class="o">-</span><span class="n">ω_y</span><span class="o">*</span><span class="n">ω_z</span> <span class="o">/</span> <span class="p">(</span><span class="n">ω_xy_mag</span> <span class="o">*</span> <span class="n">ω_mag</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                         <span class="o">-</span><span class="n">ω_xy_mag</span> <span class="o">/</span> <span class="n">ω_mag</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="p">[</span><span class="n">ω_x</span> <span class="o">/</span> <span class="n">ω_mag</span><span class="p">,</span> <span class="n">ω_y</span> <span class="o">/</span> <span class="n">ω_mag</span><span class="p">,</span> <span class="n">ω_z</span> <span class="o">/</span> <span class="n">ω_mag</span><span class="p">]])</span>
+        <span class="n">euler_pole_covariance</span> <span class="o">=</span> <span class="n">jac</span> <span class="o">@</span> <span class="n">rotation_covariance</span> <span class="o">@</span> <span class="n">jac</span><span class="o">.</span><span class="n">T</span>
+    <span class="c1"># return</span>
+    <span class="k">if</span> <span class="n">rotation_covariance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">euler_pole</span><span class="p">,</span> <span class="n">euler_pole_covariance</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">euler_pole</span></div>
+
+
+<div class="viewcode-block" id="eulerpole2rotvec"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.eulerpole2rotvec">[docs]</a><span class="k">def</span> <span class="nf">eulerpole2rotvec</span><span class="p">(</span><span class="n">euler_pole</span><span class="p">,</span> <span class="n">euler_pole_covariance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert an Euler pole (and optionally, its formal covariance) into a rotation</span>
+<span class="sd">    vector and associated covariance matrix. Based on [goudarzi14]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    euler_pole : numpy.ndarray</span>
+<span class="sd">        NumPy Array containing the longitude [rad], latitude [rad], and rotation</span>
+<span class="sd">        rate [rad/time] of the Euler pole.</span>
+<span class="sd">    euler_pole_covariance : numpy.ndarray</span>
+<span class="sd">        If ``rotation_covariance`` was given, the propagated uncertainty for the Euler</span>
+<span class="sd">        Pole for all three components.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rotation_vector : numpy.ndarray</span>
+<span class="sd">        Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`</span>
+<span class="sd">        rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</span>
+<span class="sd">    rotation_covariance : numpy.ndarray</span>
+<span class="sd">        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    rotvec2eulerpole : Inverse function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># readability</span>
+    <span class="n">Ω</span> <span class="o">=</span> <span class="n">euler_pole</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">sinΩlat</span><span class="p">,</span> <span class="n">cosΩlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">sinΩlon</span><span class="p">,</span> <span class="n">cosΩlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># rotation vector, eq. 5 (no scaling)</span>
+    <span class="n">ω_x</span> <span class="o">=</span> <span class="n">Ω</span> <span class="o">*</span> <span class="n">cosΩlat</span> <span class="o">*</span> <span class="n">cosΩlon</span>
+    <span class="n">ω_y</span> <span class="o">=</span> <span class="n">Ω</span> <span class="o">*</span> <span class="n">cosΩlat</span> <span class="o">*</span> <span class="n">sinΩlon</span>
+    <span class="n">ω_z</span> <span class="o">=</span> <span class="n">Ω</span> <span class="o">*</span> <span class="n">sinΩlat</span>
+    <span class="n">rotation_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ω_x</span><span class="p">,</span> <span class="n">ω_y</span><span class="p">,</span> <span class="n">ω_z</span><span class="p">])</span>
+    <span class="c1"># uncertainty, eq. 6 (no scaling)</span>
+    <span class="k">if</span> <span class="n">euler_pole_covariance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">jac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="n">Ω</span><span class="o">*</span><span class="n">cosΩlat</span><span class="o">*</span><span class="n">sinΩlon</span><span class="p">,</span> <span class="o">-</span><span class="n">Ω</span><span class="o">*</span><span class="n">sinΩlat</span><span class="o">*</span><span class="n">cosΩlon</span><span class="p">,</span> <span class="n">cosΩlat</span><span class="o">*</span><span class="n">cosΩlon</span><span class="p">],</span>
+                        <span class="p">[</span><span class="n">Ω</span><span class="o">*</span><span class="n">cosΩlat</span><span class="o">*</span><span class="n">cosΩlon</span><span class="p">,</span> <span class="o">-</span><span class="n">Ω</span><span class="o">*</span><span class="n">sinΩlat</span><span class="o">*</span><span class="n">sinΩlon</span><span class="p">,</span> <span class="n">cosΩlat</span><span class="o">*</span><span class="n">sinΩlon</span><span class="p">],</span>
+                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ω</span><span class="o">*</span><span class="n">cosΩlat</span><span class="p">,</span> <span class="n">sinΩlat</span><span class="p">]])</span>
+        <span class="n">rotation_covariance</span> <span class="o">=</span> <span class="n">jac</span> <span class="o">@</span> <span class="n">euler_pole_covariance</span> <span class="o">@</span> <span class="n">jac</span><span class="o">.</span><span class="n">T</span>
+    <span class="c1"># return</span>
+    <span class="k">if</span> <span class="n">euler_pole_covariance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotation_vector</span></div>
+
+
+<div class="viewcode-block" id="R_ecef2enu"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.R_ecef2enu">[docs]</a><span class="k">def</span> <span class="nf">R_ecef2enu</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the rotation matrix used to express a vector written in ECEF (XYZ)</span>
+<span class="sd">    coordinates as a vector written in local east, north, up (ENU) coordinates</span>
+<span class="sd">    at the position defined by geodetic latitude and longitude. See Chapter 4</span>
+<span class="sd">    and Appendix 4.A in [misraenge2010]_ for details.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lon : float</span>
+<span class="sd">        Longitude [°] of vector position.</span>
+<span class="sd">    lat : float</span>
+<span class="sd">        Latitude [°] of vector position.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        The 3-by-3 rotation matrix.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    R_enu2ecef : The inverse matrix.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [misraenge2010] Misra, P., &amp; Enge, P. (2010),</span>
+<span class="sd">       *Global Positioning System: Signals, Measurements, and Performance*,</span>
+<span class="sd">       Lincoln, Mass: Ganga-Jamuna Press.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lon</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input longitude &amp; latitude are not convertible to scalars &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;(got </span><span class="si">{</span><span class="n">lon</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">lat</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+                     <span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)],</span>
+                     <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)]])</span></div>
+
+
+<div class="viewcode-block" id="R_enu2ecef"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.R_enu2ecef">[docs]</a><span class="k">def</span> <span class="nf">R_enu2ecef</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the rotation matrix used to express a vector written in local ENU</span>
+<span class="sd">    coordinates as a vector written ECEF (XYZ) coordinates at the position defined</span>
+<span class="sd">    by geodetic latitude and longitude. This is the transpose of the rotation matrix</span>
+<span class="sd">    computed by :func:`~disstans.tools.R_ecef2enu`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lon : float</span>
+<span class="sd">        Longitude [°] of vector position.</span>
+<span class="sd">    lat : float</span>
+<span class="sd">        Latitude [°] of vector position.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        The 3-by-3 rotation matrix.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    R_ecef2enu : The inverse matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">R_ecef2enu</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
 
 
 <div class="viewcode-block" id="RINEXDataHolding"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.RINEXDataHolding">[docs]</a><span class="k">class</span> <span class="nc">RINEXDataHolding</span><span class="p">():</span>

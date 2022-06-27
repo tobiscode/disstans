@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -82,6 +83,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -123,6 +125,19 @@
 <li class="toctree-l3"><a class="reference internal" href="examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -130,7 +145,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -210,13 +224,20 @@
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>

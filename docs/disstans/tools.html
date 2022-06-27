@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tools &mdash; DISSTANS 1.0.2 documentation</title>
@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -82,6 +83,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -123,6 +125,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -130,7 +145,6 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -210,13 +224,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#weighted-median">weighted_median</a></li>
 </ul>
@@ -259,14 +280,14 @@
            <div itemprop="articleBody">
              
   <section id="module-disstans.tools">
-<span id="tools"></span><h1>Tools<a class="headerlink" href="#module-disstans.tools" title="Permalink to this headline"></a></h1>
+<span id="tools"></span><h1>Tools<a class="headerlink" href="#module-disstans.tools" title="Permalink to this heading"></a></h1>
 <p>This module contains helper functions and classes that are not dependent on
 any of DISSTANS’s classes.</p>
 <p>For more specialized processing functions, see <a class="reference internal" href="processing.html#module-disstans.processing" title="disstans.processing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">processing</span></code></a>.</p>
 <section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <section id="block-permutation">
-<h3>block_permutation<a class="headerlink" href="#block-permutation" title="Permalink to this headline"></a></h3>
+<h3>block_permutation<a class="headerlink" href="#block-permutation" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.block_permutation">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">block_permutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_outer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_inner</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#block_permutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.block_permutation" title="Permalink to this definition"></a></dt>
@@ -276,19 +297,19 @@ individual <code class="docutils literal notranslate"><span class="pre">n_inner<
 individual <code class="docutils literal notranslate"><span class="pre">n_outer</span></code>-sized blocks.</p>
 <p>Transposing the result is equivalent to calling this function with swapped arguments.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_outer</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of sub-matrices.</p></li>
-<li><p><strong>n_inner</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Size of the individual sub-matrices.</p></li>
+<li><p><strong>n_outer</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of sub-matrices.</p></li>
+<li><p><strong>n_inner</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Size of the individual sub-matrices.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>P</strong> – Square permutation matrix with dimensions
 <span class="math notranslate nohighlight">\(n = \text{n_outer} * \text{n_inner}\)</span>.
 To permute a matrix <span class="math notranslate nohighlight">\(A\)</span>, calculate <span class="math notranslate nohighlight">\(~P A P^T\)</span>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -315,7 +336,7 @@ To permute a matrix <span class="math notranslate nohighlight">\(A\)</span>, cal
 
 </section>
 <section id="cov2corr">
-<h3>cov2corr<a class="headerlink" href="#cov2corr" title="Permalink to this headline"></a></h3>
+<h3>cov2corr<a class="headerlink" href="#cov2corr" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.cov2corr">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">cov2corr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#cov2corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.cov2corr" title="Permalink to this definition"></a></dt>
@@ -323,43 +344,43 @@ To permute a matrix <span class="math notranslate nohighlight">\(A\)</span>, cal
 matrix, taking into account zero-valued variances and setting the
 respective correlation entries to NaN.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>cov</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Covariance matrix.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cov</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Covariance matrix.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>corr</strong> – Correlation matrix.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </section>
 <section id="create-powerlaw-noise">
-<h3>create_powerlaw_noise<a class="headerlink" href="#create-powerlaw-noise" title="Permalink to this headline"></a></h3>
+<h3>create_powerlaw_noise<a class="headerlink" href="#create-powerlaw-noise" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.create_powerlaw_noise">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">create_powerlaw_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#create_powerlaw_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.create_powerlaw_noise" title="Permalink to this definition"></a></dt>
 <dd><p>Creates synthetic noise according to a Power Law model <a class="reference internal" href="#langbein04" id="id1"><span>[langbein04]</span></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Number of (equally-spaced) noise samples of the output noise array or
+<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a>) – Number of (equally-spaced) noise samples of the output noise array or
 a shape where the first entry defines the number of noise samples for
 the remaining dimensions.</p></li>
-<li><p><strong>exponent</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Exponent of the power law noise model.
+<li><p><strong>exponent</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Exponent of the power law noise model.
 E.g. <code class="docutils literal notranslate"><span class="pre">0</span></code> corresponds to white (Gaussian) noise, <code class="docutils literal notranslate"><span class="pre">1</span></code> to flicker (pink)
 noise, and <code class="docutils literal notranslate"><span class="pre">2</span></code> to random walk (red, Brownian) noise.</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v1.20)"><em>numpy.random.Generator</em></a><em>, </em><em>optional</em>) – Pass an initial seed to the random number generator, or pass
-a <a class="reference external" href="https://numpy.org/doc/1.20/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a> instance.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v1.22)"><em>numpy.random.Generator</em></a><em>, </em><em>optional</em>) – Pass an initial seed to the random number generator, or pass
+a <a class="reference external" href="https://numpy.org/doc/1.22/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a> instance.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Noise output array.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -367,24 +388,26 @@ a <a class="reference external" href="https://numpy.org/doc/1.20/reference/rando
 generate the noise, and Felix Patzelt’s <a class="reference external" href="https://github.com/felixpatzelt/colorednoise">colorednoise</a> code to calculate
 the theoretical standard deviation.</p>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="langbein04"><span class="brackets"><a class="fn-backref" href="#id1">langbein04</a></span></dt>
-<dd><p>Langbein, J. (2004),
+<div role="list" class="citation-list">
+<div class="citation" id="langbein04" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">langbein04</a><span class="fn-bracket">]</span></span>
+<p>Langbein, J. (2004),
 <em>Noise in two‐color electronic distance meter measurements revisited</em>,
 J. Geophys. Res., 109, B04406,
 doi:<a class="reference external" href="https://doi.org/10.1029/2003JB002819">10.1029/2003JB002819</a>.</p>
-</dd>
-<dt class="label" id="timmerkoenig95"><span class="brackets"><a class="fn-backref" href="#id2">timmerkoenig95</a></span></dt>
-<dd><p>Timmer, J.; König, M. (1995),
+</div>
+<div class="citation" id="timmerkoenig95" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">timmerkoenig95</a><span class="fn-bracket">]</span></span>
+<p>Timmer, J.; König, M. (1995),
 <em>On generating power law noise</em>,
 Astronomy and Astrophysics, v.300, p.707.</p>
-</dd>
-</dl>
+</div>
+</div>
 </dd></dl>
 
 </section>
 <section id="date2decyear">
-<h3>date2decyear<a class="headerlink" href="#date2decyear" title="Permalink to this headline"></a></h3>
+<h3>date2decyear<a class="headerlink" href="#date2decyear" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.date2decyear">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">date2decyear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#date2decyear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.date2decyear" title="Permalink to this definition"></a></dt>
@@ -392,22 +415,22 @@ Astronomy and Astrophysics, v.300, p.707.</p>
 to decimal years, assuming all years have 365.25 years (JPL convention for
 GIPSY timeseries, also used by UNR NGL).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dates</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><em>pandas.DatetimeIndex</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><em>datetime.datetime</em></a>) – Input date(s). If a Series, needs to be a series of Timestamp-convertible
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dates</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime.datetime</em></a>) – Input date(s). If a Series, needs to be a series of Timestamp-convertible
 data types.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Date(s) as sorted decimal year(s).</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </section>
 <section id="download-unr-data">
-<h3>download_unr_data<a class="headerlink" href="#download-unr-data" title="Permalink to this headline"></a></h3>
+<h3>download_unr_data<a class="headerlink" href="#download-unr-data" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.download_unr_data">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">download_unr_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_list_or_bbox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'final'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'24h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_solutions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#download_unr_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.download_unr_data" title="Permalink to this definition"></a></dt>
@@ -418,38 +441,38 @@ downloaded as well).</p>
 <p>Files will only be downloaded if there is no matching file already present,
 or the remote file is newer than the local one.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>station_list_or_bbox</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Defines which stations to look for data and download.
+<li><p><strong>station_list_or_bbox</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Defines which stations to look for data and download.
 It can be either a list of station names (list of strings), a list of bounding
 box coordinates (the four floats <code class="docutils literal notranslate"><span class="pre">[lon_min,</span> <span class="pre">lon_max,</span> <span class="pre">lat_min,</span> <span class="pre">lat_max]</span></code>
 in degrees), or a three-element list defining a circle (location in degrees
 and radius in kilometers <code class="docutils literal notranslate"><span class="pre">[center_lon,</span> <span class="pre">center_lat,</span> <span class="pre">radius]</span></code>).</p></li>
-<li><p><strong>data_dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Folder for data.</p></li>
-<li><p><strong>solution</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Which timeseries solution to download. Possible values are <code class="docutils literal notranslate"><span class="pre">'final'</span></code>,
+<li><p><strong>data_dir</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Folder for data.</p></li>
+<li><p><strong>solution</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Which timeseries solution to download. Possible values are <code class="docutils literal notranslate"><span class="pre">'final'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'rapid'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ultra'</span></code>. See the Notes for approximate latency times.
 Defaults to <code class="docutils literal notranslate"><span class="pre">'final'</span></code>.</p></li>
-<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Which sample rate to download. Possible values are <code class="docutils literal notranslate"><span class="pre">'24h'</span></code> and
+<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Which sample rate to download. Possible values are <code class="docutils literal notranslate"><span class="pre">'24h'</span></code> and
 <code class="docutils literal notranslate"><span class="pre">'5min'</span></code>. See the Notes for a table of which rates are available for each
 solution. Defaults to <code class="docutils literal notranslate"><span class="pre">'24h'</span></code>.</p></li>
-<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The UNR abbreviation for the reference frame in which to download the data.
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The UNR abbreviation for the reference frame in which to download the data.
 Applies only for daily sample rates and final or rapid orbit solutions.
 Defaults to <code class="docutils literal notranslate"><span class="pre">'IGS14'</span></code>.</p></li>
-<li><p><strong>min_solutions</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Only consider stations with at least a certain number of all-time solutions
+<li><p><strong>min_solutions</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Only consider stations with at least a certain number of all-time solutions
 according to the station list file.
 Defaults to <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
-<li><p><strong>t_min</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Only consider stations that have data on or after <code class="docutils literal notranslate"><span class="pre">t_min</span></code>.</p></li>
-<li><p><strong>t_max</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Only consider stations that have data on or before <code class="docutils literal notranslate"><span class="pre">t_max</span></code>.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (dault: <code class="docutils literal notranslate"><span class="pre">False</span></code>), individual actions are printed.</p></li>
-<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>t_min</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Only consider stations that have data on or after <code class="docutils literal notranslate"><span class="pre">t_min</span></code>.</p></li>
+<li><p><strong>t_max</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Only consider stations that have data on or before <code class="docutils literal notranslate"><span class="pre">t_max</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (dault: <code class="docutils literal notranslate"><span class="pre">False</span></code>), individual actions are printed.</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>stations</strong> – A DataFrame, built from UNR’s data holding list, subset to the stations
 actually selected for download.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)">pandas.DataFrame</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)">pandas.DataFrame</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -458,12 +481,6 @@ Note that not all stations are equipped to provide all data types.
 Furthermore, only the daily files will be available in a plate
 reference frame.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 30%" />
-<col style="width: 18%" />
-<col style="width: 20%" />
-<col style="width: 32%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>orbit solutions</p></th>
 <th class="head"><p>24 hours</p></th>
@@ -498,13 +515,14 @@ this script does not rename files or change the folder structure that it finds
 on UNR’s servers.</p>
 </div>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="blewitt18"><span class="brackets"><a class="fn-backref" href="#id3">blewitt18</a></span></dt>
-<dd><p>Blewitt, G., Hammond, W., &amp; Kreemer, C. (2018).
+<div role="list" class="citation-list">
+<div class="citation" id="blewitt18" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">blewitt18</a><span class="fn-bracket">]</span></span>
+<p>Blewitt, G., Hammond, W., &amp; Kreemer, C. (2018).
 <em>Harnessing the GPS Data Explosion for Interdisciplinary Science</em>. Eos, 99.
 doi:<a class="reference external" href="https://doi.org/10.1029/2018EO104623">10.1029/2018EO104623</a></p>
-</dd>
-</dl>
+</div>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
@@ -515,8 +533,117 @@ doi:<a class="reference external" href="https://doi.org/10.1029/2018EO104623">10
 </dd></dl>
 
 </section>
+<section id="estimate-euler-pole">
+<h3>estimate_euler_pole<a class="headerlink" href="#estimate-euler-pole" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.estimate_euler_pole">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">estimate_euler_pole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#estimate_euler_pole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.estimate_euler_pole" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate a best-fit Euler pole assuming all velocities lie on the same
+rigid plate on a sphere. The calculations are based on <a class="reference internal" href="#goudarzi14" id="id4"><span>[goudarzi14]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locations</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_stations}, \text{num_components})\)</span>
+containing the locations of each station (observation), where
+<span class="math notranslate nohighlight">\(\text{num_components}=2\)</span> if the locations are given by longitudes and
+latitudes [°] (<code class="docutils literal notranslate"><span class="pre">enu=True</span></code>, default) or <span class="math notranslate nohighlight">\(\text{num_components}=3\)</span>
+if the locations are given in the cartesian Earth-Centered, Earth-Fixed
+(ECEF) reference frame [m] (<code class="docutils literal notranslate"><span class="pre">enu=False</span></code>).</p></li>
+<li><p><strong>velocities</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_stations}, \text{num_components})\)</span>
+containing the velocities [m/time] at different stations (observations), where
+<span class="math notranslate nohighlight">\(\text{num_components}=2\)</span> if the velocities are given in the
+East-North local geodetic reference frame (<code class="docutils literal notranslate"><span class="pre">enu=True</span></code>, default) or
+<span class="math notranslate nohighlight">\(\text{num_components}=3\)</span> if the velocities are given in the cartesian
+Earth-Centered, Earth-Fixed (ECEF) reference frame (<code class="docutils literal notranslate"><span class="pre">enu=False</span></code>).</p></li>
+<li><p><strong>covariances</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Array containing the (co)variances of the velocities [m^2/time^2], allowing for
+different input shapes depending on what uncertainties are available.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), all observations are weighted equally.
+If <code class="docutils literal notranslate"><span class="pre">enu=True</span></code>, the array should have shape <span class="math notranslate nohighlight">\((\text{num_stations}, 2)\)</span>
+if only variances are present, <span class="math notranslate nohighlight">\((\text{num_stations}, 3)\)</span> if also
+the covariances are present but are given as a column, or
+<span class="math notranslate nohighlight">\((\text{num_stations}, 2, 2)\)</span> if the <span class="math notranslate nohighlight">\(2 \times 2`covariance
+matrix is given for each observation.
+If ``enu=False`\)</span>, the arrays should be of shapes
+<span class="math notranslate nohighlight">\((\text{num_stations}, 3)\)</span>, <span class="math notranslate nohighlight">\((\text{num_stations}, 6)\)</span>,
+or <span class="math notranslate nohighlight">\((\text{num_stations}, 3, 3)\)</span>, respectively.</p></li>
+<li><p><strong>enu</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – See <code class="docutils literal notranslate"><span class="pre">locations</span></code> and <code class="docutils literal notranslate"><span class="pre">velocities</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>rotation_vector</strong> (<em>numpy.ndarray</em>) – Rotation vector [rad/time] containing the diagonals of the <span class="math notranslate nohighlight">\(3 \times 3\)</span>
+rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</p></li>
+<li><p><strong>rotation_covariance</strong> (<em>numpy.ndarray</em>) – Formal <span class="math notranslate nohighlight">\(3 \times 3\)</span> covariance matrix [rad^2/time^2] of the rotation vector.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The ENU solution assumes a spherical Earth with radius 6378137 meters.</p>
+<p>If the covariances are given in columns, the formatting of
+<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> is being used.</p>
+<p>Contrary to <a class="reference internal" href="#goudarzi14" id="id5"><span>[goudarzi14]</span></a>, the estimated covariance matrix is not scaled by the a
+posteriori sigma, to match the covariance definition throughout the rest of DISSTANS.
+The time unit is also not assumed to be in years, and then scaled to millions
+of years.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#disstans.tools.rotvec2eulerpole" title="disstans.tools.rotvec2eulerpole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotvec2eulerpole</span></code></a></dt><dd><p>Convert the rotation vector into an Euler pole and magnitude.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="goudarzi14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>goudarzi14<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id6">3</a>,<a role="doc-backlink" href="#id9">4</a>)</span>
+<p>Goudarzi, M. A., Cocard, M., &amp; Santerre, R. (2014),
+<em>EPC: Matlab software to estimate Euler pole parameters</em>,
+GPS Solutions, 18(1), 153–162,
+doi:<a class="reference external" href="https://doi.org/10.1007/s10291-013-0354-4">10.1007/s10291-013-0354-4</a>.</p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="eulerpole2rotvec">
+<h3>eulerpole2rotvec<a class="headerlink" href="#eulerpole2rotvec" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.eulerpole2rotvec">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">eulerpole2rotvec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">euler_pole</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">euler_pole_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#eulerpole2rotvec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.eulerpole2rotvec" title="Permalink to this definition"></a></dt>
+<dd><p>Convert an Euler pole (and optionally, its formal covariance) into a rotation
+vector and associated covariance matrix. Based on <a class="reference internal" href="#goudarzi14" id="id6"><span>[goudarzi14]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>euler_pole</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – NumPy Array containing the longitude [rad], latitude [rad], and rotation
+rate [rad/time] of the Euler pole.</p></li>
+<li><p><strong>euler_pole_covariance</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – If <code class="docutils literal notranslate"><span class="pre">rotation_covariance</span></code> was given, the propagated uncertainty for the Euler
+Pole for all three components.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>rotation_vector</strong> (<em>numpy.ndarray</em>) – Rotation vector [rad/time] containing the diagonals of the <span class="math notranslate nohighlight">\(3 \times 3\)</span>
+rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</p></li>
+<li><p><strong>rotation_covariance</strong> (<em>numpy.ndarray</em>) – Formal <span class="math notranslate nohighlight">\(3 \times 3\)</span> covariance matrix [rad^2/time^2] of the rotation vector.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#disstans.tools.rotvec2eulerpole" title="disstans.tools.rotvec2eulerpole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotvec2eulerpole</span></code></a></dt><dd><p>Inverse function</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
 <section id="full-cov-mat-to-columns">
-<h3>full_cov_mat_to_columns<a class="headerlink" href="#full-cov-mat-to-columns" title="Permalink to this headline"></a></h3>
+<h3>full_cov_mat_to_columns<a class="headerlink" href="#full-cov-mat-to-columns" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.full_cov_mat_to_columns">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">full_cov_mat_to_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_single</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#full_cov_mat_to_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.full_cov_mat_to_columns" title="Permalink to this definition"></a></dt>
@@ -530,18 +657,18 @@ neighboring rows/columns (i.e. the first parameter or observation occupies the
 first <code class="docutils literal notranslate"><span class="pre">num_components</span></code> rows/columns, the second one the second <code class="docutils literal notranslate"><span class="pre">num_components</span></code>
 rows/columns, etc.).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cov_mat</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Square array with dimensions <span class="math notranslate nohighlight">\(\text{num_elements} * \text{num_components}\)</span>
+<li><p><strong>cov_mat</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Square array with dimensions <span class="math notranslate nohighlight">\(\text{num_elements} * \text{num_components}\)</span>
 where <span class="math notranslate nohighlight">\(\text{num_elements}\)</span> is the number of elements (e.g. observations
 or parameters) in each of the <span class="math notranslate nohighlight">\(\text{num_components}\)</span> dimensions.</p></li>
-<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of components <cite>cov_mat</cite> contains.</p></li>
-<li><p><strong>include_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, also extract the off-diagonal covariances of each element between
+<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of components <cite>cov_mat</cite> contains.</p></li>
+<li><p><strong>include_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, also extract the off-diagonal covariances of each element between
 its components. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>, i.e. only the diagonal covariances.</p></li>
-<li><p><strong>return_single</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), return two arrays; if <code class="docutils literal notranslate"><span class="pre">True</span></code>, concatenate the two.</p></li>
+<li><p><strong>return_single</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), return two arrays; if <code class="docutils literal notranslate"><span class="pre">True</span></code>, concatenate the two.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>variance</strong> (<em>numpy.ndarray</em>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_elements}, \text{num_components})\)</span>.
 If <code class="docutils literal notranslate"><span class="pre">include_covariance=True</span></code> and <code class="docutils literal notranslate"><span class="pre">return_single=True</span></code>, this array
@@ -558,22 +685,22 @@ columns instead.</p></li>
 
 </section>
 <section id="get-cov-dims">
-<h3>get_cov_dims<a class="headerlink" href="#get-cov-dims" title="Permalink to this headline"></a></h3>
+<h3>get_cov_dims<a class="headerlink" href="#get-cov-dims" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.get_cov_dims">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">get_cov_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#get_cov_dims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.get_cov_dims" title="Permalink to this definition"></a></dt>
 <dd><p>Given a number of components, return the number of covariances that
 exist between the components.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of components of timeseries or model.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of components of timeseries or model.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of covariances, calculated as
 <span class="math notranslate nohighlight">\(\text{num_components}*(\text{num_components}-1))/2\)</span>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -587,7 +714,7 @@ exist between the components.</p>
 
 </section>
 <section id="make-cov-index-map">
-<h3>make_cov_index_map<a class="headerlink" href="#make-cov-index-map" title="Permalink to this headline"></a></h3>
+<h3>make_cov_index_map<a class="headerlink" href="#make-cov-index-map" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.make_cov_index_map">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">make_cov_index_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#make_cov_index_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.make_cov_index_map" title="Permalink to this definition"></a></dt>
@@ -595,12 +722,12 @@ exist between the components.</p>
 of where covariance columns present in a timeseries’ or model’s 2D dataframe
 will show in the covariance matrix of a single observation or parameter.
 Also provides the ordering in a 1D array which can be used together with
-<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.reshape.html#numpy.reshape" title="(in NumPy v1.20)"><code class="xref py py-func docutils literal notranslate"><span class="pre">reshape()</span></code></a> to create the varaiance-covariance matrix from the columns.</p>
+<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.reshape.html#numpy.reshape" title="(in NumPy v1.22)"><code class="xref py py-func docutils literal notranslate"><span class="pre">reshape()</span></code></a> to create the varaiance-covariance matrix from the columns.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of components of timeseries or model.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of components of timeseries or model.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>index_map</strong> (<em>numpy.ndarray</em>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_components}, \text{num_components})\)</span>
 that is NaN everywhere except in the upper triangle, where integer numbers
@@ -657,7 +784,7 @@ observation, we use <code class="docutils literal notranslate"><span class="pre"
 
 </section>
 <section id="get-cov-indices">
-<h3>get_cov_indices<a class="headerlink" href="#get-cov-indices" title="Permalink to this headline"></a></h3>
+<h3>get_cov_indices<a class="headerlink" href="#get-cov-indices" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.get_cov_indices">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">get_cov_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icomp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#get_cov_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.get_cov_indices" title="Permalink to this definition"></a></dt>
@@ -665,19 +792,19 @@ observation, we use <code class="docutils literal notranslate"><span class="pre"
 of a timeseries or model that are associated with that component.
 Exactly one of <code class="docutils literal notranslate"><span class="pre">index_map</span></code> or <code class="docutils literal notranslate"><span class="pre">num_components</span></code> must be provided as input.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>icomp</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Index of the component.</p></li>
-<li><p><strong>index_map</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Output of <a class="reference internal" href="#disstans.tools.make_cov_index_map" title="disstans.tools.make_cov_index_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_cov_index_map()</span></code></a>.</p></li>
-<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of components of timeseries or model. (Function will call
+<li><p><strong>icomp</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Index of the component.</p></li>
+<li><p><strong>index_map</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Output of <a class="reference internal" href="#disstans.tools.make_cov_index_map" title="disstans.tools.make_cov_index_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_cov_index_map()</span></code></a>.</p></li>
+<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of components of timeseries or model. (Function will call
 <a class="reference internal" href="#disstans.tools.make_cov_index_map" title="disstans.tools.make_cov_index_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_cov_index_map()</span></code></a> to get <code class="docutils literal notranslate"><span class="pre">index_map</span></code>.)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>List of integer covariance column indices associated with <code class="docutils literal notranslate"><span class="pre">icomp</span></code>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -692,8 +819,69 @@ covariance dataframe, this corresponds to the following columns:</p>
 </dd></dl>
 
 </section>
+<section id="get-hom-vel-strain-rot">
+<h3>get_hom_vel_strain_rot<a class="headerlink" href="#get-hom-vel-strain-rot" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.get_hom_vel_strain_rot">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">get_hom_vel_strain_rot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">utmzone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#get_hom_vel_strain_rot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.get_hom_vel_strain_rot" title="Permalink to this definition"></a></dt>
+<dd><p>For a set of horizontal velocities on a 2D cartesian grid, estimate the
+best-fit displacement gradient matrix to calculate a homogenous velocity
+field characterized by a single translation vector, strain tensor, and
+rotation tensor. See <a class="reference internal" href="#tape09" id="id7"><span>[tape09]</span></a> for an introduction.</p>
+<p>This function uses a local approximation to the spherical Earth by
+converting all station locations into a suitable UTM zone, and only
+considering the horizontal velocities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>locations</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_stations}, 2)\)</span> containing the
+longitude and latitude [°] of the observations (stations).</p></li>
+<li><p><strong>velocities</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_stations}, 2)\)</span> containing the
+East and North velocities [m/time] of the observations</p></li>
+<li><p><strong>covariances</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Array of shape <span class="math notranslate nohighlight">\((\text{num_stations}, 2)\)</span> containing the
+variances in the East and North velocities [m^2/time^2]. Alternatively,
+array of shape <span class="math notranslate nohighlight">\((\text{num_stations}, 3)\)</span> additionally
+containing the East-North covariance [m2/time^2].</p></li>
+<li><p><strong>utmzome</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – If provided, the UTM zone to use for the horizontal approximation.
+By default (<code class="docutils literal notranslate"><span class="pre">None</span></code>), the average longitude will be calculated, and the
+respective UTM zone will be used.</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Reference station to be used by the calculation. This can be either a
+longitude-latitude [°] list, or the index of the reference station in
+<code class="docutils literal notranslate"><span class="pre">locations</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>v_O</strong> (<em>numpy.ndarray</em>) – Velocity of the origin <span class="math notranslate nohighlight">\(\mathbf{v}_O\)</span>.</p></li>
+<li><p><strong>epsilon</strong> (<em>numpy.ndarray</em>) – <span class="math notranslate nohighlight">\(2 \times 2\)</span> strain tensor <span class="math notranslate nohighlight">\(\mathbf{\varepsilon}\)</span>.</p></li>
+<li><p><strong>omega</strong> (<em>numpy.ndarray</em>) – <span class="math notranslate nohighlight">\(2 \times 2\)</span> rotation tensor <span class="math notranslate nohighlight">\(\mathbf{\omega}\)</span>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#disstans.tools.strain_rotation_invariants" title="disstans.tools.strain_rotation_invariants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strain_rotation_invariants</span></code></a></dt><dd><p>For calculation of invariants of the tensors.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="tape09" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>tape09<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id7">1</a>,<a role="doc-backlink" href="#id10">2</a>)</span>
+<p>Tape, C., Musé, P., Simons, M., Dong, D., &amp; Webb, F. (2009),
+<em>Multiscale estimation of GPS velocity fields</em>,
+Geophysical Journal International, 179(2), 945–971,
+doi:<a class="reference external" href="https://doi.org/10.1111/j.1365-246X.2009.04337.x">10.1111/j.1365-246X.2009.04337.x</a>.</p>
+</div>
+</div>
+</dd></dl>
+
+</section>
 <section id="parallelize">
-<h3>parallelize<a class="headerlink" href="#parallelize" title="Permalink to this headline"></a></h3>
+<h3>parallelize<a class="headerlink" href="#parallelize" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.parallelize">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">parallelize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#parallelize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.parallelize" title="Permalink to this definition"></a></dt>
@@ -707,7 +895,7 @@ in its routines (you can check this by running some very large and time-consumin
 math, and monitoring the usage of your processors). Just using multiple Python
 threads will give the default number of threads to all new Python threads,
 completely overloading the system since it’s now out of processors, slowing
-down the computations by a lot. The Python <a class="reference external" href="https://docs.python.org/3.9/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>
+down the computations by a lot. The Python <a class="reference external" href="https://docs.python.org/3.10/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.10)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>
 module does not change these settings, since it is apparently hard to guess which backend
 NumPy uses, see <a class="reference external" href="https://github.com/numpy/numpy/issues/11826">this thread on GitHub</a>.
 So, it is sadly currently up to the user to disable this behavior when using
@@ -720,18 +908,18 @@ make sure the settings and the rest of the script are encapsulated in the standa
 <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span> <span class="pre">...</span></code> clause.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<em>function</em>) – Function to wrap, can only have a single input argument.</p></li>
 <li><p><strong>iterable</strong> (<em>iterable</em>) – Iterable object (list, generator expression, etc.) that contains all the
 arguments that <code class="docutils literal notranslate"><span class="pre">func</span></code> should be called with.</p></li>
-<li><p><strong>num_threads</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of threads to use. Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> if no parallelization is desired.
+<li><p><strong>num_threads</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Number of threads to use. Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> if no parallelization is desired.
 Defaults to the value in <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>.</p></li>
-<li><p><strong>chunksize</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Chunk size used in the parallelization pool, see
-<a class="reference external" href="https://docs.python.org/3.9/library/multiprocessing.html#multiprocessing.pool.Pool.imap" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imap()</span></code></a>.</p></li>
+<li><p><strong>chunksize</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Chunk size used in the parallelization pool, see
+<a class="reference external" href="https://docs.python.org/3.10/library/multiprocessing.html#multiprocessing.pool.Pool.imap" title="(in Python v3.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imap()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields</dt>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>result</em> – Whenever a result is calculated, return it.</p>
 </dd>
 </dl>
@@ -763,7 +951,7 @@ Defaults to the value in <a class="reference internal" href="config.html#disstan
 
 </section>
 <section id="parse-maintenance-table">
-<h3>parse_maintenance_table<a class="headerlink" href="#parse-maintenance-table" title="Permalink to this headline"></a></h3>
+<h3>parse_maintenance_table<a class="headerlink" href="#parse-maintenance-table" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.parse_maintenance_table">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">parse_maintenance_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csvpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sitecol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datecols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">siteformatter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codecol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#parse_maintenance_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.parse_maintenance_table" title="Permalink to this definition"></a></dt>
@@ -771,26 +959,26 @@ Defaults to the value in <a class="reference internal" href="config.html#disstan
 a list of step times for each station. It also provides an interface to ignore
 certain maintenance codes (if present), and modify the site names when loading.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>csvpath</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path of the file to load.</p></li>
-<li><p><strong>sitecol</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Column index of the station names.</p></li>
-<li><p><strong>datecols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of indices that contain the ingredients to convert the input to a valid
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a>. It should fail gracefully, i.e. return a string
+<li><p><strong>csvpath</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path of the file to load.</p></li>
+<li><p><strong>sitecol</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Column index of the station names.</p></li>
+<li><p><strong>datecols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of indices that contain the ingredients to convert the input to a valid
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a>. It should fail gracefully, i.e. return a string
 if Pandas cannot interpret the column(s) appropriately.</p></li>
 <li><p><strong>siteformatter</strong> (<em>function</em><em>, </em><em>optional</em>) – Function that will be called element-wise on the loaded station names to
 produce the output station names.</p></li>
-<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter character for the input file.</p></li>
-<li><p><strong>codecol</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Column index of the maintenance code.</p></li>
-<li><p><strong>exclude</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Maintenance records that exactly match an element in <code class="docutils literal notranslate"><span class="pre">exclude</span></code> will be ignored.
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter character for the input file.</p></li>
+<li><p><strong>codecol</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Column index of the maintenance code.</p></li>
+<li><p><strong>exclude</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Maintenance records that exactly match an element in <code class="docutils literal notranslate"><span class="pre">exclude</span></code> will be ignored.
 <code class="docutils literal notranslate"><span class="pre">codecol</span></code> has to be set.</p></li>
-<li><p><strong>include</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Only maintenance records that include an element of <code class="docutils literal notranslate"><span class="pre">include</span></code> will be used.
+<li><p><strong>include</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Only maintenance records that include an element of <code class="docutils literal notranslate"><span class="pre">include</span></code> will be used.
 No exact match is required.
 <code class="docutils literal notranslate"><span class="pre">codecol</span></code> has to be set.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print loading information.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print loading information.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>maint_table</strong> (<em>pandas.DataFrame</em>) – Parsed maintenance table.</p></li>
 <li><p><strong>maint_dict</strong> (<em>dict</em>) – Dictionary of that maps the station names to a list of steptimes.</p></li>
@@ -799,14 +987,14 @@ No exact match is required.
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>If running into problems, also consult the Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.read_csv.html#pandas.read_csv" title="(in pandas v1.2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_csv()</span></code></a>
-function (used to load the <code class="docutils literal notranslate"><span class="pre">csvpath</span></code> file) and <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>
+<p>If running into problems, also consult the Pandas <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.read_csv.html#pandas.read_csv" title="(in pandas v1.4.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_csv()</span></code></a>
+function (used to load the <code class="docutils literal notranslate"><span class="pre">csvpath</span></code> file) and <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>
 (object on which the filtering happens).</p>
 </dd></dl>
 
 </section>
 <section id="parse-unr-steps">
-<h3>parse_unr_steps<a class="headerlink" href="#parse-unr-steps" title="Permalink to this headline"></a></h3>
+<h3>parse_unr_steps<a class="headerlink" href="#parse-unr-steps" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.parse_unr_steps">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">parse_unr_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#parse_unr_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.parse_unr_steps" title="Permalink to this definition"></a></dt>
@@ -816,15 +1004,15 @@ If a newer step file is found online, the local copy is updated.</p>
 <p>See <a class="reference internal" href="#disstans.tools.download_unr_data" title="disstans.tools.download_unr_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">download_unr_data()</span></code></a> for more information about UNR’s dataset, as well as
 how to access and cite it.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the step file.</p></li>
-<li><p><strong>check_update</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), check UNR’s server for an updated step file.</p></li>
-<li><p><strong>only_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – If specified, a list of station IDs. Other stations are not included in the output.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>) print actions.</p></li>
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the step file.</p></li>
+<li><p><strong>check_update</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), check UNR’s server for an updated step file.</p></li>
+<li><p><strong>only_stations</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – If specified, a list of station IDs. Other stations are not included in the output.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>) print actions.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>maint_table</strong> (<em>pandas.DataFrame</em>) – Parsed maintenance table.</p></li>
 <li><p><strong>maint_dict</strong> (<em>dict</em>) – Dictionary of that maps the station names to a list of maintenance steptimes.</p></li>
@@ -837,61 +1025,207 @@ how to access and cite it.</p>
 </dd></dl>
 
 </section>
+<section id="r-ecef2enu">
+<h3>R_ecef2enu<a class="headerlink" href="#r-ecef2enu" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.R_ecef2enu">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">R_ecef2enu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#R_ecef2enu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.R_ecef2enu" title="Permalink to this definition"></a></dt>
+<dd><p>Generate the rotation matrix used to express a vector written in ECEF (XYZ)
+coordinates as a vector written in local east, north, up (ENU) coordinates
+at the position defined by geodetic latitude and longitude. See Chapter 4
+and Appendix 4.A in <a class="reference internal" href="#misraenge2010" id="id8"><span>[misraenge2010]</span></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Longitude [°] of vector position.</p></li>
+<li><p><strong>lat</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Latitude [°] of vector position.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The 3-by-3 rotation matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#disstans.tools.R_enu2ecef" title="disstans.tools.R_enu2ecef"><code class="xref py py-obj docutils literal notranslate"><span class="pre">R_enu2ecef</span></code></a></dt><dd><p>The inverse matrix.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="misraenge2010" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">misraenge2010</a><span class="fn-bracket">]</span></span>
+<p>Misra, P., &amp; Enge, P. (2010),
+<em>Global Positioning System: Signals, Measurements, and Performance</em>,
+Lincoln, Mass: Ganga-Jamuna Press.</p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="r-enu2ecef">
+<h3>R_enu2ecef<a class="headerlink" href="#r-enu2ecef" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.R_enu2ecef">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">R_enu2ecef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#R_enu2ecef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.R_enu2ecef" title="Permalink to this definition"></a></dt>
+<dd><p>Generate the rotation matrix used to express a vector written in local ENU
+coordinates as a vector written ECEF (XYZ) coordinates at the position defined
+by geodetic latitude and longitude. This is the transpose of the rotation matrix
+computed by <a class="reference internal" href="#disstans.tools.R_ecef2enu" title="disstans.tools.R_ecef2enu"><code class="xref py py-func docutils literal notranslate"><span class="pre">R_ecef2enu()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lon</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Longitude [°] of vector position.</p></li>
+<li><p><strong>lat</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Latitude [°] of vector position.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The 3-by-3 rotation matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#disstans.tools.R_ecef2enu" title="disstans.tools.R_ecef2enu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">R_ecef2enu</span></code></a></dt><dd><p>The inverse matrix.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="rotvec2eulerpole">
+<h3>rotvec2eulerpole<a class="headerlink" href="#rotvec2eulerpole" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.rotvec2eulerpole">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">rotvec2eulerpole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rotation_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#rotvec2eulerpole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.rotvec2eulerpole" title="Permalink to this definition"></a></dt>
+<dd><p>Convert a rotation vector containing the diagonals of a <span class="math notranslate nohighlight">\(3 \times 3\)</span>
+rotation matrix (and optionally, its formal covariance) into an Euler
+Pole and associated magnitude. Based on <a class="reference internal" href="#goudarzi14" id="id9"><span>[goudarzi14]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rotation_vector</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Rotation vector [rad/time] containing the diagonals of the <span class="math notranslate nohighlight">\(3 \times 3\)</span>
+rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</p></li>
+<li><p><strong>rotation_covariance</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Formal <span class="math notranslate nohighlight">\(3 \times 3\)</span> covariance matrix [rad^2/time^2] of the rotation vector.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>euler_pole</strong> (<em>numpy.ndarray</em>) – NumPy Array containing the longitude [rad], latitude [rad], and rotation
+rate [rad/time] of the Euler pole.</p></li>
+<li><p><strong>euler_pole_covariance</strong> (<em>numpy.ndarray</em>) – If <code class="docutils literal notranslate"><span class="pre">rotation_covariance</span></code> was given, the propagated uncertainty for the Euler
+Pole for all three components.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#disstans.tools.eulerpole2rotvec" title="disstans.tools.eulerpole2rotvec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eulerpole2rotvec</span></code></a></dt><dd><p>Inverse function</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="strain-rotation-invariants">
+<h3>strain_rotation_invariants<a class="headerlink" href="#strain-rotation-invariants" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="disstans.tools.strain_rotation_invariants">
+<span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">strain_rotation_invariants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#strain_rotation_invariants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.strain_rotation_invariants" title="Permalink to this definition"></a></dt>
+<dd><p>Given a strain (rate) and/or rotation (rate) tensor, calculate scalar
+invariant quantities of interest. See <a class="reference internal" href="#tape09" id="id10"><span>[tape09]</span></a> for an introduction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epsilon</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Strain (rate) tensor <span class="math notranslate nohighlight">\(\mathbf{\varepsilon}\)</span>.</p></li>
+<li><p><strong>omega</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Rotation (rate) tensor <span class="math notranslate nohighlight">\(\mathbf{\omega}\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>dilatation</strong> (<em>float</em>) – Only if <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> is provided. Scalar dilatation (rate) as defined
+by the first invariant of the strain (rate) tensor
+<span class="math notranslate nohighlight">\(\Theta = \text{Tr} \left( \mathbf{\varepsilon} \right)\)</span>.</p></li>
+<li><p><strong>strain</strong> (<em>float</em>) – Only if <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> is provided. Scalar strain (rate) as defined
+by the Frobenius norm of the strain (rate) tensor
+<span class="math notranslate nohighlight">\(\Sigma = \lVert \mathbf{\varepsilon} \rVert_F\)</span></p></li>
+<li><p><strong>shear</strong> (<em>float</em>) – Only if <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> is provided. Scalar shearing (rate) as defined
+by the square root of the second invariant of the deviatoric strain (rate) tensor
+<span class="math notranslate nohighlight">\(\text{T} = \sqrt{\frac{1}{2} \text{Tr}(\mathbf{\varepsilon}^2)
+- \frac{1}{6} \text{Tr}(\mathbf{\varepsilon})^2}\)</span>.</p></li>
+<li><p><strong>rotation</strong> (<em>float</em>) – Only if <code class="docutils literal notranslate"><span class="pre">omega</span></code> is provided. Scalar rotation (rate) as defined
+by <span class="math notranslate nohighlight">\(\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F\)</span>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="tvec-to-numpycol">
-<h3>tvec_to_numpycol<a class="headerlink" href="#tvec-to-numpycol" title="Permalink to this headline"></a></h3>
+<h3>tvec_to_numpycol<a class="headerlink" href="#tvec-to-numpycol" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.tvec_to_numpycol">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">tvec_to_numpycol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#tvec_to_numpycol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.tvec_to_numpycol" title="Permalink to this definition"></a></dt>
 <dd><p>Converts a Pandas timestamp series into a NumPy array of relative
 time to a reference time in the given time unit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> of when to evaluate the model.</p></li>
-<li><p><strong>t_reference</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Reference <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or datetime-like string
+<li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> of when to evaluate the model.</p></li>
+<li><p><strong>t_reference</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><em>optional</em>) – Reference <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or datetime-like string
 that can be converted to one.
 Defaults to the first element of <code class="docutils literal notranslate"><span class="pre">timevector</span></code>.</p></li>
-<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit for parameters.
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit for parameters.
 Refer to <a class="reference internal" href="#disstans.tools.Timedelta" title="disstans.tools.Timedelta"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a> for more details.
 Defaults to <code class="docutils literal notranslate"><span class="pre">D</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Array of time differences.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </section>
 <section id="weighted-median">
-<h3>weighted_median<a class="headerlink" href="#weighted-median" title="Permalink to this headline"></a></h3>
+<h3>weighted_median<a class="headerlink" href="#weighted-median" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.tools.weighted_median">
 <span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">weighted_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visualize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#weighted_median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.weighted_median" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the weighted median along a given axis.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Values to calculate the medians for.</p></li>
-<li><p><strong>weights</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Weights of each value along the given <code class="docutils literal notranslate"><span class="pre">axis</span></code>.</p></li>
-<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Axis along which to calculate the median. Defaults to the first one (<code class="docutils literal notranslate"><span class="pre">0</span></code>).</p></li>
-<li><p><strong>percentile</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Changes the percentile (between 0 and 1) of which median to calculate.
+<li><p><strong>values</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Values to calculate the medians for.</p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Weights of each value along the given <code class="docutils literal notranslate"><span class="pre">axis</span></code>.</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Axis along which to calculate the median. Defaults to the first one (<code class="docutils literal notranslate"><span class="pre">0</span></code>).</p></li>
+<li><p><strong>percentile</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Changes the percentile (between 0 and 1) of which median to calculate.
 Defaults to <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
-<li><p><strong>keepdims</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, squeezes out the axis along which the median was calculated.
+<li><p><strong>keepdims</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, squeezes out the axis along which the median was calculated.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>visualize</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, show a plot of the weighted median calculation.
+<li><p><strong>visualize</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, show a plot of the weighted median calculation.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Weighted median of input.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -899,21 +1233,21 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 </section>
 </section>
 <section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h2>
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h2>
 <section id="click">
-<h3>Click<a class="headerlink" href="#click" title="Permalink to this headline"></a></h3>
+<h3>Click<a class="headerlink" href="#click" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.tools.Click">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">Click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#Click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.Click" title="Permalink to this definition"></a></dt>
 <dd><p>Class that enables a GUI to distinguish between clicks (mouse press and release)
 and dragging event (mouse press, move, then release).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/3.5.0/api/axis_api.html#matplotlib.axis.Axis" title="(in Matplotlib v3.5.0)"><em>matplotlib.axis.Axis</em></a>) – Axis on which to look for clicks.</p></li>
-<li><p><strong>func</strong> (<em>function</em>) – Function to call, with the Matplotlib clicking <a class="reference external" href="https://matplotlib.org/3.5.0/api/backend_bases_api.html#matplotlib.backend_bases.Event" title="(in Matplotlib v3.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a>
+<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/3.5.2/api/axis_api.html#matplotlib.axis.Axis" title="(in Matplotlib v3.5.2)"><em>matplotlib.axis.Axis</em></a>) – Axis on which to look for clicks.</p></li>
+<li><p><strong>func</strong> (<em>function</em>) – Function to call, with the Matplotlib clicking <a class="reference external" href="https://matplotlib.org/3.5.2/api/backend_bases_api.html#matplotlib.backend_bases.Event" title="(in Matplotlib v3.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a>
 as its first argument.</p></li>
-<li><p><strong>button</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Which mouse button to operate on. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code> (left).</p></li>
+<li><p><strong>button</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Which mouse button to operate on. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code> (left).</p></li>
 </ul>
 </dd>
 </dl>
@@ -921,7 +1255,7 @@ as its first argument.</p></li>
 
 </section>
 <section id="rinexdataholding">
-<h3>RINEXDataHolding<a class="headerlink" href="#rinexdataholding" title="Permalink to this headline"></a></h3>
+<h3>RINEXDataHolding<a class="headerlink" href="#rinexdataholding" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.tools.RINEXDataHolding">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">RINEXDataHolding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding" title="Permalink to this definition"></a></dt>
@@ -931,7 +1265,7 @@ as its first argument.</p></li>
 <li><p>From one or multiple folder(s) using <a class="reference internal" href="#disstans.tools.RINEXDataHolding.from_folders" title="disstans.tools.RINEXDataHolding.from_folders"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_folders()</span></code></a></p></li>
 <li><p>From a previously-saved file using <a class="reference internal" href="#disstans.tools.RINEXDataHolding.from_file" title="disstans.tools.RINEXDataHolding.from_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_file()</span></code></a></p></li>
 </ul>
-<p>An object can be saved by using Pandas’ <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.to_pickle.html#pandas.DataFrame.to_pickle" title="(in pandas v1.2.4)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_pickle()</span></code></a>
+<p>An object can be saved by using Pandas’ <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.to_pickle.html#pandas.DataFrame.to_pickle" title="(in pandas v1.4.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_pickle()</span></code></a>
 on the instance’s <a class="reference internal" href="#disstans.tools.RINEXDataHolding.df" title="disstans.tools.RINEXDataHolding.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a> attribute (it is recommended to add the <code class="docutils literal notranslate"><span class="pre">.gz</span></code>
 extension to enable compression).</p>
 <p>The location information and availability metrics can be saved in the
@@ -954,7 +1288,7 @@ by the maximum amount of possible observations between the first and last
 acquisition given the assumed sampling interval of the data.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sampling</strong> (<a class="reference internal" href="#disstans.tools.Timedelta" title="disstans.tools.Timedelta"><em>disstans.tools.Timedelta</em></a>) – Assumed sampling frequency of the data files.
 Defaults to daily.</p>
 </dd>
@@ -968,12 +1302,12 @@ Defaults to daily.</p>
 using <a class="reference internal" href="#disstans.tools.RINEXDataHolding.load_db_from_file" title="disstans.tools.RINEXDataHolding.load_db_from_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_db_from_file()</span></code></a> and then optionally loads the locations and metrics
 from their respective files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_file</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path of the main file.</p></li>
-<li><p><strong>locations_file</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Path of the locations file.</p></li>
-<li><p><strong>metrics_file</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Path of the metrics file.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print database size and a sample entry.
+<li><p><strong>db_file</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path of the main file.</p></li>
+<li><p><strong>locations_file</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Path of the locations file.</p></li>
+<li><p><strong>metrics_file</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Path of the metrics file.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print database size and a sample entry.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
@@ -993,14 +1327,14 @@ calls <a class="reference internal" href="#disstans.tools.RINEXDataHolding.load_
 <span class="sig-name descname"><span class="pre">get_files_by</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">between</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding.get_files_by"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding.get_files_by" title="Permalink to this definition"></a></dt>
 <dd><p>Return a subset of the database by criteria.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Return only files of this/these station(s).</p></li>
-<li><p><strong>network</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Return only files of this/these network(s).</p></li>
-<li><p><strong>year</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Return only files of this/these year(s).</p></li>
-<li><p><strong>between</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>optional</em>) – Return only files between the start and end date (inclusive)
+<li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Return only files of this/these station(s).</p></li>
+<li><p><strong>network</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Return only files of this/these network(s).</p></li>
+<li><p><strong>year</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Return only files of this/these year(s).</p></li>
+<li><p><strong>between</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a><em>, </em><em>optional</em>) – Return only files between the start and end date (inclusive)
 given by the length-two tuple.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print the number of selected entries.
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print the number of selected entries.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
@@ -1012,18 +1346,18 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 <span class="sig-name descname"><span class="pre">get_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lla</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding.get_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding.get_location" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the approximate location of a station.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the station</p></li>
-<li><p><strong>lla</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, returns the coordinates in Longitude [°], Latitude [°] &amp;
+<li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the station</p></li>
+<li><p><strong>lla</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, returns the coordinates in Longitude [°], Latitude [°] &amp;
 Altitude [m], otherwise in XYZ [m] coordinates.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The location of the station in the specified coordinate system.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)">pandas.Series</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)">pandas.Series</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1034,14 +1368,14 @@ Altitude [m], otherwise in XYZ [m] coordinates.</p></li>
 <dd><p>Open a RINEX file, read the header, and format it as a dictionary.
 No data type conversion or stripping of whitespaces is performed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to RINEX file.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to RINEX file.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>headers</strong> – Dictionary of header lines.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1051,10 +1385,10 @@ No data type conversion or stripping of whitespaces is performed.</p>
 <span class="sig-name descname"><span class="pre">load_db_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding.load_db_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding.load_db_from_file" title="Permalink to this definition"></a></dt>
 <dd><p>Loads a RINEXDataHolding object from a pickled Pandas DataFrame file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>db_file</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path of the main file.</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print database size and a sample entry.
+<li><p><strong>db_file</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path of the main file.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print database size and a sample entry.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
@@ -1069,14 +1403,14 @@ The data should be located in one or multiple folder structure(s) organized by
 <code class="docutils literal notranslate"><span class="pre">YYYY/DDD</span></code>, where <code class="docutils literal notranslate"><span class="pre">YYYY</span></code> is a four-digit year and <code class="docutils literal notranslate"><span class="pre">DDD</span></code> is the three-digit
 day of the year.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>folders</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Folder(s) in which the different year-folders are found, formatted as a
+<li><p><strong>folders</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a>) – Folder(s) in which the different year-folders are found, formatted as a
 single tuple or a list of tuples with name and respective folder
 (<code class="docutils literal notranslate"><span class="pre">[('network1',</span> <span class="pre">'/folder/one/'),</span> <span class="pre">...]</span></code>).</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print final database size and a sample entry.
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print final database size and a sample entry.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1087,8 +1421,8 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 <span class="sig-name descname"><span class="pre">load_locations_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding.load_locations_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding.load_locations_from_file" title="Permalink to this definition"></a></dt>
 <dd><p>Load a previously-saved DataFrame containing the locations of each station.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the pickled DataFrame.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the pickled DataFrame.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1099,18 +1433,18 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 <dd><p>Scan the RINEX files’ headers for approximate locations for
 plotting purposes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>keep</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Determine which location to use. Possible values are <code class="docutils literal notranslate"><span class="pre">'last'</span></code>
+<li><p><strong>keep</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Determine which location to use. Possible values are <code class="docutils literal notranslate"><span class="pre">'last'</span></code>
 (only scan the most recent file), <code class="docutils literal notranslate"><span class="pre">'first'</span></code> (only scan the oldest
 file) or <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> (load all files and calculate average).
 Note that <code class="docutils literal notranslate"><span class="pre">'mean'</span></code> could take a substantial amount of time, since
 all files have to opened, decompressed and searched.</p></li>
-<li><p><strong>replace_not_found</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If a location is not found and <code class="docutils literal notranslate"><span class="pre">replace_not_found=True</span></code>,
+<li><p><strong>replace_not_found</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If a location is not found and <code class="docutils literal notranslate"><span class="pre">replace_not_found=True</span></code>,
 the location of Null Island (0° Longitude, 0° Latitude) is used
 and a warning is issued.
 If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), an error is raised instead.</p></li>
-<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default).</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1121,8 +1455,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <span class="sig-name descname"><span class="pre">load_metrics_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding.load_metrics_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding.load_metrics_from_file" title="Permalink to this definition"></a></dt>
 <dd><p>Load a previously-saved DataFrame containing the calculated availability metrics.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the pickled DataFrame.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the pickled DataFrame.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1133,17 +1467,17 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <dd><p>Recreate the full paths to the individual rinex files from the database or
 a subset thereof.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>db</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – <a class="reference internal" href="#disstans.tools.RINEXDataHolding.df" title="disstans.tools.RINEXDataHolding.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a> or a subset thereof.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><em>pandas.DataFrame</em></a>) – <a class="reference internal" href="#disstans.tools.RINEXDataHolding.df" title="disstans.tools.RINEXDataHolding.df"><code class="xref py py-attr docutils literal notranslate"><span class="pre">df</span></code></a> or a subset thereof.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>filenames</strong> – List of paths.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
 </dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#NotImplementedError" title="(in Python v3.9)"><strong>NotImplementedError</strong></a> – If <a class="reference internal" href="#disstans.tools.RINEXDataHolding.GLOBPATTERN" title="disstans.tools.RINEXDataHolding.GLOBPATTERN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GLOBPATTERN</span></code></a> or <a class="reference internal" href="#disstans.tools.RINEXDataHolding.RINEXPATTERN" title="disstans.tools.RINEXDataHolding.RINEXPATTERN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RINEXPATTERN</span></code></a> for this instance are not the
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#NotImplementedError" title="(in Python v3.10)"><strong>NotImplementedError</strong></a> – If <a class="reference internal" href="#disstans.tools.RINEXDataHolding.GLOBPATTERN" title="disstans.tools.RINEXDataHolding.GLOBPATTERN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GLOBPATTERN</span></code></a> or <a class="reference internal" href="#disstans.tools.RINEXDataHolding.RINEXPATTERN" title="disstans.tools.RINEXDataHolding.RINEXPATTERN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RINEXPATTERN</span></code></a> for this instance are not the
     same as the default values. In this case, redefine this function with the
     appropriate folder and file patterns.</p>
 </dd>
@@ -1155,13 +1489,13 @@ a subset thereof.</p>
 <span class="sig-name descname"><span class="pre">plot_availability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timedelta('1</span> <span class="pre">days</span> <span class="pre">00:00:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by_latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saveas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#RINEXDataHolding.plot_availability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.RINEXDataHolding.plot_availability" title="Permalink to this definition"></a></dt>
 <dd><p>Create an availability figure for the dataset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sampling</strong> (<a class="reference internal" href="#disstans.tools.Timedelta" title="disstans.tools.Timedelta"><em>disstans.tools.Timedelta</em></a><em>, </em><em>optional</em>) – Assume that breaks strictly larger than <code class="docutils literal notranslate"><span class="pre">sampling</span></code> constitute a data gap.
 Defaults to daily.</p></li>
-<li><p><strong>sort_by_latitude</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), sort the stations by latitude, else alphabetical.
+<li><p><strong>sort_by_latitude</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), sort the stations by latitude, else alphabetical.
 (Always falls back to alphabetical if location information is missing.)</p></li>
-<li><p><strong>saveas</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, the figure will be saved at this location.</p></li>
+<li><p><strong>saveas</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, the figure will be saved at this location.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1174,17 +1508,17 @@ Defaults to daily.</p></li>
 The markers can be colored by the different availability metrics calculated
 by <a class="reference internal" href="#disstans.tools.RINEXDataHolding.calculate_availability_metrics" title="disstans.tools.RINEXDataHolding.calculate_availability_metrics"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_availability_metrics()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Calculate the marker color (and respective colormap) given a certain
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Calculate the marker color (and respective colormap) given a certain
 metric. If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), no color is applied.</p></li>
-<li><p><strong>orientation</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Colorbar orientation, see <a class="reference external" href="https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.colorbar.html#matplotlib.pyplot.colorbar" title="(in Matplotlib v3.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">colorbar()</span></code></a>.
+<li><p><strong>orientation</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Colorbar orientation, see <a class="reference external" href="https://matplotlib.org/3.5.2/api/_as_gen/matplotlib.pyplot.colorbar.html#matplotlib.pyplot.colorbar" title="(in Matplotlib v3.5.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">colorbar()</span></code></a>.
 Defaults to <code class="docutils literal notranslate"><span class="pre">'horizontal'</span></code>.</p></li>
-<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.</p></li>
-<li><p><strong>figsize</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>optional</em>) – Set the figure size (width, height) in inches.</p></li>
-<li><p><strong>saveas</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, the figure will be saved at this location.</p></li>
-<li><p><strong>dpi</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Use this DPI for saved figures.</p></li>
-<li><p><strong>gui_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Override default GUI settings of <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>.</p></li>
+<li><p><strong>annotate_stations</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), add the station names to the map.</p></li>
+<li><p><strong>figsize</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a><em>, </em><em>optional</em>) – Set the figure size (width, height) in inches.</p></li>
+<li><p><strong>saveas</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, the figure will be saved at this location.</p></li>
+<li><p><strong>dpi</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Use this DPI for saved figures.</p></li>
+<li><p><strong>gui_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – Override default GUI settings of <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1267,14 +1601,14 @@ altitude [m]) coordinates.</p>
 
 </section>
 <section id="timedelta">
-<h3>Timedelta<a class="headerlink" href="#timedelta" title="Permalink to this headline"></a></h3>
+<h3>Timedelta<a class="headerlink" href="#timedelta" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.tools.Timedelta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.tools.</span></span><span class="sig-name descname"><span class="pre">Timedelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#Timedelta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.Timedelta" title="Permalink to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="disstans.tools.Timedelta.__new__">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/tools.html#Timedelta.__new__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.tools.Timedelta.__new__" title="Permalink to this definition"></a></dt>
-<dd><p>DISSTANS Timedelta subclassed from <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timedelta.html#pandas.Timedelta" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a> but with support
+<dd><p>DISSTANS Timedelta subclassed from <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timedelta.html#pandas.Timedelta" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timedelta</span></code></a> but with support
 for the <code class="docutils literal notranslate"><span class="pre">'Y'</span></code> year time unit, defined as always exactly 365.25 days.
 Other possible values are:</p>
 <p><code class="docutils literal notranslate"><span class="pre">W</span></code>, <code class="docutils literal notranslate"><span class="pre">D</span></code>, <code class="docutils literal notranslate"><span class="pre">days</span></code>, <code class="docutils literal notranslate"><span class="pre">day</span></code>, <code class="docutils literal notranslate"><span class="pre">hours</span></code>, <code class="docutils literal notranslate"><span class="pre">hour</span></code>, <code class="docutils literal notranslate"><span class="pre">hr</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>,

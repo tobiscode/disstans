@@ -215,14 +215,15 @@ but rather a cleaner timeseries after we remove the CME.
     ...     # now, evaluate the models
     ...     # noise will be white + colored
     ...     gen_data = \
-    ...         {"seas+sec+eq": (mdl_sec.evaluate(timevector)["fit"] +
-    ...                          mdl_seas.evaluate(timevector)["fit"] +
-    ...                          mdl_eq.evaluate(timevector)["fit"] +
-    ...                          mdl_post.evaluate(timevector)["fit"]),
+    ...         {"sec": mdl_sec.evaluate(timevector)["fit"],
     ...          "trans": (mdl_sse1.evaluate(timevector)["fit"] +
     ...                    mdl_sse2.evaluate(timevector)["fit"] +
     ...                    mdl_sse3.evaluate(timevector)["fit"]),
     ...          "noise": noisevec}
+    ...     gen_data["seas+sec+eq"] = (gen_data["sec"] +
+    ...                                mdl_seas.evaluate(timevector)["fit"] +
+    ...                                mdl_eq.evaluate(timevector)["fit"] +
+    ...                                mdl_post.evaluate(timevector)["fit"])
     ...     # for one station, we'll add a colored noise process such that the resulting
     ...     # noise variance is the same as before
     ...     # but: only in the second half, where there are no strong, short-term signals
@@ -1196,3 +1197,145 @@ We can see that in general, the transients that were estimated through the spati
 L0 estimation process show a more homogenous direction of the motion to the southeast,
 which we know to be the true direction of motion. This is also (although less) visible in
 the far east of the network, where the signal is close or below the noise floor.
+
+Secular velocity comparisons
+----------------------------
+
+To highlight the importance of modeling transients explicitly, we are now going to look
+at the estimated linear (secular) velocity that every station experiences. That velocity
+is stored in the following parameter in our network (for station Jeckle, e.g.)::
+
+    >>> net["Jeckle"].models["Displacement"]["Secular"].parameters[1, :]
+
+So, for all station velocities for our latest spatially-aware fit, we could use::
+
+    >>> vels_spatl0 = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+    ...                         for stat in net])
+
+Keep in mind that whenever we perform the fitting process, old parameter estimates
+get thrown away, so to compare the current estimate from our spatially-aware fit with
+the non-spatially-aware one, we have to save these estimates along the way (see script
+file). For our comparisons with other approaches that do not explicitly model the
+transient episodes, we will therefore simply create new network objects with the same
+stations, but different models. We will compare our results with the following alternatives:
+
+1. An unregularized least-squares result without any knowledge of the transients,
+2. an unregularized least-squares result approximating the transients with step functions,
+3. and results using the MIDAS ([blewitt16]_) algorithm (included in DISSTANS).
+
+Note that we don't actually need an extra network object for the last approach, since
+it only operates on the timeseries data directly. For the other ones, we can create
+copies using the standard Python approach:
+
+.. doctest::
+
+    >>> # make an almost-from-scratch network object for comparisons
+    >>> net_basic = deepcopy(net)
+    >>> # delete all unnecessary timeseries and the Transient model
+    >>> for stat in net_basic:
+    ...     for ts in [t for t in stat.timeseries.keys()
+    ...                if t != "Displacement"]:
+    ...         del stat[ts]
+    ...     del stat.models["Displacement"]["Transient"]
+    ...     del stat.fits["Displacement"]["Transient"]
+    >>> # we'll compare our spatial-L0 results to a model with steps instead of transients
+    >>> net_steps = deepcopy(net_basic)
+    >>> # add true center times as steps (reality is going to be worse)
+    >>> for stat in net_steps:
+    ...     stat.models["Displacement"]["SSESteps"] = \
+    ...         Step(["2001-07-01", "2003-07-01", "2007-01-01"])
+
+Next, we will fit both networks, and save the velocities:
+
+.. doctest::
+
+    >>> # fit both the basic network and the one with added steps
+    >>> net_basic.fitevalres(ts_description="Displacement", solver="linear_regression",
+    ...                      output_description="Fit", residual_description="Res")
+    >>> net_steps.fitevalres(ts_description="Displacement", solver="linear_regression",
+    ...                      output_description="Fit", residual_description="Res")
+    >>> # extract velocities
+    >>> vels_basic = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+    ...                        for stat in net_basic])
+    >>> vels_steps = np.stack([stat.models["Displacement"]["Secular"].par[1, :]
+    ...                        for stat in net_steps])
+
+The MIDAS algorithm is next. Even though our network is small, let's pretend it's big
+enough to warrant parallelization. The :func:`~disstans.processing.midas` function
+only needs the :class:`~disstans.timeseries.Timeseries` objects as input, so a
+parallelized call using :func:`~disstans.tools.parallelize` would look like this:
+
+.. doctest::
+
+    >>> from disstans.tools import parallelize
+    >>> from disstans.processing import midas
+    >>> midas_in = [stat["Displacement"] for stat in net]
+    >>> midas_out = {sta_name: result for sta_name, result
+    ...              in zip(net.station_names, parallelize(midas, midas_in))}
+
+We now need to parse the outputs from ``midas_out`` to extract the velocity using
+DISSTANS' :meth:`~disstans.models.Model.evaluate` method:
+
+.. doctest::
+
+    >>> mdls_midas = {sta_name: m_out[0] for sta_name, m_out in midas_out.items()}
+    >>> vels_midas = np.stack([mdl.par[1, :] for mdl in mdls_midas.values()])
+
+The true velocities to which we'll compare all of the estimated velocities were defined
+by us in the very beginning:
+
+.. doctest::
+
+    >>> vels_true = np.stack([mdl["Secular"].par[1, :]
+    ...                       for mdl in mdl_coll_synth.values()])
+
+So, we can calculate all the root-mean-squared errors of our velocity estimate as
+follows::
+
+    >>> # get RMSE stats
+    >>> rmse_spatl0 = np.sqrt(np.mean((vels_spatl0 - vels_true)**2, axis=0))
+    >>> rmse_locl0 = np.sqrt(np.mean((vels_locl0 - vels_true)**2, axis=0))
+    >>> rmse_steps = np.sqrt(np.mean((vels_steps - vels_true)**2, axis=0))
+    >>> rmse_basic = np.sqrt(np.mean((vels_basic - vels_true)**2, axis=0))
+    >>> rmse_midas = np.sqrt(np.mean((vels_midas - vels_true)**2, axis=0))
+    >>> vel_rmses = pd.DataFrame({"Spatial L0": rmse_spatl0, "Local L0": rmse_locl0,
+    ...                           "Linear + Steps": rmse_steps, "Linear": rmse_basic,
+    ...                           "MIDAS": rmse_midas},
+    ...                          index=sta["Displacement"].data_cols).T
+    >>> # print
+    >>> print(vel_rmses)
+                       E         N
+    Spatial L0      0.108107  0.227728
+    Local L0        0.456424  0.512325
+    Linear + Steps  0.623014  0.605845
+    Linear          1.275072  1.272709
+    MIDAS           0.854414  0.871200
+
+(Note that these results were calculated after the added maintenance steps, and require
+that the velocity results from the solution before adding spatial awareness were saved
+into ``vels_locl0``.)
+
+We can see that quantitatively, the spatially-aware, L0-regularized fits significantly
+outerperforms the other estimates. Visually, for the two components at station Jeckle,
+we can see this improvement:
+
+.. image:: ../img/tutorial_3j_seccomp_Jeckle_E.png
+
+.. image:: ../img/tutorial_3j_seccomp_Jeckle_N.png
+
+Here, the different colored lines correspond to the purely linear components of the fitted
+timeseries. The true linear constituent, together with the synthetic noise, is shown as the
+dark grey points. The light grey points additionally include the true transient constituent.
+A clear progression from the purely linear model that is trying to capture the transient
+episodes to our spatially-regularized model explicitly including the transients as to not be
+affected by them is clearly visible.
+
+.. note::
+
+    Note that the spatially-regularized solution is still not capturing the true secular
+    velocity. This is due to the inherent tradeoff between longterm transients and the
+    linear, secular velocity, as well as the presence of noise. We could easily make
+    our method recover the true solution by either reducing the number and maximum
+    timespan of the transient episodes, and/or lowering the noise level. We have chosen
+    the current model and noise hyperparameters to show exactly this tradeoff, and to
+    remind the user that this tradeoff would only be worse in real data.

@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -79,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -120,6 +122,19 @@
 <li class="toctree-l3"><a class="reference internal" href="examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -127,7 +142,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -207,13 +221,20 @@
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -287,34 +308,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.__add__">__add__() (disstans.timeseries.Timeseries method)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.AmpPhModulatedSinusoid.__annotations__">__annotations__ (disstans.models.AmpPhModulatedSinusoid attribute)</a>
-
-      <ul>
-        <li><a href="disstans/models.html#disstans.models.Arctangent.__annotations__">(disstans.models.Arctangent attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.BSpline.__annotations__">(disstans.models.BSpline attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.Exponential.__annotations__">(disstans.models.Exponential attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.HyperbolicTangent.__annotations__">(disstans.models.HyperbolicTangent attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.ISpline.__annotations__">(disstans.models.ISpline attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.Logarithmic.__annotations__">(disstans.models.Logarithmic attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.Polynomial.__annotations__">(disstans.models.Polynomial attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.Sinusoid.__annotations__">(disstans.models.Sinusoid attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.SplineSet.__annotations__">(disstans.models.SplineSet attribute)</a>
-</li>
-        <li><a href="disstans/models.html#disstans.models.Step.__annotations__">(disstans.models.Step attribute)</a>
-</li>
-        <li><a href="disstans/timeseries.html#disstans.timeseries.GipsyTimeseries.__annotations__">(disstans.timeseries.GipsyTimeseries attribute)</a>
-</li>
-        <li><a href="disstans/timeseries.html#disstans.timeseries.UNRTimeseries.__annotations__">(disstans.timeseries.UNRTimeseries attribute)</a>
-</li>
-      </ul></li>
       <li><a href="disstans/solvers.html#disstans.solvers.InverseReweighting.__call__">__call__() (disstans.solvers.InverseReweighting method)</a>
 
       <ul>
@@ -347,8 +340,6 @@
         <li><a href="disstans/models.html#disstans.models.ModelCollection.__eq__">(disstans.models.ModelCollection method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.ModelCollection.__getitem__">__getitem__() (disstans.models.ModelCollection method)</a>
 
       <ul>
@@ -367,6 +358,8 @@
         <li><a href="disstans/station.html#disstans.station.Station.__iter__">(disstans.station.Station method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.ModelCollection.__len__">__len__() (disstans.models.ModelCollection method)</a>
 
       <ul>
@@ -523,10 +516,24 @@
 </li>
       <li><a href="disstans/solvers.html#disstans.solvers.Solution.converged">converged (disstans.solvers.Solution attribute)</a>
 </li>
+      <li><a href="disstans/models.html#disstans.models.Model.convert_units">convert_units() (disstans.models.Model method)</a>
+
+      <ul>
+        <li><a href="disstans/models.html#disstans.models.ModelCollection.convert_units">(disstans.models.ModelCollection method)</a>
+</li>
+        <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.convert_units">(disstans.timeseries.Timeseries method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.copy">copy() (disstans.timeseries.Timeseries method)</a>
+      <li><a href="disstans/models.html#disstans.models.Model.copy">copy() (disstans.models.Model method)</a>
+
+      <ul>
+        <li><a href="disstans/models.html#disstans.models.ModelCollection.copy">(disstans.models.ModelCollection method)</a>
 </li>
+        <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.copy">(disstans.timeseries.Timeseries method)</a>
+</li>
+      </ul></li>
       <li><a href="disstans/network.html#disstans.network.Network.copy_uncertainties">copy_uncertainties() (disstans.network.Network method)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.Model.cov">cov (disstans.models.Model property)</a>
@@ -685,6 +692,12 @@
 </li>
       <li><a href="disstans/solvers.html#disstans.solvers.ReweightingFunction.eps">eps (disstans.solvers.ReweightingFunction attribute)</a>
 </li>
+      <li><a href="disstans/tools.html#disstans.tools.estimate_euler_pole">estimate_euler_pole() (in module disstans.tools)</a>
+</li>
+      <li><a href="disstans/network.html#disstans.network.Network.euler_rot_field">euler_rot_field() (disstans.network.Network method)</a>
+</li>
+      <li><a href="disstans/tools.html#disstans.tools.eulerpole2rotvec">eulerpole2rotvec() (in module disstans.tools)</a>
+</li>
       <li><a href="disstans/models.html#disstans.models.Model.EVAL_PREDVAR_PRECISION">EVAL_PREDVAR_PRECISION (disstans.models.Model attribute)</a>
 
       <ul>
@@ -769,16 +782,22 @@
         <li><a href="disstans/timeseries.html#disstans.timeseries.UNRTimeseries.get_arch">(disstans.timeseries.UNRTimeseries method)</a>
 </li>
       </ul></li>
+      <li><a href="disstans/models.html#disstans.models.Model.get_cov_by_index">get_cov_by_index() (disstans.models.Model method)</a>
+</li>
       <li><a href="disstans/tools.html#disstans.tools.get_cov_dims">get_cov_dims() (in module disstans.tools)</a>
 </li>
       <li><a href="disstans/tools.html#disstans.tools.get_cov_indices">get_cov_indices() (in module disstans.tools)</a>
 </li>
+      <li><a href="disstans/models.html#disstans.models.Polynomial.get_exp_index">get_exp_index() (disstans.models.Polynomial method)</a>
+</li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.get_files_by">get_files_by() (disstans.tools.RINEXDataHolding method)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.AmpPhModulatedSinusoid.get_inst_amplitude_phase">get_inst_amplitude_phase() (disstans.models.AmpPhModulatedSinusoid method)</a>
+      <li><a href="disstans/tools.html#disstans.tools.get_hom_vel_strain_rot">get_hom_vel_strain_rot() (in module disstans.tools)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/models.html#disstans.models.AmpPhModulatedSinusoid.get_inst_amplitude_phase">get_inst_amplitude_phase() (disstans.models.AmpPhModulatedSinusoid method)</a>
+</li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.get_location">get_location() (disstans.tools.RINEXDataHolding method)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.Model.get_mapping">get_mapping() (disstans.models.Model method)</a>
@@ -790,6 +809,8 @@
       <li><a href="disstans/solvers.html#disstans.solvers.Solution.get_model_indices">get_model_indices() (disstans.solvers.Solution method)</a>
 </li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.get_rinex_header">get_rinex_header() (disstans.tools.RINEXDataHolding method)</a>
+</li>
+      <li><a href="disstans/network.html#disstans.network.Network.get_stations_with">get_stations_with() (disstans.network.Network method)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.BSpline.get_transient_period">get_transient_period() (disstans.models.BSpline method)</a>
 
@@ -812,6 +833,10 @@
 
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/network.html#disstans.network.Network.hom_velocity_field">hom_velocity_field() (disstans.network.Network method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.HyperbolicTangent">HyperbolicTangent (class in disstans.models)</a>
 </li>
@@ -911,8 +936,6 @@
 </li>
       <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.mask_out">mask_out() (disstans.timeseries.Timeseries method)</a>
 </li>
-      <li><a href="disstans/compiled.html#disstans.compiled.maskedmedfilt2d">maskedmedfilt2d() (in module disstans.compiled)</a>
-</li>
       <li><a href="disstans/network.html#disstans.network.Network.math">math() (disstans.network.Network method)</a>
 </li>
       <li><a href="disstans/processing.html#disstans.processing.median">median() (in module disstans.processing)</a>
@@ -929,10 +952,10 @@
 </li>
       <li><a href="disstans/solvers.html#disstans.solvers.Solution.model_list">model_list (disstans.solvers.Solution property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.ModelCollection.model_names">model_names (disstans.models.ModelCollection property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.ModelCollection">ModelCollection (class in disstans.models)</a>
 </li>
       <li><a href="disstans/station.html#disstans.station.Station.models">models (disstans.station.Station attribute)</a>
@@ -1098,6 +1121,10 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/tools.html#disstans.tools.R_ecef2enu">R_ecef2enu() (in module disstans.tools)</a>
+</li>
+      <li><a href="disstans/tools.html#disstans.tools.R_enu2ecef">R_enu2ecef() (in module disstans.tools)</a>
+</li>
       <li><a href="disstans/models.html#disstans.models.Model.read_parameters">read_parameters() (disstans.models.Model method)</a>
 
       <ul>
@@ -1114,10 +1141,10 @@
 </li>
       <li><a href="disstans/station.html#disstans.station.Station.remove_fit">remove_fit() (disstans.station.Station method)</a>
 </li>
-      <li><a href="disstans/station.html#disstans.station.Station.remove_local_models">remove_local_models() (disstans.station.Station method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/station.html#disstans.station.Station.remove_local_models">remove_local_models() (disstans.station.Station method)</a>
+</li>
       <li><a href="disstans/network.html#disstans.network.Network.remove_station">remove_station() (disstans.network.Network method)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.Step.remove_step">remove_step() (disstans.models.Step method)</a>
@@ -1135,6 +1162,8 @@
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding">RINEXDataHolding (class in disstans.tools)</a>
 </li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.RINEXPATTERN">RINEXPATTERN (disstans.tools.RINEXDataHolding attribute)</a>
+</li>
+      <li><a href="disstans/tools.html#disstans.tools.rotvec2eulerpole">rotvec2eulerpole() (in module disstans.tools)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1172,10 +1201,10 @@
         <li><a href="disstans/models.html#disstans.models.ISpline.spacing">(disstans.models.ISpline attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/network.html#disstans.network.Network.spatialfit">spatialfit() (disstans.network.Network method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.SplineSet.splineclass">splineclass (disstans.models.SplineSet attribute)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.SplineSet.splines">splines (disstans.models.SplineSet attribute)</a>
@@ -1185,6 +1214,8 @@
       <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.src">src (disstans.timeseries.Timeseries property)</a>
 </li>
       <li><a href="disstans/station.html#disstans.station.Station">Station (class in disstans.station)</a>
+</li>
+      <li><a href="disstans/network.html#disstans.network.Network.station_locations">station_locations (disstans.network.Network property)</a>
 </li>
       <li><a href="disstans/network.html#disstans.network.Network.station_names">station_names (disstans.network.Network property)</a>
 </li>
@@ -1197,6 +1228,8 @@
       <li><a href="disstans/processing.html#disstans.processing.StepDetector.steps">steps() (disstans.processing.StepDetector static method)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.Step.steptimes">steptimes (disstans.models.Step attribute)</a>
+</li>
+      <li><a href="disstans/tools.html#disstans.tools.strain_rotation_invariants">strain_rotation_invariants() (in module disstans.tools)</a>
 </li>
       <li><a href="disstans/station.html#disstans.station.Station.sum_fits">sum_fits() (disstans.station.Station method)</a>
 </li>

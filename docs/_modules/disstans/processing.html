@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 1.0.2 documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 1.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -30,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.0.2
+                1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -120,6 +121,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -127,7 +141,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -207,13 +220,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -271,10 +291,11 @@
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">find_peaks</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">pandas.api.indexers</span> <span class="kn">import</span> <span class="n">BaseIndexer</span>
 
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
 <span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
-<span class="kn">from</span> <span class="nn">.compiled</span> <span class="kn">import</span> <span class="n">maskedmedfilt2d</span><span class="p">,</span> <span class="n">selectpair</span>
+<span class="kn">from</span> <span class="nn">.compiled</span> <span class="kn">import</span> <span class="n">selectpair</span>
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">parallelize</span><span class="p">,</span> <span class="n">tvec_to_numpycol</span><span class="p">,</span> <span class="n">date2decyear</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Polynomial</span>
 
@@ -359,12 +380,77 @@
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
 
+<span class="k">class</span> <span class="nc">ExpandingRollingIndexer</span><span class="p">(</span><span class="n">BaseIndexer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Indexer class used in the pandas rolling calculations (e.g., rolling median).</span>
+<span class="sd">    This custom indexer behaves like a regular rolling window, except at the</span>
+<span class="sd">    start and end of the timeseries, where the window slowly grows or shrinks,</span>
+<span class="sd">    respectively. Specifically, at the first time step, the window is only one</span>
+<span class="sd">    element wide. At the second step, it is three elements wide; at the third,</span>
+<span class="sd">    five elements, and so forth, until the window has the defined window size.</span>
+<span class="sd">    As the window approaches the end of the timeseries, it starts to shrink again</span>
+<span class="sd">    until it is one element wide at the last time step.</span>
+
+<span class="sd">    The goal of this kind of rolling window is to reduce the influence of late</span>
+<span class="sd">    (early) observations when looking at the first (last) timesteps (respectively).</span>
+
+<span class="sd">    For more information, see the pandas documentation about `custom window rolling</span>
+<span class="sd">    &lt;https://pandas.pydata.org/docs/user_guide/window.html#custom-window-rolling&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_window_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_values</span><span class="p">,</span> <span class="n">min_periods</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">closed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the function that needs to be implemented for the</span>
+<span class="sd">        :class:`~pandas.api.indexers.BaseIndexer` class to be used for all</span>
+<span class="sd">        rolling pandas operations. It shouldn&#39;t be called manually.</span>
+
+<span class="sd">        The parameters ``min_periods``, ``center``, and ``closed`` have to</span>
+<span class="sd">        be included to match expected pandas behavior, but this function</span>
+<span class="sd">        does not implement their potential features.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_values : int</span>
+<span class="sd">            Total number of values in the array to be rolled through.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        start : np.ndarray</span>
+<span class="sd">            Start indices of individual windows.</span>
+<span class="sd">        end  : np.ndarray</span>
+<span class="sd">            End indices (exclusive) of individual windows.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># window_size is set by BaseIndexer.__init__</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;window_size&#39; must be odd, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span>
+        <span class="c1"># initialize index arrays</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">num_values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="c1"># left and right boundaries for the boundary intervals</span>
+        <span class="n">max_ix_start</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_values</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">max_ix_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_values</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># starting interval</span>
+        <span class="n">start</span><span class="p">[:</span><span class="n">max_ix_start</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">max_ix_start</span><span class="p">)</span>
+        <span class="n">end</span><span class="p">[:</span><span class="n">max_ix_start</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">max_ix_start</span><span class="p">)</span>
+        <span class="c1"># ending interval</span>
+        <span class="n">start</span><span class="p">[</span><span class="o">-</span><span class="n">max_ix_end</span><span class="p">:]</span> <span class="o">=</span> <span class="n">num_values</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">max_ix_end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">end</span><span class="p">[</span><span class="o">-</span><span class="n">max_ix_end</span><span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_values</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">max_ix_end</span><span class="p">)</span>
+        <span class="c1"># middle, regular interval</span>
+        <span class="n">start</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="o">//</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="o">//</span><span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_values</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">end</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="o">//</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="o">//</span><span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_values</span><span class="p">)</span>
+        <span class="c1"># return</span>
+        <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span>
+
+
 <div class="viewcode-block" id="median"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.median">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
 <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes the median filter (ignoring NaNs) column-wise, either by calling</span>
-<span class="sd">    :func:`~numpy.nanmedian` iteratively or by using the precompiled Fortran</span>
-<span class="sd">    function :func:`~disstans.compiled.maskedmedfilt2d`.</span>
+<span class="sd">    Computes the rolling median filter column-wise. Missing observations (NaNs) are</span>
+<span class="sd">    ignored during the median calculation, but missing observations are not imputed</span>
+<span class="sd">    from the rolling median (i.e., a NaN value remains a NaN value, but does not</span>
+<span class="sd">    affect surrounding values).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -382,30 +468,15 @@
 <span class="sd">    filtered : numpy.ndarray</span>
 <span class="sd">        2D filtered array (may still contain NaNs).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">filtered</span> <span class="o">=</span> <span class="n">maskedmedfilt2d</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">),</span> <span class="n">kernel_size</span><span class="p">)</span>
-        <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
-    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;&#39;kernel_size&#39; has to be odd, got </span><span class="si">{</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="n">num_obs</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_obs</span><span class="p">,</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">filtered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="c1"># Run filtering while suppressing warnings</span>
-        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;All-NaN slice encountered&#39;</span><span class="p">)</span>
-            <span class="c1"># Beginning region</span>
-            <span class="n">halfwindow</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
-                <span class="n">filtered</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">halfwindow</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="c1"># Middle region</span>
-            <span class="k">assert</span> <span class="n">halfwindow</span> <span class="o">==</span> <span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">halfwindow</span><span class="p">,</span> <span class="n">num_obs</span> <span class="o">-</span> <span class="n">halfwindow</span><span class="p">):</span>
-                <span class="n">filtered</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="c1"># Ending region</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_obs</span> <span class="o">-</span> <span class="n">halfwindow</span><span class="p">,</span> <span class="n">num_obs</span><span class="p">):</span>
-                <span class="n">halfwindow</span> <span class="o">-=</span> <span class="mi">1</span>
-                <span class="n">filtered</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">halfwindow</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">halfwindow</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># make sure the array is 2D even if it&#39;s only a single column</span>
+    <span class="n">num_obs</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_obs</span><span class="p">,</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># the indexer object will tell pandas over which windows to calculate the median</span>
+    <span class="n">indexer</span> <span class="o">=</span> <span class="n">ExpandingRollingIndexer</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">)</span>
+    <span class="c1"># now we calculate the rolling median (this is compiled-optimized by pandas)</span>
+    <span class="n">filtered</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+    <span class="c1"># add NaNs again to where they were initially</span>
+    <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
     <span class="k">return</span> <span class="n">filtered</span></div>
 
 
@@ -476,7 +547,7 @@
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;pca&#39;</span><span class="p">:</span>
         <span class="n">decomposer</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_components</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;ica&#39;</span><span class="p">:</span>
-        <span class="n">decomposer</span> <span class="o">=</span> <span class="n">FastICA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_components</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">decomposer</span> <span class="o">=</span> <span class="n">FastICA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_components</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="s2">&quot;unit-variance&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot estimate the common mode error &quot;</span>
                                   <span class="sa">f</span><span class="s2">&quot;using the &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; method.&quot;</span><span class="p">)</span>
@@ -513,6 +584,9 @@
 <span class="sd">    - ``&#39;min_obs&#39;``: Minimum number of observations the timeseries has to contain.</span>
 <span class="sd">    - ``&#39;std_outlier&#39;``: Classify as an outlier any observation that is this many</span>
 <span class="sd">      standard deviations away from the reference.</span>
+<span class="sd">    - ``&#39;iqr_outlier&#39;``: Classify as an outlier any observation that is this many</span>
+<span class="sd">      inter-quartile ranges (IQR, difference between the 25th and 75th percentile)</span>
+<span class="sd">      away from the reference&#39;s 25th-75th percentile range.</span>
 <span class="sd">    - ``&#39;std_thresh&#39;``: After the removal of outliers, the maximum standard deviation</span>
 <span class="sd">      that the residual between reference and input timeseries is allowed to have.</span>
 <span class="sd">    - ``&#39;min_clean_obs&#39;``: After the removal of outliers, the minimum number of</span>
@@ -583,13 +657,26 @@
             <span class="k">continue</span>
         <span class="c1"># compute residuals</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> \
+           <span class="ow">or</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> \
            <span class="ow">or</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_thresh&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">residual</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts_ref</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
         <span class="c1"># check for and remove outliers</span>
-        <span class="k">if</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> \
+           <span class="ow">or</span> <span class="p">(</span><span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
-            <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sd</span>
+            <span class="n">mask_copy</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">mask_copy</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">residual</span><span class="p">[</span><span class="n">mask_copy</span><span class="p">])</span>
+                                    <span class="o">&gt;</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;std_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">sd</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">q1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+                <span class="n">q3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+                <span class="n">iqr</span> <span class="o">=</span> <span class="n">q3</span> <span class="o">-</span> <span class="n">q1</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">mask_copy</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">residual</span><span class="p">[</span><span class="n">mask_copy</span><span class="p">]</span>
+                                                 <span class="o">&lt;</span> <span class="n">q1</span> <span class="o">-</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">,</span>
+                                                 <span class="n">residual</span><span class="p">[</span><span class="n">mask_copy</span><span class="p">]</span>
+                                                 <span class="o">&gt;</span> <span class="n">q3</span> <span class="o">+</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">)</span>
             <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
             <span class="n">residual</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts_ref</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
@@ -651,11 +738,14 @@
 <span class="sd">       doi:`10.1002/2015JB012552 &lt;https://doi.org/10.1002/2015JB012552&gt;`_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># extract timeseries data, adjust zero-crossing to first epoch</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">x_off</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">x_off</span>
     <span class="c1"># convert timeseries index and step times to decimal years</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">date2decyear</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
     <span class="n">tstep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># need at least one entry for selectpair</span>
-    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tstep_back</span> <span class="o">=</span> <span class="n">tstep</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">steps_decyear</span> <span class="o">=</span> <span class="n">date2decyear</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
         <span class="n">tstep_back</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="o">-</span><span class="n">steps_decyear</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tstep</span><span class="p">])</span>
         <span class="n">tstep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">steps_decyear</span><span class="p">,</span> <span class="n">tstep</span><span class="p">])</span>
@@ -716,7 +806,7 @@
     <span class="c1"># intercept uncertainty is &quot;perfect&quot; since it wasn&#39;t estimated at all,</span>
     <span class="c1"># it&#39;s just relative to a reference time</span>
     <span class="n">mdl</span> <span class="o">=</span> <span class="n">Polynomial</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
-    <span class="n">mdl</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x50</span><span class="p">,</span> <span class="n">v50</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="n">mdl</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x50</span> <span class="o">+</span> <span class="n">x_off</span><span class="p">,</span> <span class="n">v50</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
                         <span class="n">covariances</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x50</span><span class="p">),</span> <span class="n">sv</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
     <span class="c1"># return residual as a Timeseries</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">Timeseries</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">timevector</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;midas&quot;</span><span class="p">,</span>

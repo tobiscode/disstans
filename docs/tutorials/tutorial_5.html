@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tutorial 5: Signal Recovery at Low SNR &mdash; DISSTANS 1.0.2 documentation</title>
@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -83,6 +84,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -124,6 +126,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -131,7 +146,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -211,13 +225,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -260,7 +281,7 @@
            <div itemprop="articleBody">
              
   <section id="tutorial-5-signal-recovery-at-low-snr">
-<h1>Tutorial 5: Signal Recovery at Low SNR<a class="headerlink" href="#tutorial-5-signal-recovery-at-low-snr" title="Permalink to this headline"></a></h1>
+<h1>Tutorial 5: Signal Recovery at Low SNR<a class="headerlink" href="#tutorial-5-signal-recovery-at-low-snr" title="Permalink to this heading"></a></h1>
 <aside class="sidebar">
 <p class="sidebar-title">Download full script</p>
 <p><a class="reference download internal" download="" href="../_downloads/32a07a6e409c83530fb6f799642ded4f/tutorial_5_low_snr.py"><code class="xref download docutils literal notranslate"><span class="pre">tutorial_5_low_snr.py</span></code></a></p>
@@ -270,7 +291,7 @@ L0-regularized solver is able to better recover signals affected by noise, altho
 we didn’t have time to explore how the reweighting hyperparameters affected the quality
 of the results. This tutorial will explore a bit more quantitatively how using more
 and more stations improves the recovery of a synthetic signal.</p>
-<div class="contents local topic" id="table-of-contents">
+<nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id1">Preparations</a></p></li>
@@ -278,9 +299,9 @@ and more stations improves the recovery of a synthetic signal.</p>
 <li><p><a class="reference internal" href="#running-test-cases" id="id3">Running test cases</a></p></li>
 <li><p><a class="reference internal" href="#results" id="id4">Results</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id1">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
 <p>By now, not every import needs to be explained, so I’ll just get those out of the
 way first:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
@@ -337,7 +358,7 @@ as clearly as possible, without having to worry about other models:</p>
 </div>
 </section>
 <section id="defining-the-variables-and-hyperparameter-space">
-<h2><a class="toc-backref" href="#id2">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Permalink to this heading"></a></h2>
 <p>So now that we have a network, a true signal shared by all stations, and a different
 noise realization for every station, what are the variables and hyperparameters we want
 to examine?</p>
@@ -372,7 +393,7 @@ for now. Here is the suite of parameters we want to consider:</p>
 </div>
 </section>
 <section id="running-test-cases">
-<h2><a class="toc-backref" href="#id3">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Permalink to this heading"></a></h2>
 <p>It becomes clear that this is best done in parallel, given the sheer number of
 hyperparameter combinations, not to mention that we have to do each combination a number
 of times with different station subsets to get a statistically valid result. To do this
@@ -395,7 +416,7 @@ standard deviation of that. Finally, we can plot this mean and standard deviatio
 mean RMSE for all different number of stations.</p>
 </section>
 <section id="results">
-<h2><a class="toc-backref" href="#id4">Results</a><a class="headerlink" href="#results" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Results</a><a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
 <p>When we then plot all of the different cases in one big plot, we can see the big picture:</p>
 <img alt="../_images/tutorial_5_S20N50_1.png" src="../_images/tutorial_5_S20N50_1.png" />
 <p>Here for example, we compare, for an initial penalty parameter of 1, the effect that

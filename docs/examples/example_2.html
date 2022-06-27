@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 1.0.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DISSTANS" href="../disstans.html" />
+    <link rel="prev" title="Example 1: Long Valley Caldera Transient Motions" href="example_1.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html">
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                1.0.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation &amp; Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#minimal-installation">Minimal installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#full-development-installation">Full development installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#updates">Updates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_1.html">Tutorial 1: The first synthetic station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#building-a-model-collection">Building a Model collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#creating-timeseries-objects">Creating Timeseries objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#fitting-the-models">Fitting the models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_1.html#plotting-the-fit-and-residuals">Plotting the fit and residuals</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_2.html">Tutorial 2: Advanced Models and Fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#creating-more-complex-synthetic-data">Creating more complex synthetic data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#spline-models-for-transients">Spline models for transients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#building-a-network">Building a Network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#fitting-an-entire-network">Fitting an entire network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_3.html">Tutorial 3: Incorporating Spatial Coherence</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#dreaming-up-a-network">Dreaming up a network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#fantasizing-data">Fantasizing data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#removing-the-common-mode-error">Removing the Common Mode Error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#fitting-the-data-using-reweighted-l1-regularization">Fitting the data using reweighted L1 regularization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#fitting-the-data-using-a-spatially-aware-l1-reweighting">Fitting the data using a spatially-aware L1 reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#finding-unmodeled-jumps">Finding unmodeled jumps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#making-a-noisy-network">Making a noisy network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#fitting-the-models-with-the-spatial-l0-solver">Fitting the models with the spatial L0 solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#quality-of-the-fits">Quality of the fits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#correlation-of-parameters">Correlation of parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#simple-linear-regression-with-restricted-spline-set">Simple linear regression with restricted spline set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_1.html">Example 1: Long Valley Caldera Transient Motions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#preparations">Preparations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="example_1.html#getting-data">Getting data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="example_1.html#building-the-network">Building the network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#cleaning-the-timeseries">Cleaning the timeseries</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="example_1.html#outlier-and-cme-removal">Outlier and CME removal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="example_1.html#first-pass-major-steps-and-noisy-periods">First pass: major steps and noisy periods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="example_1.html#second-pass-minor-catalog-based-steps">Second pass: minor, catalog-based steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#model-parameter-estimation">Model parameter estimation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#modeled-horizontal-transient-motion">Modeled horizontal transient motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#modeled-vertical-seasonal-motion">Modeled vertical seasonal motion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#comparison-of-secular-velocities">Comparison of secular velocities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#final-considerations">Final considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_1.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#selectpair">selectpair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/models.html">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#model-collection">Model Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#fit-collection">Fit Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#basic-models">Basic Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#arctangent">Arctangent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#exponential">Exponential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#hyperbolic-tangent">Hyperbolic Tangent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#logarithmic">Logarithmic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#polynomial">Polynomial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#step">Step</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#sinusoid">Sinusoid</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#spline-models">Spline Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#bspline">BSpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/processing.html">Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#clean">clean</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#decompose">decompose</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#median">median</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#midas">midas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/processing.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/processing.html#stepdetector">StepDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/solvers.html">Solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#solver-functions">Solver Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#linear-regression">linear_regression</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#ridge-regression">ridge_regression</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/solvers.html#reweighting-functions">Reweighting Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#reweightingfunction">ReweightingFunction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#inversereweighting">InverseReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#inversesquaredreweighting">InverseSquaredReweighting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/solvers.html#logarithmicreweighting">LogarithmicReweighting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/timeseries.html">Timeseries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/timeseries.html#specialized-classes">Specialized Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../disstans/tools.html">Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#date2decyear">date2decyear</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parallelize">parallelize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#click">Click</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rinexdataholding">RINEXDataHolding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#timedelta">Timedelta</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DISSTANS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../examples.html">Examples</a> &raquo;</li>
+      <li>Example 2: Long Valley Caldera Comparisons</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/example_2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-2-long-valley-caldera-comparisons">
+<h1>Example 2: Long Valley Caldera Comparisons<a class="headerlink" href="#example-2-long-valley-caldera-comparisons" title="Permalink to this heading"></a></h1>
+<aside class="sidebar">
+<p class="sidebar-title">Download full script</p>
+<p><a class="reference download internal" download="" href="../_downloads/4c632ee0ef9132a29da61d5e38ae78ba/example_2_lvc_comparison.py"><code class="xref download docutils literal notranslate"><span class="pre">example_2_lvc_comparison.py</span></code></a></p>
+</aside>
+<p>This example builds on the data from <a class="reference internal" href="example_1.html"><span class="doc">Example 1</span></a> and compares secular
+velocity model results with published data. On the way, it shows how to do coordinate
+transformations from the cartesian to the local geodetic reference frame.</p>
+<nav class="contents local" id="table-of-contents">
+<p class="topic-title">Table of contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#preparations" id="id3">Preparations</a></p></li>
+<li><p><a class="reference internal" href="#homogenous-translation-rotation-and-strain" id="id4">Homogenous translation, rotation, and strain</a></p></li>
+<li><p><a class="reference internal" href="#rotation-about-an-euler-pole" id="id5">Rotation about an Euler pole</a></p></li>
+<li><p><a class="reference internal" href="#comparison-of-different-methods" id="id6">Comparison of different methods</a></p></li>
+<li><p><a class="reference internal" href="#loading-other-different-datasets" id="id7">Loading other different datasets</a></p></li>
+<li><p><a class="reference internal" href="#north-american-reference-frame" id="id8">North American reference frame</a></p></li>
+<li><p><a class="reference internal" href="#estimate-euler-poles-for-datasets" id="id9">Estimate Euler poles for datasets</a></p></li>
+<li><p><a class="reference internal" href="#map-view-comparison-of-datasets" id="id10">Map view comparison of datasets</a></p></li>
+<li><p><a class="reference internal" href="#quantitative-comparison-of-datasets" id="id11">Quantitative comparison of datasets</a></p></li>
+<li><p><a class="reference internal" href="#references" id="id12">References</a></p></li>
+</ul>
+</nav>
+<section id="preparations">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<p>Here are the imports we will need throughout the example:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gzip</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.tools</span> <span class="kn">import</span> <span class="p">(</span><span class="n">R_ecef2enu</span><span class="p">,</span> <span class="n">strain_rotation_invariants</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">estimate_euler_pole</span><span class="p">,</span> <span class="n">rotvec2eulerpole</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We also need to define the same folders as in Example 1 - in our case:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">main_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;proj_dir&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">main_dir</span> <span class="o">/</span> <span class="s2">&quot;data/gnss&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gnss_dir</span> <span class="o">=</span> <span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;longvalley&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out_dir_ex1</span> <span class="o">=</span> <span class="n">main_dir</span> <span class="o">/</span> <span class="s2">&quot;out/example_1&quot;</span>
+</pre></div>
+</div>
+<p>With that, we can load some of the data we used or produced in Example 1:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_dir_ex1</span><span class="si">}</span><span class="s2">/example_1_net.pkl.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">net</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stations_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gnss_dir</span><span class="si">}</span><span class="s2">/downloaded.pkl.gz&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">all_poly_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_dir_ex1</span><span class="si">}</span><span class="s2">/example_1_secular_velocities.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">poly_stat_names</span> <span class="o">=</span> <span class="n">all_poly_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In the next two sections, we will compute “average” background velocity fields
+for the secular, linear velocities previously estimated, using two different methods.</p>
+</section>
+<section id="homogenous-translation-rotation-and-strain">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Homogenous translation, rotation, and strain</a><a class="headerlink" href="#homogenous-translation-rotation-and-strain" title="Permalink to this heading"></a></h2>
+<p>The first method determines the best-fit displacement gradient tensor for the
+entire network, which in turn can be decomposed into a rotation and a strain (rate) tensor
+(plus a velocity offset term). More information can be found in the
+<a class="reference internal" href="../disstans/network.html#disstans.network.Network.hom_velocity_field" title="disstans.network.Network.hom_velocity_field"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hom_velocity_field()</span></code></a> method, which wraps the
+<a class="reference internal" href="../disstans/tools.html#disstans.tools.get_hom_vel_strain_rot" title="disstans.tools.get_hom_vel_strain_rot"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_hom_vel_strain_rot()</span></code></a> function for network objects.</p>
+<p>Directly from the network object we loaded from Example 1, we can get our desired
+results:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_pred_hom</span><span class="p">,</span> <span class="n">v_O</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">hom_velocity_field</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">mdl_description</span><span class="o">=</span><span class="s2">&quot;Linear&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We are going to plot the results later, but for now, let’s have a look at some scalar
+quantities related to the outputs that can give us insight into what is happening
+in our study region.</p>
+<p>So, there is a little bit of everything going on here. We’re not going to dwell on
+it here, since we’re mostly focused on the resulting predicted velocities, but you
+can have a look at <a class="reference internal" href="../disstans/tools.html#disstans.tools.strain_rotation_invariants" title="disstans.tools.strain_rotation_invariants"><code class="xref py py-func docutils literal notranslate"><span class="pre">strain_rotation_invariants()</span></code></a> if you’re
+curious what the quantities mean. For now, let’s move on to the other method
+included in DISSTANS, which might be a bit more intuitive.</p>
+</section>
+<section id="rotation-about-an-euler-pole">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Rotation about an Euler pole</a><a class="headerlink" href="#rotation-about-an-euler-pole" title="Permalink to this heading"></a></h2>
+<p>The second method assumes that all observations lie on a rigid body that can move
+freely on a sphere, but not deform. All rigid-body motion on a sphere can be
+expressed about a rotation around a location on the sphere, and we’ll use the
+<a class="reference internal" href="../disstans/network.html#disstans.network.Network.euler_rot_field" title="disstans.network.Network.euler_rot_field"><code class="xref py py-meth docutils literal notranslate"><span class="pre">euler_rot_field()</span></code></a> method for the calculation,
+which wraps the <a class="reference internal" href="../disstans/tools.html#disstans.tools.estimate_euler_pole" title="disstans.tools.estimate_euler_pole"><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_euler_pole()</span></code></a> function for network
+objects:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_pred_euler</span><span class="p">,</span> <span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">euler_rot_field</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="n">mdl_description</span><span class="o">=</span><span class="s2">&quot;Linear&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The rotation vector returned here is in ECEF (cartesian) coordinates, which is useful
+if we want to rotate vectors later, but for now, we can convert it into the more
+convenient Euler pole notation using <a class="reference internal" href="../disstans/tools.html#disstans.tools.rotvec2eulerpole" title="disstans.tools.rotvec2eulerpole"><code class="xref py py-func docutils literal notranslate"><span class="pre">rotvec2eulerpole()</span></code></a>:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">euler_pole</span><span class="p">,</span> <span class="n">euler_pole_covariance</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">rotvec2eulerpole</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># convert to degrees for printing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">euler_pole</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">euler_pole</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">euler_pole_sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">euler_pole_covariance</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Euler pole results (with one s.d.):</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Longitude: </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> °</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Latitude:  </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> °</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Rate:      </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.2g</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.2g</span><span class="si">}</span><span class="s2"> °/a&quot;</span><span class="p">)</span>
+<span class="go">Euler pole results (with one s.d.):</span>
+<span class="go">Longitude: 61.059 +/- 0.003 °</span>
+<span class="go">Latitude:  31.733 +/- 0.625 °</span>
+<span class="go">Rate:      0.0019 +/- 2.2e-05 °/a</span>
+</pre></div>
+</div>
+</section>
+<section id="comparison-of-different-methods">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Comparison of different methods</a><a class="headerlink" href="#comparison-of-different-methods" title="Permalink to this heading"></a></h2>
+<p>Plotting the resulting two velocity fields (see script file) gives us the plot
+below. We can clearly see that the Euler pole solution gives a rotation pattern
+about some center south of the plot. The solution assuming a Homogenous
+motion and deformation shows less of a rotation, and more of an east-west motion
+with associated extension.</p>
+<img alt="../_images/example_2_single.png" src="../_images/example_2_single.png" />
+</section>
+<section id="loading-other-different-datasets">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Loading other different datasets</a><a class="headerlink" href="#loading-other-different-datasets" title="Permalink to this heading"></a></h2>
+<p>We will now compare the DISSTANS-derived secular velocities with other published
+datasets. Specifically, we will be using the MIDAS-calculated velocities from UNR
+(<a class="reference internal" href="../disstans/processing.html#blewitt16" id="id1"><span>[blewitt16]</span></a> - <cite>link to file &lt;http://geodesy.unr.edu/velocities/midas.IGS14.txt&gt;`_</cite>)
+and from the Geodesy Advancing Geosciences and EarthScope (GAGE) facility (<a class="reference internal" href="#herring16" id="id2"><span>[herring16]</span></a> -
+<cite>link to file &lt;https://data.unavco.org/archive/gnss/products/velocity/pbo.final_igs14.vel&gt;`_</cite>).</p>
+<p>To load them, we rely on pandas:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># MIDAS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fname_midas</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">/midas.IGS14.txt&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_midas</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fname_midas</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sta&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;t(1)&quot;</span><span class="p">,</span> <span class="s2">&quot;t(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;delt&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;mgood&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;ve50&quot;</span><span class="p">,</span> <span class="s2">&quot;vn50&quot;</span><span class="p">,</span> <span class="s2">&quot;vu50&quot;</span><span class="p">,</span> <span class="s2">&quot;sve&quot;</span><span class="p">,</span> <span class="s2">&quot;svn&quot;</span><span class="p">,</span> <span class="s2">&quot;svu&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;xe50&quot;</span><span class="p">,</span> <span class="s2">&quot;xn50&quot;</span><span class="p">,</span> <span class="s2">&quot;xu50&quot;</span><span class="p">,</span> <span class="s2">&quot;fe&quot;</span><span class="p">,</span> <span class="s2">&quot;fn&quot;</span><span class="p">,</span> <span class="s2">&quot;fu&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="s2">&quot;sde&quot;</span><span class="p">,</span> <span class="s2">&quot;sdn&quot;</span><span class="p">,</span> <span class="s2">&quot;sdu&quot;</span><span class="p">,</span> <span class="s2">&quot;nstep&quot;</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;sta&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify_integrity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># GAGE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fname_gage</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">/pbo.final_igs14.vel&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_gage</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span><span class="n">fname_gage</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">widths</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span>
+<span class="gp">... </span>                                 <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span>
+<span class="gp">... </span>                         <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Dot#&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Ref_epoch&quot;</span><span class="p">,</span> <span class="s2">&quot;Ref_jday&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="s2">&quot;Ref_X&quot;</span><span class="p">,</span> <span class="s2">&quot;Ref_Y&quot;</span><span class="p">,</span> <span class="s2">&quot;Ref_Z&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="s2">&quot;Ref_Nlat&quot;</span><span class="p">,</span> <span class="s2">&quot;Ref_Elong&quot;</span><span class="p">,</span> <span class="s2">&quot;Ref_Up&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="s2">&quot;dX/dt&quot;</span><span class="p">,</span> <span class="s2">&quot;dY/dt&quot;</span><span class="p">,</span> <span class="s2">&quot;dZ/dt&quot;</span><span class="p">,</span> <span class="s2">&quot;SXd&quot;</span><span class="p">,</span> <span class="s2">&quot;SYd&quot;</span><span class="p">,</span> <span class="s2">&quot;SZd&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="s2">&quot;Rxy&quot;</span><span class="p">,</span> <span class="s2">&quot;Rxz&quot;</span><span class="p">,</span> <span class="s2">&quot;Ryz&quot;</span><span class="p">,</span> <span class="s2">&quot;dN/dt&quot;</span><span class="p">,</span> <span class="s2">&quot;dE/dt&quot;</span><span class="p">,</span> <span class="s2">&quot;dU/dt&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="s2">&quot;SNd&quot;</span><span class="p">,</span> <span class="s2">&quot;SEd&quot;</span><span class="p">,</span> <span class="s2">&quot;SUd&quot;</span><span class="p">,</span> <span class="s2">&quot;Rne&quot;</span><span class="p">,</span> <span class="s2">&quot;Rnu&quot;</span><span class="p">,</span> <span class="s2">&quot;Reu&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="s2">&quot;first_epoch&quot;</span><span class="p">,</span> <span class="s2">&quot;last_epoch&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># manually checked that the last occurrence of repeated station velocities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># is the median of the reported velocities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Dot#&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s2">&quot;last&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Dot#&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify_integrity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the comparison, we need a list of all the stations that have solutions in all
+three datasets. For the plotting, we also need their latitude and longitudes.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># station list</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">common_stations</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">poly_stat_names</span><span class="p">)</span>
+<span class="gp">... </span>                              <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="gp">... </span>                              <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">())))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># locations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">station_lolaal</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">station_locations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+<span class="gp">... </span>    <span class="n">common_stations</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Longitude [°]&quot;</span><span class="p">,</span> <span class="s2">&quot;Latitude [°]&quot;</span><span class="p">,</span> <span class="s2">&quot;Altitude [m]&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">alts</span> <span class="o">=</span> <span class="n">station_lolaal</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">station_lolaal</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">station_lolaal</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In the next step, we need to bring all datasets into the same format, and order them the
+same way:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># reduce DataFrame to what we need for the velocities comparison</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl</span><span class="p">[</span><span class="s2">&quot;DISSTANS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_poly_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+<span class="gp">... </span>    <span class="n">common_stations</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;vel_n&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_vel_n&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl</span><span class="p">[</span><span class="s2">&quot;DISSTANS&quot;</span><span class="p">][</span><span class="s2">&quot;corr_vel_en&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_poly_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;corr_vel_en&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># also convert the MIDAS and GAGE velocity dataframes into the same format</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl</span><span class="p">[</span><span class="s2">&quot;MIDAS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;vel_e&quot;</span><span class="p">:</span> <span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;ve50&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s2">&quot;vel_n&quot;</span><span class="p">:</span> <span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;vn50&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s2">&quot;sig_vel_e&quot;</span><span class="p">:</span> <span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;sve&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s2">&quot;sig_vel_n&quot;</span><span class="p">:</span> <span class="n">v_mdl_midas</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;svn&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                               <span class="s2">&quot;corr_vel_en&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">common_stations</span><span class="p">))},</span>
+<span class="gp">... </span>                              <span class="n">index</span><span class="o">=</span><span class="n">common_stations</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl</span><span class="p">[</span><span class="s2">&quot;GAGE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;vel_e&quot;</span><span class="p">:</span> <span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;dE/dt&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="s2">&quot;vel_n&quot;</span><span class="p">:</span> <span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;dN/dt&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="s2">&quot;sig_vel_e&quot;</span><span class="p">:</span> <span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;SEd&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="s2">&quot;sig_vel_n&quot;</span><span class="p">:</span> <span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;SNd&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                              <span class="s2">&quot;corr_vel_en&quot;</span><span class="p">:</span> <span class="n">v_mdl_gage</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">common_stations</span><span class="p">,</span> <span class="s2">&quot;Rne&quot;</span><span class="p">]},</span>
+<span class="gp">... </span>                             <span class="n">index</span><span class="o">=</span><span class="n">common_stations</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="north-american-reference-frame">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">North American reference frame</a><a class="headerlink" href="#north-american-reference-frame" title="Permalink to this heading"></a></h2>
+<p>Even though removing an average velocity field with either method will remove any large-scale
+plate motion from the IGS14-referenced data, for plotting purposes, we want to be able to see
+the velocity field relative to stable North America. We could have downloaded the data in that
+reference frame in the first place, but for illustration purposes, we didn’t, such that we
+can rotate the data ourselves using the <a class="reference internal" href="../disstans/tools.html#disstans.tools.R_ecef2enu" title="disstans.tools.R_ecef2enu"><code class="xref py py-func docutils literal notranslate"><span class="pre">R_ecef2enu()</span></code></a> rotation matrix:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># ITRF2014 plate motion model: https://doi.org/10.1093/gji/ggx136</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rot_NA_masperyear</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.024</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.694</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.063</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rot_NA</span> <span class="o">=</span> <span class="n">rot_NA_masperyear</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">648000</span>  <span class="c1"># [rad/a]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crs_lla</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geodetic</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crs_xyz</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geocentric</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat_xyz</span> <span class="o">=</span> <span class="n">crs_xyz</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">alts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_NA_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">rot_NA</span><span class="p">,</span> <span class="n">stat_xyz</span><span class="p">)</span>  <span class="c1"># [m/a]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_NA_enu</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([(</span><span class="n">R_ecef2enu</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span> <span class="o">@</span> <span class="n">v_NA_xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span>
+<span class="gp">... </span>                   <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">))]),</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="n">common_stations</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;vel_n&quot;</span><span class="p">,</span> <span class="s2">&quot;vel_u&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>With this, we can now remove the velocity at every station due to the North American (NA)
+plate moving around Earth to get the velocity relative to the NA plate:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_na</span> <span class="o">=</span> <span class="p">{</span><span class="n">case</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">v_NA_enu</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="n">v_mdl</span><span class="p">[</span><span class="n">case</span><span class="p">][[</span><span class="s2">&quot;vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;vel_n&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="gp">... </span>            <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">v_mdl</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+</pre></div>
+</div>
+</section>
+<section id="estimate-euler-poles-for-datasets">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Estimate Euler poles for datasets</a><a class="headerlink" href="#estimate-euler-poles-for-datasets" title="Permalink to this heading"></a></h2>
+<p>Since an Euler pole captures a more “explainable” signal, while still approximating most
+of the velocity field, we will only use this method for the comparison between fields.
+Instead of creating timeseries and <a class="reference internal" href="../disstans/models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a> models, and adding
+them to our network object from before, we will instead be using the Euler pole function
+<a class="reference internal" href="../disstans/tools.html#disstans.tools.estimate_euler_pole" title="disstans.tools.estimate_euler_pole"><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_euler_pole()</span></code></a> directly. For that, we will need the variances
+and covariances instead of the standard deviations and correlation coefficients:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_covs</span> <span class="o">=</span> <span class="p">{</span><span class="n">case</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">v_mdl</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s2">&quot;sig_vel_e&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">v_mdl</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s2">&quot;sig_vel_n&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>     <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">v_mdl</span><span class="p">[</span><span class="n">case</span><span class="p">][[</span><span class="s2">&quot;sig_vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_vel_n&quot;</span><span class="p">,</span> <span class="s2">&quot;corr_vel_en&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>     <span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">v_mdl</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+</pre></div>
+</div>
+<p>We can now run a loop over the three datasets, calculate the Euler poles, predict the
+background velocity at every station, and calculate the residuals:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_pred</span><span class="p">,</span> <span class="n">v_res</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;DISSTANS&quot;</span><span class="p">,</span> <span class="s2">&quot;MIDAS&quot;</span><span class="p">,</span> <span class="s2">&quot;GAGE&quot;</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="c1"># get solution for all stations</span>
+<span class="gp">... </span>    <span class="n">rotation_vector</span> <span class="o">=</span> <span class="n">estimate_euler_pole</span><span class="p">(</span><span class="n">station_lolaal</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span>
+<span class="gp">... </span>                                          <span class="n">v_mdl_na</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<span class="gp">... </span>                                          <span class="n">v_mdl_covs</span><span class="p">[</span><span class="n">case</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="c1"># calculate the surface motion at each station</span>
+<span class="gp">... </span>    <span class="n">v_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">stat_xyz</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># rotate the motion into the local ENU frame</span>
+<span class="gp">... </span>    <span class="n">v_pred</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([(</span><span class="n">R_ecef2enu</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span> <span class="o">@</span> <span class="n">v_temp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span>
+<span class="gp">... </span>                       <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">))])[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">index</span><span class="o">=</span><span class="n">common_stations</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;vel_n&quot;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="c1"># get residual</span>
+<span class="gp">... </span>    <span class="n">v_res</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_mdl_na</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">-</span> <span class="n">v_pred</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+</section>
+<section id="map-view-comparison-of-datasets">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Map view comparison of datasets</a><a class="headerlink" href="#map-view-comparison-of-datasets" title="Permalink to this heading"></a></h2>
+<p>Let’s now have a look at the modeled velocities, the background velocity field, as
+well as the residual velocities, for all three datasets. For the plotting code, see the
+script file.</p>
+<p>First off, we can see that qualitatively, the three secular velocity models (DISSTANS,
+GAGE, and MIDAS) mostly match each other. Zooming into the caldera region, however, there
+are some significant differences.</p>
+<img alt="../_images/example_2_observed_igs.png" src="../_images/example_2_observed_igs.png" />
+<img alt="../_images/example_2_observed_na.png" src="../_images/example_2_observed_na.png" />
+<p>In terms of the background vleocity field derived from the best-fit Euler poles, we see
+that qualitatively, all three estimates mostly match each other again, with some differences
+for the DISSTANS background field in the east of the study area.</p>
+<img alt="../_images/example_2_predicted.png" src="../_images/example_2_predicted.png" />
+<p>Finally, looking at the residuals, we can see that the DISSTANS solution has significantly
+lower residuals within the caldera region, suggesting that the DISSTANS-derived secular
+velocity field is more closely matching that of a rigid body motion on a sphere.
+Outside the caldera, DISSTANS’ residuals are slightly different, which is likely due to the
+slightly different background velocity fields, and our imperfect assumption about the nature
+of the background velocity field.</p>
+<img alt="../_images/example_2_residuals.png" src="../_images/example_2_residuals.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For better plots, feel free to add elements in Cartopy, or use (Py)GMT.
+The script file contains a part about saving our results in a GMT-compatible
+format.</p>
+</div>
+</section>
+<section id="quantitative-comparison-of-datasets">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Quantitative comparison of datasets</a><a class="headerlink" href="#quantitative-comparison-of-datasets" title="Permalink to this heading"></a></h2>
+<p>To put into numbers what we gathered by looking at the maps, we will perform a couple of
+root-mean-square (RMS) calculations of the residuals of the different models and station
+subsets. In order to do that, we first need to define a region close to the caldera center,
+which we will call the Long Valley Caldera Region (LVCR):</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">inner_bbox</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">119</span><span class="o">-</span><span class="mi">12</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="o">-</span><span class="mi">118</span><span class="o">-</span><span class="mi">33</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="mi">37</span><span class="o">+</span><span class="mi">30</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="mi">37</span><span class="o">+</span><span class="mi">50</span><span class="o">/</span><span class="mi">60</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inner_shell</span> <span class="o">=</span> <span class="p">((</span><span class="n">lons</span> <span class="o">&gt;</span> <span class="mi">360</span> <span class="o">+</span> <span class="n">inner_bbox</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span>
+<span class="gp">... </span>               <span class="p">(</span><span class="n">lons</span> <span class="o">&lt;</span> <span class="mi">360</span> <span class="o">+</span> <span class="n">inner_bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span>
+<span class="gp">... </span>               <span class="p">(</span><span class="n">lats</span> <span class="o">&gt;</span> <span class="n">inner_bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">&amp;</span>
+<span class="gp">... </span>               <span class="p">(</span><span class="n">lats</span> <span class="o">&lt;</span> <span class="n">inner_bbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outer_shell</span> <span class="o">=</span> <span class="o">~</span><span class="n">inner_shell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inner_stations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">common_stations</span><span class="p">)[</span><span class="n">inner_shell</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outer_stations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">common_stations</span><span class="p">)[</span><span class="n">outer_shell</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>With that, we can calculate another background velocity field that only considers the
+stations outside the LVCR:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_pred_os</span><span class="p">,</span> <span class="n">v_res_os</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;DISSTANS&quot;</span><span class="p">,</span> <span class="s2">&quot;MIDAS&quot;</span><span class="p">,</span> <span class="s2">&quot;GAGE&quot;</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">rotation_vector</span> <span class="o">=</span> <span class="n">estimate_euler_pole</span><span class="p">(</span><span class="n">station_lolaal</span><span class="p">[</span><span class="n">outer_shell</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span>
+<span class="gp">... </span>                                          <span class="n">v_mdl_na</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">outer_shell</span><span class="p">,</span> <span class="p">:],</span>
+<span class="gp">... </span>                                          <span class="n">v_mdl_covs</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="n">outer_shell</span><span class="p">,</span> <span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">v_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">stat_xyz</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">v_pred_os</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([(</span><span class="n">R_ecef2enu</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span> <span class="o">@</span> <span class="n">v_temp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span>
+<span class="gp">... </span>                       <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">))])[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="n">index</span><span class="o">=</span><span class="n">common_stations</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vel_e&quot;</span><span class="p">,</span> <span class="s2">&quot;vel_n&quot;</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">v_res_os</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_mdl_na</span><span class="p">[</span><span class="n">case</span><span class="p">]</span> <span class="o">-</span> <span class="n">v_pred_os</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+<p>This enables us to see how different the results are depending on whether the stations
+inside the LVCR are being used to calculate the best-fit Euler poles:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rmses_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+<span class="gp">... </span>                         <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">v_res</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="s2">&quot;inner&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rmses_res_os</span><span class="p">,</span> <span class="n">rmses_resdiff</span> <span class="o">=</span> <span class="n">rmses_res</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">rmses_res</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">sub_name</span><span class="p">,</span> <span class="n">sub_ix</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="s2">&quot;inner&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                            <span class="p">[[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="n">outer_shell</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">outer_shell</span><span class="p">,</span> <span class="o">~</span><span class="n">outer_shell</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="n">rmses_res</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub_name</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
+<span class="gp">... </span>        <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v_res</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">sub_ix</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**</span><span class="mf">0.5</span>
+<span class="gp">... </span>         <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">v_res</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="gp">... </span>    <span class="n">rmses_res_os</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub_name</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
+<span class="gp">... </span>        <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v_res_os</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">sub_ix</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**</span><span class="mf">0.5</span>
+<span class="gp">... </span>         <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">v_res_os</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="gp">... </span>    <span class="c1"># compare the residuals between the common and outer stations cases</span>
+<span class="gp">... </span>    <span class="c1"># this is the same as comparing the predictions, as the plate velocity cancels out</span>
+<span class="gp">... </span>    <span class="n">rmses_resdiff</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub_name</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
+<span class="gp">... </span>        <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v_res</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">sub_ix</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">... </span>                         <span class="o">-</span> <span class="n">v_res_os</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">sub_ix</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+<span class="gp">... </span>                         <span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">v_res_os</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+</pre></div>
+</div>
+<p>We can also quantify the differences between the different modeled secular velocity
+fields:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rmses_predmdls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">&quot;D2M&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;DISSTANS&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">vp</span><span class="p">[</span><span class="s2">&quot;MIDAS&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**</span><span class="mf">0.5</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="p">[</span><span class="n">v_pred</span><span class="p">,</span> <span class="n">v_pred_os</span><span class="p">]],</span>
+<span class="gp">... </span>     <span class="s2">&quot;D2G&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;DISSTANS&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">vp</span><span class="p">[</span><span class="s2">&quot;GAGE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**</span><span class="mf">0.5</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="p">[</span><span class="n">v_pred</span><span class="p">,</span> <span class="n">v_pred_os</span><span class="p">]],</span>
+<span class="gp">... </span>     <span class="s2">&quot;M2G&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vp</span><span class="p">[</span><span class="s2">&quot;MIDAS&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">vp</span><span class="p">[</span><span class="s2">&quot;GAGE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">**</span><span class="mf">0.5</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="p">[</span><span class="n">v_pred</span><span class="p">,</span> <span class="n">v_pred_os</span><span class="p">]]},</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;common&quot;</span><span class="p">,</span> <span class="s2">&quot;outer&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Finally, let’s print out all the statistics we just calculated:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Difference between model predictions</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">rmses_predmdls</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Residuals common_stations</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">rmses_res</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Residuals outer_stations</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">rmses_res_os</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Difference of residuals between station subsets</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">rmses_resdiff</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Relative improvement from other models to DISSTANS</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="p">(</span><span class="n">rmses_res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">rmses_res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>       <span class="p">)</span> <span class="o">/</span> <span class="n">rmses_res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="go">Difference between model predictions</span>
+<span class="go">             D2M      D2G       M2G</span>
+<span class="go">common  0.001528  0.00169  0.000678</span>
+<span class="go">outer   0.001536  0.00177  0.000693</span>
+
+<span class="go">Residuals common_stations</span>
+<span class="go">       DISSTANS     MIDAS      GAGE</span>
+<span class="go">all    0.002692  0.003065  0.003883</span>
+<span class="go">outer  0.002880  0.002788  0.002789</span>
+<span class="go">inner  0.002490  0.003318  0.004730</span>
+
+<span class="go">Residuals outer_stations</span>
+<span class="go">       DISSTANS     MIDAS      GAGE</span>
+<span class="go">all    0.002642  0.003084  0.003989</span>
+<span class="go">outer  0.002743  0.002755  0.002888</span>
+<span class="go">inner  0.002537  0.003381  0.004846</span>
+
+<span class="go">Difference of residuals between station subsets</span>
+<span class="go">       DISSTANS     MIDAS      GAGE</span>
+<span class="go">all    0.000430  0.000471  0.000505</span>
+<span class="go">outer  0.000447  0.000472  0.000505</span>
+<span class="go">inner  0.000412  0.000471  0.000505</span>
+
+<span class="go">Relative improvement from other models to DISSTANS</span>
+<span class="go">          MIDAS      GAGE</span>
+<span class="go">all    0.121536  0.306674</span>
+<span class="go">outer -0.033071 -0.032699</span>
+<span class="go">inner  0.249614  0.473615</span>
+</pre></div>
+</div>
+<p>There’s a lot to unpack here, so let’s jump right in:</p>
+<ol class="arabic simple">
+<li><p>The MIDAs and GAGE modeled velocity fields are similar to each other at the scale of
+less than 1 mm/a, the DISSTANS field is still comparable, with an RMS difference of
+less than 2 mm/a.</p></li>
+<li><p>Excluding the stations inside the LVCR from the Euler pole estimation does not
+significantly affect the results for any of the datasets. The differences are below
+the level of 1 mm/a.</p></li>
+<li><p>Across the board, the DISSTANS solution has the lowest residuals. Looking more closely,
+this is mainly driven by lower residuals inside the LVCR, where the relative
+improvements are 25% to 47%. Outside the LVCR, DISSTANS’ residuals are slightly larger
+by about 3%.</p></li>
+<li><p>While there are large differences between residuals inside and outside the LVCR for
+the MIDAS (33% to 28%, respectively) and GAGE (47% to 28%) models, the residuals for
+the DISSTANS model are the most similar (25% to 29%).</p></li>
+</ol>
+<p>Keep in mind that this of course does not mean that DISSTANS’ solution is “better” than
+the MIDAS or GAGE solutions. After all, neither of those models explicitly aim to model
+transient episodes, nor do they require significant user interaction. This comparison
+does show, however, how the explicit modeling of transients changes the results.</p>
+</section>
+<section id="references">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<div role="list" class="citation-list">
+<div class="citation" id="herring16" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">herring16</a><span class="fn-bracket">]</span></span>
+<p>Herring, T. A., Melbourne, T. I., Murray, M. H., Floyd, M. A.,
+Szeliga, W. M., King, R. W., et al. (2016). <em>Plate Boundary Observatory and related
+networks: GPS data analysis methods and geodetic products</em>.
+Reviews of Geophysics, 54(4), 759–808.
+doi:<a class="reference external" href="https://doi.org/10.1002/2016RG000529">10.1002/2016RG000529</a></p>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_1.html" class="btn btn-neutral float-left" title="Example 1: Long Valley Caldera Transient Motions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../disstans.html" class="btn btn-neutral float-right" title="DISSTANS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Tobias Köhne.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

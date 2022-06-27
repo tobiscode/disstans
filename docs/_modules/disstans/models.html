@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.models &mdash; DISSTANS 0.10 documentation</title>
+  <title>disstans.models &mdash; DISSTANS 1.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -30,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.10
+                1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -42,9 +43,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-installation">Minimal installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../installation.html#full-development-installation">Full development installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-environment">Minimal environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#updates">Updates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
@@ -119,6 +121,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -126,7 +141,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -206,13 +220,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -429,6 +450,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span>
 
+<div class="viewcode-block" id="Model.get_cov_by_index"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.Model.get_cov_by_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_cov_by_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the covariance matrix for a given parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index : int</span>
+<span class="sd">            Parameter index.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cov : numpy.ndarray</span>
+<span class="sd">            Covariance matrix for the selected parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_parameters</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;index&#39; needs to be an integer less than the number of parameters, got </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_comps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_par</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="p">[</span><span class="n">index</span><span class="o">*</span><span class="n">num_comps</span><span class="p">:(</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">num_comps</span><span class="p">,</span>
+                             <span class="n">index</span><span class="o">*</span><span class="n">num_comps</span><span class="p">:(</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">num_comps</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="Model.__str__"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.Model.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Special function that returns a readable summary of the Model.</span>
@@ -525,6 +569,62 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Instantiated model was not subclassed or &quot;</span>
                                   <span class="s2">&quot;it does not overwrite the &#39;_get_arch&#39; method.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.copy"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.Model.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">covariances</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">active_parameters</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy the model object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameters : bool, optional</span>
+<span class="sd">            If ``True`` (default), include the read-in parameters in the copy</span>
+<span class="sd">            (:attr:`~par`), otherwise leave empty.</span>
+<span class="sd">        covariances : bool, optional</span>
+<span class="sd">            If ``True`` (default), include the read-in (co)variances in the copy</span>
+<span class="sd">            (:attr:`~cov`), otherwise leave empty.</span>
+<span class="sd">        active_parameters : bool, optional</span>
+<span class="sd">            If ``True`` (default), include the active parameter setting in the copy</span>
+<span class="sd">            (:attr:`~active_parameters`), otherwise leave empty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        disstans.models.Model</span>
+<span class="sd">            A copy of the model, based on :meth:`~get_arch`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># instantiate</span>
+        <span class="n">arch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_arch</span><span class="p">()</span>
+        <span class="n">mdl</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">arch</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]](</span><span class="o">**</span><span class="n">arch</span><span class="p">[</span><span class="s2">&quot;kw_args&quot;</span><span class="p">])</span>
+        <span class="c1"># update read-in parameters and settings</span>
+        <span class="k">if</span> <span class="n">parameters</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_par</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">mdl</span><span class="o">.</span><span class="n">_par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_par</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">covariances</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">mdl</span><span class="o">.</span><span class="n">_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">active_parameters</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">mdl</span><span class="o">.</span><span class="n">active_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_parameters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">mdl</span></div>
+
+<div class="viewcode-block" id="Model.convert_units"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.Model.convert_units">[docs]</a>    <span class="k">def</span> <span class="nf">convert_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the parameter and covariances to a new unit by providing a</span>
+<span class="sd">        conversion factor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Factor to multiply the parameters by to obtain the parameters in the new units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># input checks</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;factor&#39; and has to be a scalar, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="c1"># convert parameters</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_par</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_par</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="c1"># convert covariances</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span> <span class="o">*=</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span></div>
 
 <div class="viewcode-block" id="Model.freeze"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.Model.freeze">[docs]</a>    <span class="k">def</span> <span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zero_threshold</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -762,7 +862,8 @@
         <span class="c1"># check and set parameters</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_parameters</span> <span class="o">==</span> <span class="n">parameters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> \
             <span class="s2">&quot;Read-in parameters have different size than the instantiated model. &quot;</span> <span class="o">+</span> \
-            <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">[0].&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_parameters</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">. The input &quot;</span> <span class="o">+</span> \
+            <span class="sa">f</span><span class="s2">&quot;shape was </span><span class="si">{</span><span class="n">parameters</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, is there a dimension missing?&quot;</span>
         <span class="n">par</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_parameters</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">act_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_parameters</span>
         <span class="k">if</span> <span class="n">act_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -950,7 +1051,35 @@
         <span class="n">exponents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_exponent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># broadcast to all coefficients</span>
         <span class="n">coefs</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponents</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">coefs</span></div>
+        <span class="k">return</span> <span class="n">coefs</span>
+
+<div class="viewcode-block" id="Polynomial.get_exp_index"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.Polynomial.get_exp_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_exp_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the row index for :attr:`~Model.par` and :attr:`~Model.var`</span>
+<span class="sd">        of a given exponent.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        exponent : int</span>
+<span class="sd">            Exponent for which to return the index. E.g., ``1`` would correspond</span>
+<span class="sd">            to the index of the linear term.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Index of the exponent&#39;s term.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Raised if the desired exponent is not present in the model..</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exponent</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;exponent&#39; needs to be an integer&#39;, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exponent</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_exponent</span> <span class="o">&lt;=</span> <span class="n">exponent</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">exponent</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_exponent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exponent </span><span class="si">{</span><span class="n">exponent</span><span class="si">}</span><span class="s2"> is not included in the model.&quot;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="BSpline"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.BSpline">[docs]</a><span class="k">class</span> <span class="nc">BSpline</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
@@ -2185,6 +2314,59 @@
 <span class="sd">        Convenience function that returns a key-value-iterator from :attr:`~collection`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ModelCollection.copy"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.ModelCollection.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">covariances</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">active_parameters</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy the model collection object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameters : bool, optional</span>
+<span class="sd">            If ``True`` (default), include the read-in parameters in the copy</span>
+<span class="sd">            (:attr:`~par`), otherwise leave empty.</span>
+<span class="sd">        covariances : bool, optional</span>
+<span class="sd">            If ``True`` (default), include the read-in (co)variances in the copy</span>
+<span class="sd">            (:attr:`~cov`), otherwise leave empty.</span>
+<span class="sd">        active_parameters : bool, optional</span>
+<span class="sd">            If ``True`` (default), include the active parameter setting in the copy</span>
+<span class="sd">            (:attr:`~active_parameters`), otherwise leave empty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        disstans.models.ModelCollection</span>
+<span class="sd">            A copy of the model collection, based on the individual models&#39;</span>
+<span class="sd">            :meth:`~disstans.models.Model.copy` method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ModelCollection</span><span class="o">.</span><span class="n">from_model_dict</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">mdl_desc</span><span class="p">:</span> <span class="n">mdl</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> <span class="n">covariances</span><span class="o">=</span><span class="n">covariances</span><span class="p">,</span>
+                                <span class="n">active_parameters</span><span class="o">=</span><span class="n">active_parameters</span><span class="p">)</span>
+             <span class="k">for</span> <span class="n">mdl_desc</span><span class="p">,</span> <span class="n">mdl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span></div>
+
+<div class="viewcode-block" id="ModelCollection.convert_units"><a class="viewcode-back" href="../../disstans/models.html#disstans.models.ModelCollection.convert_units">[docs]</a>    <span class="k">def</span> <span class="nf">convert_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the parameter and covariances to a new unit by providing a</span>
+<span class="sd">        conversion factor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Factor to multiply the parameters by to obtain the parameters in the new units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># input checks</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;factor&#39; and has to be a scalar, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="c1"># convert parameters</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_par</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_par</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="c1"># convert covariances</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span> <span class="o">*=</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c1"># update individual models</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">convert_units</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

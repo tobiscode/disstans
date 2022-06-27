@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.timeseries &mdash; DISSTANS 0.10 documentation</title>
+  <title>disstans.timeseries &mdash; DISSTANS 1.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -30,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.10
+                1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -42,9 +43,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-installation">Minimal installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../installation.html#full-development-installation">Full development installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-environment">Minimal environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#updates">Updates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
@@ -119,6 +121,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -126,7 +141,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -206,13 +220,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -835,6 +856,35 @@
             <span class="k">return</span> <span class="n">Timeseries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">new_name</span><span class="p">,</span>
                               <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_unit</span><span class="p">),</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_cols</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Timeseries.convert_units"><a class="viewcode-back" href="../../disstans/timeseries.html#disstans.timeseries.Timeseries.convert_units">[docs]</a>    <span class="k">def</span> <span class="nf">convert_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">new_data_unit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the data and covariances to a new data unit by providing a</span>
+<span class="sd">        conversion factor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor : float</span>
+<span class="sd">            Factor to multiply the data by to obtain the data in the new units.</span>
+<span class="sd">        new_data_unit : str</span>
+<span class="sd">            New data unit to be saved in the :attr:`~data_cols` attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># input checks</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;factor&#39; and has to be a scalar, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="c1"># update data unit (contains input check)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_unit</span> <span class="o">=</span> <span class="n">new_data_unit</span>
+        <span class="c1"># convert data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="c1"># convert variances</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c1"># convert covariances</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span></div>
+
 <div class="viewcode-block" id="Timeseries.mask_out"><a class="viewcode-back" href="../../disstans/timeseries.html#disstans.timeseries.Timeseries.mask_out">[docs]</a>    <span class="k">def</span> <span class="nf">mask_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dcol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Mask out an entire data column (and if present, its uncertainty column) by setting</span>
@@ -1334,6 +1384,8 @@
 <span class="sd">    show_warnings : bool, optional</span>
 <span class="sd">        If ``True``, warn if there are data inconsistencies encountered while loading.</span>
 <span class="sd">        Defaults to ``True``.</span>
+<span class="sd">    data_unit : str, optional</span>
+<span class="sd">        Can be ``&#39;mm&#39;`` (default) or ``&#39;m&#39;``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1365,8 +1417,14 @@
 <span class="sd">repro2018a/raw/position/envseries/0000_README.format</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;mm&quot;</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;data_unit&#39; needs to be &#39;mm&#39; or &#39;m&#39;, got </span><span class="si">{</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="c1"># load data</span>
         <span class="n">data_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">]</span>
         <span class="n">var_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;east_var&quot;</span><span class="p">,</span> <span class="s2">&quot;north_var&quot;</span><span class="p">,</span> <span class="s2">&quot;up_var&quot;</span><span class="p">]</span>
@@ -1386,8 +1444,8 @@
         <span class="c1"># convert standard deviation into variance, still in meters</span>
         <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var_cols</span><span class="p">]</span>
         <span class="c1"># now convert everything to millimeters</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">data_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">1e3</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var_cols</span> <span class="o">+</span> <span class="n">cov_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">1e6</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">data_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var_cols</span> <span class="o">+</span> <span class="n">cov_cols</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
         <span class="c1"># combine dataframe with time</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="c1"># check for duplicate timestamps and create time index</span>
@@ -1402,7 +1460,7 @@
                  <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># construct Timeseries object</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.tseries&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.tseries&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="n">data_unit</span><span class="p">,</span>
                          <span class="n">data_cols</span><span class="o">=</span><span class="n">data_cols</span><span class="p">,</span> <span class="n">var_cols</span><span class="o">=</span><span class="n">var_cols</span><span class="p">,</span> <span class="n">cov_cols</span><span class="o">=</span><span class="n">cov_cols</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GipsyTimeseries.get_arch"><a class="viewcode-back" href="../../disstans/timeseries.html#disstans.timeseries.GipsyTimeseries.get_arch">[docs]</a>    <span class="k">def</span> <span class="nf">get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1437,6 +1495,8 @@
 <span class="sd">    show_warnings : bool, optional</span>
 <span class="sd">        If ``True``, warn if there are data inconsistencies encountered while loading.</span>
 <span class="sd">        Defaults to ``True``.</span>
+<span class="sd">    data_unit : str, optional</span>
+<span class="sd">        Can be ``&#39;mm&#39;`` (default) or ``&#39;m&#39;``.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1475,13 +1535,29 @@
 <span class="sd">    | Column 20     | North-Vertical correlation coefficient [-]        |</span>
 <span class="sd">    +---------------+---------------------------------------------------+</span>
 
+<span class="sd">    Newer files also contain the following three columns:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Column 21     | Latitude [°]                                      |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Column 22     | Longitude [°]                                     |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Column 23     | Altitude [m]                                      |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+
 <span class="sd">    The time series are relative to each station&#39;s first integer epoch.</span>
 
 <span class="sd">    .. _UNR&#39;s website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;mm&quot;</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;data_unit&#39; needs to be &#39;mm&#39; or &#39;m&#39;, got </span><span class="si">{</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="c1"># load data and check for some warnings</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                          <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">13</span><span class="p">))</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">20</span><span class="p">)))</span>
@@ -1516,20 +1592,20 @@
         <span class="c1"># remove columns that are no longer needed</span>
         <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">,</span> <span class="s2">&quot;reflon&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># make the data</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;__east(m)&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets_east</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;north&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;_north(m)&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets_north</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;up&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;____up(m)&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets_up</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;__east(m)&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets_east</span><span class="p">)</span> <span class="o">*</span> <span class="n">factor</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;north&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;_north(m)&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets_north</span><span class="p">)</span> <span class="o">*</span> <span class="n">factor</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;up&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;____up(m)&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets_up</span><span class="p">)</span> <span class="o">*</span> <span class="n">factor</span>
         <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_e0(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;__east(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;____n0(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;_north(m)&quot;</span><span class="p">,</span>
                          <span class="s2">&quot;u0(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;____up(m)&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># make the covariance</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__corr_en&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_n(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e6</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__corr_eu&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_u(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e6</span>
-        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__corr_nu&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_n(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_u(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e6</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__corr_en&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_n(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__corr_eu&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_u(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;__corr_nu&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_n(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_u(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;__corr_en&quot;</span><span class="p">:</span> <span class="s2">&quot;east_north_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;__corr_eu&quot;</span><span class="p">:</span> <span class="s2">&quot;east_up_cov&quot;</span><span class="p">,</span>
                            <span class="s2">&quot;__corr_nu&quot;</span><span class="p">:</span> <span class="s2">&quot;north_up_cov&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># make the variance</span>
         <span class="n">old_sig_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_n(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_u(m)&quot;</span><span class="p">]</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">old_sig_cols</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">old_sig_cols</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">old_sig_cols</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">old_sig_cols</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;east_var&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_n(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;north_var&quot;</span><span class="p">,</span>
                            <span class="s2">&quot;sig_u(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;up_var&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># check for duplicate timestamps and create time index</span>
@@ -1547,7 +1623,7 @@
                  <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># construct Timeseries object</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.tenv3&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.tenv3&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="n">data_unit</span><span class="p">,</span>
                          <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">],</span>
                          <span class="n">var_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east_var&quot;</span><span class="p">,</span> <span class="s2">&quot;north_var&quot;</span><span class="p">,</span> <span class="s2">&quot;up_var&quot;</span><span class="p">],</span>
                          <span class="n">cov_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east_north_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;east_up_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;north_up_cov&quot;</span><span class="p">])</span>

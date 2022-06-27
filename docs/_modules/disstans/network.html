@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.network &mdash; DISSTANS 0.10 documentation</title>
+  <title>disstans.network &mdash; DISSTANS 1.0.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -14,6 +14,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -30,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.10
+                1.0.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -42,9 +43,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation &amp; Updates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-installation">Minimal installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../installation.html#full-development-installation">Full development installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../installation.html#minimal-environment">Minimal environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#updates">Updates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
@@ -78,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -119,6 +122,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -126,7 +142,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -206,13 +221,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -284,7 +306,8 @@
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
 <span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
 <span class="kn">from</span> <span class="nn">.station</span> <span class="kn">import</span> <span class="n">Station</span>
-<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">parallelize</span><span class="p">,</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">Click</span><span class="p">,</span> <span class="n">weighted_median</span>
+<span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="p">(</span><span class="n">parallelize</span><span class="p">,</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">Click</span><span class="p">,</span> <span class="n">weighted_median</span><span class="p">,</span> <span class="n">R_ecef2enu</span><span class="p">,</span>
+                    <span class="n">get_hom_vel_strain_rot</span><span class="p">,</span> <span class="n">best_utmzone</span><span class="p">,</span> <span class="n">estimate_euler_pole</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.earthquakes</span> <span class="kn">import</span> <span class="n">okada_displacement</span>
 <span class="kn">from</span> <span class="nn">.solvers</span> <span class="kn">import</span> <span class="n">Solution</span><span class="p">,</span> <span class="n">ReweightingFunction</span>
 
@@ -403,6 +426,12 @@
         <span class="sd">&quot;&quot;&quot; Names of stations present in the network. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">station_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; DataFrame of all locations for all stations in the network. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">station</span><span class="o">.</span><span class="n">location</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">},</span>
+                            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Latitude [°]&quot;</span><span class="p">,</span> <span class="s2">&quot;Longitude [°]&quot;</span><span class="p">,</span> <span class="s2">&quot;Altitude [m]&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
 <div class="viewcode-block" id="Network.__str__"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Special function that returns a readable summary of the network.</span>
@@ -510,6 +539,37 @@
 <span class="sd">        to make interactions with iterators easier.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_stations</span></div>
+
+<div class="viewcode-block" id="Network.get_stations_with"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.get_stations_with">[docs]</a>    <span class="k">def</span> <span class="nf">get_stations_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">mdl_description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the list of all station names that contain a given timeseries</span>
+<span class="sd">        (and optionally, a model).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ts_description : str</span>
+<span class="sd">            Name of the timeseries that the stations should contain.</span>
+<span class="sd">        mdl_description : str, optional</span>
+<span class="sd">            Name of the model that the stations&#39; timeseries should contain.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        station_list : list</span>
+<span class="sd">            Names of stations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;ts_description&#39; needs to be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ts_description</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">mdl_description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mdl_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;mdl_description&#39; needs to be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mdl_description</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="c1"># get view of all stations in network</span>
+        <span class="n">station_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">station_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># remove all stations that do not contain our timeseries and model</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">station_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">ts_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">])</span> <span class="ow">or</span>
+                <span class="p">((</span><span class="n">mdl_description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                 <span class="p">(</span><span class="n">mdl_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]))):</span>
+                <span class="n">station_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">station_list</span></div>
 
 <div class="viewcode-block" id="Network.export_network_ts"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.export_network_ts">[docs]</a>    <span class="k">def</span> <span class="nf">export_network_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">subset_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1159,7 +1219,8 @@
 <div class="viewcode-block" id="Network.spatialfit"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.spatialfit">[docs]</a>    <span class="k">def</span> <span class="nf">spatialfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">penalty</span><span class="p">,</span> <span class="n">spatial_reweight_models</span><span class="p">,</span>
                    <span class="n">spatial_reweight_iters</span><span class="p">,</span> <span class="n">spatial_reweight_percentile</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                    <span class="n">spatial_reweight_max_rms</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">spatial_reweight_max_changed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                   <span class="n">dist_num_avg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dist_weight_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_weight_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">spatial_reweight_agg_comps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dist_num_avg</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                   <span class="n">dist_weight_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_weight_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">continuous_reweight_models</span><span class="o">=</span><span class="p">[],</span> <span class="n">local_reweight_iters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                    <span class="n">local_reweight_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_reweight_coupled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                    <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1195,7 +1256,7 @@
 <span class="sd">        the L0 regularization weights :math:`\mathbf{w}^{(i)}_j`. The distance weights</span>
 <span class="sd">        :math:`v_{j,k}` from station :math:`j` to station :math:`k` are based on the</span>
 <span class="sd">        average distance :math:`D_j` from the station in question to the</span>
-<span class="sd">        ``dist_num_avg`` clostest stations, following an exponential curve:</span>
+<span class="sd">        ``dist_num_avg`` closest stations, following an exponential curve:</span>
 <span class="sd">        :math:`v_{j,k}=\exp \left( - r_{j,k} / D_j \right)` where</span>
 <span class="sd">        :math:`r_{j,k}` is the distance between the stations :math:`j` and :math:`k`.</span>
 <span class="sd">        ``dist_weight_min`` and ``dist_weight_max`` allow to set boundaries for</span>
@@ -1232,6 +1293,11 @@
 <span class="sd">            flipped between zero and non-zero) falls below a threshold. The threshold</span>
 <span class="sd">            ``spatial_reweight_max_changed`` is given as the percentage of changed over total</span>
 <span class="sd">            parameters (including all models and components). Defaults to no early stopping.</span>
+<span class="sd">        spatial_reweight_agg_comps : bool, optional</span>
+<span class="sd">            If ``False`` (default), the spatial reweighting is done individually for each</span>
+<span class="sd">            component, i.e., the distance-weighted median of the weights will be calculated</span>
+<span class="sd">            for each component. If ``True``, a single median is calculated from the aggregated</span>
+<span class="sd">            weights in all data components, and then used for all components.</span>
 <span class="sd">        dist_num_avg : int, optional</span>
 <span class="sd">            Calculate the characteristic distance for the drop-off of station weights</span>
 <span class="sd">            as the average of the ``dist_num_avg`` closest stations (default: ``4``).</span>
@@ -1360,6 +1426,7 @@
                           <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">}</span>
         <span class="n">station_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">valid_stations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">num_stations</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">station_names</span><span class="p">)</span>
+        <span class="n">num_components</span> <span class="o">=</span> <span class="n">valid_stations</span><span class="p">[</span><span class="n">station_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">num_components</span>
         <span class="k">assert</span> <span class="n">num_stations</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;The number of stations in the network that &quot;</span> \
             <span class="s2">&quot;contain the timeseries must be more than one.&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spatial_reweight_models</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> \
@@ -1413,6 +1480,10 @@
         <span class="c1"># distance_weights is ignoring whether (1) a station actually has data, and</span>
         <span class="c1"># (2) if the spatial extent of the signal we&#39;re trying to estimate is correlated</span>
         <span class="c1"># to the station geometry</span>
+        <span class="c1"># repeat the weights for all data components if the weights are being aggregated</span>
+        <span class="k">if</span> <span class="n">spatial_reweight_agg_comps</span><span class="p">:</span>
+            <span class="n">distance_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">distance_weights</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_components</span><span class="p">])</span>
+        <span class="c1"># print stats for distances distribution</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">nonzero_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">all_distances</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
                                         <span class="p">)[</span><span class="nb">int</span><span class="p">(</span><span class="n">num_stations</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_stations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):]</span>
@@ -1454,7 +1525,8 @@
                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_uniques</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
 
         <span class="c1"># initialize the other statistics objects</span>
-        <span class="n">num_components</span> <span class="o">=</span> <span class="n">num_uniques</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">assert</span> <span class="n">num_components</span> <span class="o">==</span> <span class="n">num_uniques</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">num_components</span><span class="si">}</span><span class="s2"> data &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;components from statistics, got </span><span class="si">{</span><span class="n">num_uniques</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="n">arr_uniques</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">spatial_reweight_iters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_components</span><span class="p">))</span>
         <span class="n">arr_uniques</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
         <span class="n">arr_uniques</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">num_uniques</span>
@@ -1555,12 +1627,20 @@
                         <span class="n">percs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">stacked_weights</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">95</span><span class="p">]]</span>
                         <span class="n">tqdm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Weight percentiles (5-50-95): &quot;</span>
                                    <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">percs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">percs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">percs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                    <span class="c1"># if aggregating components, reshape and concatenate axes</span>
+                    <span class="k">if</span> <span class="n">spatial_reweight_agg_comps</span><span class="p">:</span>
+                        <span class="n">stacked_weights</span> <span class="o">=</span> <span class="p">(</span><span class="n">stacked_weights</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                                           <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_stations</span> <span class="o">*</span> <span class="n">num_components</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                     <span class="c1"># now apply the spatial median to parameter weights</span>
                     <span class="k">for</span> <span class="n">station_index</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">station_names</span><span class="p">):</span>
-                        <span class="n">new_net_weights</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;reweight_init&quot;</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">new_weights</span> <span class="o">=</span> \
                             <span class="n">weighted_median</span><span class="p">(</span><span class="n">stacked_weights</span><span class="p">,</span>
                                             <span class="n">distance_weights</span><span class="p">[</span><span class="n">station_index</span><span class="p">,</span> <span class="p">:],</span>
                                             <span class="n">percentile</span><span class="o">=</span><span class="n">spatial_reweight_percentile</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">spatial_reweight_agg_comps</span><span class="p">:</span>
+                            <span class="n">new_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">new_weights</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                                    <span class="n">num_components</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">new_net_weights</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;reweight_init&quot;</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_weights</span>
                 <span class="k">else</span><span class="p">:</span>  <span class="c1"># stacking failed, keep old weights</span>
                     <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mdl_description</span><span class="si">}</span><span class="s2"> cannot be stacked, reusing old weights.&quot;</span><span class="p">,</span>
                          <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -2156,6 +2236,289 @@
         <span class="k">if</span> <span class="n">ts_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">import_network_ts</span><span class="p">(</span><span class="n">ts_out</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">spatial</span><span class="p">,</span> <span class="n">temporal</span></div>
+
+    <span class="k">def</span> <span class="nf">_subset_stations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stations_valid</span><span class="p">,</span> <span class="n">subset_stations</span><span class="p">,</span> <span class="n">extrapolate</span><span class="p">):</span>
+        <span class="c1"># subset network for inversion</span>
+        <span class="k">if</span> <span class="n">subset_stations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stat_names_in</span> <span class="o">=</span> <span class="n">stations_valid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">subset_stations</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">subset_stations</span><span class="p">])),</span> \
+                <span class="sa">f</span><span class="s2">&quot;&#39;subset_stations&#39; needs to be a list of station names, got </span><span class="si">{</span><span class="n">subset_stations</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">stat_names_in</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stations_valid</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">subset_stations</span><span class="p">))))</span>
+        <span class="c1"># parse the extrapolate option</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extrapolate</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">extrapolate</span><span class="p">]),</span> \
+                <span class="sa">f</span><span class="s2">&quot;The &#39;extrapolate&#39; list contains non-string entries: </span><span class="si">{</span><span class="n">extrapolate</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">stat_names_out</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stations_valid</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">extrapolate</span><span class="p">))))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">extrapolate</span><span class="p">:</span>
+            <span class="n">stat_names_out</span> <span class="o">=</span> <span class="n">stat_names_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stat_names_out</span> <span class="o">=</span> <span class="n">stations_valid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># forgt about all stations not in in- or output</span>
+        <span class="n">stations_valid</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stat_names_in</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stat_names_out</span><span class="p">))))</span>
+        <span class="k">return</span> <span class="n">stations_valid</span><span class="p">,</span> <span class="n">stat_names_in</span><span class="p">,</span> <span class="n">stat_names_out</span>
+
+    <span class="k">def</span> <span class="nf">_get_2comp_pars_covs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stat_list_in</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">,</span>
+                             <span class="n">index</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span> <span class="n">num_mdl_comps</span><span class="p">,</span> <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">):</span>
+        <span class="c1"># stack parameters</span>
+        <span class="n">pars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">station</span>
+                         <span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span>
+                         <span class="o">.</span><span class="n">par</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">comps</span><span class="p">]</span>
+                         <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_in</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># apply weights</span>
+        <span class="k">if</span> <span class="n">use_vars</span><span class="p">:</span>
+            <span class="n">covs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">station</span>
+                             <span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span>
+                             <span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">comps</span><span class="p">]</span>
+                             <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_in</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">use_covs</span><span class="p">:</span>
+                <span class="n">linear_index_cov</span> <span class="o">=</span> <span class="n">index</span> <span class="o">*</span> <span class="n">num_mdl_comps</span>
+                <span class="n">covlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">station</span>
+                           <span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span>
+                           <span class="o">.</span><span class="n">cov</span><span class="p">[</span><span class="n">linear_index_cov</span> <span class="o">+</span> <span class="n">comps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linear_index_cov</span> <span class="o">+</span> <span class="n">comps</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                           <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_in</span><span class="p">]</span>
+                <span class="n">covs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">covs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">covlist</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">covs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">pars</span><span class="p">,</span> <span class="n">covs</span>
+
+<div class="viewcode-block" id="Network.hom_velocity_field"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.hom_velocity_field">[docs]</a>    <span class="k">def</span> <span class="nf">hom_velocity_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">,</span> <span class="n">comps</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">use_vars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">use_covs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">utmzone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subset_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">extrapolate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reference_station</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">use_parts</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assuming the entire network (or a subset thereof) is located on the same body</span>
+<span class="sd">        undergoing translation, strain and rotation, calculate the homogenous</span>
+<span class="sd">        velocity field as well as the horizontal strain and rotation rate tensors.</span>
+<span class="sd">        This function requires a :class:`~disstans.models.Polynomial` model to have</span>
+<span class="sd">        been fitted to a timeseries in the network.</span>
+
+<span class="sd">        Wraps :func:`~disstans.tools.get_hom_vel_strain_rot`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ts_description : str</span>
+<span class="sd">            Name of the timeseries to use.</span>
+<span class="sd">        mdl_description : str</span>
+<span class="sd">            Name of the :class:`~disstans.models.Polynomial` model that contains the</span>
+<span class="sd">            estimated linear station velocities.</span>
+<span class="sd">        comps : list, optional</span>
+<span class="sd">            Specifies the components of the fitted model to use as the East and North</span>
+<span class="sd">            directions, respectively. Defaults to the first two components.</span>
+<span class="sd">        use_vars : bool, optional</span>
+<span class="sd">            If ``True`` (default), use the formal parameter variances in the model</span>
+<span class="sd">            during the inversion. If ``False``, all velocities will be weighted equally.</span>
+<span class="sd">        use_covs : bool, optional</span>
+<span class="sd">            If ``True`` (default) and ``use_vars=True``, also use the formal parameter</span>
+<span class="sd">            covariance for the inversion.</span>
+<span class="sd">        utmzome : int, optional</span>
+<span class="sd">            If provided, the UTM zone to use for the horizontal approximation.</span>
+<span class="sd">            By default (``None``), the average longitude will be calculated, and the</span>
+<span class="sd">            respective UTM zone will be used.</span>
+<span class="sd">        subset_stations : list, optional</span>
+<span class="sd">            If set, a list of strings that contains the names of stations to be used.</span>
+<span class="sd">        extrapolate : bool, list, optional</span>
+<span class="sd">            If ``True`` (default), the velocity will be predicted for all stations in</span>
+<span class="sd">            the network.</span>
+<span class="sd">            If ``False``, the prediction will only be made for the station subset being</span>
+<span class="sd">            used in the inversion. Note that ``False`` is only different from ``True``</span>
+<span class="sd">            if ``subset_stations`` is set.</span>
+<span class="sd">            If a list, the prediction will be made for the stations in the list.</span>
+<span class="sd">            Note that no output will be made for stations that do not contain the</span>
+<span class="sd">            passed ``&#39;ts_description&#39;`` and ``&#39;mdl_description&#39;``.</span>
+<span class="sd">        reference_station : str, optional</span>
+<span class="sd">            Reference station to be used by the calculation. If all parts are removed</span>
+<span class="sd">            (translation, rotation, strain), the reference station is not relevant,</span>
+<span class="sd">            otherwise, it changes the results significantly.</span>
+<span class="sd">        use_parts : list, optional</span>
+<span class="sd">            By default, all three parts are used in the calculation of the best-fit</span>
+<span class="sd">            average velocity field: translation, strain relative to the origin, and</span>
+<span class="sd">            rotation about the origin. By changing this list of booleans, the individual</span>
+<span class="sd">            parts can be turned on and off, e.g., setting the third element to ``False``</span>
+<span class="sd">            will return a predicted velocity only composed of the translation and</span>
+<span class="sd">            strain parts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        df_v_pred : pandas.DataFrame</span>
+<span class="sd">            DataFrame containing the predicted velocities at each station (rows) in</span>
+<span class="sd">            the East and North components (columns).</span>
+<span class="sd">        v_O : numpy.ndarray</span>
+<span class="sd">            1D translation vector.</span>
+<span class="sd">        epsilon : numpy.ndarray</span>
+<span class="sd">            2D strain rate tensor.</span>
+<span class="sd">        omega : numpy.ndarray</span>
+<span class="sd">            2D rotation rate tensor.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        disstans.tools.strain_rotation_invariants : Use the strain and rotation rate</span>
+<span class="sd">            tensors to calculate invariants such as the dilatation or shearing rates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># input check</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comps</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+                <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;comps&#39; needs to be a length-2 list of integers, got </span><span class="si">{</span><span class="n">comps</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">use_parts</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">use_parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">use_parts</span><span class="p">])</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">use_parts</span><span class="p">)),</span> \
+            <span class="s2">&quot;&#39;use_parts&#39; needs to be a boolean list of length three with at least &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;one True element, got </span><span class="si">{</span><span class="n">use_parts</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">stat_names_valid</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_stations_with</span><span class="p">(</span><span class="n">ts_description</span><span class="p">))</span>
+        <span class="n">stat_names_valid</span><span class="p">,</span> <span class="n">stat_names_in</span><span class="p">,</span> <span class="n">stat_names_out</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subset_stations</span><span class="p">(</span><span class="n">stat_names_valid</span><span class="p">,</span> <span class="n">subset_stations</span><span class="p">,</span> <span class="n">extrapolate</span><span class="p">)</span>
+        <span class="c1"># get quick access to station objects</span>
+        <span class="n">stat_list_valid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
+        <span class="n">stat_list_in</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stat_names_in</span><span class="p">]</span>
+        <span class="c1"># check if our reference station is in stat_list_in</span>
+        <span class="k">if</span> <span class="n">reference_station</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reference_station</span> <span class="ow">in</span> <span class="n">stat_names_in</span><span class="p">:</span>
+                <span class="n">reference_index</span> <span class="o">=</span> <span class="n">stat_names_in</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">reference_station</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reference_index</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reference station &#39;</span><span class="si">{</span><span class="n">reference_station</span><span class="si">}</span><span class="s2">&#39; is not included in the input &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;station list, using &#39;</span><span class="si">{</span><span class="n">stat_names_in</span><span class="p">[</span><span class="n">reference_index</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; instead.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reference_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># get quantities from the reference station</span>
+        <span class="n">ref_stat</span> <span class="o">=</span> <span class="n">stat_list_in</span><span class="p">[</span><span class="n">reference_index</span><span class="p">]</span>
+        <span class="n">lat0</span><span class="p">,</span> <span class="n">lon0</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">linear_index</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">get_exp_index</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">use_vars</span> <span class="o">&amp;=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">num_mdl_comps</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">num_parameters</span>
+        <span class="n">v_pred_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref_stat</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
+        <span class="c1"># for the inversion, we need the indices of the subsets</span>
+        <span class="n">ix_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_in</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
+        <span class="n">ix_out</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_out</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
+        <span class="c1"># convert network positions into UTM coordinates</span>
+        <span class="c1"># prepare data and projections</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_valid</span><span class="p">])</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_valid</span><span class="p">])</span>
+        <span class="n">lon_lat_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">lon</span><span class="p">[</span><span class="n">ix_in</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="n">ix_in</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># determine UTM zone if needed</span>
+        <span class="k">if</span> <span class="n">utmzone</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">utmzone</span> <span class="o">=</span> <span class="n">best_utmzone</span><span class="p">(</span><span class="n">lon</span><span class="p">[</span><span class="n">ix_in</span><span class="p">])</span>
+        <span class="c1"># get all velocities and weights for subset</span>
+        <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_2comp_pars_covs</span><span class="p">(</span><span class="n">stat_list_in</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span>
+                                                  <span class="n">mdl_description</span><span class="p">,</span> <span class="n">linear_index</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span>
+                                                  <span class="n">num_mdl_comps</span><span class="p">,</span> <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">)</span>
+        <span class="c1"># calculate homogenous translation, strain, and rotation</span>
+        <span class="n">v_O</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">get_hom_vel_strain_rot</span><span class="p">(</span><span class="n">lon_lat_in</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span>
+                                                     <span class="n">utmzone</span><span class="o">=</span><span class="n">utmzone</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="p">[</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">])</span>
+        <span class="c1"># convert output locations to UTM eastings &amp; northings</span>
+        <span class="n">crs_lla</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geodetic</span><span class="p">()</span>
+        <span class="n">crs_utm</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">UTM</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">utmzone</span><span class="p">)</span>
+        <span class="n">ENU</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">lon</span><span class="p">[</span><span class="n">ix_out</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="n">ix_out</span><span class="p">])</span>
+        <span class="c1"># get all positions relative to reference station</span>
+        <span class="n">EO</span><span class="p">,</span> <span class="n">NO</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_point</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">crs_lla</span><span class="p">)</span>
+        <span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span> <span class="o">=</span> <span class="n">ENU</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">EO</span><span class="p">,</span> <span class="n">ENU</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">NO</span>
+        <span class="n">dENO</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># calculate predicted uniform velocity</span>
+        <span class="n">v_pred</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">use_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">v_O</span> <span class="o">+</span>
+                  <span class="n">dENO</span> <span class="o">@</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">use_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">epsilon</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">use_parts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">omega</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="c1"># return as DataFrame</span>
+        <span class="n">df_v_pred</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">v_pred</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">stat_names_out</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">v_pred_cols</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df_v_pred</span><span class="p">,</span> <span class="n">v_O</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span></div>
+
+<div class="viewcode-block" id="Network.euler_rot_field"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.euler_rot_field">[docs]</a>    <span class="k">def</span> <span class="nf">euler_rot_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">,</span> <span class="n">comps</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">use_vars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">use_covs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subset_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the best-fit Euler pole for a given timeseries&#39; model in the network,</span>
+<span class="sd">        and compute the resulting velocities at each station.</span>
+<span class="sd">        This function requires a :class:`~disstans.models.Polynomial` model to have</span>
+<span class="sd">        been fitted to a timeseries in the network.</span>
+
+<span class="sd">        Wraps :func:`~disstans.tools.estimate_euler_pole`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ts_description : str</span>
+<span class="sd">            Name of the ts_description to use.</span>
+<span class="sd">        mdl_description : str</span>
+<span class="sd">            Name of the :class:`~disstans.models.Polynomial` model that contains the</span>
+<span class="sd">            estimated linear station velocities.</span>
+<span class="sd">        comps : list, optional</span>
+<span class="sd">            Specifies the components of the fitted model to use as the East and North</span>
+<span class="sd">            directions, respectively. Defaults to the first two components.</span>
+<span class="sd">        use_vars : bool, optional</span>
+<span class="sd">            If ``True`` (default), use the formal parameter variances in the model</span>
+<span class="sd">            during the inversion. If ``False``, all velocities will be weighted equally.</span>
+<span class="sd">        use_covs : bool, optional</span>
+<span class="sd">            If ``True`` (default) and ``use_vars=True``, also use the formal parameter</span>
+<span class="sd">            covariance for the inversion.</span>
+<span class="sd">        subset_stations : list, optional</span>
+<span class="sd">            If set, a list of strings that contains the names of stations to be used.</span>
+<span class="sd">        extrapolate : bool, list, optional</span>
+<span class="sd">            If ``True`` (default), the velocity will be predicted for all stations in</span>
+<span class="sd">            the network.</span>
+<span class="sd">            If ``False``, the prediction will only be made for the station subset being</span>
+<span class="sd">            used in the inversion. Note that ``False`` is only different from ``True``</span>
+<span class="sd">            if ``subset_stations`` is set.</span>
+<span class="sd">            If a list, the prediction will be made for the stations in the list.</span>
+<span class="sd">            Note that no output will be made for stations that do not contain the</span>
+<span class="sd">            passed ``&#39;ts_description&#39;`` and ``&#39;mdl_description&#39;``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        df_v_pred : pandas.DataFrame</span>
+<span class="sd">            DataFrame containing the Euler pole modeled velocities at each station (rows)</span>
+<span class="sd">            in the East and North components (columns).</span>
+<span class="sd">        rotation_vector : numpy.ndarray</span>
+<span class="sd">            Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`</span>
+<span class="sd">            rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.</span>
+<span class="sd">        rotation_covariance : numpy.ndarray</span>
+<span class="sd">            Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        disstans.tools.rotvec2eulerpole : Convert from rotation vector and covariance</span>
+<span class="sd">            matrix to Euler pole and covariance notation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># input check</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comps</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+                <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;comps&#39; needs to be a length-2 list of integers, got </span><span class="si">{</span><span class="n">comps</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">stat_names_valid</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_stations_with</span><span class="p">(</span><span class="n">ts_description</span><span class="p">))</span>
+        <span class="n">stat_names_valid</span><span class="p">,</span> <span class="n">stat_names_in</span><span class="p">,</span> <span class="n">stat_names_out</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subset_stations</span><span class="p">(</span><span class="n">stat_names_valid</span><span class="p">,</span> <span class="n">subset_stations</span><span class="p">,</span> <span class="n">extrapolate</span><span class="p">)</span>
+        <span class="c1"># get quick access to station objects</span>
+        <span class="n">stat_list_valid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
+        <span class="n">stat_list_in</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">stat_names_in</span><span class="p">]</span>
+        <span class="c1"># get quantities from the reference station</span>
+        <span class="n">reference_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ref_stat</span> <span class="o">=</span> <span class="n">stat_list_in</span><span class="p">[</span><span class="n">reference_index</span><span class="p">]</span>
+        <span class="n">linear_index</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">get_exp_index</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">use_vars</span> <span class="o">&amp;=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">num_mdl_comps</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">num_parameters</span>
+        <span class="n">v_pred_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref_stat</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
+        <span class="c1"># for the inversion, we need the indices of the subsets</span>
+        <span class="n">ix_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_in</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
+        <span class="n">ix_out</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_out</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
+        <span class="c1"># convert network positions into UTM coordinates</span>
+        <span class="c1"># prepare data and projections</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_valid</span><span class="p">])</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_valid</span><span class="p">])</span>
+        <span class="n">alt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">station</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_valid</span><span class="p">])</span>
+        <span class="n">lon_lat_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">lon</span><span class="p">[</span><span class="n">ix_in</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="n">ix_in</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># get all velocities and weights for subset</span>
+        <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_2comp_pars_covs</span><span class="p">(</span><span class="n">stat_list_in</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span>
+                                                  <span class="n">mdl_description</span><span class="p">,</span> <span class="n">linear_index</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span>
+                                                  <span class="n">num_mdl_comps</span><span class="p">,</span> <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">)</span>
+        <span class="c1"># calculate Euler pole from input list</span>
+        <span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span> <span class="o">=</span> \
+            <span class="n">estimate_euler_pole</span><span class="p">(</span><span class="n">lon_lat_in</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="c1"># get ECEF coordinates for all output stations</span>
+        <span class="n">crs_lla</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geodetic</span><span class="p">()</span>
+        <span class="n">crs_xyz</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geocentric</span><span class="p">()</span>
+        <span class="n">stat_xyz</span> <span class="o">=</span> <span class="n">crs_xyz</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">lon</span><span class="p">[</span><span class="n">ix_out</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="n">ix_out</span><span class="p">],</span> <span class="n">alt</span><span class="p">[</span><span class="n">ix_out</span><span class="p">])</span>
+        <span class="c1"># predict rotation on surface of sphere</span>
+        <span class="n">v_pred_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">rotation_vector</span><span class="p">,</span> <span class="n">stat_xyz</span><span class="p">)</span>
+        <span class="n">v_pred_enu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([(</span><span class="n">R_ecef2enu</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span> <span class="o">@</span> <span class="n">v_pred_xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">)</span>
+                               <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lon</span><span class="p">[</span><span class="n">ix_out</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="n">ix_out</span><span class="p">]))])</span>
+        <span class="c1"># return as DataFrame</span>
+        <span class="n">df_v_pred</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">v_pred_enu</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span>
+                                 <span class="n">index</span><span class="o">=</span><span class="n">stat_names_out</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">v_pred_cols</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df_v_pred</span><span class="p">,</span> <span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span></div>
 
     <span class="k">def</span> <span class="nf">_create_map_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gui_settings</span><span class="p">,</span> <span class="n">annotate_stations</span><span class="p">,</span> <span class="n">subset_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># get location data and projections</span>
@@ -3130,8 +3493,9 @@
 <div class="viewcode-block" id="Network.ampphaseplot"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.ampphaseplot">[docs]</a>    <span class="k">def</span> <span class="nf">ampphaseplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subset_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">lat_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annotate_stations</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">legend_refs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">save_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">},</span> <span class="n">colorbar_kw_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gui_kw_args</span><span class="o">=</span><span class="p">{}):</span>
+                     <span class="n">legend_refs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">return_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">},</span>
+                     <span class="n">colorbar_kw_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gui_kw_args</span><span class="o">=</span><span class="p">{}):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the amplitude and phase of a :class:`~disstans.models.Sinusoid`</span>
 <span class="sd">        model on a network map.</span>
@@ -3176,6 +3540,11 @@
 <span class="sd">            If set, a list of amplitudes that will be used to generate legend entries.</span>
 <span class="sd">        legend_labels : list, optional</span>
 <span class="sd">            If set, a list of labels that will be used for ``legend_refs``.</span>
+<span class="sd">        month_range : tuple, optional</span>
+<span class="sd">            By default, the phase range will be an entire year, and therefore circular.</span>
+<span class="sd">            Pass a different range (in inclusive months, e.g., ``(5, 10)`` for all of May</span>
+<span class="sd">            through all of October) to subset the range.</span>
+<span class="sd">            This automatically switches to a non-circular colormap.</span>
 <span class="sd">        return_figure : bool, optional</span>
 <span class="sd">            If ``True`` (default: ``False``), return the figure and axis objects instead of</span>
 <span class="sd">            showing the plot interactively. Only used if ``fname`` is not set.</span>
@@ -3243,13 +3612,28 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">e</span>
 
+        <span class="c1"># define range and colormap</span>
+        <span class="k">if</span> <span class="n">month_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">scm</span><span class="o">.</span><span class="n">romaO</span>
+            <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">13</span> <span class="o">-</span> <span class="mf">1e-3</span>
+            <span class="n">phase_cols</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">month_range</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">month_range</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+                    <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">m</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">month_range</span><span class="p">])),</span> \
+                <span class="sa">f</span><span class="s2">&quot;&#39;month_range&#39; must be a tuple of 2 integer months, got </span><span class="si">{</span><span class="n">month_range</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">scm</span><span class="o">.</span><span class="n">batlow</span>
+            <span class="n">vmin</span> <span class="o">=</span> <span class="n">month_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vmax</span> <span class="o">=</span> <span class="n">month_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-3</span>
+            <span class="n">phase_cols</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">-</span> <span class="n">month_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                          <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">month_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">month_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="c1"># update the station marker sizes</span>
         <span class="n">stat_points</span><span class="o">.</span><span class="n">set_zorder</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">stat_points</span><span class="o">.</span><span class="n">set_sizes</span><span class="p">(</span><span class="mi">20</span><span class="o">*</span><span class="n">scale</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">amps</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># update the marker colors</span>
         <span class="k">if</span> <span class="n">phase</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">stat_points</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">scm</span><span class="o">.</span><span class="n">romaO</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)))</span>
+            <span class="n">stat_points</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">cmap</span><span class="p">(</span><span class="n">phase_cols</span><span class="p">))</span>
 
         <span class="c1"># add gridlines</span>
         <span class="n">ax_map</span><span class="o">.</span><span class="n">gridlines</span><span class="p">(</span><span class="n">draw_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -3272,8 +3656,8 @@
 
         <span class="c1"># add a colorbar</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colorbar_kw_args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">fig_map</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">13</span><span class="o">-</span><span class="mf">1e-10</span><span class="p">),</span>
-                                            <span class="n">cmap</span><span class="o">=</span><span class="n">scm</span><span class="o">.</span><span class="n">romaO</span><span class="p">),</span>
+            <span class="n">fig_map</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">),</span>
+                                            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">),</span>
                              <span class="n">ax</span><span class="o">=</span><span class="n">ax_map</span><span class="p">,</span> <span class="o">**</span><span class="n">colorbar_kw_args</span><span class="p">)</span>
 
         <span class="c1"># finish up</span>

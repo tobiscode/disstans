@@ -35,7 +35,7 @@ if __name__ == "__main__":
     main_dir = Path("proj_dir").resolve()
     data_dir = main_dir / "data/gnss"
     gnss_dir = data_dir / "longvalley"
-    plot_dir = Path("../img").resolve()
+    plot_dir = main_dir / "out/example_1"
     os.makedirs(plot_dir, exist_ok=True)
     os.chdir(plot_dir)
 
@@ -336,7 +336,7 @@ if __name__ == "__main__":
                            keep_mdl_res_as=("model_srw", "resid_srw"))
 
     # save to file
-    with gzip.open("example_1_net.pkl.gz", "wb") as f:
+    with gzip.open(plot_dir / "example_1_net.pkl.gz", "wb") as f:
         pickle.dump(net, f)
 
     # make CASA plots
@@ -382,11 +382,15 @@ if __name__ == "__main__":
                                columns=["off_e", "off_n", "off_u", "vel_e", "vel_n", "vel_u",
                                         "sig_vel_e", "sig_vel_n", "sig_vel_u", "corr_vel_en",
                                         "corr_vel_eu", "corr_vel_nu"])
+    # convert variances to standard deviations and covariances to correlations
     all_poly_df[["sig_vel_e", "sig_vel_n", "sig_vel_u"]] **= 0.5
     all_poly_df["corr_vel_en"] /= (all_poly_df["sig_vel_e"] * all_poly_df["sig_vel_n"])
     all_poly_df["corr_vel_eu"] /= (all_poly_df["sig_vel_e"] * all_poly_df["sig_vel_u"])
     all_poly_df["corr_vel_nu"] /= (all_poly_df["sig_vel_n"] * all_poly_df["sig_vel_u"])
-    all_poly_df.to_csv(plot_dir / "secular_velocities.csv", index_label="station")
+    # make pretty and save
+    all_poly_df.sort_index(inplace=True)
+    all_poly_df.index.rename("station", inplace=True)
+    all_poly_df.to_csv(plot_dir / "example_1_secular_velocities.csv")
 
     # make wormplot
     subset_stations = ["RDOM", "KRAC", "SAWC", "MWTP", "CASA", "CA99", "P639", "HOTK",
@@ -647,6 +651,7 @@ if __name__ == "__main__":
                      save_kw_args={"format": fmt, "dpi": 300},
                      subset_stations=subset_stations, annotate_stations="small",
                      lat_min=37.52, lat_max=37.87, lon_min=-119.18, lon_max=-118.56,
-                     legend_refs=[1, 5], legend_labels=["1 mm", "5 mm"], scale=0.5,
+                     legend_refs=[1, 5], legend_labels=["1 mm", "5 mm"],
+                     scale=0.5, month_range=(8, 10),
                      colorbar_kw_args={"shrink": 0.7, "label": "Month",
                                        "orientation": "horizontal"})

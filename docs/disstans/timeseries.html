@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Timeseries &mdash; DISSTANS 1.0.2 documentation</title>
@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -83,6 +84,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -124,6 +126,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#comparison-of-different-methods">Comparison of different methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#loading-other-different-datasets">Loading other different datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#north-american-reference-frame">North American reference frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#estimate-euler-poles-for-datasets">Estimate Euler poles for datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#map-view-comparison-of-datasets">Map view comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#quantitative-comparison-of-datasets">Quantitative comparison of datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -131,7 +146,6 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#maskedmedfilt2d">maskedmedfilt2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
@@ -211,13 +225,20 @@
 <li class="toctree-l4"><a class="reference internal" href="tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#date2decyear">date2decyear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#download-unr-data">download_unr_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#estimate-euler-pole">estimate_euler_pole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#eulerpole2rotvec">eulerpole2rotvec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#full-cov-mat-to-columns">full_cov_mat_to_columns</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#parse-unr-steps">parse_unr_steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#r-ecef2enu">R_ecef2enu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#r-enu2ecef">R_enu2ecef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
 </ul>
@@ -260,34 +281,34 @@
            <div itemprop="articleBody">
              
   <section id="module-disstans.timeseries">
-<span id="timeseries"></span><h1>Timeseries<a class="headerlink" href="#module-disstans.timeseries" title="Permalink to this headline"></a></h1>
+<span id="timeseries"></span><h1>Timeseries<a class="headerlink" href="#module-disstans.timeseries" title="Permalink to this heading"></a></h1>
 <p>This module contains the <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> base class and other
 formats included by default in DISSTANS.</p>
 <section id="timeseries-parent-class">
-<h2>Timeseries (Parent Class)<a class="headerlink" href="#timeseries-parent-class" title="Permalink to this headline"></a></h2>
+<h2>Timeseries (Parent Class)<a class="headerlink" href="#timeseries-parent-class" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">Timeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries" title="Permalink to this definition"></a></dt>
-<dd><p>Object that expands the functionality of a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object
+<dd><p>Object that expands the functionality of a <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object
 for better integration into DISSTANS. Apart from the data itself, it contains
 information about the source and units of the data. It also performs input
 checks and uses property setters/getters to ensure consistency.</p>
 <p>Also enables the ability to perform math on timeseries directly.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dataframe</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – The timeseries’ data as a DataFrame. The index should be time, whereas
+<li><p><strong>dataframe</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><em>pandas.DataFrame</em></a>) – The timeseries’ data as a DataFrame. The index should be time, whereas
 data columns can be both data and their uncertainties.</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Source description.</p></li>
-<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Data unit.</p></li>
-<li><p><strong>data_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> that
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Source description.</p></li>
+<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Data unit.</p></li>
+<li><p><strong>data_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> that
 contain the data.
 The length cooresponds to the number of components <a class="reference internal" href="#disstans.timeseries.Timeseries.num_components" title="disstans.timeseries.Timeseries.num_components"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_components</span></code></a>.</p></li>
-<li><p><strong>var_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> that contain the
+<li><p><strong>var_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> that contain the
 data’s variance.
 Must have the same length as <code class="docutils literal notranslate"><span class="pre">data_cols</span></code>.
 Defaults to no data variance columns.</p></li>
-<li><p><strong>cov_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> that contain
+<li><p><strong>cov_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> that contain
 the data’s covariance.
 Must have length <code class="docutils literal notranslate"><span class="pre">(num_components</span> <span class="pre">*</span> <span class="pre">(num_components</span> <span class="pre">-</span> <span class="pre">1))</span> <span class="pre">/</span> <span class="pre">2</span></code>, where
 the order of the elements is determined by their row-by-row, sequential
@@ -301,11 +322,6 @@ Defaults to no covariance columns.</p></li>
 for the <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> class, consider this example for observations with
 three components:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">var_cols[0]</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cov_cols[0]</span></code></p></td>
@@ -327,13 +343,13 @@ three components:</p>
 <dd><p>Special function that allows two timeseries instances (or a timeseries and
 an equivalently shaped NumPy array) to be added together element-wise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a>) – Timeseries to add to instance.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New timeseries object containing the sum of the two timeseries.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
@@ -357,15 +373,15 @@ an equivalently shaped NumPy array) to be added together element-wise.</p>
 <dd><p>Convenience special function that provides a shorthand notation
 to access the timeseries’ columns.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – String or list of strings of the columns to return.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – String or list of strings of the columns to return.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Returns the requested data as a Series (if a single column) or
 DataFrame (if multiple columns).</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)">pandas.Series</a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)">pandas.DataFrame</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)">pandas.Series</a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)">pandas.DataFrame</a></p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -383,13 +399,13 @@ of column names, the following two are equivalent:</p>
 <dd><p>Special function that allows two timeseries instances (or a timeseries and
 an equivalently shaped NumPy array) to be multiplied together element-wise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a>) – Timeseries to multiply to instance.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New timeseries object containing the product of the two timeseries.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
@@ -437,11 +453,11 @@ an equivalently shaped NumPy array) to be multiplied together element-wise.</p>
 <dd><p>Special function that returns a readable summary of the timeseries.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>info</strong> – Timeseries summary.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -452,13 +468,13 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 <dd><p>Special function that allows a timeseries instance (or a timeseries and
 an equivalently shaped NumPy array) to be subtracted from another element-wise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a>) – Timeseries to subtract from instance.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New timeseries object containing the difference of the two timeseries.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
@@ -482,13 +498,13 @@ an equivalently shaped NumPy array) to be subtracted from another element-wise.<
 <dd><p>Special function that allows a timeseries instances (or a timeseries and
 an equivalently shaped NumPy array) to be divided by another element-wise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a>) – Timeseries to divide instance by.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New timeseries object containing the quotient of the two timeseries.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
@@ -511,15 +527,15 @@ an equivalently shaped NumPy array) to be divided by another element-wise.</p>
 <span class="sig-name descname"><span class="pre">add_uncertainties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.add_uncertainties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.add_uncertainties" title="Permalink to this definition"></a></dt>
 <dd><p>Add variance and covariance data and column names to the timeseries.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timeseries</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Another timeseries object that contains uncertainty information.
 If set, the function will ignore the rest of the arguments.</p></li>
-<li><p><strong>var_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – New data variance.</p></li>
-<li><p><strong>var_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of variance column names.</p></li>
-<li><p><strong>cov_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – New data covariance.
+<li><p><strong>var_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – New data variance.</p></li>
+<li><p><strong>var_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of variance column names.</p></li>
+<li><p><strong>cov_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – New data covariance.
 Setting this but not <code class="docutils literal notranslate"><span class="pre">var_data</span></code> requires there to already be data variance.</p></li>
-<li><p><strong>cov_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of covariance column names.</p></li>
+<li><p><strong>cov_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of covariance column names.</p></li>
 </ul>
 </dd>
 </dl>
@@ -538,22 +554,37 @@ names by itself if none are specified.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="disstans.timeseries.Timeseries.convert_units">
+<span class="sig-name descname"><span class="pre">convert_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_data_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.convert_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.convert_units" title="Permalink to this definition"></a></dt>
+<dd><p>Convert the data and covariances to a new data unit by providing a
+conversion factor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Factor to multiply the data by to obtain the data in the new units.</p></li>
+<li><p><strong>new_data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – New data unit to be saved in the <a class="reference internal" href="#disstans.timeseries.Timeseries.data_cols" title="disstans.timeseries.Timeseries.data_cols"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data_cols</span></code></a> attribute.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">only_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.copy" title="Permalink to this definition"></a></dt>
 <dd><p>Return a deep copy of the timeseries instance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>only_data</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, only copy the data columns and ignore any uncertainty information.
+<li><p><strong>only_data</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, only copy the data columns and ignore any uncertainty information.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Set a new source information attribute for the copy.
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Set a new source information attribute for the copy.
 Uses the current one by default.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The copy of the timeseries instance.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
@@ -564,15 +595,15 @@ Uses the current one by default.</p></li>
 <span class="sig-name descname"><span class="pre">cov_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.cov_at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.cov_at" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the covariance matrix of the timeseries at a given time or index.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – A timestamp or timestamp-convertable string to return the covariance
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – A timestamp or timestamp-convertable string to return the covariance
 matrix for. Alternatively, an integer index.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>cov_mat</strong> – The full covariance matrix at time <code class="docutils literal notranslate"><span class="pre">t</span></code>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -587,15 +618,15 @@ Also provides the reverse operation, i.e. only removing data between dates.</p>
 <p>This operation changes the timeseries in-place; if it should be done on a
 new timeseries, use <a class="reference internal" href="#disstans.timeseries.Timeseries.copy" title="disstans.timeseries.Timeseries.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a> first.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t_min</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – A timestamp or timestamp-convertable string of the earliest observation
+<li><p><strong>t_min</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A timestamp or timestamp-convertable string of the earliest observation
 to keep.</p></li>
-<li><p><strong>t_max</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – A timestamp or timestamp-convertable string of the latest observation
+<li><p><strong>t_max</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – A timestamp or timestamp-convertable string of the latest observation
 to keep.</p></li>
-<li><p><strong>i_min</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The index of the earliest observation to keep.</p></li>
-<li><p><strong>i_max</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The index of the latest observation to keep.</p></li>
-<li><p><strong>keep_inside</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), keeps data inside of the specified date range.
+<li><p><strong>i_min</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The index of the earliest observation to keep.</p></li>
+<li><p><strong>i_max</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – The index of the latest observation to keep.</p></li>
+<li><p><strong>keep_inside</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), keeps data inside of the specified date range.
 If <code class="docutils literal notranslate"><span class="pre">False</span></code>, keeps only data outside the specified date range.</p></li>
 </ul>
 </dd>
@@ -606,29 +637,29 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <dt class="sig sig-object py" id="disstans.timeseries.Timeseries.from_array">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.from_array" title="Permalink to this definition"></a></dt>
 <dd><p>Constructor method to create a <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> instance from a NumPy
-<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
+<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – 2D NumPy array of shape <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>
+<li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – 2D NumPy array of shape <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>
 containing the data.</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Source description.</p></li>
-<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Data unit.</p></li>
-<li><p><strong>data_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p></li>
-<li><p><strong>var</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – 2D NumPy array of shape <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Source description.</p></li>
+<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Data unit.</p></li>
+<li><p><strong>data_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p></li>
+<li><p><strong>var</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – 2D NumPy array of shape <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>
 containing the data variances.
 Defaults to no data uncertainty.</p></li>
-<li><p><strong>var_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code> that contain the
+<li><p><strong>var_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code> that contain the
 data’s variance.
 Must have the same length as <code class="docutils literal notranslate"><span class="pre">data_cols</span></code>.
 If <code class="docutils literal notranslate"><span class="pre">var</span></code> is given but <code class="docutils literal notranslate"><span class="pre">var_cols</span></code> is not, it defaults to appending
 <code class="docutils literal notranslate"><span class="pre">'_var'</span></code> to <code class="docutils literal notranslate"><span class="pre">data_cols</span></code>.</p></li>
-<li><p><strong>cov</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – 2D NumPy array of shape <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>
+<li><p><strong>cov</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – 2D NumPy array of shape <span class="math notranslate nohighlight">\((\text{n_observations},\text{n_components})\)</span>
 containing the data covariances (as defined in <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>).
 Defaults to no data uncertainty.</p></li>
-<li><p><strong>cov_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code> that contain the
+<li><p><strong>cov_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the names of the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code> that contain the
 data’s covariance.
 Must have the same length as <code class="docutils literal notranslate"><span class="pre">data_cols</span></code>.
 If <code class="docutils literal notranslate"><span class="pre">cov</span></code> is given but <code class="docutils literal notranslate"><span class="pre">cov_cols</span></code> is not, it defaults to appending
@@ -639,7 +670,7 @@ If <code class="docutils literal notranslate"><span class="pre">cov</span></code
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.2.4/reference/api/pandas.date_range.html#pandas.date_range" title="(in pandas v1.2.4)"><code class="xref py py-func docutils literal notranslate"><span class="pre">date_range()</span></code></a></dt><dd><p>Quick function to generate a timevector.</p>
+<dt><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.date_range.html#pandas.date_range" title="(in pandas v1.4.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">date_range()</span></code></a></dt><dd><p>Quick function to generate a timevector.</p>
 </dd>
 </dl>
 </div>
@@ -650,19 +681,19 @@ If <code class="docutils literal notranslate"><span class="pre">cov</span></code
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#Timeseries.from_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.Timeseries.from_fit" title="Permalink to this definition"></a></dt>
 <dd><p>Import a fit dictionary and create a Timeseries instance.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Data unit.</p></li>
-<li><p><strong>data_cols</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of strings containing the data column names.
+<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Data unit.</p></li>
+<li><p><strong>data_cols</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of strings containing the data column names.
 Uncertainty column names are generated by adding a ‘_var’.</p></li>
-<li><p><strong>fit</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary with the keys <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, <code class="docutils literal notranslate"><span class="pre">'fit'</span></code>, <code class="docutils literal notranslate"><span class="pre">'var'</span></code> and <code class="docutils literal notranslate"><span class="pre">'cov'</span></code>
+<li><p><strong>fit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary with the keys <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, <code class="docutils literal notranslate"><span class="pre">'fit'</span></code>, <code class="docutils literal notranslate"><span class="pre">'var'</span></code> and <code class="docutils literal notranslate"><span class="pre">'cov'</span></code>
 (the latter two can be set to <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Timeseries instance created from <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries">Timeseries</a></p>
 </dd>
 </dl>
@@ -702,8 +733,8 @@ a general Timeseries object from just a JSON-compatible dictionary.</p>
 <dd><p>Mask out an entire data column (and if present, its uncertainty column) by setting
 the entire column to <code class="docutils literal notranslate"><span class="pre">NaN</span></code>. Converts it to a sparse representation to save memory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>dcol</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the data column to mask out.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dcol</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the data column to mask out.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -726,15 +757,15 @@ of both).</p>
 performed, and should not need to be used by normal users.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>left</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Left term of the operation.</p></li>
-<li><p><strong>right</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Right term of the operation.</p></li>
-<li><p><strong>operation</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Operation to perform.
+<li><p><strong>left</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Left term of the operation.</p></li>
+<li><p><strong>right</strong> (<a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>Timeseries</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Right term of the operation.</p></li>
+<li><p><strong>operation</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Operation to perform.
 Possible values are <code class="docutils literal notranslate"><span class="pre">'+'</span></code>, <code class="docutils literal notranslate"><span class="pre">'-'</span></code>, <code class="docutils literal notranslate"><span class="pre">'*'</span></code> and <code class="docutils literal notranslate"><span class="pre">'/'</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>left_data</strong> (<em>numpy.ndarray</em>) – View of the 2D left data array of the operation
 with shape (<code class="docutils literal notranslate"><span class="pre">len(out_time)</span></code>, <a class="reference internal" href="#disstans.timeseries.Timeseries.num_components" title="disstans.timeseries.Timeseries.num_components"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_components</span></code></a>).</p></li>
@@ -747,14 +778,14 @@ with shape (<code class="docutils literal notranslate"><span class="pre">len(out
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If one of the operands is not a <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> or <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>,
-    or if both are <a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> (since then this function would never be
+<li><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#TypeError" title="(in Python v3.10)"><strong>TypeError</strong></a> – If one of the operands is not a <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> or <a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>,
+    or if both are <a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> (since then this function would never be
     called anyway).</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the number of data columns is not equal between the two operands,
+<li><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the number of data columns is not equal between the two operands,
     or if the data units are not the same adding or subtracting.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#AssertionError" title="(in Python v3.9)"><strong>AssertionError</strong></a> – If one of the operands is a NumPy array but does not have the same number of
+<li><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#AssertionError" title="(in Python v3.10)"><strong>AssertionError</strong></a> – If one of the operands is a NumPy array but does not have the same number of
     rows as the other operand.</p></li>
 </ul>
 </dd>
@@ -910,31 +941,28 @@ matrix for a single time.</p>
 
 </section>
 <section id="specialized-classes">
-<h2>Specialized Classes<a class="headerlink" href="#specialized-classes" title="Permalink to this headline"></a></h2>
+<h2>Specialized Classes<a class="headerlink" href="#specialized-classes" title="Permalink to this heading"></a></h2>
 <section id="gipsytimeseries">
-<h3>GipsyTimeseries<a class="headerlink" href="#gipsytimeseries" title="Permalink to this headline"></a></h3>
+<h3>GipsyTimeseries<a class="headerlink" href="#gipsytimeseries" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.GipsyTimeseries">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">GipsyTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">GipsyTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>.</p>
 <p>Timeseries subclass for GNSS measurements in JPL’s Gipsy <code class="docutils literal notranslate"><span class="pre">.tseries</span></code> file format.
 The data and (co)variances are converted into millimeters (squared).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the timeseries file.</p></li>
-<li><p><strong>show_warnings</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, warn if there are data inconsistencies encountered while loading.
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the timeseries file.</p></li>
+<li><p><strong>show_warnings</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, warn if there are data inconsistencies encountered while loading.
 Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Can be <code class="docutils literal notranslate"><span class="pre">'mm'</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">'m'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>The column format is described on <a class="reference external" href="https://sideshow.jpl.nasa.gov/pub/JPL_GPS_Timeseries/repro2018a/raw/position/envseries/0000_README.format">JPL’s website</a>:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 23%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Columns</p></th>
 <th class="head"><p>Description</p></th>
@@ -970,11 +998,11 @@ as per personal communication with Angelyn Moore, JPL.)</p>
 <dd><p>Returns a JSON-compatible dictionary with all the information necessary to recreate
 the Timeseries instance (provided the data file is available).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>JSON-compatible dictionary sufficient to recreate the GipsyTimeseries instance.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -986,38 +1014,30 @@ the Timeseries instance (provided the data file is available).</p>
 </div>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="disstans.timeseries.GipsyTimeseries.__annotations__">
-<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries.__annotations__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </section>
 <section id="unrtimeseries">
-<h3>UNRTimeseries<a class="headerlink" href="#unrtimeseries" title="Permalink to this headline"></a></h3>
+<h3>UNRTimeseries<a class="headerlink" href="#unrtimeseries" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.timeseries.UNRTimeseries">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">UNRTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">UNRTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>.</p>
 <p>Timeseries subclass for GNSS measurements in UNR’s <code class="docutils literal notranslate"><span class="pre">.tenv3</span></code> file format.
 The data and (co)variances are converted into millimeters (squared).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the timeseries file.</p></li>
-<li><p><strong>show_warnings</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, warn if there are data inconsistencies encountered while loading.
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path to the timeseries file.</p></li>
+<li><p><strong>show_warnings</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, warn if there are data inconsistencies encountered while loading.
 Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>data_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Can be <code class="docutils literal notranslate"><span class="pre">'mm'</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">'m'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>The column format is described on <a class="reference external" href="http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt">UNR’s website</a>:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 23%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Columns</p></th>
 <th class="head"><p>Description</p></th>
@@ -1068,6 +1088,20 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
 </tr>
 </tbody>
 </table>
+<p>Newer files also contain the following three columns:</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>Column 21</p></td>
+<td><p>Latitude [°]</p></td>
+</tr>
+<tr class="row-even"><td><p>Column 22</p></td>
+<td><p>Longitude [°]</p></td>
+</tr>
+<tr class="row-odd"><td><p>Column 23</p></td>
+<td><p>Altitude [m]</p></td>
+</tr>
+</tbody>
+</table>
 <p>The time series are relative to each station’s first integer epoch.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.UNRTimeseries.get_arch">
@@ -1075,11 +1109,11 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">True</s
 <dd><p>Returns a JSON-compatible dictionary with all the information necessary to recreate
 the Timeseries instance (provided the data file is available).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>JSON-compatible dictionary sufficient to recreate the UNRTimeseries instance.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1090,11 +1124,6 @@ the Timeseries instance (provided the data file is available).</p>
 </dl>
 </div>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="disstans.timeseries.UNRTimeseries.__annotations__">
-<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#disstans.timeseries.UNRTimeseries.__annotations__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

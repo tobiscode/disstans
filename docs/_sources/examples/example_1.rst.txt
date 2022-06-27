@@ -55,6 +55,7 @@ files will be downloaded into:
     >>> main_dir = Path("proj_dir").resolve()
     >>> data_dir = main_dir / "data/gnss"
     >>> gnss_dir = data_dir / "longvalley"
+    >>> plot_dir = main_dir / "out/example_1"
 
 .. note::
 
@@ -858,12 +859,12 @@ final result, the data covariance should be taken into account.
 If we want to save the state of the entire network object right now (such that we can load it
 later without having to re-run the fitting process), we can save it efficiently like this::
 
-    >>> with gzip.open("example_1_net.pkl.gz", "wb") as f:
+    >>> with gzip.open(plot_dir / "example_1_net.pkl.gz", "wb") as f:
     >>>     pickle.dump(net, f)
 
 We can load it again using::
 
-    >>> with gzip.open("example_1_net.pkl.gz", "rb") as f:
+    >>> with gzip.open(plot_dir / "example_1_net.pkl.gz", "rb") as f:
     >>>     net = pickle.load(f)
 
 Using the GUI, we can again get a first impression of the quality of the fit::
