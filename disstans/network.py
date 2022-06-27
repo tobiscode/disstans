@@ -3215,8 +3215,9 @@ class Network():
     def ampphaseplot(self, ts_description, mdl_description, components=None, phase=True,
                      fname=None, subset_stations=None, lon_min=None, lon_max=None,
                      lat_min=None, lat_max=None, scale=1, annotate_stations=True,
-                     legend_refs=None, legend_labels=None, return_figure=False,
-                     save_kw_args={"format": "png"}, colorbar_kw_args=None, gui_kw_args={}):
+                     legend_refs=None, legend_labels=None, month_range=None,
+                     return_figure=False, save_kw_args={"format": "png"},
+                     colorbar_kw_args=None, gui_kw_args={}):
         """
         Plot the amplitude and phase of a :class:`~disstans.models.Sinusoid`
         model on a network map.
@@ -3261,6 +3262,11 @@ class Network():
             If set, a list of amplitudes that will be used to generate legend entries.
         legend_labels : list, optional
             If set, a list of labels that will be used for ``legend_refs``.
+        month_range : tuple, optional
+            By default, the phase range will be an entire year, and therefore circular.
+            Pass a different range (in inclusive months, e.g., ``(5, 10)`` for all of May
+            through all of October) to subset the range.
+            This automatically switches to a non-circular colormap.
         return_figure : bool, optional
             If ``True`` (default: ``False``), return the figure and axis objects instead of
             showing the plot interactively. Only used if ``fname`` is not set.
@@ -3328,13 +3334,28 @@ class Network():
                     else:
                         raise e
 
+        # define range and colormap
+        if month_range is None:
+            cmap = scm.romaO
+            vmin, vmax = 1, 13 - 1e-3
+            phase_cols = (np.array(phases) % (2*np.pi)) / (2*np.pi)
+        else:
+            assert (isinstance(month_range, tuple) and len(month_range) == 2 and
+                    all([isinstance(m, int) and (1 <= m <= 12) for m in month_range])), \
+                f"'month_range' must be a tuple of 2 integer months, got {month_range}."
+            cmap = scm.batlow
+            vmin = month_range[0]
+            vmax = month_range[1] + 1 - 1e-3
+            phase_cols = ((np.array(phases) % (2*np.pi)) / (2*np.pi) * 12 - month_range[0]
+                          ) / (month_range[1] + 1 - month_range[0])
+
         # update the station marker sizes
         stat_points.set_zorder(1)
         stat_points.set_sizes(20*scale*np.array(amps).ravel()**2)
 
         # update the marker colors
         if phase and (len(phases) > 0):
-            stat_points.set_facecolor(scm.romaO((np.array(phases) % (2*np.pi)) / (2*np.pi)))
+            stat_points.set_facecolor(cmap(phase_cols))
 
         # add gridlines
         ax_map.gridlines(draw_labels=True)
@@ -3357,8 +3378,8 @@ class Network():
 
         # add a colorbar
         if isinstance(colorbar_kw_args, dict):
-            fig_map.colorbar(ScalarMappable(norm=Normalize(vmin=1, vmax=13-1e-10),
-                                            cmap=scm.romaO),
+            fig_map.colorbar(ScalarMappable(norm=Normalize(vmin=vmin, vmax=vmax),
+                                            cmap=cmap),
                              ax=ax_map, **colorbar_kw_args)
 
         # finish up
