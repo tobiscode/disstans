@@ -3,10 +3,14 @@ This module contains the :class:`~Timeseries` base class and other
 formats included by default in DISSTANS.
 """
 
+import zipfile
+import gzip
 import numpy as np
 import pandas as pd
+from io import BytesIO
 from warnings import warn
 from copy import deepcopy
+from pathlib import Path
 
 from .tools import get_cov_dims, make_cov_index_map, get_cov_indices
 
@@ -1366,4 +1370,165 @@ class UNRTimeseries(Timeseries):
         Timeseries.get_arch : For further information.
         """
         return {"type": "UNRTimeseries",
+                "kw_args": {"path": self._path}}
+
+
+class UNRHighRateTimeseries(Timeseries):
+    """
+    Subclasses :class:`~Timeseries`.
+
+    Timeseries subclass for GNSS measurements in UNR's ``.kenv`` file format.
+    The data and (co)variances are converted into millimeters (squared).
+
+    Parameters
+    ----------
+    path : str
+        Path to the timeseries file.
+    show_warnings : bool, optional
+        If ``True``, warn if there are data inconsistencies encountered while loading.
+        Defaults to ``True``.
+    data_unit : str, optional
+        Can be ``'mm'`` (default) or ``'m'``.
+
+    Notes
+    -----
+
+    The column format is described on `UNR's website`_:
+
+    +---------------+---------------------------------------------------+
+    | Columns       | Description                                       |
+    +===============+===================================================+
+    | Column 1      | Station name                                      |
+    +---------------+---------------------------------------------------+
+    | Column 2      | GPS seconds since J2000                           |
+    +---------------+---------------------------------------------------+
+    | Column 3      | Modified Julian Day for GPS day                   |
+    +---------------+---------------------------------------------------+
+    | Columns 4-7   | Year, month, day of month, day of year            |
+    +---------------+---------------------------------------------------+
+    | Column 8      | Seconds of the GPS day                            |
+    +---------------+---------------------------------------------------+
+    | Columns 9-11  | East, North, Up from reference location           |
+    +---------------+---------------------------------------------------+
+    | Columns 12-14 | East, North, Up from daily mean position          |
+    +---------------+---------------------------------------------------+
+    | Columns 15-17 | East, North, Up standard deviations               |
+    +---------------+---------------------------------------------------+
+
+    Note that only the location timeseries relative to the reference locations
+    is loaded.
+    The timestamp associated with each observation is in Terrestrial Time.
+
+    .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_kenv.txt
+
+    """
+    def __init__(self, path, show_warnings=True, data_unit="mm"):
+        self._path = str(path)
+        if data_unit == "m":
+            factor = 1
+        elif data_unit == "mm":
+            factor = 1000
+        else:
+            raise ValueError(f"'data_unit' needs to be 'mm' or 'm', got {data_unit}.")
+        # load data
+        pathobj = Path(self._path)
+        # if the path is a folder or a .kenv.zip file, we need to concatenate files
+        if pathobj.is_dir() or pathobj.match("*.kenv.zip"):
+            # collect list of files if path is a folder
+            if pathobj.is_dir():
+                paths_years = sorted(pathobj.glob("*.kenv.zip"))
+            else:
+                paths_years = [pathobj]
+            # initialize memory buffer for pandas later
+            f = BytesIO()
+            # loop over years
+            for path_y in paths_years:
+                # unzip year
+                try:
+                    with zipfile.ZipFile(path_y) as zip_y:
+                        # get list of daily compressed files
+                        paths_days = sorted(zip_y.namelist())
+                        # load every day
+                        for path_d in paths_days:
+                            with zip_y.open(path_d) as zip_d:
+                                try:
+                                    with gzip.open(zip_d) as gz_d:
+                                        # skip header line
+                                        gz_d.readline()
+                                        # write to buffer
+                                        f.write(gz_d.read())
+                                except gzip.BadGzipFile as e:
+                                    raise RuntimeError(f"Error extracting the file {path_y}."
+                                                       ).with_traceback(e.__traceback__) from e
+                except (zipfile.BadZipFile, zipfile.LargeZipFile) as e:
+                    raise RuntimeError(f"Error extracting the file {path_y}."
+                                       ).with_traceback(e.__traceback__) from e
+            # load data into pandas
+            f.seek(0)
+            df = pd.read_csv(f, delim_whitespace=True,
+                             names=["site", "sec-J2000", "___e-ref(m)", "___n-ref(m)",
+                                    "___v-ref(m)", "sig_e(m)", "sig_n(m)", "sig_v(m)"],
+                             usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
+        # if the path is a .kenv.gz file, we only need to extract the single file
+        elif pathobj.match("*.kenv.gz"):
+            with gzip.open(self._path, mode="r") as f:
+                df = pd.read_csv(f, delim_whitespace=True,
+                                 usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
+        # in all other cases, try loading directly
+        else:
+            df = pd.read_csv(self._path, delim_whitespace=True,
+                             usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
+        # check for duplicate sites
+        if show_warnings and len(df['site'].unique()) > 1:
+            warn(f"Timeseries file/folder {self._path} contains multiple site codes: "
+                 f"{df['site'].unique()}", stacklevel=2)
+        # remove site column
+        df.drop(columns=["site"], inplace=True)
+        # convert data units
+        df["___e-ref(m)"] *= factor
+        df["___n-ref(m)"] *= factor
+        df["___v-ref(m)"] *= factor
+        # convert to variance and change units
+        df["sig_e(m)"] *= df["sig_e(m)"] * factor**2
+        df["sig_n(m)"] *= df["sig_n(m)"] * factor**2
+        df["sig_v(m)"] *= df["sig_v(m)"] * factor**2
+        # check for duplicate timestamps
+        num_duplicates = int(df.duplicated(subset="sec-J2000").sum())
+        if show_warnings and (num_duplicates > 0):
+            warn(f"Timeseries file/folder {self._path} contains data for {num_duplicates} "
+                 "duplicate timestamps. Keeping first occurrences.", stacklevel=2)
+        df.drop_duplicates(subset="sec-J2000", inplace=True)
+        # create time index and rename columns
+        df["sec-J2000"] = (pd.Timestamp("2000-01-01 12:00:00") +
+                           pd.to_timedelta(df["sec-J2000"], unit="s"))
+        df.rename(columns={"___e-ref(m)": "east", "sig_e(m)": "east_var",
+                           "___n-ref(m)": "north", "sig_n(m)": "north_var",
+                           "___v-ref(m)": "up", "sig_v(m)": "up_var",
+                           "sec-J2000": "time"}, inplace=True)
+        df.set_index("time", inplace=True)
+        # check for monotonic time index
+        if not df.index.is_monotonic_increasing:
+            warn(f"Timeseries file/folder {self._path} is not ordered in time, sorting it now.",
+                 stacklevel=2)
+            df.sort_index(inplace=True)
+        # construct Timeseries object
+        super().__init__(dataframe=df, src=".kenv", data_unit=data_unit,
+                         data_cols=["east", "north", "up"],
+                         var_cols=["east_var", "north_var", "up_var"])
+
+    def get_arch(self):
+        """
+        Returns a JSON-compatible dictionary with all the information necessary to recreate
+        the Timeseries instance (provided the data file is available).
+
+        Returns
+        -------
+        dict
+            JSON-compatible dictionary sufficient to recreate the UNRTimeseries instance.
+
+        See Also
+        --------
+        Timeseries.get_arch : For further information.
+        """
+        return {"type": "UNRHighRateTimeseries",
                 "kw_args": {"path": self._path}}
