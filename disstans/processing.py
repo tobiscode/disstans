@@ -872,7 +872,7 @@ class StepDetector():
                                      self.kernel_size_min, maxdel))
 
     def search_network(self, net, ts_description, maxdel=10, threshold=20,
-                       gap=2, gap_unit="D", no_pbar=False):
+                       gap=2, gap_unit="D", aggregate_components=True, no_pbar=False):
         r"""
         Function that searches for steps in an entire network (possibly in parallel),
         thresholds those probabilities, and identifies all the consecutive ranges in which
@@ -894,6 +894,9 @@ class StepDetector():
             of possible steps.
         gap_unit : str, optional
             Time unit of ``gap``.
+        aggregate_components : bool, optional
+            If ``True`` (default), use the maximum step probability across all data components
+            when searching for steps.
         no_pbar : bool, optional
             Suppress the progress bar with ``True`` (default: ``False``).
 
@@ -927,7 +930,8 @@ class StepDetector():
                      desc="Searching for steps", disable=no_pbar)):
             # find steps given the just calculated probabilities
             # setting the maximum number of steps to infinite to not miss anything
-            steps = StepDetector.steps(probs, threshold, np.inf, False)
+            steps = StepDetector.steps(probs, threshold=threshold, maxsteps=np.inf,
+                                       aggregate_components=aggregate_components, verbose=False)
             # combine all data components and keep largest probability if the step
             # is present in multiple components
             unique_steps = np.sort(np.unique(np.concatenate(steps)))
@@ -1108,7 +1112,8 @@ class StepDetector():
         return step_table, step_ranges
 
     @staticmethod
-    def steps(probabilities, threshold=2, maxsteps=np.inf, verbose=True):
+    def steps(probabilities, threshold=2, maxsteps=np.inf, aggregate_components=True,
+              verbose=True):
         r"""
         Threshold the probabilities to return a list of steps.
 
@@ -1119,6 +1124,9 @@ class StepDetector():
         maxsteps : int, optional
             Return at most ``maxsteps`` number of steps. Can be useful if a good value for
             ``threshold`` has not been found yet.
+        aggregate_components : bool, optional
+            If ``True`` (default), use the maximum step probability across all data components
+            when searching for steps.
         verbose : bool, optional
             If ``True`` (default), print warnings when there will be a large number of
             steps identified given the ``threshold``.
@@ -1131,6 +1139,8 @@ class StepDetector():
         """
         # initialize
         probabilities[np.isnan(probabilities)] = -1
+        if aggregate_components:
+            probabilities = probabilities.max(axis=1, keepdims=True)
         steps = []
         for icomp in range(probabilities.shape[1]):
             # find peaks above the threshold
