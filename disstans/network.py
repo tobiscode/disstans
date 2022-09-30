@@ -3393,3 +3393,80 @@ class Network():
                 return fig_map, ax_map
             else:
                 plt.show()
+
+    def plot_availability(self, ts_description, sampling=Timedelta(1, "D"), sort_by_latitude=True,
+                          saveas=None):
+        """
+        Create an availability figure for the network.
+
+        Parameters
+        ----------
+        ts_description : str
+            The name of the timeseries to be used.
+        sampling : disstans.tools.Timedelta, optional
+            Assume that breaks strictly larger than ``sampling`` constitute a data gap.
+            Defaults to daily.
+        sort_by_latitude : bool, optional
+            If ``True`` (default), sort the stations by latitude, else alphabetical.
+            (Always falls back to alphabetical if location information is missing.)
+        saveas : str, optional
+            If provided, the figure will be saved at this location.
+        """
+        # find a sorting by latitude to match a map view,
+        # otherwise go by alphabet
+        sort_stations = None
+        if sort_by_latitude:
+            try:
+                sort_indices = np.argsort(self.station_locations["Latitude [°]"].values)
+                sort_stations = np.array(self.station_names)[sort_indices].tolist()
+            except RuntimeError:
+                pass
+        if sort_stations is None:
+            sort_stations = list(reversed(sorted([s.lower() for s in self.station_names])))
+        n_stations = len(sort_stations)
+        # make an empty figure and start a color loop
+        fig, ax = plt.subplots(figsize=(6, 0.25*n_stations))
+        colors = [plt.cm.tab10(i) for i in range(10)]
+        icolor = 0
+        n_dates = []
+        # loop over stations in the sorted order
+        for offset, station in enumerate(sort_stations):
+            # get the timestamps and split them by contiguous chunks
+            all_dates = self[station][ts_description].time.values
+            n_dates.append(all_dates.size)
+            if all_dates.size > 1:
+                split_at = np.nonzero(np.diff(all_dates) > sampling)[0]
+                if split_at.size > 0:
+                    intervals = np.split(all_dates, split_at + 1)
+                else:
+                    intervals = [all_dates]
+            else:
+                intervals = [all_dates]
+            # plot a line for each chunk
+            for chunk in intervals:
+                ax.fill_between([chunk[0], chunk[-1]],
+                                [offset + 0.7, offset + 0.7], [offset + 1.3, offset + 1.3],
+                                fc=colors[icolor])
+            icolor = (icolor + 1) % 10
+        # add station labels
+        ax.set_yticks(np.arange(n_stations) + 1)
+        ax.set_yticklabels(sort_stations)
+        ax.tick_params(which="major", axis="y", left=False)
+        # do some pretty formatting
+        ax.set_title(f"Network: {self.name}\n"
+                     f"Files: {sum(n_dates)}")
+        ax.grid(which="major", axis="x")
+        ax.xaxis.set_tick_params(labeltop='on')
+        ax.set_axisbelow(True)
+        ax.set_ylim(0.5, n_stations + 0.5)
+        # add number of files per station
+        ax_right = ax.twinx()
+        ax_right.set_ylim(0.5, n_stations + 0.5)
+        ax_right.set_yticks(np.arange(n_stations) + 1)
+        ax_right.set_yticklabels([f"({n})" for n in n_dates], fontsize="x-small")
+        ax_right.tick_params(which="major", axis="y", right=False)
+        # save
+        if saveas is not None:
+            fig.savefig(saveas)
+        # show
+        plt.show()
