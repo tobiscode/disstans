@@ -3454,7 +3454,7 @@ class Network():
         ax.tick_params(which="major", axis="y", left=False)
         # do some pretty formatting
         ax.set_title(f"Network: {self.name}\n"
-                     f"Files: {sum(n_dates)}")
+                     f"Observations: {sum(n_dates)}")
         ax.grid(which="major", axis="x")
         ax.xaxis.set_tick_params(labeltop='on')
         ax.set_axisbelow(True)
