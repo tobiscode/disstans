@@ -1742,12 +1742,18 @@ class Logarithmic(Model):
         Logarithmic time constant(s) :math:`\tau`.
         It represents the time at which, after zero-crossing at the reference
         time, the logarithm reaches the value 1 (before model scaling).
+    sign_constraint : int, list, optional
+        Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.
+        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
+        sign, avoiding sign flips between individual exponentials. It can also be a list, where
+        each entry applies to one data component (needs to be known at initialization).
+        If ``None``, no constraint is enforced.
 
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, tau, t_reference,
-                 time_unit="D", t_start=None, zero_after=False, **model_kw_args):
+    def __init__(self, tau, t_reference, sign_constraint=None, time_unit="D", t_start=None,
+                 zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
         tau = np.asarray(tau)
@@ -1755,6 +1761,15 @@ class Logarithmic(Model):
                               f"array of shape {tau.shape}."
         self.tau = tau
         """ Logarithmic time constant. """
+        assert ((sign_constraint in [1, -1, None]) or
+                (isinstance(sign_constraint, list) and
+                 all([s in [1, -1, None] for s in sign_constraint]))), "'sign_constraint' " \
+            f"must be None, -1, 1, or a list of None, -1, and 1, got {sign_constraint}."
+        self.sign_constraint = sign_constraint
+        """
+        Flag whether the sign of the fitted parameters should be constrained.
+        Only supported by the :func:`~disstans.solvers.lasso_regression` solver.
+        """
         # initialize Model object
         super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
                          time_unit=time_unit, zero_after=zero_after, **model_kw_args)
@@ -1765,7 +1780,8 @@ class Logarithmic(Model):
     def _get_arch(self):
         tau = self.tau if len(self.tau) > 1 else self.tau[0]
         arch = {"type": "Logarithmic",
-                "kw_args": {"tau": tau}}
+                "kw_args": {"tau": tau,
+                            "sign_constraint": self.sign_constraint}}
         return arch
 
     def _get_mapping(self, timevector):
@@ -1791,12 +1807,18 @@ class Exponential(Model):
         Applied to this model, for a given relative amplitude :math:`a` (so :math:`0 < a < 1`,
         before model scaling) to be reached at given :math:`\Delta t` past ``t_start``,
         :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
+    sign_constraint : int, list, optional
+        Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.
+        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
+        sign, avoiding sign flips between individual exponentials. It can also be a list, where
+        each entry applies to one data component (needs to be known at initialization).
+        If ``None``, no constraint is enforced.
 
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, tau, t_reference,
-                 time_unit="D", t_start=None, zero_after=False, **model_kw_args):
+    def __init__(self, tau, t_reference, sign_constraint=None, time_unit="D", t_start=None,
+                 zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
         tau = np.asarray(tau)
@@ -1804,6 +1826,15 @@ class Exponential(Model):
                               f"array of shape {tau.shape}."
         self.tau = tau
         """ Exponential time constant(s). """
+        assert ((sign_constraint in [1, -1, None]) or
+                (isinstance(sign_constraint, list) and
+                 all([s in [1, -1, None] for s in sign_constraint]))), "'sign_constraint' " \
+            f"must be None, -1, 1, or a list of None, -1, and 1, got {sign_constraint}."
+        self.sign_constraint = sign_constraint
+        """
+        Flag whether the sign of the fitted parameters should be constrained.
+        Only supported by the :func:`~disstans.solvers.lasso_regression` solver.
+        """
         # initialize Model object
         super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
                          time_unit=time_unit, zero_after=zero_after, **model_kw_args)
@@ -1814,7 +1845,8 @@ class Exponential(Model):
     def _get_arch(self):
         tau = self.tau if len(self.tau) > 1 else self.tau[0]
         arch = {"type": "Exponential",
-                "kw_args": {"tau": tau}}
+                "kw_args": {"tau": tau,
+                            "sign_constraint": self.sign_constraint}}
         return arch
 
     def _get_mapping(self, timevector):
@@ -2458,7 +2490,7 @@ class ModelCollection():
             return mapping
 
     def prepare_LS(self, ts, include_regularization=True, reweight_init=None,
-                   use_internal_scales=False):
+                   use_internal_scales=False, check_constraints=False):
         r"""
         Helper function that concatenates the mapping matrices of the collection
         models given the timevector in in the input timeseries, and returns some
@@ -2485,6 +2517,9 @@ class ModelCollection():
         use_internal_scales : bool, optional
             If ``True`` (default: ``False``), also return the internal model scales,
             subset to the observable and regularized parameters.
+        check_constraints : bool, optional
+            If ``True`` (default: ``False``), also return an array that contains the signs
+            that should be enforced for the parameters.
 
         Returns
         -------
@@ -2517,6 +2552,11 @@ class ModelCollection():
             Numpy array of shape :math:`(\text{num_reg}, )` that for each observable
             and regularized parameter contains the internal model scale.
             ``None`` if ``use_internal_scales=False``.
+        sign_constraints : numpy.ndarray
+            (Only if ``check_constraints=True``.)
+            Numpy array of shape :math:`(\text{num_obs}, \text{num_comps})` that for
+            each observable parameter denotes whether it should be positive (``+1``),
+            negative (``-1``), or unconstrained (``NaN``).
 
         See Also
         --------
@@ -2528,9 +2568,11 @@ class ModelCollection():
         G, obs_mask = self.get_mapping(ts.time, return_observability=True)
         num_time, num_params = G.shape
         assert num_params > 0, f"Mapping matrix is empty, has shape {G.shape}."
+        assert num_params == obs_mask.size, "Parameter and observability mismatch."
         num_obs = obs_mask.sum()
         assert num_obs > 0, "Mapping matrix has no observable parameters."
         num_comps = ts.num_components
+        return_vals = [G, obs_mask, num_time, num_params, num_comps, num_obs]
         if include_regularization:
             # reg_mask_full has shape (self.num_parameters, ) and is True if
             # a parameter should be regularized
@@ -2578,10 +2620,29 @@ class ModelCollection():
                 assert init_weights.shape == (num_reg, num_comps), \
                     "The combined 'reweight_init' must have the shape " + \
                     f"{(num_reg, num_comps)}, got {reweight_init.shape}."
-            return G, obs_mask, num_time, num_params, num_comps, num_obs, num_reg, \
-                reg_mask, init_weights, weights_scaling
-        else:
-            return G, obs_mask, num_time, num_params, num_comps, num_obs
+            return_vals.extend([num_reg, reg_mask, init_weights, weights_scaling])
+        if check_constraints:
+            # check for constraints
+            sign_constraints = np.empty((num_params, num_comps))
+            sign_constraints[:] = np.NaN
+            i = 0
+            for mdl_name, model in self.items():
+                try:
+                    # one sign is broadcasted, or the list is inserted into the array
+                    sign_constraints[i:i+model.num_parameters, :] = model.sign_constraint
+                except AttributeError:  # model hasn't implemented constraints, just skip
+                    pass
+                except ValueError as e:  # list doesn't match number of components
+                    raise ValueError(f"The sign constraint in the model '{mdl_name}' is "
+                                     "either not a scalar, or the list length does not "
+                                     f"match the number of data components ({num_comps})."
+                                     ).with_traceback(e.__traceback__) from e
+                i += model.num_parameters
+            # subset to observables
+            sign_constraints = sign_constraints[obs_mask, :]
+            return_vals.append(sign_constraints)
+        # return all collected outputs
+        return tuple(return_vals)
 
     @staticmethod
     def build_LS(ts, G, obs_mask, icomp=None, return_W_G=False,

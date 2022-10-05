@@ -676,6 +676,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                      reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
                      formal_covariance=False, use_data_variance=True, use_data_covariance=True,
                      use_internal_scales=True, cov_zero_threshold=1e-6, return_weights=False,
+                     check_constraints=True,
                      cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
     r"""
     Performs linear, L1-regularized least squares using
@@ -770,6 +771,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         When reweighting is active, set to ``True`` to return the weights after the last
         update.
         Defaults to ``False``.
+    check_constraints : bool, optional
+        If ``True`` (default), check whether models have sign constraints that should
+        be enforced.
     cvxpy_kw_args : dict
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
         By default, the CVXPY solver options are set to use CVXOPT as the solver
@@ -849,8 +853,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
 
     # get mapping and regularization matrix
     G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, \
-        reweight_init, weights_scaling = models.prepare_LS(
-            ts, reweight_init=reweight_init, use_internal_scales=True)
+        reweight_init, weights_scaling, sign_constraints = models.prepare_LS(
+            ts, reweight_init=reweight_init, use_internal_scales=True,
+            check_constraints=check_constraints)
     # determine if a shortcut is possible
     regularize = (num_reg > 0) and (np.any(penalty > 0))
     if (not regularize) or (reweight_max_iters is None):
@@ -871,13 +876,24 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     if (ts.cov_cols is not None) and use_data_covariance:
         reg_indices = np.repeat(reg_indices, num_comps)
         weights_scaling = np.repeat(weights_scaling, num_comps)
+    # create constraint indices
+    if check_constraints and np.isfinite(sign_constraints).sum() > 0:
+        nonneg_indices = sign_constraints > 0
+        nonpos_indices = sign_constraints < 0
+    else:
+        check_constraints = False
 
     # solve CVXPY problem while checking for convergence
-    def solve_problem(GtWG, GtWd, pen, num_comps, init_weights):
+    def solve_problem(GtWG, GtWd, pen, num_comps, init_weights, nonneg, nonpos):
         # build objective function
         m = cp.Variable(GtWd.size)
         objective = cp.norm2(GtWG @ m - GtWd)
-        constraints = None
+        constraints = []
+        if check_constraints:
+            if nonneg is not None:
+                constraints.append(m[nonneg] >= 0)
+            if nonpos is not None:
+                constraints.append(m[nonpos] <= 0)
         if regularize:
             if reweight_max_iters is not None:
                 reweight_size = num_reg * num_comps
@@ -898,7 +914,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                     lambd = cp.Parameter(shape=() if num_comps == 1 else pen.size,
                                          value=pen, pos=True)
                     objective = objective + cp.norm1(cp.multiply(lambd, z))
-                constraints = [z == cp.multiply(weights, m[reg_indices])]
+                constraints.append(z == cp.multiply(weights, m[reg_indices]))
                 old_m = np.zeros(m.shape)
             else:
                 lambd = cp.Parameter(shape=() if num_comps == 1 else pen.size,
@@ -962,7 +978,15 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 ts, G, obs_indices, icomp=i, return_W_G=True, use_data_var=use_data_variance)
             solution, wts = solve_problem(GtWG, GtWd, pen=penalty[i], num_comps=1,
                                           init_weights=reweight_init[:, i]
-                                          if reweight_init is not None else None)
+                                          if reweight_init is not None else None,
+                                          nonneg=nonneg_indices[:, i]
+                                          if check_constraints
+                                          and nonneg_indices[:, i].sum() > 0
+                                          else None,
+                                          nonpos=nonpos_indices[:, i]
+                                          if check_constraints
+                                          and nonpos_indices[:, i].sum() > 0
+                                          else None)
             # store results
             if solution is None:
                 params[:, i] = np.NaN
@@ -1002,7 +1026,13 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         solution, wts = solve_problem(GtWG, GtWd, pen=np.tile(penalty, num_reg),
                                       num_comps=num_comps,
                                       init_weights=reweight_init.ravel()
-                                      if reweight_init is not None else None)
+                                      if reweight_init is not None else None,
+                                      nonneg=nonneg_indices.ravel()
+                                      if check_constraints and nonneg_indices.sum() > 0
+                                      else None,
+                                      nonpos=nonpos_indices.ravel()
+                                      if check_constraints and nonpos_indices.sum() > 0
+                                      else None)
         # store results
         if solution is None:
             params = np.empty((num_obs, num_comps))
