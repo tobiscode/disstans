@@ -1646,8 +1646,8 @@ class Logarithmic(Model):
 
     Parameters
     ----------
-    tau : float
-        Logarithmic time constant :math:`\tau`.
+    tau : float, list, numpy.ndarray
+        Logarithmic time constant(s) :math:`\tau`.
         It represents the time at which, after zero-crossing at the reference
         time, the logarithm reaches the value 1 (before model scaling).
 
@@ -1658,22 +1658,27 @@ class Logarithmic(Model):
                  time_unit="D", t_start=None, zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
-        super().__init__(num_parameters=1, t_reference=t_reference, t_start=t_start,
+        tau = np.asarray(tau)
+        assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
+                              f"array of shape {tau.shape}."
+        self.tau = tau
+        """ Logarithmic time constant. """
+        # initialize Model object
+        super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
                          time_unit=time_unit, zero_after=zero_after, **model_kw_args)
         assert self.t_reference <= self.t_start, \
             "Logarithmic model has to have valid bounds, but the reference time " + \
             f"{self.t_reference_str} is after the start time {self.t_start_str}."
-        self.tau = float(tau)
-        """ Logarithmic time constant. """
 
     def _get_arch(self):
+        tau = self.tau if len(self.tau) > 1 else self.tau[0]
         arch = {"type": "Logarithmic",
-                "kw_args": {"tau": self.tau}}
+                "kw_args": {"tau": tau}}
         return arch
 
     def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
-        coefs = np.log1p(dt / self.tau).reshape(-1, 1)
+        coefs = np.log1p(dt.reshape(-1, 1) / self.tau.reshape(1, -1))
         return coefs
 
 
@@ -1687,8 +1692,8 @@ class Exponential(Model):
 
     Parameters
     ----------
-    tau : float
-        Exponential time constant :math:`\tau`.
+    tau : float, list, numpy.ndarray
+        Exponential time constant(s) :math:`\tau`.
         It represents the amount of time that it takes for the (general) exponential
         function's value to be multiplied by :math:`e`.
         Applied to this model, for a given relative amplitude :math:`a` (so :math:`0 < a < 1`,
@@ -1702,22 +1707,27 @@ class Exponential(Model):
                  time_unit="D", t_start=None, zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
-        super().__init__(num_parameters=1, t_reference=t_reference, t_start=t_start,
+        tau = np.asarray(tau)
+        assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
+                              f"array of shape {tau.shape}."
+        self.tau = tau
+        """ Exponential time constant(s). """
+        # initialize Model object
+        super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
                          time_unit=time_unit, zero_after=zero_after, **model_kw_args)
         assert self.t_reference <= self.t_start, \
             "Exponential model has to have valid bounds, but the reference time " + \
             f"{self.t_reference_str} is after the start time {self.t_start_str}."
-        self.tau = float(tau)
-        """ Exponential time constant. """
 
     def _get_arch(self):
+        tau = self.tau if len(self.tau) > 1 else self.tau[0]
         arch = {"type": "Exponential",
-                "kw_args": {"tau": self.tau}}
+                "kw_args": {"tau": tau}}
         return arch
 
     def _get_mapping(self, timevector):
         dt = self.tvec_to_numpycol(timevector)
-        coefs = (1 - np.exp(-dt / self.tau)).reshape(-1, 1)
+        coefs = 1 - np.exp(-dt.reshape(-1, 1) / self.tau.reshape(1, -1))
         return coefs
 
 
