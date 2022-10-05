@@ -49,6 +49,10 @@ class Timeseries():
         the order of the elements is determined by their row-by-row, sequential
         position in the covariance matrix (see Notes).
         Defaults to no covariance columns.
+    remove_initial_offset : bool, optional
+        If ``True`` (default), the data timeseries will be shifted such that
+        it starts at zero. The offset will be recorded in
+        :class:`~Timeseries.offset` if it needs to be recovered.
 
     Notes
     -----
@@ -66,9 +70,11 @@ class Timeseries():
     +-------------------+-------------------+-------------------+
     """
     def __init__(self, dataframe, src, data_unit, data_cols,
-                 var_cols=None, cov_cols=None):
+                 var_cols=None, cov_cols=None, remove_initial_offset=True):
         # input type checks
         assert isinstance(dataframe, pd.DataFrame)
+        assert dataframe.index.inferred_type == "datetime64"
+        assert all([pd.api.types.is_numeric_dtype(dt) for dt in dataframe.dtypes])
         assert isinstance(src, str)
         assert isinstance(data_unit, str)
         assert isinstance(data_cols, list) and all([isinstance(dcol, str) for dcol in data_cols])
@@ -118,6 +124,14 @@ class Timeseries():
             matrix for a single time.
             """
         self._cov_cols = cov_cols
+        # shift data to zero if desired
+        if remove_initial_offset:
+            offset = self._df.loc[self._df.index[0], self.data_cols]
+            self._df.loc[:, self.data_cols] -= offset
+        else:
+            offset = None
+        self.offset = offset
+        """ Offset applied to the timeseries data such that it starts at zero. """
 
     def __str__(self):
         """
@@ -130,7 +144,8 @@ class Timeseries():
             Timeseries summary.
         """
         info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}" \
-               f"\n - Shape: {self.shape}\n - Data: {[key for key in self.data_cols]}"
+               f"\n - Shape: {self.shape}\n - Offset Removed: {~(self.offset is None)}" \
+               f"\n - Data: {[key for key in self.data_cols]}"
         if self.var_cols is not None:
             info += f"\n - Variances: {[key for key in self.var_cols]}"
         if self.cov_cols is not None:
@@ -1114,6 +1129,9 @@ class GipsyTimeseries(Timeseries):
     data_unit : str, optional
         Can be ``'mm'`` (default) or ``'m'``.
 
+
+    Additional keyword arguments will be passed onto :class:`~Timeseries`.
+
     Notes
     -----
 
@@ -1144,7 +1162,7 @@ class GipsyTimeseries(Timeseries):
 repro2018a/raw/position/envseries/0000_README.format
 
     """
-    def __init__(self, path, show_warnings=True, data_unit="mm"):
+    def __init__(self, path, show_warnings=True, data_unit="mm", **kw_args):
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1188,7 +1206,8 @@ repro2018a/raw/position/envseries/0000_README.format
             df.sort_index(inplace=True)
         # construct Timeseries object
         super().__init__(dataframe=df, src=".tseries", data_unit=data_unit,
-                         data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols)
+                         data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols,
+                         **kw_args)
 
     def get_arch(self):
         """
@@ -1224,6 +1243,9 @@ class UNRTimeseries(Timeseries):
         Defaults to ``True``.
     data_unit : str, optional
         Can be ``'mm'`` (default) or ``'m'``.
+
+
+    Additional keyword arguments will be passed onto :class:`~Timeseries`.
 
     Notes
     -----
@@ -1277,7 +1299,7 @@ class UNRTimeseries(Timeseries):
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
 
     """
-    def __init__(self, path, show_warnings=True, data_unit="mm"):
+    def __init__(self, path, show_warnings=True, data_unit="mm", **kw_args):
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1353,7 +1375,8 @@ class UNRTimeseries(Timeseries):
         super().__init__(dataframe=df, src=".tenv3", data_unit=data_unit,
                          data_cols=["east", "north", "up"],
                          var_cols=["east_var", "north_var", "up_var"],
-                         cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"])
+                         cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"],
+                         **kw_args)
 
     def get_arch(self):
         """
@@ -1390,6 +1413,9 @@ class UNRHighRateTimeseries(Timeseries):
     data_unit : str, optional
         Can be ``'mm'`` (default) or ``'m'``.
 
+
+    Additional keyword arguments will be passed onto :class:`~Timeseries`.
+
     Notes
     -----
 
@@ -1422,7 +1448,7 @@ class UNRHighRateTimeseries(Timeseries):
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_kenv.txt
 
     """
-    def __init__(self, path, show_warnings=True, data_unit="mm"):
+    def __init__(self, path, show_warnings=True, data_unit="mm", **kw_args):
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1514,7 +1540,8 @@ class UNRHighRateTimeseries(Timeseries):
         # construct Timeseries object
         super().__init__(dataframe=df, src=".kenv", data_unit=data_unit,
                          data_cols=["east", "north", "up"],
-                         var_cols=["east_var", "north_var", "up_var"])
+                         var_cols=["east_var", "north_var", "up_var"],
+                         **kw_args)
 
     def get_arch(self):
         """
