@@ -883,13 +883,10 @@ class BSpline(Model):
             """ Spacing between the center times of the splines. """
             assert abs(self.spacing) > 0, \
                 f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
-            if num_splines == 1:
-                warn(f"'spacing' ({self.spacing} {time_unit}) is given, but "
-                     "'num_splines' = 1 splines are requested.", stacklevel=2)
         elif num_splines > 1:
             self.spacing = self.scale
         else:
-            self.spacing = None
+            self.spacing = 0.0
         self.observability_scale = float(obs_scale)
         """ Observability scale factor. """
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
@@ -994,13 +991,10 @@ class ISpline(Model):
             """ Spacing between the center times of the splines. """
             assert abs(self.spacing) > 0, \
                 f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
-            if num_splines == 1:
-                warn(f"'spacing' ({self.spacing} {time_unit}) is given, "
-                     "but 'num_splines' = 1 splines are requested.", stacklevel=2)
         elif num_splines > 1:
             self.spacing = self.scale
         else:
-            self.spacing = None
+            self.spacing = 0.0
         self.observability_scale = float(obs_scale)
         """ Observability scale factor. """
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
@@ -1228,7 +1222,7 @@ class SplineSet(Model):
         ix_coefs = 0
         for model in self.splines:
             coefs[:, ix_coefs:ix_coefs + model.num_parameters] = \
-                model.get_mapping(timevector).A.squeeze()
+                model.get_mapping(timevector).A
             ix_coefs += model.num_parameters
         if self.internal_scaling:
             coefs *= self.internal_scales.reshape(1, self.num_parameters)
