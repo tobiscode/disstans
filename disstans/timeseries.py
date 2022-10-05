@@ -50,8 +50,8 @@ class Timeseries():
         position in the covariance matrix (see Notes).
         Defaults to no covariance columns.
     remove_initial_offset : bool, optional
-        If ``True`` (default), the data timeseries will be shifted such that
-        it starts at zero. The offset will be recorded in
+        If ``True`` (default: ``False``), the data timeseries will be shifted such
+        that it starts at zero. The offset will be recorded in
         :class:`~Timeseries.offset` if it needs to be recovered.
 
     Notes
@@ -70,7 +70,7 @@ class Timeseries():
     +-------------------+-------------------+-------------------+
     """
     def __init__(self, dataframe, src, data_unit, data_cols,
-                 var_cols=None, cov_cols=None, remove_initial_offset=True):
+                 var_cols=None, cov_cols=None, remove_initial_offset=False):
         # input type checks
         assert isinstance(dataframe, pd.DataFrame)
         assert dataframe.index.inferred_type == "datetime64"
