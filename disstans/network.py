@@ -2429,8 +2429,8 @@ class Network():
             If passed, also plot a scalogram. Defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
             are the names of the timeseries and associated model that are of the
-            :class:`~disstans.models.SplineSet` class, and therefore have a
-            :meth:`~disstans.models.SplineSet.make_scalogram` method.
+            :class:`~disstans.models.BaseSplineSet` class, and therefore have a
+            :meth:`~disstans.models.BaseSplineSet.make_scalogram` method.
         mark_events : pandas.DataFrame, list, optional
             If passed, a DataFrame or list of DataFrames that contain the columns
             ``'station'`` and ``'time'``. For each timestamp, a vertical line is plotted

@@ -975,7 +975,7 @@ class ISpline(Model):
 
     See Also
     --------
-    disstans.models.BSpline : More details about B-Splines.
+    disstans.models.BSpline : More details about B-Splines and the available keyword arguments.
     """
     def __init__(self, degree, scale, t_reference, regularize=True, time_unit="D",
                  num_splines=1, spacing=None, zero_after=False, obs_scale=1, **model_kw_args):
@@ -1071,126 +1071,36 @@ class ISpline(Model):
         return transient
 
 
-class SplineSet(Model):
+class BaseSplineSet(Model):
     """
     Subclasses :class:`~disstans.models.Model`.
 
-    Contains a list of splines that share a common degree, but different center
-    times and scales.
-
-    The set is constructed from a time span (``t_center_start`` and ``t_center_end``)
-    and numbers of centerpoints or length scales. By default (``complete=True``),
-    the number of splines and center points for each scale will then be chosen such
-    that the resulting set of splines will be complete over the input time scale.
-    This means it will contain all splines that are non-zero at least somewhere in
-    the time span. Otherwise, the spline set will only have center times at or
-    between ``t_center_start`` and ``t_center_end``.
-
-    This class also sets the spacing equal to the scale.
-
-    Lastly, in order to influence the tradeoff between splines of different timescales,
-    the mapping matrix of each spline is scaled by its own time scale to promote using
-    fewer components. Without this, there would be an ambiguity for the solver as to
-    whether fit the signal using many smaller scales or with one large scale, as the
-    fit would be almost identical. This behavior can be disabled by setting
-    ``internal_scaling=False``.
+    Raw container class for lists of splines, which are usually created with subclasses
+    like :class:`~disstans.models.SplineSet`. The common functionalities are implemented
+    here.
 
     Parameters
     ----------
-    degree : int
-        Degree of the splines to be created.
-    t_center_start : str or pandas.Timestamp
-        Time span start of the spline set.
-    t_center_end : str or pandas.Timestamp
-        Time span end of the spline set.
-    time_unit : str
-        Time unit of scale, spacing and model parameters.
-    list_scales : list
-        List of scales to use for each of the sub-splines.
-        Mutually exclusive to setting ``list_num_knots``.
-    list_num_knots : list
-        List of number of knots to divide the time span into for each of the sub-splines.
-        Mutually exclusive to setting ``list_scales``.
-    splineclass : Model, optional
-        Model class to use for the splines. Defaults to :class:`~disstans.models.ISpline`.
-    complete : bool, optional
-        See usage description. Defaults to ``True``.
+    splines : list
+        List of spline model objects.
     internal_scaling : bool, optional
-        See usage description. Defaults to ``True``.
+        By default (``internal_scaling=True``), in order to influence the tradeoff between
+        splines of different timescales, the mapping matrix of each spline is scaled by its
+        own time scale to promote using fewer components. Without this, there would be an
+        ambiguity for the solver as to whether fit the signal using many smaller scales or
+        with one large scale, as the fit would be almost identical. This behavior can be
+        disabled by setting ``internal_scaling=False``.
 
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
-    def __init__(self, degree, t_center_start, t_center_end, time_unit="D",
-                 list_scales=None, list_num_knots=None, splineclass=ISpline, complete=True,
-                 internal_scaling=True, regularize=True, **model_kw_args):
-        assert np.logical_xor(list_scales is None, list_num_knots is None), \
-            "To construct a set of Splines, pass exactly one of " \
-            "'list_scales' and 'list_num_knots' " \
-            f"(got {list_scales} and {list_num_knots})."
-        relevant_list = list_scales if list_num_knots is None else list_num_knots
-        try:
-            if isinstance(splineclass, str):
-                splineclass = globals()[splineclass]
-            assert issubclass(splineclass, Model)
-        except BaseException as e:
-            raise LookupError("When trying to create the SplineSet, couldn't find the model "
-                              f"'{splineclass}' (expected Model type argument or string "
-                              "representation of a loaded Model)."
-                              ).with_traceback(e.__traceback__) from e
-        # get time range
-        t_center_start_tstamp = pd.Timestamp(t_center_start)
-        t_center_end_tstamp = pd.Timestamp(t_center_end)
-        t_center_start = t_center_start_tstamp.isoformat()
-        t_center_end = t_center_end_tstamp.isoformat()
-        t_range_tdelta = t_center_end_tstamp - t_center_start_tstamp
-        # if a complete set is requested, we need to find the number of overlaps
-        # given the degree on a single side
-        num_overlaps = int(np.floor(degree/2)) if complete else 0
-        # for each scale, make a BSplines object
-        splset = []
-        num_parameters = 0
-        for elem in relevant_list:
-            # Calculate the scale as float and Timedelta depending on the function call
-            if list_scales is not None:
-                scale_float = elem
-                scale_tdelta = Timedelta(scale_float, time_unit)
-            else:
-                scale_tdelta = t_range_tdelta / (elem - 1)
-                scale_float = scale_tdelta / Timedelta(1, time_unit)
-            # find the number of center points between t_center_start and t_center_end,
-            # plus the overlapping ones
-            num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
-            num_parameters += num_centerpoints
-            # shift the reference to be the first spline
-            t_ref = t_center_start_tstamp - num_overlaps*scale_tdelta
-            # create model and append
-            splset.append(splineclass(degree, scale_float, num_splines=num_centerpoints,
-                          t_reference=t_ref, time_unit=time_unit, regularize=regularize))
-        # create the actual Model object
-        super().__init__(num_parameters=num_parameters, time_unit=time_unit,
-                         zero_after=False if splineclass == ISpline else True,
-                         regularize=regularize, **model_kw_args)
-        self.degree = degree
-        """ Degree of the splines. """
-        self.t_center_start = t_center_start
-        """ Relevant time span start. """
-        self.t_center_end = t_center_end
-        """ Relevant time span end. """
-        self.splineclass = splineclass
-        """ Class of the splines contained. """
-        self.list_scales = list_scales
-        """ List of scales of each of the sub-splines. """
-        self.list_num_knots = list_num_knots
-        """
-        List of number of knots the time span is divided into for each of the sub-splines.
-        """
-        self.complete = complete
-        """
-        Sets whether the spline coverage of the time span is considered to be complete or not
-        (see class documentation).
-        """
-        self.splines = splset
+
+    def __init__(self, splines, internal_scaling=True, **model_kw_args):
+        # create attributes specific to spline sets
+        assert (isinstance(splines, list) and
+                all([isinstance(s, BSpline) or isinstance(s, ISpline) for s in splines])), \
+            f"'splines' needs to be a list of spline models, got {splines}."
+        self.splines = splines
         """ List of spline object contained within the SplineSet. """
         self.internal_scaling = bool(internal_scaling)
         """ Trackes whether to scale the sub-splines relative to their lengths. """
@@ -1204,18 +1114,13 @@ class SplineSet(Model):
         If :attr:`~internal_scaling` is ``True``, this NumPy array holds the relative
         scaling factors of all parameters over all the sub-splines.
         """
+        # create Model object
+        num_parameters = sum([s.num_parameters for s in self.splines])
+        super().__init__(num_parameters=num_parameters, **model_kw_args)
 
     def _get_arch(self):
-        arch = {"type": "SplineSet",
-                "kw_args": {"degree": self.degree,
-                            "t_center_start": self.t_center_start,
-                            "t_center_end": self.t_center_end,
-                            "splineclass": self.splineclass.__name__,
-                            "list_scales": self.list_scales,
-                            "list_num_knots": self.list_num_knots,
-                            "complete": self.complete,
-                            "internal_scaling": self.internal_scaling}}
-        return arch
+        raise NotImplementedError("BaseSplineSet is not designed to be exported and "
+                                  "created directly, use a subclass.")
 
     def _get_mapping(self, timevector):
         coefs = np.empty((timevector.size, self.num_parameters))
@@ -1384,14 +1289,14 @@ class SplineSet(Model):
             # where to put this scale
             y_off = 1 - (i + 1)*dy_scale
             # get normalized values
-            if self.splineclass == BSpline:
+            if isinstance(model, BSpline):
                 mdl_mapping = model.get_mapping(t_plot, ignore_active_parameters=True).A
-            elif self.splineclass == ISpline:
+            elif isinstance(model, ISpline):
                 mdl_mapping = np.gradient(
                     model.get_mapping(t_plot, ignore_active_parameters=True).A, axis=0)
             else:
                 raise NotImplementedError("Scalogram undefined for a SplineSet of class "
-                                          f"{self.splineclass.__name__}.")
+                                          f"{type(model)}.")
             mdl_sum = np.sum(mdl_mapping, axis=1, keepdims=True)
             mdl_sum[mdl_sum == 0] = 1
             y_norm = np.hstack([np.zeros((t_plot.size, 1)),
@@ -1426,6 +1331,193 @@ class SplineSet(Model):
         fig.colorbar(cmap, cax=ax[-1], orientation='horizontal',
                      label='Coefficient Value')
         return fig, ax
+
+
+class SplineSet(BaseSplineSet):
+    """
+    Subclasses :class:`~disstans.models.BaseSplineSet`.
+
+    Contains a list of splines that cover an entire timespan, and that share a
+    common degree, but different center times and scales.
+
+    The set is constructed from a time span (``t_center_start`` and ``t_center_end``)
+    and numbers of centerpoints or length scales. By default (``complete=True``),
+    the number of splines and center points for each scale will then be chosen such
+    that the resulting set of splines will be complete over the input time scale.
+    This means it will contain all splines that are non-zero at least somewhere in
+    the time span. Otherwise, the spline set will only have center times at or
+    between ``t_center_start`` and ``t_center_end``.
+
+    This class also sets the spacing equal to the scale.
+
+    Parameters
+    ----------
+    degree : int
+        Degree of the splines to be created.
+    t_center_start : str or pandas.Timestamp
+        Time span start of the spline set.
+    t_center_end : str or pandas.Timestamp
+        Time span end of the spline set.
+    time_unit : str
+        Time unit of scale, spacing and model parameters.
+    list_scales : list
+        List of scales to use for each of the sub-splines.
+        Mutually exclusive to setting ``list_num_knots``.
+    list_num_knots : list
+        List of number of knots to divide the time span into for each of the sub-splines.
+        Mutually exclusive to setting ``list_scales``.
+    splineclass : Model, optional
+        Model class to use for the splines. Defaults to :class:`~disstans.models.ISpline`.
+    complete : bool, optional
+        See usage description. Defaults to ``True``.
+
+
+    See :class:`~disstans.models.BaseSplineSet` and :class:`~disstans.models.Model` for
+    attribute descriptions and more keyword arguments.
+    """
+    def __init__(self, degree, t_center_start, t_center_end, time_unit="D",
+                 list_scales=None, list_num_knots=None, splineclass=ISpline, complete=True,
+                 regularize=True, **model_kw_args):
+        assert np.logical_xor(list_scales is None, list_num_knots is None), \
+            "To construct a set of Splines, pass exactly one of " \
+            "'list_scales' and 'list_num_knots' " \
+            f"(got {list_scales} and {list_num_knots})."
+        relevant_list = list_scales if list_num_knots is None else list_num_knots
+        try:
+            if isinstance(splineclass, str):
+                splineclass = globals()[splineclass]
+            assert issubclass(splineclass, Model)
+        except BaseException as e:
+            raise LookupError("When trying to create the SplineSet, couldn't find the model "
+                              f"'{splineclass}' (expected Model type argument or string "
+                              "representation of a loaded Model)."
+                              ).with_traceback(e.__traceback__) from e
+        # get time range
+        t_center_start_tstamp = pd.Timestamp(t_center_start)
+        t_center_end_tstamp = pd.Timestamp(t_center_end)
+        t_center_start = t_center_start_tstamp.isoformat()
+        t_center_end = t_center_end_tstamp.isoformat()
+        t_range_tdelta = t_center_end_tstamp - t_center_start_tstamp
+        # if a complete set is requested, we need to find the number of overlaps
+        # given the degree on a single side
+        num_overlaps = int(np.floor(degree/2)) if complete else 0
+        # for each scale, make a BSplines object
+        splines = []
+        for elem in relevant_list:
+            # Calculate the scale as float and Timedelta depending on the function call
+            if list_scales is not None:
+                scale_float = elem
+                scale_tdelta = Timedelta(scale_float, time_unit)
+            else:
+                scale_tdelta = t_range_tdelta / (elem - 1)
+                scale_float = scale_tdelta / Timedelta(1, time_unit)
+            # find the number of center points between t_center_start and t_center_end,
+            # plus the overlapping ones
+            num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
+            # shift the reference to be the first spline
+            t_ref = t_center_start_tstamp - num_overlaps*scale_tdelta
+            # create model and append
+            splines.append(splineclass(degree, scale_float, num_splines=num_centerpoints,
+                           t_reference=t_ref, time_unit=time_unit, regularize=regularize))
+        # set attributes
+        self.degree = degree
+        """ Degree of the splines. """
+        self.t_center_start = t_center_start
+        """ Relevant time span start. """
+        self.t_center_end = t_center_end
+        """ Relevant time span end. """
+        self.splineclass = splineclass
+        """ Class of the splines contained. """
+        self.list_scales = list_scales
+        """ List of scales of each of the sub-splines. """
+        self.list_num_knots = list_num_knots
+        """
+        List of number of knots the time span is divided into for each of the sub-splines.
+        """
+        self.complete = complete
+        """
+        Sets whether the spline coverage of the time span is considered to be complete or not
+        (see class documentation).
+        """
+        # create the BaseSplineSet and therefore Model object
+        super().__init__(splines=splines, time_unit=time_unit, regularize=regularize,
+                         **model_kw_args)
+
+    def _get_arch(self):
+        arch = {"type": "SplineSet",
+                "kw_args": {"degree": self.degree,
+                            "t_center_start": self.t_center_start,
+                            "t_center_end": self.t_center_end,
+                            "splineclass": self.splineclass.__name__,
+                            "list_scales": self.list_scales,
+                            "list_num_knots": self.list_num_knots,
+                            "complete": self.complete,
+                            "internal_scaling": self.internal_scaling}}
+        return arch
+
+
+class DecayingSplineSet(BaseSplineSet):
+    """
+    Subclasses :class:`~disstans.models.BaseSplineSet`.
+
+    Parameters
+    ----------
+    degree : int
+        Degree of the splines to be created.
+    t_center_start : str or pandas.Timestamp
+        First center time of the spline set.
+    time_unit : str
+        Time unit of scale, spacing and model parameters.
+    list_scales : list
+        List of scales to use for each of the sub-splines.
+    list_num_splines : int, list
+        Number of splines to create for each scale.
+    time_unit : str, optional
+        Time unit of scale, spacing and model parameters.
+
+
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    """
+    def __init__(self, degree, t_center_start, list_scales, list_num_splines, time_unit="D",
+                 regularize=True, **model_kw_args):
+        # initial checks
+        if isinstance(list_num_splines, int):
+            list_num_splines = [list_num_splines] * len(list_scales)
+        else:
+            assert (isinstance(list_num_splines, list) and
+                    all([isinstance(n, int) for n in list_num_splines])), \
+                f"'list_num_splines' needs to be a (list of) integers, got {list_num_splines}."
+        assert len(list_scales) == len(list_num_splines), \
+            "'list_scales' and 'list_num_splines' need to have the same lengths, got " \
+            f"{len(list_scales)} and {len(list_num_splines)} elements."
+        # create spline set
+        t_center_start_tstamp = pd.Timestamp(t_center_start)
+        splines = []
+        for scale_float, num_centerpoints in zip(list_scales, list_num_splines):
+            splines.append(ISpline(degree, scale_float, num_splines=num_centerpoints,
+                           t_reference=t_center_start_tstamp, time_unit=time_unit,
+                           regularize=regularize))
+        # save attributes
+        self.degree = degree
+        """ Degree of the splines. """
+        self.t_center_start = t_center_start_tstamp.isoformat()
+        """ Relevant time span start. """
+        self.list_scales = list_scales
+        """ List of scales of each of the sub-splines. """
+        self.list_num_splines = list_num_splines
+        """ List of number of splines for each scale. """
+        # create the BaseSplineSet and therefore Model object
+        super().__init__(splines=splines, time_unit=time_unit, regularize=regularize,
+                         **model_kw_args)
+
+    def _get_arch(self):
+        arch = {"type": "DecayingISplineSet",
+                "kw_args": {"degree": self.degree,
+                            "t_center_start": self.t_center_start,
+                            "list_scales": self.list_scales,
+                            "list_num_splines": self.list_num_splines,
+                            "internal_scaling": self.internal_scaling}}
+        return arch
 
 
 class Sinusoid(Model):
