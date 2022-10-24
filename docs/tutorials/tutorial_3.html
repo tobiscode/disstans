@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 3: Incorporating Spatial Coherence &mdash; DISSTANS 1.1 documentation</title>
+  <title>Tutorial 3: Incorporating Spatial Coherence &mdash; DISSTANS 1.1.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -312,7 +312,7 @@ between Python, NumPy/SciPy, and the low-level math libraries like BLAS/LAPACK
 (which can differ from machine to machine). For more information, including how
 to properly set up parallelization, see <a class="reference internal" href="../disstans/tools.html#disstans.tools.parallelize" title="disstans.tools.parallelize"><code class="xref py py-func docutils literal notranslate"><span class="pre">parallelize()</span></code></a>.</p>
 </div>
-<nav class="contents local" id="table-of-contents">
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id3">Preparations</a></p></li>
@@ -327,9 +327,9 @@ to properly set up parallelization, see <a class="reference internal" href="../d
 <li><p><a class="reference internal" href="#transient-visualization-with-worm-plots" id="id12">Transient visualization with worm plots</a></p></li>
 <li><p><a class="reference internal" href="#secular-velocity-comparisons" id="id13">Secular velocity comparisons</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
 <p>We need to prepare two things: parallelization (which can differ from the machine used to
 test this tutorial to yours, see the note above) and a random number seed to make the data
 and figures reproducible.
@@ -348,7 +348,7 @@ in the script does the trick, and we can set the number of threads manually:</p>
 </div>
 </section>
 <section id="dreaming-up-a-network">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Dreaming up a network</a><a class="headerlink" href="#dreaming-up-a-network" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Dreaming up a network</a><a class="headerlink" href="#dreaming-up-a-network" title="Permalink to this heading"></a></h2>
 <p>The network we’re dreaming of is a collection of 16 stations situated on the beautiful
 <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Island">Null Island</a>. There is no reason the
 stations shouldn’t be named after fake kitten names created by a neural network of
@@ -377,7 +377,7 @@ instantiate a <a class="reference internal" href="../disstans/network.html#disst
 </div>
 </section>
 <section id="fantasizing-data">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Fantasizing data</a><a class="headerlink" href="#fantasizing-data" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5">Fantasizing data</a><a class="headerlink" href="#fantasizing-data" title="Permalink to this heading"></a></h2>
 <p>Just as above, we first need a vector of time stamps:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
@@ -581,7 +581,7 @@ at all stations from west to east.</p>
 </div>
 </section>
 <section id="removing-the-common-mode-error">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Removing the Common Mode Error</a><a class="headerlink" href="#removing-the-common-mode-error" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6">Removing the Common Mode Error</a><a class="headerlink" href="#removing-the-common-mode-error" title="Permalink to this heading"></a></h2>
 <p>To remove the common mode error that we added, we first need a high-pass filtered
 version of our <code class="docutils literal notranslate"><span class="pre">'Raw'</span></code> timeseries. We can do this effectively and step-insensitive
 by calculating the running median of the timeseries, and then removing this
@@ -650,7 +650,7 @@ defined above. Lastly, we can remove the now-obsolete intermediate timeseries.</
 </div>
 </section>
 <section id="fitting-the-data-using-reweighted-l1-regularization">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Fitting the data using reweighted L1 regularization</a><a class="headerlink" href="#fitting-the-data-using-reweighted-l1-regularization" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7">Fitting the data using reweighted L1 regularization</a><a class="headerlink" href="#fitting-the-data-using-reweighted-l1-regularization" title="Permalink to this heading"></a></h2>
 <p>We’ll basically do the same processing as at the end of the previous tutorial, but make
 use of yet another high-level function to reduce the amount of lines we have to write:
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.fitevalres" title="disstans.network.Network.fitevalres"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitevalres()</span></code></a>, which combines the two functions
@@ -774,7 +774,7 @@ between the stations (which is computationally still unfeasible for any real reg
 network), we need to think of a better way to reduce the number of unique splines.</p>
 </section>
 <section id="fitting-the-data-using-a-spatially-aware-l1-reweighting">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">Fitting the data using a spatially-aware L1 reweighting</a><a class="headerlink" href="#fitting-the-data-using-a-spatially-aware-l1-reweighting" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id8">Fitting the data using a spatially-aware L1 reweighting</a><a class="headerlink" href="#fitting-the-data-using-a-spatially-aware-l1-reweighting" title="Permalink to this heading"></a></h2>
 <p><a class="reference internal" href="../disstans/network.html#riel14" id="id1"><span>[riel14]</span></a> solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
 updated based on a weighting scheme. In DISSTANS, this is handled by the
@@ -1016,7 +1016,7 @@ levels is presented in <a class="reference internal" href="tutorial_5.html"><spa
 </div>
 </section>
 <section id="finding-unmodeled-jumps">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">Finding unmodeled jumps</a><a class="headerlink" href="#finding-unmodeled-jumps" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id9">Finding unmodeled jumps</a><a class="headerlink" href="#finding-unmodeled-jumps" title="Permalink to this heading"></a></h2>
 <p>When looking at the errors that we just printed out, we are painfully reminded that
 we added an unmodeled maintenance step to the station Corko. Lets’s use the
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.gui" title="disstans.network.Network.gui"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gui()</span></code></a> function to plot the scalograms and timeseries
@@ -1087,7 +1087,7 @@ and rerun the local and spatial L0 fits.</p>
 </div>
 </section>
 <section id="statistics-of-spatial-reweighting">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Statistics of spatial reweighting</a><a class="headerlink" href="#statistics-of-spatial-reweighting" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id10">Statistics of spatial reweighting</a><a class="headerlink" href="#statistics-of-spatial-reweighting" title="Permalink to this heading"></a></h2>
 <p>Let’s have a look at the statistics saved by ourselves as well as those returned
 by <a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a> into the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary.
 The first three variables contain the key numbers we used before to show how
@@ -1208,7 +1208,7 @@ colored noise; by principle, our <em>residuals</em> will be slightly larger, in 
 that our <em>errors</em> are smaller.</p>
 </section>
 <section id="model-parameter-correlations">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Model parameter correlations</a><a class="headerlink" href="#model-parameter-correlations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id11">Model parameter correlations</a><a class="headerlink" href="#model-parameter-correlations" title="Permalink to this heading"></a></h2>
 <p>While a more detailed exploration of the parameter correlations is left to the next tutorial,
 let’s have a quick look at the correlation matrices at station Jeckle.
 The following code will produce the annotated correlation plot using the
@@ -1234,7 +1234,7 @@ are omitted, yielding the following plot:</p>
 splines and the other models.</p>
 </section>
 <section id="transient-visualization-with-worm-plots">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Transient visualization with worm plots</a><a class="headerlink" href="#transient-visualization-with-worm-plots" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id12">Transient visualization with worm plots</a><a class="headerlink" href="#transient-visualization-with-worm-plots" title="Permalink to this heading"></a></h2>
 <p>The reason we saved the transient model fits as separate timeseries
 (e.g. <code class="docutils literal notranslate"><span class="pre">'Trans_L1R1S20'</span></code>) is because we will make use of the
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot" title="disstans.network.Network.wormplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wormplot()</span></code></a> method to show the motion of the different
@@ -1270,7 +1270,7 @@ which we know to be the true direction of motion. This is also (although less) v
 the far east of the network, where the signal is close or below the noise floor.</p>
 </section>
 <section id="secular-velocity-comparisons">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Secular velocity comparisons</a><a class="headerlink" href="#secular-velocity-comparisons" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id13">Secular velocity comparisons</a><a class="headerlink" href="#secular-velocity-comparisons" title="Permalink to this heading"></a></h2>
 <p>To highlight the importance of modeling transients explicitly, we are now going to look
 at the estimated linear (secular) velocity that every station experiences. That velocity
 is stored in the following parameter in our network (for station Jeckle, e.g.):</p>

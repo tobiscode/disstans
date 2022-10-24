@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 1: The first synthetic station &mdash; DISSTANS 1.1 documentation</title>
+  <title>Tutorial 1: The first synthetic station &mdash; DISSTANS 1.1.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -34,7 +34,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -290,7 +290,7 @@ We will have a look at the <a class="reference internal" href="../disstans/times
 <a class="reference internal" href="../disstans/models.html#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, and <a class="reference internal" href="../disstans/station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> objects,
 and show how standard Python, NumPy and Matplotlib procedures can be used directly
 with DISSTANS.</p>
-<nav class="contents local" id="table-of-contents">
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#building-a-model-collection" id="id1">Building a Model collection</a></p></li>
@@ -298,9 +298,9 @@ with DISSTANS.</p>
 <li><p><a class="reference internal" href="#fitting-the-models" id="id3">Fitting the models</a></p></li>
 <li><p><a class="reference internal" href="#plotting-the-fit-and-residuals" id="id4">Plotting the fit and residuals</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="building-a-model-collection">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Building a Model collection</a><a class="headerlink" href="#building-a-model-collection" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1">Building a Model collection</a><a class="headerlink" href="#building-a-model-collection" title="Permalink to this heading"></a></h2>
 <p>Let’s create an empty synthetic station “TUT” located in Los Angeles using
 <a class="reference internal" href="../disstans/station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a>:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans</span> <span class="kn">import</span> <span class="n">Station</span>
@@ -342,7 +342,7 @@ returns a dictionary and the modeled output can be found in the <code class="doc
 </div>
 </section>
 <section id="creating-timeseries-objects">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Creating Timeseries objects</a><a class="headerlink" href="#creating-timeseries-objects" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2">Creating Timeseries objects</a><a class="headerlink" href="#creating-timeseries-objects" title="Permalink to this heading"></a></h2>
 <p>A <a class="reference internal" href="../disstans/timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> can now be created using the data we just
 made up, and we can add it to our station:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans</span> <span class="kn">import</span> <span class="n">Timeseries</span>
@@ -390,7 +390,7 @@ interface to plot timeseries with Matplotlib:</p>
 <img alt="../_images/tutorial_1a.png" src="../_images/tutorial_1a.png" />
 </section>
 <section id="fitting-the-models">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Fitting the models</a><a class="headerlink" href="#fitting-the-models" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Fitting the models</a><a class="headerlink" href="#fitting-the-models" title="Permalink to this heading"></a></h2>
 <p>We’ve successfully created a synthetic timeseries for a single station. Now, let’s see
 if a linear regression solver can estimate the model parameters we originally put
 in. To this end, we must first associate our models with the timeseries at the station.</p>
@@ -469,7 +469,7 @@ and <a class="reference internal" href="../disstans/network.html#disstans.networ
 </div>
 </section>
 <section id="plotting-the-fit-and-residuals">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Plotting the fit and residuals</a><a class="headerlink" href="#plotting-the-fit-and-residuals" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Plotting the fit and residuals</a><a class="headerlink" href="#plotting-the-fit-and-residuals" title="Permalink to this heading"></a></h2>
 <p>At this point, we first want to have a look at the fit to see if everything worked
 before actually looking at the parameters themselves or residuals. The <code class="docutils literal notranslate"><span class="pre">evaluate</span></code>
 function already created a new timeseries object on the way, which we can now plot:</p>
