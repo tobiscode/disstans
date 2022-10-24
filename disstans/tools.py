@@ -135,7 +135,7 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
 def date2decyear(dates):
     """
     Convert dates (just year, month, day, each day assumed to be centered at noon)
-    to decimal years, assuming all years have 365.25 years (JPL convention for
+    to decimal years, assuming all years have 365.25 days (JPL convention for
     GIPSY timeseries, also used by UNR NGL).
 
     Parameters
