@@ -896,7 +896,8 @@ class StepDetector():
             Time unit of ``gap``.
         aggregate_components : bool, optional
             If ``True`` (default), use the maximum step probability across all data components
-            when searching for steps.
+            when searching for steps. Otherwise, keep all steps from maximum probabilities in
+            each component (which could lead to multiple close-by steps).
         no_pbar : bool, optional
             Suppress the progress bar with ``True`` (default: ``False``).
 
@@ -1127,7 +1128,8 @@ class StepDetector():
             ``threshold`` has not been found yet.
         aggregate_components : bool, optional
             If ``True`` (default), use the maximum step probability across all data components
-            when searching for steps.
+            when searching for steps. Otherwise, keep all steps from maximum probabilities in
+            each component (which could lead to multiple close-by steps).
         verbose : bool, optional
             If ``True`` (default), print warnings when there will be a large number of
             steps identified given the ``threshold``.

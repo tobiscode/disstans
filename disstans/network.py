@@ -3394,8 +3394,8 @@ class Network():
             else:
                 plt.show()
 
-    def plot_availability(self, ts_description, sampling=Timedelta(1, "D"), sort_by_latitude=True,
-                          saveas=None):
+    def plot_availability(self, ts_description, sampling=Timedelta(1, "D"),
+                          sort_by_latitude=True, saveas=None):
         """
         Create an availability figure for the network.
 

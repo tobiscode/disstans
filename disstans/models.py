@@ -1745,7 +1745,8 @@ class Logarithmic(Model):
     sign_constraint : int, list, optional
         Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.
         Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
-        sign, avoiding sign flips between individual exponentials. It can also be a list, where
+        sign, avoiding sign flips between individual exponentials. This is useful if
+        the resulting curve should be monotonous. It can also be a list, where
         each entry applies to one data component (needs to be known at initialization).
         If ``None``, no constraint is enforced.
 
@@ -1810,7 +1811,8 @@ class Exponential(Model):
     sign_constraint : int, list, optional
         Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.
         Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
-        sign, avoiding sign flips between individual exponentials. It can also be a list, where
+        sign, avoiding sign flips between individual exponentials. This is useful if
+        the resulting curve should be monotonous. It can also be a list, where
         each entry applies to one data component (needs to be known at initialization).
         If ``None``, no constraint is enforced.
 

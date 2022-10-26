@@ -144,7 +144,7 @@ class Timeseries():
             Timeseries summary.
         """
         info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}" \
-               f"\n - Shape: {self.shape}\n - Offset Removed: {~(self.offset is None)}" \
+               f"\n - Shape: {self.shape}\n - Offset Removed: {self.offset is not None}" \
                f"\n - Data: {[key for key in self.data_cols]}"
         if self.var_cols is not None:
             info += f"\n - Variances: {[key for key in self.var_cols]}"

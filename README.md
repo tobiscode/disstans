@@ -8,8 +8,8 @@ With DISSTANS, you can:
 
 - Fit GNSS displacement (or any type of) timeseries using a variety of functional
   models. These range from common ones such as a polynomial, a sinusoid, or a
-  logarithm, to more complex ones as modulated sinusoids or dictionary of
-  splines.
+  logarithm, to more complex ones as logarithms with unknown timescales, modulated
+  sinusoids, or dictionaries of splines.
 - Solve for model parameters using least squares with no regularization or using
   any of the L2, L1, and L0 norms. Spatial L0 allows to use expected spatial coherence
   in the data to improve local fits.
@@ -18,14 +18,14 @@ With DISSTANS, you can:
 - Perform PCA/ICA-based common mode estimation and timeseries basis decomposition.
 - Clean data from outliers.
 - Visualize timeseries, network maps, dictionary scalograms, station motions,
-  model parameter correlations, and more.
+  station observation availabilities, model parameter correlations, and more.
 - Manage databases of raw RINEX files, including availability plots.
 - Download GNSS timeseries from public sites.
 - Use catalogued seismic and maintenance events to inform the model setup.
 - Detect jumps in the data using a simple step detector.
 - Run the [MIDAS](https://doi.org/10.1002/2015JB012552) algorithm.
 - Generate synthetic timeseries.
-- Load timeseries in JPL's `.tseries` or UNR's `.tenv3` formats natively,
+- Load timeseries in JPL's `.tseries` or UNR's `.tenv3` and `.kenv` formats natively,
   or load standard NumPy and pandas data.
 
 All from within your Python shell, and everything in standard Python object-oriented
