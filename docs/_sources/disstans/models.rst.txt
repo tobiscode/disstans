@@ -95,10 +95,24 @@ ISpline
    :members:
    :special-members:
 
+BaseSplineSet
+.............
+
+.. autoclass:: disstans.models.BaseSplineSet
+   :members:
+   :special-members:
+
 SplineSet
 .........
 
 .. autoclass:: disstans.models.SplineSet
+   :members:
+   :special-members:
+
+DecayingSplineSet
+.................
+
+.. autoclass:: disstans.models.DecayingSplineSet
    :members:
    :special-members:
 

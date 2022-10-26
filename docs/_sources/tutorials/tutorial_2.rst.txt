@@ -268,7 +268,7 @@ data and noise? ::
     error tracks the noise. This behaviour will not change significantly throughout
     this second tutorial, but will be addressed in the third tutorial.
 
-We can use a scalogram (see :meth:`~disstans.models.SplineSet.make_scalogram`) to visualize
+We can use a scalogram (see :meth:`~disstans.models.BaseSplineSet.make_scalogram`) to visualize
 the coefficient values of our spline collection, and quickly understand that without
 regularization, the set is quite heavily populated in order to minimize the residuals::
 

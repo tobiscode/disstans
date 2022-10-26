@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.tools &mdash; DISSTANS 1.1 documentation</title>
+  <title>disstans.tools &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -31,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -80,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -121,7 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
@@ -164,7 +165,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -1298,13 +1301,13 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No stations to download after applying all filters.&quot;</span><span class="p">)</span>
     <span class="c1"># prepare list of URLs to download</span>
     <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;24h&quot;</span><span class="p">:</span>
-        <span class="n">list_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">)</span> <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">stations_list</span><span class="p">]</span>
+        <span class="n">dict_urls</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta</span><span class="p">:</span> <span class="p">[</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">)]</span> <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">stations_list</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No parsing of index pages necessary.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># if it&#39;s a 5min sampling rate, there&#39;s multiple files per station,</span>
         <span class="c1"># and we need to parse the index webpage for all possible links</span>
-        <span class="n">list_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dict_urls</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;rapid&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;final&quot;</span><span class="p">:</span>
                 <span class="n">index_url</span> <span class="o">=</span> <span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;kenv/&quot;</span>
@@ -1319,7 +1322,7 @@
                 <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">index_page</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;windows-1252&quot;</span><span class="p">)</span>
                     <span class="n">avail_years</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
-                <span class="n">list_urls</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">avail_years</span><span class="p">])</span>
+                <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">avail_years</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;ultra&quot;</span><span class="p">:</span>
             <span class="n">index_url</span> <span class="o">=</span> <span class="n">base_url</span> <span class="o">+</span> <span class="s2">&quot;ultracombo/kenv/&quot;</span>
             <span class="n">pattern_y</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=&lt;a href=&quot;)(\d</span><span class="si">{4}</span><span class="s1">)/(?=&quot;&gt;)&#39;</span>
@@ -1335,6 +1338,7 @@
                 <span class="n">avail_years</span> <span class="o">=</span> <span class="n">extractor_y</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
+            <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">iter_avail_years</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">avail_years</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Parsing daily index pages&quot;</span><span class="p">,</span>
                                     <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">iter_avail_years</span><span class="p">:</span>
@@ -1348,12 +1352,13 @@
                     <span class="k">for</span> <span class="n">staurl</span> <span class="ow">in</span> <span class="n">avail_files</span><span class="p">:</span>
                         <span class="n">sta</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="n">staurl</span>
                         <span class="k">if</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">stations_list</span><span class="p">:</span>
-                            <span class="n">list_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">date</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">date</span><span class="p">))</span>
+    <span class="n">num_urls</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">dict_urls</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+    <span class="k">if</span> <span class="n">num_urls</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No files to download after looking on the server.&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_urls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">no_pbar</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">num_urls</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">no_pbar</span><span class="p">):</span>
         <span class="n">answer</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;WARNING: The current selection criteria would lead to &quot;</span>
-                       <span class="sa">f</span><span class="s2">&quot;downloading </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">list_urls</span><span class="p">)</span><span class="si">}</span><span class="s2"> files (from &quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot;downloading </span><span class="si">{</span><span class="n">num_urls</span><span class="si">}</span><span class="s2"> files (from &quot;</span>
                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stations_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> stations).</span><span class="se">\n</span><span class="s2">Press ENTER to continue, &quot;</span>
                        <span class="s2">&quot;or anything else to abort.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">answer</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
@@ -1369,72 +1374,62 @@
         <span class="n">avail_atr_files</span> <span class="o">=</span> <span class="n">extractor_atr</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
-    <span class="n">list_atr_urls</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">stations_list</span><span class="p">:</span>
-        <span class="n">list_atr_urls</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">atr_base_url</span> <span class="o">+</span> <span class="n">atr_file</span> <span class="k">for</span> <span class="n">atr_file</span> <span class="ow">in</span> <span class="n">avail_atr_files</span>
-                              <span class="k">if</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">atr_file</span><span class="p">])</span>
+    <span class="n">dict_atr_urls</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta</span><span class="p">:</span> <span class="p">[</span><span class="n">atr_base_url</span> <span class="o">+</span> <span class="n">atr_file</span>
+                           <span class="k">for</span> <span class="n">atr_file</span> <span class="ow">in</span> <span class="n">avail_atr_files</span> <span class="k">if</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">atr_file</span><span class="p">]</span>
+                     <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">stations_list</span><span class="p">}</span>
     <span class="c1"># loop over list of URLs</span>
-    <span class="n">iter_list_urls</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">list_urls</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading station timeseries&quot;</span><span class="p">,</span>
-                          <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">staurl</span><span class="p">,</span> <span class="n">atrurls</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_list_urls</span><span class="p">,</span> <span class="n">list_atr_urls</span><span class="p">):</span>
-        <span class="c1"># local target path</span>
-        <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">staurl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="c1"># check if local file exists and if so, get its last-modified time</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
-            <span class="n">local_time</span> <span class="o">=</span> \
-                <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span>
-                                                    <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">))</span>
-            <span class="n">local_time_str</span> <span class="o">=</span> <span class="n">local_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="n">iter_stations</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">stations_list</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Downloading station timeseries&quot;</span><span class="p">,</span>
+                         <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">iter_stations</span><span class="p">:</span>
+        <span class="n">staurls</span> <span class="o">=</span> <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span>
+        <span class="n">atrurls</span> <span class="o">=</span> <span class="n">dict_atr_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span>
+        <span class="c1"># if we&#39;re downloading a single timeseries file, leave it in main folder</span>
+        <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;24h&quot;</span><span class="p">:</span>
+            <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">staurls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">_download_update_file</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">staurls</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="c1"># if we&#39;re potentially downloading multiple files (for high-rate timeseries), make a folder</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">local_time</span><span class="p">,</span> <span class="n">local_time_str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span>
-        <span class="c1"># open the remote connection</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">staurl</span><span class="p">)</span> <span class="k">as</span> <span class="n">remote</span><span class="p">:</span>
-                <span class="c1"># get the remote last-modified time</span>
-                <span class="n">remote_time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">])</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">local_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">remote_time</span> <span class="o">&gt;</span> <span class="n">local_time</span><span class="p">):</span>
-                    <span class="c1"># need to download the file, since we either don&#39;t have a local copy</span>
-                    <span class="c1"># or the remote one is newer than the one we have</span>
-                    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;NEW FILE&quot;</span> <span class="k">if</span> <span class="n">local_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;UPDATE&quot;</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">local</span><span class="p">:</span>
-                        <span class="n">local</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;SKIPPED&quot;</span>
-        <span class="k">except</span> <span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download the remote file from </span><span class="si">{</span><span class="n">staurl</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                 <span class="sa">f</span><span class="s2">&quot;HTTP Error </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="n">tqdm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">] &#39;</span><span class="si">{</span><span class="n">staurl</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="n">remote_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
-                           <span class="sa">f</span><span class="s2">&quot; -&gt; &#39;</span><span class="si">{</span><span class="n">local_path</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="n">local_time_str</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="c1"># repeat the same procedure for the attribution files</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">sta</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">staurl</span> <span class="ow">in</span> <span class="n">staurls</span><span class="p">:</span>
+                <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">sta</span><span class="p">,</span> <span class="n">staurl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">_download_update_file</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">staurl</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="c1"># download all attribution files into single folder</span>
         <span class="k">for</span> <span class="n">atrurl</span> <span class="ow">in</span> <span class="n">atrurls</span><span class="p">:</span>
-            <span class="n">local_atr_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">atr_dir</span><span class="p">,</span> <span class="n">atrurl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local_atr_path</span><span class="p">):</span>
-                <span class="n">local_atr_time</span> <span class="o">=</span> \
-                    <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">local_atr_path</span><span class="p">),</span>
-                                                        <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">))</span>
-                <span class="n">local_atr_time_str</span> <span class="o">=</span> <span class="n">local_atr_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">local_atr_time</span><span class="p">,</span> <span class="n">local_atr_time_str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">atrurl</span><span class="p">)</span> <span class="k">as</span> <span class="n">remote_atr</span><span class="p">:</span>
-                    <span class="n">remote_atr_time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">remote_atr</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">])</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">local_atr_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">remote_atr_time</span> <span class="o">&gt;</span> <span class="n">local_atr_time</span><span class="p">):</span>
-                        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;NEW FILE&quot;</span> <span class="k">if</span> <span class="n">local_atr_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;UPDATE&quot;</span>
-                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_atr_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">local_atr</span><span class="p">:</span>
-                            <span class="n">local_atr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">remote_atr</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;SKIPPED&quot;</span>
-            <span class="k">except</span> <span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download the remote attribution file from </span><span class="si">{</span><span class="n">atrurl</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                     <span class="sa">f</span><span class="s2">&quot;HTTP Error </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                    <span class="n">tqdm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">] &#39;</span><span class="si">{</span><span class="n">atrurl</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="n">remote_atr_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
-                               <span class="sa">f</span><span class="s2">&quot; -&gt; &#39;</span><span class="si">{</span><span class="n">local_atr_path</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="n">local_atr_time_str</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">atr_dir</span><span class="p">,</span> <span class="n">atrurl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">_download_update_file</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">atrurl</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
     <span class="c1"># return the DataFrame with the downloaded stations</span>
     <span class="k">return</span> <span class="n">stations</span></div>
+
+
+<span class="k">def</span> <span class="nf">_download_update_file</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># check if local file exists and if so, get its last-modified time</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+        <span class="n">local_time</span> <span class="o">=</span> \
+            <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span>
+                                                <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">))</span>
+        <span class="n">local_time_str</span> <span class="o">=</span> <span class="n">local_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">local_time</span><span class="p">,</span> <span class="n">local_time_str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span>
+    <span class="c1"># open the remote connection</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">remote</span><span class="p">:</span>
+            <span class="c1"># get the remote last-modified time</span>
+            <span class="n">remote_time</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">local_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">remote_time</span> <span class="o">&gt;</span> <span class="n">local_time</span><span class="p">):</span>
+                <span class="c1"># need to download the file, since we either don&#39;t have a local copy</span>
+                <span class="c1"># or the remote one is newer than the one we have</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;NEW FILE&quot;</span> <span class="k">if</span> <span class="n">local_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;UPDATE&quot;</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">local</span><span class="p">:</span>
+                    <span class="n">local</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;SKIPPED&quot;</span>
+    <span class="k">except</span> <span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download the remote file from </span><span class="si">{</span><span class="n">remote_path</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="sa">f</span><span class="s2">&quot;HTTP Error </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">tqdm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">] &#39;</span><span class="si">{</span><span class="n">remote_path</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="n">remote_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot; -&gt; &#39;</span><span class="si">{</span><span class="n">local_path</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="n">local_time_str</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="parse_unr_steps"><a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.parse_unr_steps">[docs]</a><span class="k">def</span> <span class="nf">parse_unr_steps</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">check_update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">only_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

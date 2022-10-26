@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 1: Long Valley Caldera Transient Motions &mdash; DISSTANS 1.1 documentation</title>
+  <title>Example 1: Long Valley Caldera Transient Motions &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -34,7 +34,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -168,7 +168,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -294,7 +296,7 @@ Additionally, there are extensive catalogues detailing possible steps in the tim
 that arise due to equipment changes or earthquakes, even though they appear to be incomplete
 as we will see later. Today, the data is for example accessible through the
 University of Nevada at Reno’s <a class="reference external" href="http://geodesy.unr.edu/">Nevada Geodetic Laboratory</a>.</p>
-<nav class="contents local" id="table-of-contents">
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id3">Preparations</a></p>
@@ -317,7 +319,7 @@ University of Nevada at Reno’s <a class="reference external" href="http://geod
 <li><p><a class="reference internal" href="#final-considerations" id="id14">Final considerations</a></p></li>
 <li><p><a class="reference internal" href="#references" id="id15">References</a></p></li>
 </ul>
-</nav>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>While the table of contents might suggest that this process is sequential,
@@ -328,7 +330,7 @@ Using the fit to get a better understanding of our noise, and how to model
 signals, can in turn motivate another cleaning and fitting step.</p>
 </div>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
 <p>Here are the imports we will need throughout the example:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
@@ -367,7 +369,7 @@ need to make on your own machine):</p>
 </pre></div>
 </div>
 <section id="getting-data">
-<h3><a class="toc-backref" href="#id4" role="doc-backlink">Getting data</a><a class="headerlink" href="#getting-data" title="Permalink to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id4">Getting data</a><a class="headerlink" href="#getting-data" title="Permalink to this heading"></a></h3>
 <p>DISSTANS includes the <a class="reference internal" href="../disstans/tools.html#disstans.tools.download_unr_data" title="disstans.tools.download_unr_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">download_unr_data()</span></code></a> function to automatically
 download timeseries files from the UNR servers, the
 <a class="reference internal" href="../disstans/timeseries.html#disstans.timeseries.UNRTimeseries" title="disstans.timeseries.UNRTimeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">UNRTimeseries</span></code></a> class to load the files, and the
@@ -404,7 +406,7 @@ save the dataframe now, and load it the next time we use the data:</p>
 </div>
 </section>
 <section id="building-the-network">
-<h3><a class="toc-backref" href="#id5" role="doc-backlink">Building the network</a><a class="headerlink" href="#building-the-network" title="Permalink to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id5">Building the network</a><a class="headerlink" href="#building-the-network" title="Permalink to this heading"></a></h3>
 <p>First off, we instantiate a <a class="reference internal" href="../disstans/network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> object:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">disstans</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s2">&quot;LVC&quot;</span><span class="p">)</span>
 </pre></div>
@@ -449,7 +451,7 @@ snowfall.</p></li>
 </section>
 </section>
 <section id="cleaning-the-timeseries">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Cleaning the timeseries</a><a class="headerlink" href="#cleaning-the-timeseries" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6">Cleaning the timeseries</a><a class="headerlink" href="#cleaning-the-timeseries" title="Permalink to this heading"></a></h2>
 <p>In this step, we want to make sure that we will not use data with either a high noise floor,
 or exhibiting behavior that we do not want to (or are not able) to model properly.
 Both conditions would deteriorate our solution process later on, and while in general,
@@ -457,7 +459,7 @@ singular bad fits at individual stations can just be ignored afterwards, the fac
 we want to use a spatially-coherent solver, means that extremely bad fits at one station
 can affect other stations as well.</p>
 <section id="outlier-and-cme-removal">
-<h3><a class="toc-backref" href="#id7" role="doc-backlink">Outlier and CME removal</a><a class="headerlink" href="#outlier-and-cme-removal" title="Permalink to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id7">Outlier and CME removal</a><a class="headerlink" href="#outlier-and-cme-removal" title="Permalink to this heading"></a></h3>
 <p>Outlier removal is done with the <a class="reference internal" href="../disstans/processing.html#disstans.processing.clean" title="disstans.processing.clean"><code class="xref py py-func docutils literal notranslate"><span class="pre">clean()</span></code></a> function using the raw
 timeseries and a reference timeseries, accessed as a one-liner through
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_func_no_return" title="disstans.network.Network.call_func_no_return"><code class="xref py py-meth docutils literal notranslate"><span class="pre">call_func_no_return()</span></code></a>.
@@ -500,7 +502,7 @@ than the original one, so we copy it over:</p>
 </div>
 </section>
 <section id="first-pass-major-steps-and-noisy-periods">
-<h3><a class="toc-backref" href="#id8" role="doc-backlink">First pass: major steps and noisy periods</a><a class="headerlink" href="#first-pass-major-steps-and-noisy-periods" title="Permalink to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id8">First pass: major steps and noisy periods</a><a class="headerlink" href="#first-pass-major-steps-and-noisy-periods" title="Permalink to this heading"></a></h3>
 <p>Now that we have a cleaner timeseries to start from, we will try to identify as many
 steps in the timeseries as possible, with the least amount of user interaction.
 In order to do that, we first have to estimate and remove the dominant signals in the
@@ -761,7 +763,7 @@ model to fit the potential offset that is there):</p>
 </div>
 </section>
 <section id="second-pass-minor-catalog-based-steps">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">Second pass: minor, catalog-based steps</a><a class="headerlink" href="#second-pass-minor-catalog-based-steps" title="Permalink to this heading"></a></h3>
+<h3><a class="toc-backref" href="#id9">Second pass: minor, catalog-based steps</a><a class="headerlink" href="#second-pass-minor-catalog-based-steps" title="Permalink to this heading"></a></h3>
 <p>After removing major steps and noisy periods in the previous section, we will now do one
 last unregularized fit to the data, which we will use to look for minor steps, this time
 aided by UNR’s step file.</p>
@@ -925,7 +927,7 @@ fitting quality. For the purposes of this example, we will move on, however.</p>
 </section>
 </section>
 <section id="model-parameter-estimation">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Model parameter estimation</a><a class="headerlink" href="#model-parameter-estimation" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id10">Model parameter estimation</a><a class="headerlink" href="#model-parameter-estimation" title="Permalink to this heading"></a></h2>
 <p>Now we’re ready to do a full, spatially-coherent estimation of model parameters.
 For that, we first remove the unregularized long-term transient model we added in
 the previous section for a better step detection:</p>
@@ -1051,7 +1053,7 @@ and the other models, let’s have a look at the correlation matrix for the CASA
 <img alt="../_images/example_1e_corr.png" src="../_images/example_1e_corr.png" />
 </section>
 <section id="modeled-horizontal-transient-motion">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Modeled horizontal transient motion</a><a class="headerlink" href="#modeled-horizontal-transient-motion" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id11">Modeled horizontal transient motion</a><a class="headerlink" href="#modeled-horizontal-transient-motion" title="Permalink to this heading"></a></h2>
 <p>We can also use the <a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot" title="disstans.network.Network.wormplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wormplot()</span></code></a> method
 (also see <a class="reference internal" href="../tutorials/tutorial_3.html#transient-visualization-with-worm-plots"><span class="std std-ref">Tutorial 3</span></a>)
 to have a closer look at one of the transient periods at the center of the network:</p>
@@ -1110,7 +1112,7 @@ The temporally coherent expansion is clearly visible:</p>
 <img alt="../_images/example_1g_expansion_azim.png" src="../_images/example_1g_expansion_azim.png" />
 </section>
 <section id="modeled-vertical-seasonal-motion">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Modeled vertical seasonal motion</a><a class="headerlink" href="#modeled-vertical-seasonal-motion" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id12">Modeled vertical seasonal motion</a><a class="headerlink" href="#modeled-vertical-seasonal-motion" title="Permalink to this heading"></a></h2>
 <p>We can also look at how the seasonal signal ends up being modeled by our
 time-varying-amplitude sinusoid (again, code in the script file).
 Here is just an example plot for the vertical component at station P647:</p>
@@ -1122,11 +1124,20 @@ in map view using <a class="reference internal" href="../disstans/network.html#d
 <img alt="../_images/example_1i_annual_vertical.png" src="../_images/example_1i_annual_vertical.png" />
 </section>
 <section id="comparison-of-secular-velocities">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Comparison of secular velocities</a><a class="headerlink" href="#comparison-of-secular-velocities" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id13">Comparison of secular velocities</a><a class="headerlink" href="#comparison-of-secular-velocities" title="Permalink to this heading"></a></h2>
 <p>Finally, as the last “sanity check” that our models are correctly disentangling secular motion from
 other signals, let’s compare some of our estimated linear velocity vectors of the network stations
 with the published MIDAS velocities in <a class="reference internal" href="../disstans/processing.html#blewitt16" id="id2"><span>[blewitt16]</span></a> (everything in [m/a]):</p>
 <table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td rowspan="2"><p>Station</p></td>
 <td colspan="3"><p>This example</p></td>
@@ -1218,7 +1229,7 @@ and the transient therefore should be zero, all we have to do is to increase our
 model parameters, and remove that same linear trend from our transient estimate.</p>
 </section>
 <section id="final-considerations">
-<h2><a class="toc-backref" href="#id14" role="doc-backlink">Final considerations</a><a class="headerlink" href="#final-considerations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id14">Final considerations</a><a class="headerlink" href="#final-considerations" title="Permalink to this heading"></a></h2>
 <p>Let’s conclude with two remarks:</p>
 <ol class="arabic simple">
 <li><p>The choice of the hyperparameters (e.g. starting <code class="docutils literal notranslate"><span class="pre">penalty</span></code>; the type and <code class="docutils literal notranslate"><span class="pre">eps</span></code>,
@@ -1232,17 +1243,16 @@ steps might be useful.</p></li>
 </ol>
 </section>
 <section id="references">
-<h2><a class="toc-backref" href="#id15" role="doc-backlink">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
-<div role="list" class="citation-list">
-<div class="citation" id="gazeaux13" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">gazeaux13</a><span class="fn-bracket">]</span></span>
-<p>Gazeaux, J., Williams, S., King, M., Bos, M., Dach, R., Deo, M., et al. (2013).
+<h2><a class="toc-backref" href="#id15">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<dl class="citation">
+<dt class="label" id="gazeaux13"><span class="brackets"><a class="fn-backref" href="#id1">gazeaux13</a></span></dt>
+<dd><p>Gazeaux, J., Williams, S., King, M., Bos, M., Dach, R., Deo, M., et al. (2013).
 <em>Detecting offsets in GPS time series: First results from the detection of
 offsets in GPS experiment</em>.
 Journal of Geophysical Research: Solid Earth, 118(5), 2397–2407.
 doi:<a class="reference external" href="https://doi.org/10.1002/jgrb.50152">10.1002/jgrb.50152</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </section>
 </section>
 

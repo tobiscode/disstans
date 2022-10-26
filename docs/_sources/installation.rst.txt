@@ -71,7 +71,8 @@ branch to try out new features and fixes.
 
     If you want to try out modifications to the code, but still be able to import
     the package as it were installed fully, use pip's `editable installs
-    <https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs>`_ feature:
+    <https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs>`_ feature
+    in the last step:
 
     .. code-block:: bash
 
@@ -88,7 +89,8 @@ branch to try out new features and fixes.
         git checkout development
 
     as the editable install will always match the current state of the local
-    repository.
+    repository. (If you don't use the editable install feature, this command
+    needs to be run before ``pip install``.)
 
 
 Updates

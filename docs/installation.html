@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &amp; Updates &mdash; DISSTANS 1.1 documentation</title>
+  <title>Installation &amp; Updates &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -34,7 +34,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -168,7 +168,9 @@
 <li class="toctree-l3"><a class="reference internal" href="disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -341,7 +343,8 @@ pip install .
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If you want to try out modifications to the code, but still be able to import
-the package as it were installed fully, use pip’s <a class="reference external" href="https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs">editable installs</a> feature:</p>
+the package as it were installed fully, use pip’s <a class="reference external" href="https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs">editable installs</a> feature
+in the last step:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -e .
 </pre></div>
 </div>
@@ -353,7 +356,8 @@ branch of the repository, which you can switch to using</p>
 </pre></div>
 </div>
 <p>as the editable install will always match the current state of the local
-repository.</p>
+repository. (If you don’t use the editable install feature, this command
+needs to be run before <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>.)</p>
 </div>
 </section>
 <section id="updates">

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 1.1 documentation</title>
+  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -34,7 +34,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -168,7 +168,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -288,7 +290,7 @@
 <p>This example builds on the data from <a class="reference internal" href="example_1.html"><span class="doc">Example 1</span></a> and compares secular
 velocity model results with published data. On the way, it shows how to do coordinate
 transformations from the cartesian to the local geodetic reference frame.</p>
-<nav class="contents local" id="table-of-contents">
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id3">Preparations</a></p></li>
@@ -302,9 +304,9 @@ transformations from the cartesian to the local geodetic reference frame.</p>
 <li><p><a class="reference internal" href="#quantitative-comparison-of-datasets" id="id11">Quantitative comparison of datasets</a></p></li>
 <li><p><a class="reference internal" href="#references" id="id12">References</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
 <p>Here are the imports we will need throughout the example:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
@@ -338,7 +340,7 @@ transformations from the cartesian to the local geodetic reference frame.</p>
 for the secular, linear velocities previously estimated, using two different methods.</p>
 </section>
 <section id="homogenous-translation-rotation-and-strain">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Homogenous translation, rotation, and strain</a><a class="headerlink" href="#homogenous-translation-rotation-and-strain" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Homogenous translation, rotation, and strain</a><a class="headerlink" href="#homogenous-translation-rotation-and-strain" title="Permalink to this heading"></a></h2>
 <p>The first method determines the best-fit displacement gradient tensor for the
 entire network, which in turn can be decomposed into a rotation and a strain (rate) tensor
 (plus a velocity offset term). More information can be found in the
@@ -360,7 +362,7 @@ curious what the quantities mean. For now, let’s move on to the other method
 included in DISSTANS, which might be a bit more intuitive.</p>
 </section>
 <section id="rotation-about-an-euler-pole">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Rotation about an Euler pole</a><a class="headerlink" href="#rotation-about-an-euler-pole" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5">Rotation about an Euler pole</a><a class="headerlink" href="#rotation-about-an-euler-pole" title="Permalink to this heading"></a></h2>
 <p>The second method assumes that all observations lie on a rigid body that can move
 freely on a sphere, but not deform. All rigid-body motion on a sphere can be
 expressed about a rotation around a location on the sphere, and we’ll use the
@@ -391,7 +393,7 @@ convenient Euler pole notation using <a class="reference internal" href="../diss
 </div>
 </section>
 <section id="comparison-of-different-methods">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Comparison of different methods</a><a class="headerlink" href="#comparison-of-different-methods" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6">Comparison of different methods</a><a class="headerlink" href="#comparison-of-different-methods" title="Permalink to this heading"></a></h2>
 <p>Plotting the resulting two velocity fields (see script file) gives us the plot
 below. We can clearly see that the Euler pole solution gives a rotation pattern
 about some center south of the plot. The solution assuming a Homogenous
@@ -400,7 +402,7 @@ with associated extension.</p>
 <img alt="../_images/example_2_single.png" src="../_images/example_2_single.png" />
 </section>
 <section id="loading-other-different-datasets">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Loading other different datasets</a><a class="headerlink" href="#loading-other-different-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7">Loading other different datasets</a><a class="headerlink" href="#loading-other-different-datasets" title="Permalink to this heading"></a></h2>
 <p>We will now compare the DISSTANS-derived secular velocities with other published
 datasets. Specifically, we will be using the MIDAS-calculated velocities from UNR
 (<a class="reference internal" href="../disstans/processing.html#blewitt16" id="id1"><span>[blewitt16]</span></a> - <cite>link to file &lt;http://geodesy.unr.edu/velocities/midas.IGS14.txt&gt;`_</cite>)
@@ -472,7 +474,7 @@ same way:</p>
 </div>
 </section>
 <section id="north-american-reference-frame">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">North American reference frame</a><a class="headerlink" href="#north-american-reference-frame" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id8">North American reference frame</a><a class="headerlink" href="#north-american-reference-frame" title="Permalink to this heading"></a></h2>
 <p>Even though removing an average velocity field with either method will remove any large-scale
 plate motion from the IGS14-referenced data, for plotting purposes, we want to be able to see
 the velocity field relative to stable North America. We could have downloaded the data in that
@@ -499,7 +501,7 @@ plate moving around Earth to get the velocity relative to the NA plate:</p>
 </div>
 </section>
 <section id="estimate-euler-poles-for-datasets">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">Estimate Euler poles for datasets</a><a class="headerlink" href="#estimate-euler-poles-for-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id9">Estimate Euler poles for datasets</a><a class="headerlink" href="#estimate-euler-poles-for-datasets" title="Permalink to this heading"></a></h2>
 <p>Since an Euler pole captures a more “explainable” signal, while still approximating most
 of the velocity field, we will only use this method for the comparison between fields.
 Instead of creating timeseries and <a class="reference internal" href="../disstans/models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a> models, and adding
@@ -534,7 +536,7 @@ background velocity at every station, and calculate the residuals:</p>
 </div>
 </section>
 <section id="map-view-comparison-of-datasets">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Map view comparison of datasets</a><a class="headerlink" href="#map-view-comparison-of-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id10">Map view comparison of datasets</a><a class="headerlink" href="#map-view-comparison-of-datasets" title="Permalink to this heading"></a></h2>
 <p>Let’s now have a look at the modeled velocities, the background velocity field, as
 well as the residual velocities, for all three datasets. For the plotting code, see the
 script file.</p>
@@ -562,7 +564,7 @@ format.</p>
 </div>
 </section>
 <section id="quantitative-comparison-of-datasets">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Quantitative comparison of datasets</a><a class="headerlink" href="#quantitative-comparison-of-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id11">Quantitative comparison of datasets</a><a class="headerlink" href="#quantitative-comparison-of-datasets" title="Permalink to this heading"></a></h2>
 <p>To put into numbers what we gathered by looking at the maps, we will perform a couple of
 root-mean-square (RMS) calculations of the residuals of the different models and station
 subsets. In order to do that, we first need to define a region close to the caldera center,
@@ -690,17 +692,16 @@ transient episodes, nor do they require significant user interaction. This compa
 does show, however, how the explicit modeling of transients changes the results.</p>
 </section>
 <section id="references">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
-<div role="list" class="citation-list">
-<div class="citation" id="herring16" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">herring16</a><span class="fn-bracket">]</span></span>
-<p>Herring, T. A., Melbourne, T. I., Murray, M. H., Floyd, M. A.,
+<h2><a class="toc-backref" href="#id12">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<dl class="citation">
+<dt class="label" id="herring16"><span class="brackets"><a class="fn-backref" href="#id2">herring16</a></span></dt>
+<dd><p>Herring, T. A., Melbourne, T. I., Murray, M. H., Floyd, M. A.,
 Szeliga, W. M., King, R. W., et al. (2016). <em>Plate Boundary Observatory and related
 networks: GPS data analysis methods and geodetic products</em>.
 Reviews of Geophysics, 54(4), 759–808.
 doi:<a class="reference external" href="https://doi.org/10.1002/2016RG000529">10.1002/2016RG000529</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </section>
 </section>
 

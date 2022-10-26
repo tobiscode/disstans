@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; DISSTANS 1.1 documentation</title>
+  <title>Index &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -31,7 +31,7 @@
             <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -165,7 +165,9 @@
 <li class="toctree-l3"><a class="reference internal" href="disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -472,6 +474,8 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet">BaseSplineSet (class in disstans.models)</a>
+</li>
       <li><a href="disstans/tools.html#disstans.tools.block_permutation">block_permutation() (in module disstans.tools)</a>
 </li>
   </ul></td>
@@ -580,6 +584,8 @@
 </li>
       <li><a href="disstans/tools.html#disstans.tools.date2decyear">date2decyear() (in module disstans.tools)</a>
 </li>
+      <li><a href="disstans/models.html#disstans.models.DecayingSplineSet">DecayingSplineSet (class in disstans.models)</a>
+</li>
       <li><a href="disstans/network.html#disstans.network.Network.decompose">decompose() (disstans.network.Network method)</a>
 
       <ul>
@@ -596,6 +602,8 @@
 
       <ul>
         <li><a href="disstans/models.html#disstans.models.BSpline.degree">(disstans.models.BSpline attribute)</a>
+</li>
+        <li><a href="disstans/models.html#disstans.models.DecayingSplineSet.degree">(disstans.models.DecayingSplineSet attribute)</a>
 </li>
         <li><a href="disstans/models.html#disstans.models.ISpline.degree">(disstans.models.ISpline attribute)</a>
 </li>
@@ -615,6 +623,8 @@
         <li><a href="disstans.html#module-disstans">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     disstans.config
 
@@ -622,8 +632,6 @@
         <li><a href="disstans/config.html#module-disstans.config">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     disstans.earthquakes
 
@@ -732,12 +740,12 @@
 </li>
       <li><a href="disstans/station.html#disstans.station.Station.fits">fits (disstans.station.Station attribute)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.Model.freeze">freeze() (disstans.models.Model method)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.freeze">freeze() (disstans.models.BaseSplineSet method)</a>
 
       <ul>
-        <li><a href="disstans/models.html#disstans.models.ModelCollection.freeze">(disstans.models.ModelCollection method)</a>
+        <li><a href="disstans/models.html#disstans.models.Model.freeze">(disstans.models.Model method)</a>
 </li>
-        <li><a href="disstans/models.html#disstans.models.SplineSet.freeze">(disstans.models.SplineSet method)</a>
+        <li><a href="disstans/models.html#disstans.models.ModelCollection.freeze">(disstans.models.ModelCollection method)</a>
 </li>
         <li><a href="disstans/network.html#disstans.network.Network.freeze">(disstans.network.Network method)</a>
 </li>
@@ -850,15 +858,15 @@
 </li>
       <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.index_map">index_map (disstans.timeseries.Timeseries attribute)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.ModelCollection.internal_scales">internal_scales (disstans.models.ModelCollection property)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.internal_scales">internal_scales (disstans.models.BaseSplineSet attribute)</a>
 
       <ul>
-        <li><a href="disstans/models.html#disstans.models.SplineSet.internal_scales">(disstans.models.SplineSet attribute)</a>
+        <li><a href="disstans/models.html#disstans.models.ModelCollection.internal_scales">(disstans.models.ModelCollection property)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="disstans/models.html#disstans.models.SplineSet.internal_scaling">internal_scaling (disstans.models.SplineSet attribute)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.internal_scaling">internal_scaling (disstans.models.BaseSplineSet attribute)</a>
 </li>
       <li><a href="disstans/solvers.html#disstans.solvers.InverseReweighting">InverseReweighting (class in disstans.solvers)</a>
 </li>
@@ -894,16 +902,22 @@
 </li>
       <li><a href="disstans/models.html#disstans.models.SplineSet.list_num_knots">list_num_knots (disstans.models.SplineSet attribute)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.SplineSet.list_scales">list_scales (disstans.models.SplineSet attribute)</a>
+      <li><a href="disstans/models.html#disstans.models.DecayingSplineSet.list_num_splines">list_num_splines (disstans.models.DecayingSplineSet attribute)</a>
 </li>
+      <li><a href="disstans/models.html#disstans.models.DecayingSplineSet.list_scales">list_scales (disstans.models.DecayingSplineSet attribute)</a>
+
+      <ul>
+        <li><a href="disstans/models.html#disstans.models.SplineSet.list_scales">(disstans.models.SplineSet attribute)</a>
+</li>
+      </ul></li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.list_stations">list_stations (disstans.tools.RINEXDataHolding property)</a>
 </li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.load_db_from_file">load_db_from_file() (disstans.tools.RINEXDataHolding method)</a>
 </li>
-      <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.load_db_from_folders">load_db_from_folders() (disstans.tools.RINEXDataHolding method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.load_db_from_folders">load_db_from_folders() (disstans.tools.RINEXDataHolding method)</a>
+</li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.load_locations_from_file">load_locations_from_file() (disstans.tools.RINEXDataHolding method)</a>
 </li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.load_locations_from_rinex">load_locations_from_rinex() (disstans.tools.RINEXDataHolding method)</a>
@@ -932,7 +946,7 @@
 </li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.make_filenames">make_filenames() (disstans.tools.RINEXDataHolding method)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.SplineSet.make_scalogram">make_scalogram() (disstans.models.SplineSet method)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.make_scalogram">make_scalogram() (disstans.models.BaseSplineSet method)</a>
 </li>
       <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.mask_out">mask_out() (disstans.timeseries.Timeseries method)</a>
 </li>
@@ -946,7 +960,7 @@
 </li>
       <li><a href="disstans/processing.html#disstans.processing.midas">midas() (in module disstans.processing)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.SplineSet.min_scale">min_scale (disstans.models.SplineSet attribute)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.min_scale">min_scale (disstans.models.BaseSplineSet attribute)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.Model">Model (class in disstans.models)</a>
 </li>
@@ -1045,6 +1059,8 @@
         <li><a href="disstans/models.html#disstans.models.ISpline.observability_scale">(disstans.models.ISpline attribute)</a>
 </li>
       </ul></li>
+      <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.offset">offset (disstans.timeseries.Timeseries attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/earthquakes.html#disstans.earthquakes.okada_displacement">okada_displacement() (in module disstans.earthquakes)</a>
@@ -1103,8 +1119,12 @@
         <li><a href="disstans/models.html#disstans.models.Sinusoid.phase">(disstans.models.Sinusoid property)</a>
 </li>
       </ul></li>
-      <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.plot_availability">plot_availability() (disstans.tools.RINEXDataHolding method)</a>
+      <li><a href="disstans/network.html#disstans.network.Network.plot_availability">plot_availability() (disstans.network.Network method)</a>
+
+      <ul>
+        <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.plot_availability">(disstans.tools.RINEXDataHolding method)</a>
 </li>
+      </ul></li>
       <li><a href="disstans/models.html#disstans.models.ModelCollection.plot_covariance">plot_covariance() (disstans.models.ModelCollection method)</a>
 </li>
       <li><a href="disstans/tools.html#disstans.tools.RINEXDataHolding.plot_map">plot_map() (disstans.tools.RINEXDataHolding method)</a>
@@ -1125,12 +1145,12 @@
 </li>
       <li><a href="disstans/tools.html#disstans.tools.R_enu2ecef">R_enu2ecef() (in module disstans.tools)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.Model.read_parameters">read_parameters() (disstans.models.Model method)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.read_parameters">read_parameters() (disstans.models.BaseSplineSet method)</a>
 
       <ul>
-        <li><a href="disstans/models.html#disstans.models.ModelCollection.read_parameters">(disstans.models.ModelCollection method)</a>
+        <li><a href="disstans/models.html#disstans.models.Model.read_parameters">(disstans.models.Model method)</a>
 </li>
-        <li><a href="disstans/models.html#disstans.models.SplineSet.read_parameters">(disstans.models.SplineSet method)</a>
+        <li><a href="disstans/models.html#disstans.models.ModelCollection.read_parameters">(disstans.models.ModelCollection method)</a>
 </li>
       </ul></li>
       <li><a href="disstans/models.html#disstans.models.Model.regularize">regularize (disstans.models.Model attribute)</a>
@@ -1191,6 +1211,12 @@
 </li>
       <li><a href="disstans/timeseries.html#disstans.timeseries.Timeseries.sigmas">sigmas (disstans.timeseries.Timeseries property)</a>
 </li>
+      <li><a href="disstans/models.html#disstans.models.Exponential.sign_constraint">sign_constraint (disstans.models.Exponential attribute)</a>
+
+      <ul>
+        <li><a href="disstans/models.html#disstans.models.Logarithmic.sign_constraint">(disstans.models.Logarithmic attribute)</a>
+</li>
+      </ul></li>
       <li><a href="disstans/models.html#disstans.models.Sinusoid">Sinusoid (class in disstans.models)</a>
 </li>
       <li><a href="disstans/solvers.html#disstans.solvers.Solution">Solution (class in disstans.solvers)</a>
@@ -1201,13 +1227,13 @@
         <li><a href="disstans/models.html#disstans.models.ISpline.spacing">(disstans.models.ISpline attribute)</a>
 </li>
       </ul></li>
-      <li><a href="disstans/network.html#disstans.network.Network.spatialfit">spatialfit() (disstans.network.Network method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="disstans/network.html#disstans.network.Network.spatialfit">spatialfit() (disstans.network.Network method)</a>
+</li>
       <li><a href="disstans/models.html#disstans.models.SplineSet.splineclass">splineclass (disstans.models.SplineSet attribute)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.SplineSet.splines">splines (disstans.models.SplineSet attribute)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.splines">splines (disstans.models.BaseSplineSet attribute)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.SplineSet">SplineSet (class in disstans.models)</a>
 </li>
@@ -1241,8 +1267,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="disstans/models.html#disstans.models.SplineSet.t_center_end">t_center_end (disstans.models.SplineSet attribute)</a>
 </li>
-      <li><a href="disstans/models.html#disstans.models.SplineSet.t_center_start">t_center_start (disstans.models.SplineSet attribute)</a>
+      <li><a href="disstans/models.html#disstans.models.DecayingSplineSet.t_center_start">t_center_start (disstans.models.DecayingSplineSet attribute)</a>
+
+      <ul>
+        <li><a href="disstans/models.html#disstans.models.SplineSet.t_center_start">(disstans.models.SplineSet attribute)</a>
 </li>
+      </ul></li>
       <li><a href="disstans/models.html#disstans.models.Model.t_end">t_end (disstans.models.Model attribute)</a>
 </li>
       <li><a href="disstans/models.html#disstans.models.Model.t_end_str">t_end_str (disstans.models.Model attribute)</a>
@@ -1297,12 +1327,12 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="disstans/models.html#disstans.models.Model.unfreeze">unfreeze() (disstans.models.Model method)</a>
+      <li><a href="disstans/models.html#disstans.models.BaseSplineSet.unfreeze">unfreeze() (disstans.models.BaseSplineSet method)</a>
 
       <ul>
-        <li><a href="disstans/models.html#disstans.models.ModelCollection.unfreeze">(disstans.models.ModelCollection method)</a>
+        <li><a href="disstans/models.html#disstans.models.Model.unfreeze">(disstans.models.Model method)</a>
 </li>
-        <li><a href="disstans/models.html#disstans.models.SplineSet.unfreeze">(disstans.models.SplineSet method)</a>
+        <li><a href="disstans/models.html#disstans.models.ModelCollection.unfreeze">(disstans.models.ModelCollection method)</a>
 </li>
         <li><a href="disstans/network.html#disstans.network.Network.unfreeze">(disstans.network.Network method)</a>
 </li>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compiled &mdash; DISSTANS 1.1 documentation</title>
+  <title>Compiled &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -34,7 +34,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -168,7 +168,9 @@
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -308,7 +310,7 @@ indices of the pairs to use in the MIDAS calculation.</p></li>
 <dd><p>n,ip = selectpair(t,tstep,tol,[m,nstep])</p>
 <p>Wrapper for <code class="docutils literal notranslate"><span class="pre">selectpair</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>input rank-1 array</em><em>(</em><em>'f'</em><em>) </em><em>with bounds</em><em> (</em><em>m</em><em>)</em>) – </p></li>
 <li><p><strong>tstep</strong> (<em>input rank-1 array</em><em>(</em><em>'f'</em><em>) </em><em>with bounds</em><em> (</em><em>1 + nstep</em><em>)</em>) – </p></li>
@@ -317,7 +319,7 @@ indices of the pairs to use in the MIDAS calculation.</p></li>
 <li><p><strong>nstep</strong> (<em>input int</em><em>, </em><em>optional</em>) – Default: -1 + shape(tstep, 0)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>n</strong> (<em>int</em>)</p></li>
 <li><p><strong>ip</strong> (<em>rank-2 array(‘i’) with bounds (2,19999)</em>)</p></li>

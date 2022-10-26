@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 5: Signal Recovery at Low SNR &mdash; DISSTANS 1.1 documentation</title>
+  <title>Tutorial 5: Signal Recovery at Low SNR &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -169,7 +169,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -291,7 +293,7 @@ L0-regularized solver is able to better recover signals affected by noise, altho
 we didn’t have time to explore how the reweighting hyperparameters affected the quality
 of the results. This tutorial will explore a bit more quantitatively how using more
 and more stations improves the recovery of a synthetic signal.</p>
-<nav class="contents local" id="table-of-contents">
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id1">Preparations</a></p></li>
@@ -299,9 +301,9 @@ and more stations improves the recovery of a synthetic signal.</p>
 <li><p><a class="reference internal" href="#running-test-cases" id="id3">Running test cases</a></p></li>
 <li><p><a class="reference internal" href="#results" id="id4">Results</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
 <p>By now, not every import needs to be explained, so I’ll just get those out of the
 way first:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
@@ -358,7 +360,7 @@ as clearly as possible, without having to worry about other models:</p>
 </div>
 </section>
 <section id="defining-the-variables-and-hyperparameter-space">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Permalink to this heading"></a></h2>
 <p>So now that we have a network, a true signal shared by all stations, and a different
 noise realization for every station, what are the variables and hyperparameters we want
 to examine?</p>
@@ -393,7 +395,7 @@ for now. Here is the suite of parameters we want to consider:</p>
 </div>
 </section>
 <section id="running-test-cases">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Permalink to this heading"></a></h2>
 <p>It becomes clear that this is best done in parallel, given the sheer number of
 hyperparameter combinations, not to mention that we have to do each combination a number
 of times with different station subsets to get a statistically valid result. To do this
@@ -416,7 +418,7 @@ standard deviation of that. Finally, we can plot this mean and standard deviatio
 mean RMSE for all different number of stations.</p>
 </section>
 <section id="results">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Results</a><a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Results</a><a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
 <p>When we then plot all of the different cases in one big plot, we can see the big picture:</p>
 <img alt="../_images/tutorial_5_S20N50_1.png" src="../_images/tutorial_5_S20N50_1.png" />
 <p>Here for example, we compare, for an initial penalty parameter of 1, the effect that

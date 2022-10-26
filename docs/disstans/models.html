@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Models &mdash; DISSTANS 1.1 documentation</title>
+  <title>Models &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -169,7 +169,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -319,7 +321,7 @@ other parameters into the parent class through <code class="docutils literal not
 both <a class="reference internal" href="#disstans.models.Model._get_mapping" title="disstans.models.Model._get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_mapping()</span></code></a> and <a class="reference internal" href="#disstans.models.Model._get_arch" title="disstans.models.Model._get_arch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_arch()</span></code></a> (see the base class’ documentation
 for expected in- and output).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num_parameters</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of model parameters.</p></li>
 <li><p><strong>regularize</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, regularization-capable solvers will regularize the
@@ -343,7 +345,7 @@ if the boundary value should be used (attribute <a class="reference internal" hr
 <dd><p>Special function that allows for the comparison of models based on their
 type and architecture, regardless of model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><em>disstans.models.Model</em></a>) – Model to compare to.</p>
 </dd>
 </dl>
@@ -379,10 +381,10 @@ type and architecture, regardless of model parameters.</p>
 <dd><p>Special function that returns a readable summary of the Model.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>info</strong> – Model summary.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
@@ -393,11 +395,11 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 <span class="sig-name descname"><span class="pre">_get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Model._get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Model._get_arch" title="Permalink to this definition"></a></dt>
 <dd><p>Subclass-specific model keyword dictionary.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>arch</strong> – Model keyword dictionary. Must have keys <code class="docutils literal notranslate"><span class="pre">'type'</span></code> and <code class="docutils literal notranslate"><span class="pre">'kw_args'</span></code>,
 with a string and a dictionary as values, respectively.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
@@ -409,17 +411,17 @@ with a string and a dictionary as values, respectively.</p>
 <dd><p>Build the mapping matrix <span class="math notranslate nohighlight">\(\mathbf{G}\)</span> given a time vector <span class="math notranslate nohighlight">\(\mathbf{t}\)</span>
 for the active period. Called inside <a class="reference internal" href="#disstans.models.Model.get_mapping" title="disstans.models.Model.get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_mapping()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.
 It can and should be assumed that all included timestamps are valid
 (i.e., defined by the model’s <a class="reference internal" href="#disstans.models.Model.zero_before" title="disstans.models.Model.zero_before"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_before</span></code></a> and <a class="reference internal" href="#disstans.models.Model.zero_after" title="disstans.models.Model.zero_after"><code class="xref py py-attr docutils literal notranslate"><span class="pre">zero_after</span></code></a>).</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>coefs</strong> – Mapping matrix with the same number of rows as <code class="docutils literal notranslate"><span class="pre">timevector</span></code> and
 <a class="reference internal" href="#disstans.models.Model.num_parameters" title="disstans.models.Model.num_parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_parameters</span></code></a> columns.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -431,7 +433,7 @@ It can and should be assumed that all included timestamps are valid
 <dd><p>Convert the parameter and covariances to a new unit by providing a
 conversion factor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Factor to multiply the parameters by to obtain the parameters in the new units.</p>
 </dd>
 </dl>
@@ -442,7 +444,7 @@ conversion factor.</p>
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Model.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Model.copy" title="Permalink to this definition"></a></dt>
 <dd><p>Copy the model object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), include the read-in parameters in the copy
 (<a class="reference internal" href="#disstans.models.Model.par" title="disstans.models.Model.par"><code class="xref py py-attr docutils literal notranslate"><span class="pre">par</span></code></a>), otherwise leave empty.</p></li>
@@ -452,10 +454,10 @@ conversion factor.</p>
 (<a class="reference internal" href="#disstans.models.Model.active_parameters" title="disstans.models.Model.active_parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">active_parameters</span></code></a>), otherwise leave empty.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A copy of the model, based on <a class="reference internal" href="#disstans.models.Model.get_arch" title="disstans.models.Model.get_arch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_arch()</span></code></a>.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model">disstans.models.Model</a></p>
 </dd>
 </dl>
@@ -468,20 +470,20 @@ conversion factor.</p>
 and its (co)variance, if applicable).</p>
 <p>This method ignores the parameters being set invalid by <a class="reference internal" href="#disstans.models.Model.freeze" title="disstans.models.Model.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dictionary with the keys <code class="docutils literal notranslate"><span class="pre">time</span></code> containing the input time vector,
 <code class="docutils literal notranslate"><span class="pre">fit</span></code> containing <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and <code class="docutils literal notranslate"><span class="pre">var</span></code> containing
 the formal variance (or <code class="docutils literal notranslate"><span class="pre">None</span></code>, if not present). <code class="docutils literal notranslate"><span class="pre">fit</span></code> and <code class="docutils literal notranslate"><span class="pre">var</span></code>
 (if not <code class="docutils literal notranslate"><span class="pre">None</span></code>) are <a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> objects.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#RuntimeError" title="(in Python v3.10)"><strong>RuntimeError</strong></a> – If the model parameters have not yet been set with <a class="reference internal" href="#disstans.models.Model.read_parameters" title="disstans.models.Model.read_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_parameters()</span></code></a>.</p>
 </dd>
 </dl>
@@ -497,7 +499,7 @@ to be invalid. The mask will be kept in <a class="reference internal" href="#dis
 <p>Only valid parameters will be used by <a class="reference internal" href="#disstans.models.Model.get_mapping" title="disstans.models.Model.get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_mapping()</span></code></a> and
 <a class="reference internal" href="#disstans.models.Model.evaluate" title="disstans.models.Model.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>zero_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Model parameters with absolute values below <code class="docutils literal notranslate"><span class="pre">zero_threshold</span></code> will be
 set to zero and set inactive. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-10</span></code>.</p>
 </dd>
@@ -516,11 +518,11 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 <span class="sig-name descname"><span class="pre">get_active_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timevector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Model.get_active_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Model.get_active_period" title="Permalink to this definition"></a></dt>
 <dd><p>Given a time vector, return at each point whether the model is active.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>active</strong> (<em>numpy.ndarray</em>) – Array of same length as <code class="docutils literal notranslate"><span class="pre">timevector</span></code>, with <code class="docutils literal notranslate"><span class="pre">True</span></code> where active.</p></li>
 <li><p><strong>first</strong> (<em>int</em>) – Index of the first active timestamp.</p></li>
@@ -538,13 +540,13 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 Requires the model to be subclassed and implement a <a class="reference internal" href="#disstans.models.Model._get_arch" title="disstans.models.Model._get_arch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_arch()</span></code></a> method
 that expands the base model keywords to the subclassed model details.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>arch</strong> – Model keyword dictionary.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#NotImplementedError" title="(in Python v3.10)"><strong>NotImplementedError</strong></a> – If the model has not been subclassed and <a class="reference internal" href="#disstans.models.Model._get_arch" title="disstans.models.Model._get_arch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_arch()</span></code></a> has not been added.</p>
 </dd>
 </dl>
@@ -555,13 +557,13 @@ that expands the base model keywords to the subclassed model details.</p>
 <span class="sig-name descname"><span class="pre">get_cov_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Model.get_cov_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Model.get_cov_by_index" title="Permalink to this definition"></a></dt>
 <dd><p>Return the covariance matrix for a given parameter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Parameter index.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>cov</strong> – Covariance matrix for the selected parameter.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -583,7 +585,7 @@ its boundaries) or the values at the boundaries themselves.</p>
 <p>This method respects the parameters being set invalid by <a class="reference internal" href="#disstans.models.Model.freeze" title="disstans.models.Model.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a>, and will
 interpret those parameters to be unobservable.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p></li>
@@ -594,7 +596,7 @@ valid indices.</p></li>
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>mapping</strong> (<em>scipy.sparse.csc_matrix</em>) – Sparse mapping matrix.</p></li>
 <li><p><strong>observable</strong> (<em>numpy.ndarray</em>) – Returned if <code class="docutils literal notranslate"><span class="pre">return_observability=True</span></code>.
@@ -603,7 +605,7 @@ A boolean NumPy array of the same length as <code class="docutils literal notran
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#NotImplementedError" title="(in Python v3.10)"><strong>NotImplementedError</strong></a> – If the model has not been subclassed and <a class="reference internal" href="#disstans.models.Model._get_mapping" title="disstans.models.Model._get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_get_mapping()</span></code></a> has not been added.</p>
 </dd>
 </dl>
@@ -615,7 +617,7 @@ A boolean NumPy array of the same length as <code class="docutils literal notran
 <dd><p>Reads in the parameters <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> (optionally also their
 covariance) and stores them in the instance attributes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Model parameters of shape
 <span class="math notranslate nohighlight">\((\text{num_parameters}, \text{num_components})\)</span>.</p></li>
@@ -781,12 +783,12 @@ model value at the start time will be used for all times before that.</p>
 <dd><p>Checks whether a dictionary has the appropriate structure to be used to
 create <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary of structure <code class="docutils literal notranslate"><span class="pre">{model_name:</span> <span class="pre">{&quot;type&quot;:</span> <span class="pre">modelclass,</span> <span class="pre">&quot;kw_args&quot;:</span>
 <span class="pre">{**kw_args}}}</span></code> that contains the names, types and necessary keyword arguments
 to create each model object.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#AssertionError" title="(in Python v3.10)"><strong>AssertionError</strong></a> – If the dictionary structure is invalid.</p>
 </dd>
 </dl>
@@ -834,7 +836,7 @@ covariance matrices to be reset to <code class="docutils literal notranslate"><s
 <dd><p>Special function that allows for the comparison of model collection based on
 their contents, regardless of model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection to compare to.</p>
 </dd>
 </dl>
@@ -893,10 +895,10 @@ parameter and covariance matrices to be reset to <code class="docutils literal n
 <dd><p>Special function that returns a readable summary of the model collection.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>info</strong> – Model collection summary.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
@@ -918,7 +920,7 @@ creates the multi-component weight matrix, and then computes those same
 <span class="math notranslate nohighlight">\(\mathbf{G}^T \mathbf{W} \mathbf{G}\)</span> and
 <span class="math notranslate nohighlight">\(\mathbf{G}^T \mathbf{W} \mathbf{d}\)</span> matrices.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<a class="reference external" href="https://docs.scipy.org/doc/scipy-1.8.1/reference/generated/scipy.sparse.spmatrix.html#scipy.sparse.spmatrix" title="(in SciPy v1.8.1)"><em>scipy.sparse.spmatrix</em></a>) – Single-component mapping matrix.</p></li>
 <li><p><strong>obs_mask</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Observability mask.</p></li>
@@ -932,7 +934,7 @@ ignore it even if it is present.</p></li>
 ignore it even if it is present.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>G</strong> (<em>scipy.sparse.spmatrix</em>) – (If <code class="docutils literal notranslate"><span class="pre">return_W_G=True</span></code>.) Reduced <span class="math notranslate nohighlight">\(\mathbf{G}\)</span> matrix.</p></li>
 <li><p><strong>W</strong> (<em>scipy.sparse.spmatrix</em>) – (If <code class="docutils literal notranslate"><span class="pre">return_W_G=True</span></code>.) Reduced <span class="math notranslate nohighlight">\(\mathbf{W}\)</span> matrix.</p></li>
@@ -957,7 +959,7 @@ ignore it even if it is present.</p></li>
 <dd><p>Convert the parameter and covariances to a new unit by providing a
 conversion factor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Factor to multiply the parameters by to obtain the parameters in the new units.</p>
 </dd>
 </dl>
@@ -968,7 +970,7 @@ conversion factor.</p>
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#ModelCollection.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.ModelCollection.copy" title="Permalink to this definition"></a></dt>
 <dd><p>Copy the model collection object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), include the read-in parameters in the copy
 (<a class="reference internal" href="#disstans.models.ModelCollection.par" title="disstans.models.ModelCollection.par"><code class="xref py py-attr docutils literal notranslate"><span class="pre">par</span></code></a>), otherwise leave empty.</p></li>
@@ -978,11 +980,11 @@ conversion factor.</p>
 (<a class="reference internal" href="#disstans.models.ModelCollection.active_parameters" title="disstans.models.ModelCollection.active_parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">active_parameters</span></code></a>), otherwise leave empty.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A copy of the model collection, based on the individual models’
 <a class="reference internal" href="#disstans.models.Model.copy" title="disstans.models.Model.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">copy()</span></code></a> method.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.models.ModelCollection" title="disstans.models.ModelCollection">disstans.models.ModelCollection</a></p>
 </dd>
 </dl>
@@ -995,20 +997,20 @@ conversion factor.</p>
 and its (co)variance, if applicable).</p>
 <p>This method ignores the parameters being set invalid by <a class="reference internal" href="#disstans.models.ModelCollection.freeze" title="disstans.models.ModelCollection.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dictionary with the keys <code class="docutils literal notranslate"><span class="pre">time</span></code> containing the input time vector,
 <code class="docutils literal notranslate"><span class="pre">fit</span></code> containing <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and <code class="docutils literal notranslate"><span class="pre">var</span></code> containing
 the formal variance (or <code class="docutils literal notranslate"><span class="pre">None</span></code>, if not present). <code class="docutils literal notranslate"><span class="pre">fit</span></code> and <code class="docutils literal notranslate"><span class="pre">var</span></code>
 (if not <code class="docutils literal notranslate"><span class="pre">None</span></code>) are <a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> objects.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#RuntimeError" title="(in Python v3.10)"><strong>RuntimeError</strong></a> – If the model parameters have not yet been set with <a class="reference internal" href="#disstans.models.ModelCollection.read_parameters" title="disstans.models.ModelCollection.read_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_parameters()</span></code></a>.</p>
 </dd>
 </dl>
@@ -1020,7 +1022,7 @@ the formal variance (or <code class="docutils literal notranslate"><span class="
 <dd><p>Convenience function that calls <a class="reference internal" href="#disstans.models.Model.freeze" title="disstans.models.Model.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a> for all
 models (or a subset thereof) contained in the collection.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_list</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), freeze all models. If a list of strings, only
 freeze the corresponding models in the collection.</p></li>
@@ -1037,14 +1039,14 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 <dd><p>Creates an empty <a class="reference internal" href="#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> object, and adds a dictionary of
 model objects to it.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model_dict</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary with model names as keys, and <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> object instances
 as values.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The new <a class="reference internal" href="#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> object.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.models.ModelCollection" title="disstans.models.ModelCollection">ModelCollection</a></p>
 </dd>
 </dl>
@@ -1056,10 +1058,10 @@ as values.</p>
 <dd><p>Get a dictionary that describes the model collection fully and allows it to
 be recreated.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>arch</strong> – Model keyword dictionary.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
@@ -1074,7 +1076,7 @@ their method <a class="reference internal" href="#disstans.models.Model.get_mapp
 <p>This method respects the parameters being set invalid by <a class="reference internal" href="#disstans.models.ModelCollection.freeze" title="disstans.models.ModelCollection.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a>, and will
 interpret those parameters to be unobservable.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p></li>
@@ -1085,7 +1087,7 @@ valid indices.</p></li>
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>mapping</strong> (<em>scipy.sparse.csc_matrix</em>) – Sparse mapping matrix.</p></li>
 <li><p><strong>observable</strong> (<em>numpy.ndarray</em>) – Returned if <code class="docutils literal notranslate"><span class="pre">return_observability=True</span></code>.
@@ -1109,7 +1111,7 @@ A boolean NumPy array of the same length as <code class="docutils literal notran
 <dd><p>Plotting method that displays the covariance (or correlation coefficient) matrix.
 The axes are labeled by model names for easier interpretation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, the title that is added to the figure.</p></li>
 <li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – By default (<code class="docutils literal notranslate"><span class="pre">None</span></code>), the figure is shown interarctively to enable zooming in
@@ -1130,7 +1132,7 @@ used when <code class="docutils literal notranslate"><span class="pre">fname</sp
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.models.ModelCollection.prepare_LS">
-<span class="sig-name descname"><span class="pre">prepare_LS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_regularization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_internal_scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#ModelCollection.prepare_LS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.ModelCollection.prepare_LS" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">prepare_LS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_regularization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_internal_scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#ModelCollection.prepare_LS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.ModelCollection.prepare_LS" title="Permalink to this definition"></a></dt>
 <dd><p>Helper function that concatenates the mapping matrices of the collection
 models given the timevector in in the input timeseries, and returns some
 relevant sizes.</p>
@@ -1138,7 +1140,7 @@ relevant sizes.</p>
 into the format used by the solvers, optionally taking into account
 the internal scales.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – The timeseries whose time indices are used to calculate the mapping matrix.</p></li>
 <li><p><strong>include_regularization</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), expands the returned variables (see below) and computes
@@ -1151,9 +1153,11 @@ model names, and the values are then the Numpy arrays which will be arranged
 properly to match the mapping matrix.</p></li>
 <li><p><strong>use_internal_scales</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), also return the internal model scales,
 subset to the observable and regularized parameters.</p></li>
+<li><p><strong>check_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>), also return an array that contains the signs
+that should be enforced for the parameters.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>G</strong> (<em>scipy.sparse.spmatrix</em>) – Mapping matrix computed by <a class="reference internal" href="#disstans.models.ModelCollection.get_mapping" title="disstans.models.ModelCollection.get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_mapping()</span></code></a>.</p></li>
 <li><p><strong>obs_mask</strong> (<em>numpy.ndarray</em>) – Observability mask computed by <a class="reference internal" href="#disstans.models.ModelCollection.get_mapping" title="disstans.models.ModelCollection.get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_mapping()</span></code></a>.</p></li>
@@ -1174,6 +1178,10 @@ and regularized parameter contains the initial weights.
 Numpy array of shape <span class="math notranslate nohighlight">\((\text{num_reg}, )\)</span> that for each observable
 and regularized parameter contains the internal model scale.
 <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">use_internal_scales=False</span></code>.</p></li>
+<li><p><strong>sign_constraints</strong> (<em>numpy.ndarray</em>) – (Only if <code class="docutils literal notranslate"><span class="pre">check_constraints=True</span></code>.)
+Numpy array of shape <span class="math notranslate nohighlight">\((\text{num_obs}, \text{num_comps})\)</span> that for
+each observable parameter denotes whether it should be positive (<code class="docutils literal notranslate"><span class="pre">+1</span></code>),
+negative (<code class="docutils literal notranslate"><span class="pre">-1</span></code>), or unconstrained (<code class="docutils literal notranslate"><span class="pre">NaN</span></code>).</p></li>
 </ul>
 </p>
 </dd>
@@ -1193,7 +1201,7 @@ and regularized parameter contains the internal model scale.
 <dd><p>Reads in the entire collection’s parameters <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> (optionally also
 their covariance) and stores them in the instance attributes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Model collection parameters of shape
 <span class="math notranslate nohighlight">\((\text{num_parameters}, \text{num_components})\)</span>.</p></li>
@@ -1213,7 +1221,7 @@ represents a full variance-covariance matrix.</p></li>
 <dd><p>Convenience function that calls <a class="reference internal" href="#disstans.models.Model.unfreeze" title="disstans.models.Model.unfreeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unfreeze()</span></code></a> for all
 models (or a subset thereof) contained in the collection.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model_list</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), unfreeze all models. If a list of strings, only
 unfreeze the corresponding models in the collection.</p>
 </dd>
@@ -1350,7 +1358,7 @@ and <code class="docutils literal notranslate"><span class="pre">t_end</span></c
 artifacts). (Using <code class="docutils literal notranslate"><span class="pre">t_start</span></code> and/or <code class="docutils literal notranslate"><span class="pre">t_end</span></code> might be desirable for creating
 syntehtic data, however.)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Arctangent time constant <span class="math notranslate nohighlight">\(\tau\)</span>.
 It represents the time at which, after zero-crossing at the reference
 time, the arctangent reaches the value <span class="math notranslate nohighlight">\(\pi/4\)</span> (before model scaling),
@@ -1371,26 +1379,41 @@ i.e. half of the one-sided amplitude.</p>
 <h3>Exponential<a class="headerlink" href="#exponential" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.models.Exponential">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">Exponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Exponential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Exponential" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">Exponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign_constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Exponential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Exponential" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>.</p>
 <p>This model provides the “geophysical” exponential <span class="math notranslate nohighlight">\(1-\exp(-\mathbf{t}/\tau)\)</span>
 with a given time constant, zero for <span class="math notranslate nohighlight">\(\mathbf{t} &lt; 0\)</span>, and approaching
 one asymptotically.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Exponential time constant <span class="math notranslate nohighlight">\(\tau\)</span>.
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Exponential time constant(s) <span class="math notranslate nohighlight">\(\tau\)</span>.
 It represents the amount of time that it takes for the (general) exponential
 function’s value to be multiplied by <span class="math notranslate nohighlight">\(e\)</span>.
 Applied to this model, for a given relative amplitude <span class="math notranslate nohighlight">\(a\)</span> (so <span class="math notranslate nohighlight">\(0 &lt; a &lt; 1\)</span>,
 before model scaling) to be reached at given <span class="math notranslate nohighlight">\(\Delta t\)</span> past <code class="docutils literal notranslate"><span class="pre">t_start</span></code>,
-<span class="math notranslate nohighlight">\(\tau = - \frac{\Delta t}{\ln(1 - a)}\)</span></p>
+<span class="math notranslate nohighlight">\(\tau = - \frac{\Delta t}{\ln(1 - a)}\)</span></p></li>
+<li><p><strong>sign_constraint</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Only supported when using solvers based on <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.
+Can be <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code>, and tells the solver to constrain fitted parameters to this
+sign, avoiding sign flips between individual exponentials. This is useful if
+the resulting curve should be monotonous. It can also be a list, where
+each entry applies to one data component (needs to be known at initialization).
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, no constraint is enforced.</p></li>
+</ul>
 </dd>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Exponential.sign_constraint">
+<span class="sig-name descname"><span class="pre">sign_constraint</span></span><a class="headerlink" href="#disstans.models.Exponential.sign_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Flag whether the sign of the fitted parameters should be constrained.
+Only supported by the <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a> solver.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Exponential.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#disstans.models.Exponential.tau" title="Permalink to this definition"></a></dt>
-<dd><p>Exponential time constant.</p>
+<dd><p>Exponential time constant(s).</p>
 </dd></dl>
 
 </dd></dl>
@@ -1406,7 +1429,7 @@ before model scaling) to be reached at given <span class="math notranslate nohig
 stretched with a given time constant and normalized to be between
 <span class="math notranslate nohighlight">\((0, 1)\)</span> at the limits.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Time constant <span class="math notranslate nohighlight">\(\tau\)</span>.
 To determine the constant from a characteristic time scale <span class="math notranslate nohighlight">\(T\)</span> and a
 percentage <span class="math notranslate nohighlight">\(0&lt;q&lt;1\)</span> of the fraction of magnitude change to have happened
@@ -1429,18 +1452,33 @@ and given the specified time unit), use the following formula:
 <h3>Logarithmic<a class="headerlink" href="#logarithmic" title="Permalink to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.models.Logarithmic">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">Logarithmic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Logarithmic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Logarithmic" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">Logarithmic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sign_constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Logarithmic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Logarithmic" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>.</p>
 <p>This model provides the “geophysical” logarithmic <span class="math notranslate nohighlight">\(\ln(1 + \mathbf{t}/\tau)\)</span>
 with a given time constant and zero for <span class="math notranslate nohighlight">\(\mathbf{t} &lt; 0\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Logarithmic time constant <span class="math notranslate nohighlight">\(\tau\)</span>.
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Logarithmic time constant(s) <span class="math notranslate nohighlight">\(\tau\)</span>.
 It represents the time at which, after zero-crossing at the reference
-time, the logarithm reaches the value 1 (before model scaling).</p>
+time, the logarithm reaches the value 1 (before model scaling).</p></li>
+<li><p><strong>sign_constraint</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Only supported when using solvers based on <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.
+Can be <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code>, and tells the solver to constrain fitted parameters to this
+sign, avoiding sign flips between individual exponentials. This is useful if
+the resulting curve should be monotonous. It can also be a list, where
+each entry applies to one data component (needs to be known at initialization).
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, no constraint is enforced.</p></li>
+</ul>
 </dd>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.Logarithmic.sign_constraint">
+<span class="sig-name descname"><span class="pre">sign_constraint</span></span><a class="headerlink" href="#disstans.models.Logarithmic.sign_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Flag whether the sign of the fitted parameters should be constrained.
+Only supported by the <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a> solver.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Logarithmic.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#disstans.models.Logarithmic.tau" title="Permalink to this definition"></a></dt>
@@ -1458,7 +1496,7 @@ time, the logarithm reaches the value 1 (before model scaling).</p>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>.</p>
 <p>Polynomial model of given order.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Order (highest exponent) of the polynomial. The number of model parameters
 equals <code class="docutils literal notranslate"><span class="pre">order</span> <span class="pre">+</span> <span class="pre">1</span> <span class="pre">-</span> <span class="pre">min_exponent</span></code>.</p></li>
@@ -1473,17 +1511,17 @@ equals <code class="docutils literal notranslate"><span class="pre">order</span>
 <dd><p>Return the row index for <a class="reference internal" href="#disstans.models.Model.par" title="disstans.models.Model.par"><code class="xref py py-attr docutils literal notranslate"><span class="pre">par</span></code></a> and <a class="reference internal" href="#disstans.models.Model.var" title="disstans.models.Model.var"><code class="xref py py-attr docutils literal notranslate"><span class="pre">var</span></code></a>
 of a given exponent.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>exponent</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Exponent for which to return the index. E.g., <code class="docutils literal notranslate"><span class="pre">1</span></code> would correspond
 to the index of the linear term.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Index of the exponent’s term.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)">int</a></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – Raised if the desired exponent is not present in the model..</p>
 </dd>
 </dl>
@@ -1500,7 +1538,7 @@ to the index of the linear term.</p>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>.</p>
 <p>Model that introduces steps at discrete times.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>steptimes</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of datetime-like strings that can be converted into <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a>.
 Length of it equals the number of model parameters.</p>
 </dd>
@@ -1511,7 +1549,7 @@ Length of it equals the number of model parameters.</p>
 <span class="sig-name descname"><span class="pre">add_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Step.add_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Step.add_step" title="Permalink to this definition"></a></dt>
 <dd><p>Add a step to the model.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>step</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Datetime-like string of the step time to add</p>
 </dd>
 </dl>
@@ -1522,7 +1560,7 @@ Length of it equals the number of model parameters.</p>
 <span class="sig-name descname"><span class="pre">remove_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#Step.remove_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.Step.remove_step" title="Permalink to this definition"></a></dt>
 <dd><p>Remove a step from the model.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>step</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Datetime-like string of the step time to remove</p>
 </dd>
 </dl>
@@ -1552,7 +1590,7 @@ Length of it equals the number of model parameters.</p>
 <p>This model defines a fixed-frequency periodic sinusoid signal with
 constant amplitude and phase to be estimated.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>period</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Period length <span class="math notranslate nohighlight">\(T\)</span> in <a class="reference internal" href="#disstans.models.Model.time_unit" title="disstans.models.Model.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a> units.</p>
 </dd>
 </dl>
@@ -1597,7 +1635,7 @@ and <a class="reference internal" href="#disstans.models.Sinusoid.amplitude" tit
 <p>Model defined by cardinal, centralized B-Splines of certain order/degree and time scale.
 Used for transient temporary signals that return to zero after a given time span.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Degree of the B-Splines.</p></li>
 <li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Scale of the B-Splines, see Notes.</p></li>
@@ -1630,36 +1668,34 @@ in the same units as the scale).</p>
 <p>If no spacing is given but multiple splines are requested, the scale will be used
 as the spacing.</p>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="butzer88" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">butzer88</a><span class="fn-bracket">]</span></span>
-<p>Butzer, P., Schmidt, M., &amp; Stark, E. (1988).
+<dl class="citation">
+<dt class="label" id="butzer88"><span class="brackets"><a class="fn-backref" href="#id1">butzer88</a></span></dt>
+<dd><p>Butzer, P., Schmidt, M., &amp; Stark, E. (1988).
 <em>Observations on the History of Central B-Splines.</em>
 Archive for History of Exact Sciences, 39(2), 137-156. Retrieved May 14, 2020,
 from <a class="reference external" href="https://www.jstor.org/stable/41133848">https://www.jstor.org/stable/41133848</a></p>
-</div>
-<div class="citation" id="schoenberg73" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">schoenberg73</a><span class="fn-bracket">]</span></span>
-<p>Schoenberg, I. J. (1973). <em>Cardinal Spline Interpolation.</em>
+</dd>
+<dt class="label" id="schoenberg73"><span class="brackets"><a class="fn-backref" href="#id2">schoenberg73</a></span></dt>
+<dd><p>Schoenberg, I. J. (1973). <em>Cardinal Spline Interpolation.</em>
 Society for Industrial and Applied Mathematics.
 doi:<a class="reference external" href="https://doi.org/10.1137/1.9781611970555">10.1137/1.9781611970555</a></p>
-</div>
-</div>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.models.BSpline.get_transient_period">
 <span class="sig-name descname"><span class="pre">get_transient_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timevector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#BSpline.get_transient_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.BSpline.get_transient_period" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a mask-like array of where each spline is currently transient
 (not staying constant).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>transient</strong> – NumPy array with <code class="docutils literal notranslate"><span class="pre">True</span></code> when a spline is currently transient,
 <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -1719,7 +1755,7 @@ maximum value after a given time span.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#disstans.models.BSpline" title="disstans.models.BSpline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disstans.models.BSpline</span></code></a></dt><dd><p>More details about B-Splines.</p>
+<dt><a class="reference internal" href="#disstans.models.BSpline" title="disstans.models.BSpline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">disstans.models.BSpline</span></code></a></dt><dd><p>More details about B-Splines and the available keyword arguments.</p>
 </dd>
 </dl>
 </div>
@@ -1729,14 +1765,14 @@ maximum value after a given time span.</p>
 <dd><p>Returns a mask-like array of where each spline is currently transient
 (not staying constant).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a> containing the timestamps of each observation.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>transient</strong> – NumPy array with <code class="docutils literal notranslate"><span class="pre">True</span></code> when a spline is currently transient, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -1781,49 +1817,32 @@ maximum value after a given time span.</p>
 </dd></dl>
 
 </section>
-<section id="splineset">
-<h3>SplineSet<a class="headerlink" href="#splineset" title="Permalink to this heading"></a></h3>
+<section id="basesplineset">
+<h3>BaseSplineSet<a class="headerlink" href="#basesplineset" title="Permalink to this heading"></a></h3>
 <dl class="py class">
-<dt class="sig sig-object py" id="disstans.models.SplineSet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">SplineSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_center_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_center_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit='D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_scales=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_num_knots=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splineclass=&lt;class</span> <span class="pre">'disstans.models.ISpline'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complete=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_scaling=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#SplineSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.SplineSet" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">BaseSplineSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">splines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#BaseSplineSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.BaseSplineSet" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>.</p>
-<p>Contains a list of splines that share a common degree, but different center
-times and scales.</p>
-<p>The set is constructed from a time span (<code class="docutils literal notranslate"><span class="pre">t_center_start</span></code> and <code class="docutils literal notranslate"><span class="pre">t_center_end</span></code>)
-and numbers of centerpoints or length scales. By default (<code class="docutils literal notranslate"><span class="pre">complete=True</span></code>),
-the number of splines and center points for each scale will then be chosen such
-that the resulting set of splines will be complete over the input time scale.
-This means it will contain all splines that are non-zero at least somewhere in
-the time span. Otherwise, the spline set will only have center times at or
-between <code class="docutils literal notranslate"><span class="pre">t_center_start</span></code> and <code class="docutils literal notranslate"><span class="pre">t_center_end</span></code>.</p>
-<p>This class also sets the spacing equal to the scale.</p>
-<p>Lastly, in order to influence the tradeoff between splines of different timescales,
-the mapping matrix of each spline is scaled by its own time scale to promote using
-fewer components. Without this, there would be an ambiguity for the solver as to
-whether fit the signal using many smaller scales or with one large scale, as the
-fit would be almost identical. This behavior can be disabled by setting
-<code class="docutils literal notranslate"><span class="pre">internal_scaling=False</span></code>.</p>
+<p>Raw container class for lists of splines, which are usually created with subclasses
+like <a class="reference internal" href="#disstans.models.SplineSet" title="disstans.models.SplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineSet</span></code></a>. The common functionalities are implemented
+here.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Degree of the splines to be created.</p></li>
-<li><p><strong>t_center_start</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a>) – Time span start of the spline set.</p></li>
-<li><p><strong>t_center_end</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a>) – Time span end of the spline set.</p></li>
-<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Time unit of scale, spacing and model parameters.</p></li>
-<li><p><strong>list_scales</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of scales to use for each of the sub-splines.
-Mutually exclusive to setting <code class="docutils literal notranslate"><span class="pre">list_num_knots</span></code>.</p></li>
-<li><p><strong>list_num_knots</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of number of knots to divide the time span into for each of the sub-splines.
-Mutually exclusive to setting <code class="docutils literal notranslate"><span class="pre">list_scales</span></code>.</p></li>
-<li><p><strong>splineclass</strong> (<a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><em>Model</em></a><em>, </em><em>optional</em>) – Model class to use for the splines. Defaults to <a class="reference internal" href="#disstans.models.ISpline" title="disstans.models.ISpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISpline</span></code></a>.</p></li>
-<li><p><strong>complete</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – See usage description. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>internal_scaling</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – See usage description. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>splines</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of spline model objects.</p></li>
+<li><p><strong>internal_scaling</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – By default (<code class="docutils literal notranslate"><span class="pre">internal_scaling=True</span></code>), in order to influence the tradeoff between
+splines of different timescales, the mapping matrix of each spline is scaled by its
+own time scale to promote using fewer components. Without this, there would be an
+ambiguity for the solver as to whether fit the signal using many smaller scales or
+with one large scale, as the fit would be almost identical. This behavior can be
+disabled by setting <code class="docutils literal notranslate"><span class="pre">internal_scaling=False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 <p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.freeze">
-<span class="sig-name descname"><span class="pre">freeze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#SplineSet.freeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.SplineSet.freeze" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.freeze">
+<span class="sig-name descname"><span class="pre">freeze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#BaseSplineSet.freeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.BaseSplineSet.freeze" title="Permalink to this definition"></a></dt>
 <dd><p>In case some parameters are estimated to be close to zero and should not
 be considered in future fits and evaluations, this function “freezes”
 the model by setting parameters below the threshold <code class="docutils literal notranslate"><span class="pre">zero_threshold</span></code>
@@ -1832,7 +1851,7 @@ to be invalid. The mask will be kept in
 <p>Only valid parameters will be used by <a class="reference internal" href="#disstans.models.Model.get_mapping" title="disstans.models.Model.get_mapping"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_mapping()</span></code></a> and
 <a class="reference internal" href="#disstans.models.Model.evaluate" title="disstans.models.Model.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>zero_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Model parameters with absolute values below <code class="docutils literal notranslate"><span class="pre">zero_threshold</span></code> will be
 set inactive. Defaults to <code class="docutils literal notranslate"><span class="pre">1e-10</span></code>.</p>
 </dd>
@@ -1840,15 +1859,15 @@ set inactive. Defaults to <code class="docutils literal notranslate"><span class
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#disstans.models.SplineSet.unfreeze" title="disstans.models.SplineSet.unfreeze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unfreeze</span></code></a></dt><dd><p>The reverse method.</p>
+<dt><a class="reference internal" href="#disstans.models.BaseSplineSet.unfreeze" title="disstans.models.BaseSplineSet.unfreeze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unfreeze</span></code></a></dt><dd><p>The reverse method.</p>
 </dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.make_scalogram">
-<span class="sig-name descname"><span class="pre">make_scalogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmaprange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_param_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#SplineSet.make_scalogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.SplineSet.make_scalogram" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.make_scalogram">
+<span class="sig-name descname"><span class="pre">make_scalogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmaprange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_param_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#BaseSplineSet.make_scalogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.BaseSplineSet.make_scalogram" title="Permalink to this definition"></a></dt>
 <dd><p>Create a scalogram figure of the model parameters.</p>
 <p>A scalogram shows the amplitude of each model parameter plotted over time and
 for all the different scales contained. Model parameters that have overlapping
@@ -1856,7 +1875,7 @@ influence are also shown as overlapping. The height of each parameter’s patch
 is defined by the weight of that parameter relative to the other parameters
 (excluding splines that are not transient at that time).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t_left</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Left boundary of the time axis.</p></li>
 <li><p><strong>t_right</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Right boundary of the time axis.</p></li>
@@ -1866,14 +1885,14 @@ Defaults to the 95th percentile of the absolute amplitudes of all parameters.</p
 <li><p><strong>min_param_mag</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – The absolute value under which any value is plotted as zero.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – Figure object of the scalogram.</p></li>
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – Axes object of the scalogram.</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#NotImplementedError" title="(in Python v3.10)"><strong>NotImplementedError</strong></a> – If the generation method for the scalogram given the SplineSet’s
     spline class is not defined in this method yet.</p>
 </dd>
@@ -1881,14 +1900,14 @@ Defaults to the 95th percentile of the absolute amplitudes of all parameters.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.read_parameters">
-<span class="sig-name descname"><span class="pre">read_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#SplineSet.read_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.SplineSet.read_parameters" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.read_parameters">
+<span class="sig-name descname"><span class="pre">read_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#BaseSplineSet.read_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.BaseSplineSet.read_parameters" title="Permalink to this definition"></a></dt>
 <dd><p>Reads in the parameters <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> (optionally also their variances)
 of all the sub-splines and stores them in the respective attributes.</p>
 <p>Note that the main <code class="docutils literal notranslate"><span class="pre">SplineSet</span></code> object will still contain all the cross-spline
 covariances (if contained in <code class="docutils literal notranslate"><span class="pre">covariances</span></code>), but the sub-splines cannot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Model parameters of shape
 <span class="math notranslate nohighlight">\((\text{num_parameters}, \text{num_components})\)</span>.</p></li>
@@ -1903,12 +1922,74 @@ represents a full variance-covariance matrix.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.unfreeze">
-<span class="sig-name descname"><span class="pre">unfreeze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#SplineSet.unfreeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.SplineSet.unfreeze" title="Permalink to this definition"></a></dt>
-<dd><p>Resets previous model freezing done by <a class="reference internal" href="#disstans.models.SplineSet.freeze" title="disstans.models.SplineSet.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a> such that all parameters
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.unfreeze">
+<span class="sig-name descname"><span class="pre">unfreeze</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#BaseSplineSet.unfreeze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.BaseSplineSet.unfreeze" title="Permalink to this definition"></a></dt>
+<dd><p>Resets previous model freezing done by <a class="reference internal" href="#disstans.models.BaseSplineSet.freeze" title="disstans.models.BaseSplineSet.freeze"><code class="xref py py-meth docutils literal notranslate"><span class="pre">freeze()</span></code></a> such that all parameters
 are active again.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.internal_scales">
+<span class="sig-name descname"><span class="pre">internal_scales</span></span><a class="headerlink" href="#disstans.models.BaseSplineSet.internal_scales" title="Permalink to this definition"></a></dt>
+<dd><p>If <a class="reference internal" href="#disstans.models.BaseSplineSet.internal_scaling" title="disstans.models.BaseSplineSet.internal_scaling"><code class="xref py py-attr docutils literal notranslate"><span class="pre">internal_scaling</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, this NumPy array holds the relative
+scaling factors of all parameters over all the sub-splines.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.internal_scaling">
+<span class="sig-name descname"><span class="pre">internal_scaling</span></span><a class="headerlink" href="#disstans.models.BaseSplineSet.internal_scaling" title="Permalink to this definition"></a></dt>
+<dd><p>Trackes whether to scale the sub-splines relative to their lengths.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.min_scale">
+<span class="sig-name descname"><span class="pre">min_scale</span></span><a class="headerlink" href="#disstans.models.BaseSplineSet.min_scale" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum scale of the sub-splines.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.BaseSplineSet.splines">
+<span class="sig-name descname"><span class="pre">splines</span></span><a class="headerlink" href="#disstans.models.BaseSplineSet.splines" title="Permalink to this definition"></a></dt>
+<dd><p>List of spline object contained within the SplineSet.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="splineset">
+<h3>SplineSet<a class="headerlink" href="#splineset" title="Permalink to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="disstans.models.SplineSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">SplineSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_center_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_center_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit='D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_scales=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_num_knots=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splineclass=&lt;class</span> <span class="pre">'disstans.models.ISpline'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complete=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#SplineSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.SplineSet" title="Permalink to this definition"></a></dt>
+<dd><p>Subclasses <a class="reference internal" href="#disstans.models.BaseSplineSet" title="disstans.models.BaseSplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSplineSet</span></code></a>.</p>
+<p>Contains a list of splines that cover an entire timespan, and that share a
+common degree, but different center times and scales.</p>
+<p>The set is constructed from a time span (<code class="docutils literal notranslate"><span class="pre">t_center_start</span></code> and <code class="docutils literal notranslate"><span class="pre">t_center_end</span></code>)
+and numbers of centerpoints or length scales. By default (<code class="docutils literal notranslate"><span class="pre">complete=True</span></code>),
+the number of splines and center points for each scale will then be chosen such
+that the resulting set of splines will be complete over the input time scale.
+This means it will contain all splines that are non-zero at least somewhere in
+the time span. Otherwise, the spline set will only have center times at or
+between <code class="docutils literal notranslate"><span class="pre">t_center_start</span></code> and <code class="docutils literal notranslate"><span class="pre">t_center_end</span></code>.</p>
+<p>This class also sets the spacing equal to the scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Degree of the splines to be created.</p></li>
+<li><p><strong>t_center_start</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a>) – Time span start of the spline set.</p></li>
+<li><p><strong>t_center_end</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a>) – Time span end of the spline set.</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Time unit of scale, spacing and model parameters.</p></li>
+<li><p><strong>list_scales</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of scales to use for each of the sub-splines.
+Mutually exclusive to setting <code class="docutils literal notranslate"><span class="pre">list_num_knots</span></code>.</p></li>
+<li><p><strong>list_num_knots</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of number of knots to divide the time span into for each of the sub-splines.
+Mutually exclusive to setting <code class="docutils literal notranslate"><span class="pre">list_scales</span></code>.</p></li>
+<li><p><strong>splineclass</strong> (<a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><em>Model</em></a><em>, </em><em>optional</em>) – Model class to use for the splines. Defaults to <a class="reference internal" href="#disstans.models.ISpline" title="disstans.models.ISpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISpline</span></code></a>.</p></li>
+<li><p><strong>complete</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – See usage description. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>See <a class="reference internal" href="#disstans.models.BaseSplineSet" title="disstans.models.BaseSplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSplineSet</span></code></a> and <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for
+attribute descriptions and more keyword arguments.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.SplineSet.complete">
 <span class="sig-name descname"><span class="pre">complete</span></span><a class="headerlink" href="#disstans.models.SplineSet.complete" title="Permalink to this definition"></a></dt>
@@ -1920,19 +2001,6 @@ are active again.</p>
 <dt class="sig sig-object py" id="disstans.models.SplineSet.degree">
 <span class="sig-name descname"><span class="pre">degree</span></span><a class="headerlink" href="#disstans.models.SplineSet.degree" title="Permalink to this definition"></a></dt>
 <dd><p>Degree of the splines.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.internal_scales">
-<span class="sig-name descname"><span class="pre">internal_scales</span></span><a class="headerlink" href="#disstans.models.SplineSet.internal_scales" title="Permalink to this definition"></a></dt>
-<dd><p>If <a class="reference internal" href="#disstans.models.SplineSet.internal_scaling" title="disstans.models.SplineSet.internal_scaling"><code class="xref py py-attr docutils literal notranslate"><span class="pre">internal_scaling</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, this NumPy array holds the relative
-scaling factors of all parameters over all the sub-splines.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.internal_scaling">
-<span class="sig-name descname"><span class="pre">internal_scaling</span></span><a class="headerlink" href="#disstans.models.SplineSet.internal_scaling" title="Permalink to this definition"></a></dt>
-<dd><p>Trackes whether to scale the sub-splines relative to their lengths.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1948,21 +2016,9 @@ scaling factors of all parameters over all the sub-splines.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.min_scale">
-<span class="sig-name descname"><span class="pre">min_scale</span></span><a class="headerlink" href="#disstans.models.SplineSet.min_scale" title="Permalink to this definition"></a></dt>
-<dd><p>Minimum scale of the sub-splines.</p>
-</dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.SplineSet.splineclass">
 <span class="sig-name descname"><span class="pre">splineclass</span></span><a class="headerlink" href="#disstans.models.SplineSet.splineclass" title="Permalink to this definition"></a></dt>
 <dd><p>Class of the splines contained.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="disstans.models.SplineSet.splines">
-<span class="sig-name descname"><span class="pre">splines</span></span><a class="headerlink" href="#disstans.models.SplineSet.splines" title="Permalink to this definition"></a></dt>
-<dd><p>List of spline object contained within the SplineSet.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1974,6 +2030,52 @@ scaling factors of all parameters over all the sub-splines.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.SplineSet.t_center_start">
 <span class="sig-name descname"><span class="pre">t_center_start</span></span><a class="headerlink" href="#disstans.models.SplineSet.t_center_start" title="Permalink to this definition"></a></dt>
+<dd><p>Relevant time span start.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="decayingsplineset">
+<h3>DecayingSplineSet<a class="headerlink" href="#decayingsplineset" title="Permalink to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="disstans.models.DecayingSplineSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">DecayingSplineSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_center_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_num_splines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#DecayingSplineSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.DecayingSplineSet" title="Permalink to this definition"></a></dt>
+<dd><p>Subclasses <a class="reference internal" href="#disstans.models.BaseSplineSet" title="disstans.models.BaseSplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSplineSet</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Degree of the splines to be created.</p></li>
+<li><p><strong>t_center_start</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><em>pandas.Timestamp</em></a>) – First center time of the spline set.</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit of scale, spacing and model parameters.</p></li>
+<li><p><strong>list_scales</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – List of scales to use for each of the sub-splines.</p></li>
+<li><p><strong>list_num_splines</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Number of splines to create for each scale.</p></li>
+<li><p><strong>time_unit</strong> – Time unit of scale, spacing and model parameters.</p></li>
+</ul>
+</dd>
+</dl>
+<p>See <a class="reference internal" href="#disstans.models.Model" title="disstans.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> for attribute descriptions and more keyword arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.DecayingSplineSet.degree">
+<span class="sig-name descname"><span class="pre">degree</span></span><a class="headerlink" href="#disstans.models.DecayingSplineSet.degree" title="Permalink to this definition"></a></dt>
+<dd><p>Degree of the splines.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.DecayingSplineSet.list_num_splines">
+<span class="sig-name descname"><span class="pre">list_num_splines</span></span><a class="headerlink" href="#disstans.models.DecayingSplineSet.list_num_splines" title="Permalink to this definition"></a></dt>
+<dd><p>List of number of splines for each scale.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.DecayingSplineSet.list_scales">
+<span class="sig-name descname"><span class="pre">list_scales</span></span><a class="headerlink" href="#disstans.models.DecayingSplineSet.list_scales" title="Permalink to this definition"></a></dt>
+<dd><p>List of scales of each of the sub-splines.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="disstans.models.DecayingSplineSet.t_center_start">
+<span class="sig-name descname"><span class="pre">t_center_start</span></span><a class="headerlink" href="#disstans.models.DecayingSplineSet.t_center_start" title="Permalink to this definition"></a></dt>
 <dd><p>Relevant time span start.</p>
 </dd></dl>
 
@@ -1994,7 +2096,7 @@ The functional form of these parameters is a full B-Spline basis set, defined by
 <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.8.1/reference/generated/scipy.interpolate.BSpline.basis_element.html#scipy.interpolate.BSpline.basis_element" title="(in SciPy v1.8.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">basis_element()</span></code></a> (not a <a class="reference internal" href="#disstans.models.SplineSet" title="disstans.models.SplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineSet</span></code></a> of
 purely cardinal splines).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>period</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Nominal period length <span class="math notranslate nohighlight">\(T\)</span> in <a class="reference internal" href="#disstans.models.Model.time_unit" title="disstans.models.Model.time_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">time_unit</span></code></a> units.</p></li>
 <li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Degree <span class="math notranslate nohighlight">\(p\)</span> of the B-spline to be used.</p></li>
@@ -2019,13 +2121,13 @@ as observable. Defaults to <code class="docutils literal notranslate"><span clas
 <dd><p>Calculate the instantaenous (time-varying) amplitude and phase of the sinusoid
 over its entire fitted domain.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_points</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of points to use in the discretized, normalized phase vector
 used in the evaluation of the basis functions. For plotting purposes,
 this value should be the length of the timeseries to which this
 model was fitted.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>amplitude</strong> (<em>numpy.ndarray</em>) – Amplitude timeseries for each point (rows) and component (columns).</p></li>
 <li><p><strong>phase</strong> (<em>numpy.ndarray</em>) – Phase timeseries in radians (with the same shape as <code class="docutils literal notranslate"><span class="pre">amplitude</span></code>).</p></li>

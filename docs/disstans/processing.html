@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Processing &mdash; DISSTANS 1.1 documentation</title>
+  <title>Processing &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -169,7 +169,9 @@
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -342,7 +344,7 @@ that the residual between reference and input timeseries is allowed to have.</p>
 observations the timeseries has to contain.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>station</strong> (<a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station"><em>disstans.station.Station</em></a>) – Station to operate on.</p></li>
 <li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to clean.</p></li>
@@ -376,7 +378,7 @@ the raw input timeseries, specify <code class="docutils literal notranslate"><sp
 <span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.decompose" title="Permalink to this definition"></a></dt>
 <dd><p>Decomposes the input signal into different components using PCA or ICA.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>
 (can contain NaNs).
@@ -392,7 +394,7 @@ dictionaries of them as input (i.e. the output of
 themselves in space and time. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>model</strong> (<em>numpy.ndarray</em>) – Best-fit model with shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>.</p></li>
 <li><p><strong>temporal</strong> (<em>numpy.ndarray</em>) – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Temporal source with shape
@@ -404,23 +406,21 @@ themselves in space and time. Defaults to <code class="docutils literal notransl
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="dong06" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">dong06</a><span class="fn-bracket">]</span></span>
-<p>Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L.,
+<dl class="citation">
+<dt class="label" id="dong06"><span class="brackets"><a class="fn-backref" href="#id1">dong06</a></span></dt>
+<dd><p>Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L.,
 Kedar, S., &amp; Jamason, P. (2006). <em>Spatiotemporal filtering using principal component
 analysis and Karhunen-Loeve expansion approaches for regional GPS network analysis</em>.
 Journal of Geophysical Research: Solid Earth, 111(B3).
 doi:<a class="reference external" href="https://doi.org/10.1029/2005JB003806">10.1029/2005JB003806</a>.</p>
-</div>
-<div class="citation" id="huang12" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">huang12</a><span class="fn-bracket">]</span></span>
-<p>Huang, D. W., Dai, W. J., &amp; Luo, F. X. (2012).
+</dd>
+<dt class="label" id="huang12"><span class="brackets"><a class="fn-backref" href="#id2">huang12</a></span></dt>
+<dd><p>Huang, D. W., Dai, W. J., &amp; Luo, F. X. (2012).
 <em>ICA Spatiotemporal Filtering Method and Its Application in GPS Deformation Monitoring</em>.
 Applied Mechanics and Materials, 204–208, 2806–2812.
 doi:<a class="reference external" href="http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806">10.4028/www.scientific.net/AMM.204-208.2806</a>.</p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -434,7 +434,7 @@ ignored during the median calculation, but missing observations are not imputed
 from the rolling median (i.e., a NaN value remains a NaN value, but does not
 affect surrounding values).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – 2D input array (can contain NaNs).
 Wrapped by <a class="reference internal" href="#disstans.processing.unwrap_dict_and_ts" title="disstans.processing.unwrap_dict_and_ts"><code class="xref py py-func docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a> to also accept
@@ -444,10 +444,10 @@ dictionaries of them as input.</p></li>
 Has to be an odd number.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>filtered</strong> – 2D filtered array (may still contain NaNs).</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -468,7 +468,7 @@ crossing known step epochs and using a fixed period, the influence of unmodeled
 jumps and seasonal variations can be minimized. At the end, an empirical estimate
 of the velocities’ uncertainty is calculated as well.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to perform the MIDAS algorithm on.</p></li>
 <li><p><strong>steps</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a><em>, </em><em>optional</em>) – If given, a pandas Series or Index of step times, across which no pairs
@@ -476,7 +476,7 @@ should be formed.</p></li>
 <li><p><strong>tolerance</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>mdl</strong> (<em>disstans.models.Polynomial</em>) – Fitted polynomial (offset &amp; constant velocity) model.</p></li>
 <li><p><strong>res</strong> (<em>disstans.timeseries.Timeseries</em>) – Residual timeseries.</p></li>
@@ -492,15 +492,14 @@ deviation of the velocity pairs, respectively, and for each component.</p></li>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="blewitt16" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">blewitt16</a><span class="fn-bracket">]</span></span>
-<p>Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).
+<dl class="citation">
+<dt class="label" id="blewitt16"><span class="brackets"><a class="fn-backref" href="#id3">blewitt16</a></span></dt>
+<dd><p>Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).
 <em>MIDAS robust trend estimator for accurate GPS station velocities without step detection.</em>
 Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.
 doi:<a class="reference external" href="https://doi.org/10.1002/2015JB012552">10.1002/2015JB012552</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -524,7 +523,7 @@ calls its method <a class="reference internal" href="#disstans.processing.StepDe
 Running the method again with a different <code class="docutils literal notranslate"><span class="pre">kernel_size</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code> or <code class="docutils literal notranslate"><span class="pre">y</span></code> will overwrite
 previous results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Window size of the detector. Must be odd.</p></li>
 <li><p><strong>kernel_size_min</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum window size of the detector (for edges). Must be smaller than or equal
@@ -542,7 +541,7 @@ Can contain NaNs.</p></li>
 <dd><p>Calculates the Akaike Information Criterion for small samples for Least Squares
 regression results. Implementation is based on <a class="reference internal" href="#burnhamanderson02" id="id4"><span>[burnhamanderson02]</span></a> (ch. 2).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rss</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Residual sum of squares.</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of samples.</p></li>
@@ -551,23 +550,22 @@ parameters (including the mean), then the degrees of freedom are
 <span class="math notranslate nohighlight">\(K = \text{num_parameters} + 1\)</span></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The Small Sample AIC for Least Squares <span class="math notranslate nohighlight">\(\text{AIC}_c\)</span>.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)">float</a></p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="burnhamanderson02" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">burnhamanderson02</a><span class="fn-bracket">]</span></span>
-<p>(2002) <em>Information and Likelihood Theory:
+<dl class="citation">
+<dt class="label" id="burnhamanderson02"><span class="brackets"><a class="fn-backref" href="#id4">burnhamanderson02</a></span></dt>
+<dd><p>(2002) <em>Information and Likelihood Theory:
 A Basis for Model Selection and Inference.</em> In: Burnham K.P., Anderson D.R. (eds)
 Model Selection and Multimodel Inference. Springer, New York, NY.
 doi:<a class="reference external" href="https://doi.org/10.1007/978-0-387-22456-5_2">10.1007/978-0-387-22456-5_2</a>.</p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -578,7 +576,7 @@ Upon successful completion, it will return the relative step probabilities
 as well as the residuals variances of the two hypotheses tested
 (as reported by <a class="reference internal" href="#disstans.processing.StepDetector.test_single" title="disstans.processing.StepDetector.test_single"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test_single()</span></code></a>).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},)\)</span>.
 Should not contain NaNs.</p></li>
@@ -588,7 +586,7 @@ Can contain NaNs.</p></li>
 (Refers to <span class="math notranslate nohighlight">\(\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}\)</span>.)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>probabilities</strong> (<em>numpy.ndarray</em>) – Contains the relative probabilities array.
 Has shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.</p></li>
@@ -617,7 +615,7 @@ Has shape <span class="math notranslate nohighlight">\((\text{num_observations},
 <dd><p>Search a dictionary of potential step times for each station in the dictionary
 and assess the probability for each one.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>net</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><em>disstans.network.Network</em></a>) – Network instance to operate on.</p></li>
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be analyzed.</p></li>
@@ -637,7 +635,7 @@ If <code class="docutils literal notranslate"><span class="pre">True</span></cod
 <li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>step_table</strong> (<em>pandas.DataFrame</em>) – A DataFrame containing the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> (its name), <code class="docutils literal notranslate"><span class="pre">'time'</span></code>
 (a timestamp of the station) and <code class="docutils literal notranslate"><span class="pre">'probability'</span></code> (maximum <span class="math notranslate nohighlight">\(\Delta_i\)</span>
@@ -656,12 +654,12 @@ steps as determined by <code class="docutils literal notranslate"><span class="p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search_network">
-<span class="sig-name descname"><span class="pre">search_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_network" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">search_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_network" title="Permalink to this definition"></a></dt>
 <dd><p>Function that searches for steps in an entire network (possibly in parallel),
 thresholds those probabilities, and identifies all the consecutive ranges in which
 steps happen over the network.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>net</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><em>disstans.network.Network</em></a>) – Network instance to operate on.</p></li>
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be analyzed.</p></li>
@@ -671,10 +669,13 @@ steps happen over the network.</p>
 <li><p><strong>gap</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum gap between identified steps to count as a continuous period
 of possible steps.</p></li>
 <li><p><strong>gap_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit of <code class="docutils literal notranslate"><span class="pre">gap</span></code>.</p></li>
+<li><p><strong>aggregate_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), use the maximum step probability across all data components
+when searching for steps. Otherwise, keep all steps from maximum probabilities in
+each component (which could lead to multiple close-by steps).</p></li>
 <li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>step_table</strong> (<em>pandas.DataFrame</em>) – A DataFrame containing the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> (its name), <code class="docutils literal notranslate"><span class="pre">'time'</span></code>
 (a timestamp of the station) and <code class="docutils literal notranslate"><span class="pre">'probability'</span></code> (maximum <span class="math notranslate nohighlight">\(\Delta_i\)</span>
@@ -692,23 +693,26 @@ steps as determined by <code class="docutils literal notranslate"><span class="p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.steps">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.steps" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.steps" title="Permalink to this definition"></a></dt>
 <dd><p>Threshold the probabilities to return a list of steps.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
 <li><p><strong>maxsteps</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Return at most <code class="docutils literal notranslate"><span class="pre">maxsteps</span></code> number of steps. Can be useful if a good value for
 <code class="docutils literal notranslate"><span class="pre">threshold</span></code> has not been found yet.</p></li>
+<li><p><strong>aggregate_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), use the maximum step probability across all data components
+when searching for steps. Otherwise, keep all steps from maximum probabilities in
+each component (which could lead to multiple close-by steps).</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), print warnings when there will be a large number of
 steps identified given the <code class="docutils literal notranslate"><span class="pre">threshold</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>steps</strong> – Returns a list of <a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> arrays that contain the indices of steps
 for each component.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
 </dd>
 </dl>
@@ -721,7 +725,7 @@ for each component.</p>
 whether a step is likely present (H1) or not (H0) in the <code class="docutils literal notranslate"><span class="pre">y</span></code> data given
 <code class="docutils literal notranslate"><span class="pre">x</span></code> coordinates.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xwindow</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Time array of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>.
 Should not contain NaNs.</p></li>
@@ -735,7 +739,7 @@ down the computation.</p></li>
 (Refers to <span class="math notranslate nohighlight">\(\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}\)</span>.)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>int</em> – Best hypothesis (<code class="docutils literal notranslate"><span class="pre">0</span></code> for no step, <code class="docutils literal notranslate"><span class="pre">1</span></code> for step).</p></li>
 <li><p><em>float</em> – If H1 is the best hypothesis (and suffices <code class="docutils literal notranslate"><span class="pre">maxdel</span></code>), its relative probability,

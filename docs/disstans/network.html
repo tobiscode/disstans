@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Network &mdash; DISSTANS 1.1 documentation</title>
+  <title>Network &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -169,7 +169,9 @@
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -290,7 +292,7 @@ highest-level container object in DISSTANS.</p>
 <dd><p>Main class of DISSTANS. Contains information about the network, defines defaults,
 and most importantly, contains a dictionary of all stations in the network.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the network.</p></li>
 <li><p><strong>default_location_path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If station locations aren’t given directly, check for a file with this path for the
@@ -344,13 +346,13 @@ from the network by wrapping <a class="reference internal" href="#disstans.netwo
 <dd><p>Convenience special function that provides a shorthand notation
 to access the network’s stations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the station.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Station in network.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station">disstans.station.Station</a></p>
 </dd>
 </dl>
@@ -409,10 +411,10 @@ the network by wrapping <a class="reference internal" href="#disstans.network.Ne
 <dd><p>Special function that returns a readable summary of the network.
 Accessed, for example, by Python’s <code class="docutils literal notranslate"><span class="pre">print()</span></code> built-in function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>info</strong> – Network summary.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
 </dd>
 </dl>
@@ -426,7 +428,7 @@ Accessed, for example, by Python’s <code class="docutils literal notranslate">
 from a JSON file using <a class="reference internal" href="#disstans.network.Network.from_json" title="disstans.network.Network.from_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_json()</span></code></a> but skipping the adding of local
 models at that stage.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Timeseries description to add the models to.</p></li>
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings containing the model names of the subset of the default
@@ -449,7 +451,7 @@ local models to add. Defaults to all local models.</p></li>
 <dd><p>For each station in the network (or a subset thereof), add models
 to a timeseries using dictionary keywords.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary of structure <code class="docutils literal notranslate"><span class="pre">{model_name:</span> <span class="pre">{&quot;type&quot;:</span> <span class="pre">modelclass,</span> <span class="pre">&quot;kw_args&quot;:</span>
 <span class="pre">{**kw_args}}}</span></code> that contains the names, types and necessary keyword arguments
@@ -466,7 +468,7 @@ to create each model object (see <a class="reference internal" href="models.html
 <span class="sig-name descname"><span class="pre">add_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.add_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.add_station" title="Permalink to this definition"></a></dt>
 <dd><p>Add a station to the network.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the station.</p></li>
 <li><p><strong>station</strong> (<a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station"><em>disstans.station.Station</em></a>) – Station object to add.</p></li>
@@ -499,7 +501,7 @@ import of a JSON file, but there is no associated information for that timeserie
 itself. Usually, this happens when after the network is loaded, the target
 timeseries still needs to be added.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>target_ts</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Timeseries description to add the models to.</p></li>
 <li><p><strong>hidden_ts</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Description of the timeseries that contains the unused model.
@@ -517,7 +519,7 @@ local models to add. Defaults to all hidden models.</p></li>
 <dd><p>Plot the amplitude and phase of a <a class="reference internal" href="models.html#disstans.models.Sinusoid" title="disstans.models.Sinusoid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sinusoid</span></code></a>
 model on a network map.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the timeseries to be used.</p></li>
 <li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the model to be plotted.</p></li>
@@ -567,20 +569,20 @@ to the <a class="reference external" href="https://matplotlib.org/3.5.2/api/figu
 <dd><p>Analyze residual timeseries for all stations and components, calling
 <a class="reference internal" href="station.html#disstans.station.Station.analyze_residuals" title="disstans.station.Station.analyze_residuals"><code class="xref py py-meth docutils literal notranslate"><span class="pre">analyze_residuals()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Timeseries to analyze. Method assumes it already is a residual.</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Additional keyword arguments are directly passed on to
 <a class="reference internal" href="station.html#disstans.station.Station.analyze_residuals" title="disstans.station.Station.analyze_residuals"><code class="xref py py-meth docutils literal notranslate"><span class="pre">analyze_residuals()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>DataFrame with the station names as index, the different metrics
 as top-level columns, and the different components as lower-level
 columns. Averages of each metric can easily be calculated with the
 Pandas command <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.mean.html#pandas.DataFrame.mean" title="(in pandas v1.4.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mean()</span></code></a>.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)">pandas.DataFrame</a></p>
 </dd>
 </dl>
@@ -592,7 +594,7 @@ Pandas command <a class="reference external" href="https://pandas.pydata.org/pan
 <dd><p>A convenience wrapper that for each station in the network, calls a given function on
 each station. Also provides a progress bar.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>function</em>) – Function to use. If provided with a string, will check for that function in
 <a class="reference internal" href="processing.html#module-disstans.processing" title="disstans.processing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">processing</span></code></a>, otherwise the function will be assumed to adhere to the
@@ -625,7 +627,7 @@ is then added to the station). Also provides a progress bar.
 Will automatically use multiprocessing if parallelization has been enabled in
 the configuration (defaults to parallelization if possible).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>function</em>) – Function to use. If provided with a string, will check for that function in
 <a class="reference internal" href="processing.html#module-disstans.processing" title="disstans.processing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">processing</span></code></a>, otherwise the function will be assumed to adhere
@@ -670,7 +672,7 @@ is the function to use, then the following two are equivalent:</p>
 <dd><p>A convenience wrapper for functions that operate on an entire network’s timeseries
 at once.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>function</em>) – Function to use. If provided with a string, will check for that function in
 <a class="reference internal" href="processing.html#module-disstans.processing" title="disstans.processing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">processing</span></code></a>, otherwise the function will be assumed to adhere
@@ -713,7 +715,7 @@ then the following two are equivalent:</p>
 <dd><p>Convenience function that copies the uncertainties of one timeseries
 to another for all stations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>origin_ts</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the timeseries that contains the uncertainty data.</p></li>
 <li><p><strong>target_ts</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the timeseries that should receive the uncertainty data.</p></li>
@@ -727,7 +729,7 @@ to another for all stations.</p>
 <span class="sig-name descname"><span class="pre">create_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.create_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.create_station" title="Permalink to this definition"></a></dt>
 <dd><p>Create a station and add it to the network.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the station.</p></li>
 <li><p><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Location (Latitude [°], Longitude [°], Altitude [m]) of the station.
@@ -735,7 +737,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <a class="reference internal" href="#disstans.network.Network.default_location_path" title="disstans.network.Network.default_location_path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_location_path</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If no location data is passed or found in <a class="reference internal" href="#disstans.network.Network.default_location_path" title="disstans.network.Network.default_location_path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_location_path</span></code></a>.</p>
 </dd>
 </dl>
@@ -747,7 +749,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <dd><p>Decomposes a timeseries in the network and returns its best-fit models
 and spatiotemporal sources.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the timeseries to analyze.</p></li>
 <li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, save the model as a timeseries called <code class="docutils literal notranslate"><span class="pre">ts_out</span></code> to
@@ -755,7 +757,7 @@ the stations in the network.</p></li>
 <li><p><strong>**decompose_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Additional keyword arguments passed to <a class="reference internal" href="processing.html#disstans.processing.decompose" title="disstans.processing.decompose"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompose()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>model</strong> (<em>dict</em>) – Dictionary of best-fit models at each station and for each data component.
 The keys are the data components of the <code class="docutils literal notranslate"><span class="pre">ts_in</span></code> timeseries, and
@@ -792,7 +794,7 @@ This function requires a <a class="reference internal" href="models.html#disstan
 been fitted to a timeseries in the network.</p>
 <p>Wraps <a class="reference internal" href="tools.html#disstans.tools.estimate_euler_pole" title="disstans.tools.estimate_euler_pole"><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_euler_pole()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the ts_description to use.</p></li>
 <li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the <a class="reference internal" href="models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a> model that contains the
@@ -814,7 +816,7 @@ Note that no output will be made for stations that do not contain the
 passed <code class="docutils literal notranslate"><span class="pre">'ts_description'</span></code> and <code class="docutils literal notranslate"><span class="pre">'mdl_description'</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>df_v_pred</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the Euler pole modeled velocities at each station (rows)
 in the East and North components (columns).</p></li>
@@ -844,7 +846,7 @@ Also provides a progress bar.
 Will automatically use multiprocessing if parallelization has been enabled in
 the configuration (defaults to parallelization if possible).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to evaluate.</p></li>
 <li><p><strong>timevector</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.4.2)"><em>pandas.DatetimeIndex</em></a><em>, </em><em>optional</em>) – <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a> of <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.4.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> or alternatively a
@@ -893,7 +895,7 @@ to evaluate the models for, then the following two are equivalent:</p>
 <dd><p>Collects a specific timeseries from all stations and returns them in a dictionary
 of network-wide <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> objects.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be collected
 from all stations in the network. If a tuple, specifies the timeseries
@@ -902,12 +904,12 @@ and name of a fitted model for the timeseries at each station.</p></li>
 other stations will be ignored.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>network_df</strong> – Dictionary with the data components of the <code class="docutils literal notranslate"><span class="pre">ts_description</span></code> timeseries
 as keys and <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> objects as values
 (which will have in turn the station names as column names).</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
@@ -929,7 +931,7 @@ Also provides a progress bar.
 Will automatically use multiprocessing if parallelization has been enabled in
 the configuration (defaults to parallelization if possible).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to fit.</p></li>
 <li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>function</em><em>, </em><em>optional</em>) – Solver function to use. If given a string, will look for a solver with that
@@ -945,11 +947,11 @@ by the calls to the solver function.</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Additional keyword arguments that are passed on to the solver function.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>solutions</strong> – If <code class="docutils literal notranslate"><span class="pre">return_solutions=True</span></code>, a dictionary that contains the
 <a class="reference internal" href="solvers.html#disstans.solvers.Solution" title="disstans.solvers.Solution"><code class="xref py py-class docutils literal notranslate"><span class="pre">Solution</span></code></a> objects for each station.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>, optional</p>
 </dd>
 </dl>
@@ -986,7 +988,7 @@ and <code class="docutils literal notranslate"><span class="pre">mysolver</span>
 <dd><p>Convenience method that combines the calls for <a class="reference internal" href="#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, <a class="reference internal" href="#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>
 and <a class="reference internal" href="#disstans.network.Network.math" title="disstans.network.Network.math"><code class="xref py py-meth docutils literal notranslate"><span class="pre">math()</span></code></a> (to compute the fit residual) into one method call.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – See <a class="reference internal" href="#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> and <a class="reference internal" href="#disstans.network.Network.evaluate" title="disstans.network.Network.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>.</p></li>
 <li><p><strong>solver</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>function</em><em>, </em><em>optional</em>) – See <a class="reference internal" href="#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.</p></li>
@@ -1041,7 +1043,7 @@ contain the model fit, and the residuals should be put into the timeseries
 for the <a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> for a certain
 timeseries at every station.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to to freeze the models for.</p></li>
 <li><p><strong>model_list</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), freeze all models. If a list of strings, only
@@ -1065,7 +1067,7 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_default_local_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.from_json" title="Permalink to this definition"></a></dt>
 <dd><p>Create a <a class="reference internal" href="#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> instance from a JSON configuration file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path of input JSON file.</p></li>
 <li><p><strong>add_default_local_models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If false, skip the adding of any default local model found in a station.</p></li>
@@ -1076,10 +1078,10 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> constructor.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>net</strong> – Network instance.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.network.Network" title="disstans.network.Network">disstans.network.Network</a></p>
 </dd>
 </dl>
@@ -1098,16 +1100,16 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 <dd><p>Return the list of all station names that contain a given timeseries
 (and optionally, a model).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the timeseries that the stations should contain.</p></li>
 <li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the model that the stations’ timeseries should contain.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>station_list</strong> – Names of stations.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
 </dd>
 </dl>
@@ -1119,7 +1121,7 @@ set to zero and set inactive. Defaults to <code class="docutils literal notransl
 <dd><p>Calculates the Common Mode Error (CME) of the network and shows its spatial
 and temporal pattern. Optionally saves the model for each station.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the timeseries to analyze.</p></li>
 <li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, save the model as a timeseries called <code class="docutils literal notranslate"><span class="pre">ts_out</span></code> to
@@ -1171,7 +1173,7 @@ Optionally, this function can</p>
 <li><p>print station information.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Pre-select a station.</p></li>
 <li><p><strong>timeseries</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – List of strings with the descriptions of the timeseries to plot.
@@ -1197,8 +1199,8 @@ used when <code class="docutils literal notranslate"><span class="pre">save=True
 <li><p><strong>scalogram_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – If passed, also plot a scalogram. Defaults to no scalogram shown.
 The dictionary has to contain <code class="docutils literal notranslate"><span class="pre">'ts'</span></code> and <code class="docutils literal notranslate"><span class="pre">'model'</span></code> keys. The string values
 are the names of the timeseries and associated model that are of the
-<a class="reference internal" href="models.html#disstans.models.SplineSet" title="disstans.models.SplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineSet</span></code></a> class, and therefore have a
-<a class="reference internal" href="models.html#disstans.models.SplineSet.make_scalogram" title="disstans.models.SplineSet.make_scalogram"><code class="xref py py-meth docutils literal notranslate"><span class="pre">make_scalogram()</span></code></a> method.</p></li>
+<a class="reference internal" href="models.html#disstans.models.BaseSplineSet" title="disstans.models.BaseSplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSplineSet</span></code></a> class, and therefore have a
+<a class="reference internal" href="models.html#disstans.models.BaseSplineSet.make_scalogram" title="disstans.models.BaseSplineSet.make_scalogram"><code class="xref py py-meth docutils literal notranslate"><span class="pre">make_scalogram()</span></code></a> method.</p></li>
 <li><p><strong>mark_events</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.4.2)"><em>pandas.DataFrame</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – If passed, a DataFrame or list of DataFrames that contain the columns
 <code class="docutils literal notranslate"><span class="pre">'station'</span></code> and <code class="docutils literal notranslate"><span class="pre">'time'</span></code>. For each timestamp, a vertical line is plotted
 onto the station’s timeseries and the relevant entries are printed out.</p></li>
@@ -1255,7 +1257,7 @@ This function requires a <a class="reference internal" href="models.html#disstan
 been fitted to a timeseries in the network.</p>
 <p>Wraps <a class="reference internal" href="tools.html#disstans.tools.get_hom_vel_strain_rot" title="disstans.tools.get_hom_vel_strain_rot"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_hom_vel_strain_rot()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the timeseries to use.</p></li>
 <li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the <a class="reference internal" href="models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a> model that contains the
@@ -1289,7 +1291,7 @@ will return a predicted velocity only composed of the translation and
 strain parts.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>df_v_pred</strong> (<em>pandas.DataFrame</em>) – DataFrame containing the predicted velocities at each station (rows) in
 the East and North components (columns).</p></li>
@@ -1315,7 +1317,7 @@ the East and North components (columns).</p></li>
 <dd><p>Distributes a dictionary of network-wide <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>
 objects onto the network stations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description where the data will be placed.</p></li>
 <li><p><strong>dict_of_timeseries</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary with the data components of the <code class="docutils literal notranslate"><span class="pre">ts_description</span></code> timeseries
@@ -1340,7 +1342,7 @@ as keys and <a class="reference internal" href="timeseries.html#disstans.timeser
 in the network where they experienced maitenance and therefore likely a jump
 in station coordinates.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>maint_dict</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary of structure <code class="docutils literal notranslate"><span class="pre">{station_name:</span> <span class="pre">[steptimes]}</span></code> where <code class="docutils literal notranslate"><span class="pre">station_name</span></code>
 is the station name as present in the Network object, and <code class="docutils literal notranslate"><span class="pre">steptimes</span></code> is a list
@@ -1367,7 +1369,7 @@ and only add steps that fall inside it.</p></li>
 <dd><p>Convenience method that performs simple math for all stations.
 Syntax is <code class="docutils literal notranslate"><span class="pre">result</span> <span class="pre">=</span> <span class="pre">left</span> <span class="pre">operator</span> <span class="pre">right</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the result timeseries.</p></li>
 <li><p><strong>left</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the left timeseries.</p></li>
@@ -1392,11 +1394,29 @@ all supported operations).</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="disstans.network.Network.plot_availability">
+<span class="sig-name descname"><span class="pre">plot_availability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Timedelta('1</span> <span class="pre">days</span> <span class="pre">00:00:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by_latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saveas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.plot_availability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.plot_availability" title="Permalink to this definition"></a></dt>
+<dd><p>Create an availability figure for the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The name of the timeseries to be used.</p></li>
+<li><p><strong>sampling</strong> (<a class="reference internal" href="tools.html#disstans.tools.Timedelta" title="disstans.tools.Timedelta"><em>disstans.tools.Timedelta</em></a><em>, </em><em>optional</em>) – Assume that breaks strictly larger than <code class="docutils literal notranslate"><span class="pre">sampling</span></code> constitute a data gap.
+Defaults to daily.</p></li>
+<li><p><strong>sort_by_latitude</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), sort the stations by latitude, else alphabetical.
+(Always falls back to alphabetical if location information is missing.)</p></li>
+<li><p><strong>saveas</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, the figure will be saved at this location.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="disstans.network.Network.remove_station">
 <span class="sig-name descname"><span class="pre">remove_station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.remove_station"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.remove_station" title="Permalink to this definition"></a></dt>
 <dd><p>Remove a station from the network.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the station.</p>
 </dd>
 </dl>
@@ -1422,7 +1442,7 @@ station, then the following two are equivalent:</p>
 <dd><p>Convenience function that scans all stations for timeseries of given names
 and removes them (together with models and fits).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>*ts_to_remove</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Pass all timeseries to remove as function arguments.</p>
 </dd>
 </dl>
@@ -1469,7 +1489,7 @@ average distance <span class="math notranslate nohighlight">\(D_j\)</span> from 
 <code class="docutils literal notranslate"><span class="pre">dist_weight_min</span></code> and <code class="docutils literal notranslate"><span class="pre">dist_weight_max</span></code> allow to set boundaries for
 <span class="math notranslate nohighlight">\(D_j\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to fit.</p></li>
 <li><p><strong>penalty</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>. For non-reweighted models (i.e.,
@@ -1546,7 +1566,7 @@ analysis of the residuals between each fitting step.</p></li>
 see <code class="docutils literal notranslate"><span class="pre">cvxpy_kw_args</span></code> in <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>statistics</strong> (<em>dict</em>) – See the Notes for an explanation of the solution and convergence statistics
 that are returned.</p></li>
@@ -1592,15 +1612,14 @@ but containing the average of the upper triagonal parts of the spatial
 correlation matrices (i.e. for each model, iteration, and component).</p></li>
 </ul>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="riel14" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">riel14</a><span class="fn-bracket">]</span></span>
-<p>Riel, B., Simons, M., Agram, P., &amp; Zhan, Z. (2014). <em>Detecting transient
+<dl class="citation">
+<dt class="label" id="riel14"><span class="brackets"><a class="fn-backref" href="#id1">riel14</a></span></dt>
+<dd><p>Riel, B., Simons, M., Agram, P., &amp; Zhan, Z. (2014). <em>Detecting transient
 signals in geodetic time series using sparse estimation techniques</em>.
 Journal of Geophysical Research: Solid Earth, 119(6), 5140–5160.
 doi:<a class="reference external" href="https://doi.org/10.1002/2014JB011077">10.1002/2014JB011077</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1608,7 +1627,7 @@ doi:<a class="reference external" href="https://doi.org/10.1002/2014JB011077">10
 <span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.to_json" title="Permalink to this definition"></a></dt>
 <dd><p>Export network configuration to a JSON file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Path of output JSON file.</p>
 </dd>
 </dl>
@@ -1627,7 +1646,7 @@ doi:<a class="reference external" href="https://doi.org/10.1002/2014JB011077">10
 <dd><p>Convenience method that resets any frozen parameters for a certain timeseries
 at every station.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to to unfreeze the models for.</p></li>
 <li><p><strong>model_list</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), freeze all models. If a list of strings, only
@@ -1650,7 +1669,7 @@ freeze the corresponding models in the collection.</p></li>
 <dd><p>Perform input checks for the structure of <code class="docutils literal notranslate"><span class="pre">models</span></code> and if successful,
 update <a class="reference internal" href="#disstans.network.Network.default_local_models" title="disstans.network.Network.default_local_models"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_local_models</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary of structure <code class="docutils literal notranslate"><span class="pre">{model_name:</span> <span class="pre">{&quot;type&quot;:</span> <span class="pre">modelclass,</span> <span class="pre">&quot;kw_args&quot;:</span>
 <span class="pre">{**kw_args}}}</span></code> that contains the names, types and necessary keyword arguments
 to create each model object (see <a class="reference internal" href="models.html#disstans.models.check_model_dict" title="disstans.models.check_model_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_model_dict()</span></code></a>).</p>
@@ -1663,7 +1682,7 @@ to create each model object (see <a class="reference internal" href="models.html
 <span class="sig-name descname"><span class="pre">wormplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_animation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">en_col_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_stations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'format':</span> <span class="pre">'png'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_ref_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/network.html#Network.wormplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.network.Network.wormplot" title="Permalink to this definition"></a></dt>
 <dd><p>Creates an animated worm plot given the data in a timeseries.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><em>tuple</em></a>) – Specifies the timeseries to plot. If a string, the name of a timeseries
 directly associated with a station, and if a tuple, specifies the timeseries

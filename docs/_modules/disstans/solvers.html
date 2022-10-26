@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.solvers &mdash; DISSTANS 1.1 documentation</title>
+  <title>disstans.solvers &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -31,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -80,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -121,7 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
@@ -164,7 +165,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -953,6 +956,7 @@
                      <span class="n">reweight_max_rss</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">reweight_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reweight_coupled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">use_internal_scales</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cov_zero_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">return_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">check_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">cvxpy_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;CVXOPT&quot;</span><span class="p">,</span> <span class="s2">&quot;kktsolver&quot;</span><span class="p">:</span> <span class="s2">&quot;robust&quot;</span><span class="p">}):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs linear, L1-regularized least squares using</span>
@@ -1047,6 +1051,9 @@
 <span class="sd">        When reweighting is active, set to ``True`` to return the weights after the last</span>
 <span class="sd">        update.</span>
 <span class="sd">        Defaults to ``False``.</span>
+<span class="sd">    check_constraints : bool, optional</span>
+<span class="sd">        If ``True`` (default), check whether models have sign constraints that should</span>
+<span class="sd">        be enforced.</span>
 <span class="sd">    cvxpy_kw_args : dict</span>
 <span class="sd">        Additional keyword arguments passed on to CVXPY&#39;s ``solve()`` function.</span>
 <span class="sd">        By default, the CVXPY solver options are set to use CVXOPT as the solver</span>
@@ -1126,8 +1133,9 @@
 
     <span class="c1"># get mapping and regularization matrix</span>
     <span class="n">G</span><span class="p">,</span> <span class="n">obs_indices</span><span class="p">,</span> <span class="n">num_time</span><span class="p">,</span> <span class="n">num_params</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">num_obs</span><span class="p">,</span> <span class="n">num_reg</span><span class="p">,</span> <span class="n">reg_indices</span><span class="p">,</span> \
-        <span class="n">reweight_init</span><span class="p">,</span> <span class="n">weights_scaling</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">prepare_LS</span><span class="p">(</span>
-            <span class="n">ts</span><span class="p">,</span> <span class="n">reweight_init</span><span class="o">=</span><span class="n">reweight_init</span><span class="p">,</span> <span class="n">use_internal_scales</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">reweight_init</span><span class="p">,</span> <span class="n">weights_scaling</span><span class="p">,</span> <span class="n">sign_constraints</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">prepare_LS</span><span class="p">(</span>
+            <span class="n">ts</span><span class="p">,</span> <span class="n">reweight_init</span><span class="o">=</span><span class="n">reweight_init</span><span class="p">,</span> <span class="n">use_internal_scales</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">check_constraints</span><span class="o">=</span><span class="n">check_constraints</span><span class="p">)</span>
     <span class="c1"># determine if a shortcut is possible</span>
     <span class="n">regularize</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_reg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">penalty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">regularize</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">reweight_max_iters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -1148,13 +1156,24 @@
     <span class="k">if</span> <span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">cov_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">use_data_covariance</span><span class="p">:</span>
         <span class="n">reg_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">reg_indices</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">)</span>
         <span class="n">weights_scaling</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">weights_scaling</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">)</span>
+    <span class="c1"># create constraint indices</span>
+    <span class="k">if</span> <span class="n">check_constraints</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sign_constraints</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">nonneg_indices</span> <span class="o">=</span> <span class="n">sign_constraints</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">nonpos_indices</span> <span class="o">=</span> <span class="n">sign_constraints</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">check_constraints</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># solve CVXPY problem while checking for convergence</span>
-    <span class="k">def</span> <span class="nf">solve_problem</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">pen</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">init_weights</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">solve_problem</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">pen</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">init_weights</span><span class="p">,</span> <span class="n">nonneg</span><span class="p">,</span> <span class="n">nonpos</span><span class="p">):</span>
         <span class="c1"># build objective function</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">GtWd</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="n">objective</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">GtWG</span> <span class="o">@</span> <span class="n">m</span> <span class="o">-</span> <span class="n">GtWd</span><span class="p">)</span>
-        <span class="n">constraints</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">check_constraints</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nonneg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">nonneg</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nonpos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">nonpos</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">regularize</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">reweight_max_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">reweight_size</span> <span class="o">=</span> <span class="n">num_reg</span> <span class="o">*</span> <span class="n">num_comps</span>
@@ -1175,7 +1194,7 @@
                     <span class="n">lambd</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">()</span> <span class="k">if</span> <span class="n">num_comps</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">pen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
                                          <span class="n">value</span><span class="o">=</span><span class="n">pen</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">objective</span> <span class="o">=</span> <span class="n">objective</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">lambd</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
-                <span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span> <span class="o">==</span> <span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">])]</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span> <span class="o">==</span> <span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">]))</span>
                 <span class="n">old_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">lambd</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">()</span> <span class="k">if</span> <span class="n">num_comps</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">pen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
@@ -1239,7 +1258,15 @@
                 <span class="n">ts</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">obs_indices</span><span class="p">,</span> <span class="n">icomp</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">return_W_G</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_var</span><span class="o">=</span><span class="n">use_data_variance</span><span class="p">)</span>
             <span class="n">solution</span><span class="p">,</span> <span class="n">wts</span> <span class="o">=</span> <span class="n">solve_problem</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="n">penalty</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">num_comps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                           <span class="n">init_weights</span><span class="o">=</span><span class="n">reweight_init</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
-                                          <span class="k">if</span> <span class="n">reweight_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                                          <span class="k">if</span> <span class="n">reweight_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                          <span class="n">nonneg</span><span class="o">=</span><span class="n">nonneg_indices</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+                                          <span class="k">if</span> <span class="n">check_constraints</span>
+                                          <span class="ow">and</span> <span class="n">nonneg_indices</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                          <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                          <span class="n">nonpos</span><span class="o">=</span><span class="n">nonpos_indices</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+                                          <span class="k">if</span> <span class="n">check_constraints</span>
+                                          <span class="ow">and</span> <span class="n">nonpos_indices</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                          <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
             <span class="c1"># store results</span>
             <span class="k">if</span> <span class="n">solution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">params</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
@@ -1279,7 +1306,13 @@
         <span class="n">solution</span><span class="p">,</span> <span class="n">wts</span> <span class="o">=</span> <span class="n">solve_problem</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">penalty</span><span class="p">,</span> <span class="n">num_reg</span><span class="p">),</span>
                                       <span class="n">num_comps</span><span class="o">=</span><span class="n">num_comps</span><span class="p">,</span>
                                       <span class="n">init_weights</span><span class="o">=</span><span class="n">reweight_init</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-                                      <span class="k">if</span> <span class="n">reweight_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                                      <span class="k">if</span> <span class="n">reweight_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">nonneg</span><span class="o">=</span><span class="n">nonneg_indices</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                                      <span class="k">if</span> <span class="n">check_constraints</span> <span class="ow">and</span> <span class="n">nonneg_indices</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                      <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">nonpos</span><span class="o">=</span><span class="n">nonpos_indices</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                                      <span class="k">if</span> <span class="n">check_constraints</span> <span class="ow">and</span> <span class="n">nonpos_indices</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                                      <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># store results</span>
         <span class="k">if</span> <span class="n">solution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_obs</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">))</span>

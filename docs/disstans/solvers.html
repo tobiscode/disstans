@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solvers &mdash; DISSTANS 1.1 documentation</title>
+  <title>Solvers &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -169,7 +169,9 @@
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -293,7 +295,7 @@ of stations.</p>
 in this module, and distributes the parameters, covariances, and weights (where
 present) into the respective models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>disstans.models.ModelCollection</strong> – Model collection object that describes which models were used by the solver.</p></li>
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Model collection parameters of shape
@@ -325,7 +327,7 @@ in the dictionary for the same model, <code class="docutils literal notranslate"
 raising an error (e.g. if the same model is site-specific and has different
 numbers of parameters).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary of Solution objects.</p></li>
 <li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the model to aggregate the parameters, variances and weights for.</p></li>
@@ -341,7 +343,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 else <a class="reference internal" href="#disstans.solvers.Solution.parameters_zeroed" title="disstans.solvers.Solution.parameters_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters_zeroed</span></code></a> and <a class="reference internal" href="#disstans.solvers.Solution.covariances_zeroed" title="disstans.solvers.Solution.covariances_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances_zeroed</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>numpy.ndarray</em> – If <code class="docutils literal notranslate"><span class="pre">stack_parameters=True</span></code>, the stacked model parameters.</p></li>
 <li><p><em>numpy.ndarray</em> – If <code class="docutils literal notranslate"><span class="pre">stack_covariances=True</span></code> and covariances are present in the models,
@@ -360,17 +362,17 @@ the stacked weights, <code class="docutils literal notranslate"><span class="pre
 <dd><p>Helper function that uses <a class="reference internal" href="#disstans.solvers.Solution.get_model_indices" title="disstans.solvers.Solution.get_model_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_indices()</span></code></a> to quickly
 return the covariances for (a) specific model(s).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p></li>
 <li><p><strong>zeroed</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), use <a class="reference internal" href="#disstans.solvers.Solution.covariances" title="disstans.solvers.Solution.covariances"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances</span></code></a>, else
 <a class="reference internal" href="#disstans.solvers.Solution.covariances_zeroed" title="disstans.solvers.Solution.covariances_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances_zeroed</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Covariances of the model subset.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -383,17 +385,17 @@ return the covariances for (a) specific model(s).</p>
 can be used to extract the relevant entries from <a class="reference internal" href="#disstans.solvers.Solution.parameters" title="disstans.solvers.Solution.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a> and
 <a class="reference internal" href="#disstans.solvers.Solution.covariances" title="disstans.solvers.Solution.covariances"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p></li>
 <li><p><strong>for_cov</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), return the indices for <a class="reference internal" href="#disstans.solvers.Solution.parameters" title="disstans.solvers.Solution.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a>, otherwise
 for <a class="reference internal" href="#disstans.solvers.Solution.covariances" title="disstans.solvers.Solution.covariances"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances</span></code></a></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Integer index array for the models.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -405,17 +407,17 @@ for <a class="reference internal" href="#disstans.solvers.Solution.covariances" 
 <dd><p>Helper function that uses <a class="reference internal" href="#disstans.solvers.Solution.get_model_indices" title="disstans.solvers.Solution.get_model_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_indices()</span></code></a> to quickly
 return the parameters for (a) specific model(s).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p></li>
 <li><p><strong>zeroed</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), use <a class="reference internal" href="#disstans.solvers.Solution.parameters" title="disstans.solvers.Solution.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a>, else
 <a class="reference internal" href="#disstans.solvers.Solution.parameters_zeroed" title="disstans.solvers.Solution.parameters_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters_zeroed</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Parameters of the model subset.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -427,13 +429,13 @@ return the parameters for (a) specific model(s).</p>
 <dd><p>Helper function that uses <a class="reference internal" href="#disstans.solvers.Solution.get_model_indices" title="disstans.solvers.Solution.get_model_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_indices()</span></code></a> to quickly
 return the weights for specific model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Weights of the model parameter subset.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -516,7 +518,7 @@ could not be estimated because of a solver failure (and which are NaNs).</p>
 <h3>lasso_regression<a class="headerlink" href="#lasso-regression" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.solvers.lasso_regression">
-<span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">lasso_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_max_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_max_rss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_coupled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_internal_scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvxpy_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'kktsolver':</span> <span class="pre">'robust',</span> <span class="pre">'solver':</span> <span class="pre">'CVXOPT'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#lasso_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.lasso_regression" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">lasso_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_max_iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_max_rss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reweight_coupled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_internal_scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_zero_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvxpy_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'kktsolver':</span> <span class="pre">'robust',</span> <span class="pre">'solver':</span> <span class="pre">'CVXOPT'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#lasso_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.lasso_regression" title="Permalink to this definition"></a></dt>
 <dd><p>Performs linear, L1-regularized least squares using
 <a class="reference external" href="https://www.cvxpy.org/index.html">CVXPY</a>.</p>
 <p>The timeseries are the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and the models’ mapping
@@ -549,7 +551,7 @@ those same rows and columns. (This definition might very well be mathematically
 or algorithmically wrong - there probably needs to be some dependence on the
 reweighting function.)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to fit.</p></li>
 <li><p><strong>models</strong> (<a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection used for fitting.</p></li>
@@ -589,6 +591,8 @@ Internal scales are always respected.</p></li>
 <li><p><strong>return_weights</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – When reweighting is active, set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to return the weights after the last
 update.
 Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>check_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), check whether models have sign constraints that should
+be enforced.</p></li>
 <li><p><strong>cvxpy_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Additional keyword arguments passed on to CVXPY’s <code class="docutils literal notranslate"><span class="pre">solve()</span></code> function.
 By default, the CVXPY solver options are set to use CVXOPT as the solver
 library, together with CVXPY’s <em>robust</em> <code class="docutils literal notranslate"><span class="pre">kktsolver</span></code> option. This slows down
@@ -597,10 +601,10 @@ when using L1 regularization. If you want to switch to default CVXPY settings,
 pass an empty dictionary.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Result of the regression.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.Solution" title="disstans.solvers.Solution">Solution</a></p>
 </dd>
 </dl>
@@ -641,16 +645,14 @@ of whether initial weights are passed or not.)</p>
 reweighting functions for the same input parameters can differ significantly, even
 with the same <code class="docutils literal notranslate"><span class="pre">penalty</span></code>.</p>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="candes08" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>candes08<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>)</span>
-<p>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008).
+<dl class="citation">
+<dt class="label" id="candes08"><span class="brackets">candes08</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>)</span></dt>
+<dd><p>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008).
 <em>Enhancing Sparsity by Reweighted</em> <span class="math notranslate nohighlight">\(\ell_1\)</span> <em>Minimization.</em>
 Journal of Fourier Analysis and Applications, 14(5), 877–905.
 doi:<a class="reference external" href="https://doi.org/10.1007/s00041-008-9045-x">10.1007/s00041-008-9045-x</a>.</p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -679,7 +681,7 @@ matrices are stacked together to form a single mapping matrix
 <div class="math notranslate nohighlight">
 \[\mathbf{C}_m = \left( \mathbf{G}^T \mathbf{C}_d \mathbf{G} \right)^g\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to fit.</p></li>
 <li><p><strong>models</strong> (<a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection used for fitting.</p></li>
@@ -690,10 +692,10 @@ uncertainty information will be used.</p></li>
 <code class="docutils literal notranslate"><span class="pre">use_data_variance</span></code> is also <code class="docutils literal notranslate"><span class="pre">True</span></code>, this uncertainty information will be used.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Result of the regression.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.Solution" title="disstans.solvers.Solution">Solution</a></p>
 </dd>
 </dl>
@@ -731,7 +733,7 @@ not designated to be regularized (see <a class="reference internal" href="models
 <p>where the subscript <span class="math notranslate nohighlight">\(_\text{reg}\)</span> masks to zero the entries corresponding
 to non-regularized model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to fit.</p></li>
 <li><p><strong>models</strong> (<a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection used for fitting.</p></li>
@@ -745,10 +747,10 @@ uncertainty information will be used.</p></li>
 <code class="docutils literal notranslate"><span class="pre">use_data_variance</span></code> is also <code class="docutils literal notranslate"><span class="pre">True</span></code>, this uncertainty information will be used.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Result of the regression.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.Solution" title="disstans.solvers.Solution">Solution</a></p>
 </dd>
 </dl>
@@ -770,7 +772,7 @@ parameter is set. Inheriting child classes need to define the
 Instantiated reweighting functions objects can be used as functions but
 still provide access to the <a class="reference internal" href="#disstans.solvers.ReweightingFunction.eps" title="disstans.solvers.ReweightingFunction.eps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eps</span></code></a> parameter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Stability parameter to use for the reweighting function.</p></li>
 <li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Scale parameter applied to reweighting result.</p></li>
@@ -789,17 +791,17 @@ still provide access to the <a class="reference internal" href="#disstans.solver
 <dd><p>Search the local namespace for a reweighting function of that name
 and return an initialized instance of it.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name (or abbreviation) of the reweighting function.</p></li>
 <li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Argument list passed on to function initialization.</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Keyword arguments passed on to function initialization.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An instantiated reweighting function object.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.ReweightingFunction" title="disstans.solvers.ReweightingFunction">ReweightingFunction</a></p>
 </dd>
 </dl>
@@ -835,7 +837,7 @@ and return an initialized instance of it.</p>
 <span class="math notranslate nohighlight">\(\frac{1}{\text{eps}}\)</span>, and the minimum penalty approaches zero
 asymptotically.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
 </dd>
 </dl>
@@ -859,7 +861,7 @@ asymptotically.</p>
 <span class="math notranslate nohighlight">\(\frac{1}{\text{eps}^2}\)</span>, and the minimum penalty approaches zero
 asymptotically.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
 </dd>
 </dl>
@@ -890,19 +892,18 @@ If there is only a single nonzero value, its penalty will be zero (at
 In the intermediate cases where multiple values are nonzero, their penalties will
 be distributed on a logarithmic slope between the <span class="math notranslate nohighlight">\(y\)</span>-intercept and zero.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="andrecut11" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">andrecut11</a><span class="fn-bracket">]</span></span>
-<p>Andrecut, M. (2011).
+<dl class="citation">
+<dt class="label" id="andrecut11"><span class="brackets"><a class="fn-backref" href="#id4">andrecut11</a></span></dt>
+<dd><p>Andrecut, M. (2011).
 <em>Stochastic Recovery Of Sparse Signals From Random Measurements.</em>
 Engineering Letters, 19(1), 1-6.</p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

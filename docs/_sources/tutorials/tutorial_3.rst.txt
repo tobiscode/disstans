@@ -276,11 +276,13 @@ Let's have a look at the summary of the first station to see what we added:
      - Source: synthetic
      - Units: mm
      - Shape: (3654, 2)
+     - Offset Removed: False
      - Data: ['E', 'N']
     Raw
      - Source: synthetic
      - Units: mm
      - Shape: (3654, 2)
+     - Offset Removed: False
      - Data: ['E', 'N']
      - Variances: ['E_var', 'N_var']
      - Covariances: ['E_N_cov']
@@ -377,11 +379,13 @@ To inspect the result, we can again have a look at the network with
      - Source: synthetic
      - Units: mm
      - Shape: (3654, 2)
+     - Offset Removed: False
      - Data: ['E', 'N']
     Raw
      - Source: synthetic
      - Units: mm
      - Shape: (3654, 2)
+     - Offset Removed: False
      - Data: ['E', 'N']
      - Variances: ['E_var', 'N_var']
      - Covariances: ['E_N_cov']
@@ -389,6 +393,7 @@ To inspect the result, we can again have a look at the network with
      - Source: synthetic-decompose
      - Units: mm
      - Shape: (3654, 2)
+     - Offset Removed: False
      - Data: ['E', 'N']
      - Variances: ['E_var', 'N_var']
      - Covariances: ['E_N_cov']

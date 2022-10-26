@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.timeseries &mdash; DISSTANS 1.1 documentation</title>
+  <title>disstans.timeseries &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -31,7 +31,7 @@
             <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -80,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#statistics-of-spatial-reweighting">Statistics of spatial reweighting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#model-parameter-correlations">Model parameter correlations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#transient-visualization-with-worm-plots">Transient visualization with worm plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_3.html#secular-velocity-comparisons">Secular velocity comparisons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_4.html">Tutorial 4: The use and estimation of covariance</a><ul>
@@ -121,7 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_1.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Method Comparisons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/example_2.html">Example 2: Long Valley Caldera Comparisons</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#preparations">Preparations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#homogenous-translation-rotation-and-strain">Homogenous translation, rotation, and strain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#rotation-about-an-euler-pole">Rotation about an Euler pole</a></li>
@@ -164,7 +165,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -280,10 +283,14 @@
 <span class="sd">formats included by default in DISSTANS.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">get_cov_dims</span><span class="p">,</span> <span class="n">make_cov_index_map</span><span class="p">,</span> <span class="n">get_cov_indices</span>
 
@@ -322,6 +329,10 @@
 <span class="sd">        the order of the elements is determined by their row-by-row, sequential</span>
 <span class="sd">        position in the covariance matrix (see Notes).</span>
 <span class="sd">        Defaults to no covariance columns.</span>
+<span class="sd">    remove_initial_offset : bool, optional</span>
+<span class="sd">        If ``True`` (default: ``False``), the data timeseries will be shifted such</span>
+<span class="sd">        that it starts at zero. The offset will be recorded in</span>
+<span class="sd">        :class:`~Timeseries.offset` if it needs to be recovered.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -339,9 +350,11 @@
 <span class="sd">    +-------------------+-------------------+-------------------+</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">data_unit</span><span class="p">,</span> <span class="n">data_cols</span><span class="p">,</span>
-                 <span class="n">var_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cov_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">var_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cov_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_initial_offset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># input type checks</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">inferred_type</span> <span class="o">==</span> <span class="s2">&quot;datetime64&quot;</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dtypes</span><span class="p">])</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_cols</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dcol</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">dcol</span> <span class="ow">in</span> <span class="n">data_cols</span><span class="p">])</span>
@@ -391,6 +404,14 @@
 <span class="sd">            matrix for a single time.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_cols</span> <span class="o">=</span> <span class="n">cov_cols</span>
+        <span class="c1"># shift data to zero if desired</span>
+        <span class="k">if</span> <span class="n">remove_initial_offset</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span> <span class="o">-=</span> <span class="n">offset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="sd">&quot;&quot;&quot; Offset applied to the timeseries data such that it starts at zero. &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Timeseries.__str__"><a class="viewcode-back" href="../../disstans/timeseries.html#disstans.timeseries.Timeseries.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -403,7 +424,8 @@
 <span class="sd">            Timeseries summary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Timeseries</span><span class="se">\n</span><span class="s2"> - Source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="si">}</span><span class="se">\n</span><span class="s2"> - Units: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">&quot;</span> \
-               <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Shape: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="se">\n</span><span class="s2"> - Data: </span><span class="si">{</span><span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Shape: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="se">\n</span><span class="s2"> - Offset Removed: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="si">}</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Data: </span><span class="si">{</span><span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cols</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Variances: </span><span class="si">{</span><span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_cols</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1387,6 +1409,9 @@
 <span class="sd">    data_unit : str, optional</span>
 <span class="sd">        Can be ``&#39;mm&#39;`` (default) or ``&#39;m&#39;``.</span>
 
+
+<span class="sd">    Additional keyword arguments will be passed onto :class:`~Timeseries`.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 
@@ -1417,7 +1442,7 @@
 <span class="sd">repro2018a/raw/position/envseries/0000_README.format</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
             <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1461,7 +1486,8 @@
             <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># construct Timeseries object</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.tseries&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="n">data_unit</span><span class="p">,</span>
-                         <span class="n">data_cols</span><span class="o">=</span><span class="n">data_cols</span><span class="p">,</span> <span class="n">var_cols</span><span class="o">=</span><span class="n">var_cols</span><span class="p">,</span> <span class="n">cov_cols</span><span class="o">=</span><span class="n">cov_cols</span><span class="p">)</span>
+                         <span class="n">data_cols</span><span class="o">=</span><span class="n">data_cols</span><span class="p">,</span> <span class="n">var_cols</span><span class="o">=</span><span class="n">var_cols</span><span class="p">,</span> <span class="n">cov_cols</span><span class="o">=</span><span class="n">cov_cols</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GipsyTimeseries.get_arch"><a class="viewcode-back" href="../../disstans/timeseries.html#disstans.timeseries.GipsyTimeseries.get_arch">[docs]</a>    <span class="k">def</span> <span class="nf">get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1497,6 +1523,9 @@
 <span class="sd">        Defaults to ``True``.</span>
 <span class="sd">    data_unit : str, optional</span>
 <span class="sd">        Can be ``&#39;mm&#39;`` (default) or ``&#39;m&#39;``.</span>
+
+
+<span class="sd">    Additional keyword arguments will be passed onto :class:`~Timeseries`.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1550,7 +1579,7 @@
 <span class="sd">    .. _UNR&#39;s website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
             <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1626,7 +1655,8 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.tenv3&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="n">data_unit</span><span class="p">,</span>
                          <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">],</span>
                          <span class="n">var_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east_var&quot;</span><span class="p">,</span> <span class="s2">&quot;north_var&quot;</span><span class="p">,</span> <span class="s2">&quot;up_var&quot;</span><span class="p">],</span>
-                         <span class="n">cov_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east_north_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;east_up_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;north_up_cov&quot;</span><span class="p">])</span>
+                         <span class="n">cov_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east_north_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;east_up_cov&quot;</span><span class="p">,</span> <span class="s2">&quot;north_up_cov&quot;</span><span class="p">],</span>
+                         <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UNRTimeseries.get_arch"><a class="viewcode-back" href="../../disstans/timeseries.html#disstans.timeseries.UNRTimeseries.get_arch">[docs]</a>    <span class="k">def</span> <span class="nf">get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1644,6 +1674,171 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;UNRTimeseries&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">}}</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">UNRHighRateTimeseries</span><span class="p">(</span><span class="n">Timeseries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Subclasses :class:`~Timeseries`.</span>
+
+<span class="sd">    Timeseries subclass for GNSS measurements in UNR&#39;s ``.kenv`` file format.</span>
+<span class="sd">    The data and (co)variances are converted into millimeters (squared).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the timeseries file.</span>
+<span class="sd">    show_warnings : bool, optional</span>
+<span class="sd">        If ``True``, warn if there are data inconsistencies encountered while loading.</span>
+<span class="sd">        Defaults to ``True``.</span>
+<span class="sd">    data_unit : str, optional</span>
+<span class="sd">        Can be ``&#39;mm&#39;`` (default) or ``&#39;m&#39;``.</span>
+
+
+<span class="sd">    Additional keyword arguments will be passed onto :class:`~Timeseries`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The column format is described on `UNR&#39;s website`_:</span>
+
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Columns       | Description                                       |</span>
+<span class="sd">    +===============+===================================================+</span>
+<span class="sd">    | Column 1      | Station name                                      |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Column 2      | GPS seconds since J2000                           |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Column 3      | Modified Julian Day for GPS day                   |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Columns 4-7   | Year, month, day of month, day of year            |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Column 8      | Seconds of the GPS day                            |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Columns 9-11  | East, North, Up from reference location           |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Columns 12-14 | East, North, Up from daily mean position          |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+<span class="sd">    | Columns 15-17 | East, North, Up standard deviations               |</span>
+<span class="sd">    +---------------+---------------------------------------------------+</span>
+
+<span class="sd">    Note that only the location timeseries relative to the reference locations</span>
+<span class="sd">    is loaded.</span>
+<span class="sd">    The timestamp associated with each observation is in Terrestrial Time.</span>
+
+<span class="sd">    .. _UNR&#39;s website: http://geodesy.unr.edu/gps_timeseries/README_kenv.txt</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">show_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">data_unit</span> <span class="o">==</span> <span class="s2">&quot;mm&quot;</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;data_unit&#39; needs to be &#39;mm&#39; or &#39;m&#39;, got </span><span class="si">{</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="c1"># load data</span>
+        <span class="n">pathobj</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+        <span class="c1"># if the path is a folder or a .kenv.zip file, we need to concatenate files</span>
+        <span class="k">if</span> <span class="n">pathobj</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">or</span> <span class="n">pathobj</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;*.kenv.zip&quot;</span><span class="p">):</span>
+            <span class="c1"># collect list of files if path is a folder</span>
+            <span class="k">if</span> <span class="n">pathobj</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">paths_years</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pathobj</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.kenv.zip&quot;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">paths_years</span> <span class="o">=</span> <span class="p">[</span><span class="n">pathobj</span><span class="p">]</span>
+            <span class="c1"># initialize memory buffer for pandas later</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+            <span class="c1"># loop over years</span>
+            <span class="k">for</span> <span class="n">path_y</span> <span class="ow">in</span> <span class="n">paths_years</span><span class="p">:</span>
+                <span class="c1"># unzip year</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path_y</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_y</span><span class="p">:</span>
+                        <span class="c1"># get list of daily compressed files</span>
+                        <span class="n">paths_days</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">zip_y</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span>
+                        <span class="c1"># load every day</span>
+                        <span class="k">for</span> <span class="n">path_d</span> <span class="ow">in</span> <span class="n">paths_days</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">zip_y</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_d</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_d</span><span class="p">:</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">zip_d</span><span class="p">)</span> <span class="k">as</span> <span class="n">gz_d</span><span class="p">:</span>
+                                        <span class="c1"># skip header line</span>
+                                        <span class="n">gz_d</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                                        <span class="c1"># write to buffer</span>
+                                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">gz_d</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                                <span class="k">except</span> <span class="n">gzip</span><span class="o">.</span><span class="n">BadGzipFile</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error extracting the file </span><span class="si">{</span><span class="n">path_y</span><span class="si">}</span><span class="s2">.&quot;</span>
+                                                       <span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">zipfile</span><span class="o">.</span><span class="n">BadZipFile</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">LargeZipFile</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error extracting the file </span><span class="si">{</span><span class="n">path_y</span><span class="si">}</span><span class="s2">.&quot;</span>
+                                       <span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="c1"># load data into pandas</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">,</span> <span class="s2">&quot;sec-J2000&quot;</span><span class="p">,</span> <span class="s2">&quot;___e-ref(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;___n-ref(m)&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;___v-ref(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_e(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_n(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_v(m)&quot;</span><span class="p">],</span>
+                             <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">17</span><span class="p">)))</span>
+        <span class="c1"># if the path is a .kenv.gz file, we only need to extract the single file</span>
+        <span class="k">elif</span> <span class="n">pathobj</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;*.kenv.gz&quot;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">17</span><span class="p">)))</span>
+        <span class="c1"># in all other cases, try loading directly</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">17</span><span class="p">)))</span>
+        <span class="c1"># check for duplicate sites</span>
+        <span class="k">if</span> <span class="n">show_warnings</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timeseries file/folder </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s2"> contains multiple site codes: &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># remove site column</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># convert data units</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;___e-ref(m)&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;___n-ref(m)&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;___v-ref(m)&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="c1"># convert to variance and change units</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_e(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_n(m)&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_n(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_v(m)&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sig_v(m)&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c1"># check for duplicate timestamps</span>
+        <span class="n">num_duplicates</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s2">&quot;sec-J2000&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">show_warnings</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_duplicates</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timeseries file/folder </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s2"> contains data for </span><span class="si">{</span><span class="n">num_duplicates</span><span class="si">}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot;duplicate timestamps. Keeping first occurrences.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s2">&quot;sec-J2000&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># create time index and rename columns</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;sec-J2000&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2000-01-01 12:00:00&quot;</span><span class="p">)</span> <span class="o">+</span>
+                           <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;sec-J2000&quot;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">))</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;___e-ref(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_e(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;east_var&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;___n-ref(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_n(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;north_var&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;___v-ref(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span> <span class="s2">&quot;sig_v(m)&quot;</span><span class="p">:</span> <span class="s2">&quot;up_var&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;sec-J2000&quot;</span><span class="p">:</span> <span class="s2">&quot;time&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># check for monotonic time index</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timeseries file/folder </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s2"> is not ordered in time, sorting it now.&quot;</span><span class="p">,</span>
+                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># construct Timeseries object</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;.kenv&quot;</span><span class="p">,</span> <span class="n">data_unit</span><span class="o">=</span><span class="n">data_unit</span><span class="p">,</span>
+                         <span class="n">data_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;north&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">],</span>
+                         <span class="n">var_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;east_var&quot;</span><span class="p">,</span> <span class="s2">&quot;north_var&quot;</span><span class="p">,</span> <span class="s2">&quot;up_var&quot;</span><span class="p">],</span>
+                         <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a JSON-compatible dictionary with all the information necessary to recreate</span>
+<span class="sd">        the Timeseries instance (provided the data file is available).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            JSON-compatible dictionary sufficient to recreate the UNRTimeseries instance.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Timeseries.get_arch : For further information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;UNRHighRateTimeseries&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;kw_args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">}}</span>
 </pre></div>
 
            </div>

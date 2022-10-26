@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Earthquakes &mdash; DISSTANS 1.1 documentation</title>
+  <title>Earthquakes &mdash; DISSTANS 1.2-beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -35,7 +35,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.1
+                1.2-beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -169,7 +169,9 @@
 <li class="toctree-l3"><a class="reference internal" href="models.html#spline-models">Spline Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#bspline">BSpline</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ispline">ISpline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#basesplineset">BaseSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#splineset">SplineSet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#decayingsplineset">DecayingSplineSet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#ampphmodulatedsinusoid">AmpPhModulatedSinusoid</a></li>
 </ul>
 </li>
@@ -290,16 +292,16 @@ of earthquakes.</p>
 <dd><p>For a single station and a single row from the earthquake catalog as defined by
 <a class="reference internal" href="#disstans.earthquakes.okada_prior" title="disstans.earthquakes.okada_prior"><code class="xref py py-func docutils literal notranslate"><span class="pre">okada_prior()</span></code></a>, calculate the estimated displacement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>station_lla</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Location of the station, see <a class="reference internal" href="station.html#disstans.station.Station.location" title="disstans.station.Station.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location</span></code></a>.</p></li>
 <li><p><strong>eq_catalog_row</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.4.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.4.2)"><em>pandas.Series</em></a>) – A single row of the earthquake catalog as defined by <a class="reference internal" href="#disstans.earthquakes.okada_prior" title="disstans.earthquakes.okada_prior"><code class="xref py py-func docutils literal notranslate"><span class="pre">okada_prior()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>station_disp</strong> – 3D displacement in mm.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -313,7 +315,7 @@ displacement for each of the stations in the network.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code> and <code class="docutils literal notranslate"><span class="pre">target_model</span></code> are passed, the function adds
 step models to the respective station’s timeseries and models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>network</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><em>Network</em></a>) – Network instance whose stations should be used.</p></li>
 <li><p><strong>catalog_path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – File name of the earthquake catalog to load. Currently, only the Japanese
@@ -327,10 +329,10 @@ Has to be passed if <code class="docutils literal notranslate"><span class="pre"
 <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a> for explanations and defaults.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>eq_steps_dict</strong> – Dictionary of that maps the station names to a list of steptimes.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
@@ -343,6 +345,11 @@ Fortran and wrapped by the Python package <a class="reference external" href="ht
 <em>mxx,mxy,mxz,myy,myz,mzz,Unit(Nm),Number_of_Stations</em></p>
 <p>The keywords in <code class="docutils literal notranslate"><span class="pre">catalog_prior_kw_args</span></code> are:</p>
 <table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 7%" />
+<col style="width: 77%" />
+</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Keyword</p></th>
 <th class="head"><p>Units</p></th>
@@ -367,14 +374,13 @@ to surpass in order for a step to be added to the model.</p></td>
 </tbody>
 </table>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="okada92" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">okada92</a><span class="fn-bracket">]</span></span>
-<p>Okada, Y. (1992).
+<dl class="citation">
+<dt class="label" id="okada92"><span class="brackets"><a class="fn-backref" href="#id1">okada92</a></span></dt>
+<dd><p>Okada, Y. (1992).
 <em>Internal deformation due to shear and tensile faults in a half-space</em>.
 Bulletin of the Seismological Society of America, 82(2), 1018–1040.</p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -390,7 +396,7 @@ and <span class="math notranslate nohighlight">\(\text{M}_\text{w}\)</span> is t
 <p>If <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code> and <code class="docutils literal notranslate"><span class="pre">target_model</span></code> are passed, the function adds
 step models to the respective station’s timeseries and models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>network</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><em>Network</em></a>) – Network instance whose stations should be used.</p></li>
 <li><p><strong>catalog_path</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – File name of the earthquake catalog to load. Currently, only the Japanese
@@ -401,10 +407,10 @@ Has to be passed if <code class="docutils literal notranslate"><span class="pre"
 <li><p><strong>target_model_regularize</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to mark the model for regularization or not.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>eq_steps_dict</strong> – Dictionary of that maps the station names to a list of steptimes.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
 </dd>
 </dl>
