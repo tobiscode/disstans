@@ -1053,7 +1053,8 @@ class StepDetector():
         # make a list that will contain all individual result DataFrames
         step_tables = []
         # run parallelized StepDetector._search
-        stations_overlap = list(check_indices.keys())
+        stations_overlap = [sta_name for sta_name, chkix in check_indices.items()
+                            if len(chkix) > 0]
         iterable_input = ((tvec_to_numpycol(net[sta_name][ts_description].time),
                            net[sta_name][ts_description].data.values,
                            self.kernel_size, self.kernel_size_min,
