@@ -34,11 +34,10 @@ needs.
 
 ## Documentation
 
-A peer-reviewed study is currently in the works (see _Using and citing this work_ below)
+A peer-reviewed study has been published (see _Using and citing this work_ below)
 that explains the concept, inner workings, goals, and successes of DISSTANS in detail.
-You can find the preprint here:
-[Decomposition and Inference of Sources through Spatiotemporal Analysis of Network
-Signals: The DISSTANS Python Package](https://doi.org/10.31223/X56K9J).
+You can find the final version [here](https://doi.org/10.1016/j.cageo.2022.105247),
+and the accepted preprint [here](https://doi.org/10.31223/X56K9J).
 
 Furthermore, DISSTANS contains full code annotation, an API documentation, as well as
 tutorials and real-data examples that show the usage of the package.
@@ -79,11 +78,12 @@ Please note that this work is under a GPL-3.0 License.
 
 If you're using this code or any parts of it, please cite the following study:
 
-  T. Köhne, B. Riel, M. Simons (submitted to *Computers and Geosciences*).
-  *Decomposition and Inference of Sources through Spatiotemporal Analysis of*
-  *Network Signals: The DISSTANS Python Package*
+  Köhne, T., Riel, B., & Simons, M. (2023).
+  _Decomposition and Inference of Sources through Spatiotemporal Analysis of Network Signals:_
+  _The DISSTANS Python package._ Computers & Geosciences, 170, 105247.
+  DOI: [10.1016/j.cageo.2022.105247](https://doi.org/10.1016/j.cageo.2022.105247)
 
-You can find the preprint [here](https://doi.org/10.31223/X56K9J).
+You can find the accepted preprint [here](https://doi.org/10.31223/X56K9J).
 
 A poster introducing the code was presented at the AGU Fall Meeting 2021, you can
 find it [here](https://doi.org/10.1002/essoar.10509232.1).
