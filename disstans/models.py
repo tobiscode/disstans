@@ -609,10 +609,11 @@ class Model():
                     "Something went wrong: covariance for inactive parameters should be 0."
             self._cov = covariances
 
-    def evaluate(self, timevector):
+    def evaluate(self, timevector, return_full_covariance=False):
         r"""
-        Evaluate the model given a time vector (calculates :math:`\mathbf{d}`
-        and its (co)variance, if applicable).
+        Evaluate the model given a time vector, calculating the predicted timeseries
+        :math:`\mathbf{d} = \mathbf{Gm}` and (if applicable) its formal covariance matrix
+        :math:`\mathbf{C}_d^{\text{pred}} = \mathbf{G} \mathbf{C}_m \mathbf{G}^T`.
 
         This method ignores the parameters being set invalid by :meth:`~freeze`.
 
@@ -621,14 +622,22 @@ class Model():
         timevector : pandas.Series, pandas.DatetimeIndex
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+        return_full_covariance : bool, optional
+            By default (``False``) the covariances between timesteps are ignored,
+            and the returned dictionary will only include the component variances and
+            covariances for each timestep. If ``True``, the full covariance matrix
+            (between components and timesteps) will be returned instead.
 
         Returns
         -------
         dict
             Dictionary with the keys ``time`` containing the input time vector,
-            ``fit`` containing :math:`\mathbf{d}`, and ``var`` containing
-            the formal variance (or ``None``, if not present). ``fit`` and ``var``
+            ``fit`` containing :math:`\mathbf{d}`, ``var`` containing the formal
+            variance (or ``None``, if not present), and ``cov`` containing the formal
+            covariance (or ``None``, if not present). ``fit``, ``var`` and ``cov``
             (if not ``None``) are :class:`~numpy.ndarray` objects.
+            If ``return_full_covariance=True``, ``var`` will be omitted and the full
+            covariance matrix will be returned in ``cov``.
 
         Raises
         ------
@@ -661,7 +670,10 @@ class Model():
                                                        include_covariance=True)
         if fit.ndim == 1:
             fit = fit.reshape(-1, 1)
-        return {"time": timevector, "fit": fit, "var": fit_var, "cov": fit_cov}
+        if return_full_covariance:
+            return {"time": timevector, "fit": fit, "cov": pred_var}
+        else:
+            return {"time": timevector, "fit": fit, "var": fit_var, "cov": fit_cov}
 
 
 class Step(Model):
