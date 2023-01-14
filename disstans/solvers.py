@@ -478,7 +478,8 @@ class LogarithmicReweighting(ReweightingFunction):
 
 
 def linear_regression(ts, models, formal_covariance=False,
-                      use_data_variance=True, use_data_covariance=True):
+                      use_data_variance=True, use_data_covariance=True,
+                      check_constraints=True):
     r"""
     Performs linear, unregularized least squares using :mod:`~scipy.linalg`.
 
@@ -519,6 +520,9 @@ def linear_regression(ts, models, formal_covariance=False,
     use_data_covariance : bool, optional
         If ``True`` (default), ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+    check_constraints : bool, optional
+        If ``True`` (default), check whether models have sign constraints that should
+        be enforced.
 
     Returns
     -------
@@ -527,8 +531,16 @@ def linear_regression(ts, models, formal_covariance=False,
     """
 
     # get mapping matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps, num_obs = \
-        models.prepare_LS(ts, include_regularization=False)
+    G, obs_indices, num_time, num_params, num_comps, num_obs, sign_constraints = \
+        models.prepare_LS(ts, include_regularization=False, check_constraints=check_constraints)
+    # make constraint bounds
+    if check_constraints and np.isfinite(sign_constraints).sum() > 0:
+        bd_upper = np.inf * np.ones_like(sign_constraints)
+        bd_lower = -bd_upper
+        bd_upper[sign_constraints == -1] = 0
+        bd_lower[sign_constraints == 1] = 0
+    else:
+        check_constraints = False
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
@@ -541,7 +553,9 @@ def linear_regression(ts, models, formal_covariance=False,
         for i in range(num_comps):
             GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
                                          use_data_var=use_data_variance)
-            params[:, i] = sp.linalg.lstsq(GtWG, GtWd)[0].squeeze()
+            bounds = ((bd_lower[:, i], bd_upper[:, i]) if check_constraints
+                      else (-np.inf, np.inf))
+            params[:, i] = sp.optimize.lsq_linear(GtWG, GtWd, bounds=bounds).x.squeeze()
             if formal_covariance:
                 cov.append(sp.linalg.pinvh(GtWG))
         if formal_covariance:
@@ -552,7 +566,9 @@ def linear_regression(ts, models, formal_covariance=False,
     else:
         GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
                                      use_data_cov=use_data_covariance)
-        params = sp.linalg.lstsq(GtWG, GtWd)[0].reshape(num_obs, num_comps)
+        bounds = ((bd_lower, bd_upper) if check_constraints
+                  else (-np.inf, np.inf))
+        params = sp.optimize.lsq_linear(GtWG, GtWd, bounds=bounds).x.reshape(num_obs, num_comps)
         if formal_covariance:
             cov = sp.linalg.pinvh(GtWG)
 
@@ -562,7 +578,8 @@ def linear_regression(ts, models, formal_covariance=False,
 
 
 def ridge_regression(ts, models, penalty, formal_covariance=False,
-                     use_data_variance=True, use_data_covariance=True):
+                     use_data_variance=True, use_data_covariance=True,
+                     check_constraints=True):
     r"""
     Performs linear, L2-regularized least squares using :mod:`~scipy.linalg`.
 
@@ -614,6 +631,9 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
     use_data_covariance : bool, optional
         If ``True`` (default), ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+    check_constraints : bool, optional
+        If ``True`` (default), check whether models have sign constraints that should
+        be enforced.
 
     Returns
     -------
@@ -634,8 +654,16 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
              "one value larger than 0.", stacklevel=2)
 
     # get mapping and regularization matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, _, _ = \
-        models.prepare_LS(ts)
+    G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, \
+        _, _, sign_constraints = models.prepare_LS(ts, check_constraints=check_constraints)
+    # make constraint bounds
+    if check_constraints and np.isfinite(sign_constraints).sum() > 0:
+        bd_upper = np.inf * np.ones_like(sign_constraints)
+        bd_lower = -bd_upper
+        bd_upper[sign_constraints == -1] = 0
+        bd_lower[sign_constraints == 1] = 0
+    else:
+        check_constraints = False
 
     # perform fit and estimate formal covariance (uncertainty) of parameters
     # if there is no covariance, it's num_comps independent problems
@@ -650,7 +678,9 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
             GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
                                          use_data_var=use_data_variance)
             GtWGreg = GtWG + reg * penalty[i]
-            params[:, i] = sp.linalg.lstsq(GtWGreg, GtWd)[0].squeeze()
+            bounds = ((bd_lower[:, i], bd_upper[:, i]) if check_constraints
+                      else (-np.inf, np.inf))
+            params[:, i] = sp.optimize.lsq_linear(GtWGreg, GtWd, bounds=bounds).x.squeeze()
             if formal_covariance:
                 cov.append(sp.linalg.pinvh(GtWGreg))
         if formal_covariance:
@@ -663,7 +693,9 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
                                      use_data_cov=use_data_covariance)
         reg = np.diag((reg_indices.reshape(-1, 1) * penalty.reshape(1, -1)).ravel())
         GtWGreg = GtWG + reg
-        params = sp.linalg.lstsq(GtWGreg, GtWd)[0].reshape(num_obs, num_comps)
+        bounds = ((bd_lower, bd_upper) if check_constraints
+                  else (-np.inf, np.inf))
+        params = sp.optimize.lsq_linear(GtWGreg, GtWd).x.reshape(num_obs, num_comps)
         if formal_covariance:
             cov = sp.linalg.pinvh(GtWGreg)
 
