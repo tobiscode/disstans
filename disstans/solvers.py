@@ -121,6 +121,12 @@ class Solution():
         converged), ``False`` otherwise.
         """
 
+    def __contains__(self, mdl_description):
+        """
+        Special function to check whether the solution contains a certain model.
+        """
+        return mdl_description in self._model_slice_ranges
+
     def get_model_indices(self, models, for_cov=False):
         """
         Given a model name or multiple names, returns an array of integer indices that
