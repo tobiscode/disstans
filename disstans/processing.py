@@ -917,6 +917,12 @@ class StepDetector():
         # get the stations who have this timeseries
         valid_stations = {name: station for name, station in net.stations.items()
                           if ts_description in station.timeseries}
+        # early exit if no station containing that timeseries was found
+        if len(valid_stations) == 0:
+            warn(f"No station containing timeseries '{ts_description}' found.",
+                 stacklevel=2)
+            return pd.DataFrame(columns=["station", "time", "probability",
+                                         "var0", "var1", "varred"]), []
         # make a list that will contain all individual result DataFrames
         step_tables = []
         # run parallelized StepDetector._search
@@ -952,6 +958,10 @@ class StepDetector():
             # this code could be used to create a model object and assign it to the station
             # mdl = disstans.models.Step(steptimes)
             # station.add_local_model(ts_description, "Detections", mdl)
+        # return early if no steps were found
+        if len(step_tables) == 0:
+            return pd.DataFrame(columns=["station", "time", "probability",
+                                         "var0", "var1", "varred"]), []
         # combine individual DataFrames to one
         step_table = pd.concat(step_tables, ignore_index=True)
         # sort dataframe by probability
@@ -1037,6 +1047,13 @@ class StepDetector():
         # we also need to keep track of the originally requested time (for the output)
         catalog_timeexists = {sta_name: [False] * len(steptimes)
                               for sta_name, steptimes in catalog.items()}
+        # check if there is at least one station with the desired timeseries
+        if len([ts_description in net[sta_name].timeseries
+                for sta_name in catalog.keys()]) == 0:
+            warn(f"No station containing timeseries '{ts_description}' found.",
+                 stacklevel=2)
+            return pd.DataFrame(columns=["station", "time", "probability",
+                                         "var0", "var1", "varred"]), []
         for sta_name, steptimes in catalog.items():
             # skip if station or timeseries not present
             if (sta_name not in net.stations.keys()) or \
@@ -1051,6 +1068,10 @@ class StepDetector():
                     continue
                 else:
                     catalog_timeexists[sta_name][ist] = True
+        # return early if we found stations, but no timesteps to check
+        if not any([any(catalog_timeexists[sta_name]) for sta_name in catalog.keys()]):
+            return pd.DataFrame(columns=["station", "time", "probability",
+                                         "var0", "var1", "varred"]), []
         # make a list that will contain all individual result DataFrames
         step_tables = []
         # run parallelized StepDetector._search
@@ -1086,6 +1107,10 @@ class StepDetector():
                                              "probability": maxstepprobs,
                                              "var0": maxstepvar0,
                                              "var1": maxstepvar1}))
+        # return early if no steps were found
+        if len(step_tables) == 0:
+            return pd.DataFrame(columns=["station", "time", "probability",
+                                         "var0", "var1", "varred"]), []
         # combine individual DataFrames to one
         step_table = pd.concat(step_tables, ignore_index=True)
         # merge it with the input dataframe, if provided
