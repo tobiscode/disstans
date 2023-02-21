@@ -1369,13 +1369,13 @@ class Network():
                     for name in station_names:
                         if mdl_description in solutions[name]:
                             new_net_weights[name]["reweight_init"][mdl_description] = \
-                                solutions[name].weights_by_models(mdl_description)
+                                solutions[name].weights_by_model(mdl_description)
             # copying over the old weights for the continuous models
             for mdl_description in continuous_reweight_models:
                 for name in station_names:
                     if mdl_description in solutions[name]:
                         new_net_weights[name]["reweight_init"][mdl_description] = \
-                            solutions[name].weights_by_models(mdl_description)
+                            solutions[name].weights_by_model(mdl_description)
             # for models that were regularized but not spatially or continuously reweighted,
             # set the initial weights to penalty (such that it keeps a constant penalty)
             for name in station_names:
