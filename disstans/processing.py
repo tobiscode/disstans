@@ -120,13 +120,13 @@ class ExpandingRollingIndexer(BaseIndexer):
     For more information, see the pandas documentation about `custom window rolling
     <https://pandas.pydata.org/docs/user_guide/window.html#custom-window-rolling>`_.
     """
-    def get_window_bounds(self, num_values, min_periods, center, closed):
+    def get_window_bounds(self, num_values, min_periods, center, closed, step):
         """
         This is the function that needs to be implemented for the
         :class:`~pandas.api.indexers.BaseIndexer` class to be used for all
         rolling pandas operations. It shouldn't be called manually.
 
-        The parameters ``min_periods``, ``center``, and ``closed`` have to
+        The parameters ``min_periods``, ``center``, ``closed``, and ``step`` have to
         be included to match expected pandas behavior, but this function
         does not implement their potential features.
 

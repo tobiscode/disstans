@@ -3,7 +3,7 @@ scipy
 scikit-learn>=1.1
 matplotlib
 cartopy
-pandas>=1
+pandas>=1.5
 tqdm
 cvxpy>=1
 cvxopt
