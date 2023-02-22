@@ -2199,7 +2199,7 @@ class RINEXDataHolding():
             if isinstance(station, str):
                 station = [station]
             elif isinstance(station, list):
-                assert(all([isinstance(s, str) for s in station])), \
+                assert (all([isinstance(s, str) for s in station])), \
                     "Found non-string station entries in 'station'."
             else:
                 raise TypeError("Invalid input form for 'station', must be a string or "
@@ -2210,7 +2210,7 @@ class RINEXDataHolding():
             if isinstance(network, str):
                 network = [network]
             elif isinstance(network, list):
-                assert(all([isinstance(s, str) for s in network])), \
+                assert (all([isinstance(s, str) for s in network])), \
                     "Found non-string network entries in 'network'."
             else:
                 raise TypeError("Invalid input form for 'network', must be a string or "
@@ -2221,8 +2221,8 @@ class RINEXDataHolding():
             if isinstance(year, int) or isinstance(year, str):
                 year = [year]
             elif isinstance(year, list):
-                assert((all([isinstance(y, int) for y in year]) or
-                        all([isinstance(y, str) for y in year]))), \
+                assert ((all([isinstance(y, int) for y in year]) or
+                         all([isinstance(y, str) for y in year]))), \
                     "Found non-string/integer year entries in 'year'."
             else:
                 raise TypeError("Invalid input form for 'year', must be an integer, string or "
