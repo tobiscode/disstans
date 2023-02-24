@@ -279,7 +279,7 @@ def decompose(array, method, num_components=1, return_sources=False):
     model = decomposer.inverse_transform(temporal)
     # reduce to where original timeseries were not NaNs and return
     model[array_nanind] = np.NaN
-    if nan_cols != []:
+    if nan_cols.size > 0:
         newmod = np.empty((temporal.shape[0], len(finite_cols) + len(nan_cols)))
         newmod[:, finite_cols] = model
         newmod[:, nan_cols] = np.NaN
