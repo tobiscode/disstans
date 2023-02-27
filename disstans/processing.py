@@ -770,6 +770,10 @@ class StepDetector():
         num_observations = x.shape[0]
         y = y.reshape(num_observations, 1 if y.ndim == 1 else -1)
         num_components = y.shape[1]
+        # type check for check_only
+        assert (isinstance(check_only, list) and (len(check_only) > 0)
+                and all([isinstance(ix, int) for ix in check_only])), \
+            f"Invalid 'check_only' parameter: {check_only}."
         # get valid array
         valid = np.isfinite(y)
         # make output arrays
@@ -1091,17 +1095,17 @@ class StepDetector():
             # if it is a float, then that's the likelihood of a step (always positive)
             # var0 and var1 can contain values regardless of the entry in probs
             has_steps = np.any(~np.isnan(probs), axis=1)
-            maxstepprobs = probs[:, 0]
-            maxstepvar0, maxstepvar1 = var0[:, 0], var1[:, 0]
-            # maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)
+            if has_steps.sum() == 0:
+                continue
+            # build matrix with maximum step probabilities for all identified steps
             maxprobindices = np.expand_dims(np.nanargmax(probs[has_steps, :], axis=1), axis=1)
-            maxstepprobs[has_steps], maxstepvar0[has_steps], maxstepvar1[has_steps] = \
+            maxstepprobs, maxstepvar0, maxstepvar1 = \
                 np.take_along_axis(probs[has_steps, :], maxprobindices, axis=1).squeeze(), \
                 np.take_along_axis(var0[has_steps, :], maxprobindices, axis=1).squeeze(), \
                 np.take_along_axis(var1[has_steps, :], maxprobindices, axis=1).squeeze()
             # isolate the original timestamps and add to the list of DataFrames
             steptimes = [origtime for i, origtime in enumerate(catalog[name])
-                         if catalog_timeexists[name][i]]
+                         if catalog_timeexists[name][i] and has_steps[i]]
             step_tables.append(pd.DataFrame({"station": [name]*len(steptimes),
                                              "time": steptimes,
                                              "probability": maxstepprobs,
