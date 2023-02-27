@@ -770,6 +770,13 @@ class StepDetector():
         num_observations = x.shape[0]
         y = y.reshape(num_observations, 1 if y.ndim == 1 else -1)
         num_components = y.shape[1]
+        # backwards-compatible check for empty list
+        if isinstance(check_only, list):
+            if len(check_only) == 0:
+                # no indices to check, for backwards compatibility return empty arrays
+                return np.array([]).reshape(0, num_components), \
+                       np.array([]).reshape(0, num_components), \
+                       np.array([]).reshape(0, num_components)
         # get valid array
         valid = np.isfinite(y)
         # make output arrays
