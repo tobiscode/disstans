@@ -665,7 +665,8 @@ class Station():
         return results
 
     def get_trend(self, ts_description, fit_list=None, components=None, total=False,
-                  t_start=None, t_end=None, include_sigma=False, time_unit="D"):
+                  t_start=None, t_end=None, use_formal_variance=None, include_sigma=False,
+                  time_unit="D"):
         r"""
         Calculates a linear trend through the desired model fits and over some time span.
 
@@ -691,6 +692,10 @@ class Station():
         t_end : str or pandas.Timestamp, optional
             Timestamp-convertible string of the end time.
             Defaults to the last timestamp present in the timeseries.
+        use_formal_variance : bool, optional
+            By default, the trend fitting will use variance information if present. This usually
+            makes sense for actual timeseries, but not for fitted models where the formal variance
+            can be very unphysical. Setting this parameter overrides the default behavior.
         include_sigma : bool, optional
             If ``True``, also calculate the formal standard deviation on the trend estimate.
             Defaults to ``False``.
@@ -732,9 +737,14 @@ class Station():
         # get relevant timeseries
         if fit_list != []:
             fit_sum, fit_sum_var = self.sum_fits(ts_description, fit_list)
+            if (use_formal_variance is not None) and (not use_formal_variance):
+                fit_sum_var = None
         else:
             fit_sum = ts.data.values
-            fit_sum_var = None if ts.var_cols is None else ts.vars.values
+            if use_formal_variance is None or use_formal_variance:
+                fit_sum_var = None if ts.var_cols is None else ts.vars.values
+            else:
+                fit_sum_var = None
         # initialize fitting
         G = np.ones((t_span.size, 2))
         G[:, 1] = tvec_to_numpycol(t_span, time_unit=time_unit)
@@ -765,9 +775,9 @@ class Station():
                 GtWG = Gsub.T @ Gsub
                 GtWd = Gsub.T @ fit_sum[inside, icomp][validsub]
             trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
-            if include_sigma and (fit_sum_var is not None):
+            if include_sigma:
                 if Gsub.shape[0] == 2:
                     trend_sigma[icomp] = 0
                 else:
                     trend_sigma[icomp] = np.sqrt(sp.linalg.pinvh(GtWG)[1, 1])
-        return trend, trend_sigma if (include_sigma and fit_sum_var) else None
+        return trend, trend_sigma if include_sigma else None
