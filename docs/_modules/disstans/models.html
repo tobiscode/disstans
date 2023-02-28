@@ -1868,6 +1868,17 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subclasses :class:`~disstans.models.BaseSplineSet`.</span>
 
+<span class="sd">    Contains a list of splines that cover a one-sided timespan, sharing a common</span>
+<span class="sd">    degree, but with different center times and scales.</span>
+
+<span class="sd">    The set is constructed from a starting center time ``t_center_start`` and</span>
+<span class="sd">    then a list of spline scales with associated number of splines. The splines</span>
+<span class="sd">    are repeated by the spacing in positive time. Note that if you want to</span>
+<span class="sd">    make the spline set start at the center time, you need to specify ``t_start``</span>
+<span class="sd">    manually.</span>
+
+<span class="sd">    This class defaults to setting the spacing equal to the scale.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    degree : int</span>
@@ -2151,7 +2162,6 @@
 <span class="sd">        It represents the time at which, after zero-crossing at the reference</span>
 <span class="sd">        time, the logarithm reaches the value 1 (before model scaling).</span>
 <span class="sd">    sign_constraint : int, list, optional</span>
-<span class="sd">        Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.</span>
 <span class="sd">        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this</span>
 <span class="sd">        sign, avoiding sign flips between individual exponentials. This is useful if</span>
 <span class="sd">        the resulting curve should be monotonous. It can also be a list, where</span>
@@ -2177,7 +2187,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sign_constraint</span> <span class="o">=</span> <span class="n">sign_constraint</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Flag whether the sign of the fitted parameters should be constrained.</span>
-<span class="sd">        Only supported by the :func:`~disstans.solvers.lasso_regression` solver.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># initialize Model object</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_parameters</span><span class="o">=</span><span class="n">tau</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_reference</span><span class="p">,</span> <span class="n">t_start</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span>
@@ -2217,7 +2226,6 @@
 <span class="sd">        before model scaling) to be reached at given :math:`\Delta t` past ``t_start``,</span>
 <span class="sd">        :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`</span>
 <span class="sd">    sign_constraint : int, list, optional</span>
-<span class="sd">        Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.</span>
 <span class="sd">        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this</span>
 <span class="sd">        sign, avoiding sign flips between individual exponentials. This is useful if</span>
 <span class="sd">        the resulting curve should be monotonous. It can also be a list, where</span>
@@ -2243,7 +2251,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sign_constraint</span> <span class="o">=</span> <span class="n">sign_constraint</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Flag whether the sign of the fitted parameters should be constrained.</span>
-<span class="sd">        Only supported by the :func:`~disstans.solvers.lasso_regression` solver.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># initialize Model object</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_parameters</span><span class="o">=</span><span class="n">tau</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_reference</span><span class="p">,</span> <span class="n">t_start</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span>

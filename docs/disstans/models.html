@@ -1529,8 +1529,7 @@ function’s value to be multiplied by <span class="math notranslate nohighlight
 Applied to this model, for a given relative amplitude <span class="math notranslate nohighlight">\(a\)</span> (so <span class="math notranslate nohighlight">\(0 &lt; a &lt; 1\)</span>,
 before model scaling) to be reached at given <span class="math notranslate nohighlight">\(\Delta t\)</span> past <code class="docutils literal notranslate"><span class="pre">t_start</span></code>,
 <span class="math notranslate nohighlight">\(\tau = - \frac{\Delta t}{\ln(1 - a)}\)</span></p></li>
-<li><p><strong>sign_constraint</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Only supported when using solvers based on <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.
-Can be <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code>, and tells the solver to constrain fitted parameters to this
+<li><p><strong>sign_constraint</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Can be <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code>, and tells the solver to constrain fitted parameters to this
 sign, avoiding sign flips between individual exponentials. This is useful if
 the resulting curve should be monotonous. It can also be a list, where
 each entry applies to one data component (needs to be known at initialization).
@@ -1542,8 +1541,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Exponential.sign_constraint">
 <span class="sig-name descname"><span class="pre">sign_constraint</span></span><a class="headerlink" href="#disstans.models.Exponential.sign_constraint" title="Permalink to this definition"></a></dt>
-<dd><p>Flag whether the sign of the fitted parameters should be constrained.
-Only supported by the <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a> solver.</p>
+<dd><p>Flag whether the sign of the fitted parameters should be constrained.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1598,8 +1596,7 @@ with a given time constant and zero for <span class="math notranslate nohighligh
 <li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Logarithmic time constant(s) <span class="math notranslate nohighlight">\(\tau\)</span>.
 It represents the time at which, after zero-crossing at the reference
 time, the logarithm reaches the value 1 (before model scaling).</p></li>
-<li><p><strong>sign_constraint</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Only supported when using solvers based on <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.
-Can be <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code>, and tells the solver to constrain fitted parameters to this
+<li><p><strong>sign_constraint</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – Can be <code class="docutils literal notranslate"><span class="pre">+1</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code>, and tells the solver to constrain fitted parameters to this
 sign, avoiding sign flips between individual exponentials. This is useful if
 the resulting curve should be monotonous. It can also be a list, where
 each entry applies to one data component (needs to be known at initialization).
@@ -1611,8 +1608,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.models.Logarithmic.sign_constraint">
 <span class="sig-name descname"><span class="pre">sign_constraint</span></span><a class="headerlink" href="#disstans.models.Logarithmic.sign_constraint" title="Permalink to this definition"></a></dt>
-<dd><p>Flag whether the sign of the fitted parameters should be constrained.
-Only supported by the <a class="reference internal" href="solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a> solver.</p>
+<dd><p>Flag whether the sign of the fitted parameters should be constrained.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -2180,6 +2176,14 @@ attribute descriptions and more keyword arguments.</p>
 <dt class="sig sig-object py" id="disstans.models.DecayingSplineSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.models.</span></span><span class="sig-name descname"><span class="pre">DecayingSplineSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_center_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_num_splines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/models.html#DecayingSplineSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.models.DecayingSplineSet" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.models.BaseSplineSet" title="disstans.models.BaseSplineSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSplineSet</span></code></a>.</p>
+<p>Contains a list of splines that cover a one-sided timespan, sharing a common
+degree, but with different center times and scales.</p>
+<p>The set is constructed from a starting center time <code class="docutils literal notranslate"><span class="pre">t_center_start</span></code> and
+then a list of spline scales with associated number of splines. The splines
+are repeated by the spacing in positive time. Note that if you want to
+make the spline set start at the center time, you need to specify <code class="docutils literal notranslate"><span class="pre">t_start</span></code>
+manually.</p>
+<p>This class defaults to setting the spacing equal to the scale.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
