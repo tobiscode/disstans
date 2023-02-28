@@ -1040,7 +1040,7 @@ class StepDetector():
             catalog_df = catalog
             catalog = dict(catalog_df.groupby("station")["time"].apply(list))
             augment_df = True
-            out_cols = catalog_df.columns + ["probability", "var0", "var1", "varred"]
+            out_cols = list(catalog_df.columns) + ["probability", "var0", "var1", "varred"]
         else:
             assert isinstance(catalog, dict), \
                 "'catalog' must be either a dictionary or DataFrame."
