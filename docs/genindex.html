@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; DISSTANS 1.2-beta documentation</title>
+  <title>Index &mdash; DISSTANS 1.2b2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -11,11 +11,10 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -27,15 +26,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2-beta
+                1.2b2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -142,16 +145,37 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#selectpair">selectpair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#selectpair">selectpair</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="disstans/config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="disstans/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disstans/config.html">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="disstans/config.html#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="disstans/earthquakes.html">Earthquakes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="disstans/earthquakes.html#disstans.earthquakes.okada_displacement"><code class="docutils literal notranslate"><span class="pre">okada_displacement()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/earthquakes.html#disstans.earthquakes.okada_prior"><code class="docutils literal notranslate"><span class="pre">okada_prior()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/earthquakes.html#disstans.earthquakes.empirical_prior"><code class="docutils literal notranslate"><span class="pre">empirical_prior()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="disstans/models.html">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="disstans/models.html#model-collection">Model Collection</a></li>
-<li class="toctree-l3"><a class="reference internal" href="disstans/models.html#fit-collection">Fit Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/models.html#model-parent-class">Model (Parent Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#disstans.models.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#disstans.models.check_model_dict"><code class="docutils literal notranslate"><span class="pre">check_model_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/models.html#model-collection">Model Collection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#disstans.models.ModelCollection"><code class="docutils literal notranslate"><span class="pre">ModelCollection</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/models.html#fit-collection">Fit Collection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/models.html#disstans.models.FitCollection"><code class="docutils literal notranslate"><span class="pre">FitCollection</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/models.html#exponential">Exponential</a></li>
@@ -173,9 +197,65 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="disstans/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disstans/network.html">Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="disstans/network.html#disstans.network.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__contains__"><code class="docutils literal notranslate"><span class="pre">Network.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__delitem__"><code class="docutils literal notranslate"><span class="pre">Network.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__getitem__"><code class="docutils literal notranslate"><span class="pre">Network.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__iter__"><code class="docutils literal notranslate"><span class="pre">Network.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__len__"><code class="docutils literal notranslate"><span class="pre">Network.__len__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__setitem__"><code class="docutils literal notranslate"><span class="pre">Network.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.__str__"><code class="docutils literal notranslate"><span class="pre">Network.__str__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.add_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_default_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.add_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.add_station"><code class="docutils literal notranslate"><span class="pre">Network.add_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.add_unused_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_unused_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.ampphaseplot"><code class="docutils literal notranslate"><span class="pre">Network.ampphaseplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Network.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.fit"><code class="docutils literal notranslate"><span class="pre">Network.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.fitevalres"><code class="docutils literal notranslate"><span class="pre">Network.fitevalres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="disstans/processing.html">Processing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/processing.html#disstans.processing.unwrap_dict_and_ts"><code class="docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="disstans/processing.html#clean">clean</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/processing.html#decompose">decompose</a></li>
@@ -190,7 +270,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="disstans/solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/solvers.html#solution-object">Solution Object</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/solvers.html#disstans.solvers.Solution"><code class="docutils literal notranslate"><span class="pre">Solution</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="disstans/solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/solvers.html#linear-regression">linear_regression</a></li>
@@ -206,9 +289,42 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="disstans/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disstans/station.html">Station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="disstans/station.html#disstans.station.Station"><code class="docutils literal notranslate"><span class="pre">Station</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.__contains__"><code class="docutils literal notranslate"><span class="pre">Station.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.__delitem__"><code class="docutils literal notranslate"><span class="pre">Station.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.__getitem__"><code class="docutils literal notranslate"><span class="pre">Station.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.__iter__"><code class="docutils literal notranslate"><span class="pre">Station.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.__setitem__"><code class="docutils literal notranslate"><span class="pre">Station.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.__str__"><code class="docutils literal notranslate"><span class="pre">Station.__str__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.add_fit"><code class="docutils literal notranslate"><span class="pre">Station.add_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.add_local_model"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.add_local_model_dict"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="disstans/timeseries.html">Timeseries</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="disstans/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="disstans/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disstans/timeseries.html#disstans.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="disstans/timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="disstans/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="disstans/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
@@ -266,8 +382,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -1409,7 +1525,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Tobias Köhne.</p>
+    <p>&#169; Copyright 2023, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

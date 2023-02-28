@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solvers &mdash; DISSTANS 1.2-beta documentation</title>
+  <title>Solvers &mdash; DISSTANS 1.2b2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -12,11 +12,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/copybutton.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -31,15 +30,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html">
-            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2-beta
+                1.2b2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -146,16 +149,37 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config.html#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="earthquakes.html">Earthquakes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="earthquakes.html#disstans.earthquakes.okada_displacement"><code class="docutils literal notranslate"><span class="pre">okada_displacement()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthquakes.html#disstans.earthquakes.okada_prior"><code class="docutils literal notranslate"><span class="pre">okada_prior()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="earthquakes.html#disstans.earthquakes.empirical_prior"><code class="docutils literal notranslate"><span class="pre">empirical_prior()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="models.html#model-parent-class">Model (Parent Class)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="models.html#model-collection">Model Collection</a></li>
-<li class="toctree-l3"><a class="reference internal" href="models.html#fit-collection">Fit Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#model-parent-class">Model (Parent Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="models.html#disstans.models.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#disstans.models.check_model_dict"><code class="docutils literal notranslate"><span class="pre">check_model_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#model-collection">Model Collection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="models.html#disstans.models.ModelCollection"><code class="docutils literal notranslate"><span class="pre">ModelCollection</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="models.html#fit-collection">Fit Collection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="models.html#disstans.models.FitCollection"><code class="docutils literal notranslate"><span class="pre">FitCollection</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#exponential">Exponential</a></li>
@@ -177,9 +201,65 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="network.html#disstans.network.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__contains__"><code class="docutils literal notranslate"><span class="pre">Network.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__delitem__"><code class="docutils literal notranslate"><span class="pre">Network.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__getitem__"><code class="docutils literal notranslate"><span class="pre">Network.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__iter__"><code class="docutils literal notranslate"><span class="pre">Network.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__len__"><code class="docutils literal notranslate"><span class="pre">Network.__len__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__setitem__"><code class="docutils literal notranslate"><span class="pre">Network.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.__str__"><code class="docutils literal notranslate"><span class="pre">Network.__str__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.add_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_default_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.add_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.add_station"><code class="docutils literal notranslate"><span class="pre">Network.add_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.add_unused_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_unused_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.ampphaseplot"><code class="docutils literal notranslate"><span class="pre">Network.ampphaseplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Network.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.fit"><code class="docutils literal notranslate"><span class="pre">Network.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.fitevalres"><code class="docutils literal notranslate"><span class="pre">Network.fitevalres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="processing.html">Processing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="processing.html#disstans.processing.unwrap_dict_and_ts"><code class="docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#clean">clean</a></li>
 <li class="toctree-l4"><a class="reference internal" href="processing.html#decompose">decompose</a></li>
@@ -194,7 +274,10 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#solution-object">Solution Object</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#disstans.solvers.Solution"><code class="docutils literal notranslate"><span class="pre">Solution</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#linear-regression">linear_regression</a></li>
@@ -210,9 +293,42 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="station.html">Station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="station.html#disstans.station.Station"><code class="docutils literal notranslate"><span class="pre">Station</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.__contains__"><code class="docutils literal notranslate"><span class="pre">Station.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.__delitem__"><code class="docutils literal notranslate"><span class="pre">Station.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.__getitem__"><code class="docutils literal notranslate"><span class="pre">Station.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.__iter__"><code class="docutils literal notranslate"><span class="pre">Station.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.__setitem__"><code class="docutils literal notranslate"><span class="pre">Station.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.__str__"><code class="docutils literal notranslate"><span class="pre">Station.__str__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_fit"><code class="docutils literal notranslate"><span class="pre">Station.add_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_local_model"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_local_model_dict"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="timeseries.html">Timeseries</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="timeseries.html#unrtimeseries">UNRTimeseries</a></li>
@@ -270,9 +386,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../disstans.html">DISSTANS</a> &raquo;</li>
-      <li>Solvers</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../disstans.html">DISSTANS</a></li>
+      <li class="breadcrumb-item active">Solvers</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/disstans/solvers.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -295,22 +411,22 @@ of stations.</p>
 in this module, and distributes the parameters, covariances, and weights (where
 present) into the respective models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>disstans.models.ModelCollection</strong> – Model collection object that describes which models were used by the solver.</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Model collection parameters of shape
+<li><p><strong>parameters</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Model collection parameters of shape
 <span class="math notranslate nohighlight">\((\text{num_solved}, \text{num_components})\)</span>.</p></li>
-<li><p><strong>covariances</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Full model variance-covariance matrix that has a square shape with dimensions
+<li><p><strong>covariances</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Full model variance-covariance matrix that has a square shape with dimensions
 <span class="math notranslate nohighlight">\(\text{num_solved} * \text{num_components}\)</span>.</p></li>
-<li><p><strong>weights</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Model parameter regularization weights of shape
+<li><p><strong>weights</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Model parameter regularization weights of shape
 <span class="math notranslate nohighlight">\((\text{num_solved}, \text{num_components})\)</span>.</p></li>
-<li><p><strong>obs_indices</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Observation mask of shape <span class="math notranslate nohighlight">\((\text{num_parameters}, )\)</span>
+<li><p><strong>obs_indices</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Observation mask of shape <span class="math notranslate nohighlight">\((\text{num_parameters}, )\)</span>
 with <code class="docutils literal notranslate"><span class="pre">True</span></code> at indices where the parameter was actually estimated,
 and <code class="docutils literal notranslate"><span class="pre">False</span></code> where the estimation was skipped due to observability or
 other reasons.
 Defaults to all <code class="docutils literal notranslate"><span class="pre">True</span></code>, which implies that
 <span class="math notranslate nohighlight">\(\text{num_parameters} = \text{num_solved}\)</span>.</p></li>
-<li><p><strong>reg_indices</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Regularization mask of shape <span class="math notranslate nohighlight">\((\text{num_solved}, )\)</span>
+<li><p><strong>reg_indices</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Regularization mask of shape <span class="math notranslate nohighlight">\((\text{num_solved}, )\)</span>
 with <code class="docutils literal notranslate"><span class="pre">True</span></code> where a parameter was subject to regularization,
 and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise. Defaults to all <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
@@ -327,7 +443,7 @@ in the dictionary for the same model, <code class="docutils literal notranslate"
 raising an error (e.g. if the same model is site-specific and has different
 numbers of parameters).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>results_dict</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Dictionary of Solution objects.</p></li>
 <li><p><strong>mdl_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name of the model to aggregate the parameters, variances and weights for.</p></li>
@@ -343,7 +459,7 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 else <a class="reference internal" href="#disstans.solvers.Solution.parameters_zeroed" title="disstans.solvers.Solution.parameters_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters_zeroed</span></code></a> and <a class="reference internal" href="#disstans.solvers.Solution.covariances_zeroed" title="disstans.solvers.Solution.covariances_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances_zeroed</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>numpy.ndarray</em> – If <code class="docutils literal notranslate"><span class="pre">stack_parameters=True</span></code>, the stacked model parameters.</p></li>
 <li><p><em>numpy.ndarray</em> – If <code class="docutils literal notranslate"><span class="pre">stack_covariances=True</span></code> and covariances are present in the models,
@@ -362,18 +478,18 @@ the stacked weights, <code class="docutils literal notranslate"><span class="pre
 <dd><p>Helper function that uses <a class="reference internal" href="#disstans.solvers.Solution.get_model_indices" title="disstans.solvers.Solution.get_model_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_indices()</span></code></a> to quickly
 return the covariances for (a) specific model(s).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p></li>
 <li><p><strong>zeroed</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), use <a class="reference internal" href="#disstans.solvers.Solution.covariances" title="disstans.solvers.Solution.covariances"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances</span></code></a>, else
 <a class="reference internal" href="#disstans.solvers.Solution.covariances_zeroed" title="disstans.solvers.Solution.covariances_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances_zeroed</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Covariances of the model subset.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -385,18 +501,18 @@ return the covariances for (a) specific model(s).</p>
 can be used to extract the relevant entries from <a class="reference internal" href="#disstans.solvers.Solution.parameters" title="disstans.solvers.Solution.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a> and
 <a class="reference internal" href="#disstans.solvers.Solution.covariances" title="disstans.solvers.Solution.covariances"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p></li>
 <li><p><strong>for_cov</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), return the indices for <a class="reference internal" href="#disstans.solvers.Solution.parameters" title="disstans.solvers.Solution.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a>, otherwise
 for <a class="reference internal" href="#disstans.solvers.Solution.covariances" title="disstans.solvers.Solution.covariances"><code class="xref py py-attr docutils literal notranslate"><span class="pre">covariances</span></code></a></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Integer index array for the models.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -407,18 +523,18 @@ for <a class="reference internal" href="#disstans.solvers.Solution.covariances" 
 <dd><p>Helper function that uses <a class="reference internal" href="#disstans.solvers.Solution.get_model_indices" title="disstans.solvers.Solution.get_model_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_indices()</span></code></a> to quickly
 return the parameters for (a) specific model(s).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p></li>
 <li><p><strong>zeroed</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), use <a class="reference internal" href="#disstans.solvers.Solution.parameters" title="disstans.solvers.Solution.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a>, else
 <a class="reference internal" href="#disstans.solvers.Solution.parameters_zeroed" title="disstans.solvers.Solution.parameters_zeroed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters_zeroed</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Parameters of the model subset.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -429,14 +545,14 @@ return the parameters for (a) specific model(s).</p>
 <dd><p>Helper function that uses <a class="reference internal" href="#disstans.solvers.Solution.get_model_indices" title="disstans.solvers.Solution.get_model_indices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model_indices()</span></code></a> to quickly
 return the weights for specific model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Name(s) of model(s).</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Weights of the model parameter subset.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -551,11 +667,11 @@ those same rows and columns. (This definition might very well be mathematically
 or algorithmically wrong - there probably needs to be some dependence on the
 reweighting function.)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to fit.</p></li>
 <li><p><strong>models</strong> (<a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection used for fitting.</p></li>
-<li><p><strong>penalty</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>.
+<li><p><strong>penalty</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>.
 It can either be a single value used for all components, or a list or NumPy array
 specifying a penalty for each component in the data.</p></li>
 <li><p><strong>reweight_max_iters</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – If an integer, number of solver iterations (see Notes), resulting in reweighting.
@@ -566,7 +682,7 @@ Defaults to an inverse reweighting with stability parameter <code class="docutil
 been reached, let the iteration stop early if the solutions do not change much
 anymore (see Notes).
 Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> to deactivate early stopping.</p></li>
-<li><p><strong>reweight_init</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – When reweighting is active, use this array to initialize the weights.
+<li><p><strong>reweight_init</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><em>optional</em>) – When reweighting is active, use this array to initialize the weights.
 It has to have size <span class="math notranslate nohighlight">\(\text{num_components} * \text{num_reg}\)</span>, where
 <span class="math notranslate nohighlight">\(\text{num_components}=1\)</span> if covariances are not used (and the actual
 number of timeseries components otherwise) and <span class="math notranslate nohighlight">\(\text{num_reg}\)</span> is the
@@ -601,10 +717,10 @@ when using L1 regularization. If you want to switch to default CVXPY settings,
 pass an empty dictionary.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Result of the regression.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.Solution" title="disstans.solvers.Solution">Solution</a></p>
 </dd>
 </dl>
@@ -645,14 +761,16 @@ of whether initial weights are passed or not.)</p>
 reweighting functions for the same input parameters can differ significantly, even
 with the same <code class="docutils literal notranslate"><span class="pre">penalty</span></code>.</p>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="candes08"><span class="brackets">candes08</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>)</span></dt>
-<dd><p>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008).
+<div role="list" class="citation-list">
+<div class="citation" id="candes08" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>candes08<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>)</span>
+<p>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008).
 <em>Enhancing Sparsity by Reweighted</em> <span class="math notranslate nohighlight">\(\ell_1\)</span> <em>Minimization.</em>
 Journal of Fourier Analysis and Applications, 14(5), 877–905.
 doi:<a class="reference external" href="https://doi.org/10.1007/s00041-008-9045-x">10.1007/s00041-008-9045-x</a>.</p>
-</dd>
-</dl>
+</div>
+</div>
 </dd></dl>
 
 </section>
@@ -660,8 +778,8 @@ doi:<a class="reference external" href="https://doi.org/10.1007/s00041-008-9045-
 <h3>linear_regression<a class="headerlink" href="#linear-regression" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.solvers.linear_regression">
-<span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">linear_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#linear_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.linear_regression" title="Permalink to this definition"></a></dt>
-<dd><p>Performs linear, unregularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.8.1/reference/linalg.html#module-scipy.linalg" title="(in SciPy v1.8.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
+<span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">linear_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#linear_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.linear_regression" title="Permalink to this definition"></a></dt>
+<dd><p>Performs linear, unregularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.10.1/reference/linalg.html#module-scipy.linalg" title="(in SciPy v1.10.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
 <p>The timeseries are the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and the models’ mapping
 matrices are stacked together to form a single mapping matrix
 <span class="math notranslate nohighlight">\(\mathbf{G}\)</span>. The solver then computes the model parameters
@@ -681,7 +799,7 @@ matrices are stacked together to form a single mapping matrix
 <div class="math notranslate nohighlight">
 \[\mathbf{C}_m = \left( \mathbf{G}^T \mathbf{C}_d \mathbf{G} \right)^g\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to fit.</p></li>
 <li><p><strong>models</strong> (<a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection used for fitting.</p></li>
@@ -690,12 +808,14 @@ matrices are stacked together to form a single mapping matrix
 uncertainty information will be used.</p></li>
 <li><p><strong>use_data_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <code class="docutils literal notranslate"><span class="pre">ts</span></code> contains variance and covariance information, and
 <code class="docutils literal notranslate"><span class="pre">use_data_variance</span></code> is also <code class="docutils literal notranslate"><span class="pre">True</span></code>, this uncertainty information will be used.</p></li>
+<li><p><strong>check_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), check whether models have sign constraints that should
+be enforced.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Result of the regression.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.Solution" title="disstans.solvers.Solution">Solution</a></p>
 </dd>
 </dl>
@@ -706,8 +826,8 @@ uncertainty information will be used.</p></li>
 <h3>ridge_regression<a class="headerlink" href="#ridge-regression" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.solvers.ridge_regression">
-<span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">ridge_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#ridge_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.ridge_regression" title="Permalink to this definition"></a></dt>
-<dd><p>Performs linear, L2-regularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.8.1/reference/linalg.html#module-scipy.linalg" title="(in SciPy v1.8.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
+<span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">ridge_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formal_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_data_covariance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#ridge_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.ridge_regression" title="Permalink to this definition"></a></dt>
+<dd><p>Performs linear, L2-regularized least squares using <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.10.1/reference/linalg.html#module-scipy.linalg" title="(in SciPy v1.10.1)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">linalg</span></code></a>.</p>
 <p>The timeseries are the observations <span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, and the models’ mapping
 matrices are stacked together to form a single mapping matrix
 <span class="math notranslate nohighlight">\(\mathbf{G}\)</span>. Given the penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>, the solver then
@@ -733,11 +853,11 @@ not designated to be regularized (see <a class="reference internal" href="models
 <p>where the subscript <span class="math notranslate nohighlight">\(_\text{reg}\)</span> masks to zero the entries corresponding
 to non-regularized model parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to fit.</p></li>
 <li><p><strong>models</strong> (<a class="reference internal" href="models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><em>disstans.models.ModelCollection</em></a>) – Model collection used for fitting.</p></li>
-<li><p><strong>penalty</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – Penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>.
+<li><p><strong>penalty</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Penalty hyperparameter <span class="math notranslate nohighlight">\(\lambda\)</span>.
 It can either be a single value used for all components, or a list or NumPy array
 specifying a penalty for each component in the data.</p></li>
 <li><p><strong>formal_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, calculate the formal model covariance. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
@@ -745,12 +865,14 @@ specifying a penalty for each component in the data.</p></li>
 uncertainty information will be used.</p></li>
 <li><p><strong>use_data_covariance</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <code class="docutils literal notranslate"><span class="pre">ts</span></code> contains variance and covariance information, and
 <code class="docutils literal notranslate"><span class="pre">use_data_variance</span></code> is also <code class="docutils literal notranslate"><span class="pre">True</span></code>, this uncertainty information will be used.</p></li>
+<li><p><strong>check_constraints</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), check whether models have sign constraints that should
+be enforced.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Result of the regression.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.Solution" title="disstans.solvers.Solution">Solution</a></p>
 </dd>
 </dl>
@@ -766,13 +888,20 @@ uncertainty information will be used.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="disstans.solvers.ReweightingFunction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.solvers.</span></span><span class="sig-name descname"><span class="pre">ReweightingFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#ReweightingFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.ReweightingFunction" title="Permalink to this definition"></a></dt>
-<dd><p>Base class for reweighting functions. At initialization, the <a class="reference internal" href="#disstans.solvers.ReweightingFunction.eps" title="disstans.solvers.ReweightingFunction.eps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eps</span></code></a>
-parameter is set. Inheriting child classes need to define the
-<a class="reference internal" href="#disstans.solvers.ReweightingFunction.__call__" title="disstans.solvers.ReweightingFunction.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a> method that determines the actual reweighting mechanism.
+<dd><p>Base class for reweighting functions for <a class="reference internal" href="network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a>,
+that convert a model parameter magnitude into a penalty value. For large magnitudes,
+the penalties approach zero, and for small magnitudes, the penalties approach
+“infinity”, i.e. very large values.</p>
+<p>Usually, the <a class="reference internal" href="#disstans.solvers.ReweightingFunction.eps" title="disstans.solvers.ReweightingFunction.eps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eps</span></code></a> value determines where the transition between significant
+and insignificant (i.e., essentially zero) parameters, and the scale modifies the
+maximum penalty for insignificant parameters (with the exact maximum penalty dependent
+on the chose reweighting function).</p>
+<p>At initialization, the <a class="reference internal" href="#disstans.solvers.ReweightingFunction.eps" title="disstans.solvers.ReweightingFunction.eps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eps</span></code></a> parameter is set. Inheriting child classes need
+to define the <a class="reference internal" href="#disstans.solvers.ReweightingFunction.__call__" title="disstans.solvers.ReweightingFunction.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a> method that determines the actual reweighting mechanism.
 Instantiated reweighting functions objects can be used as functions but
 still provide access to the <a class="reference internal" href="#disstans.solvers.ReweightingFunction.eps" title="disstans.solvers.ReweightingFunction.eps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">eps</span></code></a> parameter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Stability parameter to use for the reweighting function.</p></li>
 <li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Scale parameter applied to reweighting result.</p></li>
@@ -791,17 +920,17 @@ still provide access to the <a class="reference internal" href="#disstans.solver
 <dd><p>Search the local namespace for a reweighting function of that name
 and return an initialized instance of it.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Name (or abbreviation) of the reweighting function.</p></li>
 <li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – Argument list passed on to function initialization.</p></li>
 <li><p><strong>**kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Keyword arguments passed on to function initialization.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instantiated reweighting function object.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#disstans.solvers.ReweightingFunction" title="disstans.solvers.ReweightingFunction">ReweightingFunction</a></p>
 </dd>
 </dl>
@@ -832,13 +961,13 @@ and return an initialized instance of it.</p>
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#InverseReweighting.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.InverseReweighting.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Reweighting function based on the inverse of the input based on <a class="reference internal" href="#candes08" id="id2"><span>[candes08]</span></a>:</p>
 <div class="math notranslate nohighlight">
-\[w(m_j) = \frac{1}{|m_j| + \text{eps}}\]</div>
+\[w(m_j) = \frac{\text{scale}}{|m_j| + \text{eps}}\]</div>
 <p>The maximum penalty (<span class="math notranslate nohighlight">\(y\)</span>-intercept) can be approximated as
-<span class="math notranslate nohighlight">\(\frac{1}{\text{eps}}\)</span>, and the minimum penalty approaches zero
+<span class="math notranslate nohighlight">\(\frac{\text{scale}}{\text{eps}}\)</span>, and the minimum penalty approaches zero
 asymptotically.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -856,13 +985,13 @@ asymptotically.</p>
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#InverseSquaredReweighting.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.InverseSquaredReweighting.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Reweighting function based on the inverse squared of the input based on <a class="reference internal" href="#candes08" id="id3"><span>[candes08]</span></a>:</p>
 <div class="math notranslate nohighlight">
-\[w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}\]</div>
+\[w(m_j) = \frac{\text{scale}}{m_j^2 + \text{eps}^2}\]</div>
 <p>The maximum penalty (<span class="math notranslate nohighlight">\(y\)</span>-intercept) can be approximated as
-<span class="math notranslate nohighlight">\(\frac{1}{\text{eps}^2}\)</span>, and the minimum penalty approaches zero
+<span class="math notranslate nohighlight">\(\frac{\text{scale}}{\text{eps}^2}\)</span>, and the minimum penalty approaches zero
 asymptotically.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -880,30 +1009,31 @@ asymptotically.</p>
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/solvers.html#LogarithmicReweighting.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.solvers.LogarithmicReweighting.__call__" title="Permalink to this definition"></a></dt>
 <dd><p>Reweighting function based on the logarithm of the input based on <a class="reference internal" href="#andrecut11" id="id4"><span>[andrecut11]</span></a>:</p>
 <div class="math notranslate nohighlight">
-\[w(m_j) = \log_\text{num_reg} \frac{ \| \mathbf{m} \|_1 +
+\[w(m_j) = \text{scale} \cdot \log_\text{num_reg} \frac{ \| \mathbf{m} \|_1 +
 \text{num_reg} \cdot \text{eps}}{|m_j| + \text{eps}}\]</div>
 <p>(where <span class="math notranslate nohighlight">\(0 &lt; \text{eps} \ll \frac{1}{\text{num_reg}}\)</span>).
 This reweighting function’s calculated penalties for individual elements
 depends on the overall size and 1-norm of the input weight vector.</p>
 <p>The maximum penalty (<span class="math notranslate nohighlight">\(y\)</span>-intercept) can be approximated as
-<span class="math notranslate nohighlight">\(\log_\text{num_reg} \frac{\| \mathbf{m} \|_1}{\text{eps}}\)</span>.
+<span class="math notranslate nohighlight">\(\text{scale} \cdot \log_\text{num_reg} \frac{\| \mathbf{m} \|_1}{\text{eps}}\)</span>.
 If there is only a single nonzero value, its penalty will be zero (at
 <span class="math notranslate nohighlight">\(|m_j|=\| \mathbf{m} \|_1\)</span>).
 In the intermediate cases where multiple values are nonzero, their penalties will
 be distributed on a logarithmic slope between the <span class="math notranslate nohighlight">\(y\)</span>-intercept and zero.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.22/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – <span class="math notranslate nohighlight">\(\mathbf{m}\)</span></p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="andrecut11"><span class="brackets"><a class="fn-backref" href="#id4">andrecut11</a></span></dt>
-<dd><p>Andrecut, M. (2011).
+<div role="list" class="citation-list">
+<div class="citation" id="andrecut11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">andrecut11</a><span class="fn-bracket">]</span></span>
+<p>Andrecut, M. (2011).
 <em>Stochastic Recovery Of Sparse Signals From Random Measurements.</em>
 Engineering Letters, 19(1), 1-6.</p>
-</dd>
-</dl>
+</div>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -923,7 +1053,7 @@ Engineering Letters, 19(1), 1-6.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Tobias Köhne.</p>
+    <p>&#169; Copyright 2023, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

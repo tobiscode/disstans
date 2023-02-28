@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 1.2-beta documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 1.2b2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -11,11 +11,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -27,15 +26,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html">
-            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2-beta
+                1.2b2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -142,16 +145,37 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../disstans.html">DISSTANS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#selectpair">selectpair</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/compiled.html#source-code">Source Code</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../disstans/config.html">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../disstans/earthquakes.html">Earthquakes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/config.html">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/config.html#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/earthquakes.html">Earthquakes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_displacement"><code class="docutils literal notranslate"><span class="pre">okada_displacement()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_prior"><code class="docutils literal notranslate"><span class="pre">okada_prior()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/earthquakes.html#disstans.earthquakes.empirical_prior"><code class="docutils literal notranslate"><span class="pre">empirical_prior()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/models.html">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-parent-class">Model (Parent Class)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-collection">Model Collection</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#fit-collection">Fit Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-parent-class">Model (Parent Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#disstans.models.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#disstans.models.check_model_dict"><code class="docutils literal notranslate"><span class="pre">check_model_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#model-collection">Model Collection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#disstans.models.ModelCollection"><code class="docutils literal notranslate"><span class="pre">ModelCollection</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#fit-collection">Fit Collection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#disstans.models.FitCollection"><code class="docutils literal notranslate"><span class="pre">FitCollection</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/models.html#basic-models">Basic Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#arctangent">Arctangent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/models.html#exponential">Exponential</a></li>
@@ -173,9 +197,65 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../disstans/network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/network.html">Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__contains__"><code class="docutils literal notranslate"><span class="pre">Network.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__delitem__"><code class="docutils literal notranslate"><span class="pre">Network.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__getitem__"><code class="docutils literal notranslate"><span class="pre">Network.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__iter__"><code class="docutils literal notranslate"><span class="pre">Network.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__len__"><code class="docutils literal notranslate"><span class="pre">Network.__len__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__setitem__"><code class="docutils literal notranslate"><span class="pre">Network.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.__str__"><code class="docutils literal notranslate"><span class="pre">Network.__str__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.add_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_default_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.add_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.add_station"><code class="docutils literal notranslate"><span class="pre">Network.add_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.add_unused_local_models"><code class="docutils literal notranslate"><span class="pre">Network.add_unused_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.ampphaseplot"><code class="docutils literal notranslate"><span class="pre">Network.ampphaseplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Network.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.fit"><code class="docutils literal notranslate"><span class="pre">Network.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.fitevalres"><code class="docutils literal notranslate"><span class="pre">Network.fitevalres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/processing.html">Processing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#unwrap-dict-and-ts">unwrap_dict_and_ts</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#disstans.processing.unwrap_dict_and_ts"><code class="docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/processing.html#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#clean">clean</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/processing.html#decompose">decompose</a></li>
@@ -190,7 +270,10 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/solvers.html">Solvers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solution-object">Solution Object</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#disstans.solvers.Solution"><code class="docutils literal notranslate"><span class="pre">Solution</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/solvers.html#solver-functions">Solver Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#lasso-regression">lasso_regression</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/solvers.html#linear-regression">linear_regression</a></li>
@@ -206,9 +289,42 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../disstans/station.html">Station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../disstans/station.html">Station</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station"><code class="docutils literal notranslate"><span class="pre">Station</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.__contains__"><code class="docutils literal notranslate"><span class="pre">Station.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.__delitem__"><code class="docutils literal notranslate"><span class="pre">Station.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.__getitem__"><code class="docutils literal notranslate"><span class="pre">Station.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.__iter__"><code class="docutils literal notranslate"><span class="pre">Station.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.__setitem__"><code class="docutils literal notranslate"><span class="pre">Station.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.__str__"><code class="docutils literal notranslate"><span class="pre">Station.__str__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_fit"><code class="docutils literal notranslate"><span class="pre">Station.add_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model_dict"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/timeseries.html">Timeseries</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../disstans/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../disstans/timeseries.html#timeseries-parent-class">Timeseries (Parent Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/timeseries.html#disstans.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
@@ -266,9 +382,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>disstans.processing</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">disstans.processing</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -304,7 +420,7 @@
 
 
 <div class="viewcode-block" id="unwrap_dict_and_ts"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.unwrap_dict_and_ts">[docs]</a><span class="k">def</span> <span class="nf">unwrap_dict_and_ts</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A wrapper decorator that aims at simplifying the coding of processing functions.</span>
 <span class="sd">    Ideally, a new function that doesn&#39;t need to know if its input is a</span>
 <span class="sd">    :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame`,</span>
@@ -384,7 +500,7 @@
 
 
 <span class="k">class</span> <span class="nc">ExpandingRollingIndexer</span><span class="p">(</span><span class="n">BaseIndexer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Indexer class used in the pandas rolling calculations (e.g., rolling median).</span>
 <span class="sd">    This custom indexer behaves like a regular rolling window, except at the</span>
 <span class="sd">    start and end of the timeseries, where the window slowly grows or shrinks,</span>
@@ -400,13 +516,13 @@
 <span class="sd">    For more information, see the pandas documentation about `custom window rolling</span>
 <span class="sd">    &lt;https://pandas.pydata.org/docs/user_guide/window.html#custom-window-rolling&gt;`_.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">get_window_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_values</span><span class="p">,</span> <span class="n">min_periods</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">closed</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_window_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_values</span><span class="p">,</span> <span class="n">min_periods</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">closed</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This is the function that needs to be implemented for the</span>
 <span class="sd">        :class:`~pandas.api.indexers.BaseIndexer` class to be used for all</span>
 <span class="sd">        rolling pandas operations. It shouldn&#39;t be called manually.</span>
 
-<span class="sd">        The parameters ``min_periods``, ``center``, and ``closed`` have to</span>
+<span class="sd">        The parameters ``min_periods``, ``center``, ``closed``, and ``step`` have to</span>
 <span class="sd">        be included to match expected pandas behavior, but this function</span>
 <span class="sd">        does not implement their potential features.</span>
 
@@ -449,7 +565,7 @@
 
 <div class="viewcode-block" id="median"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.median">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
 <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the rolling median filter column-wise. Missing observations (NaNs) are</span>
 <span class="sd">    ignored during the median calculation, but missing observations are not imputed</span>
 <span class="sd">    from the rolling median (i.e., a NaN value remains a NaN value, but does not</span>
@@ -485,7 +601,7 @@
 
 <div class="viewcode-block" id="decompose"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.decompose">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
 <span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">return_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decomposes the input signal into different components using PCA or ICA.</span>
 
 <span class="sd">    Parameters</span>
@@ -559,7 +675,7 @@
     <span class="n">model</span> <span class="o">=</span> <span class="n">decomposer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">temporal</span><span class="p">)</span>
     <span class="c1"># reduce to where original timeseries were not NaNs and return</span>
     <span class="n">model</span><span class="p">[</span><span class="n">array_nanind</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
-    <span class="k">if</span> <span class="n">nan_cols</span> <span class="o">!=</span> <span class="p">[]:</span>
+    <span class="k">if</span> <span class="n">nan_cols</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">newmod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">temporal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">finite_cols</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_cols</span><span class="p">)))</span>
         <span class="n">newmod</span><span class="p">[:,</span> <span class="n">finite_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
         <span class="n">newmod</span><span class="p">[:,</span> <span class="n">nan_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
@@ -578,7 +694,7 @@
 
 <div class="viewcode-block" id="clean"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.clean">[docs]</a><span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">ts_in</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">ts_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">clean_kw_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">reference_callable_args</span><span class="o">=</span><span class="p">{}):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function operating on a single station&#39;s timeseries to clean it from outliers,</span>
 <span class="sd">    and mask it out if the data is not good enough. The criteria are set by</span>
 <span class="sd">    :attr:`~disstans.config.defaults` but can be overriden by providing ``clean_kw_args``.</span>
@@ -696,7 +812,7 @@
 
 
 <div class="viewcode-block" id="midas"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.midas">[docs]</a><span class="k">def</span> <span class="nf">midas</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function performs the MIDAS estimate as described by [blewitt16]_.</span>
 <span class="sd">    It is adapted from the Fortran code provided by the author (see</span>
 <span class="sd">    :func:`~disstans.compiled.selectpair` for more details and original copyright).</span>
@@ -824,7 +940,7 @@
 
 
 <div class="viewcode-block" id="StepDetector"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector">[docs]</a><span class="k">class</span> <span class="nc">StepDetector</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements a step detector based on the Akaike Information Criterion (AIC).</span>
 
 <span class="sd">    A window is moved over the input data, and two linear models are fit in the</span>
@@ -862,7 +978,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Kernel (window) size of the detector. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Kernel (window) size of the detector. &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;kernel_size&#39; has not yet been set.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span>
@@ -876,7 +992,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Minimum kernel (window) size of the detector. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Minimum kernel (window) size of the detector. &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;kernel_size_min&#39; has not yet been set.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span>
@@ -890,7 +1006,7 @@
 
 <div class="viewcode-block" id="StepDetector.AIC_c"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.AIC_c">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">AIC_c</span><span class="p">(</span><span class="n">rss</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the Akaike Information Criterion for small samples for Least Squares</span>
 <span class="sd">        regression results. Implementation is based on [burnhamanderson02]_ (ch. 2).</span>
 
@@ -930,7 +1046,7 @@
 
 <div class="viewcode-block" id="StepDetector.test_single"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.test_single">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">test_single</span><span class="p">(</span><span class="n">xwindow</span><span class="p">,</span> <span class="n">ywindow</span><span class="p">,</span> <span class="n">valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a single window (of arbitrary, but odd length), perform the AIC hypothesis test</span>
 <span class="sd">        whether a step is likely present (H1) or not (H0) in the ``y`` data given</span>
 <span class="sd">        ``x`` coordinates.</span>
@@ -1031,7 +1147,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parallelizable part of the search, search_network and search_catalog methods.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
@@ -1046,10 +1162,21 @@
         <span class="c1"># some checks</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> \
             <span class="sa">f</span><span class="s2">&quot;&#39;x&#39; and &#39;y&#39; need to be NumPy arrays, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="n">check_only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">check_only</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">check_only</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">check_only</span><span class="p">])),</span> \
+                <span class="sa">f</span><span class="s2">&quot;Invalid &#39;check_only&#39; parameter: </span><span class="si">{</span><span class="n">check_only</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="c1"># get sizes</span>
         <span class="n">num_observations</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_observations</span><span class="p">,</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">num_components</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># backwards-compatible check for empty list</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">check_only</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">check_only</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># no indices to check, for backwards compatibility return empty arrays</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_components</span><span class="p">),</span> \
+                       <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_components</span><span class="p">),</span> \
+                       <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_components</span><span class="p">)</span>
         <span class="c1"># get valid array</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="c1"># make output arrays</span>
@@ -1111,7 +1238,7 @@
         <span class="k">return</span> <span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span>
 
 <div class="viewcode-block" id="StepDetector.search"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function that will search for steps in the data.</span>
 <span class="sd">        Upon successful completion, it will return the relative step probabilities</span>
 <span class="sd">        as well as the residuals variances of the two hypotheses tested</span>
@@ -1153,7 +1280,7 @@
 
 <div class="viewcode-block" id="StepDetector.search_network"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_network">[docs]</a>    <span class="k">def</span> <span class="nf">search_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
                        <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">aggregate_components</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function that searches for steps in an entire network (possibly in parallel),</span>
 <span class="sd">        thresholds those probabilities, and identifies all the consecutive ranges in which</span>
 <span class="sd">        steps happen over the network.</span>
@@ -1197,6 +1324,12 @@
         <span class="c1"># get the stations who have this timeseries</span>
         <span class="n">valid_stations</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">station</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
                           <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">in</span> <span class="n">station</span><span class="o">.</span><span class="n">timeseries</span><span class="p">}</span>
+        <span class="c1"># early exit if no station containing that timeseries was found</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_stations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No station containing timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39; found.&quot;</span><span class="p">,</span>
+                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">,</span>
+                                         <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">,</span> <span class="s2">&quot;varred&quot;</span><span class="p">]),</span> <span class="p">[]</span>
         <span class="c1"># make a list that will contain all individual result DataFrames</span>
         <span class="n">step_tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># run parallelized StepDetector._search</span>
@@ -1232,6 +1365,10 @@
             <span class="c1"># this code could be used to create a model object and assign it to the station</span>
             <span class="c1"># mdl = disstans.models.Step(steptimes)</span>
             <span class="c1"># station.add_local_model(ts_description, &quot;Detections&quot;, mdl)</span>
+        <span class="c1"># return early if no steps were found</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step_tables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">,</span>
+                                         <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">,</span> <span class="s2">&quot;varred&quot;</span><span class="p">]),</span> <span class="p">[]</span>
         <span class="c1"># combine individual DataFrames to one</span>
         <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">step_tables</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># sort dataframe by probability</span>
@@ -1251,7 +1388,7 @@
 
 <div class="viewcode-block" id="StepDetector.search_catalog"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_catalog">[docs]</a>    <span class="k">def</span> <span class="nf">search_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">keep_nan_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search a dictionary of potential step times for each station in the dictionary</span>
 <span class="sd">        and assess the probability for each one.</span>
 
@@ -1306,10 +1443,12 @@
             <span class="n">catalog_df</span> <span class="o">=</span> <span class="n">catalog</span>
             <span class="n">catalog</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">catalog_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;station&quot;</span><span class="p">)[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">))</span>
             <span class="n">augment_df</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">out_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">catalog_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">,</span> <span class="s2">&quot;varred&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> \
                 <span class="s2">&quot;&#39;catalog&#39; must be either a dictionary or DataFrame.&quot;</span>
             <span class="n">augment_df</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">out_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="s2">&quot;var0&quot;</span><span class="p">,</span> <span class="s2">&quot;var1&quot;</span><span class="p">,</span> <span class="s2">&quot;varred&quot;</span><span class="p">]</span>
         <span class="c1"># for each station, find the first time index after a catalogued event</span>
         <span class="c1"># (alternatively, we could &quot;add&quot; a timestamp without an observation if</span>
         <span class="c1"># there isn&#39;t a timestamp already present - probably better, but harder)</span>
@@ -1317,6 +1456,12 @@
         <span class="c1"># we also need to keep track of the originally requested time (for the output)</span>
         <span class="n">catalog_timeexists</span> <span class="o">=</span> <span class="p">{</span><span class="n">sta_name</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">)</span>
                               <span class="k">for</span> <span class="n">sta_name</span><span class="p">,</span> <span class="n">steptimes</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="c1"># check if there is at least one station with the desired timeseries</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">ts_description</span> <span class="ow">in</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">timeseries</span>
+                <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No station containing timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39; found.&quot;</span><span class="p">,</span>
+                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">),</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">sta_name</span><span class="p">,</span> <span class="n">steptimes</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># skip if station or timeseries not present</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">sta_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> \
@@ -1331,6 +1476,9 @@
                     <span class="k">continue</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">sta_name</span><span class="p">][</span><span class="n">ist</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># return early if we found stations, but no timesteps to check</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="nb">any</span><span class="p">(</span><span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">sta_name</span><span class="p">])</span> <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">keys</span><span class="p">()]):</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">),</span> <span class="p">[]</span>
         <span class="c1"># make a list that will contain all individual result DataFrames</span>
         <span class="n">step_tables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># run parallelized StepDetector._search</span>
@@ -1350,22 +1498,25 @@
             <span class="c1"># if it is a float, then that&#39;s the likelihood of a step (always positive)</span>
             <span class="c1"># var0 and var1 can contain values regardless of the entry in probs</span>
             <span class="n">has_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">probs</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">maxstepprobs</span> <span class="o">=</span> <span class="n">probs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="n">maxstepvar0</span><span class="p">,</span> <span class="n">maxstepvar1</span> <span class="o">=</span> <span class="n">var0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">var1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="c1"># maxstepprobs[has_steps] = np.nanmax(probs[has_steps, :], axis=1)</span>
+            <span class="k">if</span> <span class="n">has_steps</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># build matrix with maximum step probabilities for all identified steps</span>
             <span class="n">maxprobindices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">maxstepprobs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">],</span> <span class="n">maxstepvar0</span><span class="p">[</span><span class="n">has_steps</span><span class="p">],</span> <span class="n">maxstepvar1</span><span class="p">[</span><span class="n">has_steps</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">maxstepprobs</span><span class="p">,</span> <span class="n">maxstepvar0</span><span class="p">,</span> <span class="n">maxstepvar1</span> <span class="o">=</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">var0</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">var1</span><span class="p">[</span><span class="n">has_steps</span><span class="p">,</span> <span class="p">:],</span> <span class="n">maxprobindices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
             <span class="c1"># isolate the original timestamps and add to the list of DataFrames</span>
             <span class="n">steptimes</span> <span class="o">=</span> <span class="p">[</span><span class="n">origtime</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">origtime</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-                         <span class="k">if</span> <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+                         <span class="k">if</span> <span class="n">catalog_timeexists</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">has_steps</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
             <span class="n">step_tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;station&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">steptimes</span><span class="p">),</span>
                                              <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">steptimes</span><span class="p">,</span>
                                              <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">maxstepprobs</span><span class="p">,</span>
                                              <span class="s2">&quot;var0&quot;</span><span class="p">:</span> <span class="n">maxstepvar0</span><span class="p">,</span>
                                              <span class="s2">&quot;var1&quot;</span><span class="p">:</span> <span class="n">maxstepvar1</span><span class="p">}))</span>
+        <span class="c1"># return early if no steps were found</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step_tables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">),</span> <span class="p">[]</span>
         <span class="c1"># combine individual DataFrames to one</span>
         <span class="n">step_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">step_tables</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># merge it with the input dataframe, if provided</span>
@@ -1396,7 +1547,7 @@
 <div class="viewcode-block" id="StepDetector.steps"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.steps">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">steps</span><span class="p">(</span><span class="n">probabilities</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxsteps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">aggregate_components</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
               <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold the probabilities to return a list of steps.</span>
 
 <span class="sd">        Parameters</span>
@@ -1439,7 +1590,7 @@
             <span class="c1"># warn if a large number of steps have been detected</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="p">(</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In component </span><span class="si">{</span><span class="n">icomp</span><span class="si">}</span><span class="s2">, using threshold=</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> leads to &quot;</span>
-                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> of timestamps being &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">peaks</span><span class="o">.</span><span class="n">size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">probabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2"> of timestamps being &quot;</span>
                               <span class="s2">&quot;steps. Consider setting a higher threshold.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">steps</span></div></div>
@@ -1452,7 +1603,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Tobias Köhne.</p>
+    <p>&#169; Copyright 2023, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
