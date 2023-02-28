@@ -286,7 +286,7 @@ class Timeseries():
 
     @data.setter
     def data(self, new_data):
-        self._df.loc[:, self._data_cols] = new_data
+        self._df[self._data_cols] = new_data
 
     @property
     def sigmas(self):
@@ -308,7 +308,7 @@ class Timeseries():
     def vars(self, new_var):
         if self._var_cols is None:
             raise ValueError("No variance columns present to set.")
-        self.df.loc[:, self._var_cols] = new_var
+        self._df[self._var_cols] = new_var
 
     @property
     def covs(self):
@@ -321,7 +321,7 @@ class Timeseries():
     def covs(self, new_cov):
         if self._cov_cols is None:
             raise ValueError("No covariance columns present to set.")
-        self.df.loc[:, self._cov_cols] = new_cov
+        self._df[self._cov_cols] = new_cov
 
     @property
     def var_cov(self):
