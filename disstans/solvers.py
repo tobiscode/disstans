@@ -352,9 +352,18 @@ class Solution():
 
 class ReweightingFunction(ABC):
     """
-    Base class for reweighting functions. At initialization, the :attr:`~eps`
-    parameter is set. Inheriting child classes need to define the
-    :meth:`~__call__` method that determines the actual reweighting mechanism.
+    Base class for reweighting functions for :meth:`~disstans.network.Network.spatialfit`,
+    that convert a model parameter magnitude into a penalty value. For large magnitudes,
+    the penalties approach zero, and for small magnitudes, the penalties approach
+    "infinity", i.e. very large values.
+
+    Usually, the :attr:`~eps` value determines where the transition between significant
+    and insignificant (i.e., essentially zero) parameters, and the scale modifies the
+    maximum penalty for insignificant parameters (with the exact maximum penalty dependent
+    on the chose reweighting function).
+
+    At initialization, the :attr:`~eps` parameter is set. Inheriting child classes need
+    to define the :meth:`~__call__` method that determines the actual reweighting mechanism.
     Instantiated reweighting functions objects can be used as functions but
     still provide access to the :attr:`~eps` parameter.
 
@@ -412,10 +421,10 @@ class InverseReweighting(ReweightingFunction):
         Reweighting function based on the inverse of the input based on [candes08]_:
 
         .. math::
-            w(m_j) = \frac{1}{|m_j| + \text{eps}}
+            w(m_j) = \frac{\text{scale}}{|m_j| + \text{eps}}
 
         The maximum penalty (:math:`y`-intercept) can be approximated as
-        :math:`\frac{1}{\text{eps}}`, and the minimum penalty approaches zero
+        :math:`\frac{\text{scale}}{\text{eps}}`, and the minimum penalty approaches zero
         asymptotically.
 
         Parameters
@@ -432,10 +441,10 @@ class InverseSquaredReweighting(ReweightingFunction):
         Reweighting function based on the inverse squared of the input based on [candes08]_:
 
         .. math::
-            w(m_j) = \frac{1}{m_j^2 + \text{eps}^2}
+            w(m_j) = \frac{\text{scale}}{m_j^2 + \text{eps}^2}
 
         The maximum penalty (:math:`y`-intercept) can be approximated as
-        :math:`\frac{1}{\text{eps}^2}`, and the minimum penalty approaches zero
+        :math:`\frac{\text{scale}}{\text{eps}^2}`, and the minimum penalty approaches zero
         asymptotically.
 
         Parameters
@@ -452,7 +461,7 @@ class LogarithmicReweighting(ReweightingFunction):
         Reweighting function based on the logarithm of the input based on [andrecut11]_:
 
         .. math::
-            w(m_j) = \log_\text{num_reg} \frac{ \| \mathbf{m} \|_1 +
+            w(m_j) = \text{scale} \cdot \log_\text{num_reg} \frac{ \| \mathbf{m} \|_1 +
             \text{num_reg} \cdot \text{eps}}{|m_j| + \text{eps}}
 
         (where :math:`0 < \text{eps} \ll \frac{1}{\text{num_reg}}`).
@@ -460,7 +469,7 @@ class LogarithmicReweighting(ReweightingFunction):
         depends on the overall size and 1-norm of the input weight vector.
 
         The maximum penalty (:math:`y`-intercept) can be approximated as
-        :math:`\log_\text{num_reg} \frac{\| \mathbf{m} \|_1}{\text{eps}}`.
+        :math:`\text{scale} \cdot \log_\text{num_reg} \frac{\| \mathbf{m} \|_1}{\text{eps}}`.
         If there is only a single nonzero value, its penalty will be zero (at
         :math:`|m_j|=\| \mathbf{m} \|_1`).
         In the intermediate cases where multiple values are nonzero, their penalties will

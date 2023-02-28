@@ -530,6 +530,8 @@ class Station():
         """
         # shorthand for timeseries
         ts = self[ts_description]
+        assert fit_list is None or isinstance(fit_list, list), \
+            f"'fit_list' needs to be None or a list, got {type(fit_list)}."
         # get model subset
         fits_to_sum = {model_description: fit
                        for model_description, fit in self.fits[ts_description].items()
@@ -666,7 +668,7 @@ class Station():
 
     def get_trend(self, ts_description, fit_list=None, components=None, total=False,
                   t_start=None, t_end=None, use_formal_variance=None, include_sigma=False,
-                  time_unit="D"):
+                  time_unit="D", ignore_missing=False):
         r"""
         Calculates a linear trend through the desired model fits and over some time span.
 
@@ -701,6 +703,11 @@ class Station():
             Defaults to ``False``.
         time_unit : str, optional
             Time unit for output (only required if ``total=False``).
+        ignore_missing : bool, optional
+            By default (``False``), this method will throw an error if the timeseries or
+            the models are not present in  the station. Set to ``True`` if the method
+            should return ``(None, None)`` instead (as done when the requested timespan
+            is outside the observed one).
 
         Returns
         -------
@@ -713,11 +720,41 @@ class Station():
         assert isinstance(ts_description, str), \
             f"Station {self.name}: " \
             f"'ts_description' needs to be a string, got {type(ts_description)}."
-        assert ts_description in self.timeseries, \
-            f"Station {self.name}: Can't find '{ts_description}' to calculate a trend for."
-        if fit_list != []:
-            assert self.models[ts_description], \
-                f"Station {self.name}, timeseries {ts_description}: Can't find any models."
+        try:
+            assert ts_description in self.timeseries, \
+                f"Station {self.name}: Can't find '{ts_description}' to calculate a trend for."
+        except AssertionError:
+            if ignore_missing:  # fail softly
+                return None, None
+            else:
+                raise
+        if fit_list is not None:
+            if isinstance(fit_list, str):
+                fit_list = [fit_list]
+            else:
+                assert isinstance(fit_list, list), "'fit_list' needs to be None, a string, " \
+                    f"or a list, got {type(fit_list)}."
+            if len(fit_list) == 0:
+                # use data instead of fits
+                use_fits = False
+            else:
+                # use a model subset list
+                try:
+                    assert (self.models[ts_description] and
+                            any([f in self.models[ts_description] for f in fit_list])), \
+                        f"Station {self.name}, timeseries {ts_description}: " \
+                        "Can't find any models."
+                except AssertionError:
+                    if ignore_missing:  # fail softly
+                        return None, None
+                    else:
+                        raise
+                else:
+                    use_fits = True
+        else:
+            # default to all fitted models
+            use_fits = True
+        # check components
         ts = self[ts_description]
         if components is None:
             components = list(range(ts.num_components))
@@ -735,7 +772,7 @@ class Station():
         else:
             return None, None
         # get relevant timeseries
-        if fit_list != []:
+        if use_fits:
             fit_sum, fit_sum_var = self.sum_fits(ts_description, fit_list)
             if (use_formal_variance is not None) and (not use_formal_variance):
                 fit_sum_var = None
@@ -755,7 +792,7 @@ class Station():
             trend_sigma = np.zeros(n_comps)
         # fit components
         for icomp in components:
-            if fit_list != []:
+            if use_fits:
                 validsub = np.ones(inside.sum(), dtype=bool)
                 Gsub = G
             else:
