@@ -766,14 +766,14 @@ class StepDetector():
         # some checks
         assert isinstance(x, np.ndarray) and isinstance(y, np.ndarray), \
             f"'x' and 'y' need to be NumPy arrays, got {type(x)} and {type(y)}."
+        if check_only is not None:
+            assert (isinstance(check_only, list) and (len(check_only) > 0)
+                    and all([isinstance(ix, int) for ix in check_only])), \
+                f"Invalid 'check_only' parameter: {check_only}."
         # get sizes
         num_observations = x.shape[0]
         y = y.reshape(num_observations, 1 if y.ndim == 1 else -1)
         num_components = y.shape[1]
-        # type check for check_only
-        assert (isinstance(check_only, list) and (len(check_only) > 0)
-                and all([isinstance(ix, int) for ix in check_only])), \
-            f"Invalid 'check_only' parameter: {check_only}."
         # get valid array
         valid = np.isfinite(y)
         # make output arrays
