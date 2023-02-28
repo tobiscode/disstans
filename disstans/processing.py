@@ -1040,10 +1040,12 @@ class StepDetector():
             catalog_df = catalog
             catalog = dict(catalog_df.groupby("station")["time"].apply(list))
             augment_df = True
+            out_cols = catalog_df.columns + ["probability", "var0", "var1", "varred"]
         else:
             assert isinstance(catalog, dict), \
                 "'catalog' must be either a dictionary or DataFrame."
             augment_df = False
+            out_cols = ["station", "time", "probability", "var0", "var1", "varred"]
         # for each station, find the first time index after a catalogued event
         # (alternatively, we could "add" a timestamp without an observation if
         # there isn't a timestamp already present - probably better, but harder)
@@ -1056,8 +1058,7 @@ class StepDetector():
                 for sta_name in catalog.keys()]) == 0:
             warn(f"No station containing timeseries '{ts_description}' found.",
                  stacklevel=2)
-            return pd.DataFrame(columns=["station", "time", "probability",
-                                         "var0", "var1", "varred"]), []
+            return pd.DataFrame(columns=out_cols), []
         for sta_name, steptimes in catalog.items():
             # skip if station or timeseries not present
             if (sta_name not in net.stations.keys()) or \
@@ -1074,8 +1075,7 @@ class StepDetector():
                     catalog_timeexists[sta_name][ist] = True
         # return early if we found stations, but no timesteps to check
         if not any([any(catalog_timeexists[sta_name]) for sta_name in catalog.keys()]):
-            return pd.DataFrame(columns=["station", "time", "probability",
-                                         "var0", "var1", "varred"]), []
+            return pd.DataFrame(columns=out_cols), []
         # make a list that will contain all individual result DataFrames
         step_tables = []
         # run parallelized StepDetector._search
@@ -1113,8 +1113,7 @@ class StepDetector():
                                              "var1": maxstepvar1}))
         # return early if no steps were found
         if len(step_tables) == 0:
-            return pd.DataFrame(columns=["station", "time", "probability",
-                                         "var0", "var1", "varred"]), []
+            return pd.DataFrame(columns=out_cols), []
         # combine individual DataFrames to one
         step_table = pd.concat(step_tables, ignore_index=True)
         # merge it with the input dataframe, if provided
