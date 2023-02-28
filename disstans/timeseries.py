@@ -1288,9 +1288,14 @@ class UNRTimeseries(Timeseries):
             warn(f"Timeseries file {self._path} contains multiple site codes: "
                  f"{df['site'].unique()}", stacklevel=2)
         if len(df['reflon'].unique()) > 1:
-            raise NotImplementedError(f"Timeseries file {self._path} contains "
-                                      "multiple reference longitudes: "
-                                      f"{df['reflon'].unique()}")
+            calculate_stepdates = True
+            if show_warnings:
+                warn(f"Timeseries file {self._path} contains multiple reference longitudes: "
+                     f"{df['reflon'].unique()}. Step dates will be saved to "
+                     "'self._reflonsteptimes' and should be added as free model parameters, "
+                     "or the affected observations should be removed.", stacklevel=2)
+        else:
+            calculate_stepdates = False
         if len(df['_e0(m)'].unique()) > 1:
             if show_warnings:
                 warn(f"Timeseries file {self._path} contains multiple integer "
@@ -1312,8 +1317,6 @@ class UNRTimeseries(Timeseries):
             offsets_up = df["u0(m)"].values - df["u0(m)"].values[0]
         else:
             offsets_up = 0
-        # remove columns that are no longer needed
-        df.drop(columns=["site", "reflon"], inplace=True)
         # make the data
         df["east"] = (df["__east(m)"] + offsets_east) * factor
         df["north"] = (df["_north(m)"] + offsets_north) * factor
@@ -1345,6 +1348,11 @@ class UNRTimeseries(Timeseries):
             warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.",
                  stacklevel=2)
             df.sort_index(inplace=True)
+        # calculate step dates for multiple reference meridians
+        if calculate_stepdates:
+            self._reflonsteptimes = df.index[df["reflon"].diff().abs() > 0]
+        # remove columns that are no longer needed
+        df.drop(columns=["site", "reflon"], inplace=True)
         # construct Timeseries object
         super().__init__(dataframe=df, src=".tenv3", data_unit=data_unit,
                          data_cols=["east", "north", "up"],
