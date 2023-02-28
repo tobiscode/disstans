@@ -774,7 +774,7 @@ class Station():
             else:
                 GtWG = Gsub.T @ Gsub
                 GtWd = Gsub.T @ fit_sum[inside, icomp][validsub]
-            trend[icomp] = sparse.linalg.lsqr(GtWG, GtWd.squeeze())[0].squeeze()[1]
+            trend[icomp] = np.linalg.lstsq(GtWG, GtWd.squeeze(), rcond=None)[0][1]
             if include_sigma:
                 if Gsub.shape[0] == 2:
                     trend_sigma[icomp] = 0
