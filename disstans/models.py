@@ -1472,6 +1472,17 @@ class DecayingSplineSet(BaseSplineSet):
     """
     Subclasses :class:`~disstans.models.BaseSplineSet`.
 
+    Contains a list of splines that cover a one-sided timespan, sharing a common
+    degree, but with different center times and scales.
+
+    The set is constructed from a starting center time ``t_center_start`` and
+    then a list of spline scales with associated number of splines. The splines
+    are repeated by the spacing in positive time. Note that if you want to
+    make the spline set start at the center time, you need to specify ``t_start``
+    manually.
+
+    This class defaults to setting the spacing equal to the scale.
+
     Parameters
     ----------
     degree : int
@@ -1755,7 +1766,6 @@ class Logarithmic(Model):
         It represents the time at which, after zero-crossing at the reference
         time, the logarithm reaches the value 1 (before model scaling).
     sign_constraint : int, list, optional
-        Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.
         Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
         sign, avoiding sign flips between individual exponentials. This is useful if
         the resulting curve should be monotonous. It can also be a list, where
@@ -1781,7 +1791,6 @@ class Logarithmic(Model):
         self.sign_constraint = sign_constraint
         """
         Flag whether the sign of the fitted parameters should be constrained.
-        Only supported by the :func:`~disstans.solvers.lasso_regression` solver.
         """
         # initialize Model object
         super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
@@ -1821,7 +1830,6 @@ class Exponential(Model):
         before model scaling) to be reached at given :math:`\Delta t` past ``t_start``,
         :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
     sign_constraint : int, list, optional
-        Only supported when using solvers based on :func:`~disstans.solvers.lasso_regression`.
         Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
         sign, avoiding sign flips between individual exponentials. This is useful if
         the resulting curve should be monotonous. It can also be a list, where
@@ -1847,7 +1855,6 @@ class Exponential(Model):
         self.sign_constraint = sign_constraint
         """
         Flag whether the sign of the fitted parameters should be constrained.
-        Only supported by the :func:`~disstans.solvers.lasso_regression` solver.
         """
         # initialize Model object
         super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
