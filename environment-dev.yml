@@ -25,8 +25,8 @@ dependencies:
   - flake8  # optional
   - build  # optional
   - twine  # optional
+  - sphinx-rtd-theme  # optional
   - pip
   - pip:
     - git+https://github.com/tbenthompson/okada_wrapper.git
-    - sphinx-rtd-theme  # optional
     - git+https://github.com/sphinx-contrib/video.git  # optional
