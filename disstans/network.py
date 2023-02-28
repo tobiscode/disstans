@@ -2557,6 +2557,8 @@ class Network():
                 "'trend_kw_args' dictionary has to include a 'ts_description' keyword."
             if "fit_list" not in trend_kw_args:
                 trend_kw_args["fit_list"] = fit_list
+            # force get_trend to ignore missing timeseries or models
+            trend_kw_args["ignore_missing"] = True
             # loop over stations
             trend = np.zeros((self.num_stations, 2))
             trend_sigma = np.zeros_like(trend)
