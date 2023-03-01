@@ -1767,7 +1767,7 @@ class Logarithmic(Model):
         time, the logarithm reaches the value 1 (before model scaling).
     sign_constraint : int, list, optional
         Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
-        sign, avoiding sign flips between individual exponentials. This is useful if
+        sign, avoiding sign flips between individual logarithms. This is useful if
         the resulting curve should be monotonous. It can also be a list, where
         each entry applies to one data component (needs to be known at initialization).
         If ``None``, no constraint is enforced.
@@ -1779,7 +1779,7 @@ class Logarithmic(Model):
                  zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
-        tau = np.asarray(tau)
+        tau = np.atleast_1d(tau)
         assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
                               f"array of shape {tau.shape}."
         self.tau = tau
@@ -1800,7 +1800,7 @@ class Logarithmic(Model):
             f"{self.t_reference_str} is after the start time {self.t_start_str}."
 
     def _get_arch(self):
-        tau = self.tau if len(self.tau) > 1 else self.tau[0]
+        tau = self.tau.tolist() if self.tau.size > 1 else self.tau[0]
         arch = {"type": "Logarithmic",
                 "kw_args": {"tau": tau,
                             "sign_constraint": self.sign_constraint}}
@@ -1843,7 +1843,7 @@ class Exponential(Model):
                  zero_after=False, **model_kw_args):
         if t_start is None:
             t_start = t_reference
-        tau = np.asarray(tau)
+        tau = np.atleast_1d(tau)
         assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
                               f"array of shape {tau.shape}."
         self.tau = tau
@@ -1864,7 +1864,7 @@ class Exponential(Model):
             f"{self.t_reference_str} is after the start time {self.t_start_str}."
 
     def _get_arch(self):
-        tau = self.tau if len(self.tau) > 1 else self.tau[0]
+        tau = self.tau.tolist() if self.tau.size > 1 else self.tau[0]
         arch = {"type": "Exponential",
                 "kw_args": {"tau": tau,
                             "sign_constraint": self.sign_constraint}}
