@@ -210,21 +210,14 @@ least-squares we used in the previous tutorial:
 
 We saved a lot of lines and hassle compared to the previous fitting by using the
 :class:`~disstans.network.Network` methods. We already calculated the residuals and
-errors, so let's print some statistics::
+errors, so let's print some statistics:
+
+.. doctest::
 
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg                          Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.624258e-08            2.046006
-
-.. doctest::
-    :hide:
-
-    >>> with pd.option_context("display.precision", 1):
-    ...     _ = stat.analyze_residuals(ts_description="Res_noreg",
-    ...                                mean=True, std=True, verbose=True)
-    TUT: Res_noreg                     Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.6e-08                 2.0
+    Total-Displacement_Model_Total  1.624111e-08            2.046006
 
 Advanced plotting
 -----------------
@@ -293,21 +286,14 @@ solver:
     >>> stat["Res_L2"] = stat["Displacement"] - stat["Fit_L2"]
     >>> stat["Err_L2"] = stat["Fit_L2"] - stat["Truth"]
 
-Giving us the statistics::
-    
+Giving us the statistics:
+
+.. doctest::
+
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2                             Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.656468e-09            2.087589
-
-.. doctest::
-    :hide:
-
-    >>> with pd.option_context("display.precision", 1):
-    ...     _ = stat.analyze_residuals(ts_description="Res_L2",
-    ...                                mean=True, std=True, verbose=True)
-    TUT: Res_L2                        Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.7e-09                 2.1
+    Total-Displacement_Model_Total  1.656325e-09            2.087589
 
 ::
 
@@ -363,21 +349,14 @@ basically-zero splines in the transient dictionary:
     >>> stat["Res_L1"] = stat["Displacement"] - stat["Fit_L1"]
     >>> stat["Err_L1"] = stat["Fit_L1"] - stat["Truth"]
 
-Giving us the statistics::
+Giving us the statistics:
+
+.. doctest::
 
     >>> _ = stat.analyze_residuals(ts_description="Res_L1",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1                         Mean  Standard Deviation
     Total-Displacement_Model_Total  0.000003            2.121951
-
-.. doctest::
-    :hide:
-
-    >>> with pd.option_context("display.precision", 1):
-    ...     _ = stat.analyze_residuals(ts_description="Res_L1",
-    ...                                mean=True, std=True, verbose=True)
-    TUT: Res_L1                        Mean  Standard Deviation
-    Total-Displacement_Model_Total  2.7e-06                 2.1
 
 ::
 
@@ -440,21 +419,14 @@ the notes of :func:`~disstans.solvers.lasso_regression`. Let's try it:
     >>> stat["Res_L1R"] = stat["Displacement"] - stat["Fit_L1R"]
     >>> stat["Err_L1R"] = stat["Fit_L1R"] - stat["Truth"]
 
-Giving us the statistics::
+Giving us the statistics:
+
+.. doctest::
 
     >>> _ = stat.analyze_residuals(ts_description="Res_L1R",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L1R                            Mean  Standard Deviation
     Total-Displacement_Model_Total  9.511036e-08            2.117921
-
-.. doctest::
-    :hide:
-
-    >>> with pd.option_context("display.precision", 1):
-    ...     _ = stat.analyze_residuals(ts_description="Res_L1R",
-    ...                                mean=True, std=True, verbose=True)
-    TUT: Res_L1R                       Mean  Standard Deviation
-    Total-Displacement_Model_Total  9.5e-08                 2.1
 
 ::
 
