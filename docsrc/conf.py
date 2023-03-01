@@ -81,11 +81,11 @@ autodoc_default_options = {'undoc-members': True,
 
 # intersphinx settings
 intersphinx_mapping = {'python': ('https://docs.python.org/3.10/', None),
-                       'numpy': ('https://numpy.org/doc/1.22/', None),
-                       'scipy': ('https://docs.scipy.org/doc/scipy-1.8.1/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.4.2/', None),
-                       'matplotlib': ('https://matplotlib.org/3.5.2/', None),
-                       'scikit-learn': ('https://scikit-learn.org/1.1/', None)}
+                       'numpy': ('https://numpy.org/doc/1.24/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy-1.10.0/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/1.4.4/', None),
+                       'matplotlib': ('https://matplotlib.org/3.7.0/', None),
+                       'scikit-learn': ('https://scikit-learn.org/1.2/', None)}
 
 # ReadTheDocs theme settings
 html_theme_options = {'collapse_navigation': False,
