@@ -42,8 +42,8 @@ synth_ts = Timeseries.from_array(timevector=timevector,
 synth_stat["Data"] = synth_ts
 
 # add noise to synthetic timeseries
-np.random.seed(1)  # make this example reproducible
-noise = np.random.randn(*synth_stat["Data"].shape)*0.01
+rng = np.random.default_rng(1)  # make this example reproducible
+noise = rng.normal(scale=0.01, size=synth_stat["Data"].shape)
 synth_stat["Data"].data += noise
 
 # plot the synthetic data

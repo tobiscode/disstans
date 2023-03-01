@@ -105,8 +105,8 @@ the tutorial:
 
 .. doctest::
 
-    >>> np.random.seed(1)  # make this example reproducible
-    >>> noise = np.random.randn(*synth_stat["Data"].shape)*0.01
+    >>> rng = np.random.default_rng(1)  # make this example reproducible
+    >>> noise = rng.normal(scale=0.01, size=synth_stat["Data"].shape)
     >>> synth_stat["Data"].data += noise
 
 Finally, let's have a look at the timeseries we created. DISSTANS provides a straightforward
@@ -237,7 +237,7 @@ Timeseries object that can be added to the station.
     >>> stats_dict = synth_stat.analyze_residuals(ts_description="Residual",
     ...                                           mean=True, std=True, verbose=True)
     TUT: Residual          Mean  Standard Deviation
-    total-total    4.420482e-14            0.009595
+    total-total    5.323611e-14            0.009065
 
 And we can plot it like before::
 
