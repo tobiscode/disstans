@@ -2723,22 +2723,21 @@ class ModelCollection():
             assert isinstance(icomp, int) and icomp in list(range(num_comps)), \
                 "'icomp' must be a valid integer component index (between 0 and " \
                 f"{num_comps-1}), got {icomp}."
-            # d and G are dense
             d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
             dnotnan = ~np.isnan(d).squeeze()
-            Gout = G.A[np.ix_(dnotnan, obs_mask)]
-            # W is sparse
+            Gout = G[:, obs_mask]
             if (ts.var_cols is not None) and use_data_var:
-                Linv = sparse.diags(ts.df[ts.var_cols[icomp]].values[dnotnan] ** 0.5)
+                Linv = sparse.diags(ts.df[ts.var_cols[icomp]].values ** 0.5)
+                if return_W_G:
+                    W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
             else:
-                Linv = sparse.eye(dnotnan.sum())
+                Linv = sparse.eye(ts.df[ts.var_cols[icomp]].size)
+                if return_W_G:
+                    W = sparse.eye(dnotnan.sum())
         else:
-            # d is dense, G and W are sparse
             d = ts.data.values.reshape(-1, 1)
             dnotnan = ~np.isnan(d).squeeze()
             Gout = sparse.kron(G[:, obs_mask], sparse.eye(num_comps), format='csr')
-            if dnotnan.sum() < dnotnan.size:
-                Gout = Gout[dnotnan, :]
             if (ts.cov_cols is not None) and use_data_var and use_data_cov:
                 var_cov_matrix = ts.var_cov.values
                 Linvblocks = [np.linalg.cholesky(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
@@ -2746,26 +2745,35 @@ class ModelCollection():
                               for iobs in range(ts.num_observations)]
                 Linv = sparse.block_diag(Linvblocks, format='csr')
                 Linv.eliminate_zeros()
-                if dnotnan.sum() < dnotnan.size:
-                    Linv = Linv[dnotnan, :].tocsc()[:, dnotnan]
+                if return_W_G:
+                    Wblocks = [sp.linalg.pinvh(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
+                                                          (num_comps, num_comps)))
+                               for iobs in range(ts.num_observations)]
+                    W = sparse.block_diag(Wblocks, format='csr')
+                    W.eliminate_zeros()
+                    if dnotnan.sum() < dnotnan.size:
+                        W = W[dnotnan, :].tocsc()[:, dnotnan]
             elif (ts.var_cols is not None) and use_data_var:
-                Linv = sparse.diags(ts.vars.values.ravel()[dnotnan] ** 0.5)
+                Linv = sparse.diags(ts.vars.values.ravel() ** 0.5)
+                if return_W_G:
+                    W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
             else:
-                Linv = sparse.eye(dnotnan.sum())
+                Linv = sparse.eye(ts.vars.size)
+                if return_W_G:
+                    W = sparse.eye(dnotnan.sum())
         if dnotnan.sum() < dnotnan.size:
+            d = d[dnotnan]
+            Gout = Gout[dnotnan, :]
+            if isinstance(Linv, sparse.dia_matrix):
+                Linv = sparse.diags(Linv.diagonal()[dnotnan])
+            else:  # is csr
+                Linv = Linv[dnotnan, :].tocsc()[:, dnotnan]
             # double-check
             if np.any(np.isnan(Gout.data)) or np.any(np.isnan(Linv.data)):
                 raise ValueError("Still NaNs in G or Linv, unexpected error!")
-        # everything here will be dense, except GtWG when using data covariance
-        d = d[dnotnan]
         LinvG = Linv @ Gout
         GtWd = (LinvG.T @ (Linv @ d)).squeeze()
         GtWG = LinvG.T @ LinvG
-        if return_W_G:
-            if isinstance(GtWG, sparse.spmatrix):
-                W = sparse.linalg.inv(GtWG)
-            else:
-                W = np.linalg.pinv(GtWG)
         if isinstance(GtWG, sparse.spmatrix):
             GtWG = GtWG.A
         if return_W_G:
