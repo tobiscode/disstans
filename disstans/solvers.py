@@ -933,7 +933,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     # solve CVXPY problem while checking for convergence
     def solve_problem(GtWG, GtWd, pen, num_comps, init_weights, nonneg, nonpos):
         # build objective function
-        m = cp.Variable(GtWd.size)
+        m = cp.Variable(GtWG.shape[1])
         objective = cp.norm2(GtWG @ m - GtWd)
         constraints = []
         if check_constraints:

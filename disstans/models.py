@@ -2729,9 +2729,9 @@ class ModelCollection():
             Gout = G.A[np.ix_(dnotnan, obs_mask)]
             # W is sparse
             if (ts.var_cols is not None) and use_data_var:
-                W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
+                Linv = sparse.diags(ts.df[ts.var_cols[icomp]].values[dnotnan] ** 0.5)
             else:
-                W = sparse.eye(dnotnan.sum())
+                Linv = sparse.eye(dnotnan.sum())
         else:
             # d is dense, G and W are sparse
             d = ts.data.values.reshape(-1, 1)
@@ -2741,26 +2741,31 @@ class ModelCollection():
                 Gout = Gout[dnotnan, :]
             if (ts.cov_cols is not None) and use_data_var and use_data_cov:
                 var_cov_matrix = ts.var_cov.values
-                Wblocks = [sp.linalg.pinvh(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
-                                                      (num_comps, num_comps)))
-                           for iobs in range(ts.num_observations)]
-                W = sparse.block_diag(Wblocks, format='csr')
-                W.eliminate_zeros()
+                Linvblocks = [np.linalg.cholesky(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
+                                                 (num_comps, num_comps)))
+                              for iobs in range(ts.num_observations)]
+                Linv = sparse.block_diag(Linvblocks, format='csr')
+                Linv.eliminate_zeros()
                 if dnotnan.sum() < dnotnan.size:
-                    W = W[dnotnan, :].tocsc()[:, dnotnan]
+                    Linv = Linv[dnotnan, :].tocsc()[:, dnotnan]
             elif (ts.var_cols is not None) and use_data_var:
-                W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
+                Linv = sparse.diags(ts.vars.values.ravel()[dnotnan] ** 0.5)
             else:
-                W = sparse.eye(dnotnan.sum())
+                Linv = sparse.eye(dnotnan.sum())
         if dnotnan.sum() < dnotnan.size:
             # double-check
-            if np.any(np.isnan(Gout.data)) or np.any(np.isnan(W.data)):
-                raise ValueError("Still NaNs in G or W, unexpected error!")
-        # everything here will be dense, except GtW when using data covariance
+            if np.any(np.isnan(Gout.data)) or np.any(np.isnan(Linv.data)):
+                raise ValueError("Still NaNs in G or Linv, unexpected error!")
+        # everything here will be dense, except GtWG when using data covariance
         d = d[dnotnan]
-        GtW = Gout.T @ W
-        GtWG = GtW @ Gout
-        GtWd = (GtW @ d).squeeze()
+        LinvG = Linv @ Gout
+        GtWd = (LinvG.T @ (Linv @ d)).squeeze()
+        GtWG = LinvG.T @ LinvG
+        if return_W_G:
+            if isinstance(GtWG, sparse.spmatrix):
+                W = sparse.linalg.inv(GtWG)
+            else:
+                W = np.linalg.pinv(GtWG)
         if isinstance(GtWG, sparse.spmatrix):
             GtWG = GtWG.A
         if return_W_G:
