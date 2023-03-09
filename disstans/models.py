@@ -2667,7 +2667,7 @@ class ModelCollection():
 
     @staticmethod
     def build_LS(ts, G, obs_mask, icomp=None, return_W_G=False,
-                 use_data_var=True, use_data_cov=True):
+                 use_data_var=True, use_data_cov=True, robust=False):
         r"""
         Helper function that builds the necessary matrices to solve the
         least-squares problem for the observable parameters given observations.
@@ -2702,6 +2702,7 @@ class ModelCollection():
         use_data_cov : bool, optional
             If ``True`` (default), use the data covariance if present. If ``False``,
             ignore it even if it is present.
+        robust : bool, optional
 
         Returns
         -------
@@ -2772,14 +2773,18 @@ class ModelCollection():
             if np.any(np.isnan(Gout.data)) or np.any(np.isnan(Linv.data)):
                 raise ValueError("Still NaNs in G or Linv, unexpected error!")
         LinvG = Linv @ Gout
-        GtWd = (LinvG.T @ (Linv @ d)).squeeze()
-        GtWG = LinvG.T @ LinvG
-        if isinstance(GtWG, sparse.spmatrix):
-            GtWG = GtWG.A
-        if return_W_G:
-            return Gout, W, GtWG, GtWd
+        if robust:
+            out_A = LinvG.A
+            out_b = (Linv @ d).squeeze()
         else:
-            return GtWG, GtWd
+            out_A = LinvG.T @ LinvG
+            out_b = (LinvG.T @ (Linv @ d)).squeeze()
+        if isinstance(out_A, sparse.spmatrix):
+            out_A = out_A.A
+        if return_W_G:
+            return Gout, W, out_A, out_b
+        else:
+            return out_A, out_b
 
     def plot_covariance(self, title=None, fname=None, use_corr_coef=False, plot_empty=True,
                         save_kw_args={"format": "png"}):

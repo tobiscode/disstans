@@ -723,7 +723,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                      reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
                      formal_covariance=False, use_data_variance=True, use_data_covariance=True,
                      use_internal_scales=True, cov_zero_threshold=1e-6, return_weights=False,
-                     check_constraints=True,
+                     check_constraints=True, robust=False,
                      cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
     r"""
     Performs linear, L1-regularized least squares using
@@ -821,6 +821,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     check_constraints : bool, optional
         If ``True`` (default), check whether models have sign constraints that should
         be enforced.
+    robust : bool, optional
     cvxpy_kw_args : dict
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
         By default, the CVXPY solver options are set to use CVXOPT as the solver
@@ -1022,7 +1023,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         for i in range(num_comps):
             # build and solve problem
             Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
-                ts, G, obs_indices, icomp=i, return_W_G=True, use_data_var=use_data_variance)
+                ts, G, obs_indices, icomp=i, return_W_G=True,
+                use_data_var=use_data_variance, robust=robust)
             solution, wts = solve_problem(GtWG, GtWd, pen=penalty[i], num_comps=1,
                                           init_weights=reweight_init[:, i]
                                           if reweight_init is not None else None,
@@ -1069,7 +1071,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         # build stacked problem and solve
         Gnonan, Wnonan, GtWG, GtWd = models.build_LS(ts, G, obs_indices, return_W_G=True,
                                                      use_data_var=use_data_variance,
-                                                     use_data_cov=use_data_covariance)
+                                                     use_data_cov=use_data_covariance,
+                                                     robust=robust)
         solution, wts = solve_problem(GtWG, GtWd, pen=np.tile(penalty, num_reg),
                                       num_comps=num_comps,
                                       init_weights=reweight_init.ravel()
