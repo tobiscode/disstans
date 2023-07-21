@@ -933,9 +933,19 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
 
     # solve CVXPY problem while checking for convergence
     def solve_problem(GtWG, GtWd, pen, num_comps, init_weights, nonneg, nonpos):
+        # print(f"pen = {pen}")
+        # print(f"num_comps = {num_comps}")
+        # print(f"num_reg = {num_reg}")
+        # print(f"init_weights = {init_weights}")
+        # print(f"nonneg = {nonneg}")
+        # print(f"nonpos = {nonpos}")
+        # print(f"check_constraints = {check_constraints}")
+        # print(f"regularize = {regularize}")
+        # print(f"reweight_max_iters = {reweight_max_iters}")
         # build objective function
         m = cp.Variable(GtWG.shape[1])
-        objective = cp.norm2(GtWG @ m - GtWd)
+        # objective = cp.norm2(GtWG @ m - GtWd)
+        objective = cp.quad_form(m, cp.psd_wrap(GtWG)) - 2 * GtWd.T @ m
         constraints = []
         if check_constraints:
             if nonneg is not None:
@@ -1025,6 +1035,14 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
                 ts, G, obs_indices, icomp=i, return_W_G=True,
                 use_data_var=use_data_variance, robust=robust)
+            # np.savetxt("G.txt", Gnonan.A)
+            # np.savetxt("W.txt", np.diag(Wnonan.A))
+            # np.savetxt("GtWG.txt", GtWG)
+            # np.savetxt("GtWd.txt", GtWd)
+            # np.savetxt("ts.time.txt", ts.time.values)
+            # np.savetxt("ts.values.txt", ts.data.values[:, i])
+            # np.savetxt("reg_indices.txt", reg_indices)
+            # exit()
             solution, wts = solve_problem(GtWG, GtWd, pen=penalty[i], num_comps=1,
                                           init_weights=reweight_init[:, i]
                                           if reweight_init is not None else None,
@@ -1036,6 +1054,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                                           if check_constraints
                                           and nonpos_indices[:, i].sum() > 0
                                           else None)
+            # exit()
             # store results
             if solution is None:
                 params[:, i] = np.NaN

@@ -943,7 +943,7 @@ class BSpline(Model):
         # to avoid numerical issues, set to zero manually outside of valid domains
         coefs[np.abs(tnorm.squeeze()) > self.order / 2] = 0
         # to avoid even more numerical issues, set a basis function to zero if we only
-        # observe (somewhat arbitrarily) < 20% of a spline
+        # observe (somewhat arbitrarily) < 20% of a spline TODO
         # (setting an entire column to zero will make the calling get_mapping() method
         # flag this parameter as unobservable)
         del_t = np.max(trel.squeeze(), axis=0) - np.min(trel.squeeze(), axis=0)
@@ -1413,8 +1413,9 @@ class SplineSet(BaseSplineSet):
         # if a complete set is requested, we need to find the number of overlaps
         # given the degree on a single side
         num_overlaps = int(np.floor(degree/2)) if complete else 0
-        # for each scale, make a BSplines object
+        # for each scale, make a spline object
         splines = []
+        obs_scale = model_kw_args.pop("obs_scale", 1)
         for elem in relevant_list:
             # Calculate the scale as float and Timedelta depending on the function call
             if list_scales is not None:
@@ -1429,8 +1430,12 @@ class SplineSet(BaseSplineSet):
             # shift the reference to be the first spline
             t_ref = t_center_start_tstamp - num_overlaps*scale_tdelta
             # create model and append
-            splines.append(splineclass(degree, scale_float, num_splines=num_centerpoints,
-                           t_reference=t_ref, time_unit=time_unit, regularize=regularize))
+            splines.append(splineclass(degree, scale_float,
+                                       num_splines=num_centerpoints,
+                                       t_reference=t_ref,
+                                       time_unit=time_unit,
+                                       regularize=regularize,
+                                       obs_scale=obs_scale))
         # set attributes
         self.degree = degree
         """ Degree of the splines. """
@@ -1452,6 +1457,11 @@ class SplineSet(BaseSplineSet):
         (see class documentation).
         """
         # create the BaseSplineSet and therefore Model object
+        if "zero_after" not in model_kw_args:
+            if splineclass == BSpline:
+                model_kw_args["zero_after"] = True
+            elif splineclass == ISpline:
+                model_kw_args["zero_after"] = False
         super().__init__(splines=splines, time_unit=time_unit, regularize=regularize,
                          **model_kw_args)
 
@@ -1497,12 +1507,14 @@ class DecayingSplineSet(BaseSplineSet):
         Number of splines to create for each scale.
     time_unit : str, optional
         Time unit of scale, spacing and model parameters.
+    splineclass : Model, optional
+        Model class to use for the splines. Defaults to :class:`~disstans.models.ISpline`.
 
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
     """
     def __init__(self, degree, t_center_start, list_scales, list_num_splines, time_unit="D",
-                 regularize=True, **model_kw_args):
+                 splineclass=ISpline, regularize=True, **model_kw_args):
         # initial checks
         if isinstance(list_num_splines, int):
             list_num_splines = [list_num_splines] * len(list_scales)
@@ -1513,30 +1525,51 @@ class DecayingSplineSet(BaseSplineSet):
         assert len(list_scales) == len(list_num_splines), \
             "'list_scales' and 'list_num_splines' need to have the same lengths, got " \
             f"{len(list_scales)} and {len(list_num_splines)} elements."
+        try:
+            if isinstance(splineclass, str):
+                splineclass = globals()[splineclass]
+            assert issubclass(splineclass, Model)
+        except BaseException as e:
+            raise LookupError("When trying to create the SplineSet, couldn't find the model "
+                              f"'{splineclass}' (expected Model type argument or string "
+                              "representation of a loaded Model)."
+                              ).with_traceback(e.__traceback__) from e
         # create spline set
         t_center_start_tstamp = pd.Timestamp(t_center_start)
         splines = []
+        obs_scale = model_kw_args.pop("obs_scale", 1)
         for scale_float, num_centerpoints in zip(list_scales, list_num_splines):
-            splines.append(ISpline(degree, scale_float, num_splines=num_centerpoints,
-                           t_reference=t_center_start_tstamp, time_unit=time_unit,
-                           regularize=regularize))
+            splines.append(splineclass(degree, scale_float,
+                                       num_splines=num_centerpoints,
+                                       t_reference=t_center_start_tstamp,
+                                       time_unit=time_unit,
+                                       regularize=regularize,
+                                       obs_scale=obs_scale))
         # save attributes
         self.degree = degree
         """ Degree of the splines. """
         self.t_center_start = t_center_start_tstamp.isoformat()
         """ Relevant time span start. """
+        self.splineclass = splineclass
+        """ Class of the splines contained. """
         self.list_scales = list_scales
         """ List of scales of each of the sub-splines. """
         self.list_num_splines = list_num_splines
         """ List of number of splines for each scale. """
         # create the BaseSplineSet and therefore Model object
+        if "zero_after" not in model_kw_args:
+            if splineclass == BSpline:
+                model_kw_args["zero_after"] = True
+            elif splineclass == ISpline:
+                model_kw_args["zero_after"] = False
         super().__init__(splines=splines, time_unit=time_unit, regularize=regularize,
                          **model_kw_args)
 
     def _get_arch(self):
-        arch = {"type": "DecayingISplineSet",
+        arch = {"type": "DecayingSplineSet",
                 "kw_args": {"degree": self.degree,
                             "t_center_start": self.t_center_start,
+                            "splineclass": self.splineclass.__name__,
                             "list_scales": self.list_scales,
                             "list_num_splines": self.list_num_splines,
                             "internal_scaling": self.internal_scaling}}
@@ -2728,10 +2761,12 @@ class ModelCollection():
             dnotnan = ~np.isnan(d).squeeze()
             Gout = G[:, obs_mask]
             if (ts.var_cols is not None) and use_data_var:
+                # print("icomp not None, use variance\n")
                 Linv = sparse.diags(ts.df[ts.var_cols[icomp]].values ** 0.5)
                 if return_W_G:
                     W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
             else:
+                # print("icomp not None, don't use variance\n")
                 Linv = sparse.eye(ts.df[ts.var_cols[icomp]].size)
                 if return_W_G:
                     W = sparse.eye(dnotnan.sum())
@@ -2740,6 +2775,7 @@ class ModelCollection():
             dnotnan = ~np.isnan(d).squeeze()
             Gout = sparse.kron(G[:, obs_mask], sparse.eye(num_comps), format='csr')
             if (ts.cov_cols is not None) and use_data_var and use_data_cov:
+                # print("icomp None, use covariance\n")
                 var_cov_matrix = ts.var_cov.values
                 Linvblocks = [np.linalg.cholesky(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
                                                  (num_comps, num_comps)))
@@ -2755,13 +2791,18 @@ class ModelCollection():
                     if dnotnan.sum() < dnotnan.size:
                         W = W[dnotnan, :].tocsc()[:, dnotnan]
             elif (ts.var_cols is not None) and use_data_var:
+                # print("icomp None, use variance\n")
                 Linv = sparse.diags(ts.vars.values.ravel() ** 0.5)
                 if return_W_G:
                     W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
             else:
+                # print("icomp None, don't use variance\n")
                 Linv = sparse.eye(ts.vars.size)
                 if return_W_G:
                     W = sparse.eye(dnotnan.sum())
+        # print("Before NaN removal:\n"
+        #       f"Gout: {type(Gout)}\n"
+        #       f"Linv: {type(Linv)}\n")
         if dnotnan.sum() < dnotnan.size:
             d = d[dnotnan]
             Gout = Gout[dnotnan, :]
@@ -2772,6 +2813,9 @@ class ModelCollection():
             # double-check
             if np.any(np.isnan(Gout.data)) or np.any(np.isnan(Linv.data)):
                 raise ValueError("Still NaNs in G or Linv, unexpected error!")
+            # print("After NaN removal:\n"
+            #       f"Gout: {type(Gout)}\n"
+            #       f"Linv: {type(Linv)}\n")
         LinvG = Linv @ Gout
         if robust:
             out_A = LinvG.A
@@ -2779,6 +2823,12 @@ class ModelCollection():
         else:
             out_A = LinvG.T @ LinvG
             out_b = (LinvG.T @ (Linv @ d)).squeeze()
+        # print("After computation:\n"
+        #       f"LinvG: {type(LinvG)}\n"
+        #       f"out_A: {type(out_A)}\n"
+        #       f"out_b: {type(out_b)}\n")
+        # if return_W_G:
+        #     print(f"W: {type(W)}\n")
         if isinstance(out_A, sparse.spmatrix):
             out_A = out_A.A
         if return_W_G:
