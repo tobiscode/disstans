@@ -26,6 +26,7 @@ dependencies:
   - build  # optional
   - twine  # optional
   - sphinx-rtd-theme  # optional
+  - sphinx-autodoc-typehints  # optional
   - pygmt  # optional
   - pip
   - pip:
