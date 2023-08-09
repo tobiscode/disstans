@@ -79,6 +79,12 @@ class Timeseries():
         assert isinstance(data_unit, str)
         assert isinstance(data_cols, list) and all([isinstance(dcol, str) for dcol in data_cols])
         assert all([dcol in dataframe.columns for dcol in data_cols])
+        # duplicates check
+        index_duplicated = dataframe.index.duplicated()
+        if index_duplicated.sum() > 0:
+            raise RuntimeError("Input DataFrame cannot have duplicate indices, but found the "
+                               "following duplicate timestamps:\n" +
+                               str(dataframe.index[index_duplicated].to_list()))
         # save to private instance variables
         self._df = dataframe
         self._src = src
