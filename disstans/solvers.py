@@ -723,8 +723,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                      reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
                      formal_covariance=False, use_data_variance=True, use_data_covariance=True,
                      use_internal_scales=True, cov_zero_threshold=1e-6, return_weights=False,
-                     check_constraints=True,
-                     cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
+                     check_constraints=True, **cvxpy_kw_args):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -821,13 +820,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     check_constraints : bool, optional
         If ``True`` (default), check whether models have sign constraints that should
         be enforced.
-    cvxpy_kw_args : dict
+    **cvxpy_kw_args : dict
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
-        By default, the CVXPY solver options are set to use CVXOPT as the solver
-        library, together with CVXPY's *robust* ``kktsolver`` option. This slows down
-        the solution significantly, but in general will converge more reliably
-        when using L1 regularization. If you want to switch to default CVXPY settings,
-        pass an empty dictionary.
 
     Returns
     -------
@@ -899,7 +893,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         f"'cov_zero_threshold needs to be non-negative, got {cov_zero_threshold}."
 
     # get mapping and regularization matrix
-    G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, \
+    G, obs_indices, _, _, num_comps, num_obs, num_reg, reg_indices, \
         reweight_init, weights_scaling, sign_constraints = models.prepare_LS(
             ts, reweight_init=reweight_init, use_internal_scales=True,
             check_constraints=check_constraints)

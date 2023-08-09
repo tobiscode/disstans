@@ -951,7 +951,7 @@ class Network():
                    return_stats=True, extended_stats=False,
                    keep_mdl_res_as=None, return_solutions=False,
                    zero_threshold=1e-4, num_threads_evaluate=None, roll_mean_kernel=30,
-                   cvxpy_kw_args={"solver": "CVXOPT", "kktsolver": "robust"}):
+                   **cvxpy_kw_args):
         r"""
         Fit the models for a specific timeseries at all stations using the
         spatiotemporal capabilities of :func:`~disstans.solvers.lasso_regression`,
@@ -1083,7 +1083,7 @@ class Network():
         roll_mean_kernel : int, optional
             Only used if ``extended_stats=True``. This is the kernel size that gets used in the
             analysis of the residuals between each fitting step.
-        cvxpy_kw_args : dict
+        **cvxpy_kw_args : dict
             Additional keyword arguments passed on to CVXPY's ``solve()`` function,
             see ``cvxpy_kw_args`` in :func:`~disstans.solvers.lasso_regression`.
 
@@ -1231,7 +1231,7 @@ class Network():
                              use_data_covariance=use_data_covariance,
                              use_internal_scales=use_internal_scales,
                              cov_zero_threshold=cov_zero_threshold,
-                             cvxpy_kw_args=cvxpy_kw_args)
+                             **cvxpy_kw_args)
         num_total = sum([s.models[ts_description][m].parameters.size
                          for s in valid_stations.values() for m in all_reweight_models])
         num_uniques = np.sum(np.stack(
@@ -1402,7 +1402,7 @@ class Network():
                                  use_data_variance=use_data_variance,
                                  use_data_covariance=use_data_covariance,
                                  cov_zero_threshold=cov_zero_threshold,
-                                 cvxpy_kw_args=cvxpy_kw_args)
+                                 **cvxpy_kw_args)
             # get statistics
             num_nonzero = sum([(s.models[ts_description][m].parameters.ravel()
                                 > zero_threshold).sum()

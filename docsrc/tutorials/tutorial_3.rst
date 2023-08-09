@@ -594,10 +594,9 @@ the quality of the fit.
 
 :meth:`~disstans.network.Network.spatialfit` takes some important arguments, but at its core
 it's essentially a wrapper for :meth:`~disstans.network.Network.fit`. Just like the latter,
-we give it an (initial) ``penalty`` parameter, and our ``cvxpy_kw_args`` solver settings.
-Additionally, we can now specify the models which we want to combine spatially
-(``spatial_reweight_models``), how many spatial iterations we want
-(``spatial_reweight_iters``), and what reweighting function we want to use
+we give it an (initial) ``penalty`` parameter. Additionally, we can now specify the models
+which we want to combine spatially (``spatial_reweight_models``), how many spatial iterations
+we want (``spatial_reweight_iters``), and what reweighting function we want to use
 (``local_reweight_func``). The choice of the reweighting function and its hyperparameters
 is crucial for good results, much like the choice of the penalty parameter for simple
 L2-regularized least squares. At this stage, there is no perfect way to know the best
