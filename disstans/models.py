@@ -2315,8 +2315,13 @@ class ModelCollection():
         if len(self) > 0:
             internal_scales = []
             for m in self:
-                internal_scales.append(getattr(m, "internal_scales",
-                                               np.ones(m.num_parameters)))
+                try:
+                    if m.internal_scales is None:
+                        internal_scales.append(np.ones(m.num_parameters))
+                    else:
+                        internal_scales.append(m.internal_scales)
+                except AttributeError:
+                    internal_scales.append(np.ones(m.num_parameters))
             return np.concatenate(internal_scales)
 
     @property
