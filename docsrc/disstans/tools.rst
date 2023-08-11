@@ -6,6 +6,11 @@ Tools
 Functions
 ---------
 
+best_utmzone
+............
+
+.. autofunction:: disstans.tools.best_utmzone
+
 block_permutation
 .................
 
