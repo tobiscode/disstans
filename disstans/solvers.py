@@ -778,7 +778,6 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         Defaults to no reweighting (``None``).
     reweight_func : ReweightingFunction, optional
         If reweighting is active, the reweighting function instance to be used.
-        Defaults to an inverse reweighting with stability parameter ``eps=1e-4``.
     reweight_max_rss : float, optional
         When reweighting is active and the maximum number of iterations has not yet
         been reached, let the iteration stop early if the solutions do not change much
@@ -907,12 +906,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     else:
         assert isinstance(reweight_max_iters, int) and reweight_max_iters > 0
         n_iters = int(reweight_max_iters)
-        if reweight_func is None:
-            rw_func = ReweightingFunction.from_name("inv", 1e-4)
-        else:
-            assert isinstance(reweight_func, ReweightingFunction), "'reweight_func' " \
-                f"needs to be None or a ReweightingFunction, got {type(reweight_func)}."
-            rw_func = reweight_func
+        assert isinstance(reweight_func, ReweightingFunction), "'reweight_func' " \
+            f"needs to be a ReweightingFunction, got {type(reweight_func)}."
     # determine if reg_indices and weights_scaling need a reshape
     if (ts.cov_cols is not None) and use_data_covariance:
         reg_indices = np.repeat(reg_indices, num_comps)
@@ -982,9 +977,9 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                 if regularize and reweight_max_iters is not None:
                     # update weights
                     if use_internal_scales and (weights_scaling is not None):
-                        weights.value = rw_func(m.value[reg_indices]*weights_scaling)
+                        weights.value = reweight_func(m.value[reg_indices]*weights_scaling)
                     else:
-                        weights.value = rw_func(m.value[reg_indices])
+                        weights.value = reweight_func(m.value[reg_indices])
                     # check if the solution changed to previous iteration
                     if (i > 0) and (np.sqrt(np.sum((old_m - m.value)**2)) < reweight_max_rss):
                         break
