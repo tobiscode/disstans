@@ -204,7 +204,7 @@ def median(array, kernel_size):
 
 
 @unwrap_dict_and_ts
-def decompose(array, method, num_components=1, return_sources=False):
+def decompose(array, method, num_components=1, return_sources=False, rng=None):
     r"""
     Decomposes the input signal into different components using PCA or ICA.
 
@@ -226,6 +226,8 @@ def decompose(array, method, num_components=1, return_sources=False):
     return_sources : bool, optional
         If ``True``, return not only the best-fit model, but also the sources
         themselves in space and time. Defaults to ``False``.
+    rng : np.random.Generator, optional
+        Random number generator instance to use to fill missing values.
 
     Returns
     -------
@@ -262,7 +264,11 @@ def decompose(array, method, num_components=1, return_sources=False):
     array_nanmean = np.nanmean(array, axis=0)
     array_nansd = np.nanstd(array, axis=0)
     array_nanind = np.isnan(array)
-    rng = np.random.default_rng()
+    if rng is None:
+        rng = np.random.default_rng()
+    else:
+        assert isinstance(rng, np.random.Generator), "'rng' needs to be None or a " \
+            f"Generator instance, got {type(rng)}."
     for icol in range(array.shape[1]):
         array[array_nanind[:, icol], icol] = array_nanmean[icol] + \
             array_nansd[icol] * rng.normal(size=array_nanind[:, icol].sum())
