@@ -29,7 +29,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.backend_bases import Event, MouseButton
 from cmcrameri import cm as scm
 from scipy.stats import circmean
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from typing import Any, Literal
 
 from .config import defaults
@@ -70,8 +70,11 @@ class Click():
         Which mouse button to operate on, see :class:`~matplotlib.backend_bases.MouseButton`
         for accepted values.
     """
-    def __init__(self, ax: mpl.Axis, func: Callable[[Event], None],
-                 button: MouseButton = MouseButton.LEFT):
+    def __init__(self,
+                 ax: mpl.Axis,
+                 func: Callable[[Event], None],
+                 button: MouseButton = MouseButton.LEFT
+                 ) -> None:
         self._ax = ax
         self._func = func
         self._button = button
@@ -81,23 +84,23 @@ class Click():
         self._c2 = self._ax.figure.canvas.mpl_connect('button_release_event', self._onrelease)
         self._c3 = self._ax.figure.canvas.mpl_connect('motion_notify_event', self._onmove)
 
-    def __del__(self):
+    def __del__(self) -> None:
         for cid in [self._c1, self._c2, self._c3]:
             self._ax.figure.canvas.mpl_disconnect(cid)
 
-    def _onclick(self, event: Event):
+    def _onclick(self, event: Event) -> None:
         if event.inaxes == self._ax:
             if event.button == self._button:
                 self._func(event)
 
-    def _onpress(self, event: Event):
+    def _onpress(self, event: Event) -> None:
         self._press = True
 
-    def _onmove(self, event: Event):
+    def _onmove(self, event: Event) -> None:
         if self._press:
             self._move = True
 
-    def _onrelease(self, event: Event):
+    def _onrelease(self, event: Event) -> None:
         if self._press and not self._move:
             self._onclick(event)
         self._press = False
@@ -106,7 +109,8 @@ class Click():
 
 def tvec_to_numpycol(timevector: pd.Series | pd.DatetimeIndex,
                      t_reference: str | pd.Timestamp | None = None,
-                     time_unit: str | None = 'D') -> np.ndarray:
+                     time_unit: str | None = "D"
+                     ) -> np.ndarray:
     """
     Converts a Pandas timestamp series into a NumPy array of relative
     time to a reference time in the given time unit.
@@ -268,8 +272,10 @@ def make_cov_index_map(num_components: int) -> (np.ndarray, np.ndarray):
     return index_map, var_cov_map
 
 
-def get_cov_indices(icomp: int, index_map: np.ndarray | None = None,
-                    num_components: int | None = None) -> list[int]:
+def get_cov_indices(icomp: int,
+                    index_map: np.ndarray | None = None,
+                    num_components: int | None = None
+                    ) -> list[int]:
     """
     Given a data or variance component index, retrieve the indices in the covariance columns
     of a timeseries or model that are associated with that component.
@@ -312,7 +318,8 @@ def get_cov_indices(icomp: int, index_map: np.ndarray | None = None,
     return sorted(indices)
 
 
-def full_cov_mat_to_columns(cov_mat: np.ndarray, num_components: int,
+def full_cov_mat_to_columns(cov_mat: np.ndarray,
+                            num_components: int,
                             include_covariance: bool = False,
                             return_single: bool = False
                             ) -> tuple[np.ndarray, ...]:
@@ -456,8 +463,11 @@ def cov2corr(cov: np.ndarray) -> np.ndarray:
     return corr
 
 
-def parallelize(func: Callable[[Any], Any], iterable: Iterable, num_threads: int | None = None,
-                chunksize: int = 1):
+def parallelize(func: Callable[[Any], Any],
+                iterable: Iterable,
+                num_threads: int | None = None,
+                chunksize: int = 1
+                ) -> Iterator[Any]:
     """
     Convenience wrapper that given a function, an iterable set of inputs
     and parallelization settings automatically either runs the function
@@ -537,7 +547,8 @@ def parallelize(func: Callable[[Any], Any], iterable: Iterable, num_threads: int
             yield func(parameter)
 
 
-def create_powerlaw_noise(size: int | list | tuple, exponent: int,
+def create_powerlaw_noise(size: int | list | tuple,
+                          exponent: int,
                           seed: int | np.random.Generator | None = None
                           ) -> np.ndarray:
     """
@@ -636,7 +647,9 @@ def create_powerlaw_noise(size: int | list | tuple, exponent: int,
     return out
 
 
-def parse_maintenance_table(csvpath: str, sitecol: int, datecols: list,
+def parse_maintenance_table(csvpath: str,
+                            sitecol: int,
+                            datecols: list,
                             siteformatter: Callable[[str], str] | None = None,
                             delimiter: str = ',',
                             codecol: int | None = None,
@@ -751,9 +764,13 @@ def parse_maintenance_table(csvpath: str, sitecol: int, datecols: list,
     return maint_table, maint_dict
 
 
-def weighted_median(values: np.ndarray, weights: np.ndarray, axis: int = 0,
-                    percentile: float = 0.5, keepdims: bool = False,
-                    visualize: bool = False) -> np.ndarray:
+def weighted_median(values: np.ndarray,
+                    weights: np.ndarray,
+                    axis: int = 0,
+                    percentile: float = 0.5,
+                    keepdims: bool = False,
+                    visualize: bool = False
+                    ) -> np.ndarray:
     """
     Calculates the weighted median along a given axis.
 
@@ -835,10 +852,12 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
                       data_dir: str,
                       solution: Literal["final", "rapid", "ultra"] = "final",
                       rate: Literal["24h", "5min"] = "24h",
-                      reference: str = "IGS14", min_solutions: int = 100,
+                      reference: str = "IGS14",
+                      min_solutions: int = 100,
                       t_min: str | pd.Timestamp | None = None,
                       t_max: str | pd.Timestamp | None = None,
-                      verbose: bool = False, no_pbar: bool = False
+                      verbose: bool = False,
+                      no_pbar: bool = False
                       ) -> pd.DataFrame:
     """
     Downloads GNSS timeseries data from the University of Nevada at Reno's
@@ -1133,7 +1152,9 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     return stations
 
 
-def _download_update_file(local_path: str, remote_path: str, verbose: bool = False
+def _download_update_file(local_path: str,
+                          remote_path: str,
+                          verbose: bool = False
                           ) -> None:
     # check if local file exists and if so, get its last-modified time
     if os.path.isfile(local_path):
@@ -1165,8 +1186,10 @@ def _download_update_file(local_path: str, remote_path: str, verbose: bool = Fal
                        f" -> '{local_path}' ({local_time_str})")
 
 
-def parse_unr_steps(filepath: str, check_update: bool = True,
-                    only_stations: list[str] | None = None, verbose: bool = False
+def parse_unr_steps(filepath: str,
+                    check_update: bool = True,
+                    only_stations: list[str] | None = None,
+                    verbose: bool = False
                     ) -> (pd.DataFrame, dict[str, list], pd.DataFrame, dict[str, list]):
     """
     This functions parses the main step file from UNR and produces two step databases,
@@ -1289,7 +1312,8 @@ def best_utmzone(longitudes: np.ndarray) -> int:
     return utmzone
 
 
-def get_hom_vel_strain_rot(locations: np.ndarray, velocities: np.ndarray,
+def get_hom_vel_strain_rot(locations: np.ndarray,
+                           velocities: np.ndarray,
                            covariances: np.ndarray | None = None,
                            utmzone: int | None = None,
                            reference: int | list = 0
@@ -1476,8 +1500,10 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
         return rotation
 
 
-def estimate_euler_pole(locations: np.ndarray, velocities: np.ndarray,
-                        covariances: np.ndarray | None = None, enu: bool = True
+def estimate_euler_pole(locations: np.ndarray,
+                        velocities: np.ndarray,
+                        covariances: np.ndarray | None = None,
+                        enu: bool = True
                         ) -> (np.ndarray, np.ndarray):
     r"""
     Estimate a best-fit Euler pole assuming all velocities lie on the same
@@ -1826,7 +1852,7 @@ class RINEXDataHolding():
     METRICCOLS = ("number", "age", "recency", "length", "reliability")
     """ The metrics that can be calculated. """
 
-    def __init__(self, df: pd.DataFrame | None = None):
+    def __init__(self, df: pd.DataFrame | None = None) -> None:
         self._df = None
         self._locations_xyz = None
         self._locations_lla = None
@@ -1949,8 +1975,11 @@ class RINEXDataHolding():
         self._metrics = metrics
 
     @classmethod
-    def from_folders(cls, folders: tuple | list[tuple], verbose: bool = False,
-                     no_pbar: bool = False) -> RINEXDataHolding:
+    def from_folders(cls,
+                     folders: tuple | list[tuple],
+                     verbose: bool = False,
+                     no_pbar: bool = False
+                     ) -> RINEXDataHolding:
         """
         Convenience class method that creates a new RINEXDataHolding object and directly
         calls :meth:`~load_db_from_folders`.
@@ -1974,8 +2003,11 @@ class RINEXDataHolding():
         instance.load_db_from_folders(folders, verbose=verbose, no_pbar=no_pbar)
         return instance
 
-    def load_db_from_folders(self, folders: tuple | list[tuple], verbose: bool = False,
-                             no_pbar: bool = False) -> None:
+    def load_db_from_folders(self,
+                             folders: tuple | list[tuple],
+                             verbose: bool = False,
+                             no_pbar: bool = False
+                             ) -> None:
         """
         Loads a RINEX database from folders in the file system.
         The data should be located in one or multiple folder structure(s) organized by
@@ -2084,8 +2116,11 @@ class RINEXDataHolding():
         self.df = df
 
     @classmethod
-    def from_file(cls, db_file: str, locations_file: str | None = None,
-                  metrics_file: str | None = None, verbose: bool = False
+    def from_file(cls,
+                  db_file: str,
+                  locations_file: str | None = None,
+                  metrics_file: str | None = None,
+                  verbose: bool = False
                   ) -> RINEXDataHolding:
         """
         Convenience class method that creates a new RINEXDataHolding object from a file
@@ -2136,8 +2171,10 @@ class RINEXDataHolding():
         # save to attribute
         self.df = df
 
-    def load_locations_from_rinex(self, keep: Literal["last", "first", "mean"] = "last",
-                                  replace_not_found: bool = False, no_pbar: bool = True
+    def load_locations_from_rinex(self,
+                                  keep: Literal["last", "first", "mean"] = "last",
+                                  replace_not_found: bool = False,
+                                  no_pbar: bool = True
                                   ) -> None:
         """
         Scan the RINEX files' headers for approximate locations for
@@ -2217,11 +2254,13 @@ class RINEXDataHolding():
             raise ValueError(f"Unrecognized DataFrame columns in {filepath}: " +
                              str(df.columns.tolist()))
 
-    def get_files_by(self, station: str | list[str] | None = None,
+    def get_files_by(self,
+                     station: str | list[str] | None = None,
                      network: str | list[str] | None = None,
                      year: int | list[int] | None = None,
                      between: tuple | None = None,
-                     verbose: bool = False) -> pd.DataFrame:
+                     verbose: bool = False
+                     ) -> pd.DataFrame:
         """
         Return a subset of the database by criteria.
 
@@ -2406,7 +2445,8 @@ class RINEXDataHolding():
                 headers[descriptor] = content
         return headers
 
-    def calculate_availability_metrics(self, sampling: Timedelta = Timedelta(1, "D")
+    def calculate_availability_metrics(self,
+                                       sampling: Timedelta = Timedelta(1, "D")
                                        ) -> None:
         """
         Calculates the following metrics and stores them in the :attr:`~metrics`
@@ -2442,12 +2482,12 @@ class RINEXDataHolding():
         metrics = metrics.astype({"number": int})
         self.metrics = metrics
 
-    def _create_map_figure(self, gui_settings: dict, annotate_stations: bool, figsize: tuple
+    def _create_map_figure(self,
+                           gui_settings: dict,
+                           annotate_stations: bool,
+                           figsize: tuple
                            ) -> (mpl.Figure, mpl.Axis, ccrs.CRS, ccrs.CRS,
                                  matplotlib.collections.PathCollection, list[str]):
-        """
-        Create a basemap of all stations.
-        """
         # get location data and projections
         stat_lats = self.locations_lla["lat"].values
         stat_lons = self.locations_lla["lon"].values
@@ -2483,13 +2523,15 @@ class RINEXDataHolding():
                            edgecolor="white" if map_underlay else "black")
         return fig, ax, proj_gui, proj_lla, stat_points, stat_names
 
-    def plot_map(self, metric: str | None = None,
+    def plot_map(self,
+                 metric: str | None = None,
                  orientation: Literal["horizontal", "vertical"] = "horizontal",
                  annotate_stations: bool = True,
                  figsize: tuple | None = None,
                  saveas: str | None = None,
                  dpi: float | None = None,
-                 gui_kw_args: dict = {}) -> None:
+                 gui_kw_args: dict[str,  Any] = {}
+                 ) -> None:
         """
         Plot a map of all the stations present in the RINEX database.
         The markers can be colored by the different availability metrics calculated
@@ -2571,8 +2613,11 @@ class RINEXDataHolding():
         # show
         plt.show()
 
-    def plot_availability(self, sampling: Timedelta = Timedelta(1, "D"),
-                          sort_by_latitude: bool = True, saveas: str = None) -> None:
+    def plot_availability(self,
+                          sampling: Timedelta = Timedelta(1, "D"),
+                          sort_by_latitude: bool = True,
+                          saveas: str = None
+                          ) -> None:
         """
         Create an availability figure for the dataset.
 

@@ -3,6 +3,7 @@ This module contains solver routines for fitting models to the timeseries
 of stations.
 """
 
+from __future__ import annotations
 import numpy as np
 import scipy as sp
 import scipy.sparse as sparse
@@ -12,6 +13,7 @@ from abc import ABC, abstractmethod
 
 from .tools import block_permutation
 from .models import ModelCollection
+from .timeseries import Timeseries
 
 
 class Solution():
@@ -22,31 +24,37 @@ class Solution():
 
     Parameters
     ----------
-    disstans.models.ModelCollection
+    models
         Model collection object that describes which models were used by the solver.
-    parameters : numpy.ndarray
+    parameters
         Model collection parameters of shape
         :math:`(\text{num_solved}, \text{num_components})`.
-    covariances : numpy.ndarray, optional
+    covariances
         Full model variance-covariance matrix that has a square shape with dimensions
         :math:`\text{num_solved} * \text{num_components}`.
-    weights : numpy.ndarray, optional
+    weights
         Model parameter regularization weights of shape
         :math:`(\text{num_solved}, \text{num_components})`.
-    obs_indices : numpy.ndarray, optional
+    obs_indices
         Observation mask of shape :math:`(\text{num_parameters}, )`
         with ``True`` at indices where the parameter was actually estimated,
         and ``False`` where the estimation was skipped due to observability or
         other reasons.
-        Defaults to all ``True``, which implies that
+        ``None`` defaults to all ``True``, which implies that
         :math:`\text{num_parameters} = \text{num_solved}`.
-    reg_indices : numpy.ndarray, optional
+    reg_indices
         Regularization mask of shape :math:`(\text{num_solved}, )`
         with ``True`` where a parameter was subject to regularization,
-        and ``False`` otherwise. Defaults to all ``False``.
+        and ``False`` otherwise. ``None`` defaults to all ``False``.
     """
-    def __init__(self, models, parameters, covariances=None, weights=None,
-                 obs_indices=None, reg_indices=None):
+    def __init__(self,
+                 models: ModelCollection,
+                 parameters: np.ndarray,
+                 covariances: np.ndarray | None = None,
+                 weights: np.ndarray | None = None,
+                 obs_indices: np.ndarray | None = None,
+                 reg_indices: np.ndarray | None = None
+                 ) -> None:
         # input checks
         assert isinstance(models, ModelCollection), \
             f"'models' is not a valid ModelCollection object, got {type(models)}."
@@ -121,13 +129,16 @@ class Solution():
         converged), ``False`` otherwise.
         """
 
-    def __contains__(self, mdl_description):
+    def __contains__(self, mdl_description: str) -> bool:
         """
         Special function to check whether the solution contains a certain model.
         """
         return mdl_description in self._model_slice_ranges
 
-    def get_model_indices(self, models, for_cov=False):
+    def get_model_indices(self,
+                          models: str | list[str],
+                          for_cov: bool = False
+                          ) -> np.ndarray:
         """
         Given a model name or multiple names, returns an array of integer indices that
         can be used to extract the relevant entries from :attr:`~parameters` and
@@ -135,15 +146,14 @@ class Solution():
 
         Parameters
         ----------
-        models : str, list
+        models
             Name(s) of model(s).
-        for_cov : bool, optional
-            If ``False`` (default), return the indices for :attr:`~parameters`, otherwise
+        for_cov
+            If ``False``, return the indices for :attr:`~parameters`, otherwise
             for :attr:`~covariances`
 
         Returns
         -------
-        numpy.ndarray
             Integer index array for the models.
         """
         # (returns empty index array if models not found)
@@ -162,22 +172,24 @@ class Solution():
                                           if m in model_list]).astype(int)
         return np.sort(combined_ranges)
 
-    def parameters_by_model(self, models, zeroed=False):
+    def parameters_by_model(self,
+                            models: str | list[str],
+                            zeroed: bool = False
+                            ) -> np.ndarray:
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the parameters for (a) specific model(s).
 
         Parameters
         ----------
-        models : str, list
+        models
             Name(s) of model(s).
-        zeroed : bool, optional
-            If ``False`` (default), use :attr:`~parameters`, else
+        zeroed
+            If ``False``, use :attr:`~parameters`, else
             :attr:`~parameters_zeroed`.
 
         Returns
         -------
-        numpy.ndarray
             Parameters of the model subset.
         """
         indices = self.get_model_indices(models)
@@ -186,22 +198,24 @@ class Solution():
         else:
             return self.parameters[indices, :]
 
-    def covariances_by_model(self, models, zeroed=False):
+    def covariances_by_model(self,
+                             models: str | list[str],
+                             zeroed: bool = False
+                             ) -> np.ndarray:
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the covariances for (a) specific model(s).
 
         Parameters
         ----------
-        models : str, list
+        models
             Name(s) of model(s).
-        zeroed : bool, optional
-            If ``False`` (default), use :attr:`~covariances`, else
+        zeroed
+            If ``False``, use :attr:`~covariances`, else
             :attr:`~covariances_zeroed`.
 
         Returns
         -------
-        numpy.ndarray
             Covariances of the model subset.
         """
         if self.covariances is not None:
@@ -211,19 +225,18 @@ class Solution():
             else:
                 return self.covariances[np.ix_(indices, indices)]
 
-    def weights_by_model(self, models):
+    def weights_by_model(self, models: str | list[str]) -> np.ndarray:
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the weights for specific model parameters.
 
         Parameters
         ----------
-        models : str, list
+        models
             Name(s) of model(s).
 
         Returns
         -------
-        numpy.ndarray
             Weights of the model parameter subset.
         """
         if self.weights is not None:
@@ -231,7 +244,7 @@ class Solution():
             return self.weights[indices, :]
 
     @property
-    def parameters_zeroed(self):
+    def parameters_zeroed(self) -> np.ndarray:
         """
         Returns the model parameters but sets the unobservable ones to zero
         to distinguish between unobservable ones and observable ones that
@@ -242,7 +255,7 @@ class Solution():
         return par
 
     @property
-    def covariances_zeroed(self):
+    def covariances_zeroed(self) -> np.ndarray:
         """
         Returns the model covariances but sets the unobservable ones to zero
         to distinguish between unobservable ones and observable ones that
@@ -256,14 +269,19 @@ class Solution():
             return cov
 
     @property
-    def model_list(self):
+    def model_list(self) -> list[str]:
         """ List of models present in the solution. """
         return list(self._model_slice_ranges.keys())
 
     @staticmethod
-    def aggregate_models(results_dict, mdl_description, key_list=None,
-                         stack_parameters=False, stack_covariances=False,
-                         stack_weights=False, zeroed=False):
+    def aggregate_models(results_dict: dict[str, Solution],
+                         mdl_description: str,
+                         key_list: list[str] | None = None,
+                         stack_parameters: bool = False,
+                         stack_covariances: bool = False,
+                         stack_weights: bool = False,
+                         zeroed: bool = False
+                         ) -> (np.ndarray | None, np.ndarray | None, np.ndarray | None):
         """
         For a dictionary of Solution objects (e.g. one per station) and a given
         model description, aggregate the model parameters, variances and parameter
@@ -276,34 +294,31 @@ class Solution():
 
         Parameters
         ----------
-        results_dict : dict
+        results_dict
             Dictionary of Solution objects.
-        mdl_description : str
+        mdl_description
             Name of the model to aggregate the parameters, variances and weights for.
-        key_list : list, optional
+        key_list
             If provided, aggregate only the selected keys in the dictionary.
-            Defaults to all keys.
-        stack_parameters : bool, optional
+            ``None`` defaults to all keys.
+        stack_parameters
             If ``True``, stack the parameters, otherwise just return ``None``.
-            Defaults to ``False``.
-        stack_covariances : bool, optional
+        stack_covariances
             If ``True``, stack the covariances, otherwise just return ``None``.
-            Defaults to ``False``.
-        stack_weights : bool, optional
+        stack_weights
             If ``True``, stack the weights, otherwise just return ``None``.
-            Defaults to ``False``.
-        zeroed : bool, optional
-            If ``False`` (default), use :attr:`~parameters` and :attr:`~covariances`,
+        zeroed
+            If ``False``, use :attr:`~parameters` and :attr:`~covariances`,
             else :attr:`~parameters_zeroed` and :attr:`~covariances_zeroed`.
 
         Returns
         -------
-        numpy.ndarray
+        stacked_parameters
             If ``stack_parameters=True``, the stacked model parameters.
-        numpy.ndarray
+        stacked_covariances
             If ``stack_covariances=True`` and covariances are present in the models,
             the stacked component covariances, ``None`` if not present everywhere.
-        numpy.ndarray
+        stacked_weights
             If ``stack_weights=True`` and regularization weights are present in the models,
             the stacked weights, ``None`` if not present everywhere.
         """
@@ -369,39 +384,38 @@ class ReweightingFunction(ABC):
 
     Parameters
     ----------
-    eps : int, float
+    eps
         Stability parameter to use for the reweighting function.
-    scale : float, optional
+    scale
         Scale parameter applied to reweighting result.
     """
-    def __init__(self, eps, scale=1):
+    def __init__(self, eps: float, scale: float = 1) -> None:
         self.eps = float(eps)
         """ Stability parameter to use for the reweighting function. """
         self.scale = float(scale)
         """ Scaling factor applied to reweighting result. """
 
     @abstractmethod
-    def __call__(self, value):
+    def __call__(self, value: np.ndarray) -> np.ndarray:
         pass
 
     @staticmethod
-    def from_name(name, *args, **kw_args):
+    def from_name(name: str, *args, **kw_args) -> ReweightingFunction:
         """
         Search the local namespace for a reweighting function of that name
         and return an initialized instance of it.
 
         Parameters
         ----------
-        name : str
+        name
             Name (or abbreviation) of the reweighting function.
-        *args : list
+        *args
             Argument list passed on to function initialization.
-        **kw_args : dict
+        **kw_args
             Keyword arguments passed on to function initialization.
 
         Returns
         -------
-        ReweightingFunction
             An instantiated reweighting function object.
         """
         if name in ["inv", "InverseReweighting"]:
@@ -416,7 +430,7 @@ class ReweightingFunction(ABC):
 
 
 class InverseReweighting(ReweightingFunction):
-    def __call__(self, m):
+    def __call__(self, m: np.ndarray) -> np.ndarray:
         r"""
         Reweighting function based on the inverse of the input based on [candes08]_:
 
@@ -429,14 +443,18 @@ class InverseReweighting(ReweightingFunction):
 
         Parameters
         ----------
-        m : numpy.ndarray
+        m
             :math:`\mathbf{m}`
+
+        Returns
+        -------
+            Weights
         """
         return self.scale / (np.abs(m) + self.eps)
 
 
 class InverseSquaredReweighting(ReweightingFunction):
-    def __call__(self, m):
+    def __call__(self, m: np.ndarray) -> np.ndarray:
         r"""
         Reweighting function based on the inverse squared of the input based on [candes08]_:
 
@@ -449,14 +467,18 @@ class InverseSquaredReweighting(ReweightingFunction):
 
         Parameters
         ----------
-        m : numpy.ndarray
+        m
             :math:`\mathbf{m}`
+
+        Returns
+        -------
+            Weights
         """
         return self.scale / (m**2 + self.eps**2)
 
 
 class LogarithmicReweighting(ReweightingFunction):
-    def __call__(self, m):
+    def __call__(self, m: np.ndarray) -> np.ndarray:
         r"""
         Reweighting function based on the logarithm of the input based on [andrecut11]_:
 
@@ -477,8 +499,12 @@ class LogarithmicReweighting(ReweightingFunction):
 
         Parameters
         ----------
-        m : numpy.ndarray
+        m
             :math:`\mathbf{m}`
+
+        Returns
+        -------
+            Weights
 
         References
         ----------
@@ -492,9 +518,13 @@ class LogarithmicReweighting(ReweightingFunction):
         return self.scale * weight
 
 
-def linear_regression(ts, models, formal_covariance=False,
-                      use_data_variance=True, use_data_covariance=True,
-                      check_constraints=True):
+def linear_regression(ts: Timeseries,
+                      models: ModelCollection,
+                      formal_covariance: bool = False,
+                      use_data_variance: bool = True,
+                      use_data_covariance: bool = True,
+                      check_constraints: bool = True
+                      ) -> Solution:
     r"""
     Performs linear, unregularized least squares using :mod:`~scipy.linalg`.
 
@@ -523,25 +553,24 @@ def linear_regression(ts, models, formal_covariance=False,
 
     Parameters
     ----------
-    ts : disstans.timeseries.Timeseries
+    ts
         Timeseries to fit.
-    models : disstans.models.ModelCollection
+    models
         Model collection used for fitting.
     formal_covariance : bool, optional
-        If ``True``, calculate the formal model covariance. Defaults to ``False``.
+        If ``True``, calculate the formal model covariance.
     use_data_variance : bool, optional
-        If ``True`` (default) and ``ts`` contains variance information, this
-        uncertainty information will be used.
+        If ``True`` and ``ts`` contains variance information, this uncertainty
+        information will be used.
     use_data_covariance : bool, optional
-        If ``True`` (default), ``ts`` contains variance and covariance information, and
+        If ``True``, ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
     check_constraints : bool, optional
-        If ``True`` (default), check whether models have sign constraints that should
+        If ``True``, check whether models have sign constraints that should
         be enforced.
 
     Returns
     -------
-    Solution
         Result of the regression.
     """
 
@@ -592,9 +621,14 @@ def linear_regression(ts, models, formal_covariance=False,
                     obs_indices=obs_indices)
 
 
-def ridge_regression(ts, models, penalty, formal_covariance=False,
-                     use_data_variance=True, use_data_covariance=True,
-                     check_constraints=True):
+def ridge_regression(ts: Timeseries,
+                     models: ModelCollection,
+                     penalty: float | list[float] | np.ndarray,
+                     formal_covariance: bool = False,
+                     use_data_variance: bool = True,
+                     use_data_covariance: bool = True,
+                     check_constraints: bool = True
+                     ) -> Solution:
     r"""
     Performs linear, L2-regularized least squares using :mod:`~scipy.linalg`.
 
@@ -630,29 +664,28 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
 
     Parameters
     ----------
-    ts : disstans.timeseries.Timeseries
+    ts
         Timeseries to fit.
-    models : disstans.models.ModelCollection
+    models
         Model collection used for fitting.
-    penalty : float, list, numpy.ndarray
+    penalty
         Penalty hyperparameter :math:`\lambda`.
         It can either be a single value used for all components, or a list or NumPy array
         specifying a penalty for each component in the data.
-    formal_covariance : bool, optional
-        If ``True``, calculate the formal model covariance. Defaults to ``False``.
-    use_data_variance : bool, optional
-        If ``True`` (default) and ``ts`` contains variance information, this
-        uncertainty information will be used.
-    use_data_covariance : bool, optional
-        If ``True`` (default), ``ts`` contains variance and covariance information, and
+    formal_covariance
+        If ``True``, calculate the formal model covariance.
+    use_data_variance
+        If ``True`` and ``ts`` contains variance information, this uncertainty
+        information will be used.
+    use_data_covariance
+        If ``True``, ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
-    check_constraints : bool, optional
-        If ``True`` (default), check whether models have sign constraints that should
+    check_constraints
+        If ``True``, check whether models have sign constraints that should
         be enforced.
 
     Returns
     -------
-    Solution
         Result of the regression.
     """
     # check input penalty shape and value
@@ -719,11 +752,23 @@ def ridge_regression(ts, models, penalty, formal_covariance=False,
                     obs_indices=obs_indices)
 
 
-def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func=None,
-                     reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
-                     formal_covariance=False, use_data_variance=True, use_data_covariance=True,
-                     use_internal_scales=True, cov_zero_threshold=1e-6, return_weights=False,
-                     check_constraints=True, **cvxpy_kw_args):
+def lasso_regression(ts: Timeseries,
+                     models: ModelCollection,
+                     penalty: float | list[float] | np.ndarray,
+                     reweight_max_iters: int | None = None,
+                     reweight_func: ReweightingFunction | None = None,
+                     reweight_max_rss: float = 1e-9,
+                     reweight_init: list[np.ndarray] | dict[str, np.ndarray] | np.ndarray = None,
+                     reweight_coupled: bool = True,
+                     formal_covariance: bool = False,
+                     use_data_variance: bool = True,
+                     use_data_covariance: bool = True,
+                     use_internal_scales: bool = True,
+                     cov_zero_threshold: float = 1e-6,
+                     return_weights: bool = False,
+                     check_constraints: bool = True,
+                     **cvxpy_kw_args
+                     ) -> Solution:
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -765,26 +810,25 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
 
     Parameters
     ----------
-    ts : disstans.timeseries.Timeseries
+    ts
         Timeseries to fit.
-    models : disstans.models.ModelCollection
+    models
         Model collection used for fitting.
-    penalty : float, list, numpy.ndarray
+    penalty
         Penalty hyperparameter :math:`\lambda`.
         It can either be a single value used for all components, or a list or NumPy array
         specifying a penalty for each component in the data.
-    reweight_max_iters : int, optional
+    reweight_max_iters
         If an integer, number of solver iterations (see Notes), resulting in reweighting.
-        Defaults to no reweighting (``None``).
-    reweight_func : ReweightingFunction, optional
+        ``None`` defaults to no reweighting.
+    reweight_func
         If reweighting is active, the reweighting function instance to be used.
-        Defaults to an inverse reweighting with stability parameter ``eps=1e-4``.
-    reweight_max_rss : float, optional
+    reweight_max_rss
         When reweighting is active and the maximum number of iterations has not yet
         been reached, let the iteration stop early if the solutions do not change much
         anymore (see Notes).
         Set to ``0`` to deactivate early stopping.
-    reweight_init : numpy.ndarray, dict, list, optional
+    reweight_init
         When reweighting is active, use this array to initialize the weights.
         It has to have size :math:`\text{num_components} * \text{num_reg}`, where
         :math:`\text{num_components}=1` if covariances are not used (and the actual
@@ -795,37 +839,35 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
         output shape (no check is performed). If it is a dictionary, the keys need to be
         model names, and the values are then the NumPy arrays which will be arranged
         properly to match the mapping matrix.
-    reweight_coupled : bool, optional
-        If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
-        is coupled with the reweighting weights (see Notes).
-    formal_covariance : bool, optional
-        If ``True``, calculate the formal model covariance. Defaults to ``False``.
-    use_data_variance : bool, optional
-        If ``True`` (default) and ``ts`` contains variance information, this
-        uncertainty information will be used.
-    use_data_covariance : bool, optional
-        If ``True`` (default), ``ts`` contains variance and covariance information, and
+    reweight_coupled
+        If ``True`` and reweighting is active, the L1 penalty hyperparameter is coupled
+        with the reweighting weights (see Notes).
+    formal_covariance
+        If ``True``, calculate the formal model covariance.
+    use_data_variance
+        If ``True`` and ``ts`` contains variance information, this uncertainty information
+        will be used.
+    use_data_covariance
+        If ``True``, ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
-    use_internal_scales : bool, optional
-        If ``True`` (default), the reweighting takes into account potential
-        model-specific internal scaling parameters, otherwise ignores them.
-    cov_zero_threshold : float, optional
+    use_internal_scales
+        If ``True``, the reweighting takes into account potential model-specific internal
+        scaling parameters, otherwise ignores them.
+    cov_zero_threshold
         When extracting the formal covariance matrix, assume parameters with absolute
         values smaller than ``cov_zero_threshold`` are effectively zero.
         Internal scales are always respected.
-    return_weights : bool, optional
+    return_weights
         When reweighting is active, set to ``True`` to return the weights after the last
         update.
-        Defaults to ``False``.
-    check_constraints : bool, optional
-        If ``True`` (default), check whether models have sign constraints that should
+    check_constraints
+        If ``True``, check whether models have sign constraints that should
         be enforced.
-    **cvxpy_kw_args : dict
+    **cvxpy_kw_args
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
 
     Returns
     -------
-    Solution
         Result of the regression.
 
     Notes

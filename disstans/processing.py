@@ -15,15 +15,19 @@ from scipy.signal import find_peaks
 from tqdm import tqdm
 from warnings import warn
 from pandas.api.indexers import BaseIndexer
+from collections.abc import Callable
+from typing import Any
 
 from .config import defaults
 from .timeseries import Timeseries
 from .compiled import selectpair
 from .tools import Timedelta, parallelize, tvec_to_numpycol, date2decyear
 from .models import Polynomial
+from .network import Network
+from .station import Station
 
 
-def unwrap_dict_and_ts(func):
+def unwrap_dict_and_ts(func: Callable) -> Callable:
     """
     A wrapper decorator that aims at simplifying the coding of processing functions.
     Ideally, a new function that doesn't need to know if its input is a
@@ -50,6 +54,15 @@ def unwrap_dict_and_ts(func):
         def func(in_array, **kw_args):
             # do some things
             return out_array
+
+    Parameters
+    ----------
+    func
+        Function to be wrapped.
+
+    Returns
+    -------
+        Wrapped function.
     """
     @wraps(func)
     def wrapper(data, *args, **kw_args):
@@ -120,7 +133,13 @@ class ExpandingRollingIndexer(BaseIndexer):
     For more information, see the pandas documentation about `custom window rolling
     <https://pandas.pydata.org/docs/user_guide/window.html#custom-window-rolling>`_.
     """
-    def get_window_bounds(self, num_values, min_periods, center, closed, step):
+    def get_window_bounds(self,
+                          num_values: int,
+                          min_periods: Any,
+                          center: Any,
+                          closed: Any,
+                          step: Any
+                          ) -> (np.ndarray, np.ndarray):
         """
         This is the function that needs to be implemented for the
         :class:`~pandas.api.indexers.BaseIndexer` class to be used for all
@@ -132,14 +151,14 @@ class ExpandingRollingIndexer(BaseIndexer):
 
         Parameters
         ----------
-        num_values : int
+        num_values
             Total number of values in the array to be rolled through.
 
         Returns
         -------
-        start : np.ndarray
+        start
             Start indices of individual windows.
-        end  : np.ndarray
+        end
             End indices (exclusive) of individual windows.
         """
         # window_size is set by BaseIndexer.__init__
@@ -168,7 +187,7 @@ class ExpandingRollingIndexer(BaseIndexer):
 
 
 @unwrap_dict_and_ts
-def median(array, kernel_size):
+def median(array: np.ndarray, kernel_size: int) -> np.ndarray:
     """
     Computes the rolling median filter column-wise. Missing observations (NaNs) are
     ignored during the median calculation, but missing observations are not imputed
@@ -177,18 +196,17 @@ def median(array, kernel_size):
 
     Parameters
     ----------
-    array : numpy.ndarray
+    array
         2D input array (can contain NaNs).
         Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept
         :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
         dictionaries of them as input.
-    kernel_size : int
+    kernel_size
         Kernel size (length of moving window to compute the median over).
         Has to be an odd number.
 
     Returns
     -------
-    filtered : numpy.ndarray
         2D filtered array (may still contain NaNs).
     """
     # make sure the array is 2D even if it's only a single column
@@ -204,37 +222,41 @@ def median(array, kernel_size):
 
 
 @unwrap_dict_and_ts
-def decompose(array, method, num_components=1, return_sources=False):
+def decompose(array: np.ndarray,
+              method: str,
+              num_components: int = 1,
+              return_sources: bool = False
+              ) -> (np.ndarray, np.ndarray | None, np.ndarray | None):
     r"""
     Decomposes the input signal into different components using PCA or ICA.
 
     Parameters
     ----------
-    array : numpy.ndarray
+    array
         Input array of shape :math:`(\text{num_observations},\text{n_stations})`
         (can contain NaNs).
         Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept
         :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and
         dictionaries of them as input (i.e. the output of
         :meth:`~disstans.network.Network.export_network_ts`).
-    method : str
+    method
         Method to use to decompose the array. Possible values are ``'pca'`` and ``'ica'``:
         ``'pca'`` uses :class:`~sklearn.decomposition.PCA` (motivated by [dong06]_), whereas
         ``'ica'`` uses :class:`~sklearn.decomposition.FastICA` (motivated by [huang12]_).
-    num_components : int, optional
-        Number of components to estimate. Defaults to ``1``. If ``None``, all are used.
-    return_sources : bool, optional
+    num_components
+        Number of components to estimate. If ``None``, all are used.
+    return_sources
         If ``True``, return not only the best-fit model, but also the sources
-        themselves in space and time. Defaults to ``False``.
+        themselves in space and time.
 
     Returns
     -------
-    model : numpy.ndarray
+    model
         Best-fit model with shape :math:`(\text{num_observations},\text{n_stations})`.
-    temporal : numpy.ndarray
+    temporal
         Only if ``return_sources=True``: Temporal source with shape
         :math:`(\text{num_observations},\text{num_components})`.
-    spatial : numpy.ndarray
+    spatial
         Only if ``return_sources=True``: Spatial source with shape
         :math:`(\text{num_components},\text{n_stations})`.
 
@@ -296,8 +318,12 @@ def decompose(array, method, num_components=1, return_sources=False):
         return model
 
 
-def clean(station, ts_in, reference, ts_out=None,
-          clean_kw_args={}, reference_callable_args={}):
+def clean(station: Station,
+          ts_in: str,
+          reference: str | Timeseries | Callable,
+          ts_out: str = None,
+          clean_kw_args: dict[str,  Any] = {},
+          reference_callable_args: dict[str,  Any] = {}) -> None:
     """
     Function operating on a single station's timeseries to clean it from outliers,
     and mask it out if the data is not good enough. The criteria are set by
@@ -317,23 +343,23 @@ def clean(station, ts_in, reference, ts_out=None,
 
     Parameters
     ----------
-    station : disstans.station.Station
+    station
         Station to operate on.
-    ts_in : str
+    ts_in
         Description of the timeseries to clean.
-    reference : str, disstans.timeseries.Timeseries, function
+    reference
         Reference timeseries.
         If string, checks for a timeseries with that description in the ``station``.
         If a :class:`~disstans.timeseries.Timeseries` instance, use it directly.
         If a function, the reference timeseries will be calculated as
         ``t_ref = reference(ts_in, **reference_callable_args)``.
-    ts_out : str, optional
+    ts_out
         If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``
         and clean the copy (to preserve the raw timeseries).
-    clean_kw_args : dict, optional
+    clean_kw_args
         Override the default cleaning criteria in :attr:`~disstans.config.defaults`,
         see the explanations above.
-    reference_callable_args : dict, optional
+    reference_callable_args
         If ``reference`` is a function, ``reference_callable_args`` can be used
         to pass additional keyword arguments to the former when calculating
         the reference timeseries.
@@ -415,7 +441,10 @@ def clean(station, ts_in, reference, ts_out=None,
         station.add_timeseries(ts_out, ts)
 
 
-def midas(ts, steps=None, tolerance=0.001):
+def midas(ts: Timeseries,
+          steps: pd.Series | pd.DateTimeIndex | None = None,
+          tolerance: float = 0.001
+          ) -> (Polynomial, Timeseries, dict[str, Any]):
     """
     This function performs the MIDAS estimate as described by [blewitt16]_.
     It is adapted from the Fortran code provided by the author (see
@@ -562,72 +591,76 @@ class StepDetector():
 
     Parameters
     ----------
-    kernel_size : int, optional
+    kernel_size
         Window size of the detector. Must be odd.
-    kernel_size_min : int, optional
+    kernel_size_min
         Minimum window size of the detector (for edges). Must be smaller than or equal
-        to ``kernel_size``. Defaults to ``0``.
-    x : numpy.ndarray, optional
+        to ``kernel_size``.
+    x
         Input array of shape :math:`(\text{num_observations},)`.
         Should not contain NaNs.
-    y : numpy.ndarray, optional
+    y
         Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
         Can contain NaNs.
     """
-    def __init__(self, kernel_size=None, kernel_size_min=0, x=None, y=None):
+    def __init__(self,
+                 kernel_size: int | None = None,
+                 kernel_size_min: int = 0,
+                 x: np.ndarray | None = None,
+                 y: np.ndarray | None = None
+                 ) -> None:
         self.kernel_size = kernel_size
         self.kernel_size_min = kernel_size_min
         if (x is not None) and (y is not None) and (kernel_size is not None):
             self.search(x, y, kernel_size)
 
     @property
-    def kernel_size(self):
+    def kernel_size(self) -> int:
         """ Kernel (window) size of the detector. """
         if self._kernel_size is None:
             raise ValueError("'kernel_size' has not yet been set.")
         return self._kernel_size
 
     @kernel_size.setter
-    def kernel_size(self, kernel_size):
+    def kernel_size(self, kernel_size: int) -> None:
         if kernel_size is not None:
             assert isinstance(kernel_size, int) and (kernel_size % 2 == 1), \
                 f"'kernel_size' must be an odd integer or None, got {kernel_size}."
         self._kernel_size = kernel_size
 
     @property
-    def kernel_size_min(self):
+    def kernel_size_min(self) -> int:
         """ Minimum kernel (window) size of the detector. """
         if self._kernel_size_min is None:
             raise ValueError("'kernel_size_min' has not yet been set.")
         return self._kernel_size_min
 
     @kernel_size_min.setter
-    def kernel_size_min(self, kernel_size_min):
+    def kernel_size_min(self, kernel_size_min: int) -> int:
         if kernel_size_min is not None:
             assert kernel_size_min <= self.kernel_size, "'kernel_size_min' must be smaller " + \
                 f"or equal to 'kernel_size', but {kernel_size_min} > {self.kernel_size}."
         self._kernel_size_min = kernel_size_min
 
     @staticmethod
-    def AIC_c(rss, n, K):
+    def AIC_c(rss: float, n: int, K: int) -> float:
         r"""
         Calculates the Akaike Information Criterion for small samples for Least Squares
         regression results. Implementation is based on [burnhamanderson02]_ (ch. 2).
 
         Parameters
         ----------
-        rss : float
+        rss
             Residual sum of squares.
-        n : int
+        n
             Number of samples.
-        K : int
+        K
             Degrees of freedom. If the Least Squares model has :math:`\text{num_parameters}`
             parameters (including the mean), then the degrees of freedom are
             :math:`K = \text{num_parameters} + 1`
 
         Returns
         -------
-        float
             The Small Sample AIC for Least Squares :math:`\text{AIC}_c`.
 
         References
@@ -649,7 +682,11 @@ class StepDetector():
         return AIC + correction
 
     @staticmethod
-    def test_single(xwindow, ywindow, valid=None, maxdel=10):
+    def test_single(xwindow: np.ndarray,
+                    ywindow: np.ndarray,
+                    valid: np.ndarray | None = None,
+                    maxdel: float = 10.0
+                    ) -> (int, float, (float | None, float | None)):
         r"""
         For a single window (of arbitrary, but odd length), perform the AIC hypothesis test
         whether a step is likely present (H1) or not (H0) in the ``y`` data given
@@ -657,30 +694,30 @@ class StepDetector():
 
         Parameters
         ----------
-        xwindow : numpy.ndarray
+        xwindow
             Time array of shape :math:`(\text{num_window},)`.
             Should not contain NaNs.
-        ywindow : numpy.ndarray
+        ywindow
             Data array of shape :math:`(\text{num_window},)`.
             Should not contain NaNs.
-        valid : numpy.ndarray, optional
+        valid
             Mask array of the data of shape :math:`(\text{num_window},)`,
             with ``1`` where the ``ywindow`` is finite (not NaN or infinity).
             If not passed to the function, it is calculated internally, which will slow
             down the computation.
-        maxdel : float, optional
+        maxdel
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
 
         Returns
         -------
-        int
+        best_hyp
             Best hypothesis (``0`` for no step, ``1`` for step).
-        float
+        rel_prob
             If H1 is the best hypothesis (and suffices ``maxdel``), its relative probability,
             otherwise the relative probability of H0 (which therefore can be ``0`` if H0 is also
             the best hypothesis in general).
-        tuple
+        msr_hyps
             A 2-tuple of the two mean-squared residuals of the H0 and H1 hypotheses,
             respectively. Assuming the test is unbiased, this is the residual's variance.
             Is ``NaN`` in an element if the least-squares model did not converge.
@@ -750,7 +787,7 @@ class StepDetector():
             return 0, Delta_best[best_hyp], (rss0/n_total, rss1/n_total)
 
     @staticmethod
-    def _search(data_and_params):
+    def _search(data_and_params: tuple[Any]) -> (np.ndarray, np.ndarray, np.ndarray):
         """
         Parallelizable part of the search, search_network and search_catalog methods.
         """
@@ -841,7 +878,11 @@ class StepDetector():
             var1 = var1[check_only, :].reshape(-1, num_components)
         return probs, var0, var1
 
-    def search(self, x, y, maxdel=10):
+    def search(self,
+               x: np.ndarray,
+               y: np.ndarray,
+               maxdel: float = 10.0
+               ) -> (np.ndarray, np.ndarray, np.ndarray):
         r"""
         Function that will search for steps in the data.
         Upon successful completion, it will return the relative step probabilities
@@ -850,26 +891,26 @@ class StepDetector():
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x
             Input array of shape :math:`(\text{num_observations},)`.
             Should not contain NaNs.
-        y : numpy.ndarray
+        y
             Input array of shape :math:`(\text{num_observations}, \text{num_components})`.
             Can contain NaNs.
-        maxdel : float, optional
+        maxdel
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
 
         Returns
         -------
-        probabilities : numpy.ndarray
+        probabilities
             Contains the relative probabilities array.
             Has shape :math:`(\text{num_observations}, \text{num_components})`.
-        var0 : numpy.ndarray
+        var0
             Contains the array of the residuals variance of the hypothesis
             that no step is present.
             Has shape :math:`(\text{num_observations}, \text{num_components})`.
-        var1 : numpy.ndarray
+        var1
             Contains the array of the residuals variance of the hypothesis
             that a step is present.
             Has shape :math:`(\text{num_observations}, \text{num_components})`.
@@ -882,8 +923,16 @@ class StepDetector():
         return StepDetector._search((x, y, self.kernel_size,
                                      self.kernel_size_min, maxdel))
 
-    def search_network(self, net, ts_description, maxdel=10, threshold=20,
-                       gap=2, gap_unit="D", aggregate_components=True, no_pbar=False):
+    def search_network(self,
+                       net: Network,
+                       ts_description: str,
+                       maxdel: float = 10.0,
+                       threshold: float = 20.0,
+                       gap: float = 2.0,
+                       gap_unit: str = "D",
+                       aggregate_components: bool = True,
+                       no_pbar: bool = False
+                       ) -> (pd.DataFrame, list):
         r"""
         Function that searches for steps in an entire network (possibly in parallel),
         thresholds those probabilities, and identifies all the consecutive ranges in which
@@ -891,37 +940,37 @@ class StepDetector():
 
         Parameters
         ----------
-        net : disstans.network.Network
+        net
             Network instance to operate on.
-        ts_description : str
+        ts_description
             :class:`~disstans.timeseries.Timeseries` description that will be analyzed.
-        maxdel : float, optional
+        maxdel
             Difference in AIC that should be considered not significantly better.
             (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)
-        threshold : float, optional
+        threshold
             Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
-        gap : float, optional
+        gap
             Maximum gap between identified steps to count as a continuous period
             of possible steps.
-        gap_unit : str, optional
+        gap_unit
             Time unit of ``gap``.
-        aggregate_components : bool, optional
-            If ``True`` (default), use the maximum step probability across all data components
+        aggregate_components
+            If ``True``, use the maximum step probability across all data components
             when searching for steps. Otherwise, keep all steps from maximum probabilities in
             each component (which could lead to multiple close-by steps).
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
+        no_pbar
+            Suppress the progress bar with ``True``.
 
         Returns
         -------
-        step_table : pandas.DataFrame
+        step_table
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
             over all components for this timestamp), as well as ``var0``, ``var1``
             (the two hypotheses' residuals variances for the component of
             maximum step probability) and ``varred`` (the variance reduction in percent,
             ``(var0 - var1) / var0``).
-        step_ranges : list
+        step_ranges
             A list of lists containing continuous periods over all stations of the potential
             steps as determined by ``gap`` and ``gap_unit``.
         """
@@ -990,42 +1039,50 @@ class StepDetector():
             step_ranges = []
         return step_table, step_ranges
 
-    def search_catalog(self, net, ts_description, catalog, threshold=None,
-                       gap=2, gap_unit="D", keep_nan_probs=True, no_pbar=False):
+    def search_catalog(self,
+                       net: Network,
+                       ts_description: str,
+                       catalog: dict[str, Any] | pd.Dataframe,
+                       threshold: float | None = None,
+                       gap: float = 2.0,
+                       gap_unit: str = "D",
+                       keep_nan_probs: bool = True,
+                       no_pbar: bool = False
+                       ) -> (pd.DataFrame, list):
         r"""
         Search a dictionary of potential step times for each station in the dictionary
         and assess the probability for each one.
 
         Parameters
         ----------
-        net : disstans.network.Network
+        net
             Network instance to operate on.
-        ts_description : str
+        ts_description
             :class:`~disstans.timeseries.Timeseries` description that will be analyzed.
-        catalog : dict, pandas.DataFrame
+        catalog
             Dictionary where each key is a station name and its value is a list of
             :class:`~pandas.Timestamp` compatible potential times/dates.
             Alternatively, a DataFrame with at least the columns ``'station'`` and ``'time'``.
-        threshold : float, optional
+        threshold
             Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
-        gap : float, optional
+        gap
             Maximum gap between identified steps to count as a continuous period
             of possible steps.
-        gap_unit : str, optional
+        gap_unit
             Time unit of ``gap``.
-        keep_nan_probs : bool, optional
+        keep_nan_probs
             (Only applies to a DataFrame-type ``catalog`` input.)
             If a catalogued station is not in the network, or if a catalogued timestamp
             is after the available timeseries, no step probability can be calculated
             and the results will contain NaNs.
-            If ``True`` (default), those entries will be kept in the output, and if
-            ``False``, they will be dropped.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
+            If ``True``, those entries will be kept in the output, and if ``False``,
+            they will be dropped.
+        no_pbar
+            Suppress the progress bar with ``True``.
 
         Returns
         -------
-        step_table : pandas.DataFrame
+        step_table
             A DataFrame containing the columns ``'station'`` (its name), ``'time'``
             (a timestamp of the station) and ``'probability'`` (maximum :math:`\Delta_i`
             over all components for this timestamp) for each potential step in ``catalog``,
@@ -1033,7 +1090,7 @@ class StepDetector():
             for the component of maximum step probability).
             If a DataFrame was passed as ``catalog``, a copy of that will be returned, with
             the added columns specified above.
-        step_ranges : list
+        step_ranges
             A list of lists containing continuous periods over all stations of the potential
             steps as determined by ``gap`` and ``gap_unit``.
         """
@@ -1149,29 +1206,34 @@ class StepDetector():
         return step_table, step_ranges
 
     @staticmethod
-    def steps(probabilities, threshold=2, maxsteps=np.inf, aggregate_components=True,
-              verbose=True):
+    def steps(probabilities: np.ndarray,
+              threshold: float = 2.0,
+              maxsteps: int = np.inf,
+              aggregate_components: bool = True,
+              verbose: bool = True
+              ) -> list[np.ndarray]:
         r"""
         Threshold the probabilities to return a list of steps.
 
         Parameters
         ----------
-        threshold : float, optional
+        probabilities
+            Array of probabilities.
+        threshold
             Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.
-        maxsteps : int, optional
+        maxsteps
             Return at most ``maxsteps`` number of steps. Can be useful if a good value for
             ``threshold`` has not been found yet.
-        aggregate_components : bool, optional
-            If ``True`` (default), use the maximum step probability across all data components
-            when searching for steps. Otherwise, keep all steps from maximum probabilities in
+        aggregate_components
+            If ``True``, use the maximum step probability across all data components when
+            searching for steps. Otherwise, keep all steps from maximum probabilities in
             each component (which could lead to multiple close-by steps).
-        verbose : bool, optional
-            If ``True`` (default), print warnings when there will be a large number of
-            steps identified given the ``threshold``.
+        verbose
+            If ``True``, print warnings when there will be a large number of steps
+            identified given the ``threshold``.
 
         Returns
         -------
-        steps : list
             Returns a list of :class:`~numpy.ndarray` arrays that contain the indices of steps
             for each component.
         """

@@ -11,6 +11,8 @@ import scipy as sp
 import scipy.sparse as sparse
 from copy import deepcopy
 from warnings import warn
+from collections.abc import Iterator
+from typing import Any
 
 from . import models as disstans_models
 from .timeseries import Timeseries
@@ -29,14 +31,20 @@ class Station():
 
     Parameters
     ----------
-    name : str
+    name
         Name of the station.
-    location : tuple, list, numpy.ndarray
+    location
         Location (Latitude [°], Longitude [°], Altitude [m]) of the station.
     """
-    def __init__(self, name, location):
-        self.name = name
+    def __init__(self,
+                 name: str,
+                 location: list[float] | np.ndarray
+                 ) -> np.ndarray:
+        self.name = str(name)
         """ Name of the station. """
+        if isinstance(location, np.ndarray):
+            location = location.squeeze().tolist()
+        assert all([isinstance(v, float) for v in location]) and len(location) == 3
         self.location = location
         """ Location of the station (Latitude [°], Longitude [°], Altitude [m]). """
         self.timeseries = {}
@@ -75,14 +83,13 @@ class Station():
             stat.fits['myts']['mymodel']
         """
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Special function that returns a readable summary of the station.
         Accessed, for example, by Python's ``print()`` built-in function.
 
         Returns
         -------
-        info : str
             Station summary.
         """
         info = f"Station {self.name} at {self.location} with timeseries"
@@ -94,19 +101,18 @@ class Station():
                 info += f"\n - Fits: {[str(key) for key in self.fits[ts_description]]}"
         return info
 
-    def __getitem__(self, ts_description):
+    def __getitem__(self, ts_description: str) -> Timeseries:
         """
         Convenience special function that provides a shorthand notation
         to access the station's timeseries.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries.
 
         Returns
         -------
-        disstans.timeseries.Timeseries
             Timeseries in station.
 
         Example
@@ -121,7 +127,7 @@ class Station():
             raise KeyError(f"Station {self.name}: No timeseries '{ts_description}' present.")
         return self.timeseries[ts_description]
 
-    def __setitem__(self, ts_description, timeseries):
+    def __setitem__(self, ts_description: str, timeseries: Timeseries) -> None:
         """
         Convenience special function that allows a dictionary-like adding of timeseries to
         the station by wrapping :meth:`~add_timeseries`.
@@ -132,7 +138,7 @@ class Station():
         """
         self.add_timeseries(ts_description, timeseries, warn_existing=False)
 
-    def __delitem__(self, ts_description):
+    def __delitem__(self, ts_description: str) -> None:
         """
         Convenience special function that allows a dictionary-like removing of timeseries from
         the station by wrapping :meth:`~remove_timeseries`.
@@ -143,7 +149,7 @@ class Station():
         """
         self.remove_timeseries(ts_description)
 
-    def __contains__(self, ts_description):
+    def __contains__(self, ts_description: str) -> bool:
         """
         Special function that allows to check whether a certain timeseries
         is in the station.
@@ -160,7 +166,7 @@ class Station():
         """
         return ts_description in self.timeseries
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Timeseries]:
         """
         Convenience special function that allows for a shorthand notation to quickly
         iterate over all timeseries.
@@ -181,16 +187,20 @@ class Station():
             yield ts
 
     @property
-    def ts(self):
+    def ts(self) -> dict[str, Timeseries]:
         """
         Abbreviation for :attr:`~timeseries`.
         """
         return self.timeseries
 
-    def get_arch(self):
+    def get_arch(self) -> dict[str, Any]:
         """
         Build a dictionary describing the architecture of this station,
         to be used when creating a network JSON configuration file.
+
+        Returns
+        -------
+            Ditionary of attributes.
 
         See Also
         --------
@@ -216,10 +226,18 @@ class Station():
                 stat_arch["models"][ts_description] = self.models[ts_description].get_arch()
         return stat_arch
 
-    def add_timeseries(self, ts_description, timeseries, uncertainties_from=None,
-                       override_src=None, override_data_unit=None, override_data_cols=None,
-                       override_var_cols=None, override_cov_cols=None, add_models=None,
-                       warn_existing=True):
+    def add_timeseries(self,
+                       ts_description: str,
+                       timeseries: Timeseries,
+                       uncertainties_from: Timeseries | None = None,
+                       override_src: str | None = None,
+                       override_data_unit: str | None = None,
+                       override_data_cols: str | None = None,
+                       override_var_cols: str | None = None,
+                       override_cov_cols: str | None = None,
+                       add_models: dict[str, Model] | None = None,
+                       warn_existing: bool = True
+                       ) -> None:
         """
         Add a timeseries to the station.
 
@@ -228,31 +246,33 @@ class Station():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries.
-        timeseries : disstans.timeseries.Timeseries
+        timeseries
             Timeseries object to add.
-        uncertainties_from : disstans.timeseries.Timeseries, optional
+        uncertainties_from
             If the variance and covariance data should come from another timeseries,
             specify the source timeseries here.
-        override_src : str, optional
+        override_src
             Override the :attr:`~disstans.timeseries.Timeseries.src`
             attribute of ``timeseries``.
-        override_data_unit : str, optional
+        override_data_unit
             Override the :attr:`~disstans.timeseries.Timeseries.data_unit`
             attribute of ``timeseries``.
-        override_data_cols : str, optional
+        override_data_cols
             Override the :attr:`~disstans.timeseries.Timeseries.data_cols`
             attribute of ``timeseries``.
-        override_var_cols : str, optional
+        override_var_cols
             Override the :attr:`~disstans.timeseries.Timeseries.var_cols`
             attribute of ``timeseries``.
-        override_cov_cols : str, optional
+        override_cov_cols
             Override the :attr:`~disstans.timeseries.Timeseries.cov_cols`
             attribute of ``timeseries``.
-        add_models : dict, optional
+        add_models
             Dictionary of models to add to the timeseries, where the keys are the
             model description and the values are :class:`~disstans.models.Model` objects.
+        warn_existing
+            Issue a warning if a station's timeseries is being overwritten.
 
         See Also
         --------
@@ -294,13 +314,13 @@ class Station():
         if add_models is not None:
             self.add_local_model_dict(ts_description=ts_description, model_kw_args=add_models)
 
-    def remove_timeseries(self, ts_description):
+    def remove_timeseries(self, ts_description: str) -> None:
         """
         Remove a timeseries (including associated fits and models) from the station.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries.
 
         See Also
@@ -324,18 +344,22 @@ class Station():
             del self.fits[ts_description]
             del self.models[ts_description]
 
-    def add_local_model(self, ts_description, model_description, model):
+    def add_local_model(self,
+                        ts_description: str,
+                        model_description: str,
+                        model: Model
+                        ) -> None:
         """
         Add a model to a timeseries (overwrites the model if it has already
         been added with the same description).
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to add the model to.
-        model_description : str
+        model_description
             Model description.
-        model : disstans.models.Model
+        model
             Model object.
         """
         if not isinstance(ts_description, str):
@@ -353,7 +377,7 @@ class Station():
                  category=RuntimeWarning, stacklevel=2)
         self.models[ts_description][model_description] = model
 
-    def add_local_model_dict(self, ts_description, model_dict):
+    def add_local_model_dict(self, ts_description: str, model_dict: dict[str, Model]) -> None:
         """
         Add a dictionary of models to a timeseries (overwrites the models if they have already
         been added with the same description).
@@ -362,9 +386,9 @@ class Station():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to add the model to.
-        model_dict : dict
+        model_dict
             Dictionary of ``{model_description: model}`` key-value pairs to add.
         """
         assert isinstance(model_dict, dict), \
@@ -372,7 +396,10 @@ class Station():
         for mdl_desc, mdl in model_dict.items():
             self.add_local_model(ts_description, mdl_desc, mdl)
 
-    def add_local_model_kwargs(self, ts_description, model_kw_args):
+    def add_local_model_kwargs(self,
+                               ts_description: str,
+                               model_kw_args: dict[str, dict[str, Any]]
+                               ) -> None:
         """
         Add models to a timeseries from a dictionary of keyword arguments needed to create
         them (overwrites the models if they have already been added with the same description).
@@ -381,9 +408,9 @@ class Station():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to add the model to.
-        model_kw_args : dict
+        model_kw_args
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
             to create each model object.
@@ -395,19 +422,23 @@ class Station():
             self.add_local_model(ts_description=ts_description,
                                  model_description=mdl_desc, model=mdl)
 
-    def remove_local_models(self, ts_description, model_descriptions, verbose=False):
+    def remove_local_models(self,
+                            ts_description: str,
+                            model_descriptions: str | list[str],
+                            verbose: bool = False
+                            ) -> None:
         """
         Remove models from a timeseries.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to remove the model from.
-        model_descriptions : str or list
+        model_descriptions
             Model description(s).
-        verbose : bool, optional
-            If ``True`` (default: ``False``), raise a warning if a timeseries or model
-            could not be found in the network.
+        verbose
+            If ``True``, raise a warning if a timeseries or model could not be found
+            in the network.
         """
         # unpack list
         if isinstance(model_descriptions, str):
@@ -430,27 +461,31 @@ class Station():
                      f"couldn't delete local model '{mdl_desc}'.",
                      category=RuntimeWarning, stacklevel=2)
 
-    def add_fit(self, ts_description, fit, model_description=None, return_ts=False):
+    def add_fit(self,
+                ts_description: str,
+                fit: dict[str, np.ndarray | None],
+                model_description: str | None = None,
+                return_ts: bool = False
+                ) -> Timeseries | None:
         """
         Add a fit dictionary to a timeseries' model (overwrites the fit if it has
         already been added for the model).
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to add the fit to.
-        fit : dict
+        fit
             Dictionary with the keys ``'time'``, ``'fit'``, ``'var'`` and ``'cov'``
             (the latter two can be set to ``None``).
-        model_description : str, optional
+        model_description
             Model description the fit applies to.
             If ``None``, the fit is the sum of all individual model fits.
-        return_ts : bool, optional
-            If ``True`` (default: ``False``), return the created timeseries.
+        return_ts
+            If ``True``, return the created timeseries.
 
         Returns
         -------
-        fit_ts : disstans.timeseries.Timeseries
             (If ``return_ts=True``.) The fit as a Timeseries object.
 
         See Also
@@ -482,15 +517,15 @@ class Station():
         if return_ts:
             return fit_ts
 
-    def remove_fit(self, ts_description, model_description):
+    def remove_fit(self, ts_description: str, model_description: str) -> None:
         """
         Remove a fit from a timeseries' model.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to remove the fit from.
-        model_description : str
+        model_description
             Model description to remove the fit from.
         """
         if ts_description not in self.timeseries:
@@ -508,23 +543,26 @@ class Station():
         else:
             del self.fits[ts_description][model_description]
 
-    def sum_fits(self, ts_description, fit_list=None):
+    def sum_fits(self,
+                 ts_description: str,
+                 fit_list: list[str] | None = None
+                 ) -> (np.ndarray, np.ndarray | None):
         r"""
         Method to quickly sum fits of a timeseries.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries whose fits to sum.
-        fit_list : list, optional
+        fit_list
             List of strings containing the model names of the subset of the fitted models
-            to be summed. Defaults to all fitted models.
+            to be summed. ``None`` defaults to all fitted models.
 
         Returns
         -------
-        fit_sum : numpy.ndarray
+        fit_sum
             2D array of shape :math:`(\text{n_observations},\text{n_components})`
-        fit_sum_var : numpy.ndarray or None
+        fit_sum_var
             2D array of shape :math:`(\text{n_observations},\text{n_components})`.
             Returns ``None`` if no standard deviations are available.
         """
@@ -551,49 +589,53 @@ class Station():
                 fit_sum_var += fit.vars.values
         return fit_sum, fit_sum_var
 
-    def analyze_residuals(self, ts_description, verbose=False, t_start=None, t_end=None,
-                          mean=False, std=False, rms=False, n_observations=False,
-                          std_outlier=0, max_rolling_dev=0):
+    def analyze_residuals(self,
+                          ts_description: str,
+                          verbose: bool = False,
+                          t_start: str | pd.Timestamp | None = None,
+                          t_end: str | pd.Timestamp | None = None,
+                          mean: bool = False,
+                          std: bool = False,
+                          rms: bool = False,
+                          n_observations: bool = False,
+                          std_outlier: int | float = 0,
+                          max_rolling_dev: int = 0
+                          ) -> dict[str, np.ndarray]:
         """
         Analyze, print and return the residuals of a station's timeseries according
         to certain metrics defined in the arguments.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to analyze. Method assumes it already is a residual.
-        verbose : bool, optional
-            If True, additionally print the results. Defaults to ``False``.
-        t_start : str or pandas.Timestamp, optional
+        verbose
+            If True, additionally print the results.
+        t_start
             If set, specify a lower bound for the analysis. ``t_start`` should be a
             Timestamp-convertible string of the start time, or a datetime-like object.
             Defaults to the first timestamp present in the timeseries.
-        t_end : str or pandas.Timestamp, optional
+        t_end
             If set, specify an upper bound for the analysis. ``t_end`` should be a
             Timestamp-convertible string of the end time, or a datetime-like object.
             Defaults to the last timestamp present in the timeseries.
-        mean : bool, optional
+        mean
             If ``True``, calculate the mean of the timeseries.
             Adds the key ``'Mean'`` to the output dictionary.
-            Defaults to ``False``.
-        std : bool, optional
+        std
             If ``True``, calculate the standard deviation of the timeseries.
             Adds the key ``'Standard Deviation'`` to the output dictionary.
-            Defaults to ``False``.
-        rms : bool, list, optional
+        rms
             If ``True``, calculate the root-mean-squared over all components combined,
             or if ``rms`` is a list, only using those components.
             Adds the key ``'RMS'`` to the output dictionary.
-            Defaults to ``False``.
-        n_observations : bool, optional
+        n_observations
             If ``True``, count the number of observations (excluding NaNs) and NaNs.
             Adds the keys ``'Observations'`` and ``'Gaps'`` to the output dictionary.
-            Defaults to ``False``.
-        std_outlier : int, float
+        std_outlier
             If ``std_outlier > 0``, count the number of non-NaN outliers, defined
             by the number of standard deviations they are away from the mean.
             Adds the key ``'Outliers'`` to the output dictionary.
-            Defaults to ``0``.
         max_rolling_dev : int, optional
             If ``max_rolling_dev > 0``, calculate the (sign-aware) maximum of the
             rolling deviation from the mean with window size ``max_rolling_dev`` for
@@ -603,7 +645,6 @@ class Station():
 
         Returns
         -------
-        results : dict
             Dictionary that includes the results as defined by the arguments.
             Empty by default.
         """
@@ -666,44 +707,52 @@ class Station():
             results["RMS"] = rms_result
         return results
 
-    def get_trend(self, ts_description, fit_list=None, components=None, total=False,
-                  t_start=None, t_end=None, use_formal_variance=None, include_sigma=False,
-                  time_unit="D", ignore_missing=False):
+    def get_trend(self,
+                  ts_description: str,
+                  fit_list: list[str] | None = None,
+                  components: list[int] | None = None,
+                  total: bool = False,
+                  t_start: str | pd.Timestamp | None = None,
+                  t_end: str | pd.Timestamp | None = None,
+                  use_formal_variance: bool | None = None,
+                  include_sigma: bool = False,
+                  time_unit: str = "D",
+                  ignore_missing: bool = False
+                  ) -> (np.ndarray | None, np.ndarray | None):
         r"""
         Calculates a linear trend through the desired model fits and over some time span.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries whose fits to use.
-        fit_list : list, optional
+        fit_list
             List of strings containing the model names of the subset of the fitted models
-            to be used. Defaults to all fitted models.
+            to be used. ``None`` defaults to all fitted models.
             If ``ts_description`` does not contain any fits, and the trend of the timeseries
             itself is to be calculated, pass an empty list (``[]``).
-        components : list, optional
+        components
             List of the numerical indices of which components of the timeseries to use.
-            Defaults to all components.
-        total : bool, optional
+            ``None`` defaults to all components.
+        total
             By default (``False``), the function will return the trend per ``time_unit``.
             If ``True``, the function will instead give the total difference over the
             entire timespan.
-        t_start : str or pandas.Timestamp, optional
+        t_start
             Timestamp-convertible string of the start time.
-            Defaults to the first timestamp present in the timeseries.
-        t_end : str or pandas.Timestamp, optional
+            ``None`` defaults to the first timestamp present in the timeseries.
+        t_end
             Timestamp-convertible string of the end time.
-            Defaults to the last timestamp present in the timeseries.
-        use_formal_variance : bool, optional
+            ``None`` defaults to the last timestamp present in the timeseries.
+        use_formal_variance
             By default, the trend fitting will use variance information if present. This usually
             makes sense for actual timeseries, but not for fitted models where the formal variance
             can be very unphysical. Setting this parameter overrides the default behavior.
-        include_sigma : bool, optional
+        include_sigma
             If ``True``, also calculate the formal standard deviation on the trend estimate.
-            Defaults to ``False``.
-        time_unit : str, optional
+        time_unit
             Time unit for output (only required if ``total=False``).
-        ignore_missing : bool, optional
+        ignore_missing
             By default (``False``), this method will throw an error if the timeseries or
             the models are not present in  the station. Set to ``True`` if the method
             should return ``(None, None)`` instead (as done when the requested timespan
@@ -711,9 +760,9 @@ class Station():
 
         Returns
         -------
-        trend : numpy.ndarray
+        trend
             1D array of size ``len(components)`` containing the trends.
-        trend_sigma : numpy.ndarray or None
+        trend_sigma
             1D array of size ``len(components)`` containing the standard deviation of
             the trend estimate. Returns ``None`` if no standard deviations are available.
         """
