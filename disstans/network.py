@@ -20,6 +20,7 @@ from matplotlib.colors import Normalize
 from matplotlib.patches import Rectangle
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
+from scipy.stats import circmean
 
 from . import timeseries as disstans_ts
 from . import models as disstans_models
@@ -153,6 +154,14 @@ class Network():
         """ DataFrame of all locations for all stations in the network. """
         return pd.DataFrame(data={station.name: station.location for station in self},
                             index=["Latitude [°]", "Longitude [°]", "Altitude [m]"]).T
+
+    @property
+    def mean_longitude(self):
+        """ Mean longitude [°] of all stations """
+        if self.num_stations > 0:
+            return np.rad2deg(circmean(np.deg2rad([s.location[1] for s in self])))
+        else:
+            raise RuntimeError("No stations in network.")
 
     def __str__(self):
         """
