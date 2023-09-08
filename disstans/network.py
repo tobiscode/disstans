@@ -2251,7 +2251,8 @@ class Network():
                                  index=stat_names_out, columns=v_pred_cols)
         return df_v_pred, rotation_vector, rotation_covariance
 
-    def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None):
+    def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None,
+                           center_longitude=0):
         # get location data and projections
         if subset_stations:
             stat_names = subset_stations
@@ -2261,7 +2262,7 @@ class Network():
             stat_list = self.stations.values()
         stat_lats = [station.location[0] for station in stat_list]
         stat_lons = [station.location[1] for station in stat_list]
-        proj_gui = getattr(ccrs, gui_settings["projection"])()
+        proj_gui = getattr(ccrs, gui_settings["projection"])(central_longitude=center_longitude)
         proj_lla = ccrs.PlateCarree()
         # create figure and plot stations
         fig_map = plt.figure()
@@ -2343,7 +2344,8 @@ class Network():
                 latlonenu[i, 2 + j] = spatial[comps[j]][0, i]
         # make map for spatial component
         fig_map, ax_map, _, proj_lla, _, _, _, _ = \
-            self._create_map_figure(gui_settings, annotate_stations)
+            self._create_map_figure(gui_settings, annotate_stations,
+                                    center_longitude=self.mean_longitude)
         if ndim == 1:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
                                  np.zeros_like(latlonenu[:, 2]), latlonenu[:, 2],
@@ -2375,8 +2377,8 @@ class Network():
     def gui(self, station=None, timeseries=None, fit_list=None, sum_models=True,
             verbose=False, annotate_stations=True, save=False, save_map=False,
             save_kw_args={"format": "png"}, scalogram_kw_args=None, mark_events=None,
-            stepdetector={}, trend_kw_args={}, analyze_kw_args={}, rms_on_map={},
-            gui_kw_args={}):
+            lon_min=None, lon_max=None, lat_min=None, lat_max=None, stepdetector={},
+            trend_kw_args={}, analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -2443,6 +2445,14 @@ class Network():
             If passed, a DataFrame or list of DataFrames that contain the columns
             ``'station'`` and ``'time'``. For each timestamp, a vertical line is plotted
             onto the station's timeseries and the relevant entries are printed out.
+        lon_min : float, optional
+            Specify the map's minimum longitude (in degrees).
+        lon_max : float, optional
+            Specify the map's maximum longitude (in degrees).
+        lat_min : float, optional
+            Specify the map's minimum latitude (in degrees).
+        lat_max : float, optional
+            Specify the map's maximum latitude (in degrees).
         stepdetector : dict, optional
             Passing this dictionary will enable the plotting of events related to possible
             steps, both on the map (in case of an earthquake catalog) and in the timeseries
@@ -2491,8 +2501,9 @@ class Network():
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
-            stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings,
-                                                                        annotate_stations)
+            stat_points, stat_lats, stat_lons = \
+            self._create_map_figure(gui_settings, annotate_stations,
+                                    center_longitude=self.mean_longitude)
         ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
         fig_ts = plt.figure()
         if scalogram_kw_args is not None:
@@ -2609,6 +2620,18 @@ class Network():
             ax_map.quiverkey(quiv, 0.9, 0.9, key_length,
                              f"{key_length:.2g} {trend_unit:s}",
                              coordinates="figure")
+
+        # set map extent
+        ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
+        cur_lon_min, cur_lat_min = \
+            proj_lla.transform_point(ax_map_xmin, ax_map_ymin, proj_gui)
+        cur_lon_max, cur_lat_max = \
+            proj_lla.transform_point(ax_map_xmax, ax_map_ymax, proj_gui)
+        map_extent_lonlat = [cur_lon_min, cur_lon_max, cur_lat_min, cur_lat_max]
+        if any([lon_min, lon_max, lat_min, lat_max]):
+            map_extent_lonlat = [new_val if new_val else cur_val for cur_val, new_val in
+                                 zip(map_extent_lonlat, [lon_min, lon_max, lat_min, lat_max])]
+            ax_map.set_extent(map_extent_lonlat, crs=proj_lla)
 
         # check if mark_events is either a DataFrame or list of DataFrames,
         # containing the necessary columns
@@ -3062,7 +3085,9 @@ class Network():
         gui_settings.update({"wmts_show": False})
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = \
-            self._create_map_figure(gui_settings, annotate_stations, subset_stations)
+            self._create_map_figure(gui_settings, annotate_stations,
+                                    subset_stations=subset_stations,
+                                    center_longitude=self.mean_longitude)
         gui_settings.update({"wmts_show": prev_wmts_show})
 
         # set map extent
@@ -3296,7 +3321,9 @@ class Network():
         gui_settings.update(gui_kw_args)
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = \
-            self._create_map_figure(gui_settings, annotate_stations, subset_stations)
+            self._create_map_figure(gui_settings, annotate_stations,
+                                    subset_stations=subset_stations,
+                                    center_longitude=self.mean_longitude)
 
         # set map extent
         ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
