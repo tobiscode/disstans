@@ -968,7 +968,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         raise RuntimeError("Failed to download the station list from "
                            f"{station_list_url}.").with_traceback(e.__traceback__) from e
     stations = pd.read_csv(station_list_path, delim_whitespace=True, usecols=list(range(11)),
-                           parse_dates=[7, 8, 9], infer_datetime_format=True)
+                           parse_dates=[7, 8, 9])
     # subset according to station_list_or_bbox
     if all([isinstance(site, str) for site in station_list_or_bbox]):
         # list contains stations names
