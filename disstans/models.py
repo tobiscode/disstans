@@ -1118,9 +1118,9 @@ class BaseSplineSet(Model):
         """ Trackes whether to scale the sub-splines relative to their lengths. """
         self.min_scale = min([m.scale for m in self.splines])
         """ Minimum scale of the sub-splines. """
-        self.internal_scales = (np.concatenate([np.array([m.scale] * m.num_parameters)
+        self.internal_scales = ((np.concatenate([np.array([m.scale] * m.num_parameters)
                                                 for m in self.splines]) /
-                                self.min_scale
+                                 self.min_scale)**(0.5)
                                 if self.internal_scaling else None)
         """
         If :attr:`~internal_scaling` is ``True``, this NumPy array holds the relative

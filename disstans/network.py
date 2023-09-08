@@ -2333,9 +2333,8 @@ class Network():
             for j in range(ndim_max2):
                 latlonenu[i, 2 + j] = spatial[comps[j]][0, i]
         # make map for spatial component
-        fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
-            stat_points, stat_lats, stat_lons = self._create_map_figure(gui_settings,
-                                                                        annotate_stations)
+        fig_map, ax_map, _, proj_lla, _, _, _, _ = \
+            self._create_map_figure(gui_settings, annotate_stations)
         if ndim == 1:
             quiv = ax_map.quiver(latlonenu[:, 1], latlonenu[:, 0],
                                  np.zeros_like(latlonenu[:, 2]), latlonenu[:, 2],

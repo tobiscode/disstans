@@ -226,7 +226,7 @@ def decompose(array, method, num_components=1, return_sources=False, rng=None):
     return_sources : bool, optional
         If ``True``, return not only the best-fit model, but also the sources
         themselves in space and time. Defaults to ``False``.
-    rng : np.random.Generator, optional
+    rng : numpy.random.Generator, optional
         Random number generator instance to use to fill missing values.
 
     Returns
