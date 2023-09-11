@@ -88,8 +88,8 @@ class Model():
     ----------
 
     .. [koehne23] Köhne, T., Riel, B., & Simons, M. (2023).
-       *Decomposition and Inference of Sources through Spatiotemporal Analysis of *
-       *Network Signals: The DISSTANS Python package.*
+       *Decomposition and Inference of Sources through Spatiotemporal Analysis of
+       Network Signals: The DISSTANS Python package.*
        Computers & Geosciences, 170, 105247.
        doi:`10.1016/j.cageo.2022.10524 <https://doi.org/10.1016/j.cageo.2022.105247>`_
     """
@@ -1127,7 +1127,7 @@ class ISpline(Model):
         .. math:: \sum_{k=0}^{n} \frac{{\left( -1 \right)}^{k}}{\left( p+1 \right) !} \cdot
                   \binom{n}{k} \cdot {\left( t_j^\prime + \frac{n}{2} - k \right)}^{p+1}
 
-        which is the integral over time of :meth:`~Bspline.get_mapping_single`.
+        which is the integral over time of :meth:`~BSpline.get_mapping_single`.
 
         See Appendix A.2.3 in [koehne23]_ for more details.
 
@@ -1847,7 +1847,7 @@ class AmpPhModulatedSinusoid(Model):
         Calculate the mapping factors at times :math:`t` as
 
         .. math:: \left( h_j (t) \cos \left( \omega t \right),
-                  h_j (t) \sin \left( \omega t \right) \right) \right)
+                  h_j (t) \sin \left( \omega t \right) \right)
 
         where :math:`h_j` are envelopes based on B-Splines calculated by
         :class:`~scipy.interpolate.BSpline`, and :math:`\omega` is the period.
@@ -2003,7 +2003,7 @@ class Logarithmic(Model):
         r"""
         Calculate the mapping factors at times :math:`t` as
 
-        .. math:: \log \left( 1 + \frac{t}{\tau}
+        .. math:: \log \left( 1 + \frac{t}{\tau} \right)
 
         where :math:`\tau` is the logairthmic time constant.
 
