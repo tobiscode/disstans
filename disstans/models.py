@@ -55,7 +55,7 @@ class Model():
     or :class:`~disstans.models.Exponential`. Three methods need to be provided: an
     ``__init__()`` function that takes in any model-specific parameters and passes all
     other parameters into the parent class through ``super().__init__()``, as well as
-    both :meth:`~_get_mapping` and :meth:`~_get_arch` (see the base class' documentation
+    both :meth:`~get_mapping_single` and :meth:`~_get_arch` (see the base class' documentation
     for expected in- and output).
 
     Parameters
@@ -393,12 +393,12 @@ class Model():
     def get_mapping(self, timevector, return_observability=False, ignore_active_parameters=False):
         r"""
         Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`.
-        Requires the model to be subclassed and implement a :meth:`~_get_mapping` method.
+        Requires the model to be subclassed and implement a :meth:`~get_mapping_single` method.
 
         This method has multiple steps: it first checks the active period of the
         model using :meth:`~get_active_period`. If ``timevector`` is outside the active period,
         it skips the actual calculation and returns an empty sparse matrix. If there is at least
-        one timestamp where the model is active, it calls the actual :meth:`~_get_mapping`
+        one timestamp where the model is active, it calls the actual :meth:`~get_mapping_single`
         mapping matrix calculation method only for the timestamps where the model is active in
         order to reduce the computational load. Lastly, the dense, evaluated mapping matrix
         gets padded before and after with empty sparse matrices (if the model is zero outside
@@ -432,7 +432,8 @@ class Model():
         Raises
         ------
         NotImplementedError
-            If the model has not been subclassed and :meth:`~_get_mapping` has not been added.
+            If the model has not been subclassed and :meth:`~get_mapping_single`
+            has not been added.
         """
         # get active period and initialize coefficient matrix
         active, first, last = self.get_active_period(timevector)
@@ -444,9 +445,9 @@ class Model():
         # otherwise, build coefficient matrix
         else:
             # build dense sub-matrix
-            coefs = self._get_mapping(timevector[active])
+            coefs = self.get_mapping_single(timevector[active])
             assert coefs.shape[1] == self.num_parameters, \
-                f"The child function '_get_mapping' of model {type(self).__name__} " \
+                f"The child function 'get_mapping_single' of model {type(self).__name__} " \
                 f"returned an invalid shape. " \
                 f"Expected was ({last-first+1}, {self.num_parameters}), got {coefs.shape}."
             # if model is frozen, zero out inactive parameters
@@ -488,7 +489,7 @@ class Model():
         else:
             return mapping
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
         r"""
         Build the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`
         for the active period. Called inside :meth:`~get_mapping`.
@@ -508,7 +509,8 @@ class Model():
             :attr:`~num_parameters` columns.
         """
         raise NotImplementedError("'Model' needs to be subclassed and its child needs to "
-                                  "implement a '_get_mapping' function for the active period.")
+                                  "implement a 'get_mapping_single' method for the active "
+                                  "period.")
 
     def get_active_period(self, timevector):
         """
@@ -742,7 +744,26 @@ class Step(Model):
         except ValueError:
             warn(f"Step '{step}' not present.", category=RuntimeWarning, stacklevel=2)
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: H \left( t - t_l^{\text{step}} \right)
+
+        where :math:`H \left( t \right)` is the Heaviside step function and
+        :math:`t_l^{\text{step}}` are the step times.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         coefs = np.array(timevector.values.reshape(-1, 1) >=
                          pd.DataFrame(data=self.timestamps,
                                       columns=["steptime"]).values.reshape(1, -1),
@@ -780,7 +801,25 @@ class Polynomial(Model):
                 "kw_args": {"order": self.order, "min_exponent": self.min_exponent}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: t^l
+
+        where :math:`l` are the integer exponents of the model.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         dt = self.tvec_to_numpycol(timevector)
         # the exponents increase by column
         exponents = np.arange(self.min_exponent, self.order + 1)
@@ -929,10 +968,36 @@ class BSpline(Model):
                             "obs_scale": self.observability_scale}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \sum_{k=0}^{n} \frac{{\left( -1 \right)}^{k}}{p!} \cdot \binom{n}{k}
+                  \cdot {\left( t_j^\prime + \frac{n}{2} - k \right)}^p
+
+        where :math:`p` is the degree and :math:`n=p+1` is the order (see [butzer88]_
+        and [schoenberg73]_). :math:`t^\prime` is the normalized time:
+
+        .. math:: t_j^\prime = \frac{ \left( t - t_{\text{ref}} \right) - j \cdot \rho}{\rho}
+
+        where :math:`t_{\text{ref}}` and :math:`\rho` are the model's reference time and
+        timescale, respectively.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
+        # TODO check how this equation looks
         # get relative and normalized time
-        trel = self.tvec_to_numpycol(timevector).reshape(-1, 1, 1) \
-               - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
+        trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1, 1)
+                - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1))
         tnorm = trel / self.scale
         # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
@@ -1038,10 +1103,29 @@ class ISpline(Model):
                             "obs_scale": self.observability_scale}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \sum_{k=0}^{n} \frac{{\left( -1 \right)}^{k}}{\left( p+1 \right) !} \cdot
+                  \binom{n}{k} \cdot {\left( t_j^\prime + \frac{n}{2} - k \right)}^{p+1}
+
+        which is the integral over time of :meth:`~Bspline.get_mapping_single`.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         # get relative and normalized time
-        trel = self.tvec_to_numpycol(timevector).reshape(-1, 1, 1) \
-               - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
+        trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1, 1)
+                - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1))
         tnorm = trel / self.scale
         # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
@@ -1134,7 +1218,22 @@ class BaseSplineSet(Model):
         raise NotImplementedError("BaseSplineSet is not designed to be exported and "
                                   "created directly, use a subclass.")
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times by accumulating the mapping factors
+        of the different scales.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         coefs = np.empty((timevector.size, self.num_parameters))
         ix_coefs = 0
         for model in self.splines:
@@ -1614,7 +1713,25 @@ class Sinusoid(Model):
                 "kw_args": {"period": self.period}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \left( \cos \left( \omega t \right),  \sin \left( \omega t \right) \right)
+
+        where :math:`\omega` is the period of the sinusoid.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         dt = self.tvec_to_numpycol(timevector)
         phase = 2*np.pi * dt / self.period
         coefs = np.stack([np.cos(phase), np.sin(phase)], axis=1)
@@ -1704,7 +1821,27 @@ class AmpPhModulatedSinusoid(Model):
                             "obs_scale": self.observability_scale}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \left( h_j (t) \cos \left( \omega t \right),
+                  h_j (t) \sin \left( \omega t \right) \right) \right)
+
+        where :math:`h_j` are envelopes based on B-Splines calculated by
+        :class:`~scipy.interpolate.BSpline`, and :math:`\omega` is the period.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         # get phase and normalized [0, 1) phase
         dt = self.tvec_to_numpycol(timevector)
         phase = 2*np.pi * dt.reshape(-1, 1) / self.period
@@ -1816,7 +1953,7 @@ class Logarithmic(Model):
         assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
                               f"array of shape {tau.shape}."
         self.tau = tau
-        """ Logarithmic time constant. """
+        """ Logarithmic time constant(s). """
         assert ((sign_constraint in [1, -1, None]) or
                 (isinstance(sign_constraint, list) and
                  all([s in [1, -1, None] for s in sign_constraint]))), "'sign_constraint' " \
@@ -1839,7 +1976,25 @@ class Logarithmic(Model):
                             "sign_constraint": self.sign_constraint}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \log \left( 1 + \frac{t}{\tau}
+
+        where :math:`\tau` is the logairthmic time constant.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         dt = self.tvec_to_numpycol(timevector)
         coefs = np.log1p(dt.reshape(-1, 1) / self.tau.reshape(1, -1))
         return coefs
@@ -1903,7 +2058,25 @@ class Exponential(Model):
                             "sign_constraint": self.sign_constraint}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \left( 1 - \exp \left( -\frac{t}{\tau} \right) \right)
+
+        where :math:`\tau` is the exponential time constant.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         dt = self.tvec_to_numpycol(timevector)
         coefs = 1 - np.exp(-dt.reshape(-1, 1) / self.tau.reshape(1, -1))
         return coefs
@@ -1946,7 +2119,25 @@ class Arctangent(Model):
                 "kw_args": {"tau": self.tau}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \left( \frac{1}{\pi} \arctan \left( \frac{t}{\tau} \right) + 0.5 \right)
+
+        where :math:`\tau` is the arctangent time constant.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         dt = self.tvec_to_numpycol(timevector)
         coefs = np.arctan(dt / self.tau).reshape(-1, 1) / np.pi + 0.5
         return coefs
@@ -1985,7 +2176,25 @@ class HyperbolicTangent(Model):
                 "kw_args": {"tau": self.tau}}
         return arch
 
-    def _get_mapping(self, timevector):
+    def get_mapping_single(self, timevector):
+        r"""
+        Calculate the mapping factors at times :math:`t` as
+
+        .. math:: \left( \frac{1}{2} \tanh \left( \frac{t}{\tau} \right) + 0.5 \right)
+
+        where :math:`\tau` is the hyperbolic tangent time constant.
+
+        Parameters
+        ----------
+        timevector : pandas.Series, pandas.DatetimeIndex
+            :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+
+        Returns
+        -------
+        coefs : numpy.ndarray
+            Coefficients of the mapping matrix.
+        """
         dt = self.tvec_to_numpycol(timevector)
         coefs = np.tanh(dt / self.tau).reshape(-1, 1) / 2 + 0.5
         return coefs
