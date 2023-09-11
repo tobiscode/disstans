@@ -58,6 +58,8 @@ class Model():
     both :meth:`~get_mapping_single` and :meth:`~_get_arch` (see the base class' documentation
     for expected in- and output).
 
+    Appendix A.2 of [koehne23]_ describes in detail the approach to models in DISSTANS.
+
     Parameters
     ----------
     num_parameters : int
@@ -81,6 +83,15 @@ class Model():
     zero_after : bool, optional
         Defines whether the model is zero after ``t_end``, or
         if the boundary value should be used (attribute :attr:`~zero_after`).
+
+    References
+    ----------
+
+    .. [koehne23] Köhne, T., Riel, B., & Simons, M. (2023).
+       *Decomposition and Inference of Sources through Spatiotemporal Analysis of *
+       *Network Signals: The DISSTANS Python package.*
+       Computers & Geosciences, 170, 105247.
+       doi:`10.1016/j.cageo.2022.10524 <https://doi.org/10.1016/j.cageo.2022.105247>`_
     """
 
     EVAL_PREDVAR_PRECISION = np.dtype(np.single)
@@ -753,6 +764,8 @@ class Step(Model):
         where :math:`H \left( t \right)` is the Heaviside step function and
         :math:`t_l^{\text{step}}` are the step times.
 
+        See Appendix A.2.2 in [koehne23]_ for more details.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -808,6 +821,8 @@ class Polynomial(Model):
         .. math:: t^l
 
         where :math:`l` are the integer exponents of the model.
+
+        See Appendix A.2.2 in [koehne23]_ for more details.
 
         Parameters
         ----------
@@ -983,6 +998,8 @@ class BSpline(Model):
         where :math:`t_{\text{ref}}` and :math:`\rho` are the model's reference time and
         timescale, respectively.
 
+        See Appendix A.2.3 in [koehne23]_ for more details.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -1111,6 +1128,8 @@ class ISpline(Model):
                   \binom{n}{k} \cdot {\left( t_j^\prime + \frac{n}{2} - k \right)}^{p+1}
 
         which is the integral over time of :meth:`~Bspline.get_mapping_single`.
+
+        See Appendix A.2.3 in [koehne23]_ for more details.
 
         Parameters
         ----------
@@ -1721,6 +1740,8 @@ class Sinusoid(Model):
 
         where :math:`\omega` is the period of the sinusoid.
 
+        See Appendix A.2.2 in [koehne23]_ for more details.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -1830,6 +1851,8 @@ class AmpPhModulatedSinusoid(Model):
 
         where :math:`h_j` are envelopes based on B-Splines calculated by
         :class:`~scipy.interpolate.BSpline`, and :math:`\omega` is the period.
+
+        See Appendix A.2.4 in [koehne23]_ for more details.
 
         Parameters
         ----------
@@ -1984,6 +2007,8 @@ class Logarithmic(Model):
 
         where :math:`\tau` is the logairthmic time constant.
 
+        See Appendix A.2.2 in [koehne23]_ for more details.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -2066,6 +2091,8 @@ class Exponential(Model):
 
         where :math:`\tau` is the exponential time constant.
 
+        See Appendix A.2.2 in [koehne23]_ for more details.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -2127,6 +2154,8 @@ class Arctangent(Model):
 
         where :math:`\tau` is the arctangent time constant.
 
+        See Appendix A.2.2 in [koehne23]_ for more details.
+
         Parameters
         ----------
         timevector : pandas.Series, pandas.DatetimeIndex
@@ -2183,6 +2212,8 @@ class HyperbolicTangent(Model):
         .. math:: \left( \frac{1}{2} \tanh \left( \frac{t}{\tau} \right) + 0.5 \right)
 
         where :math:`\tau` is the hyperbolic tangent time constant.
+
+        See Appendix A.2.2 in [koehne23]_ for more details.
 
         Parameters
         ----------
