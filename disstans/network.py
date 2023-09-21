@@ -1078,8 +1078,10 @@ class Network():
             and the calculation of the residual as done with ``residual_description`` by
             :meth:`~disstans.network.Network.fitevalres` after finishing the spatial fitting.
         zero_threshold : float, optional
-            When extracting the formal covariance matrix or calculating statistics, assume
-            parameters with absolute values smaller than ``zero_threshold`` are effectively zero.
+            When calculating statistics, assume parameters with absolute values smaller than
+            ``zero_threshold`` are effectively zero.
+        cov_zero_threshold : float, optional
+            Covariance zero threshold, see :func:`~disstans.solvers.lasso_regression`.
         num_threads_evaluate : int, optional
             If ``extended_stats=True`` and ``formal_covariance=True``, there will be calls to
             :meth:`~evaluate` that will estimate the predicted variance,

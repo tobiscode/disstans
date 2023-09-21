@@ -1011,7 +1011,6 @@ class BSpline(Model):
         coefs : numpy.ndarray
             Coefficients of the mapping matrix.
         """
-        # TODO check how this equation looks
         # get relative and normalized time
         trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1, 1)
                 - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1))
