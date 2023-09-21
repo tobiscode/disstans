@@ -3072,6 +3072,9 @@ class ModelCollection():
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``fname`` is provided.
         """
+        # check if a covariance has been computed
+        if self.cov is None:
+            raise RuntimeError("No covariance found to plot.")
         # make a list of model names as well as the indices of the parameter boundaries
         # and the location of where to put the label
         # if a model is a spline collection, make the corresponding list entries another list
