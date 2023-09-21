@@ -947,20 +947,18 @@ class Network():
         solver, station_time, station_models, kw_args = parameter_tuple
         return solver(station_time, station_models, **kw_args)
 
-    def spatialfit(self, ts_description, penalty, spatial_reweight_models,
+    def spatialfit(self, ts_description, penalty, reweight_func, spatial_l0_models,
                    spatial_reweight_iters, spatial_reweight_percentile=0.5,
                    spatial_reweight_max_rms=1e-9, spatial_reweight_max_changed=0,
-                   spatial_reweight_agg_comps=False, dist_num_avg=4,
+                   spatial_reweight_agg_comps=True, dist_num_avg=4,
                    dist_weight_min=None, dist_weight_max=None,
-                   continuous_reweight_models=[], local_reweight_iters=1,
-                   local_reweight_func=None, local_reweight_coupled=True,
-                   formal_covariance=False, use_data_variance=True,
-                   use_data_covariance=True, use_internal_scales=True,
-                   cov_zero_threshold=1e-6, verbose=False, no_pbar=False,
-                   return_stats=True, extended_stats=False,
-                   keep_mdl_res_as=None, return_solutions=False,
-                   zero_threshold=1e-4, num_threads_evaluate=None, roll_mean_kernel=30,
-                   **cvxpy_kw_args):
+                   local_l0_models=[], local_reweight_iters=1,
+                   local_reweight_coupled=True, formal_covariance=False,
+                   use_data_variance=True, use_data_covariance=True,
+                   use_internal_scales=True, verbose=False, no_pbar=False,
+                   extended_stats=False, keep_mdl_res_as=None, return_solutions=False,
+                   zero_threshold=1e-4, cov_zero_threshold=1e-6, num_threads_evaluate=None,
+                   roll_mean_kernel=30, cvxpy_kw_args={"solver": "SCS"}):
         r"""
         Fit the models for a specific timeseries at all stations using the
         spatiotemporal capabilities of :func:`~disstans.solvers.lasso_regression`,
@@ -981,7 +979,7 @@ class Network():
 
         The iteration can stop early if either the conditions set by
         ``spatial_reweight_max_rms`` *or* ``spatial_reweight_max_changed`` are satisfied,
-        for all models in ``spatial_reweight_models``.
+        for all models in ``spatial_l0_models``.
 
         In the third step, a distance-weighted median is used at each station to combine
         the L0 regularization weights :math:`\mathbf{w}^{(i)}_j`. The distance weights
@@ -999,17 +997,21 @@ class Network():
             Description of the timeseries to fit.
         penalty : float, list, numpy.ndarray
             Penalty hyperparameter :math:`\lambda`. For non-reweighted models (i.e.,
-            regularized models that are neither in ``spatial_reweight_models`` nor in
-            ``continuous_reweight_models``), this is the constant penalty applied for
+            regularized models that are neither in ``spatial_l0_models`` nor in
+            ``local_l0_models``), this is the constant penalty applied for
             every iteration. For the reweighted models, and if ``local_reweight_coupled=True``
             (default), this is just the penalty at the first iteration. After that,
-            the penalties are largely controlled by ``local_reweight_func``. If
+            the penalties are largely controlled by ``reweight_func``. If
             ``local_reweight_coupled=False``, the penalty is applied on top of the updated
             weights at each iteration.
             ``penalty`` can either be a single value used for all components, or a list
             or NumPy array specifying a penalty for each component in the data.
-        spatial_reweight_models : list
-            Names of models to use in the spatial reweighting.
+        reweight_func : ReweightingFunction
+            An instance of a reweighting function that will be used by
+            :func:`~disstans.solvers.lasso_regression`.
+        spatial_l0_models : list
+            Names of models to use in the spatial reweighting, resulting in spatial L0
+            regularization.
         spatial_reweight_iters : int
             Number of spatial reweighting iterations.
         spatial_reweight_percentile : float, optional
@@ -1036,16 +1038,13 @@ class Network():
             Enforce a minimum value of :math:`D_j` (in kilometers).
         dist_weight_max : float, optional
             Enforce a maximum value of :math:`D_j` (in kilometers).
-        continuous_reweight_models : list
+        local_l0_models : list
             Names of models that should carry over their weights from one solver iteration
-            to the next, but should not be reweighted.
+            to the next, but should not be reweighted spatially, resulting in local L0
+            regularization.
         local_reweight_iters : int, optional
             Number of local reweighting iterations, see ``reweight_max_iters`` in
             :func:`~disstans.solvers.lasso_regression`.
-        local_reweight_func : ReweightingFunction, optional
-            An instance of a reweighting function that will be used by
-            :func:`~disstans.solvers.lasso_regression`.
-            Defaults to an inverse reweighting with stability parameter ``eps=1e-4``.
         local_reweight_coupled : bool, optional
             If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
             is coupled with the reweighting weights (see Notes in
@@ -1092,7 +1091,7 @@ class Network():
         roll_mean_kernel : int, optional
             Only used if ``extended_stats=True``. This is the kernel size that gets used in the
             analysis of the residuals between each fitting step.
-        **cvxpy_kw_args : dict
+        cvxpy_kw_args : dict, optional
             Additional keyword arguments passed on to CVXPY's ``solve()`` function,
             see ``cvxpy_kw_args`` in :func:`~disstans.solvers.lasso_regression`.
 
@@ -1160,10 +1159,10 @@ class Network():
         num_components = valid_stations[station_names[0]][ts_description].num_components
         assert num_stations > 1, "The number of stations in the network that " \
             "contain the timeseries must be more than one."
-        assert isinstance(spatial_reweight_models, list) and \
-            all([isinstance(mdl, str) for mdl in spatial_reweight_models]), \
-            "'spatial_reweight_models' must be a list of model name strings, got " + \
-            f"{spatial_reweight_models}."
+        assert isinstance(spatial_l0_models, list) and \
+            all([isinstance(mdl, str) for mdl in spatial_l0_models]), \
+            "'spatial_l0_models' must be a list of model name strings, got " + \
+            f"{spatial_l0_models}."
         assert isinstance(spatial_reweight_iters, int) and (spatial_reweight_iters > 0), \
             "'spatial_reweight_iters' must be an integer greater than 0, got " + \
             f"{spatial_reweight_iters}."
@@ -1171,23 +1170,17 @@ class Network():
             f"to be greater or equal to 0, got {spatial_reweight_max_rms}."
         assert 0 <= float(spatial_reweight_max_changed) <= 1, "'spatial_reweight_max_changed' " \
             f"needs to be between 0 and 1, got {spatial_reweight_max_changed}."
-        if continuous_reweight_models != []:
-            assert isinstance(continuous_reweight_models, list) and \
-                all([isinstance(mdl, str) for mdl in continuous_reweight_models]), \
-                "'continuous_reweight_models' must be a list of model name strings, got " + \
-                f"{continuous_reweight_models}."
-        all_reweight_models = set(spatial_reweight_models + continuous_reweight_models)
-        assert len(all_reweight_models) == len(spatial_reweight_models) + \
-            len(continuous_reweight_models), "'spatial_reweight_models' " + \
-            "and 'continuous_reweight_models' can not have shared elements"
-
-        # set up reweighting function
-        if local_reweight_func is None:
-            rw_func = ReweightingFunction.from_name("inv", 1e-4)
-        else:
-            assert isinstance(local_reweight_func, ReweightingFunction), "'local_reweight_func' " \
-                f"needs to be None or a ReweightingFunction, got {type(local_reweight_func)}."
-            rw_func = local_reweight_func
+        if local_l0_models != []:
+            assert isinstance(local_l0_models, list) and \
+                all([isinstance(mdl, str) for mdl in local_l0_models]), \
+                "'local_l0_models' must be a list of model name strings, got " + \
+                f"{local_l0_models}."
+        all_reweight_models = set(spatial_l0_models + local_l0_models)
+        assert len(all_reweight_models) == len(spatial_l0_models) + \
+            len(local_l0_models), "'spatial_l0_models' " + \
+            "and 'local_l0_models' can not have shared elements"
+        assert isinstance(reweight_func, ReweightingFunction), \
+            f"'reweight_func' needs to be a ReweightingFunction, got {type(reweight_func)}."
 
         # get scale lengths (correlation lengths) using the average distance to the
         # closest dist_num_avg stations and optional boundaries
@@ -1232,7 +1225,7 @@ class Network():
                              no_pbar=no_pbar,
                              penalty=penalty,
                              reweight_max_iters=local_reweight_iters,
-                             reweight_func=rw_func,
+                             reweight_func=reweight_func,
                              reweight_coupled=local_reweight_coupled,
                              return_weights=True,
                              formal_covariance=formal_covariance,
@@ -1240,7 +1233,7 @@ class Network():
                              use_data_covariance=use_data_covariance,
                              use_internal_scales=use_internal_scales,
                              cov_zero_threshold=cov_zero_threshold,
-                             **cvxpy_kw_args)
+                             cvxpy_kw_args=cvxpy_kw_args)
         num_total = sum([s.models[ts_description][m].parameters.size
                          for s in valid_stations.values() for m in all_reweight_models])
         num_uniques = np.sum(np.stack(
@@ -1344,7 +1337,7 @@ class Network():
                 tqdm.write("Updating weights")
             new_net_weights = {statname: {"reweight_init": {}} for statname in station_names}
             # reweighting spatial models
-            for mdl_description in spatial_reweight_models:
+            for mdl_description in spatial_l0_models:
                 stacked_weights, = \
                     Solution.aggregate_models(results_dict=solutions,
                                               mdl_description=mdl_description,
@@ -1380,7 +1373,7 @@ class Network():
                             new_net_weights[name]["reweight_init"][mdl_description] = \
                                 solutions[name].weights_by_model(mdl_description)
             # copying over the old weights for the continuous models
-            for mdl_description in continuous_reweight_models:
+            for mdl_description in local_l0_models:
                 for name in station_names:
                     if mdl_description in solutions[name]:
                         new_net_weights[name]["reweight_init"][mdl_description] = \
@@ -1404,14 +1397,14 @@ class Network():
                                  no_pbar=no_pbar,
                                  penalty=penalty,
                                  reweight_max_iters=local_reweight_iters,
-                                 reweight_func=rw_func,
+                                 reweight_func=reweight_func,
                                  reweight_coupled=local_reweight_coupled,
                                  return_weights=True,
                                  formal_covariance=formal_covariance,
                                  use_data_variance=use_data_variance,
                                  use_data_covariance=use_data_covariance,
                                  cov_zero_threshold=cov_zero_threshold,
-                                 **cvxpy_kw_args)
+                                 cvxpy_kw_args=cvxpy_kw_args)
             # get statistics
             num_nonzero = sum([(s.models[ts_description][m].parameters.ravel()
                                 > zero_threshold).sum()

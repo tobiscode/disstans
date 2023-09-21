@@ -723,7 +723,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
                      reweight_max_rss=1e-9, reweight_init=None, reweight_coupled=True,
                      formal_covariance=False, use_data_variance=True, use_data_covariance=True,
                      use_internal_scales=True, cov_zero_threshold=1e-6, return_weights=False,
-                     check_constraints=True, **cvxpy_kw_args):
+                     check_constraints=True, cvxpy_kw_args={"solver": "SCS"}):
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
@@ -819,7 +819,7 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
     check_constraints : bool, optional
         If ``True`` (default), check whether models have sign constraints that should
         be enforced.
-    **cvxpy_kw_args : dict
+    cvxpy_kw_args : dict, optional
         Additional keyword arguments passed on to CVXPY's ``solve()`` function.
 
     Returns
