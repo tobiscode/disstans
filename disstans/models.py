@@ -551,7 +551,7 @@ class Model():
         else:
             active = np.all((timevector >= self.t_start, timevector <= self.t_end), axis=0)
         if active.any():
-            first, last = int(np.argwhere(active)[0]), int(np.argwhere(active)[-1])
+            first, last = np.flatnonzero(active)[[0, -1]].tolist()
         else:
             first, last = None, None
         return active, first, last
