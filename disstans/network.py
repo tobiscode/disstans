@@ -1242,7 +1242,7 @@ class Network():
             [np.sum(np.any(np.stack([np.abs(s.models[ts_description][m].parameters)
                                      > zero_threshold for s in valid_stations.values()]),
                            axis=0), axis=0) for m in all_reweight_models]), axis=0)
-        num_nonzero = sum([(s.models[ts_description][m].parameters.ravel()
+        num_nonzero = sum([(np.abs(s.models[ts_description][m].parameters.ravel())
                             > zero_threshold).sum()
                            for s in valid_stations.values() for m in all_reweight_models])
         if verbose:
@@ -1408,7 +1408,7 @@ class Network():
                                  cov_zero_threshold=cov_zero_threshold,
                                  cvxpy_kw_args=cvxpy_kw_args)
             # get statistics
-            num_nonzero = sum([(s.models[ts_description][m].parameters.ravel()
+            num_nonzero = sum([(np.abs(s.models[ts_description][m].parameters.ravel())
                                 > zero_threshold).sum()
                                for s in valid_stations.values() for m in all_reweight_models])
             num_uniques = np.sum(np.stack(
