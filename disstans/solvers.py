@@ -931,19 +931,19 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             if nonpos is not None:
                 constraints.append(m[nonpos] <= 0)
         if regularize:
+            weights_size = num_reg * num_comps
+            z = cp.Variable(shape=weights_size)
             if reweight_max_iters is not None:
-                reweight_size = num_reg * num_comps
                 if init_weights is None:
-                    init_weights = np.ones(reweight_size)
+                    init_weights = np.ones(weights_size)
                     if reweight_coupled:
                         init_weights *= pen
                 else:
-                    assert init_weights.size == reweight_size, \
-                        f"'init_weights' must have a size of {reweight_size}, " + \
+                    assert init_weights.size == weights_size, \
+                        f"'init_weights' must have a size of {weights_size}, " + \
                         f"got {init_weights.size}."
-                weights = cp.Parameter(shape=reweight_size,
+                weights = cp.Parameter(shape=weights_size,
                                        value=init_weights, pos=True)
-                z = cp.Variable(shape=reweight_size)
                 if reweight_coupled:
                     objective = objective + cp.norm1(z)
                 else:
@@ -955,7 +955,8 @@ def lasso_regression(ts, models, penalty, reweight_max_iters=None, reweight_func
             else:
                 lambd = cp.Parameter(shape=() if num_comps == 1 else pen.size,
                                      value=pen, pos=True)
-                objective = objective + cp.norm1(cp.multiply(lambd, m[reg_indices]))
+                constraints.append(z == cp.multiply(lambd, m[reg_indices]))
+                objective = objective + cp.norm1(z)
         # define problem
         problem = cp.Problem(cp.Minimize(objective), constraints)
         # solve
