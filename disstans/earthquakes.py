@@ -3,17 +3,19 @@ This module contains functions relating to the processing and representation
 of earthquakes.
 """
 
+from __future__ import annotations
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from okada_wrapper import dc3d0wrapper as dc3d0
 from warnings import warn
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from .config import defaults
 from .tools import parallelize
 from .models import Step
-from .network import Network
+if TYPE_CHECKING:
+    from .network import Network
 
 
 def okada_displacement(station_lla: list[float], eq_catalog_row: pd.Series) -> np.ndarray:

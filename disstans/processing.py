@@ -6,6 +6,7 @@ be initialized.
 For general helper functions, see :mod:`~disstans.tools`.
 """
 
+from __future__ import annotations
 import numpy as np
 import pandas as pd
 import warnings
@@ -16,15 +17,16 @@ from tqdm import tqdm
 from warnings import warn
 from pandas.api.indexers import BaseIndexer
 from collections.abc import Callable
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from .config import defaults
 from .timeseries import Timeseries
 from .compiled import selectpair
 from .tools import Timedelta, parallelize, tvec_to_numpycol, date2decyear
 from .models import Polynomial
-from .network import Network
 from .station import Station
+if TYPE_CHECKING:
+    from .network import Network
 
 
 def unwrap_dict_and_ts(func: Callable) -> Callable:
