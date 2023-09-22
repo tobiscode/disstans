@@ -61,10 +61,6 @@ def unwrap_dict_and_ts(func: Callable) -> Callable:
     ----------
     func
         Function to be wrapped.
-
-    Returns
-    -------
-        Wrapped function.
     """
     @wraps(func)
     def wrapper(data, *args, **kw_args):

@@ -171,7 +171,6 @@ class Network():
 
         Returns
         -------
-        info
             Network summary.
         """
         info = f"Network {self.name}\n" + \
