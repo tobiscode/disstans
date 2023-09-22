@@ -5,6 +5,7 @@ any of DISSTANS's classes.
 For more specialized processing functions, see :mod:`~disstans.processing`.
 """
 
+from __future__ import annotations
 import os
 import re
 import subprocess
@@ -13,6 +14,7 @@ import scipy as sp
 import scipy.sparse as sparse
 import pandas as pd
 import matplotlib as mpl
+import matplotlib.collections
 import matplotlib.pyplot as plt
 import cartopy.geodesic as cgeod
 import cartopy.crs as ccrs
@@ -24,8 +26,11 @@ from pathlib import Path
 from datetime import datetime, timezone
 from warnings import warn
 from matplotlib.ticker import FuncFormatter
+from matplotlib.backend_bases import Event, MouseButton
 from cmcrameri import cm as scm
 from scipy.stats import circmean
+from collections.abc import Callable, Iterable, Iterator
+from typing import Any, Literal
 
 from .config import defaults
 
@@ -56,15 +61,20 @@ class Click():
 
     Parameters
     ----------
-    ax : matplotlib.axis.Axis
+    ax
         Axis on which to look for clicks.
-    func : function
+    func
         Function to call, with the Matplotlib clicking :class:`~matplotlib.backend_bases.Event`
         as its first argument.
-    button : int, optional
-        Which mouse button to operate on. Defaults to ``1`` (left).
+    button
+        Which mouse button to operate on, see :class:`~matplotlib.backend_bases.MouseButton`
+        for accepted values.
     """
-    def __init__(self, ax, func, button=1):
+    def __init__(self,
+                 ax: mpl.Axis,
+                 func: Callable[[Event], None],
+                 button: MouseButton = MouseButton.LEFT
+                 ) -> None:
         self._ax = ax
         self._func = func
         self._button = button
@@ -74,51 +84,52 @@ class Click():
         self._c2 = self._ax.figure.canvas.mpl_connect('button_release_event', self._onrelease)
         self._c3 = self._ax.figure.canvas.mpl_connect('motion_notify_event', self._onmove)
 
-    def __del__(self):
+    def __del__(self) -> None:
         for cid in [self._c1, self._c2, self._c3]:
             self._ax.figure.canvas.mpl_disconnect(cid)
 
-    def _onclick(self, event):
+    def _onclick(self, event: Event) -> None:
         if event.inaxes == self._ax:
             if event.button == self._button:
                 self._func(event)
 
-    def _onpress(self, event):
+    def _onpress(self, event: Event) -> None:
         self._press = True
 
-    def _onmove(self, event):
+    def _onmove(self, event: Event) -> None:
         if self._press:
             self._move = True
 
-    def _onrelease(self, event):
+    def _onrelease(self, event: Event) -> None:
         if self._press and not self._move:
             self._onclick(event)
         self._press = False
         self._move = False
 
 
-def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
+def tvec_to_numpycol(timevector: pd.Series | pd.DatetimeIndex,
+                     t_reference: str | pd.Timestamp | None = None,
+                     time_unit: str | None = "D"
+                     ) -> np.ndarray:
     """
     Converts a Pandas timestamp series into a NumPy array of relative
     time to a reference time in the given time unit.
 
     Parameters
     ----------
-    timevector : pandas.Series, pandas.DatetimeIndex
+    timevector
         :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
         :class:`~pandas.DatetimeIndex` of when to evaluate the model.
-    t_reference : str or pandas.Timestamp, optional
+    t_reference
         Reference :class:`~pandas.Timestamp` or datetime-like string
         that can be converted to one.
-        Defaults to the first element of ``timevector``.
-    time_unit : str, optional
+        ``None`` chooses the first element of ``timevector``.
+    time_unit
         Time unit for parameters.
         Refer to :class:`~disstans.tools.Timedelta` for more details.
-        Defaults to ``D``.
 
     Returns
     -------
-    numpy.ndarray
         Array of time differences.
     """
     # get reference time
@@ -132,7 +143,8 @@ def tvec_to_numpycol(timevector, t_reference=None, time_unit='D'):
     return ((timevector - t_reference) / Timedelta(1, time_unit)).values
 
 
-def date2decyear(dates):
+def date2decyear(dates: pd.Series | pd.DatetimeIndex | pd.Timestamp | datetime
+                 ) -> np.ndarray:
     """
     Convert dates (just year, month, day, each day assumed to be centered at noon)
     to decimal years, assuming all years have 365.25 days (JPL convention for
@@ -140,13 +152,12 @@ def date2decyear(dates):
 
     Parameters
     ----------
-    dates : pandas.Series, pandas.DatetimeIndex, pandas.Timestamp, datetime.datetime
-        Input date(s). If a Series, needs to be a series of Timestamp-convertible
-        data types.
+    dates
+        Input date(s). If a Series, needs to be a series of
+        :class:`~pandas.Timestamp`-convertible data types.
 
     Returns
     -------
-    numpy.ndarray
         Date(s) as sorted decimal year(s).
     """
     if isinstance(dates, pd.Series):
@@ -158,19 +169,18 @@ def date2decyear(dates):
     return np.sort(np.array(2000 + tdelta.total_seconds() / 86400 / 365.25))
 
 
-def get_cov_dims(num_components):
+def get_cov_dims(num_components: int) -> int:
     r"""
     Given a number of components, return the number of covariances that
     exist between the components.
 
     Parameters
     ----------
-    num_components : int
+    num_components
         Number of components of timeseries or model.
 
     Returns
     -------
-    int
         Number of covariances, calculated as
         :math:`\text{num_components}*(\text{num_components}-1))/2`.
 
@@ -182,7 +192,7 @@ def get_cov_dims(num_components):
     return int((num_components * (num_components - 1)) / 2)
 
 
-def make_cov_index_map(num_components):
+def make_cov_index_map(num_components: int) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Given a number of components, create a matrix that shows the indexing
     of where covariance columns present in a timeseries' or model's 2D dataframe
@@ -192,16 +202,16 @@ def make_cov_index_map(num_components):
 
     Parameters
     ----------
-    num_components : int
+    num_components
         Number of components of timeseries or model.
 
     Returns
     -------
-    index_map : numpy.ndarray
+    index_map
         Array of shape :math:`(\text{num_components}, \text{num_components})`
         that is NaN everywhere except in the upper triangle, where integer numbers
         denote where the column of a timseries' or model's 2D dataframe belong.
-    var_cov_map : numpy.ndarray
+    var_cov_map
         Array of shape :math:`(\text{num_components}^2, )` that can be used to
         assemble the variance-covariance matrix from the columns given a particular
         timestep or parameter.
@@ -262,7 +272,10 @@ def make_cov_index_map(num_components):
     return index_map, var_cov_map
 
 
-def get_cov_indices(icomp, index_map=None, num_components=None):
+def get_cov_indices(icomp: int,
+                    index_map: np.ndarray | None = None,
+                    num_components: int | None = None
+                    ) -> list[int]:
     """
     Given a data or variance component index, retrieve the indices in the covariance columns
     of a timeseries or model that are associated with that component.
@@ -270,17 +283,16 @@ def get_cov_indices(icomp, index_map=None, num_components=None):
 
     Parameters
     ----------
-    icomp : int
+    icomp
         Index of the component.
-    index_map : numpy.ndarray
+    index_map
         Output of :func:`~make_cov_index_map`.
-    num_components : int
+    num_components
         Number of components of timeseries or model. (Function will call
         :func:`~make_cov_index_map` to get ``index_map``.)
 
     Returns
     -------
-    list
         List of integer covariance column indices associated with ``icomp``.
 
     Example
@@ -306,8 +318,11 @@ def get_cov_indices(icomp, index_map=None, num_components=None):
     return sorted(indices)
 
 
-def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False,
-                            return_single=False):
+def full_cov_mat_to_columns(cov_mat: np.ndarray,
+                            num_components: int,
+                            include_covariance: bool = False,
+                            return_single: bool = False
+                            ) -> tuple[np.ndarray, ...]:
     r"""
     Converts a full variance(-covariance) matrix with multiple components into a
     column-based representation like the one used by :class:`~disstans.models.Model` or
@@ -322,27 +337,27 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False,
 
     Parameters
     ----------
-    cov_mat : numpy.ndarray
+    cov_mat
         Square array with dimensions :math:`\text{num_elements} * \text{num_components}`
         where :math:`\text{num_elements}` is the number of elements (e.g. observations
         or parameters) in each of the :math:`\text{num_components}` dimensions.
-    num_components : int
+    num_components
         Number of components `cov_mat` contains.
-    include_covariance : bool, optional
+    include_covariance
         If ``True``, also extract the off-diagonal covariances of each element between
         its components. Defaults to ``False``, i.e. only the diagonal covariances.
-    return_single : bool, optional
-        If ``False`` (default), return two arrays; if ``True``, concatenate the two.
+    return_single
+        If ``False``, return two arrays; if ``True``, concatenate the two.
 
     Returns
     -------
-    variance : numpy.ndarray
+    variance
         Array of shape :math:`(\text{num_elements}, \text{num_components})`.
         If ``include_covariance=True`` and ``return_single=True``, this array
         is concatenated horizontally with ``covariance``, leading to
         :math:`(\text{num_elements}, (\text{num_components}*(\text{num_components}-1))/2)`
         columns instead.
-    covariance : numpy.ndarray
+    covariance
         If ``include_covariance=True`` and ``return_single=False``, array of shape
         :math:`\text{num_components}) + (\text{num_components}*(\text{num_components}-1))/2`.
     """
@@ -372,7 +387,7 @@ def full_cov_mat_to_columns(cov_mat, num_components, include_covariance=False,
         return variance, covariance
 
 
-def block_permutation(n_outer, n_inner):
+def block_permutation(n_outer: int, n_inner: int) -> np.ndarray:
     r"""
     Convenience function to calculate a permutation matrix used to rearrange (permute)
     blockwise-ordered submatrices in a big matrix.  ``n_outer`` outside blocks of
@@ -383,14 +398,13 @@ def block_permutation(n_outer, n_inner):
 
     Parameters
     ----------
-    n_outer : int
+    n_outer
         Number of sub-matrices.
-    n_inner : int
+    n_inner
         Size of the individual sub-matrices.
 
     Returns
     -------
-    P : numpy.ndarray
         Square permutation matrix with dimensions
         :math:`n = \text{n_outer} * \text{n_inner}`.
         To permute a matrix :math:`A`, calculate :math:`~P A P^T`.
@@ -424,7 +438,7 @@ def block_permutation(n_outer, n_inner):
     return P
 
 
-def cov2corr(cov):
+def cov2corr(cov: np.ndarray) -> np.ndarray:
     """
     Function that converts a covariance matrix into a (Pearson) correlation
     matrix, taking into account zero-valued variances and setting the
@@ -432,12 +446,11 @@ def cov2corr(cov):
 
     Parameters
     ----------
-    cov : numpy.ndarray
+    cov
         Covariance matrix.
 
     Returns
     -------
-    corr : numpy.ndarray
         Correlation matrix.
     """
     var = np.diag(cov)
@@ -450,7 +463,11 @@ def cov2corr(cov):
     return corr
 
 
-def parallelize(func, iterable, num_threads=None, chunksize=1):
+def parallelize(func: Callable[[Any], Any],
+                iterable: Iterable,
+                num_threads: int | None = None,
+                chunksize: int = 1
+                ) -> Iterator[Any]:
     """
     Convenience wrapper that given a function, an iterable set of inputs
     and parallelization settings automatically either runs the function
@@ -477,15 +494,15 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
 
     Parameters
     ----------
-    func : function
+    func
         Function to wrap, can only have a single input argument.
-    iterable : iterable
+    iterable
         Iterable object (list, generator expression, etc.) that contains all the
         arguments that ``func`` should be called with.
-    num_threads : int, optional
+    num_threads
         Number of threads to use. Set to ``0`` if no parallelization is desired.
-        Defaults to the value in :attr:`~disstans.config.defaults`.
-    chunksize : int, optional
+        ``None`` defaults to the value in :attr:`~disstans.config.defaults`.
+    chunksize
         Chunk size used in the parallelization pool, see
         :meth:`~multiprocessing.pool.Pool.imap`.
 
@@ -530,27 +547,29 @@ def parallelize(func, iterable, num_threads=None, chunksize=1):
             yield func(parameter)
 
 
-def create_powerlaw_noise(size, exponent, seed=None):
+def create_powerlaw_noise(size: int | list | tuple,
+                          exponent: int,
+                          seed: int | np.random.Generator | None = None
+                          ) -> np.ndarray:
     """
     Creates synthetic noise according to a Power Law model [langbein04]_.
 
     Parameters
     ----------
-    size : int, list, tuple
+    size
         Number of (equally-spaced) noise samples of the output noise array or
         a shape where the first entry defines the number of noise samples for
         the remaining dimensions.
-    exponent : int
+    exponent
         Exponent of the power law noise model.
         E.g. ``0`` corresponds to white (Gaussian) noise, ``1`` to flicker (pink)
         noise, and ``2`` to random walk (red, Brownian) noise.
-    seed : int, numpy.random.Generator, optional
+    seed
         Pass an initial seed to the random number generator, or pass
         a :class:`~numpy.random.Generator` instance.
 
     Returns
     -------
-    numpy.ndarray
         Noise output array.
 
     Notes
@@ -563,7 +582,7 @@ def create_powerlaw_noise(size, exponent, seed=None):
     ----------
 
     .. [langbein04] Langbein, J. (2004),
-       *Noise in two‐color electronic distance meter measurements revisited*,
+       *Noise in two-color electronic distance meter measurements revisited*,
        J. Geophys. Res., 109, B04406,
        doi:`10.1029/2003JB002819 <https://doi.org/10.1029/2003JB002819>`_.
     .. [timmerkoenig95] Timmer, J.; König, M. (1995),
@@ -628,8 +647,16 @@ def create_powerlaw_noise(size, exponent, seed=None):
     return out
 
 
-def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, delimiter=',',
-                            codecol=None, exclude=None, include=None, verbose=False):
+def parse_maintenance_table(csvpath: str,
+                            sitecol: int,
+                            datecols: list,
+                            siteformatter: Callable[[str], str] | None = None,
+                            delimiter: str = ',',
+                            codecol: int | None = None,
+                            exclude: list[str] | None = None,
+                            include: list[str] | None = None,
+                            verbose: bool = False
+                            ) -> tuple[pd.DataFrame, dict[str, list]]:
     """
     Function that loads a maintenance table from a .csv file (or similar) and returns
     a list of step times for each station. It also provides an interface to ignore
@@ -637,36 +664,36 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
 
     Parameters
     ----------
-    csvpath : str
+    csvpath
         Path of the file to load.
-    sitecol : int
+    sitecol
         Column index of the station names.
-    datecols : list
+    datecols
         List of indices that contain the ingredients to convert the input to a valid
         :class:`~pandas.Timestamp`. It should fail gracefully, i.e. return a string
         if Pandas cannot interpret the column(s) appropriately.
-    siteformatter : function, optional
+    siteformatter
         Function that will be called element-wise on the loaded station names to
         produce the output station names.
-    delimiter : str, optional
+    delimiter
         Delimiter character for the input file.
-    codecol : int, optional
+    codecol
         Column index of the maintenance code.
-    exclude : list, optional
+    exclude
         Maintenance records that exactly match an element in ``exclude`` will be ignored.
         ``codecol`` has to be set.
-    include : list, optional
+    include
         Only maintenance records that include an element of ``include`` will be used.
         No exact match is required.
         ``codecol`` has to be set.
-    verbose : bool, optional
+    verbose
         If ``True``, print loading information.
 
     Returns
     -------
-    maint_table : pandas.DataFrame
+    maint_table
         Parsed maintenance table.
-    maint_dict : dict
+    maint_dict
         Dictionary of that maps the station names to a list of steptimes.
 
     Notes
@@ -736,32 +763,33 @@ def parse_maintenance_table(csvpath, sitecol, datecols, siteformatter=None, deli
     return maint_table, maint_dict
 
 
-def weighted_median(values, weights, axis=0, percentile=0.5,
-                    keepdims=False, visualize=False):
+def weighted_median(values: np.ndarray,
+                    weights: np.ndarray,
+                    axis: int = 0,
+                    percentile: float = 0.5,
+                    keepdims: bool = False,
+                    visualize: bool = False
+                    ) -> np.ndarray:
     """
     Calculates the weighted median along a given axis.
 
     Parameters
     ----------
-    values : numpy.ndarray
+    values
         Values to calculate the medians for.
-    weights : numpy.ndarray
+    weights
         Weights of each value along the given ``axis``.
-    axis : int, optional
-        Axis along which to calculate the median. Defaults to the first one (``0``).
-    percentile : float, optional
+    axis
+        Axis along which to calculate the median.
+    percentile
         Changes the percentile (between 0 and 1) of which median to calculate.
-        Defaults to ``0.5``.
-    keepdims : bool, optional
+    keepdims
         If ``True``, squeezes out the axis along which the median was calculated.
-        Defaults to ``False``.
-    visualize : bool, optional
+    visualize
         If ``True``, show a plot of the weighted median calculation.
-        Defaults to ``False``.
 
     Returns
     -------
-    numpy.ndarray
         Weighted median of input.
     """
     # some checks
@@ -819,9 +847,17 @@ def weighted_median(values, weights, axis=0, percentile=0.5,
     return medians
 
 
-def download_unr_data(station_list_or_bbox, data_dir, solution="final",
-                      rate="24h", reference=None, min_solutions=100,
-                      t_min=None, t_max=None, verbose=False, no_pbar=False):
+def download_unr_data(station_list_or_bbox: list[str] | list[float],
+                      data_dir: str,
+                      solution: Literal["final", "rapid", "ultra"] = "final",
+                      rate: Literal["24h", "5min"] = "24h",
+                      reference: str = "IGS14",
+                      min_solutions: int = 100,
+                      t_min: str | pd.Timestamp | None = None,
+                      t_max: str | pd.Timestamp | None = None,
+                      verbose: bool = False,
+                      no_pbar: bool = False
+                      ) -> pd.DataFrame:
     """
     Downloads GNSS timeseries data from the University of Nevada at Reno's
     `Nevada Geodetic Laboratory`_. When using this data, please cite [blewitt18]_,
@@ -833,42 +869,36 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
 
     Parameters
     ----------
-    station_list_or_bbox : list
+    station_list_or_bbox
         Defines which stations to look for data and download.
         It can be either a list of station names (list of strings), a list of bounding
         box coordinates (the four floats ``[lon_min, lon_max, lat_min, lat_max]``
         in degrees), or a three-element list defining a circle (location in degrees
         and radius in kilometers ``[center_lon, center_lat, radius]``).
-    data_dir : str
+    data_dir
         Folder for data.
-    solution : str, optional
-        Which timeseries solution to download. Possible values are ``'final'``,
-        ``'rapid'`` and ``'ultra'``. See the Notes for approximate latency times.
-        Defaults to ``'final'``.
-    rate : str, optional
-        Which sample rate to download. Possible values are ``'24h'`` and
-        ``'5min'``. See the Notes for a table of which rates are available for each
-        solution. Defaults to ``'24h'``.
-    reference : str, optional
+    solution
+        Which timeseries solution to download. See the Notes for approximate latency times.
+    rate
+        Which sample rate to download. See the Notes for a table of which rates are
+        available for each solution.
+    reference
         The UNR abbreviation for the reference frame in which to download the data.
         Applies only for daily sample rates and final or rapid orbit solutions.
-        Defaults to ``'IGS14'``.
-    min_solutions : int, optional
+    min_solutions
         Only consider stations with at least a certain number of all-time solutions
         according to the station list file.
-        Defaults to ``100``.
-    t_min : str or pandas.Timestamp, optional
+    t_min
         Only consider stations that have data on or after ``t_min``.
-    t_max : str or pandas.Timestamp, optional
+    t_max
         Only consider stations that have data on or before ``t_max``.
-    verbose : bool, optional
-        If ``True`` (dault: ``False``), individual actions are printed.
-    no_pbar : bool, optional
-        Suppress the progress bar with ``True`` (default: ``False``).
+    verbose
+        If ``True``, individual actions are printed.
+    no_pbar
+        Suppress the progress bar with ``True``.
 
     Returns
     -------
-    stations : pandas.DataFrame
         A DataFrame, built from UNR's data holding list, subset to the stations
         actually selected for download.
 
@@ -931,7 +961,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     base_url = "http://geodesy.unr.edu/gps_timeseries/"
     if solution == "final":
         if rate == "24h":
-            if (reference is None) or (reference == "IGS14"):
+            if reference == "IGS14":
                 def get_sta_url(sta):
                     return base_url + f"tenv3/IGS14/{sta}.tenv3"
             else:
@@ -943,7 +973,7 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
         station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldings.txt"
     elif solution == "rapid":
         if rate == "24h":
-            if (reference is None) or (reference == "IGS14"):
+            if reference == "IGS14":
                 def get_sta_url(sta):
                     return base_url + f"rapids/tenv3/{sta}.tenv3"
             else:
@@ -1121,7 +1151,10 @@ def download_unr_data(station_list_or_bbox, data_dir, solution="final",
     return stations
 
 
-def _download_update_file(local_path, remote_path, verbose=False):
+def _download_update_file(local_path: str,
+                          remote_path: str,
+                          verbose: bool = False
+                          ) -> None:
     # check if local file exists and if so, get its last-modified time
     if os.path.isfile(local_path):
         local_time = \
@@ -1152,7 +1185,11 @@ def _download_update_file(local_path, remote_path, verbose=False):
                        f" -> '{local_path}' ({local_time_str})")
 
 
-def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=False):
+def parse_unr_steps(filepath: str,
+                    check_update: bool = True,
+                    only_stations: list[str] | None = None,
+                    verbose: bool = False
+                    ) -> tuple[pd.DataFrame, dict[str, list], pd.DataFrame, dict[str, list]]:
     """
     This functions parses the main step file from UNR and produces two step databases,
     one for maintenance and one for earthquake-related events.
@@ -1163,24 +1200,24 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
 
     Parameters
     ----------
-    filepath : str
+    filepath
         Path to the step file.
-    check_update : bool, optional
-        If ``True`` (default), check UNR's server for an updated step file.
-    only_stations : list, optional
+    check_update
+        If ``True``, check UNR's server for an updated step file.
+    only_stations
         If specified, a list of station IDs. Other stations are not included in the output.
-    verbose : bool, optional
-        If ``True`` (defaults to ``False``) print actions.
+    verbose
+        If ``True``, print actions.
 
     Returns
     -------
-    maint_table : pandas.DataFrame
+    maint_table
         Parsed maintenance table.
-    maint_dict : dict
+    maint_dict
         Dictionary of that maps the station names to a list of maintenance steptimes.
-    eq_table : pandas.DataFrame
+    eq_table
         Parsed earthquake table.
-    eq_dict : dict
+    eq_dict
         Dictionary of that maps the station names to a list of earthquake-related steptimes.
     """
     # check if local file exists
@@ -1255,18 +1292,17 @@ def parse_unr_steps(filepath, check_update=True, only_stations=None, verbose=Fal
     return maint_table, maint_dict, eq_table, eq_dict
 
 
-def best_utmzone(longitudes):
+def best_utmzone(longitudes: np.ndarray) -> int:
     """
     Given a list of longitudes, find the UTM zone that is appropriate.
 
     Parameters
     ----------
-    longitudes : numpy.ndarray
+    longitudes
         Array of longitudes [°].
 
     Returns
     -------
-    utmzone : int
         UTM zone at the average input longitude.
     """
     lon_mean = np.rad2deg(circmean(np.deg2rad(longitudes),
@@ -1275,8 +1311,12 @@ def best_utmzone(longitudes):
     return utmzone
 
 
-def get_hom_vel_strain_rot(locations, velocities, covariances=None, utmzone=None,
-                           reference=0):
+def get_hom_vel_strain_rot(locations: np.ndarray,
+                           velocities: np.ndarray,
+                           covariances: np.ndarray | None = None,
+                           utmzone: int | None = None,
+                           reference: int | list = 0
+                           ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""
     For a set of horizontal velocities on a 2D cartesian grid, estimate the
     best-fit displacement gradient matrix to calculate a homogenous velocity
@@ -1289,33 +1329,33 @@ def get_hom_vel_strain_rot(locations, velocities, covariances=None, utmzone=None
 
     Parameters
     ----------
-    locations : numpy.ndarray
+    locations
         Array of shape :math:`(\text{num_stations}, 2)` containing the
         longitude and latitude [°] of the observations (stations).
-    velocities : numpy.ndarray
+    velocities
         Array of shape :math:`(\text{num_stations}, 2)` containing the
         East and North velocities [m/time] of the observations
-    covariances : numpy.ndarray, optional
+    covariances
         Array of shape :math:`(\text{num_stations}, 2)` containing the
         variances in the East and North velocities [m^2/time^2]. Alternatively,
         array of shape :math:`(\text{num_stations}, 3)` additionally
         containing the East-North covariance [m2/time^2].
-    utmzome : int, optional
+    utmzome
         If provided, the UTM zone to use for the horizontal approximation.
-        By default (``None``), the average longitude will be calculated, and the
+        If ``None``, the average longitude will be calculated, and the
         respective UTM zone will be used.
-    reference : list, int, optional
+    reference
         Reference station to be used by the calculation. This can be either a
         longitude-latitude [°] list, or the index of the reference station in
         ``locations``.
 
     Returns
     -------
-    v_O : numpy.ndarray
+    v_O
         Velocity of the origin :math:`\mathbf{v}_O`.
-    epsilon : numpy.ndarray
+    epsilon
         :math:`2 \times 2` strain tensor :math:`\mathbf{\varepsilon}`.
-    omega : numpy.ndarray
+    omega
         :math:`2 \times 2` rotation tensor :math:`\mathbf{\omega}`.
 
     See Also
@@ -1402,34 +1442,36 @@ def get_hom_vel_strain_rot(locations, velocities, covariances=None, utmzone=None
     return v_O, epsilon, omega
 
 
-def strain_rotation_invariants(epsilon=None, omega=None):
+def strain_rotation_invariants(epsilon: np.ndarray | None = None,
+                               omega: np.ndarray | None = None
+                               ) -> tuple[float, ...]:
     r"""
     Given a strain (rate) and/or rotation (rate) tensor, calculate scalar
     invariant quantities of interest. See [tape09]_ for an introduction.
 
     Parameters
     ----------
-    epsilon : numpy.ndarray
+    epsilon
         Strain (rate) tensor :math:`\mathbf{\varepsilon}`.
-    omega : numpy.ndarray
+    omega
         Rotation (rate) tensor :math:`\mathbf{\omega}`.
 
     Returns
     -------
-    dilatation : float
+    dilatation
         Only if ``epsilon`` is provided. Scalar dilatation (rate) as defined
         by the first invariant of the strain (rate) tensor
         :math:`\Theta = \text{Tr} \left( \mathbf{\varepsilon} \right)`.
-    strain : float
+    strain
         Only if ``epsilon`` is provided. Scalar strain (rate) as defined
         by the Frobenius norm of the strain (rate) tensor
         :math:`\Sigma = \lVert \mathbf{\varepsilon} \rVert_F`
-    shear : float
+    shear
         Only if ``epsilon`` is provided. Scalar shearing (rate) as defined
         by the square root of the second invariant of the deviatoric strain (rate) tensor
         :math:`\text{T} = \sqrt{\frac{1}{2} \text{Tr}(\mathbf{\varepsilon}^2)
         - \frac{1}{6} \text{Tr}(\mathbf{\varepsilon})^2}`.
-    rotation : float
+    rotation
         Only if ``omega`` is provided. Scalar rotation (rate) as defined
         by :math:`\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F`.
     """
@@ -1457,31 +1499,35 @@ def strain_rotation_invariants(epsilon=None, omega=None):
         return rotation
 
 
-def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
+def estimate_euler_pole(locations: np.ndarray,
+                        velocities: np.ndarray,
+                        covariances: np.ndarray | None = None,
+                        enu: bool = True
+                        ) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Estimate a best-fit Euler pole assuming all velocities lie on the same
     rigid plate on a sphere. The calculations are based on [goudarzi14]_.
 
     Parameters
     ----------
-    locations : numpy.ndarray
+    locations
         Array of shape :math:`(\text{num_stations}, \text{num_components})`
         containing the locations of each station (observation), where
         :math:`\text{num_components}=2` if the locations are given by longitudes and
-        latitudes [°] (``enu=True``, default) or :math:`\text{num_components}=3`
+        latitudes [°] (``enu=True``) or :math:`\text{num_components}=3`
         if the locations are given in the cartesian Earth-Centered, Earth-Fixed
         (ECEF) reference frame [m] (``enu=False``).
-    velocities : numpy.ndarray
+    velocities
         Array of shape :math:`(\text{num_stations}, \text{num_components})`
         containing the velocities [m/time] at different stations (observations), where
         :math:`\text{num_components}=2` if the velocities are given in the
-        East-North local geodetic reference frame (``enu=True``, default) or
+        East-North local geodetic reference frame (``enu=True``) or
         :math:`\text{num_components}=3` if the velocities are given in the cartesian
         Earth-Centered, Earth-Fixed (ECEF) reference frame (``enu=False``).
-    covariances : numpy.ndarray, optional
+    covariances
         Array containing the (co)variances of the velocities [m^2/time^2], allowing for
         different input shapes depending on what uncertainties are available.
-        If ``None`` (default), all observations are weighted equally.
+        If ``None``, all observations are weighted equally.
         If ``enu=True``, the array should have shape :math:`(\text{num_stations}, 2)`
         if only variances are present, :math:`(\text{num_stations}, 3)` if also
         the covariances are present but are given as a column, or
@@ -1490,15 +1536,15 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
         If ``enu=False``, the arrays should be of shapes
         :math:`(\text{num_stations}, 3)`, :math:`(\text{num_stations}, 6)`,
         or :math:`(\text{num_stations}, 3, 3)`, respectively.
-    enu : bool, optional
+    enu
         See ``locations`` and ``velocities``.
 
     Returns
     -------
-    rotation_vector : numpy.ndarray
+    rotation_vector
         Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
         rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
-    rotation_covariance : numpy.ndarray
+    rotation_covariance
         Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
 
     Notes
@@ -1600,7 +1646,9 @@ def estimate_euler_pole(locations, velocities, covariances=None, enu=True):
     return rotation_vector, rotation_covariance
 
 
-def rotvec2eulerpole(rotation_vector, rotation_covariance=None):
+def rotvec2eulerpole(rotation_vector: np.ndarray,
+                     rotation_covariance: np.ndarray | None = None
+                     ) -> tuple[np.ndarray, ...]:
     r"""
     Convert a rotation vector containing the diagonals of a :math:`3 \times 3`
     rotation matrix (and optionally, its formal covariance) into an Euler
@@ -1608,20 +1656,20 @@ def rotvec2eulerpole(rotation_vector, rotation_covariance=None):
 
     Parameters
     ----------
-    rotation_vector : numpy.ndarray
+    rotation_vector
         Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
         rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
-    rotation_covariance : numpy.ndarray
+    rotation_covariance
         Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
 
     Returns
     -------
-    euler_pole : numpy.ndarray
+    euler_pole
         NumPy Array containing the longitude [rad], latitude [rad], and rotation
         rate [rad/time] of the Euler pole.
-    euler_pole_covariance : numpy.ndarray
-        If ``rotation_covariance`` was given, the propagated uncertainty for the Euler
-        Pole for all three components.
+    euler_pole_covariance
+        If ``rotation_covariance`` was given, a NumPy Array of the propagated uncertainty
+        for the Euler Pole for all three components.
 
     See Also
     --------
@@ -1650,27 +1698,30 @@ def rotvec2eulerpole(rotation_vector, rotation_covariance=None):
         return euler_pole
 
 
-def eulerpole2rotvec(euler_pole, euler_pole_covariance=None):
+def eulerpole2rotvec(euler_pole: np.ndarray,
+                     euler_pole_covariance: np.ndarray | None = None
+                     ) -> tuple[np.ndarray, ...]:
     r"""
     Convert an Euler pole (and optionally, its formal covariance) into a rotation
     vector and associated covariance matrix. Based on [goudarzi14]_.
 
     Parameters
     ----------
-    euler_pole : numpy.ndarray
+    euler_pole
         NumPy Array containing the longitude [rad], latitude [rad], and rotation
         rate [rad/time] of the Euler pole.
-    euler_pole_covariance : numpy.ndarray
+    euler_pole_covariance
         If ``rotation_covariance`` was given, the propagated uncertainty for the Euler
         Pole for all three components.
 
     Returns
     -------
-    rotation_vector : numpy.ndarray
+    rotation_vector
         Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
         rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
-    rotation_covariance : numpy.ndarray
-        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+    rotation_covariance
+        If ``euler_pole_covariance`` was given, formal :math:`3 \times 3` covariance
+        matrix [rad^2/time^2] of the rotation vector.
 
     See Also
     --------
@@ -1698,7 +1749,7 @@ def eulerpole2rotvec(euler_pole, euler_pole_covariance=None):
         return rotation_vector
 
 
-def R_ecef2enu(lon, lat):
+def R_ecef2enu(lon: float, lat: float) -> np.ndarray:
     """
     Generate the rotation matrix used to express a vector written in ECEF (XYZ)
     coordinates as a vector written in local east, north, up (ENU) coordinates
@@ -1707,14 +1758,13 @@ def R_ecef2enu(lon, lat):
 
     Parameters
     ----------
-    lon : float
+    lon
         Longitude [°] of vector position.
-    lat : float
+    lat
         Latitude [°] of vector position.
 
     Returns
     -------
-    numpy.ndarray
         The 3-by-3 rotation matrix.
 
     See Also
@@ -1739,7 +1789,7 @@ def R_ecef2enu(lon, lat):
                      [np.cos(lat)*np.cos(lon), np.cos(lat)*np.sin(lon), np.sin(lat)]])
 
 
-def R_enu2ecef(lon, lat):
+def R_enu2ecef(lon: float, lat: float) -> np.ndarray:
     """
     Generate the rotation matrix used to express a vector written in local ENU
     coordinates as a vector written ECEF (XYZ) coordinates at the position defined
@@ -1748,14 +1798,13 @@ def R_enu2ecef(lon, lat):
 
     Parameters
     ----------
-    lon : float
+    lon
         Longitude [°] of vector position.
-    lat : float
+    lat
         Latitude [°] of vector position.
 
     Returns
     -------
-    numpy.ndarray
         The 3-by-3 rotation matrix.
 
     See Also
@@ -1802,7 +1851,7 @@ class RINEXDataHolding():
     METRICCOLS = ("number", "age", "recency", "length", "reliability")
     """ The metrics that can be calculated. """
 
-    def __init__(self, df=None):
+    def __init__(self, df: pd.DataFrame | None = None) -> None:
         self._df = None
         self._locations_xyz = None
         self._locations_lla = None
@@ -1811,29 +1860,29 @@ class RINEXDataHolding():
             self.df = df
 
     @property
-    def num_files(self):
+    def num_files(self) -> int:
         """ Number of files in the database. """
         return self.df.shape[0]
 
     @property
-    def list_stations(self):
+    def list_stations(self) -> list[str]:
         """ List of stations in the database. """
         return self.df["station"].unique().tolist()
 
     @property
-    def num_stations(self):
+    def num_stations(self) -> int:
         """ Number of stations in the database. """
         return len(self.list_stations)
 
     @property
-    def df(self):
+    def df(self) -> pd.DataFrame:
         """ Pandas DataFrame object containing the RINEX files database. """
         if self._df is None:
             raise RuntimeError("RINEX files database has not been loaded yet.")
         return self._df
 
     @df.setter
-    def df(self, new_df):
+    def df(self, new_df: pd.DataFrame) -> None:
         try:
             assert all([col in new_df.columns for col in self.COLUMNS]), \
                 "Input DataFrame does not contain the necessary columns, try using the " + \
@@ -1844,7 +1893,7 @@ class RINEXDataHolding():
         self._df = new_df
 
     @property
-    def locations_xyz(self):
+    def locations_xyz(self) -> pd.DataFrame:
         """
         Dataframe of approximate positions of stations in WGS-84 (x, y, z) [m] coordinates.
         """
@@ -1857,7 +1906,7 @@ class RINEXDataHolding():
         return self._locations_xyz
 
     @locations_xyz.setter
-    def locations_xyz(self, new_xyz):
+    def locations_xyz(self, new_xyz: pd.DataFrame) -> None:
         if not (isinstance(new_xyz, pd.DataFrame) and
                 all([col in new_xyz.columns for col in ["station", "x", "y", "z"]])):
             raise ValueError("Unrecognized input format. 'new_xyz' needs to be a "
@@ -1874,7 +1923,7 @@ class RINEXDataHolding():
         self._locations_lla = new_lla
 
     @property
-    def locations_lla(self):
+    def locations_lla(self) -> pd.DataFrame:
         """
         Approximate positions of stations in WGS-84 (longitude [°], latitude [°],
         altitude [m]) coordinates.
@@ -1888,7 +1937,7 @@ class RINEXDataHolding():
         return self._locations_lla
 
     @locations_lla.setter
-    def locations_lla(self, new_lla):
+    def locations_lla(self, new_lla: pd.DataFrame) -> None:
         if not (isinstance(new_lla, pd.DataFrame) and
                 all([col in new_lla.columns for col in ["station", "lon", "lat", "alt"]])):
             raise ValueError("Unrecognized input format. 'new_lla' needs to be a "
@@ -1906,7 +1955,7 @@ class RINEXDataHolding():
         self._locations_lla = new_lla
 
     @property
-    def metrics(self):
+    def metrics(self) -> pd.DataFrame:
         """
         Contains the station metric calculated by :meth:`calculate_availability_metrics`.
         """
@@ -1919,24 +1968,45 @@ class RINEXDataHolding():
         return self._metrics
 
     @metrics.setter
-    def metrics(self, metrics):
+    def metrics(self, metrics: pd.DataFrame) -> None:
         assert all([col in metrics.columns for col in self.METRICCOLS]), \
             "Not all metrics are in the new DataFrame."
         self._metrics = metrics
 
     @classmethod
-    def from_folders(cls, folders, verbose=False, no_pbar=False):
+    def from_folders(cls,
+                     folders: tuple | list[tuple],
+                     verbose: bool = False,
+                     no_pbar: bool = False
+                     ) -> RINEXDataHolding:
         """
         Convenience class method that creates a new RINEXDataHolding object and directly
         calls :meth:`~load_db_from_folders`.
 
-        For parameter explanations, see the above method documention.
+        Parameters
+        ----------
+        folders
+            Folder(s) in which the different year-folders are found, formatted as a
+            single tuple or a list of tuples with name and respective folder
+            (``[('network1', '/folder/one/'), ...]``).
+        verbose
+            If ``True``, print final database size and a sample entry.
+        no_pbar
+            Suppress the progress bar with ``True``.
+
+        Returns
+        -------
+            The newly created RINEXDataHolding object.
         """
         instance = cls()
         instance.load_db_from_folders(folders, verbose=verbose, no_pbar=no_pbar)
         return instance
 
-    def load_db_from_folders(self, folders, verbose=False, no_pbar=False):
+    def load_db_from_folders(self,
+                             folders: tuple | list[tuple],
+                             verbose: bool = False,
+                             no_pbar: bool = False
+                             ) -> None:
         """
         Loads a RINEX database from folders in the file system.
         The data should be located in one or multiple folder structure(s) organized by
@@ -1945,15 +2015,14 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        folders : list, tuple
+        folders
             Folder(s) in which the different year-folders are found, formatted as a
             single tuple or a list of tuples with name and respective folder
             (``[('network1', '/folder/one/'), ...]``).
-        verbose : bool, optional
+        verbose
             If ``True``, print final database size and a sample entry.
-            Defaults to ``False``.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
+        no_pbar
+            Suppress the progress bar with ``True``.
         """
         # input checks
         if isinstance(folders, tuple):
@@ -2046,7 +2115,12 @@ class RINEXDataHolding():
         self.df = df
 
     @classmethod
-    def from_file(cls, db_file, locations_file=None, metrics_file=None, verbose=False):
+    def from_file(cls,
+                  db_file: str,
+                  locations_file: str | None = None,
+                  metrics_file: str | None = None,
+                  verbose: bool = False
+                  ) -> RINEXDataHolding:
         """
         Convenience class method that creates a new RINEXDataHolding object from a file
         using :meth:`~load_db_from_file` and then optionally loads the locations and metrics
@@ -2054,15 +2128,18 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        db_file : str
+        db_file
             Path of the main file.
-        locations_file : str, optional
+        locations_file
             Path of the locations file.
-        metrics_file : str, optional
+        metrics_file
             Path of the metrics file.
-        verbose : bool, optional
+        verbose
             If ``True``, print database size and a sample entry.
-            Defaults to ``False``.
+
+        Returns
+        -------
+            The newly created RINEXDataHolding object.
         """
         # load instance from file
         instance = cls()
@@ -2074,17 +2151,16 @@ class RINEXDataHolding():
             instance.load_metrics_from_file(metrics_file)
         return instance
 
-    def load_db_from_file(self, db_file, verbose=False):
+    def load_db_from_file(self, db_file: str, verbose: bool = False) -> None:
         """
         Loads a RINEXDataHolding object from a pickled Pandas DataFrame file.
 
         Parameters
         ----------
-        db_file : str
+        db_file
             Path of the main file.
-        verbose : bool, optional
+        verbose
             If ``True``, print database size and a sample entry.
-            Defaults to ``False``.
         """
         # load main database
         df = pd.read_pickle(db_file)
@@ -2094,26 +2170,30 @@ class RINEXDataHolding():
         # save to attribute
         self.df = df
 
-    def load_locations_from_rinex(self, keep='last', replace_not_found=False, no_pbar=True):
+    def load_locations_from_rinex(self,
+                                  keep: Literal["last", "first", "mean"] = "last",
+                                  replace_not_found: bool = False,
+                                  no_pbar: bool = True
+                                  ) -> None:
         """
         Scan the RINEX files' headers for approximate locations for
         plotting purposes.
 
         Parameters
         ----------
-        keep : str, optional
+        keep
             Determine which location to use. Possible values are ``'last'``
             (only scan the most recent file), ``'first'`` (only scan the oldest
             file) or ``'mean'`` (load all files and calculate average).
             Note that ``'mean'`` could take a substantial amount of time, since
             all files have to opened, decompressed and searched.
-        replace_not_found : bool, optional
+        replace_not_found
             If a location is not found and ``replace_not_found=True``,
             the location of Null Island (0° Longitude, 0° Latitude) is used
             and a warning is issued.
-            If ``False`` (default), an error is raised instead.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default).
+            If ``False``, an error is raised instead.
+        no_pbar
+            Suppress the progress bar with ``True``.
         """
         # prepare
         assert keep in ["first", "last", "mean"], \
@@ -2154,13 +2234,13 @@ class RINEXDataHolding():
         # the xyz-to-lla conversion is done there
         self.locations_xyz = df
 
-    def load_locations_from_file(self, filepath):
+    def load_locations_from_file(self, filepath: str) -> None:
         """
         Load a previously-saved DataFrame containing the locations of each station.
 
         Parameters
         ----------
-        filepath : str
+        filepath
             Path to the pickled DataFrame.
         """
         df = pd.read_pickle(filepath)
@@ -2173,25 +2253,33 @@ class RINEXDataHolding():
             raise ValueError(f"Unrecognized DataFrame columns in {filepath}: " +
                              str(df.columns.tolist()))
 
-    def get_files_by(self, station=None, network=None, year=None, between=None,
-                     verbose=False):
+    def get_files_by(self,
+                     station: str | list[str] | None = None,
+                     network: str | list[str] | None = None,
+                     year: int | list[int] | None = None,
+                     between: tuple | None = None,
+                     verbose: bool = False
+                     ) -> pd.DataFrame:
         """
         Return a subset of the database by criteria.
 
         Parameters
         ----------
-        station : str, list, optional
+        station
             Return only files of this/these station(s).
-        network : str, list, optional
+        network
             Return only files of this/these network(s).
-        year : int, list, optional
+        year
             Return only files of this/these year(s).
-        between : tuple, optional
+        between
             Return only files between the start and end date (inclusive)
             given by the length-two tuple.
-        verbose : bool, optional
+        verbose
             If ``True``, print the number of selected entries.
-            Defaults to ``False``.
+
+        Returns
+        -------
+            The DataFrame subset.
         """
         subset = pd.Series(True, index=range(self.num_files))
         # subset by station
@@ -2248,21 +2336,20 @@ class RINEXDataHolding():
             print(f"Selected {subset.sum()} files.")
         return self.df[subset]
 
-    def get_location(self, station, lla=True):
+    def get_location(self, station: str, lla: bool = True) -> pd.Series:
         """
         Returns the approximate location of a station.
 
         Parameters
         ----------
-        station : str
+        station
             Name of the station
-        lla : bool, optional
+        lla
             If ``True``, returns the coordinates in Longitude [°], Latitude [°] &
             Altitude [m], otherwise in XYZ [m] coordinates.
 
         Returns
         -------
-        pandas.Series
             The location of the station in the specified coordinate system.
         """
         loc_df = self.locations_lla if lla else self.locations_xyz
@@ -2272,30 +2359,29 @@ class RINEXDataHolding():
         except IndexError:
             raise KeyError(f"Station {station} not present.")
 
-    def load_metrics_from_file(self, filepath):
+    def load_metrics_from_file(self, filepath: str) -> None:
         """
         Load a previously-saved DataFrame containing the calculated availability metrics.
 
         Parameters
         ----------
-        filepath : str
+        filepath
             Path to the pickled DataFrame.
         """
         self.metrics = pd.read_pickle(filepath)
 
-    def make_filenames(self, db):
+    def make_filenames(self, db: pd.DataFrame) -> list[str]:
         """
         Recreate the full paths to the individual rinex files from the database or
         a subset thereof.
 
         Parameters
         ----------
-        db : pandas.DataFrame
+        db
             :attr:`~df` or a subset thereof.
 
         Returns
         -------
-        filenames : list
             List of paths.
 
         Raises
@@ -2315,19 +2401,18 @@ class RINEXDataHolding():
                              row.year[-2:] + row.type + "." + row.compression)
                 for row in db.itertuples()]
 
-    def get_rinex_header(self, filepath):
+    def get_rinex_header(self, filepath: str) -> dict[str, str]:
         """
         Open a RINEX file, read the header, and format it as a dictionary.
         No data type conversion or stripping of whitespaces is performed.
 
         Parameters
         ----------
-        filepath : str
+        filepath
             Path to RINEX file.
 
         Returns
         -------
-        headers : dict
             Dictionary of header lines.
         """
         # if it's a compressed file, hope that gzip is installed and we can use
@@ -2359,7 +2444,9 @@ class RINEXDataHolding():
                 headers[descriptor] = content
         return headers
 
-    def calculate_availability_metrics(self, sampling=Timedelta(1, "D")):
+    def calculate_availability_metrics(self,
+                                       sampling: Timedelta = Timedelta(1, "D")
+                                       ) -> None:
         """
         Calculates the following metrics and stores them in the :attr:`~metrics`
         DataFrame:
@@ -2374,9 +2461,8 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        sampling : disstans.tools.Timedelta
+        sampling
             Assumed sampling frequency of the data files.
-            Defaults to daily.
         """
         # initialize empty DataFrame
         metrics = pd.DataFrame(self.list_stations, columns=["station"])
@@ -2395,10 +2481,12 @@ class RINEXDataHolding():
         metrics = metrics.astype({"number": int})
         self.metrics = metrics
 
-    def _create_map_figure(self, gui_settings, annotate_stations, figsize):
-        """
-        Create a basemap of all stations.
-        """
+    def _create_map_figure(self,
+                           gui_settings: dict,
+                           annotate_stations: bool,
+                           figsize: tuple
+                           ) -> tuple[mpl.Figure, mpl.Axis, ccrs.CRS, ccrs.CRS,
+                                      matplotlib.collections.PathCollection, list[str]]:
         # get location data and projections
         stat_lats = self.locations_lla["lat"].values
         stat_lons = self.locations_lla["lon"].values
@@ -2434,8 +2522,15 @@ class RINEXDataHolding():
                            edgecolor="white" if map_underlay else "black")
         return fig, ax, proj_gui, proj_lla, stat_points, stat_names
 
-    def plot_map(self, metric=None, orientation="horizontal", annotate_stations=True,
-                 figsize=None, saveas=None, dpi=None, gui_kw_args={}):
+    def plot_map(self,
+                 metric: str | None = None,
+                 orientation: Literal["horizontal", "vertical"] = "horizontal",
+                 annotate_stations: bool = True,
+                 figsize: tuple | None = None,
+                 saveas: str | None = None,
+                 dpi: float | None = None,
+                 gui_kw_args: dict[str,  Any] = {}
+                 ) -> None:
         """
         Plot a map of all the stations present in the RINEX database.
         The markers can be colored by the different availability metrics calculated
@@ -2443,21 +2538,20 @@ class RINEXDataHolding():
 
         Parameters
         ----------
-        metric : str, optional
+        metric
             Calculate the marker color (and respective colormap) given a certain
-            metric. If ``None`` (default), no color is applied.
-        orientation : str, optional
+            metric. If ``None``, no color is applied.
+        orientation
             Colorbar orientation, see :func:`~matplotlib.pyplot.colorbar`.
-            Defaults to ``'horizontal'``.
-        annotate_stations : bool, optional
-            If ``True`` (default), add the station names to the map.
-        figsize : tuple, optional
+        annotate_stations
+            If ``True``, add the station names to the map.
+        figsize
             Set the figure size (width, height) in inches.
-        saveas : str, optional
+        saveas
             If provided, the figure will be saved at this location.
-        dpi : float, optional
+        dpi
             Use this DPI for saved figures.
-        gui_kw_args : dict, optional
+        gui_kw_args
             Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
         # prepare
@@ -2518,20 +2612,22 @@ class RINEXDataHolding():
         # show
         plt.show()
 
-    def plot_availability(self, sampling=Timedelta(1, "D"), sort_by_latitude=True,
-                          saveas=None):
+    def plot_availability(self,
+                          sampling: Timedelta = Timedelta(1, "D"),
+                          sort_by_latitude: bool = True,
+                          saveas: str = None
+                          ) -> None:
         """
         Create an availability figure for the dataset.
 
         Parameters
         ----------
-        sampling : disstans.tools.Timedelta, optional
+        sampling
             Assume that breaks strictly larger than ``sampling`` constitute a data gap.
-            Defaults to daily.
-        sort_by_latitude : bool, optional
-            If ``True`` (default), sort the stations by latitude, else alphabetical.
+        sort_by_latitude
+            If ``True``, sort the stations by latitude, else alphabetical.
             (Always falls back to alphabetical if location information is missing.)
-        saveas : str, optional
+        saveas
             If provided, the figure will be saved at this location.
         """
         # find a sorting by latitude to match a map view,

@@ -3,12 +3,14 @@ This module contains the :class:`~disstans.network.Network` class, which is the
 highest-level container object in DISSTANS.
 """
 
+from __future__ import annotations
 import numpy as np
 import scipy as sp
 import pandas as pd
 import json
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.collections
 import cartopy.crs as ccrs
 import cartopy.geodesic as cgeod
 from copy import deepcopy
@@ -21,6 +23,8 @@ from matplotlib.patches import Rectangle
 from cartopy.io.ogc_clients import WMTSRasterSource
 from cmcrameri import cm as scm
 from scipy.stats import circmean
+from collections.abc import Iterator, Callable
+from typing import Any, Literal
 
 from . import timeseries as disstans_ts
 from . import models as disstans_models
@@ -33,6 +37,7 @@ from .tools import (parallelize, Timedelta, Click, weighted_median, R_ecef2enu,
                     get_hom_vel_strain_rot, best_utmzone, estimate_euler_pole)
 from .earthquakes import okada_displacement
 from .solvers import Solution, ReweightingFunction
+from .models import ModelCollection
 
 
 class Network():
@@ -42,27 +47,32 @@ class Network():
 
     Parameters
     ----------
-    name : str
+    name
         Name of the network.
-    default_location_path : str, optional
+    default_location_path
         If station locations aren't given directly, check for a file with this path for the
         station's location.
         It needs to be an at-least four-column, space-separated text file with the entries
         ``name latitude[°] longitude[°] altitude[m]``. Existing headers have to be able to be
         identified as not being floats in the coordinate columns.
-    auto_add : bool, optional
+    auto_add
         If true, instatiation will automatically add all stations found in
         ``default_location_path``.
         If ``default_location_path`` is not set, this option is ignored.
-    auto_add_filter : numpy.ndarray, optional
+    auto_add_filter
         If passed alongside ``default_location_path`` and ``auto_add``, network instantiation
         will only add stations within the latitude, longitude polygon defined by
         ``auto_add_filter`` (shape :math:`(\text{num_points}, \text{2})`).
-    default_local_models : dict, optional
+    default_local_models
         Add a default selection of models for the stations.
     """
-    def __init__(self, name, default_location_path=None, auto_add=False, auto_add_filter=None,
-                 default_local_models={}):
+    def __init__(self,
+                 name: str,
+                 default_location_path: str | None = None,
+                 auto_add: bool = False,
+                 auto_add_filter: bool | None = None,
+                 default_local_models: dict[str,  Any] = {}
+                 ) -> None:
         self.name = str(name)
         """ Network name. """
         self.default_location_path = str(default_location_path) \
@@ -140,17 +150,17 @@ class Network():
                     self.create_station(stat)
 
     @property
-    def num_stations(self):
+    def num_stations(self) -> int:
         """ Number of stations present in the network. """
         return len(self.stations)
 
     @property
-    def station_names(self):
+    def station_names(self) -> list[str]:
         """ Names of stations present in the network. """
         return list(self.stations.keys())
 
     @property
-    def station_locations(self):
+    def station_locations(self) -> pd.DataFrame:
         """ DataFrame of all locations for all stations in the network. """
         return pd.DataFrame(data={station.name: station.location for station in self},
                             index=["Latitude [°]", "Longitude [°]", "Altitude [m]"]).T
@@ -163,33 +173,31 @@ class Network():
         else:
             raise RuntimeError("No stations in network.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Special function that returns a readable summary of the network.
         Accessed, for example, by Python's ``print()`` built-in function.
 
         Returns
         -------
-        info : str
             Network summary.
         """
         info = f"Network {self.name}\n" + \
                f"Stations:\n{[key for key in self.stations]}\n"
         return info
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> Station:
         """
         Convenience special function that provides a shorthand notation
         to access the network's stations.
 
         Parameters
         ----------
-        name : str
+        name
             Name of the station.
 
         Returns
         -------
-        disstans.station.Station
             Station in network.
 
         Example
@@ -204,7 +212,7 @@ class Network():
             raise KeyError(f"No station '{name}' present.")
         return self.stations[name]
 
-    def __setitem__(self, name, station):
+    def __setitem__(self, name: str, station: Station) -> None:
         """
         Convenience special function that allows a dictionary-like adding of stations to
         the network by wrapping :meth:`~add_station`.
@@ -215,7 +223,7 @@ class Network():
         """
         self.add_station(name, station)
 
-    def __delitem__(self, name):
+    def __delitem__(self, name: str) -> None:
         """
         Convenience special function that allows a dictionary-like removing of stations
         from the network by wrapping :meth:`~remove_station`.
@@ -226,7 +234,7 @@ class Network():
         """
         self.remove_station(name)
 
-    def __contains__(self, name):
+    def __contains__(self, name: str) -> bool:
         """
         Special function that allows to check whether a certain station name
         is in the network.
@@ -243,7 +251,7 @@ class Network():
         """
         return name in self.stations
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Station]:
         """
         Convenience special function that allows for a shorthand notation to quickly
         iterate over all stations.
@@ -263,7 +271,7 @@ class Network():
         for station in self.stations.values():
             yield station
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Special function that gives quick access to the number of stations in the
         network (:attr:`~num_stations`) using Python's built-in ``len()`` function
@@ -271,21 +279,23 @@ class Network():
         """
         return self.num_stations
 
-    def get_stations_with(self, ts_description, mdl_description=None):
+    def get_stations_with(self,
+                          ts_description: str,
+                          mdl_description: str | None = None
+                          ) -> list[str]:
         """
         Return the list of all station names that contain a given timeseries
         (and optionally, a model).
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Name of the timeseries that the stations should contain.
-        mdl_description : str, optional
+        mdl_description
             Name of the model that the stations' timeseries should contain.
 
         Returns
         -------
-        station_list : list
             Names of stations.
         """
         assert isinstance(ts_description, str), \
@@ -302,24 +312,26 @@ class Network():
                 station_list.remove(name)
         return station_list
 
-    def export_network_ts(self, ts_description, subset_stations=None):
+    def export_network_ts(self,
+                          ts_description: str | (str, str),
+                          subset_stations: list[str] | None = None
+                          ) -> dict[str, Timeseries]:
         """
         Collects a specific timeseries from all stations and returns them in a dictionary
         of network-wide :class:`~disstans.timeseries.Timeseries` objects.
 
         Parameters
         ----------
-        ts_description : str, tuple
+        ts_description
             :class:`~disstans.timeseries.Timeseries` description that will be collected
             from all stations in the network. If a tuple, specifies the timeseries
             and name of a fitted model for the timeseries at each station.
-        subset_stations : list, optional
+        subset_stations
             If set, this is a list of station names to include in the output, all
             other stations will be ignored.
 
         Returns
         -------
-        network_df : dict
             Dictionary with the data components of the ``ts_description`` timeseries
             as keys and :class:`~disstans.timeseries.Timeseries` objects as values
             (which will have in turn the station names as column names).
@@ -369,16 +381,19 @@ class Network():
                       for dcol in network_data_cols}
         return network_df
 
-    def import_network_ts(self, ts_description, dict_of_timeseries):
+    def import_network_ts(self,
+                          ts_description: str,
+                          dict_of_timeseries: dict[str, Timeseries]
+                          ) -> None:
         """
         Distributes a dictionary of network-wide :class:`~disstans.timeseries.Timeseries`
         objects onto the network stations.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             :class:`~disstans.timeseries.Timeseries` description where the data will be placed.
-        dict_of_timeseries : dict
+        dict_of_timeseries
             Dictionary with the data components of the ``ts_description`` timeseries
             as keys and :class:`~disstans.timeseries.Timeseries` objects as values
             (which will have in turn the station names as column names).
@@ -399,15 +414,15 @@ class Network():
                                                Timeseries(network_df[name].dropna(),
                                                           src, data_unit, data_cols))
 
-    def add_station(self, name, station):
+    def add_station(self, name: str, station: Station) -> None:
         """
         Add a station to the network.
 
         Parameters
         ----------
-        name : str
+        name
             Name of the station.
-        station : disstans.station.Station
+        station
             Station object to add.
 
         See Also
@@ -431,15 +446,18 @@ class Network():
             warn(f"Overwriting station '{name}'.", category=RuntimeWarning, stacklevel=2)
         self.stations[name] = station
 
-    def create_station(self, name, location=None):
+    def create_station(self,
+                       name: str,
+                       location: list[float] | np.ndarray | None = None
+                       ) -> None:
         """
         Create a station and add it to the network.
 
         Parameters
         ----------
-        name : str
+        name
             Name of the station.
-        location : tuple, list, numpy.ndarray, optional
+        location
             Location (Latitude [°], Longitude [°], Altitude [m]) of the station.
             If ``None``, the location information needs to be provided in
             :attr:`~default_location_path`.
@@ -461,13 +479,13 @@ class Network():
                              "not be found in the default network locations, either.")
         self.stations[name] = Station(name, location)
 
-    def remove_station(self, name):
+    def remove_station(self, name: str) -> None:
         """
         Remove a station from the network.
 
         Parameters
         ----------
-        name : str
+        name
             Name of the station.
 
         See Also
@@ -489,29 +507,33 @@ class Network():
             del self.stations[name]
 
     @classmethod
-    def from_json(cls, path, add_default_local_models=True, no_pbar=False,
-                  station_kw_args={}, timeseries_kw_args={}):
+    def from_json(cls,
+                  path: str,
+                  add_default_local_models: bool = True,
+                  no_pbar: bool = False,
+                  station_kw_args: dict[str,  Any] = {},
+                  timeseries_kw_args: dict[str,  Any] = {}
+                  ) -> Network:
         """
         Create a :class:`~disstans.network.Network` instance from a JSON configuration file.
 
         Parameters
         ----------
-        path : str
+        path
             Path of input JSON file.
-        add_default_local_models : bool, optional
+        add_default_local_models
             If false, skip the adding of any default local model found in a station.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
-        station_kw_args : dict, optional
+        no_pbar
+            Suppress the progress bar with ``True``.
+        station_kw_args
             Additional keyword arguments passed on to the
             :class:`~disstans.station.Station` constructor.
-        timeseries_kw_args : dict, optional
+        timeseries_kw_args
             Additional keyword arguments passed on to the
             :class:`~disstans.timeseries.Timeseries` constructor.
 
         Returns
         -------
-        net : disstans.network.Network
             Network instance.
 
         See Also
@@ -559,13 +581,13 @@ class Network():
             net.add_station(name=station_name, station=station)
         return net
 
-    def to_json(self, path):
+    def to_json(self, path: str) -> None:
         """
         Export network configuration to a JSON file.
 
         Parameters
         ----------
-        path : str
+        path
             Path of output JSON file.
 
         See Also
@@ -592,14 +614,14 @@ class Network():
         # write file
         json.dump(net_arch, open(path, mode='w'), indent=2, sort_keys=True)
 
-    def update_default_local_models(self, models):
+    def update_default_local_models(self, models: dict[str, dict[str, Any]]) -> None:
         """
         Perform input checks for the structure of ``models`` and if successful,
         update :attr:`~default_local_models`.
 
         Parameters
         ----------
-        models : dict
+        models
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
             to create each model object (see :func:`~disstans.models.check_model_dict`).
@@ -607,7 +629,10 @@ class Network():
         disstans_models.check_model_dict(models)
         self.default_local_models.update(models)
 
-    def add_default_local_models(self, ts_description, models=None):
+    def add_default_local_models(self,
+                                 ts_description: str,
+                                 models: list[str] | None = None
+                                 ) -> None:
         """
         Add the network's default local models (or a subset thereof) to all stations.
 
@@ -617,9 +642,9 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries description to add the models to.
-        models : list, optional
+        models
             List of strings containing the model names of the subset of the default
             local models to add. Defaults to all local models.
 
@@ -648,7 +673,11 @@ class Network():
                                         model_description=model_description,
                                         model=mdl)
 
-    def add_unused_local_models(self, target_ts, hidden_ts=None, models=None):
+    def add_unused_local_models(self,
+                                target_ts: str,
+                                hidden_ts: str | None = None,
+                                models: list[str] | None = None
+                                ) -> None:
         """
         Add a station's unused models (or subset thereof) to a target timeseries.
 
@@ -659,14 +688,14 @@ class Network():
 
         Parameters
         ----------
-        target_ts : str
+        target_ts
             Timeseries description to add the models to.
-        hidden_ts : str, optional
+        hidden_ts
             Description of the timeseries that contains the unused model.
-            Defaults to ``target_ts``.
-        models : list, optional
+            ``None`` defaults to ``target_ts``.
+        models
             List of strings containing the model names of the subset of the default
-            local models to add. Defaults to all hidden models.
+            local models to add. ``None`` defaults to all hidden models.
         """
         assert isinstance(target_ts, str), \
             f"'target_ts' must be string, got {type(target_ts)}."
@@ -691,20 +720,24 @@ class Network():
                 station.add_local_model_kwargs(ts_description=target_ts,
                                                model_kw_args=local_models_subset)
 
-    def add_local_models(self, models, ts_description, station_subset=None):
+    def add_local_models(self,
+                         models: dict[str, dict[str, Any]],
+                         ts_description: str,
+                         station_subset: list[str] | None = None
+                         ) -> None:
         """
         For each station in the network (or a subset thereof), add models
         to a timeseries using dictionary keywords.
 
         Parameters
         ----------
-        models : dict
+        models
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
             {**kw_args}}}`` that contains the names, types and necessary keyword arguments
             to create each model object (see :func:`~disstans.models.check_model_dict`).
-        ts_description : str
+        ts_description
             Timeseries to add the models to.
-        station_subset : list, optional
+        station_subset
             If provided, only add the models to the stations in this list.
         """
         # check input
@@ -727,14 +760,14 @@ class Network():
                                         model_description=model_description,
                                         model=mdl)
 
-    def remove_timeseries(self, *ts_to_remove):
+    def remove_timeseries(self, *ts_to_remove: str) -> None:
         """
         Convenience function that scans all stations for timeseries of given names
         and removes them (together with models and fits).
 
         Parameters
         ----------
-        *ts_to_remove : list
+        *ts_to_remove
             Pass all timeseries to remove as function arguments.
 
         See Also
@@ -746,16 +779,16 @@ class Network():
                 if ts_description in station.timeseries:
                     station.remove_timeseries(ts_description)
 
-    def copy_uncertainties(self, origin_ts, target_ts):
+    def copy_uncertainties(self, origin_ts: str, target_ts: str) -> None:
         """
         Convenience function that copies the uncertainties of one timeseries
         to another for all stations.
 
         Parameters
         ----------
-        origin_ts : str
+        origin_ts
             Name of the timeseries that contains the uncertainty data.
-        target_ts : str
+        target_ts
             Name of the timeseries that should receive the uncertainty data.
         """
         for station in self:
@@ -763,8 +796,12 @@ class Network():
                (target_ts in station.timeseries.keys()):
                 station[target_ts].add_uncertainties(timeseries=station[origin_ts])
 
-    def load_maintenance_dict(self, maint_dict, ts_description, model_description,
-                              only_active=True):
+    def load_maintenance_dict(self,
+                              maint_dict: dict[str, list],
+                              ts_description: str,
+                              model_description: str,
+                              only_active: bool = True
+                              ) -> None:
         """
         Convenience wrapper to add :class:`~disstans.models.Step` models to the stations
         in the network where they experienced maitenance and therefore likely a jump
@@ -772,16 +809,16 @@ class Network():
 
         Parameters
         ----------
-        maint_dict : dict
+        maint_dict
             Dictionary of structure ``{station_name: [steptimes]}`` where ``station_name``
             is the station name as present in the Network object, and ``steptimes`` is a list
             of either datetime-like strings or :class:`~pandas.Timestamp`.
-        ts_description : str
+        ts_description
             Timeseries to add the steps to.
-        model_description : str
+        model_description
             Name for the step models.
-        only_active : bool, optional
-            If ``True`` (default), will check for the active time period of the timeseries,
+        only_active
+            If ``True``, will check for the active time period of the timeseries,
             and only add steps that fall inside it.
 
         See Also
@@ -804,7 +841,11 @@ class Network():
                 self[station].add_local_model(ts_description, model_description,
                                               disstans_models.Step(localsteps))
 
-    def freeze(self, ts_description, model_list=None, zero_threshold=1e-10):
+    def freeze(self,
+               ts_description: str,
+               model_list: list[str] | None = None,
+               zero_threshold: float = 1e-10
+               ) -> None:
         """
         Convenience method that calls :meth:`~disstans.models.Model.freeze`
         for the :class:`~disstans.models.ModelCollection` for a certain
@@ -812,14 +853,14 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries to to freeze the models for.
-        model_list : list, optional
-            If ``None`` (default), freeze all models. If a list of strings, only
-            freeze the corresponding models in the collection.
-        zero_threshold : float, optional
+        model_list
+            If ``None``, freeze all models. If a list of strings, only freeze the
+            corresponding models in the collection.
+        zero_threshold
             Model parameters with absolute values below ``zero_threshold`` will be
-            set to zero and set inactive. Defaults to ``1e-10``.
+            set to zero and set inactive.
 
         See Also
         --------
@@ -830,18 +871,21 @@ class Network():
                 station.models[ts_description].freeze(model_list=model_list,
                                                       zero_threshold=zero_threshold)
 
-    def unfreeze(self, ts_description, model_list=None):
+    def unfreeze(self,
+                 ts_description: str,
+                 model_list: list[str] | None = None
+                 ) -> None:
         """
         Convenience method that resets any frozen parameters for a certain timeseries
         at every station.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries to to unfreeze the models for.
-        model_list : list, optional
-            If ``None`` (default), freeze all models. If a list of strings, only
-            freeze the corresponding models in the collection.
+        model_list
+            If ``None``, unfreeze all models. If a list of strings, only unfreeze the
+            corresponding models in the collection.
 
         See Also
         --------
@@ -851,8 +895,15 @@ class Network():
             if ts_description in station:
                 station.models[ts_description].unfreeze(model_list=model_list)
 
-    def fit(self, ts_description, solver='linear_regression', local_input={},
-            return_solutions=False, progress_desc=None, no_pbar=False, **kw_args):
+    def fit(self,
+            ts_description: str,
+            solver: str | Callable = "linear_regression",
+            local_input: dict[str, Any] = {},
+            return_solutions: bool = False,
+            progress_desc: bool = None,
+            no_pbar: bool = False,
+            **kw_args
+            ) -> dict[str, Solution] | None:
         """
         Fit the models for a specific timeseries at all stations,
         and read the fitted parameters into the station's model collection.
@@ -862,29 +913,28 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries to fit.
-        solver : str, function, optional
+        solver
             Solver function to use. If given a string, will look for a solver with that
             name in :mod:`~disstans.solvers`, otherwise will use the passed function as a
             solver (which needs to adhere to the same input/output structure as the
-            included solver functions). Defaults to standard linear least squares.
-        local_input : dict, optional
+            included solver functions).
+        local_input
             Provides the ability to pass individual keyword arguments to the solver,
             potentially overriding the (global) keywords in ``kw_args``.
-        return_solutions : bool, optional
-            If ``True`` (default: ``False``), return a dictionary of all solutions produced
-            by the calls to the solver function.
-        progress_desc : str, optional
+        return_solutions
+            If ``True``, return a dictionary of all solutions produced by the calls to
+            the solver function.
+        progress_desc
             If provided, override the description of the progress bar.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
-        **kw_args : dict
+        no_pbar
+            Suppress the progress bar with ``True``.
+        **kw_args
             Additional keyword arguments that are passed on to the solver function.
 
         Returns
         -------
-        solutions : dict, optional
             If ``return_solutions=True``, a dictionary that contains the
             :class:`~disstans.solvers.Solution` objects for each station.
 
@@ -943,22 +993,42 @@ class Network():
             return solutions
 
     @staticmethod
-    def _fit_single_station(parameter_tuple):
+    def _fit_single_station(parameter_tuple: tuple[Callable, Timeseries, ModelCollection, dict]
+                            ) -> Solution:
         solver, station_time, station_models, kw_args = parameter_tuple
         return solver(station_time, station_models, **kw_args)
 
-    def spatialfit(self, ts_description, penalty, reweight_func, spatial_l0_models,
-                   spatial_reweight_iters, spatial_reweight_percentile=0.5,
-                   spatial_reweight_max_rms=1e-9, spatial_reweight_max_changed=0,
-                   spatial_reweight_agg_comps=True, dist_num_avg=4,
-                   dist_weight_min=None, dist_weight_max=None,
-                   local_l0_models=[], local_reweight_iters=1,
-                   local_reweight_coupled=True, formal_covariance=False,
-                   use_data_variance=True, use_data_covariance=True,
-                   use_internal_scales=True, verbose=False, no_pbar=False,
-                   extended_stats=False, keep_mdl_res_as=None, return_solutions=False,
-                   zero_threshold=1e-4, cov_zero_threshold=1e-6, num_threads_evaluate=None,
-                   roll_mean_kernel=30, cvxpy_kw_args={"solver": "SCS"}):
+    def spatialfit(self,
+                   ts_description: str,
+                   penalty: float | list[float] | np.ndarray,
+                   reweight_func: Callable,
+                   spatial_l0_models: list[str],
+                   spatial_reweight_iters: int,
+                   spatial_reweight_percentile: float = 0.5,
+                   spatial_reweight_max_rms: float = 1e-9,
+                   spatial_reweight_max_changed: float = 0.0,
+                   spatial_reweight_agg_comps: bool = True,
+                   dist_num_avg: int = 4,
+                   dist_weight_min: float | None = None,
+                   dist_weight_max: float | None = None,
+                   local_l0_models: list[str] = [],
+                   local_reweight_iters: int = 1,
+                   local_reweight_coupled: bool = True,
+                   formal_covariance: bool = False,
+                   use_data_variance: bool = True,
+                   use_data_covariance: bool = True,
+                   use_internal_scales: bool = True,
+                   verbose: bool = False,
+                   no_pbar: bool = False,
+                   extended_stats: bool = False,
+                   keep_mdl_res_as: tuple[str, str] = None,
+                   return_solutions: bool = False,
+                   zero_threshold: float = 1e-4,
+                   cov_zero_threshold: float = 1e-6,
+                   num_threads_evaluate: int | None = None,
+                   roll_mean_kernel: int = 30,
+                   cvxpy_kw_args: dict = {"solver": "SCS"}
+                   ) -> tuple[dict[str, Any], dict[str, Solution] | None]:
         r"""
         Fit the models for a specific timeseries at all stations using the
         spatiotemporal capabilities of :func:`~disstans.solvers.lasso_regression`,
@@ -993,9 +1063,9 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries to fit.
-        penalty : float, list, numpy.ndarray
+        penalty
             Penalty hyperparameter :math:`\lambda`. For non-reweighted models (i.e.,
             regularized models that are neither in ``spatial_l0_models`` nor in
             ``local_l0_models``), this is the constant penalty applied for
@@ -1006,70 +1076,70 @@ class Network():
             weights at each iteration.
             ``penalty`` can either be a single value used for all components, or a list
             or NumPy array specifying a penalty for each component in the data.
-        reweight_func : ReweightingFunction
+        reweight_func
             An instance of a reweighting function that will be used by
             :func:`~disstans.solvers.lasso_regression`.
-        spatial_l0_models : list
+        spatial_l0_models
             Names of models to use in the spatial reweighting, resulting in spatial L0
             regularization.
-        spatial_reweight_iters : int
+        spatial_reweight_iters
             Number of spatial reweighting iterations.
-        spatial_reweight_percentile : float, optional
+        spatial_reweight_percentile
             Percentile used in the spatial reweighting.
-            Defaults to ``0.5``.
-        spatial_reweight_max_rms : float, optional
+        spatial_reweight_max_rms
             Stop the spatial iterations early if the difference in the RMS (Root Mean Square)
             of the change of the parameters between reweighting iterations is less than
             ``spatial_reweight_max_rms``.
-        spatial_reweight_max_changed : float, optional
+        spatial_reweight_max_changed
             Stop the spatial iterations early if the number of changed parameters (i.e.,
             flipped between zero and non-zero) falls below a threshold. The threshold
             ``spatial_reweight_max_changed`` is given as the percentage of changed over total
-            parameters (including all models and components). Defaults to no early stopping.
-        spatial_reweight_agg_comps : bool, optional
-            If ``False`` (default), the spatial reweighting is done individually for each
+            parameters (including all models and components).
+            ``0.0`` defaults to no early stopping.
+        spatial_reweight_agg_comps
+            If ``False``, the spatial reweighting is done individually for each
             component, i.e., the distance-weighted median of the weights will be calculated
             for each component. If ``True``, a single median is calculated from the aggregated
             weights in all data components, and then used for all components.
-        dist_num_avg : int, optional
+        dist_num_avg
             Calculate the characteristic distance for the drop-off of station weights
-            as the average of the ``dist_num_avg`` closest stations (default: ``4``).
-        dist_weight_min : float, optional
+            as the average of the ``dist_num_avg`` closest stations .
+        dist_weight_min
             Enforce a minimum value of :math:`D_j` (in kilometers).
-        dist_weight_max : float, optional
+        dist_weight_max
             Enforce a maximum value of :math:`D_j` (in kilometers).
-        local_l0_models : list
+        local_l0_models
             Names of models that should carry over their weights from one solver iteration
             to the next, but should not be reweighted spatially, resulting in local L0
             regularization.
-        local_reweight_iters : int, optional
+        local_reweight_iters
             Number of local reweighting iterations, see ``reweight_max_iters`` in
             :func:`~disstans.solvers.lasso_regression`.
-        local_reweight_coupled : bool, optional
-            If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter
+        local_reweight_coupled
+            If ``True`` and reweighting is active, the L1 penalty hyperparameter
             is coupled with the reweighting weights (see Notes in
             :func:`~disstans.solvers.lasso_regression`).
-        formal_covariance : bool, optional
-            If ``True``, calculate the formal model covariance. Defaults to ``False``.
-        use_data_variance : bool, optional
-            If ``True`` (default) and ``ts_description`` contains variance information, this
+        formal_covariance
+            If ``True``, calculate the formal model covariance.
+        use_data_variance
+            If ``True`` and ``ts_description`` contains variance information, this
             uncertainty information will be used.
-        use_data_covariance : bool, optional
-            If ``True`` (default), ``ts_description`` contains variance and covariance
+        use_data_covariance
+            If ``True``, ``ts_description`` contains variance and covariance
             information, and ``use_data_variance`` is also ``True``, this uncertainty
             information will be used.
-        use_internal_scales : bool, optional
+        use_internal_scales
             Sets whether internal scaling should be used when reweighting, see
             ``use_internal_scales`` in :func:`~disstans.solvers.lasso_regression`.
-        verbose : bool, optional
-            If ``True`` (default: ``False``), print statistics along the way.
-        no_pbar : bool, optional
-            Suppress the progress bars with ``True`` (default: ``False``).
-        extended_stats : bool, optional
-            If ``True`` (default: ``False``), the fitted models are evaluated at each iteration
-            to calculate residual and fit statistics. These extended statistics are added to
+        verbose
+            If ``True``, print statistics along the way.
+        no_pbar
+            Suppress the progress bars with ``True``.
+        extended_stats
+            If ``True``, the fitted models are evaluated at each iteration to calculate
+            residual and fit statistics. These extended statistics are added to
             ``statistics`` (see Returns below).
-        keep_mdl_res_as : tuple, optional
+        keep_mdl_res_as
             If ``extended_stats=True``, the network's models are evaluated, and a model fit and
             residuals timeseries are created. Between iterations, they are removed by default,
             but passing this parameter a 2-element tuple of strings keeps the evaluated model
@@ -1077,12 +1147,15 @@ class Network():
             to skip :meth:`~disstans.network.Network.evaluate` (for ``output_description``)
             and the calculation of the residual as done with ``residual_description`` by
             :meth:`~disstans.network.Network.fitevalres` after finishing the spatial fitting.
-        zero_threshold : float, optional
+        return_solutions
+            If ``True``, return a dictionary of all solutions produced by the calls to
+            the solver function.
+        zero_threshold
             When calculating statistics, assume parameters with absolute values smaller than
             ``zero_threshold`` are effectively zero.
-        cov_zero_threshold : float, optional
+        cov_zero_threshold
             Covariance zero threshold, see :func:`~disstans.solvers.lasso_regression`.
-        num_threads_evaluate : int, optional
+        num_threads_evaluate
             If ``extended_stats=True`` and ``formal_covariance=True``, there will be calls to
             :meth:`~evaluate` that will estimate the predicted variance,
             which will be memory-intensive if the timeseries are long. Using the same number
@@ -1090,20 +1163,19 @@ class Network():
             the available memory on the system. This option allows to set a different number
             of threads or disable parallelized processing entirely for those calls.
             Defaults to ``None``, which uses the same setting as in the defaults.
-        roll_mean_kernel : int, optional
+        roll_mean_kernel
             Only used if ``extended_stats=True``. This is the kernel size that gets used in the
             analysis of the residuals between each fitting step.
-        cvxpy_kw_args : dict, optional
+        cvxpy_kw_args
             Additional keyword arguments passed on to CVXPY's ``solve()`` function,
             see ``cvxpy_kw_args`` in :func:`~disstans.solvers.lasso_regression`.
 
         Returns
         -------
-
-        statistics : dict
+        statistics
             See the Notes for an explanation of the solution and convergence statistics
             that are returned.
-        solutions : dict, optional
+        solutions
             If ``return_solutions=True``, a dictionary that contains the
             :class:`~disstans.solvers.Solution` objects for each station.
 
@@ -1477,8 +1549,13 @@ class Network():
         else:
             return statistics
 
-    def evaluate(self, ts_description, timevector=None, output_description=None,
-                 progress_desc=None, no_pbar=False):
+    def evaluate(self,
+                 ts_description: str,
+                 timevector: pd.Series | pd.DatetimeIndex | None = None,
+                 output_description: str | None = None,
+                 progress_desc: str | None = None,
+                 no_pbar: bool = False
+                 ) -> None:
         """
         Evaluate a timeseries' models at all stations and adds them as a fit to
         the timeseries. Can optionally add the aggregate model as an independent
@@ -1489,20 +1566,20 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Description of the timeseries to evaluate.
-        timevector : pandas.Series, pandas.DatetimeIndex, optional
+        timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` of when to evaluate the model.
-            Defaults to the timestamps of the timeseries itself.
-        output_description : str, optional
+            ``None`` defaults to the timestamps of the timeseries itself.
+        output_description
             If provided, add the sum of the evaluated models as a new timeseries
             to each station with the provided description (instead of only adding
             the model as a fit *to* the timeseries).
-        progress_desc : str, optional
+        progress_desc
             If provided, override the description of the progress bar.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
+        no_pbar
+            Suppress the progress bar with ``True``.
 
         Example
         -------
@@ -1554,7 +1631,10 @@ class Network():
                 stat.add_fit(ts_description, fit, model_description)
 
     @staticmethod
-    def _evaluate_single_station(parameter_tuple):
+    def _evaluate_single_station(parameter_tuple: (pd.Series | pd.DatetimeIndex,
+                                                   ModelCollection)
+                                 ) -> tuple[dict[str, np.ndarray],
+                                            dict[str, dict[str, np.ndarray]]]:
         station_time, station_models = parameter_tuple
         sumfit = station_models.evaluate(station_time)
         mdlfit = {}
@@ -1562,39 +1642,53 @@ class Network():
             mdlfit[model_description] = model.evaluate(station_time)
         return sumfit, mdlfit
 
-    def fitevalres(self, ts_description, solver='linear_regression', local_input={},
-                   return_solutions=False, timevector=None, output_description=None,
-                   residual_description=None, progress_desc=None, no_pbar=False, **kw_args):
+    def fitevalres(self,
+                   ts_description: str,
+                   solver: str | Callable = "linear_regression",
+                   local_input: dict[str, Any] = {},
+                   return_solutions: bool = False,
+                   timevector: pd.Series | pd.DatetimeIndex | None = None,
+                   output_description: str | None = None,
+                   residual_description: str | None = None,
+                   progress_desc: tuple[str | None, str | None] | None = None,
+                   no_pbar: bool = False,
+                   **kw_args
+                   ) -> dict[str, Solution] | None:
         """
         Convenience method that combines the calls for :meth:`~fit`, :meth:`~evaluate`
         and :meth:`~math` (to compute the fit residual) into one method call.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             See :meth:`~fit` and :meth:`~evaluate`.
-        solver : str, function, optional
+        solver
             See :meth:`~fit`.
-        local_input : dict, optional
+        local_input
             See :meth:`~fit`.
-        return_solutions : bool, optional
+        return_solutions
             See :meth:`~fit`.
-        timevector : pandas.Series, pandas.DatetimeIndex, optional
+        timevector
             See :meth:`~evaluate`.
-        output_description : str, optional
+        output_description
             See :meth:`~evaluate`.
-        residual_description : str, optional
+        residual_description
             If provided, calculate the residual as the difference between the data and
             the model fit, and store it as the timeseries ``residual_description``.
-        progress_desc : list, tuple, optional
+        progress_desc
             If provided, set ``progress_desc`` of :meth:`~fit` and :meth:`~evaluate`
-            using the first or second element of a tuple or list, respectively.
+            using the first or second element of a tuple, respectively.
             Leave ``None`` if only overriding one of them.
-        no_pbar : bool, optional
-            Suppress the progress bars with ``True`` (default: ``False``).
-        **kw_args : dict
+        no_pbar
+            Suppress the progress bars with ``True``.
+        **kw_args
             Additional keyword arguments that are passed on to the solver function,
             see :meth:`~fit`.
+
+        Returns
+        -------
+            If ``return_solutions=True``, a dictionary that contains the
+            :class:`~disstans.solvers.Solution` objects for each station.
 
         Example
         -------
@@ -1619,11 +1713,10 @@ class Network():
         disstans.tools.parallelize : Automatically execute a function in parallel or serial.
         """
         if progress_desc is not None:
-            assert (isinstance(progress_desc, tuple) or isinstance(progress_desc, list)) \
-                   and (len(progress_desc) == 2), "If 'progress_desc' is not None, it needs " \
-                   f"to be a 2-element tuple or list, got {progress_desc}."
+            assert (isinstance(progress_desc, tuple) and (len(progress_desc) == 2)), \
+                f"'progress_desc' needs to be None or a 2-element tuple, got {progress_desc}."
         else:
-            progress_desc = [None, None]
+            progress_desc = (None, None)
         # fit
         possible_output = self.fit(ts_description=ts_description,
                                    solver=solver, local_input=local_input,
@@ -1632,14 +1725,20 @@ class Network():
                                    no_pbar=no_pbar, **kw_args)
         # evaluate
         self.evaluate(ts_description=ts_description, timevector=timevector, no_pbar=no_pbar,
-                      output_description=output_description, progress_desc=progress_desc[0])
+                      output_description=output_description, progress_desc=progress_desc[1])
         # residual
         if residual_description:
             self.math(residual_description, ts_description, "-", output_description)
         # return either None or the solutions dictionary of self.fit():
         return possible_output
 
-    def call_func_ts_return(self, func, ts_in, ts_out=None, no_pbar=False, **kw_args):
+    def call_func_ts_return(self,
+                            func: str | Callable,
+                            ts_in: str,
+                            ts_out: str | None = None,
+                            no_pbar: bool = False,
+                            **kw_args
+                            ) -> None:
         """
         A convenience wrapper that for each station in the network, calls a given
         function which takes timeseries as input and returns a timeseries (which
@@ -1649,18 +1748,18 @@ class Network():
 
         Parameters
         ----------
-        func : str, function
+        func
             Function to use. If provided with a string, will check for that function in
             :mod:`~disstans.processing`, otherwise the function will be assumed to adhere
             to the same input and output format than the included ones.
-        ts_in : str
+        ts_in
             Name of the timeseries to use as input to ``func``.
-        ts_out : str, optional
+        ts_out
             Name of the timeseries that the output of ``func`` should be assigned to.
-            Defaults to overwriting ``ts_in``.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
-        **kw_args : dict
+            ``None`` defaults to overwriting ``ts_in``.
+        no_pbar
+            Suppress the progress bar with ``True``.
+        **kw_args
             Additional keyword arguments to be passed onto ``func``.
 
         Example
@@ -1713,28 +1812,34 @@ class Network():
             self[station_names[i]].add_timeseries(ts_out, result)
 
     @staticmethod
-    def _single_call_func_ts_return(parameter_tuple):
+    def _single_call_func_ts_return(parameter_tuple: tuple[Callable, Station, str, dict]
+                                    ) -> Timeseries:
         func, station, ts_description, kw_args = parameter_tuple
         ts_return = func(station.timeseries[ts_description], **kw_args)
         return ts_return
 
-    def call_netwide_func(self, func, ts_in, ts_out=None, **kw_args):
+    def call_netwide_func(self,
+                          func: str | Callable,
+                          ts_in: str,
+                          ts_out: str | None = None,
+                          **kw_args
+                          ) -> None:
         """
         A convenience wrapper for functions that operate on an entire network's timeseries
         at once.
 
         Parameters
         ----------
-        func : str, function
+        func
             Function to use. If provided with a string, will check for that function in
             :mod:`~disstans.processing`, otherwise the function will be assumed to adhere
             to the same input and output format than the included ones.
-        ts_in : str
+        ts_in
             Name of the timeseries to use as input to ``func``.
-        ts_out : str, optional
+        ts_out
             Name of the timeseries that the output of ``func`` should be assigned to.
-            Defaults to overwriting ``ts_in``.
-        **kw_args : dict
+            ``None`` defaults to overwriting ``ts_in``.
+        **kw_args
             Additional keyword arguments to be passed onto ``func``.
 
         Example
@@ -1779,20 +1884,24 @@ class Network():
         net_out = func(net_in, **kw_args)
         self.import_network_ts(ts_in if ts_out is None else ts_out, net_out)
 
-    def call_func_no_return(self, func, no_pbar=False, **kw_args):
+    def call_func_no_return(self,
+                            func: str | Callable,
+                            no_pbar: bool = False,
+                            **kw_args
+                            ) -> None:
         """
         A convenience wrapper that for each station in the network, calls a given function on
         each station. Also provides a progress bar.
 
         Parameters
         ----------
-        func : str, function
+        func
             Function to use. If provided with a string, will check for that function in
             :mod:`~disstans.processing`, otherwise the function will be assumed to adhere to the
             same input format than the included ones.
-        no_pbar : bool, optional
-            Suppress the progress bar with ``True`` (default: ``False``).
-        **kw_args : dict
+        no_pbar
+            Suppress the progress bar with ``True``.
+        **kw_args
             Additional keyword arguments to be passed onto ``func``.
 
         Example
@@ -1825,21 +1934,26 @@ class Network():
                                   ascii=True, unit="station", disable=no_pbar):
             func(station, **kw_args)
 
-    def math(self, result, left, operator, right):
+    def math(self,
+             result: str,
+             left: str,
+             operator: Literal["+", "-", "*", "/"],
+             right: str
+             ) -> None:
         """
         Convenience method that performs simple math for all stations.
         Syntax is ``result = left operator right``.
 
         Parameters
         ----------
-        result : str
+        result
             Name of the result timeseries.
-        left : str
+        left
             Name of the left timeseries.
-        operator : str
+        operator
             Operator symbol (see :meth:`~disstans.timeseries.Timeseries.prepare_math` for
             all supported operations).
-        right : str
+        right
             Name of the right timeseries.
 
         Example
@@ -1863,22 +1977,24 @@ class Network():
             if (left in station.timeseries) and (right in station.timeseries):
                 station[result] = eval(f"station['{left}'] {operator} station['{right}']")
 
-    def analyze_residuals(self, ts_description, **kw_args):
+    def analyze_residuals(self,
+                          ts_description: str,
+                          **kw_args
+                          ) -> pd.DataFrame:
         """
         Analyze residual timeseries for all stations and components, calling
         :meth:`~disstans.station.Station.analyze_residuals`.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Timeseries to analyze. Method assumes it already is a residual.
-        **kw_args : dict
+        **kw_args
             Additional keyword arguments are directly passed on to
             :meth:`~disstans.station.Station.analyze_residuals`.
 
         Returns
         -------
-        pandas.DataFrame
             DataFrame with the station names as index, the different metrics
             as top-level columns, and the different components as lower-level
             columns. Averages of each metric can easily be calculated with the
@@ -1908,24 +2024,28 @@ class Network():
                             index=list(valid_stations.keys()),
                             columns=metrics_components).rename_axis("Station")
 
-    def decompose(self, ts_in, ts_out=None, **decompose_kw_args):
+    def decompose(self,
+                  ts_in: str,
+                  ts_out: str | None = None,
+                  **decompose_kw_args
+                  ) -> tuple[dict[str, Timeseries], np.ndarray, dict[str, np.ndarray]]:
         r"""
         Decomposes a timeseries in the network and returns its best-fit models
         and spatiotemporal sources.
 
         Parameters
         ----------
-        ts_in : str
+        ts_in
             Name of the timeseries to analyze.
-        ts_out : str, optional
+        ts_out
             If provided, save the model as a timeseries called ``ts_out`` to
             the stations in the network.
-        **decompose_kw_args : dict
+        **decompose_kw_args
             Additional keyword arguments passed to :func:`~disstans.processing.decompose`.
 
         Returns
         -------
-        model : dict
+        model
             Dictionary of best-fit models at each station and for each data component.
             The keys are the data components of the ``ts_in`` timeseries, and
             the values are :class:`~disstans.timeseries.Timeseries` objects.
@@ -1933,11 +2053,11 @@ class Network():
             record length is the joint length of all stations in the network,
             :math:`\text{num_observations}`. If a station is missing a certain timestamp,
             that value is ``NaN``.
-        spatial : numpy.ndarray
+        spatial
             Dictionary of the spatial sources. Each key is one of the data components,
             and the values are :class:`~numpy.ndarray` objects of shape
             :math:`(\text{num_components},\text{n_stations})`.
-        temporal : dict
+        temporal
             Dictionary of the temporal sources. Each key is one of the data components,
             and the values are :class:`~numpy.ndarray` objects of shape
             :math:`(\text{num_observations},\text{num_components})`.
@@ -1963,7 +2083,11 @@ class Network():
             self.import_network_ts(ts_out, model)
         return model, spatial, temporal
 
-    def _subset_stations(self, stations_valid, subset_stations, extrapolate):
+    def _subset_stations(self,
+                         stations_valid: list[str],
+                         subset_stations: list[str] | None,
+                         extrapolate: list[str] | bool
+                         ) -> tuple[list[str], list[str], list[str]]:
         # subset network for inversion
         if subset_stations is None:
             stat_names_in = stations_valid.copy()
@@ -1985,8 +2109,16 @@ class Network():
         stations_valid = sorted(list(set(stat_names_in).union(set(stat_names_out))))
         return stations_valid, stat_names_in, stat_names_out
 
-    def _get_2comp_pars_covs(self, stat_list_in, ts_description, mdl_description,
-                             index, comps, num_mdl_comps, use_vars, use_covs):
+    def _get_2comp_pars_covs(self,
+                             stat_list_in: list[Station],
+                             ts_description: str,
+                             mdl_description: str,
+                             index: int,
+                             comps: tuple[int, int],
+                             num_mdl_comps: int,
+                             use_vars: bool,
+                             use_covs: bool
+                             ) -> tuple[np.ndarray, np.ndarray | None]:
         # stack parameters
         pars = np.stack([station
                          .models[ts_description][mdl_description]
@@ -2009,10 +2141,18 @@ class Network():
             covs = None
         return pars, covs
 
-    def hom_velocity_field(self, ts_description, mdl_description, comps=[0, 1], use_vars=True,
-                           use_covs=True, utmzone=None, subset_stations=None,
-                           extrapolate=True, reference_station=None,
-                           use_parts=[True, True, True]):
+    def hom_velocity_field(self,
+                           ts_description: str,
+                           mdl_description: str,
+                           comps: tuple[int, int] = (0, 1),
+                           use_vars: bool = True,
+                           use_covs: bool = True,
+                           utmzone: int | None = None,
+                           subset_stations: list[str] | None = None,
+                           extrapolate: list[str] | bool = True,
+                           reference_station: str | None = None,
+                           use_parts: tuple[bool, bool, bool] = (True, True, True)
+                           ) -> tuple[pd.DataFrame, np.ndarray, np.ndarray, np.ndarray]:
         """
         Assuming the entire network (or a subset thereof) is located on the same body
         undergoing translation, strain and rotation, calculate the homogenous
@@ -2024,28 +2164,28 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Name of the timeseries to use.
-        mdl_description : str
+        mdl_description
             Name of the :class:`~disstans.models.Polynomial` model that contains the
             estimated linear station velocities.
-        comps : list, optional
+        comps
             Specifies the components of the fitted model to use as the East and North
             directions, respectively. Defaults to the first two components.
-        use_vars : bool, optional
-            If ``True`` (default), use the formal parameter variances in the model
-            during the inversion. If ``False``, all velocities will be weighted equally.
-        use_covs : bool, optional
-            If ``True`` (default) and ``use_vars=True``, also use the formal parameter
-            covariance for the inversion.
-        utmzome : int, optional
+        use_vars
+            If ``True``, use the formal parameter variances in the model during the
+            inversion. If ``False``, all velocities will be weighted equally.
+        use_covs
+            If ``True`` and ``use_vars=True``, also use the formal parameter covariance
+            for the inversion.
+        utmzome
             If provided, the UTM zone to use for the horizontal approximation.
             By default (``None``), the average longitude will be calculated, and the
             respective UTM zone will be used.
-        subset_stations : list, optional
+        subset_stations
             If set, a list of strings that contains the names of stations to be used.
-        extrapolate : bool, list, optional
-            If ``True`` (default), the velocity will be predicted for all stations in
+        extrapolate
+            If ``True``, the velocity will be predicted for all stations in
             the network.
             If ``False``, the prediction will only be made for the station subset being
             used in the inversion. Note that ``False`` is only different from ``True``
@@ -2053,11 +2193,12 @@ class Network():
             If a list, the prediction will be made for the stations in the list.
             Note that no output will be made for stations that do not contain the
             passed ``'ts_description'`` and ``'mdl_description'``.
-        reference_station : str, optional
+        reference_station
             Reference station to be used by the calculation. If all parts are removed
             (translation, rotation, strain), the reference station is not relevant,
             otherwise, it changes the results significantly.
-        use_parts : list, optional
+            ``None`` defaults to the first station in the Network.
+        use_parts
             By default, all three parts are used in the calculation of the best-fit
             average velocity field: translation, strain relative to the origin, and
             rotation about the origin. By changing this list of booleans, the individual
@@ -2067,14 +2208,14 @@ class Network():
 
         Returns
         -------
-        df_v_pred : pandas.DataFrame
+        df_v_pred
             DataFrame containing the predicted velocities at each station (rows) in
             the East and North components (columns).
-        v_O : numpy.ndarray
+        v_O
             1D translation vector.
-        epsilon : numpy.ndarray
+        epsilon
             2D strain rate tensor.
-        omega : numpy.ndarray
+        omega
             2D rotation rate tensor.
 
         See Also
@@ -2083,12 +2224,12 @@ class Network():
             tensors to calculate invariants such as the dilatation or shearing rates.
         """
         # input check
-        assert (isinstance(comps, list) and len(comps) == 2 and
+        assert (isinstance(comps, tuple) and len(comps) == 2 and
                 all([isinstance(c, int) for c in comps])), \
-            f"'comps' needs to be a length-2 list of integers, got {comps}."
-        assert (isinstance(use_parts, list) and (len(use_parts) == 3) and
+            f"'comps' needs to be a length-2 tuple of integers, got {comps}."
+        assert (isinstance(use_parts, tuple) and (len(use_parts) == 3) and
                 all([isinstance(p, bool) for p in use_parts]) and any(use_parts)), \
-            "'use_parts' needs to be a boolean list of length three with at least " \
+            "'use_parts' needs to be a boolean tuple of length three with at least " \
             f"one True element, got {use_parts}."
         stat_names_valid = sorted(self.get_stations_with(ts_description))
         stat_names_valid, stat_names_in, stat_names_out = \
@@ -2146,8 +2287,15 @@ class Network():
         df_v_pred = pd.DataFrame(data=v_pred, index=stat_names_out, columns=v_pred_cols)
         return df_v_pred, v_O, epsilon, omega
 
-    def euler_rot_field(self, ts_description, mdl_description, comps=[0, 1], use_vars=True,
-                        use_covs=True, subset_stations=None, extrapolate=True):
+    def euler_rot_field(self,
+                        ts_description: str,
+                        mdl_description: str,
+                        comps: tuple[int, int] = (0, 1),
+                        use_vars: bool = True,
+                        use_covs: bool = True,
+                        subset_stations: list[str] | None = None,
+                        extrapolate: list[str] | bool = True
+                        ) -> tuple[pd.DataFrame, np.ndarray, np.ndarray]:
         r"""
         Calculate the best-fit Euler pole for a given timeseries' model in the network,
         and compute the resulting velocities at each station.
@@ -2158,25 +2306,24 @@ class Network():
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             Name of the ts_description to use.
-        mdl_description : str
+        mdl_description
             Name of the :class:`~disstans.models.Polynomial` model that contains the
             estimated linear station velocities.
-        comps : list, optional
+        comps
             Specifies the components of the fitted model to use as the East and North
             directions, respectively. Defaults to the first two components.
-        use_vars : bool, optional
-            If ``True`` (default), use the formal parameter variances in the model
-            during the inversion. If ``False``, all velocities will be weighted equally.
-        use_covs : bool, optional
-            If ``True`` (default) and ``use_vars=True``, also use the formal parameter
-            covariance for the inversion.
-        subset_stations : list, optional
+        use_vars
+            If ``True``, use the formal parameter variances in the model during the
+            inversion. If ``False``, all velocities will be weighted equally.
+        use_covs
+            If ``True`` and ``use_vars=True``, also use the formal parameter covariance
+            for the inversion.
+        subset_stations
             If set, a list of strings that contains the names of stations to be used.
-        extrapolate : bool, list, optional
-            If ``True`` (default), the velocity will be predicted for all stations in
-            the network.
+        extrapolate
+            If ``True``, the velocity will be predicted for all stations in the network.
             If ``False``, the prediction will only be made for the station subset being
             used in the inversion. Note that ``False`` is only different from ``True``
             if ``subset_stations`` is set.
@@ -2186,13 +2333,13 @@ class Network():
 
         Returns
         -------
-        df_v_pred : pandas.DataFrame
+        df_v_pred
             DataFrame containing the Euler pole modeled velocities at each station (rows)
             in the East and North components (columns).
-        rotation_vector : numpy.ndarray
+        rotation_vector
             Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
             rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
-        rotation_covariance : numpy.ndarray
+        rotation_covariance
             Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
 
         See Also
@@ -2246,8 +2393,14 @@ class Network():
                                  index=stat_names_out, columns=v_pred_cols)
         return df_v_pred, rotation_vector, rotation_covariance
 
-    def _create_map_figure(self, gui_settings, annotate_stations, subset_stations=None,
-                           center_longitude=0):
+    def _create_map_figure(self,
+                           gui_settings: dict[str, Any],
+                           annotate_stations: bool,
+                           subset_stations: list[str] | None = None,
+                           center_longitude: float = 0.0
+                           ) -> tuple[mpl.Figure, mpl.Axis, ccrs.CRS, ccrs.CRS,
+                                      list[str], matplotlib.collections.PathCollection,
+                                      list[float], list[float]]:
         # get location data and projections
         if subset_stations:
             stat_names = subset_stations
@@ -2291,32 +2444,38 @@ class Network():
         return fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons
 
-    def graphical_cme(self, ts_in, ts_out=None, annotate_stations=True, save=False,
-                      save_kw_args={"format": "png"}, gui_kw_args={}, **decompose_kw_args):
+    def graphical_cme(self,
+                      ts_in: str,
+                      ts_out: str | None = None,
+                      annotate_stations: bool | str | float = True,
+                      save: bool = False,
+                      save_kw_args: dict[str, Any] = {"format": "png"},
+                      gui_kw_args: dict[str, Any] = {},
+                      **decompose_kw_args
+                      ) -> None:
         """
         Calculates the Common Mode Error (CME) of the network and shows its spatial
         and temporal pattern. Optionally saves the model for each station.
 
         Parameters
         ----------
-        ts_in : str
+        ts_in
             Name of the timeseries to analyze.
-        ts_out : str, optional
+        ts_out
             If provided, save the model as a timeseries called ``ts_out`` to
             the stations in the network.
-        annotate_stations : bool, float, str, optional
-            If ``True`` (default), add the station names to the map.
+        annotate_stations
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
-        save : bool, optional
+        save
             If ``True``, save the map and timeseries plots to the current folder.
-            Defaults to ``False``.
-        save_kw_args : dict, optional
+        save_kw_args
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``save=True``.
-        gui_kw_args : dict, optional
+        gui_kw_args
             Override default GUI settings of :attr:`~disstans.config.defaults`.
-        **decompose_kw_args : dict
+        **decompose_kw_args
             Additional keyword arguments passed to :func:`~decompose`.
 
         See Also
@@ -2369,11 +2528,28 @@ class Network():
         else:
             plt.show()
 
-    def gui(self, station=None, timeseries=None, fit_list=None, sum_models=True,
-            verbose=False, annotate_stations=True, save=False, save_map=False,
-            save_kw_args={"format": "png"}, scalogram_kw_args=None, mark_events=None,
-            lon_min=None, lon_max=None, lat_min=None, lat_max=None, stepdetector={},
-            trend_kw_args={}, analyze_kw_args={}, rms_on_map={}, gui_kw_args={}):
+    def gui(self,
+            station: str | None = None,
+            timeseries: list[str] | None = None,
+            fit_list: list[str] | None = None,
+            sum_models: bool = True,
+            verbose: bool = False,
+            annotate_stations: bool | str | float = True,
+            save: bool | str = False,
+            save_map: bool = False,
+            save_kw_args: dict[str, Any] = {"format": "png"},
+            scalogram_kw_args: dict[str, Any] | None = None,
+            mark_events: pd.DataFrame | list[pd.DataFrame] | None = None,
+            lon_min: float | None = None,
+            lon_max: float | None = None,
+            lat_min: float | None = None,
+            lat_max: float | None = None,
+            stepdetector: dict[str, Any] = {},
+            trend_kw_args: dict[str, Any] = {},
+            analyze_kw_args: dict[str, Any] = {},
+            rms_on_map: dict[str, Any] = {},
+            gui_kw_args: dict[str, Any] = {}
+            ) -> None:
         """
         Provides a Graphical User Interface (GUI) to visualize the network and all
         of its different stations, timeseries, and models.
@@ -2400,55 +2576,54 @@ class Network():
 
         Parameters
         ----------
-        station : str, optional
+        station
             Pre-select a station.
-        timeseries : list, optional
+        timeseries
             List of strings with the descriptions of the timeseries to plot.
-            Defaults to all timeseries.
-        fit_list : list, optional
+            ``None`` defaults to all timeseries.
+        fit_list
             List of strings containing the model names of the subset of the models
-            to be plotted. Defaults to all fitted models.
-        sum_models : bool, optional
+            to be plotted. ``None`` defaults to all fitted models.
+        sum_models
             If ``True``, plot the sum of all selected models instead of every
-            model individually. Defaults to ``True``.
-        verbose : bool, optional
+            model individually.
+        verbose
             If ``True``, when clicking on a station, print its details (see
-            :meth:`~disstans.station.Station.__str__`). Defaults to ``False``.
-        annotate_stations : bool, float, str, optional
-            If ``True`` (default), add the station names to the map.
+            :meth:`~disstans.station.Station.__str__`).
+        annotate_stations
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
-        save : bool, str, optional
+        save
             If ``True``, save the figure of the selected timeseries. If a scalogram
             is also created, save this as well. The output directory is the current folder.
             Ignored if ``stepdetector`` is set. Suppresses all interactive figures.
             If ``save`` is a string, it will be included in the output file name
             for easier referencing.
-            Defaults to ``False``.
-        save_map : bool, optional
-            If ``True``, also save a map if ``save=True``. Defaults to ``False``.
-        save_kw_args : dict, optional
+        save_map
+            If ``True``, also save a map if ``save=True``.
+        save_kw_args
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``save=True``.
-        scalogram_kw_args : dict, optional
-            If passed, also plot a scalogram. Defaults to no scalogram shown.
+        scalogram_kw_args
+            If passed, also plot a scalogram. ``None`` defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
             are the names of the timeseries and associated model that are of the
             :class:`~disstans.models.BaseSplineSet` class, and therefore have a
             :meth:`~disstans.models.BaseSplineSet.make_scalogram` method.
-        mark_events : pandas.DataFrame, list, optional
+        mark_events
             If passed, a DataFrame or list of DataFrames that contain the columns
             ``'station'`` and ``'time'``. For each timestamp, a vertical line is plotted
             onto the station's timeseries and the relevant entries are printed out.
-        lon_min : float, optional
+        lon_min
             Specify the map's minimum longitude (in degrees).
-        lon_max : float, optional
+        lon_max
             Specify the map's maximum longitude (in degrees).
-        lat_min : float, optional
+        lat_min
             Specify the map's minimum latitude (in degrees).
-        lat_max : float, optional
+        lat_max
             Specify the map's maximum latitude (in degrees).
-        stepdetector : dict, optional
+        stepdetector
             Passing this dictionary will enable the plotting of events related to possible
             steps, both on the map (in case of an earthquake catalog) and in the timeseries
             (in case of detected steps by :class:`~disstans.processing.StepDetector` or a
@@ -2465,9 +2640,9 @@ class Network():
             :mod:`~disstans.earthquakes` and a maximum distance of stations to earthquakes of
             magnitude less than 7.5), and optionally, ``'maint_table'`` (a maintenance table
             as parsed by :func:`~disstans.tools.parse_maintenance_table`).
-        trend_kw_args : dict, optional
+        trend_kw_args
             If passed, also plot velocity trends on the station map.
-            Defaults to no velocity arrows shown.
+            ``{}`` defaults to no velocity arrows shown.
             The dictionary can contain all the keywords that are passed to
             :meth:`~disstans.station.Station.get_trend`, but has at least has to contain
             the ``ts_description``. If no ``fit_list`` is included, the ``fit_list``
@@ -2475,11 +2650,11 @@ class Network():
             is 3 or more, only the first two will be used. If two components are plotted,
             they correspond to the East and North components. If only one component is plotted
             (for example for vertical motion), it will be plotted as the North component.
-        analyze_kw_args : dict, optional
+        analyze_kw_args
             If provided and non-empty, call :meth:`~disstans.station.Station.analyze_residuals`
             and pass the dictionary on as keyword arguments (overriding ``'verbose'`` to
-            ``True`` to force an output). Defaults to no residual analysis.
-        rms_on_map : dict, optional
+            ``True`` to force an output). ``{}`` defaults to no residual analysis.
+        rms_on_map
             If provided and non-empty, this option will call
             :meth:`~disstans.station.Station.analyze_residuals` to calculate
             a residual timeseries' root-mean-squares to color the station markers on the map.
@@ -2489,7 +2664,7 @@ class Network():
             defaults to maximum of the RMS), ``'t_start', 't_end'`` (to restrict the time
             window, defaults to ``analyze_kw_args`` if given, otherwise the entire timeseries),
             and ``'orientation'`` (for the colorbar orientation).
-        gui_kw_args : dict, optional
+        gui_kw_args
             Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
         # create map and timeseries figures
@@ -2996,70 +3171,86 @@ class Network():
         del click
         plt.close("all")
 
-    def wormplot(self, ts_description, fname=None, fname_animation=None, subset_stations=None,
-                 t_min=None, t_max=None, lon_min=None, lon_max=None, lat_min=None, lat_max=None,
-                 en_col_names=[0, 1], scale=1e2, interval=10, annotate_stations=True,
-                 no_pbar=False, return_figure=False, save_kw_args={"format": "png"},
-                 colorbar_kw_args=None, legend_ref_dict=None, gui_kw_args={}):
+    def wormplot(self,
+                 ts_description: str | tuple[str, str],
+                 fname: str | None = None,
+                 fname_animation: str | None = None,
+                 subset_stations: list[str] | None = None,
+                 t_min: str | pd.Timestamp | None = None,
+                 t_max: str | pd.Timestamp | None = None,
+                 lon_min: float | None = None,
+                 lon_max: float | None = None,
+                 lat_min: float | None = None,
+                 lat_max: float | None = None,
+                 en_col_names: tuple[int, int] | tuple[str, str] = (0, 1),
+                 scale: float = 1e2,
+                 interval: int = 10,
+                 annotate_stations: bool | str | float = True,
+                 no_pbar: bool = False,
+                 return_figure: bool = False,
+                 save_kw_args: dict[str, Any] = {"format": "png"},
+                 colorbar_kw_args: dict[str, Any] | None = None,
+                 legend_ref_dict: dict[str, Any] | None = None,
+                 gui_kw_args: dict[str, Any] = {}
+                 ) -> tuple[mpl.Figure, mpl.Axis] | None:
         """
         Creates an animated worm plot given the data in a timeseries.
 
         Parameters
         ----------
-        ts_description : str, tuple
+        ts_description
             Specifies the timeseries to plot. If a string, the name of a timeseries
             directly associated with a station, and if a tuple, specifies the timeseries
             and name of a fitted model for the timeseries.
-        fname : str, optional
+        fname
             If set, save the map to this filename, if not (default), show the map interactively
             (unless ``return_figure=True``).
-        fname_animation : str, optional
+        fname_animation
             If specified, make an animation and save the video to this filename.
-        subset_stations : list, optional
+        subset_stations
             If set, a list of strings that contains the names of stations to be shown.
-        t_min : str, pandas.Timestamp, optional
-            Start the plot at this time. Defaults to first observation.
-        t_max : str, pandas.Timestamp, optional
-            End the plot at this time. Defaults to last observation.
-        lon_min : float, optional
+        t_min
+            Start the plot at this time. ``None`` defaults to first observation.
+        t_max
+            End the plot at this time. ``None`` defaults to last observation.
+        lon_min
             Specify the map's minimum longitude (in degrees).
-        lon_max : float, optional
+        lon_max
             Specify the map's maximum longitude (in degrees).
-        lat_min : float, optional
+        lat_min
             Specify the map's minimum latitude (in degrees).
-        lat_max : float, optional
+        lat_max
             Specify the map's maximum latitude (in degrees).
-        en_col_names : list, optional
+        en_col_names
             By default, the first two components of the timeseries will be assumed to be the
-            East and North components, respectively, by having the default value ``[0, 1]``
+            East and North components, respectively, by having the default value ``(0, 1)``
             indicating the desired components as integer indices. Alternatively, this can be
-            a list of strings with the two component's column names.
-        scale : float, optional
+            a tuple of strings with the two component's column names.
+        scale
             Specify the conversion scale factor for the displacement timeseries to be
             visible on a map. The final distance for a unit displacement on the map
             will be (timeseries assumed as meters) times (scale). E.g., for a timeseries
-            in millimeters and a scale of ``1e2`` (default), one millimeter displacement
-            will result in a mapped displacement of 100 meters.
-        interval : int, optional
-            The number of milliseconds each frame is shown (default: ``10``).
-        annotate_stations : bool, float, str, optional
-            If ``True`` (default), add the station names to the map.
+            in millimeters and a scale of ``1e2``, one millimeter displacement will result
+            in a mapped displacement of 100 meters.
+        interval
+            The number of milliseconds each frame is shown.
+        annotate_stations
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
-        no_pbar : bool, optional
-            Suppress the progress bar when creating the animation with ``True``
-            (default: ``False``).
-        return_figure : bool, optional
-            If ``True`` (default: ``False``), return the figure and axis objects instead of
+        no_pbar
+            Suppress the progress bar when creating the animation with ``True``.
+        return_figure
+            If ``True``, return the figure and axis objects instead of
             showing the plot interactively. Only used if ``fname`` is not set.
-        save_kw_args : dict, optional
+        save_kw_args
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``fname`` is specified.
-        colorbar_kw_args : dict, optional
-            If ``None`` (default), no colorbar is added to the plot. If a dictionary is passed,
+        colorbar_kw_args
+            If ``None``, no colorbar is added to the plot. If a dictionary is passed,
             a colorbar is added, with the dictionary containing additional keyword arguments
             to the :meth:`~matplotlib.figure.Figure.colorbar` method.
-        legend_ref_dict : dict, optional
+        legend_ref_dict
             If ``legend_ref_dict`` is provided and contains all of the following information,
             a reference line will be plotted at the specified location to act as a legend.
             Necessary keys: ``location`` (a tuple containing the longitude and latitude of the
@@ -3068,8 +3259,12 @@ class Network():
             The dictionary can optionally include ``rect_args`` and ``rect_kw_args`` entries
             for arguments and parameters that will be passed onto the creation of the
             background :class:`~matplotlib.patches.Rectangle`.
-        gui_kw_args : dict, optional
+        gui_kw_args
             Override default GUI settings of :attr:`~disstans.config.defaults`.
+
+        Returns
+        -------
+            (Only if ``return_figure=True``) The Figure and Axis objects of the plot.
         """
         # preparations
         gui_settings = defaults["gui"].copy()
@@ -3099,14 +3294,14 @@ class Network():
 
         # collect all the relevant data and subset to time
         network_df = self.export_network_ts(ts_description, subset_stations)
-        if isinstance(en_col_names, list) and (len(en_col_names) == 2) and \
+        if isinstance(en_col_names, tuple) and (len(en_col_names) == 2) and \
            all([isinstance(comp, int) for comp in en_col_names]):
             col_east, col_north = np.array(list(network_df.keys()))[en_col_names].tolist()
-        elif (isinstance(en_col_names, list) and (len(en_col_names) == 2) and
+        elif (isinstance(en_col_names, tuple) and (len(en_col_names) == 2) and
               all([isinstance(comp, str) for comp in en_col_names])):
             col_east, col_north = en_col_names
         else:
-            raise ValueError("'en_col_names' needs to be a two-element list of integers or "
+            raise ValueError("'en_col_names' needs to be a two-element tuple of integers or "
                              f"strings, got {en_col_names}.")
 
         # for each station, get displacement timeseries for the east and north components
@@ -3242,74 +3437,92 @@ class Network():
             else:
                 plt.show()
 
-    def ampphaseplot(self, ts_description, mdl_description, components=None, phase=True,
-                     fname=None, subset_stations=None, lon_min=None, lon_max=None,
-                     lat_min=None, lat_max=None, scale=1, annotate_stations=True,
-                     legend_refs=None, legend_labels=None, month_range=None,
-                     return_figure=False, save_kw_args={"format": "png"},
-                     colorbar_kw_args=None, gui_kw_args={}):
+    def ampphaseplot(self,
+                     ts_description: str,
+                     mdl_description: str,
+                     components: int | list[int] | None = None,
+                     phase: bool = True,
+                     fname: str | None = None,
+                     subset_stations: list[str] | None = None,
+                     lon_min: float | None = None,
+                     lon_max: float | None = None,
+                     lat_min: float | None = None,
+                     lat_max: float | None = None,
+                     scale: float = 1.0,
+                     annotate_stations: bool | str | float = True,
+                     legend_refs: list[float] | None = None,
+                     legend_labels: list[str] | None = None,
+                     month_range: tuple[float] | tuple[int] | None = None,
+                     return_figure: bool = False,
+                     save_kw_args: dict[str, Any] = {"format": "png"},
+                     colorbar_kw_args: dict[str, Any] | None = None,
+                     gui_kw_args: dict[str, Any] = {}
+                     ) -> tuple[mpl.Figure, mpl.Axis] | None:
         """
         Plot the amplitude and phase of a :class:`~disstans.models.Sinusoid`
         model on a network map.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             The name of the timeseries to be used.
-        mdl_description : str
+        mdl_description
             The name of the model to be plotted.
-        components : int, list, optional
+        components
             Specify the components to be used.
             By default (``None``), all available components are combined.
             If an integer, only a single component is used (in which case the phase
             can be used to color the marker).
             If a list, the indices of the list specify the components to be
             combined.
-        phase : bool, optional
+        phase
             (Only used if a single component is selected.)
-            If ``True`` (default), use the phase of the sinusoid to color the
-            station markers.
-        fname : str, optional
+            If ``True``, use the phase of the sinusoid to color the station markers.
+        fname
             If set, save the map to this filename, if not (default), show the map interactively
             (unless ``return_figure=True``).
-        subset_stations : list, optional
+        subset_stations
             If set, a list of strings that contains the names of stations to be shown.
-        lon_min : float, optional
+        lon_min
             Specify the map's minimum longitude (in degrees).
-        lon_max : float, optional
+        lon_max
             Specify the map's maximum longitude (in degrees).
-        lat_min : float, optional
+        lat_min
             Specify the map's minimum latitude (in degrees).
-        lat_max : float, optional
+        lat_max
             Specify the map's maximum latitude (in degrees).
-        scale : float, optional
-            Scale factor for the markers. Defaults to ``1``.
-        annotate_stations : bool, float, str, optional
-            If ``True`` (default), add the station names to the map.
+        scale
+            Scale factor for the markers.
+        annotate_stations
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
-        legend_refs : list, optional
+        legend_refs
             If set, a list of amplitudes that will be used to generate legend entries.
-        legend_labels : list, optional
+        legend_labels
             If set, a list of labels that will be used for ``legend_refs``.
-        month_range : tuple, optional
+        month_range
             By default, the phase range will be an entire year, and therefore circular.
             Pass a different range (in inclusive months, e.g., ``(5, 10)`` for all of May
             through all of October) to subset the range.
             This automatically switches to a non-circular colormap.
-        return_figure : bool, optional
-            If ``True`` (default: ``False``), return the figure and axis objects instead of
+        return_figure
+            If ``True``, return the figure and axis objects instead of
             showing the plot interactively. Only used if ``fname`` is not set.
-        save_kw_args : dict, optional
+        save_kw_args
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``fname`` is specified.
-        colorbar_kw_args : dict, optional
+        colorbar_kw_args
             (Only used if a phases are plotted.)
             If ``None`` (default), no colorbar is added to the plot. If a dictionary is passed,
             a colorbar is added, with the dictionary containing additional keyword arguments
             to the :meth:`~matplotlib.figure.Figure.colorbar` method.
-        gui_kw_args : dict, optional
+        gui_kw_args
             Override default GUI settings of :attr:`~disstans.config.defaults`.
+
+        Returns
+        -------
+            (Only if ``return_figure=True``) The Figure and Axis objects of the plot.
         """
         # preparations
         gui_settings = defaults["gui"].copy()
@@ -3426,22 +3639,25 @@ class Network():
             else:
                 plt.show()
 
-    def plot_availability(self, ts_description, sampling=Timedelta(1, "D"),
-                          sort_by_latitude=True, saveas=None):
+    def plot_availability(self,
+                          ts_description: str,
+                          sampling: Timedelta = Timedelta(1, "D"),
+                          sort_by_latitude: bool = True,
+                          saveas: str | None = None
+                          ) -> None:
         """
         Create an availability figure for the network.
 
         Parameters
         ----------
-        ts_description : str
+        ts_description
             The name of the timeseries to be used.
-        sampling : disstans.tools.Timedelta, optional
+        sampling
             Assume that breaks strictly larger than ``sampling`` constitute a data gap.
-            Defaults to daily.
-        sort_by_latitude : bool, optional
-            If ``True`` (default), sort the stations by latitude, else alphabetical.
+        sort_by_latitude
+            If ``True``, sort the stations by latitude, else alphabetical.
             (Always falls back to alphabetical if location information is missing.)
-        saveas : str, optional
+        saveas
             If provided, the figure will be saved at this location.
         """
         # find a sorting by latitude to match a map view,
