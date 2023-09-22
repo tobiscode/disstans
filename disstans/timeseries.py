@@ -3,6 +3,7 @@ This module contains the :class:`~Timeseries` base class and other
 formats included by default in DISSTANS.
 """
 
+from __future__ import annotations
 import zipfile
 import gzip
 import numpy as np
@@ -11,6 +12,7 @@ from io import BytesIO
 from warnings import warn
 from copy import deepcopy
 from pathlib import Path
+from typing import Literal
 
 from .tools import get_cov_dims, make_cov_index_map, get_cov_indices
 
@@ -26,33 +28,33 @@ class Timeseries():
 
     Parameters
     ----------
-    dataframe : pandas.DataFrame
+    dataframe
         The timeseries' data as a DataFrame. The index should be time, whereas
         data columns can be both data and their uncertainties.
-    src : str
+    src
         Source description.
-    data_unit : str
+    data_unit
         Data unit.
-    data_cols : list
+    data_cols
         List of strings with the names of the columns of ``dataframe`` that
         contain the data.
         The length cooresponds to the number of components :attr:`~num_components`.
-    var_cols : list, optional
+    var_cols
         List of strings with the names of the columns of ``dataframe`` that contain the
         data's variance.
         Must have the same length as ``data_cols``.
-        Defaults to no data variance columns.
-    cov_cols : list, optional
+        ``None`` defaults to no data variance columns.
+    cov_cols
         List of strings with the names of the columns of ``dataframe`` that contain
         the data's covariance.
         Must have length ``(num_components * (num_components - 1)) / 2``, where
         the order of the elements is determined by their row-by-row, sequential
         position in the covariance matrix (see Notes).
-        Defaults to no covariance columns.
-    remove_initial_offset : bool, optional
-        If ``True`` (default: ``False``), the data timeseries will be shifted such
-        that it starts at zero. The offset will be recorded in
-        :class:`~Timeseries.offset` if it needs to be recovered.
+        ``None`` defaults to no covariance columns.
+    remove_initial_offset
+        If ``True``, the data timeseries will be shifted such that it starts at zero.
+        The offset will be recorded in :class:`~Timeseries.offset` if it needs to be
+        recovered.
 
     Notes
     -----
@@ -69,8 +71,15 @@ class Timeseries():
     | (symmetric)       | (symmetric)       | ``var_cols[2]``   |
     +-------------------+-------------------+-------------------+
     """
-    def __init__(self, dataframe, src, data_unit, data_cols,
-                 var_cols=None, cov_cols=None, remove_initial_offset=False):
+    def __init__(self,
+                 dataframe: pd.DataFrame,
+                 src: str,
+                 data_unit: str,
+                 data_cols: list[str],
+                 var_cols: list[str] | None = None,
+                 cov_cols: list[str] | None = None,
+                 remove_initial_offset: bool = False
+                 ) -> None:
         # input type checks
         assert isinstance(dataframe, pd.DataFrame)
         assert dataframe.index.inferred_type == "datetime64"
@@ -139,14 +148,13 @@ class Timeseries():
         self.offset = offset
         """ Offset applied to the timeseries data such that it starts at zero. """
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Special function that returns a readable summary of the timeseries.
         Accessed, for example, by Python's ``print()`` built-in function.
 
         Returns
         -------
-        info : str
             Timeseries summary.
         """
         info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}" \
@@ -158,19 +166,18 @@ class Timeseries():
             info += f"\n - Covariances: {[key for key in self.cov_cols]}"
         return info
 
-    def __getitem__(self, columns):
+    def __getitem__(self, columns: str | list[str]) -> pd.Series | pd.DataFrame:
         """
         Convenience special function that provides a shorthand notation
         to access the timeseries' columns.
 
         Parameters
         ----------
-        columns : str, list
+        columns
             String or list of strings of the columns to return.
 
         Returns
         -------
-        pandas.Series, pandas.DataFrame
             Returns the requested data as a Series (if a single column) or
             DataFrame (if multiple columns).
 
@@ -190,35 +197,35 @@ class Timeseries():
         return self.df[columns]
 
     @property
-    def src(self):
+    def src(self) -> str:
         """ Source information. """
         return self._src
 
     @src.setter
-    def src(self, new_src):
+    def src(self, new_src: str) -> None:
         if not isinstance(new_src, str):
             raise TypeError(f"New 'src' attribute has to be a string, got {type(new_src)}.")
         self._src = new_src
 
     @property
-    def data_unit(self):
+    def data_unit(self) -> str:
         """ Data unit. """
         return self._data_unit
 
     @data_unit.setter
-    def data_unit(self, new_data_unit):
+    def data_unit(self, new_data_unit: str) -> None:
         if not isinstance(new_data_unit, str):
             raise TypeError("New 'data_unit' attribute has to be a string, "
                             f"got {type(new_data_unit)}.")
         self._data_unit = new_data_unit
 
     @property
-    def data_cols(self):
+    def data_cols(self) -> list[str]:
         """ List of the column names in :attr:`~df` that contain data. """
         return self._data_cols
 
     @data_cols.setter
-    def data_cols(self, new_data_cols):
+    def data_cols(self, new_data_cols: list[str]) -> None:
         assert isinstance(new_data_cols, list) and \
             all([isinstance(dcol, str) for dcol in new_data_cols]), \
             "New 'data_cols' attribute must be a list of strings of the same length as the " \
@@ -229,12 +236,12 @@ class Timeseries():
         self._data_cols = new_data_cols
 
     @property
-    def var_cols(self):
+    def var_cols(self) -> list[str] | None:
         """ List of the column names in :attr:`~df` that contain data variance. """
         return self._var_cols
 
     @var_cols.setter
-    def var_cols(self, new_var_cols):
+    def var_cols(self, new_var_cols: list[str | None]) -> None:
         assert self._var_cols is not None, \
             "No variance columns found that can be renamed."
         assert isinstance(new_var_cols, list) and \
@@ -250,12 +257,12 @@ class Timeseries():
         self._var_cols = new_var_cols
 
     @property
-    def cov_cols(self):
+    def cov_cols(self) -> list[str] | None:
         """ List of the column names in :attr:`~df` that contain data covariances. """
         return self._cov_cols
 
     @cov_cols.setter
-    def cov_cols(self, new_cov_cols):
+    def cov_cols(self, new_cov_cols: list[str | None]) -> None:
         assert self._cov_cols is not None, \
             "No covariance columns found that can be renamed."
         assert isinstance(new_cov_cols, list) and \
@@ -271,66 +278,66 @@ class Timeseries():
         self._cov_cols = new_cov_cols
 
     @property
-    def num_components(self):
+    def num_components(self) -> int:
         """ Number of data columns. """
         return len(self._data_cols)
 
     @property
-    def df(self):
+    def df(self) -> pd.DataFrame:
         """ The entire timeseries' DataFrame. """
         return self._df
 
     @property
-    def num_observations(self):
+    def num_observations(self) -> int:
         """ Number of observations (rows in :attr:`~df`). """
         return self._df.shape[0]
 
     @property
-    def data(self):
+    def data(self) -> pd.DataFrame:
         """ View of only the data columns in :attr:`~df`. """
         return self._df.loc[:, self._data_cols]
 
     @data.setter
-    def data(self, new_data):
+    def data(self, new_data: np.ndarray) -> None:
         self._df[self._data_cols] = new_data
 
     @property
-    def sigmas(self):
+    def sigmas(self) -> pd.DataFrame:
         """ View of only the data standard deviation columns in :attr:`~df`. """
         return self.vars ** (1/2)
 
     @sigmas.setter
-    def sigmas(self, new_sigma):
+    def sigmas(self, new_sigma: np.ndarray) -> None:
         self.vars = new_sigma ** 2
 
     @property
-    def vars(self):
+    def vars(self) -> pd.DataFrame:
         """ Returns the variances from :attr:`~df`. """
         if self._var_cols is None:
             raise ValueError("No variance columns present to return.")
         return self._df.loc[:, self._var_cols]
 
     @vars.setter
-    def vars(self, new_var):
+    def vars(self, new_var: np.ndarray) -> None:
         if self._var_cols is None:
             raise ValueError("No variance columns present to set.")
         self._df[self._var_cols] = new_var
 
     @property
-    def covs(self):
+    def covs(self) -> pd.DataFrame:
         """ Returns the covariances from :attr:`~df`. """
         if self._cov_cols is None:
             raise ValueError("No covariance columns present to return.")
         return self._df.loc[:, self._cov_cols]
 
     @covs.setter
-    def covs(self, new_cov):
+    def covs(self, new_cov: np.ndarray) -> None:
         if self._cov_cols is None:
             raise ValueError("No covariance columns present to set.")
         self._df[self._cov_cols] = new_cov
 
     @property
-    def var_cov(self):
+    def var_cov(self) -> pd.DataFrame:
         """
         Returns the variance as well as covariance columns from :attr:`~df`, to be indexed
         by :attr:`~var_cov_map` to yield the full variance-covariance matrix.
@@ -342,7 +349,7 @@ class Timeseries():
         return self._df.loc[:, self._var_cols + self._cov_cols]
 
     @var_cov.setter
-    def var_cov(self, new_var_cov):
+    def var_cov(self, new_var_cov: np.ndarray) -> None:
         cov_dims = get_cov_dims(self.num_components)
         assert new_var_cov.shape[1] == self.num_components + cov_dims, \
             "Setting 'var_cov' requires a column for each variance (first half of array, " \
@@ -351,12 +358,12 @@ class Timeseries():
         self.covs = new_var_cov[:, self.num_components:]
 
     @property
-    def time(self):
+    def time(self) -> pd.Index:
         """ Timestamps of the timeseries (index of :attr:`~df`). """
         return self._df.index
 
     @property
-    def shape(self):
+    def shape(self) -> tuple[int, int]:
         r"""
         Returns the shape tuple (similar to NumPy) of the timeseries, which is of shape
         :math:`(\text{n_observations},\text{n_components})`.
@@ -364,14 +371,14 @@ class Timeseries():
         return (self.num_observations, self.num_components)
 
     @property
-    def length(self):
+    def length(self) -> np.timedelta64:
         """
         Returns the length of the timeseries.
         """
         return self.time.max() - self.time.min()
 
     @property
-    def reliability(self):
+    def reliability(self) -> float:
         """
         Returns the reliability (between 0 and 1) defined as the number of available
         observations divided by the the number of expected observations. The expected
@@ -389,19 +396,18 @@ class Timeseries():
         # return ratio
         return self.num_observations / exp_obs
 
-    def cov_at(self, t):
+    def cov_at(self, t: pd.Timestamp | str | int) -> np.ndarray:
         """
         Returns the covariance matrix of the timeseries at a given time or index.
 
         Parameters
         ----------
-        t : pandas.Timestamp, str, int
+        t
             A timestamp or timestamp-convertable string to return the covariance
             matrix for. Alternatively, an integer index.
 
         Returns
         -------
-        cov_mat : numpy.ndarray
             The full covariance matrix at time ``t``.
         """
         # input checks
@@ -424,7 +430,13 @@ class Timeseries():
                                  (self.num_components, self.num_components))
         return cov_mat
 
-    def cut(self, t_min=None, t_max=None, i_min=None, i_max=None, keep_inside=True):
+    def cut(self,
+            t_min: pd.Timestamp | str | None = None,
+            t_max: pd.Timestamp | str | None = None,
+            i_min: int | None = None,
+            i_max: int | None = None,
+            keep_inside: bool = True
+            ) -> None:
         """
         Cut the timeseries to contain only data between certain times or indices.
         If both a minimum (maximum) timestamp or index is provided, the later (earlier,
@@ -436,18 +448,18 @@ class Timeseries():
 
         Parameters
         ----------
-        t_min : pandas.Timestamp, str, optional
+        t_min
             A timestamp or timestamp-convertable string of the earliest observation
             to keep.
-        t_max : pandas.Timestamp, str, optional
+        t_max
             A timestamp or timestamp-convertable string of the latest observation
             to keep.
-        i_min : int, optional
+        i_min
             The index of the earliest observation to keep.
-        i_max : int, optional
+        i_max
             The index of the latest observation to keep.
         keep_inside : bool, optional
-            If ``True`` (default), keeps data inside of the specified date range.
+            If ``True``, keeps data inside of the specified date range.
             If ``False``, keeps only data outside the specified date range.
         """
         assert any([t_min, t_max, i_min, i_max]), "No cutting operation defined."
@@ -479,24 +491,29 @@ class Timeseries():
         else:
             self._df = self._df[(self.time < cut_min) | (self.time > cut_max)]
 
-    def add_uncertainties(self, timeseries=None,
-                          var_data=None, var_cols=None, cov_data=None, cov_cols=None):
+    def add_uncertainties(self,
+                          timeseries: Timeseries | None = None,
+                          var_data: np.ndarray | None = None,
+                          var_cols: list[str] | None = None,
+                          cov_data: np.ndarray | None = None,
+                          cov_cols: list[str] | None = None
+                          ) -> None:
         """
         Add variance and covariance data and column names to the timeseries.
 
         Parameters
         ----------
-        timeseries : disstans.timeseries.Timeseries
+        timeseries
             Another timeseries object that contains uncertainty information.
             If set, the function will ignore the rest of the arguments.
-        var_data : numpy.ndarray, optional
+        var_data
             New data variance.
-        var_cols : list, optional
+        var_cols
             List of variance column names.
-        cov_data : numpy.ndarray, optional
+        cov_data
             New data covariance.
             Setting this but not ``var_data`` requires there to already be data variance.
-        cov_cols : list, optional
+        cov_cols
             List of covariance column names.
 
         Notes
@@ -577,18 +594,17 @@ class Timeseries():
             self.index_map, self.var_cov_map = make_cov_index_map(self.num_components)
             self._cov_cols = cov_cols
 
-    def copy(self, only_data=False, src=None):
+    def copy(self, only_data: bool = False, src: str | None = None) -> Timeseries:
         """
         Return a deep copy of the timeseries instance.
 
         Parameters
         ----------
-        only_data : bool, optional
+        only_data
             If ``True``, only copy the data columns and ignore any uncertainty information.
-            Defaults to ``False``.
         src : str, optional
             Set a new source information attribute for the copy.
-            Uses the current one by default.
+            Uses the current one if ``None``.
 
         Returns
         -------
@@ -604,16 +620,16 @@ class Timeseries():
             return Timeseries(self._df[self._data_cols].copy(), new_name,
                               deepcopy(self._data_unit), deepcopy(self._data_cols), None, None)
 
-    def convert_units(self, factor, new_data_unit):
+    def convert_units(self, factor: float, new_data_unit: str) -> None:
         """
         Convert the data and covariances to a new data unit by providing a
         conversion factor.
 
         Parameters
         ----------
-        factor : float
+        factor
             Factor to multiply the data by to obtain the data in the new units.
-        new_data_unit : str
+        new_data_unit
             New data unit to be saved in the :attr:`~data_cols` attribute.
         """
         # input checks
@@ -633,14 +649,14 @@ class Timeseries():
         if self._cov_cols is not None:
             self._df.loc[:, self._cov_cols] *= factor**2
 
-    def mask_out(self, dcol):
+    def mask_out(self, dcol: str) -> None:
         """
         Mask out an entire data column (and if present, its uncertainty column) by setting
         the entire column to ``NaN``. Converts it to a sparse representation to save memory.
 
         Parameters
         ----------
-        dcol : str
+        dcol
             Name of the data column to mask out.
         """
         icomp = self._data_cols.index(dcol)
@@ -657,7 +673,10 @@ class Timeseries():
                     self._df[ccol] = self._df[ccol].astype(pd.SparseDtype(dtype=float))
 
     @staticmethod
-    def prepare_math(left, right, operation):
+    def prepare_math(left: Timeseries | np.ndarray,
+                     right: Timeseries | np.ndarray,
+                     operation: Literal["+", "-", "*", "/"]
+                     ) -> (np.ndarray, np.ndarray, str, str, list[str], pd.Index):
         r"""
         Tests two timeseries' ability to be cast together in a mathematical operation,
         and returns output characteristics.
@@ -671,36 +690,30 @@ class Timeseries():
         :attr:`~data_unit` and :attr:`~data_cols` attributes (instead of a combination
         of both).
 
-        Warning
-        -------
-        This method is called under-the-hood whenever a mathematical operation is
-        performed, and should not need to be used by normal users.
-
         Parameters
         ----------
-        left : Timeseries or numpy.ndarray
+        left
             Left term of the operation.
-        right : Timeseries or numpy.ndarray
+        right
             Right term of the operation.
-        operation : str
+        operation
             Operation to perform.
-            Possible values are ``'+'``, ``'-'``, ``'*'`` and ``'/'``.
 
         Returns
         -------
-        left_data : numpy.ndarray
+        left_data
             View of the 2D left data array of the operation
             with shape (``len(out_time)``, :attr:`~num_components`).
-        right_data : numpy.ndarray
+        right_data
             View of the 2D right data array of the operation
             with shape (``len(out_time)``, :attr:`~num_components`).
-        out_src : str
+        out_src
             Combines the sources of each object to a new string.
-        out_data_unit : str
+        out_data_unit
             Combines the data units of each object into a new unit.
-        out_data_cols : list
+        out_data_cols
             List of strings containing the new data column names.
-        out_time : pandas.Index
+        out_time
             Index object containing the indices of all timestamps common to both.
 
         Raises
@@ -715,6 +728,11 @@ class Timeseries():
         AssertionError
             If one of the operands is a NumPy array but does not have the same number of
             rows as the other operand.
+
+        Warning
+        -------
+        This method is called under-the-hood whenever a mathematical operation is
+        performed, and should not need to be used by normal users.
 
         See Also
         --------
@@ -796,19 +814,18 @@ class Timeseries():
         # return data unit and column names
         return left_data, right_data, out_src, out_data_unit, out_data_cols, out_time
 
-    def __add__(self, other):
+    def __add__(self, other: Timeseries) -> Timeseries:
         """
         Special function that allows two timeseries instances (or a timeseries and
         an equivalently shaped NumPy array) to be added together element-wise.
 
         Parameters
         ----------
-        other : Timeseries
+        other
             Timeseries to add to instance.
 
         Returns
         -------
-        Timeseries
             New timeseries object containing the sum of the two timeseries.
 
         See Also
@@ -829,7 +846,7 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __radd__(self, other):
+    def __radd__(self, other: Timeseries) -> Timeseries:
         """
         Reflected operation of :meth:`~__add__` (necessary if first operand is a NumPy array).
         """
@@ -839,19 +856,18 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Timeseries) -> Timeseries:
         """
         Special function that allows a timeseries instance (or a timeseries and
         an equivalently shaped NumPy array) to be subtracted from another element-wise.
 
         Parameters
         ----------
-        other : Timeseries
+        other
             Timeseries to subtract from instance.
 
         Returns
         -------
-        Timeseries
             New timeseries object containing the difference of the two timeseries.
 
         See Also
@@ -872,7 +888,7 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __rsub__(self, other):
+    def __rsub__(self, other: Timeseries) -> Timeseries:
         """
         Reflected operation of :meth:`~__sub__` (necessary if first operand is a NumPy array).
         """
@@ -882,19 +898,18 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __mul__(self, other):
+    def __mul__(self, other: Timeseries) -> Timeseries:
         """
         Special function that allows two timeseries instances (or a timeseries and
         an equivalently shaped NumPy array) to be multiplied together element-wise.
 
         Parameters
         ----------
-        other : Timeseries
+        other
             Timeseries to multiply to instance.
 
         Returns
         -------
-        Timeseries
             New timeseries object containing the product of the two timeseries.
 
         See Also
@@ -915,7 +930,7 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: Timeseries) -> Timeseries:
         """
         Reflected operation of :meth:`~__mul__` (necessary if first operand is a NumPy array).
         """
@@ -925,19 +940,18 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: Timeseries) -> Timeseries:
         """
         Special function that allows a timeseries instances (or a timeseries and
         an equivalently shaped NumPy array) to be divided by another element-wise.
 
         Parameters
         ----------
-        other : Timeseries
+        other
             Timeseries to divide instance by.
 
         Returns
         -------
-        Timeseries
             New timeseries object containing the quotient of the two timeseries.
 
         See Also
@@ -958,7 +972,7 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, other: Timeseries) -> Timeseries:
         """
         Reflected operation of :meth:`~__truediv__` (necessary if first operand is a NumPy array).
         """
@@ -968,7 +982,7 @@ class Timeseries():
                                        index=out_time, columns=out_data_cols),
                           out_src, out_unit, out_data_cols)
 
-    def get_arch(self):
+    def get_arch(self) -> dict:
         """
         Build a dictionary describing the architecture of this timeseries,
         to be used when creating a network JSON configuration file.
@@ -988,24 +1002,27 @@ class Timeseries():
         return {}
 
     @classmethod
-    def from_fit(cls, data_unit, data_cols, fit):
+    def from_fit(cls,
+                 data_unit: str,
+                 data_cols: list[str],
+                 fit: dict[str, np.ndarray | None]
+                 ) -> Timeseries:
         """
         Import a fit dictionary and create a Timeseries instance.
 
         Parameters
         ----------
-        data_unit : str
+        data_unit
             Data unit.
-        data_cols : list
+        data_cols
             List of strings containing the data column names.
             Uncertainty column names are generated by adding a '_var'.
-        fit : dict
+        fit
             Dictionary with the keys ``'time'``, ``'fit'``, ``'var'`` and ``'cov'``
             (the latter two can be set to ``None``).
 
         Returns
         -------
-        Timeseries
             Timeseries instance created from ``fit``.
 
         See Also
@@ -1030,46 +1047,59 @@ class Timeseries():
         return cls(df, "fitted", data_unit, data_cols, var_cols, cov_cols)
 
     @classmethod
-    def from_array(cls, timevector, data, src, data_unit, data_cols,
-                   var=None, var_cols=None, cov=None, cov_cols=None):
+    def from_array(cls,
+                   timevector: pd.Series | pd.DatetimeIndex,
+                   data: np.ndarray,
+                   src: str,
+                   data_unit: str,
+                   data_cols: str,
+                   var: np.ndarray | None = None,
+                   var_cols: list[str] | None = None,
+                   cov: np.ndarray | None = None,
+                   cov_cols: list[str] | None = None
+                   ) -> Timeseries:
         r"""
         Constructor method to create a :class:`~Timeseries` instance from a NumPy
         :class:`~numpy.ndarray`.
 
         Parameters
         ----------
-        timevector : pandas.Series, pandas.DatetimeIndex
+        timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
-        data : numpy.ndarray
+        data
             2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
             containing the data.
-        src : str
+        src
             Source description.
-        data_unit : str
+        data_unit
             Data unit.
-        data_cols : list
+        data_cols
             List of strings with the names of the columns of ``data``.
-        var : numpy.ndarray, optional
+        var
             2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
             containing the data variances.
-            Defaults to no data uncertainty.
-        var_cols : list, optional
+            ``None`` defaults to no data uncertainty.
+        var_cols
             List of strings with the names of the columns of ``data`` that contain the
             data's variance.
             Must have the same length as ``data_cols``.
             If ``var`` is given but ``var_cols`` is not, it defaults to appending
             ``'_var'`` to ``data_cols``.
-        cov : numpy.ndarray, optional
+        cov
             2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
             containing the data covariances (as defined in :class:`~Timeseries`).
-            Defaults to no data uncertainty.
-        cov_cols : list, optional
+            ``None`` defaults to no data uncertainty.
+        cov_cols
             List of strings with the names of the columns of ``data`` that contain the
             data's covariance.
             Must have the same length as ``data_cols``.
             If ``cov`` is given but ``cov_cols`` is not, it defaults to appending
             ``'_cov'`` to the two respective entries of ``data_cols``.
+
+        Returns
+        -------
+            The generated Timeseries object.
 
         See Also
         --------
@@ -1127,13 +1157,12 @@ class GipsyTimeseries(Timeseries):
 
     Parameters
     ----------
-    path : str
+    path
         Path to the timeseries file.
-    show_warnings : bool, optional
+    show_warnings
         If ``True``, warn if there are data inconsistencies encountered while loading.
-        Defaults to ``True``.
-    data_unit : str, optional
-        Can be ``'mm'`` (default) or ``'m'``.
+    data_unit
+        Can be ``'mm'`` or ``'m'``.
 
 
     Additional keyword arguments will be passed onto :class:`~Timeseries`.
@@ -1168,7 +1197,12 @@ class GipsyTimeseries(Timeseries):
 repro2018a/raw/position/envseries/0000_README.format
 
     """
-    def __init__(self, path, show_warnings=True, data_unit="mm", **kw_args):
+    def __init__(self,
+                 path: str,
+                 show_warnings: bool = True,
+                 data_unit: Literal["mm", "m"] = "mm",
+                 **kw_args
+                 ) -> None:
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1215,7 +1249,7 @@ repro2018a/raw/position/envseries/0000_README.format
                          data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols,
                          **kw_args)
 
-    def get_arch(self):
+    def get_arch(self) -> dict:
         """
         Returns a JSON-compatible dictionary with all the information necessary to recreate
         the Timeseries instance (provided the data file is available).
@@ -1242,13 +1276,12 @@ class UNRTimeseries(Timeseries):
 
     Parameters
     ----------
-    path : str
+    path
         Path to the timeseries file.
-    show_warnings : bool, optional
+    show_warnings
         If ``True``, warn if there are data inconsistencies encountered while loading.
-        Defaults to ``True``.
     data_unit : str, optional
-        Can be ``'mm'`` (default) or ``'m'``.
+        Can be ``'mm'`` or ``'m'``.
 
 
     Additional keyword arguments will be passed onto :class:`~Timeseries`.
@@ -1305,7 +1338,12 @@ class UNRTimeseries(Timeseries):
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
 
     """
-    def __init__(self, path, show_warnings=True, data_unit="mm", **kw_args):
+    def __init__(self,
+                 path: str,
+                 show_warnings: bool = True,
+                 data_unit: Literal["mm", "m"] = "mm",
+                 **kw_args
+                 ) -> None:
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1392,7 +1430,7 @@ class UNRTimeseries(Timeseries):
                          cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"],
                          **kw_args)
 
-    def get_arch(self):
+    def get_arch(self) -> dict:
         """
         Returns a JSON-compatible dictionary with all the information necessary to recreate
         the Timeseries instance (provided the data file is available).
@@ -1419,13 +1457,12 @@ class UNRHighRateTimeseries(Timeseries):
 
     Parameters
     ----------
-    path : str
+    path
         Path to the timeseries file.
-    show_warnings : bool, optional
+    show_warnings
         If ``True``, warn if there are data inconsistencies encountered while loading.
-        Defaults to ``True``.
-    data_unit : str, optional
-        Can be ``'mm'`` (default) or ``'m'``.
+    data_unit
+        Can be ``'mm'`` or ``'m'``.
 
 
     Additional keyword arguments will be passed onto :class:`~Timeseries`.
@@ -1462,7 +1499,12 @@ class UNRHighRateTimeseries(Timeseries):
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_kenv.txt
 
     """
-    def __init__(self, path, show_warnings=True, data_unit="mm", **kw_args):
+    def __init__(self,
+                 path: str,
+                 show_warnings: bool = True,
+                 data_unit: Literal["mm", "m"] = "mm",
+                 **kw_args
+                 ) -> None:
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1557,7 +1599,7 @@ class UNRHighRateTimeseries(Timeseries):
                          var_cols=["east_var", "north_var", "up_var"],
                          **kw_args)
 
-    def get_arch(self):
+    def get_arch(self) -> dict:
         """
         Returns a JSON-compatible dictionary with all the information necessary to recreate
         the Timeseries instance (provided the data file is available).

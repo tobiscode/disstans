@@ -8,6 +8,7 @@ import pandas as pd
 from tqdm import tqdm
 from okada_wrapper import dc3d0wrapper as dc3d0
 from warnings import warn
+from typing import Any
 
 from .config import defaults
 from .tools import parallelize
@@ -49,7 +50,7 @@ def okada_displacement(station_lla: list[float], eq_catalog_row: pd.Series) -> n
     return station_disp.squeeze()
 
 
-def _okada_get_displacements(station_and_parameters):
+def _okada_get_displacements(station_and_parameters: tuple[Any]) -> np.ndarray:
     """
     Parallelizable sub-function of okada_prior that for a single earthquake
     source calculates the displacement response for many locations.
@@ -82,7 +83,7 @@ def _okada_get_displacements(station_and_parameters):
     return disp
 
 
-def _okada_get_cumdisp(time_station_settings):
+def _okada_get_cumdisp(time_station_settings: tuple[Any]) -> list[str]:
     """
     Parallelizable sub-function of okada_prior that for a single station
     calculates the cumulative displacements at the timestamps contained
