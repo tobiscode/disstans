@@ -546,7 +546,7 @@ class Station():
     def sum_fits(self,
                  ts_description: str,
                  fit_list: list[str] | None = None
-                 ) -> (np.ndarray, np.ndarray | None):
+                 ) -> tuple[np.ndarray, np.ndarray | None]:
         r"""
         Method to quickly sum fits of a timeseries.
 
@@ -614,11 +614,11 @@ class Station():
         t_start
             If set, specify a lower bound for the analysis. ``t_start`` should be a
             Timestamp-convertible string of the start time, or a datetime-like object.
-            Defaults to the first timestamp present in the timeseries.
+            ``None`` defaults to the first timestamp present in the timeseries.
         t_end
             If set, specify an upper bound for the analysis. ``t_end`` should be a
             Timestamp-convertible string of the end time, or a datetime-like object.
-            Defaults to the last timestamp present in the timeseries.
+            ``None`` defaults to the last timestamp present in the timeseries.
         mean
             If ``True``, calculate the mean of the timeseries.
             Adds the key ``'Mean'`` to the output dictionary.
@@ -636,7 +636,7 @@ class Station():
             If ``std_outlier > 0``, count the number of non-NaN outliers, defined
             by the number of standard deviations they are away from the mean.
             Adds the key ``'Outliers'`` to the output dictionary.
-        max_rolling_dev : int, optional
+        max_rolling_dev
             If ``max_rolling_dev > 0``, calculate the (sign-aware) maximum of the
             rolling deviation from the mean with window size ``max_rolling_dev`` for
             each component. If this is significantly larger than the standard deviation,
@@ -718,7 +718,7 @@ class Station():
                   include_sigma: bool = False,
                   time_unit: str = "D",
                   ignore_missing: bool = False
-                  ) -> (np.ndarray | None, np.ndarray | None):
+                  ) -> tuple[np.ndarray | None, np.ndarray | None]:
         r"""
         Calculates a linear trend through the desired model fits and over some time span.
 
@@ -735,7 +735,7 @@ class Station():
             List of the numerical indices of which components of the timeseries to use.
             ``None`` defaults to all components.
         total
-            By default (``False``), the function will return the trend per ``time_unit``.
+            By default, the function will return the trend per ``time_unit``.
             If ``True``, the function will instead give the total difference over the
             entire timespan.
         t_start
@@ -753,7 +753,7 @@ class Station():
         time_unit
             Time unit for output (only required if ``total=False``).
         ignore_missing
-            By default (``False``), this method will throw an error if the timeseries or
+            By default, this method will throw an error if the timeseries or
             the models are not present in  the station. Set to ``True`` if the method
             should return ``(None, None)`` instead (as done when the requested timespan
             is outside the observed one).

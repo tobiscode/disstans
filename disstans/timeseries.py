@@ -458,7 +458,7 @@ class Timeseries():
             The index of the earliest observation to keep.
         i_max
             The index of the latest observation to keep.
-        keep_inside : bool, optional
+        keep_inside
             If ``True``, keeps data inside of the specified date range.
             If ``False``, keeps only data outside the specified date range.
         """
@@ -602,7 +602,7 @@ class Timeseries():
         ----------
         only_data
             If ``True``, only copy the data columns and ignore any uncertainty information.
-        src : str, optional
+        src
             Set a new source information attribute for the copy.
             Uses the current one if ``None``.
 
@@ -676,7 +676,7 @@ class Timeseries():
     def prepare_math(left: Timeseries | np.ndarray,
                      right: Timeseries | np.ndarray,
                      operation: Literal["+", "-", "*", "/"]
-                     ) -> (np.ndarray, np.ndarray, str, str, list[str], pd.Index):
+                     ) -> tuple[np.ndarray, np.ndarray, str, str, list[str], pd.Index]:
         r"""
         Tests two timeseries' ability to be cast together in a mathematical operation,
         and returns output characteristics.
@@ -1280,7 +1280,7 @@ class UNRTimeseries(Timeseries):
         Path to the timeseries file.
     show_warnings
         If ``True``, warn if there are data inconsistencies encountered while loading.
-    data_unit : str, optional
+    data_unit
         Can be ``'mm'`` or ``'m'``.
 
 

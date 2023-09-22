@@ -294,7 +294,6 @@ class Model():
 
         Returns
         -------
-        arch
             Model keyword dictionary. Must have keys ``'type'`` and ``'kw_args'``,
             with a string and a dictionary as values, respectively.
         """
@@ -312,13 +311,13 @@ class Model():
         Parameters
         ----------
         parameters
-            If ``True`` (default), include the read-in parameters in the copy
+            If ``True``, include the read-in parameters in the copy
             (:attr:`~par`), otherwise leave empty.
         covariances
-            If ``True`` (default), include the read-in (co)variances in the copy
+            If ``True``, include the read-in (co)variances in the copy
             (:attr:`~cov`), otherwise leave empty.
         active_parameters
-            If ``True`` (default), include the active parameter setting in the copy
+            If ``True``, include the active parameter setting in the copy
             (:attr:`~active_parameters`), otherwise leave empty.
 
         Returns
@@ -866,7 +865,7 @@ class BSpline(Model):
     time_unit
         Time unit of scale, spacing and model parameters.
     num_splines
-        Number of splines, separated by ``spacing``. Defaults to ``1``.
+        Number of splines, separated by ``spacing``.
     spacing
         Spacing between the center times when multiple splines are created.
         ``None`` defaults to ``scale``.
@@ -1145,7 +1144,7 @@ class BaseSplineSet(Model):
     splines
         List of spline model objects.
     internal_scaling
-        By default (``internal_scaling=True``), in order to influence the tradeoff between
+        By default, in order to influence the tradeoff between
         splines of different timescales, the mapping matrix of each spline is scaled by its
         own time scale to promote using fewer components. Without this, there would be an
         ambiguity for the solver as to whether fit the signal using many smaller scales or
@@ -1212,7 +1211,7 @@ class BaseSplineSet(Model):
         ----------
         zero_threshold
             Model parameters with absolute values below ``zero_threshold`` will be
-            set inactive. Defaults to ``1e-10``.
+            set inactive.
 
         See Also
         --------
@@ -1577,7 +1576,7 @@ class DecayingSplineSet(BaseSplineSet):
     time_unit
         Time unit of scale, spacing and model parameters.
     splineclass
-        Model class to use for the splines. Defaults to :class:`~disstans.models.ISpline`.
+        Model class to use for the splines.
 
 
     See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
@@ -2324,7 +2323,6 @@ class ModelCollection():
 
         Returns
         -------
-        arch : dict
             Model keyword dictionary.
         """
         arch = {"type": "ModelCollection",
@@ -2649,7 +2647,6 @@ class ModelCollection():
             valid indices.
         ignore_active_parameters
             If ``True``, do not set inactive parameters to zero to avoid estimation.
-            Defaults to ``False``.
 
         Returns
         -------

@@ -136,7 +136,7 @@ def okada_prior(network: Network,
     target_model_regularize
         Whether to mark the model for regularization or not.
     no_pbar
-        Suppress the progress bar with ``True`` (default: ``False``).
+        Suppress the progress bar with ``True``.
     catalog_prior_kw_args
         A dictionary fine-tuning the displacement calculation and modeling, see
         :attr:`~disstans.config.defaults` for explanations and defaults.

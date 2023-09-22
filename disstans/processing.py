@@ -141,7 +141,7 @@ class ExpandingRollingIndexer(BaseIndexer):
                           center: Any,
                           closed: Any,
                           step: Any
-                          ) -> (np.ndarray, np.ndarray):
+                          ) -> tuple[np.ndarray, np.ndarray]:
         """
         This is the function that needs to be implemented for the
         :class:`~pandas.api.indexers.BaseIndexer` class to be used for all
@@ -228,7 +228,7 @@ def decompose(array: np.ndarray,
               method: str,
               num_components: int = 1,
               return_sources: bool = False
-              ) -> (np.ndarray, np.ndarray | None, np.ndarray | None):
+              ) -> tuple[np.ndarray, np.ndarray | None, np.ndarray | None]:
     r"""
     Decomposes the input signal into different components using PCA or ICA.
 
@@ -446,7 +446,7 @@ def clean(station: Station,
 def midas(ts: Timeseries,
           steps: pd.Series | pd.DateTimeIndex | None = None,
           tolerance: float = 0.001
-          ) -> (Polynomial, Timeseries, dict[str, Any]):
+          ) -> tuple[Polynomial, Timeseries, dict[str, Any]]:
     """
     This function performs the MIDAS estimate as described by [blewitt16]_.
     It is adapted from the Fortran code provided by the author (see
@@ -460,21 +460,21 @@ def midas(ts: Timeseries,
 
     Parameters
     ----------
-    ts : disstans.timeseries.Timeseries
+    ts
         Timeseries to perform the MIDAS algorithm on.
-    steps : pandas.Series, pandas.DatetimeIndex, optional
+    steps
         If given, a pandas Series or Index of step times, across which no pairs
         should be formed.
-    tolerance : float, optional
+    tolerance
         Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).
 
     Returns
     -------
-    mdl : disstans.models.Polynomial
+    mdl
         Fitted polynomial (offset & constant velocity) model.
-    res : disstans.timeseries.Timeseries
+    res
         Residual timeseries.
-    stats : dict
+    stats
         Fittings statistics computed along the way.
         ``'num_epochs'``, ``'num_used'``, ``'num_pairs'``, and ``'nstep'`` are the number of
         epochs in ``ts``, the number of epochs used in the velocity pairs, the number of pairs
@@ -688,7 +688,7 @@ class StepDetector():
                     ywindow: np.ndarray,
                     valid: np.ndarray | None = None,
                     maxdel: float = 10.0
-                    ) -> (int, float, (float | None, float | None)):
+                    ) -> tuple[int, float, (float | None, float | None)]:
         r"""
         For a single window (of arbitrary, but odd length), perform the AIC hypothesis test
         whether a step is likely present (H1) or not (H0) in the ``y`` data given
@@ -789,7 +789,7 @@ class StepDetector():
             return 0, Delta_best[best_hyp], (rss0/n_total, rss1/n_total)
 
     @staticmethod
-    def _search(data_and_params: tuple[Any]) -> (np.ndarray, np.ndarray, np.ndarray):
+    def _search(data_and_params: tuple[Any]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Parallelizable part of the search, search_network and search_catalog methods.
         """
@@ -884,7 +884,7 @@ class StepDetector():
                x: np.ndarray,
                y: np.ndarray,
                maxdel: float = 10.0
-               ) -> (np.ndarray, np.ndarray, np.ndarray):
+               ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         r"""
         Function that will search for steps in the data.
         Upon successful completion, it will return the relative step probabilities
@@ -934,7 +934,7 @@ class StepDetector():
                        gap_unit: str = "D",
                        aggregate_components: bool = True,
                        no_pbar: bool = False
-                       ) -> (pd.DataFrame, list):
+                       ) -> tuple[pd.DataFrame, list]:
         r"""
         Function that searches for steps in an entire network (possibly in parallel),
         thresholds those probabilities, and identifies all the consecutive ranges in which
@@ -1050,7 +1050,7 @@ class StepDetector():
                        gap_unit: str = "D",
                        keep_nan_probs: bool = True,
                        no_pbar: bool = False
-                       ) -> (pd.DataFrame, list):
+                       ) -> tuple[pd.DataFrame, list]:
         r"""
         Search a dictionary of potential step times for each station in the dictionary
         and assess the probability for each one.

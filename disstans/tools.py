@@ -192,7 +192,7 @@ def get_cov_dims(num_components: int) -> int:
     return int((num_components * (num_components - 1)) / 2)
 
 
-def make_cov_index_map(num_components: int) -> (np.ndarray, np.ndarray):
+def make_cov_index_map(num_components: int) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Given a number of components, create a matrix that shows the indexing
     of where covariance columns present in a timeseries' or model's 2D dataframe
@@ -656,7 +656,7 @@ def parse_maintenance_table(csvpath: str,
                             exclude: list[str] | None = None,
                             include: list[str] | None = None,
                             verbose: bool = False
-                            ) -> (pd.DataFrame, dict[str, list]):
+                            ) -> tuple[pd.DataFrame, dict[str, list]]:
     """
     Function that loads a maintenance table from a .csv file (or similar) and returns
     a list of step times for each station. It also provides an interface to ignore
@@ -1189,7 +1189,7 @@ def parse_unr_steps(filepath: str,
                     check_update: bool = True,
                     only_stations: list[str] | None = None,
                     verbose: bool = False
-                    ) -> (pd.DataFrame, dict[str, list], pd.DataFrame, dict[str, list]):
+                    ) -> tuple[pd.DataFrame, dict[str, list], pd.DataFrame, dict[str, list]]:
     """
     This functions parses the main step file from UNR and produces two step databases,
     one for maintenance and one for earthquake-related events.
@@ -1316,7 +1316,7 @@ def get_hom_vel_strain_rot(locations: np.ndarray,
                            covariances: np.ndarray | None = None,
                            utmzone: int | None = None,
                            reference: int | list = 0
-                           ) -> (np.ndarray, np.ndarray, np.ndarray):
+                           ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""
     For a set of horizontal velocities on a 2D cartesian grid, estimate the
     best-fit displacement gradient matrix to calculate a homogenous velocity
@@ -1503,7 +1503,7 @@ def estimate_euler_pole(locations: np.ndarray,
                         velocities: np.ndarray,
                         covariances: np.ndarray | None = None,
                         enu: bool = True
-                        ) -> (np.ndarray, np.ndarray):
+                        ) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Estimate a best-fit Euler pole assuming all velocities lie on the same
     rigid plate on a sphere. The calculations are based on [goudarzi14]_.
@@ -2485,8 +2485,8 @@ class RINEXDataHolding():
                            gui_settings: dict,
                            annotate_stations: bool,
                            figsize: tuple
-                           ) -> (mpl.Figure, mpl.Axis, ccrs.CRS, ccrs.CRS,
-                                 matplotlib.collections.PathCollection, list[str]):
+                           ) -> tuple[mpl.Figure, mpl.Axis, ccrs.CRS, ccrs.CRS,
+                                      matplotlib.collections.PathCollection, list[str]]:
         # get location data and projections
         stat_lats = self.locations_lla["lat"].values
         stat_lons = self.locations_lla["lon"].values
