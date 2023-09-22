@@ -46,23 +46,23 @@ class Network():
 
     Parameters
     ----------
-    name : str
+    name
         Name of the network.
-    default_location_path : str, optional
+    default_location_path
         If station locations aren't given directly, check for a file with this path for the
         station's location.
         It needs to be an at-least four-column, space-separated text file with the entries
         ``name latitude[°] longitude[°] altitude[m]``. Existing headers have to be able to be
         identified as not being floats in the coordinate columns.
-    auto_add : bool, optional
+    auto_add
         If true, instatiation will automatically add all stations found in
         ``default_location_path``.
         If ``default_location_path`` is not set, this option is ignored.
-    auto_add_filter : numpy.ndarray, optional
+    auto_add_filter
         If passed alongside ``default_location_path`` and ``auto_add``, network instantiation
         will only add stations within the latitude, longitude polygon defined by
         ``auto_add_filter`` (shape :math:`(\text{num_points}, \text{2})`).
-    default_local_models : dict, optional
+    default_local_models
         Add a default selection of models for the stations.
     """
     def __init__(self,
@@ -171,7 +171,7 @@ class Network():
 
         Returns
         -------
-        info : str
+        info
             Network summary.
         """
         info = f"Network {self.name}\n" + \
@@ -680,14 +680,14 @@ class Network():
 
         Parameters
         ----------
-        target_ts : str
+        target_ts
             Timeseries description to add the models to.
-        hidden_ts : str, optional
+        hidden_ts
             Description of the timeseries that contains the unused model.
-            Defaults to ``target_ts``.
-        models : list, optional
+            ``None`` defaults to ``target_ts``.
+        models
             List of strings containing the model names of the subset of the default
-            local models to add. Defaults to all hidden models.
+            local models to add. ``None`` defaults to all hidden models.
         """
         assert isinstance(target_ts, str), \
             f"'target_ts' must be string, got {type(target_ts)}."
@@ -911,7 +911,7 @@ class Network():
             Solver function to use. If given a string, will look for a solver with that
             name in :mod:`~disstans.solvers`, otherwise will use the passed function as a
             solver (which needs to adhere to the same input/output structure as the
-            included solver functions). Defaults to standard linear least squares.
+            included solver functions).
         local_input
             Provides the ability to pass individual keyword arguments to the solver,
             potentially overriding the (global) keywords in ``kw_args``.
@@ -1021,7 +1021,7 @@ class Network():
                    num_threads_evaluate: int | None = None,
                    roll_mean_kernel: int = 30,
                    **cvxpy_kw_args
-                   ) -> (dict[str, Any], dict[str, Solution] | None):
+                   ) -> tuple[dict[str, Any], dict[str, Solution] | None]:
         r"""
         Fit the models for a specific timeseries at all stations using the
         spatiotemporal capabilities of :func:`~disstans.solvers.lasso_regression`,
@@ -1135,7 +1135,7 @@ class Network():
             If ``True``, the fitted models are evaluated at each iteration to calculate
             residual and fit statistics. These extended statistics are added to
             ``statistics`` (see Returns below).
-        keep_mdl_res_as : tuple, optional
+        keep_mdl_res_as
             If ``extended_stats=True``, the network's models are evaluated, and a model fit and
             residuals timeseries are created. Between iterations, they are removed by default,
             but passing this parameter a 2-element tuple of strings keeps the evaluated model
@@ -1571,7 +1571,7 @@ class Network():
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
             :class:`~pandas.DatetimeIndex` of when to evaluate the model.
-            Defaults to the timestamps of the timeseries itself.
+            ``None`` defaults to the timestamps of the timeseries itself.
         output_description
             If provided, add the sum of the evaluated models as a new timeseries
             to each station with the provided description (instead of only adding
@@ -1633,8 +1633,8 @@ class Network():
     @staticmethod
     def _evaluate_single_station(parameter_tuple: (pd.Series | pd.DatetimeIndex,
                                                    ModelCollection)
-                                 ) -> (dict[str, np.ndarray],
-                                       dict[str, dict[str, np.ndarray]]):
+                                 ) -> tuple[dict[str, np.ndarray],
+                                            dict[str, dict[str, np.ndarray]]]:
         station_time, station_models = parameter_tuple
         sumfit = station_models.evaluate(station_time)
         mdlfit = {}
@@ -1680,7 +1680,7 @@ class Network():
             using the first or second element of a tuple, respectively.
             Leave ``None`` if only overriding one of them.
         no_pbar
-            Suppress the progress bars with ``True`` (default: ``False``).
+            Suppress the progress bars with ``True``.
         **kw_args
             Additional keyword arguments that are passed on to the solver function,
             see :meth:`~fit`.
@@ -1757,7 +1757,7 @@ class Network():
         ts_out
             Name of the timeseries that the output of ``func`` should be assigned to.
             ``None`` defaults to overwriting ``ts_in``.
-        no_pbar : bool, optional
+        no_pbar
             Suppress the progress bar with ``True``.
         **kw_args
             Additional keyword arguments to be passed onto ``func``.
@@ -2175,7 +2175,7 @@ class Network():
         use_vars
             If ``True``, use the formal parameter variances in the model during the
             inversion. If ``False``, all velocities will be weighted equally.
-        use_covs : bool, optional
+        use_covs
             If ``True`` and ``use_vars=True``, also use the formal parameter covariance
             for the inversion.
         utmzome
@@ -2323,8 +2323,7 @@ class Network():
         subset_stations
             If set, a list of strings that contains the names of stations to be used.
         extrapolate
-            If ``True`` (default), the velocity will be predicted for all stations in
-            the network.
+            If ``True``, the velocity will be predicted for all stations in the network.
             If ``False``, the prediction will only be made for the station subset being
             used in the inversion. Note that ``False`` is only different from ``True``
             if ``subset_stations`` is set.
@@ -2587,7 +2586,7 @@ class Network():
             If ``True``, when clicking on a station, print its details (see
             :meth:`~disstans.station.Station.__str__`).
         annotate_stations
-            If ``True`` (default), add the station names to the map.
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
         save
@@ -2602,7 +2601,7 @@ class Network():
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``save=True``.
         scalogram_kw_args
-            If passed, also plot a scalogram. Defaults to no scalogram shown.
+            If passed, also plot a scalogram. ``None`` defaults to no scalogram shown.
             The dictionary has to contain ``'ts'`` and ``'model'`` keys. The string values
             are the names of the timeseries and associated model that are of the
             :class:`~disstans.models.BaseSplineSet` class, and therefore have a
@@ -2630,7 +2629,7 @@ class Network():
             as parsed by :func:`~disstans.tools.parse_maintenance_table`).
         trend_kw_args
             If passed, also plot velocity trends on the station map.
-            Defaults to no velocity arrows shown.
+            ``{}`` defaults to no velocity arrows shown.
             The dictionary can contain all the keywords that are passed to
             :meth:`~disstans.station.Station.get_trend`, but has at least has to contain
             the ``ts_description``. If no ``fit_list`` is included, the ``fit_list``
@@ -2641,7 +2640,7 @@ class Network():
         analyze_kw_args
             If provided and non-empty, call :meth:`~disstans.station.Station.analyze_residuals`
             and pass the dictionary on as keyword arguments (overriding ``'verbose'`` to
-            ``True`` to force an output). Defaults to no residual analysis.
+            ``True`` to force an output). ``{}`` defaults to no residual analysis.
         rms_on_map
             If provided and non-empty, this option will call
             :meth:`~disstans.station.Station.analyze_residuals` to calculate
@@ -3185,9 +3184,9 @@ class Network():
         subset_stations
             If set, a list of strings that contains the names of stations to be shown.
         t_min
-            Start the plot at this time. Defaults to first observation.
+            Start the plot at this time. ``None`` defaults to first observation.
         t_max
-            End the plot at this time. Defaults to last observation.
+            End the plot at this time. ``None`` defaults to last observation.
         lon_min
             Specify the map's minimum longitude (in degrees).
         lon_max
@@ -3210,20 +3209,19 @@ class Network():
         interval
             The number of milliseconds each frame is shown.
         annotate_stations
-            If ``True`` (default), add the station names to the map.
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
         no_pbar
-            Suppress the progress bar when creating the animation with ``True``
-            (default: ``False``).
+            Suppress the progress bar when creating the animation with ``True``.
         return_figure
-            If ``True`` (default: ``False``), return the figure and axis objects instead of
+            If ``True``, return the figure and axis objects instead of
             showing the plot interactively. Only used if ``fname`` is not set.
         save_kw_args
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
             used when ``fname`` is specified.
         colorbar_kw_args
-            If ``None`` (default), no colorbar is added to the plot. If a dictionary is passed,
+            If ``None``, no colorbar is added to the plot. If a dictionary is passed,
             a colorbar is added, with the dictionary containing additional keyword arguments
             to the :meth:`~matplotlib.figure.Figure.colorbar` method.
         legend_ref_dict
@@ -3451,8 +3449,7 @@ class Network():
             combined.
         phase
             (Only used if a single component is selected.)
-            If ``True`` (default), use the phase of the sinusoid to color the
-            station markers.
+            If ``True``, use the phase of the sinusoid to color the station markers.
         fname
             If set, save the map to this filename, if not (default), show the map interactively
             (unless ``return_figure=True``).
@@ -3469,7 +3466,7 @@ class Network():
         scale
             Scale factor for the markers.
         annotate_stations
-            If ``True`` (default), add the station names to the map.
+            If ``True``, add the station names to the map.
             If a float or a string, add the station names to the map with the font size set
             as required by :class:`~matplotlib.text.Text`.
         legend_refs
@@ -3482,7 +3479,7 @@ class Network():
             through all of October) to subset the range.
             This automatically switches to a non-circular colormap.
         return_figure
-            If ``True`` (default: ``False``), return the figure and axis objects instead of
+            If ``True``, return the figure and axis objects instead of
             showing the plot interactively. Only used if ``fname`` is not set.
         save_kw_args
             Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
@@ -3627,9 +3624,8 @@ class Network():
             The name of the timeseries to be used.
         sampling
             Assume that breaks strictly larger than ``sampling`` constitute a data gap.
-            Defaults to daily.
         sort_by_latitude
-            If ``True`` (default), sort the stations by latitude, else alphabetical.
+            If ``True``, sort the stations by latitude, else alphabetical.
             (Always falls back to alphabetical if location information is missing.)
         saveas
             If provided, the figure will be saved at this location.

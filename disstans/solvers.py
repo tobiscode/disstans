@@ -281,7 +281,7 @@ class Solution():
                          stack_covariances: bool = False,
                          stack_weights: bool = False,
                          zeroed: bool = False
-                         ) -> (np.ndarray | None, np.ndarray | None, np.ndarray | None):
+                         ) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
         """
         For a dictionary of Solution objects (e.g. one per station) and a given
         model description, aggregate the model parameters, variances and parameter
@@ -557,15 +557,15 @@ def linear_regression(ts: Timeseries,
         Timeseries to fit.
     models
         Model collection used for fitting.
-    formal_covariance : bool, optional
+    formal_covariance
         If ``True``, calculate the formal model covariance.
-    use_data_variance : bool, optional
+    use_data_variance
         If ``True`` and ``ts`` contains variance information, this uncertainty
         information will be used.
-    use_data_covariance : bool, optional
+    use_data_covariance
         If ``True``, ``ts`` contains variance and covariance information, and
         ``use_data_variance`` is also ``True``, this uncertainty information will be used.
-    check_constraints : bool, optional
+    check_constraints
         If ``True``, check whether models have sign constraints that should
         be enforced.
 
