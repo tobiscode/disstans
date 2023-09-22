@@ -73,6 +73,7 @@ synth_data = sum_all_models + sum_noise
 import matplotlib.pyplot as plt  # noqa: E402
 from pandas.plotting import register_matplotlib_converters  # noqa: E402
 register_matplotlib_converters()  # improve how time data looks
+plt.figure()
 plt.plot(timevector, sum_seas_sec, c='C1', label="Seasonal + Secular")
 plt.plot(timevector, sum_transient, c='k', label="Transient")
 plt.plot(timevector, sum_noise, c='0.5', lw=0.3, label="Noise")
@@ -129,7 +130,7 @@ _ = stat.analyze_residuals(ts_description="Res_noreg",
                            mean=True, std=True, verbose=True)
 """
 TUT: Res_noreg                          Mean  Standard Deviation
-Total-Displacement_Model_Total  1.610461e-08            2.046004
+Total-Displacement_Model_Total -2.193582e-08            2.046182
 """
 
 # plot fit and residual
@@ -171,8 +172,11 @@ _ = stat.analyze_residuals(ts_description="Res_L2",
                            mean=True, std=True, verbose=True)
 """
 TUT: Res_L2                             Mean  Standard Deviation
-Total-Displacement_Model_Total  1.667917e-09            2.087589
+Total-Displacement_Model_Total -5.627219e-09            2.088274
 """
+
+# save transient parameters
+params_transient_L2 = stat.models["Displacement"]["Transient"].parameters.ravel().copy()
 
 # plot fit and residual
 fig, ax = plt.subplots(nrows=2, sharex=True)
@@ -210,9 +214,12 @@ stat["Err_L1"] = stat["Fit_L1"] - stat["Truth"]
 _ = stat.analyze_residuals(ts_description="Res_L1",
                            mean=True, std=True, verbose=True)
 """
-TUT: Res_L1                         Mean  Standard Deviation
-Total-Displacement_Model_Total  0.000003            2.121952
+TUT: Res_L1                             Mean  Standard Deviation
+Total-Displacement_Model_Total -1.123779e-10            2.077788
 """
+
+# save transient parameters
+params_transient_L1 = stat.models["Displacement"]["Transient"].parameters.ravel().copy()
 
 # plot fit and residual
 fig, ax = plt.subplots(nrows=2, sharex=True)
@@ -243,30 +250,35 @@ ax[0].set_title("L1 Regularization")
 fig.savefig(f"{outdir}/tutorial_2g.png")
 
 # repeat everything with reweighted L1 regularization
+from disstans.solvers import InverseReweighting  # noqa: E402
+rw_func = InverseReweighting(1e-4, scale=1)
 net.fit(ts_description="Displacement", solver="lasso_regression",
-        penalty=10, reweight_max_iters=10)
-net.evaluate(ts_description="Displacement", output_description="Fit_L1R")
-stat["Res_L1R"] = stat["Displacement"] - stat["Fit_L1R"]
-stat["Err_L1R"] = stat["Fit_L1R"] - stat["Truth"]
-_ = stat.analyze_residuals(ts_description="Res_L1R",
+        penalty=10, reweight_max_iters=20, reweight_func=rw_func)
+net.evaluate(ts_description="Displacement", output_description="Fit_L0")
+stat["Res_L0"] = stat["Displacement"] - stat["Fit_L0"]
+stat["Err_L0"] = stat["Fit_L0"] - stat["Truth"]
+_ = stat.analyze_residuals(ts_description="Res_L0",
                            mean=True, std=True, verbose=True)
 """
-TUT: Res_L1R                        Mean  Standard Deviation
-Total-Displacement_Model_Total -0.000001            2.119665
+TUT: Res_L0                             Mean  Standard Deviation
+Total-Displacement_Model_Total  4.663455e-13            2.071561
 """
+
+# save transient parameters
+params_transient_L0 = stat.models["Displacement"]["Transient"].parameters.ravel().copy()
 
 # plot fit and residual
 fig, ax = plt.subplots(nrows=2, sharex=True)
 ax[0].plot(stat["Displacement"].data, label="Synthetic")
-ax[0].plot(stat["Fit_L1R"].data, label="Fit")
+ax[0].plot(stat["Fit_L0"].data, label="Fit")
 ax[0].set_ylabel("Displacement [mm]")
 ax[0].legend(loc="upper left")
 ax[0].set_title("Reweighted L1 Regularization")
-ax[1].plot(stat["Res_L1R"].data, c='0.3', ls='none',
+ax[1].plot(stat["Res_L0"].data, c='0.3', ls='none',
            marker='.', markersize=0.5)
-ax[1].plot(stat["Err_L1R"].time, sum_noise, c='C1', ls='none',
+ax[1].plot(stat["Err_L0"].time, sum_noise, c='C1', ls='none',
            marker='.', markersize=0.5)
-ax[1].plot(stat["Err_L1R"].data, c="C0")
+ax[1].plot(stat["Err_L0"].data, c="C0")
 ax[1].set_ylim(-15, 15)
 ax[1].set_ylabel("Error [mm]")
 custom_lines = [Line2D([0], [0], c="0.3", marker=".", linestyle='none'),
@@ -283,6 +295,30 @@ fig, ax = stat.models["Displacement"]["Transient"].make_scalogram(t_left=t_start
 ax[0].set_title("Reweighted L1 Regularization")
 fig.savefig(f"{outdir}/tutorial_2i.png")
 
+# print number of parameters above zero for different regularizations
+ZERO = 1e-4
+print("Number of nonzero spline parameters:\n"
+      f"L2: {(np.abs(params_transient_L2) > ZERO).sum()}\n"
+      f"L1: {(np.abs(params_transient_L1) > ZERO).sum()}\n"
+      f"L0: {(np.abs(params_transient_L0) > ZERO).sum()}")
+"""
+Number of nonzero spline parameters:
+L2: 264
+L1: 77
+L0: 67
+"""
+
+# make parameter magnitude historgram
+plt.figure()
+bins = np.linspace(-14.5, 1.5, 17)
+stacked_params = \
+    np.stack([params_transient_L2, params_transient_L1, params_transient_L0], axis=1)
+plt.hist(np.log10(np.abs(stacked_params)), bins=bins, label=["L2", "L1", "L0"])
+plt.xlabel(r"$\log_{10}$ Parameter Magnitude [-]")
+plt.ylabel("Count [-]")
+plt.legend()
+plt.savefig(f"{outdir}/tutorial_2j.png")
+
 # compare the secular and seasonal rates to the truth
 reldiff_sec = (mdl_coll_synth["Secular"].parameters
                / stat.models["Displacement"]["Secular"].parameters).ravel() - 1
@@ -292,8 +328,12 @@ reldiff_sem_amp = (mdl_coll_synth["Semi-Annual"].amplitude
                    / stat.models["Displacement"]["Semi-Annual"].amplitude)[0] - 1
 absdiff_ann_ph = np.rad2deg(mdl_coll_synth["Annual"].phase
                             - stat.models["Displacement"]["Annual"].phase)[0]
+if absdiff_ann_ph > 180:
+    absdiff_ann_ph -= 360
 absdiff_sem_ph = np.rad2deg(mdl_coll_synth["Semi-Annual"].phase
                             - stat.models["Displacement"]["Semi-Annual"].phase)[0]
+if absdiff_sem_ph > 180:
+    absdiff_sem_ph -= 360
 print(f"Percent Error Constant:              {reldiff_sec[0]: .3%}\n"
       f"Percent Error Linear:                {reldiff_sec[1]: .3%}\n"
       f"Percent Error Annual Amplitude:      {reldiff_ann_amp: .3%}\n"
@@ -301,12 +341,12 @@ print(f"Percent Error Constant:              {reldiff_sec[0]: .3%}\n"
       f"Absolute Error Annual Phase:         {absdiff_ann_ph: .3f}°\n"
       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: .3f}°")
 """
-Percent Error Constant:              -44.024%
-Percent Error Linear:                 20.780%
-Percent Error Annual Amplitude:      -0.234%
-Percent Error Semi-Annual Amplitude:  0.062%
-Absolute Error Annual Phase:          0.917°
-Absolute Error Semi-Annual Phase:    -0.982°
+Percent Error Constant:               7.264%
+Percent Error Linear:                -1.378%
+Percent Error Annual Amplitude:       2.308%
+Percent Error Semi-Annual Amplitude: -0.407%
+Absolute Error Annual Phase:         -1.836°
+Absolute Error Semi-Annual Phase:    -1.284°
 """
 
 # get the trend for the time of rapid transient deformation
@@ -314,5 +354,5 @@ trend, _ = stat.get_trend("Displacement", fit_list=["Transient"],
                           t_start="2002-06-01", t_end="2002-08-01")
 print(f"Transient Velocity: {trend[0]:f} {ts.data_unit}/D")
 """
-Transient Velocity: 0.120261 mm/D
+Transient Velocity: 0.105952 mm/D
 """

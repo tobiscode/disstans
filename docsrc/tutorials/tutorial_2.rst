@@ -7,7 +7,7 @@ Tutorial 2: Advanced Models and Fitting
 
 This tutorial recreates the basics of the synthetic timeseries example as described in
 Bryan Riel's [riel14]_ paper on detecting geodetic transients.
-To do this, we'll be building on and expanding the workflow from the first one.
+To do this, we'll be building on the workflow from the first example.
 This time though, we'll first focus a bit more on making the synthetic data, before
 creating the station itself.
 
@@ -107,6 +107,7 @@ Let's have a look what we fabricated::
     >>> import matplotlib.pyplot as plt
     >>> from pandas.plotting import register_matplotlib_converters
     >>> register_matplotlib_converters()  # improve how time data looks
+    >>> plt.figure()
     >>> plt.plot(timevector, sum_seas_sec, c='C1', label="Seasonal + Secular")
     >>> plt.plot(timevector, sum_transient, c='k', label="Transient")
     >>> plt.plot(timevector, sum_noise, c='0.5', lw=0.3, label="Noise")
@@ -217,7 +218,7 @@ errors, so let's print some statistics:
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg                          Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.624111e-08            2.046006
+    Total-Displacement_Model_Total -2.193582e-08            2.046182
 
 Advanced plotting
 -----------------
@@ -293,7 +294,7 @@ Giving us the statistics:
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2                             Mean  Standard Deviation
-    Total-Displacement_Model_Total  1.656325e-09            2.087589
+    Total-Displacement_Model_Total -5.627219e-09            2.088274
 
 ::
 
@@ -336,6 +337,13 @@ but our physical knowledge of the processes happening tell us that our station i
 always moving - there are discrete processes. A higher penalty parameter might make
 those parameters even smaller, but they will not become significantly sparser.
 
+Let's save the parameter values of the transient spline model such that we can compare
+them later to cases with different regularizations:
+
+.. doctest::
+
+    >>> params_transient_L2 = stat.models["Displacement"]["Transient"].parameters.ravel().copy()
+
 Repeat with L1 regularization
 -----------------------------
 
@@ -355,8 +363,8 @@ Giving us the statistics:
 
     >>> _ = stat.analyze_residuals(ts_description="Res_L1",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_L1                         Mean  Standard Deviation
-    Total-Displacement_Model_Total  0.000003            2.121951
+    TUT: Res_L1                             Mean  Standard Deviation
+    Total-Displacement_Model_Total  2.171535e-10             2.07782
 
 ::
 
@@ -393,9 +401,14 @@ Giving us the statistics:
 .. image:: ../img/tutorial_2g.png
 
 This looks much better - the scalogram now shows us that we only select splines around
-where we put the Arctangent models, and is close to zero otherwise.
+where we put the Arctangent models, and is close to zero otherwise. We again sae the
+transient model parameters for later.
 
-Adding reweighting iterations
+.. doctest::
+
+    >>> params_transient_L1 = stat.models["Displacement"]["Transient"].parameters.ravel().copy()
+
+Repeat with L0 regularization
 -----------------------------
 
 Okay, one last thing about fitting, I promise. L1 regularization aims to penalize the sum of
@@ -409,38 +422,52 @@ However, by modifying an additional weight of each regularized parameter, that d
 values even closer to zero, but leaves significant values unperturbed, one can approximate
 such an L0 regularization by iteratively solving the L1-regularized problem. That is exactly
 what the option ``reweight_max_iters`` does. You can find more information about it in
-the notes of :func:`~disstans.solvers.lasso_regression`. Let's try it:
+the notes of :func:`~disstans.solvers.lasso_regression`.
+
+The solver requires the definition of a reweighting function - i.e., a function that
+helps the solver distinguish between significant and insignificant parameters.
+A reweighting function takes in parameter values, and outputs a weight to add in the
+regularization process. Small parameters (insignificant) will get a very high weight
+(penalty), whereas large parameters will get a weight close to zero. For more information,
+refer to :class:`~disstans.solvers.ReweightingFunction`. Let's define one:
+
+.. doctest::
+
+    >>> from disstans.solvers import InverseReweighting
+    >>> rw_func = InverseReweighting(1e-4, scale=1)
+
+With this, we can now run the L1 solver iteratively to approximate the L0 solution:
 
 .. doctest::
 
     >>> net.fit(ts_description="Displacement", solver="lasso_regression",
-    ...         penalty=10, reweight_max_iters=10)
-    >>> net.evaluate(ts_description="Displacement", output_description="Fit_L1R")
-    >>> stat["Res_L1R"] = stat["Displacement"] - stat["Fit_L1R"]
-    >>> stat["Err_L1R"] = stat["Fit_L1R"] - stat["Truth"]
+    ...         penalty=10, reweight_max_iters=20, reweight_func=rw_func)
+    >>> net.evaluate(ts_description="Displacement", output_description="Fit_L0")
+    >>> stat["Res_L0"] = stat["Displacement"] - stat["Fit_L0"]
+    >>> stat["Err_L0"] = stat["Fit_L0"] - stat["Truth"]
 
 Giving us the statistics:
 
 .. doctest::
 
-    >>> _ = stat.analyze_residuals(ts_description="Res_L1R",
+    >>> _ = stat.analyze_residuals(ts_description="Res_L0",
     ...                            mean=True, std=True, verbose=True)
-    TUT: Res_L1R                            Mean  Standard Deviation
-    Total-Displacement_Model_Total  9.511036e-08            2.117921
+    TUT: Res_L0                             Mean  Standard Deviation
+    Total-Displacement_Model_Total  4.663455e-13            2.071561
 
 ::
 
     >>> fig, ax = plt.subplots(nrows=2, sharex=True)
     >>> ax[0].plot(stat["Displacement"].data, label="Synthetic")
-    >>> ax[0].plot(stat["Fit_L1R"].data, label="Fit")
+    >>> ax[0].plot(stat["Fit_L0"].data, label="Fit")
     >>> ax[0].set_ylabel("Displacement [mm]")
     >>> ax[0].legend(loc="upper left")
     >>> ax[0].set_title("Reweighted L1 Regularization")
-    >>> ax[1].plot(stat["Res_L1R"].data, c='0.3', ls='none',
+    >>> ax[1].plot(stat["Res_L0"].data, c='0.3', ls='none',
     ...         marker='.', markersize=0.5)
-    >>> ax[1].plot(stat["Err_L1R"].time, sum_noise, c='C1', ls='none',
+    >>> ax[1].plot(stat["Err_L0"].time, sum_noise, c='C1', ls='none',
     ...         marker='.', markersize=0.5)
-    >>> ax[1].plot(stat["Err_L1R"].data, c="C0")
+    >>> ax[1].plot(stat["Err_L0"].data, c="C0")
     >>> ax[1].set_ylim(-15, 15)
     >>> ax[1].set_ylabel("Error [mm]")
     >>> custom_lines = [Line2D([0], [0], c="0.3", marker=".", linestyle='none'),
@@ -467,11 +494,43 @@ compared to the previous scalogram, and all the values that were small but not r
 zero in the previous case are now *really* close to zero.
 This did not come at a significant increase in residual variance.
 
+We can quantify this by plotting a histogram of the magnitudes of the transient parameters
+for the three different regularization schemes. One last time, we save the parameter
+values:
+
+.. doctest::
+
+    >>> params_transient_L0 = stat.models["Displacement"]["Transient"].parameters.ravel().copy()
+    >>> ZERO = 1e-4
+    >>> print("Number of nonzero spline parameters:\n"
+    ...       f"L2: {(np.abs(params_transient_L2) > ZERO).sum()}\n"
+    ...       f"L1: {(np.abs(params_transient_L1) > ZERO).sum()}\n"
+    ...       f"L0: {(np.abs(params_transient_L0) > ZERO).sum()}")
+    Number of nonzero spline parameters:
+    L2: 264
+    L1: 76
+    L0: 67
+
+As we can see, the L0-regularized solver gives a more sparse solution than both the L1- and
+L2-regularized solvers. A histogram can show this to use more visually::
+
+    >>> plt.figure()
+    >>> bins = np.linspace(-14.5, 1.5, 17)
+    >>> stacked_params = \
+    >>>     np.stack([params_transient_L2, params_transient_L1, params_transient_L0], axis=1)
+    >>> plt.hist(np.log10(np.abs(stacked_params)), bins=bins, label=["L2", "L1", "L0"])
+    >>> plt.xlabel(r"$\log_{10}$ Parameter Magnitude [-]")
+    >>> plt.ylabel("Count [-]")
+    >>> plt.legend()
+    >>> plt.savefig(f"{outdir}/tutorial_2j.png")
+
+.. image:: ../img/tutorial_2j.png
+
 Comparing specific parameters
 -----------------------------
 
 Before we finish up, let's just print some differences between the ground truth and our
-L1R-fitted model:
+L0-fitted model:
 
 .. doctest::
 
@@ -483,35 +542,37 @@ L1R-fitted model:
     ...                    / stat.models["Displacement"]["Semi-Annual"].amplitude)[0] - 1
     >>> absdiff_ann_ph = np.rad2deg(mdl_coll_synth["Annual"].phase
     ...                             - stat.models["Displacement"]["Annual"].phase)[0]
+    >>> if absdiff_ann_ph > 180:
+    ...     absdiff_ann_ph -= 360
     >>> absdiff_sem_ph = np.rad2deg(mdl_coll_synth["Semi-Annual"].phase
     ...                             - stat.models["Displacement"]["Semi-Annual"].phase)[0]
+    >>> if absdiff_sem_ph > 180:
+    ...     absdiff_sem_ph -= 360
     >>> print(f"Percent Error Constant:              {reldiff_sec[0]: .3%}\n"
     ...       f"Percent Error Linear:                {reldiff_sec[1]: .3%}\n"
     ...       f"Percent Error Annual Amplitude:      {reldiff_ann_amp: .3%}\n"
     ...       f"Percent Error Semi-Annual Amplitude: {reldiff_sem_amp: .3%}\n"
     ...       f"Absolute Error Annual Phase:         {absdiff_ann_ph: .3f}°\n"
     ...       f"Absolute Error Semi-Annual Phase:    {absdiff_sem_ph: .3f}°")
-    Percent Error Constant:              -44.024%
-    Percent Error Linear:                 20.780%
-    Percent Error Annual Amplitude:      -0.234%
-    Percent Error Semi-Annual Amplitude:  0.062%
-    Absolute Error Annual Phase:          0.917°
-    Absolute Error Semi-Annual Phase:    -0.982°
+    Percent Error Constant:               7.264%
+    Percent Error Linear:                -1.378%
+    Percent Error Annual Amplitude:       2.308%
+    Percent Error Semi-Annual Amplitude: -0.407%
+    Absolute Error Annual Phase:         -1.836°
+    Absolute Error Semi-Annual Phase:    -1.284°
 
-Apart from the trade-off between the polynomial trend and long-term splines, which can be
-expected in this synthetic example, we got pretty close to our ground truth. Let's finish
-up by calculating an average velocity of the station using
-:meth:`~disstans.station.Station.get_trend` around the time when it's rapidly moving
-(around the middle of 2002). We don't want a normal trend through the data, since that
-is also influenced by the secular velocity, the noise, etc., so we choose to only fit our
-transient model:
+As we can see, we got pretty close to our ground truth. Let's finish up by calculating
+an average velocity of the station using :meth:`~disstans.station.Station.get_trend` around
+the time when it's rapidly moving (around the middle of 2002). We don't want a normal trend
+through the data, since that is also influenced by the secular velocity, the noise, etc.,
+so we choose to only fit our transient model:
 
 .. doctest::
 
     >>> trend, _ = stat.get_trend("Displacement", fit_list=["Transient"],
     ...                           t_start="2002-06-01", t_end="2002-08-01")
     >>> print(f"Transient Velocity: {trend[0]:f} {ts.data_unit}/D")
-    Transient Velocity: 0.121516 mm/D
+    Transient Velocity: 0.105952 mm/D
 
 We can use average velocities like these when we want to create velocity maps for
 certain episodes.

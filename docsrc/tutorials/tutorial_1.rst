@@ -237,7 +237,7 @@ Timeseries object that can be added to the station.
     >>> stats_dict = synth_stat.analyze_residuals(ts_description="Residual",
     ...                                           mean=True, std=True, verbose=True)
     TUT: Residual          Mean  Standard Deviation
-    total-total    5.323611e-14            0.009065
+    total-total    5.342115e-14            0.009065
 
 And we can plot it like before::
 

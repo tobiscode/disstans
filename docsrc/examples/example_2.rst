@@ -9,6 +9,14 @@ This example builds on the data from :doc:`Example 1 <example_1>` and compares s
 velocity model results with published data. On the way, it shows how to do coordinate
 transformations from the cartesian to the local geodetic reference frame.
 
+.. note::
+    The figures and numbers presented in this example no longer exactly match what is
+    presented in [koehne23]_. This is because significant code improvements to DISSTANS
+    were introduced with version 2, and the effect of the hyperparameters changed.
+    Care has been taken to recreate this example to match what is in the published study,
+    although small quantitative changes remain. The qualitative interpretations are
+    unchanged.
+
 .. contents:: Table of contents
     :local:
 
@@ -85,10 +93,10 @@ in our study region.
     ...       f"Shearing rate:   {shear:.2e} 1/a\n"
     ...       f"Rotation rate:   {rotation:.2e} rad/a")
     Homogenous transation, rotation, and strain field results:
-    Dilatation rate: 8.80e-05 1/a
-    Strain rate:     7.33e-05 1/a
-    Shearing rate:   3.74e-05 1/a
-    Rotation rate:   6.42e-07 rad/a
+    Dilatation rate: 2.83e-04 1/a
+    Strain rate:     2.06e-04 1/a
+    Shearing rate:   8.93e-05 1/a
+    Rotation rate:   2.29e-05 rad/a
 
 So, there is a little bit of everything going on here. We're not going to dwell on
 it here, since we're mostly focused on the resulting predicted velocities, but you
@@ -127,9 +135,9 @@ convenient Euler pole notation using :func:`~disstans.tools.rotvec2eulerpole`:
     ...       f"Latitude:  {euler_pole[1]:.3f} +/- {euler_pole_sd[1]:.3f} °\n"
     ...       f"Rate:      {euler_pole[2]:.2g} +/- {euler_pole_sd[2]:.2g} °/a")
     Euler pole results (with one s.d.):
-    Longitude: 61.059 +/- 0.003 °
-    Latitude:  31.733 +/- 0.625 °
-    Rate:      0.0019 +/- 2.2e-05 °/a
+    Longitude: 56.979 +/- 0.040 °
+    Latitude:  -52.711 +/- 0.444 °
+    Rate:      0.00071 +/- 5.3e-06 °/a
 
 Comparison of different methods
 -------------------------------
@@ -147,9 +155,9 @@ Loading other different datasets
 
 We will now compare the DISSTANS-derived secular velocities with other published
 datasets. Specifically, we will be using the MIDAS-calculated velocities from UNR
-([blewitt16]_ - `link to file <http://geodesy.unr.edu/velocities/midas.IGS14.txt>`_`)
+([blewitt16]_ - `MIDAS velocities <http://geodesy.unr.edu/velocities/midas.IGS14.txt>`_)
 and from the Geodesy Advancing Geosciences and EarthScope (GAGE) facility ([herring16]_ -
-`link to file <https://data.unavco.org/archive/gnss/products/velocity/pbo.final_igs14.vel>`_`).
+`GAGE velocities <https://data.unavco.org/archive/gnss/products/velocity/pbo.final_igs14.vel>`_).
 
 To load them, we rely on pandas:
 
@@ -302,9 +310,9 @@ First off, we can see that qualitatively, the three secular velocity models (DIS
 GAGE, and MIDAS) mostly match each other. Zooming into the caldera region, however, there
 are some significant differences.
 
-.. image:: ../img/example_2_observed_igs.png
+.. image:: ../img/example_2_modeled_igs.png
 
-.. image:: ../img/example_2_observed_na.png
+.. image:: ../img/example_2_modeled_na.png
 
 In terms of the background vleocity field derived from the best-fit Euler poles, we see
 that qualitatively, all three estimates mostly match each other again, with some differences
@@ -417,50 +425,53 @@ Finally, let's print out all the statistics we just calculated:
     ...        ) / rmses_res.iloc[:, 1:].values, "\n", sep="")
     <BLANKLINE>
     Difference between model predictions
-                 D2M      D2G       M2G
-    common  0.001528  0.00169  0.000678
-    outer   0.001536  0.00177  0.000693
+                 D2M       D2G       M2G
+    common  0.000310  0.000864  0.000678
+    outer   0.000362  0.000388  0.000693
     <BLANKLINE>
     Residuals common_stations
            DISSTANS     MIDAS      GAGE
-    all    0.002692  0.003065  0.003883
-    outer  0.002880  0.002788  0.002789
-    inner  0.002490  0.003318  0.004730
+    all    0.002487  0.003065  0.003883
+    outer  0.002883  0.002788  0.002789
+    inner  0.002015  0.003318  0.004730
     <BLANKLINE>
     Residuals outer_stations
            DISSTANS     MIDAS      GAGE
-    all    0.002642  0.003084  0.003989
-    outer  0.002743  0.002755  0.002888
-    inner  0.002537  0.003381  0.004846
+    all    0.002598  0.003084  0.003989
+    outer  0.002901  0.002755  0.002888
+    inner  0.002254  0.003381  0.004846
     <BLANKLINE>
     Difference of residuals between station subsets
            DISSTANS     MIDAS      GAGE
-    all    0.000430  0.000471  0.000505
-    outer  0.000447  0.000472  0.000505
-    inner  0.000412  0.000471  0.000505
+    all    0.000990  0.000471  0.000505
+    outer  0.001000  0.000472  0.000505
+    inner  0.000979  0.000471  0.000505
     <BLANKLINE>
     Relative improvement from other models to DISSTANS
               MIDAS      GAGE
-    all    0.121536  0.306674
-    outer -0.033071 -0.032699
-    inner  0.249614  0.473615
+    all    0.188404  0.359450
+    outer -0.034228 -0.033855
+    inner  0.392870  0.574107
     <BLANKLINE>
 
 There's a lot to unpack here, so let's jump right in:
 
-1. The MIDAs and GAGE modeled velocity fields are similar to each other at the scale of
-   less than 1 mm/a, the DISSTANS field is still comparable, with an RMS difference of
-   less than 2 mm/a.
+1. The DISSTANS, MIDAS and GAGE modeled velocity fields are all similar to each other at
+   the scale of less than 1 mm/a, at least using the root-mean-square differences.
 2. Excluding the stations inside the LVCR from the Euler pole estimation does not
    significantly affect the results for any of the datasets. The differences are below
    the level of 1 mm/a.
-3. Across the board, the DISSTANS solution has the lowest residuals. Looking more closely,
+3. Across all stations, the DISSTANS solution has the lowest residuals. Looking more closely,
    this is mainly driven by lower residuals inside the LVCR, where the relative
-   improvements are 25% to 47%. Outside the LVCR, DISSTANS' residuals are slightly larger
-   by about 3%.
-4. While there are large differences between residuals inside and outside the LVCR for
-   the MIDAS (33% to 28%, respectively) and GAGE (47% to 28%) models, the residuals for
-   the DISSTANS model are the most similar (25% to 29%).
+   improvements are 39% and 57% relative to MIDAS and GAGE, respectively. Outside the LVCR,
+   DISSTANS' residuals are slightly larger by about 3%.
+4. There are large differences between residuals inside and outside the LVCR for
+   the DISSTANS (20% to 29%, respectively), MIDAS (33% to 28%) and GAGE (47% to 28%) models,
+   DISSTANS' residuals are larger outside than inside, whereas MIDAS and GAGE residuals are
+   larger inside. It should be noted, however, that that puts all three models in relative
+   equivalence for the region outside the LVCR. This further shows DISSTANS' ability to fit
+   the transient signals inside the LVCR without significantly compromising the fit quality
+   outside the LVCR.
 
 Keep in mind that this of course does not mean that DISSTANS' solution is "better" than
 the MIDAS or GAGE solutions. After all, neither of those models explicitly aim to model

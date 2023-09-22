@@ -11,6 +11,14 @@ we didn't have time to explore how the reweighting hyperparameters affected the 
 of the results. This tutorial will explore a bit more quantitatively how using more
 and more stations improves the recovery of a synthetic signal.
 
+.. note::
+    The figures and numbers presented in this example no longer exactly match what is
+    presented in [koehne23]_. This is because significant code improvements to DISSTANS
+    were introduced with version 2, and the effect of the hyperparameters changed.
+    Care has been taken to recreate this example to match what is in the published study,
+    although small quantitative changes remain. The qualitative interpretations are
+    unchanged.
+
 .. contents:: Table of contents
     :local:
 
@@ -98,8 +106,8 @@ The hyperparameters we care about are the following:
 - The noise standard deviation,
 - The initial ``penalty`` parameter (for :func:`~disstans.solvers.lasso_regression` and
   :meth:`~disstans.network.Network.spatialfit`), and
-- The ``scale`` of the reweighting function (which by default is
-  :class:`~disstans.solvers.InverseReweighting`).
+- The ``scale`` of the reweighting function (here, we will use the
+  :class:`~disstans.solvers.InverseReweighting` function with ``eps=1e-4``).
 
 Of course, other things could be of interest - a different functional form for the
 reweighting function, or different shapes of true signal, etc., but we'll focus on those
@@ -141,9 +149,9 @@ Results
 
 When we then plot all of the different cases in one big plot, we can see the big picture:
 
-.. image:: ../img/tutorial_5_S20N50_1.png
+.. image:: ../img/tutorial_5_S20N50_10.png
 
-Here for example, we compare, for an initial penalty parameter of 1, the effect that
+Here for example, we compare, for an initial penalty parameter of 10, the effect that
 different noise standard deviations (lines of different colors) and reweighting function
 scales (lines of different shading) have. Two auxiliary lines are also plotted: a general
 :math:`1/\sqrt{N}` curve (since that is the expected behavior when more and more stations

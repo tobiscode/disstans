@@ -1,5 +1,5 @@
 """
-First example of the disstans documentation:
+First example of the DISSTANS documentation:
 Long Valley Caldera
 
 This example aims to demonstrate the downloading of timeseries from UNR's
@@ -14,9 +14,13 @@ import gzip
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import cartopy.geodesic as cgeod
+import cartopy.crs as ccrs
 from pathlib import Path
 from scipy.linalg import lstsq
 from matplotlib.lines import Line2D
+from cartopy.io.shapereader import Reader
+from cartopy.feature import ShapelyFeature
 import disstans
 from disstans.tools import tvec_to_numpycol, full_cov_mat_to_columns
 
@@ -323,12 +327,12 @@ if __name__ == "__main__":
     net.add_local_models(new_models, "final")
 
     # make a single solution
-    rw_func = disstans.solvers.InverseReweighting(eps=1e-5, scale=1e-3)
+    rw_func = disstans.solvers.InverseReweighting(eps=1e-7, scale=1e-4)
     stats = net.spatialfit("final",
-                           penalty=[20, 20, 2],
-                           spatial_reweight_models=["Transient"],
-                           spatial_reweight_iters=20,
-                           local_reweight_func=rw_func,
+                           penalty=[150, 150, 30],
+                           spatial_l0_models=["Transient"],
+                           spatial_reweight_iters=15,
+                           reweight_func=rw_func,
                            formal_covariance=True,
                            use_data_covariance=True,
                            verbose=True,
@@ -376,7 +380,7 @@ if __name__ == "__main__":
     # # if formal_covariance=False and/or use_data_covariance=False, set covariances to zero
     # all_poly_pars_covs = np.concatenate((
     #     np.stack([net[stat_name].models["final"]["Linear"].par.ravel()
-    #                 for stat_name in poly_stat_names], axis=0),
+    #               for stat_name in poly_stat_names], axis=0),
     #     np.zeros((len(poly_stat_names), 6))), axis=1)
     all_poly_df = pd.DataFrame(data=all_poly_pars_covs, index=poly_stat_names,
                                columns=["off_e", "off_n", "off_u", "vel_e", "vel_n", "vel_u",
@@ -429,6 +433,35 @@ if __name__ == "__main__":
                                   "rect_args": [(-118.7, 37.8), 0.1, 0.05],
                                   "rect_kw_args": {"facecolor": [1, 1, 1, 0.15],
                                                    "edgecolor": [0, 0, 0, 0.6]}})
+    # make a zoomed in version where we later add the caldera outline
+    fig_worm, ax_worm = \
+        net.wormplot(ts_description=("final", "Transient"),
+                     t_min=plot_t_start, t_max=plot_t_end, scale=2e2,
+                     subset_stations=["P634", "SAWC", "RDOM", "P646", "MINS", "KNOL",
+                                      "CA99", "P639", "HOTK", "LINC", "MWTP", "SHRC",
+                                      "TILC", "P630", "P631", "P642"],
+                     lat_min=37.56, lat_max=37.72, lon_min=-119.1, lon_max=-118.75,
+                     annotate_stations="small",
+                     return_figure=True,
+                     colorbar_kw_args={"shrink": 0.5},
+                     legend_ref_dict={"location": [-118.786, 37.715],
+                                      "length": 10,
+                                      "label": "10 mm",
+                                      "rect_args": [(-118.8, 37.7), 0.05, 0.02],
+                                      "rect_kw_args": {"facecolor": [1, 1, 1, 0.15],
+                                                       "edgecolor": [0, 0, 0, 0.6]}})
+    # load USGS faults
+    qfaults = Reader("/home/datalib/Faults/USGS/source/Shapefile/QFaults.shp")
+    # extract only LVC ring fault
+    geoms = [f.geometry for f in qfaults.records() if
+             ("Long Valley Caldera ring fault" in f.attributes["fault_name"])]
+    important_faults = ShapelyFeature([geoms[0], geoms[2]], ccrs.PlateCarree(),
+                                      edgecolor="k", facecolor="none", linestyle="--")
+    # add to plot
+    ax_worm.add_feature(important_faults)
+    # save after modifications
+    fig_worm.savefig(plot_dir / f"example_1f_zoom.{fmt}", dpi=300)
+    plt.close(fig_worm)
 
     # print some secular linear velocities
     print(f"{'Station':>10s} {'East [m/a]':>12s} {'North [m/a]':>12s} {'Up [m/a]':>12s}")
@@ -493,6 +526,22 @@ if __name__ == "__main__":
     # sort by azimuth
     rots_sort_azim = dict(sorted(rots.items(), key=lambda kv: kv[1]))
 
+    # get distances from RDOM
+    geoid = cgeod.Geodesic()
+    station_lonlat = np.stack([np.array(net[name].location)[[1, 0]]
+                               for name in rots.keys()])
+    all_distances = np.empty((len(rots), len(rots)))
+    i_RDOM = rots_keys.index("RDOM")
+    for i, name in enumerate(rots.keys()):
+        all_distances[i, :] = np.array(geoid.inverse(
+            station_lonlat[i, :].reshape(1, 2), station_lonlat))[:, 0]
+    dists = all_distances[i_RDOM, :]
+    # make the RDOM distance itself really high so that it's at the end of the list since
+    # its main motion is upwards
+    dists[i_RDOM] = 1e12
+    # sort rots by distance from RDOM
+    rots_sort_dist = dict(sorted(rots.items(), key=lambda kv: dists[rots_keys.index(kv[0])]))
+
     # rotate east-north to main direction
     lvc_data_main = {name: (lvc_data[name].values[:, :2] @ R(rots[name]))[:, 0]
                      for name in lvc_names}
@@ -503,8 +552,54 @@ if __name__ == "__main__":
     lvc_data_transient_main = {name: (lvc_data_transient[name][:, :2] @ R(rots[name]))[:, 0]
                                for name in lvc_names}
 
+    # start transient plot by distance
+    offsets = [0, 30, 80, 125, 155, 205, 245, 285, 345, 330, 430, 465, 500, 540]
+    fig, ax = plt.subplots(figsize=(5, 8))
+    for i, name in enumerate(rots_sort_dist.keys()):
+        ax.plot(lvc_data[name].index,
+                lvc_data_transient_main[name] - lvc_data_transient_main[name][0] + offsets[i],
+                "k.", markersize=3, rasterized=True)
+        ax.plot(lvc_data[name].index,
+                lvc_transient_main[name] - lvc_data_transient_main[name][0] + offsets[i])
+        if name == "CASA":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i] + 30), ha="left", va="bottom")
+        elif name == "CA99":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"),
+                               offsets[i] - 30), ha="center", va="bottom")
+        elif name == "KRAC":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i] + 10), ha="right", va="center")
+        elif name == "DDMN":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i] - 10), ha="right", va="center")
+        elif name == "BALD":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i] - 10), ha="right", va="center")
+        elif name == "WATC":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i] + 10), ha="right", va="center")
+        else:
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i]), ha="right", va="center")
+        if name != "CASA":
+            ax.annotate(f"{rots[name]:.0f}°",
+                        (lvc_data[name].index[-1] + pd.Timedelta(100, "D"),
+                         lvc_transient_main[name][-1] - lvc_data_transient_main[name][0]
+                         + offsets[i]),
+                        ha="left", va="center", color="0.3")
+    ax.set_xlim([pd.Timestamp("1993-01-01"), pd.Timestamp("2025-01-01")])
+    yearticks = ["1996", "2000", "2004", "2008", "2012", "2016", "2020"]
+    ax.set_xticks([pd.Timestamp(f"{year}-01-01") for year in yearticks])
+    ax.set_xticklabels(yearticks)
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Displacement [mm]")
+    ax.grid(axis="x", color="0.8")
+    fig.savefig(plot_dir / f"example_1g_expansion_dist.{fmt}", dpi=300)
+    plt.close(fig)
+
     # start transient plot by azimuth
-    offsets = [0, 85, 100, 125, 195, 215, 245, 255, 285, 315, 380, 395, 435, 455]
+    offsets = [0, 50, 70, 90, 145, 165, 210, 250, 280, 310, 360, 405, 445, 485]
     fig, ax = plt.subplots(figsize=(5, 8))
     for i, name in enumerate(rots_sort_azim.keys()):
         ax.plot(lvc_data[name].index,
@@ -518,6 +613,9 @@ if __name__ == "__main__":
         elif name == "CA99":
             ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"), offsets[i] + 10),
                         ha="center", va="bottom")
+        elif name == "TILC":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"), offsets[i] + 10),
+                        ha="right", va="center")
         else:
             ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"), offsets[i]),
                         ha="right", va="center")
@@ -535,6 +633,33 @@ if __name__ == "__main__":
     ax.set_ylabel("Displacement [mm]")
     ax.grid(axis="x", color="0.8")
     fig.savefig(plot_dir / f"example_1g_expansion_azim.{fmt}", dpi=300)
+    plt.close(fig)
+
+    # start vertical seasonal plot, same ordering from before
+    offsets = np.arange(len(rots_keys)) * 40
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for i, name in enumerate(rots_sort_azim.keys()):
+        ax.plot(lvc_data[name].index,
+                lvc_data_seasonal[name][:, 2] + offsets[i],
+                "k.", markersize=3, rasterized=True)
+        ax.plot(lvc_data[name].index, lvc_seasonal[name][:, 2] + offsets[i])
+        if name == "CASA":
+            ax.annotate(name, (lvc_data[name].index[0], offsets[i] - 40),
+                        ha="left", va="center",
+                        bbox={"ec": "none", "fc": "w", "alpha": 0.5})
+        else:
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"), offsets[i]),
+                        ha="right", va="center",
+                        bbox={"ec": "none", "fc": "w", "alpha": 0.5})
+    ax.set_xlim([pd.Timestamp("1993-01-01"), pd.Timestamp("2022-01-01")])
+    yearticks = ["1996", "2000", "2004", "2008", "2012", "2016", "2020"]
+    ax.set_xticks([pd.Timestamp(f"{year}-01-01") for year in yearticks])
+    ax.set_xticklabels(yearticks)
+    ax.set_xlabel("Time")
+    ax.set_ylim([-30, 550])
+    ax.set_ylabel("Displacement [mm]")
+    ax.grid(axis="x", color="0.8")
+    fig.savefig(plot_dir / f"example_1g_seasonal_azim_up.{fmt}", dpi=300)
     plt.close(fig)
 
     # for all plotted stations from the wormplot, get the transient, detrended and

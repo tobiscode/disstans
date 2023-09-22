@@ -22,6 +22,9 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 from pathlib import Path
 from urllib import request
+from tqdm import tqdm
+import disstans
+from disstans.models import Polynomial
 from disstans.tools import (R_ecef2enu, strain_rotation_invariants,
                             estimate_euler_pole, rotvec2eulerpole)
 
@@ -216,6 +219,67 @@ if __name__ == "__main__":
                        in enumerate(zip(lons, lats))]),
         index=common_stations, columns=["vel_e", "vel_n", "vel_u"])
 
+    # make a new network with only the common stations, and add the different velocity models
+    net_comp = disstans.Network("LVC-COMPARISON")
+    for station in tqdm(common_stations, desc="Building networks", unit="station", ascii=True):
+        # create stations
+        net_comp[station] = disstans.Station(station, net[station].location)
+        # copy over timeseries
+        net_comp[station]["final"] = net[station]["final"].copy()
+        # comparison will be in [m], since that's the format of MIDAS and GAGE
+        net_comp[station]["final"].convert_units(1e-3, "m")
+        # get NA velocity
+        stat_vel_NA = v_NA_enu.loc[station, :].to_numpy()
+        # add the DISSTANS model
+        stat_mdl_disstans = net[station].models["final"]["Linear"].copy()
+        stat_mdl_disstans.convert_units(1e-3)  # original fit was in [mm]
+        stat_mdl_disstans_na = Polynomial(1, min_exponent=1, t_reference="2000-01-01")
+        stat_mdl_disstans_na.read_parameters(
+            (stat_mdl_disstans.par[1, :] - stat_vel_NA).reshape(1, -1),
+            stat_mdl_disstans.cov[3:, 3:])
+        net_comp[station].add_local_model("final", "DISSTANS", stat_mdl_disstans_na)
+        # extract location, velocity, and velocity variance for MIDAS
+        stat_vel_midas = v_mdl_midas.loc[station, ["ve50", "vn50", "vu50"]
+                                         ].to_numpy(dtype=float).reshape(1, -1)
+        stat_var_midas = v_mdl_midas.loc[station, ["sve", "svn", "svu"]
+                                         ].to_numpy(dtype=float).reshape(1, -1)**2
+        # add MIDAS model and read in parameters
+        stat_mdl_midas_na = Polynomial(1, min_exponent=1, t_reference="2000-01-01")
+        stat_mdl_midas_na.read_parameters(stat_vel_midas - stat_vel_NA, stat_var_midas)
+        net_comp[station].add_local_model("final", "MIDAS", stat_mdl_midas_na)
+        # extract location, velocity, and velocity covariance for GAGE
+        stat_vel_gage = v_mdl_gage.loc[station, ["dE/dt", "dN/dt", "dU/dt"]
+                                       ].to_numpy(dtype=float).reshape(1, -1)
+        stat_sd_gage = v_mdl_gage.loc[station, ["SEd", "SNd", "SUd"]
+                                      ].to_numpy(dtype=float).ravel()
+        stat_corr_gage = v_mdl_gage.loc[station, ["Rne", "Reu", "Rnu"]
+                                        ].to_numpy(dtype=float).ravel()
+        stat_cov_gage = np.diag(stat_sd_gage**2 / 2)
+        stat_cov_gage[0, 1] = stat_sd_gage[0] * stat_sd_gage[1] * stat_corr_gage[0]
+        stat_cov_gage[0, 2] = stat_sd_gage[0] * stat_sd_gage[2] * stat_corr_gage[1]
+        stat_cov_gage[1, 2] = stat_sd_gage[1] * stat_sd_gage[2] * stat_corr_gage[2]
+        stat_cov_gage += stat_cov_gage.T
+        # add model and read in parameters
+        stat_mdl_gage_na = Polynomial(1, min_exponent=1, t_reference="2000-01-01")
+        stat_mdl_gage_na.read_parameters(stat_vel_gage - stat_vel_NA, stat_cov_gage)
+        net_comp[station].add_local_model("final", "GAGE", stat_mdl_gage_na)
+
+    # estimate the homogenous strain & rotation field for all solutions
+    print("Estimating homogenous velocity strain & rotation field... ", end="", flush=True)
+    v_pred, v_pred_os = {}, {}
+    for case in ["DISSTANS", "MIDAS", "GAGE"]:
+        v_pred[case] = \
+            net_comp.euler_rot_field(ts_description="final",
+                                     mdl_description=case,
+                                     subset_stations=common_stations,
+                                     extrapolate=common_stations)[0]
+        v_pred_os[case] = \
+            net_comp.euler_rot_field(ts_description="final",
+                                     mdl_description=case,
+                                     subset_stations=outer_stations,
+                                     extrapolate=common_stations)[0]
+    print("Done")
+
     # remove NA plate velocity
     v_mdl_na = {case: (-v_NA_enu.iloc[:, :2]) + v_mdl[case][["vel_e", "vel_n"]].values
                 for case in v_mdl.keys()}
@@ -360,7 +424,7 @@ if __name__ == "__main__":
     ax_map.set_extent([-120.25, -117.75, 36.9, 38.3])
     for case, col in zip(reversed(v_pred.keys()), ["C0", "C1", "k"]):
         q = ax_map.quiver(lons, lats,
-                          v_pred[case]["east"], v_pred[case]["north"],
+                          v_pred[case]["vel_e"], v_pred[case]["vel_n"],
                           units="xy", scale=5e-7, width=1e3, color=col,
                           transform=proj_lla, label=case)
     ax_map.quiverkey(q, 0.85, 0.85, 0.01, "10 mm/a", color="0.3")

@@ -7,10 +7,10 @@ Tutorial 4: The use and estimation of covariance
 
 As seen in Tutorial 3, DISSTANS can also make use of data variance and covariance if provided
 in the timeseries. While this was not specifically addressed in the previous tutorial,
-taking advantage of that information can improve the fit to the data, especially when
-there is a large amount of correlation across components. This tutorial
-will explore this with a small synthetic network that has large but strongly
-correlated errors.
+taking advantage of that information can improve the fit to the data and provide insight into
+fitted model parameter covariances, especially when there is a large amount of correlation
+across components. This tutorial will explore this with a small synthetic network that has
+large but strongly correlated errors.
 
 .. contents:: Table of contents
     :local:
@@ -44,7 +44,7 @@ The setup should be familiar:
 This will create a network of 8 stations, arranged in a circle, and define the timespan
 we're interested in.
 
-In the next step, like i the previous tutorial, we will create a function that returns
+In the next step, like in the previous tutorial, we will create a function that returns
 model parameters for the generation of the synthetic data.
 The function most crucially though will also create the correlated noise. It does that
 by defining a (constant) noise covariance matrix, and then rotating that based on the
@@ -167,8 +167,8 @@ The following steps are nothing new - we will solve for model parameters with th
 specifying if we want the solver to use data (co)variance.
 
 This first run doesn't use either the data variance or covariance, and we will save
-the estimated linear velocity parameter for every station and component for later
-comparison.
+the estimated linear velocity parameter and covariance for every station and component
+for later comparison.
 
 .. doctest::
 
@@ -177,10 +177,10 @@ comparison.
     >>> rw_func = LogarithmicReweighting(1e-8, scale=10)
     >>> # solve without using the data variance
     >>> stats = net.spatialfit("Displacement",
-    ...                        penalty=5,
-    ...                        spatial_reweight_models=["Transient"],
+    ...                        penalty=10,
+    ...                        spatial_l0_models=["Transient"],
     ...                        spatial_reweight_iters=20,
-    ...                        local_reweight_func=rw_func,
+    ...                        reweight_func=rw_func,
     ...                        use_data_variance=False,
     ...                        use_data_covariance=False,
     ...                        formal_covariance=True,
@@ -193,18 +193,22 @@ comparison.
     >>> vel_en_est = {}
     >>> vel_en_est["onlydata"] = \
     ...     np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
+    >>> # save estimated velocity covariances
+    >>> cov_en_est = {}
+    >>> cov_en_est["onlydata"] = \
+    ...     np.stack([s.models["Displacement"]["Secular"].cov[[2, 3, 2], [2, 3, 3]] for s in net])
 
 In the next two runs, we will first add the variance, and then the covariance. At the end,
-for future comparison, we save the estimated parameters and covariance.
+for future comparison, we save the estimated parameters and covariances.
 
 .. doctest::
 
     >>> # solve using the data variance
     >>> stats = net.spatialfit("Displacement",
-    ...                        penalty=5,
-    ...                        spatial_reweight_models=["Transient"],
+    ...                        penalty=10,
+    ...                        spatial_l0_models=["Transient"],
     ...                        spatial_reweight_iters=20,
-    ...                        local_reweight_func=rw_func,
+    ...                        reweight_func=rw_func,
     ...                        use_data_variance=True,
     ...                        use_data_covariance=False,
     ...                        formal_covariance=True,
@@ -216,12 +220,15 @@ for future comparison, we save the estimated parameters and covariance.
     >>> # save estimated velocity components
     >>> vel_en_est["withvar"] = \
     ...     np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
+    >>> # save estimated velocity covariances
+    >>> cov_en_est["withvar"] = \
+    ...     np.stack([s.models["Displacement"]["Secular"].cov[[2, 3, 2], [2, 3, 3]] for s in net])
     >>> # solve with the data variance and covariance
     >>> stats = net.spatialfit("Displacement",
-    ...                        penalty=5,
-    ...                        spatial_reweight_models=["Transient"],
+    ...                        penalty=10,
+    ...                        spatial_l0_models=["Transient"],
     ...                        spatial_reweight_iters=20,
-    ...                        local_reweight_func=rw_func,
+    ...                        reweight_func=rw_func,
     ...                        use_data_variance=True,
     ...                        use_data_covariance=True,
     ...                        formal_covariance=True,
@@ -233,9 +240,13 @@ for future comparison, we save the estimated parameters and covariance.
     >>> # save estimated velocity components
     >>> vel_en_est["withvarcov"] = \
     ...     np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
+    >>> # save estimated velocity covariances
+    >>> cov_en_est["withvarcov"] = \
+    ...     np.stack([s.models["Displacement"]["Secular"].cov[[2, 3, 2], [2, 3, 3]] for s in net])
 
 Notice that right off the bat, including the variance and covariance data in the estimation
-has reduced the number of unique splines from up to 3 per component to 1 per component.
+has reduced the number of iterations necessary, and has pushed the spatial solver to select only
+a single spline per component and station to model the transient.
 
 Just to get an idea of the fit, we can again use the GUI function to show us the fits and
 scalograms::
@@ -266,7 +277,7 @@ to collect the true velocity vectors at all stations:
     >>> norm_true = np.sqrt(np.sum(vel_en_true**2, axis=1))
 
 Now we can calculate the deviation of the estimate both in terms of magnitude and direction
-from the true values:
+from the true values, and print the estimated model parameter covariance:
 
 .. doctest::
 
@@ -275,7 +286,7 @@ from the true values:
     ...     zip(["Data", "Data + Variance", "Data + Variance + Covariance"],
     ...         ["onlydata", "withvar", "withvarcov"]):
     ...     # error statistics
-    ...     print(f"\nStatistics for {title}:")
+    ...     print(f"\nError Statistics for {title}:")
     ...     # get amplitude errors
     ...     norm_est = np.sqrt(np.sum(vel_en_est[case]**2, axis=1))
     ...     err_amp = norm_est - norm_true
@@ -290,50 +301,86 @@ from the true values:
     ...     # print rms of both
     ...     print(f"RMS Amplitude: {np.sqrt(np.mean(err_amp**2)):.11g}")
     ...     print(f"RMS Angle: {np.sqrt(np.mean(err_angle**2)):.11g}")
+    ...     # print covariances
+    ...     print("Secular (Co)Variances")
+    ...     print(pd.DataFrame(index=station_names,
+    ...                        data=cov_en_est[case],
+    ...                        columns=["E-E", "N-N", "E-N"]))
     <BLANKLINE>
-    Statistics for Data:
+    Error Statistics for Data:
         Amplitude      Angle
-    S1   1.697651   4.359484
-    S2   0.328071   0.261513
-    S3  -0.677940   4.072121
-    S4  -0.659412  13.525467
-    S5  -0.898881   4.207969
-    S6   0.819918  10.613691
-    S7   0.157743  13.085969
-    S8   0.894263  15.771350
-    RMS Amplitude: 0.87955367999
-    RMS Angle: 9.8038857489
+    S1   2.598428   1.215275
+    S2   0.505623   4.063633
+    S3  -0.823852  11.933309
+    S4  -1.309459  14.540778
+    S5  -1.895504  10.011640
+    S6   0.477857   8.026414
+    S7   0.292104  12.141594
+    S8   0.863249   6.090901
+    RMS Amplitude: 1.3253632716
+    RMS Angle: 9.4934302719
+    Secular (Co)Variances
+             E-E       N-N  E-N
+    S1  0.063691  0.063691  0.0
+    S2  0.063691  0.063691  0.0
+    S3  0.063691  0.063691  0.0
+    S4  0.063691  0.063691  0.0
+    S5  0.088382  0.063691  0.0
+    S6  0.063691  0.063691  0.0
+    S7  0.063691  0.063691  0.0
+    S8  0.063691  0.063691  0.0
     <BLANKLINE>
-    Statistics for Data + Variance:
+    Error Statistics for Data + Variance:
         Amplitude     Angle
-    S1   1.511762  1.839559
-    S2   1.496591  0.231865
-    S3   1.594666  1.128778
-    S4  -1.494915  6.149112
-    S5  -0.972639  6.333535
-    S6   0.683505  6.031706
-    S7   0.000223  1.616320
-    S8   0.708014  4.211801
-    RMS Amplitude: 1.1841362945
-    RMS Angle: 4.1738823044
+    S1   1.680626  1.263873
+    S2   0.245351  1.477345
+    S3  -0.928216  2.238697
+    S4  -0.985113  6.066963
+    S5  -1.082151  7.696245
+    S6   0.995734  3.697095
+    S7   0.106339  1.188509
+    S8   0.572923  3.609512
+    RMS Amplitude: 0.94992227405
+    RMS Angle: 4.0764805213
+    Secular (Co)Variances
+             E-E       N-N  E-N
+    S1  0.397303  0.226716  0.0
+    S2  0.327963  0.327963  0.0
+    S3  0.226716  0.397303  0.0
+    S4  0.327963  0.327963  0.0
+    S5  0.397303  0.226716  0.0
+    S6  0.327963  0.327963  0.0
+    S7  0.226716  0.397303  0.0
+    S8  0.327963  0.327963  0.0
     <BLANKLINE>
-    Statistics for Data + Variance + Covariance:
-        Amplitude     Angle
-    S1   1.572796  1.954775
-    S2   0.767869  3.342269
-    S3  -0.656516  2.929676
-    S4  -0.903166  9.659920
-    S5  -1.009938  6.237068
-    S6   0.562830  6.694827
-    S7   0.015474  1.011020
-    S8   0.728856  5.113027
-    RMS Amplitude: 0.87879575059
-    RMS Angle: 5.3359148666
+    Error Statistics for Data + Variance + Covariance:
+        Amplitude      Angle
+    S1   1.888550   1.969501
+    S2   0.414432   2.517659
+    S3  -0.811653   4.516261
+    S4  -0.993368  10.887050
+    S5  -1.305148   6.773861
+    S6   0.738884   5.765371
+    S7   0.169693   3.082705
+    S8   0.815215   5.680584
+    RMS Amplitude: 1.0202124819
+    RMS Angle: 5.8098923752
+    Secular (Co)Variances
+             E-E       N-N           E-N
+    S1  0.397303  0.226716 -1.915294e-16
+    S2  0.312009  0.312009  8.529381e-02
+    S3  0.226716  0.397303 -1.291082e-15
+    S4  0.312009  0.312009 -8.529381e-02
+    S5  0.397303  0.226716  9.883866e-17
+    S6  0.312009  0.312009  8.529381e-02
+    S7  0.097160  0.397303  3.061551e-16
+    S8  0.312009  0.312009 -8.529381e-02
 
-Clearly, the fit using all the available information leads to the best set of parameters.
-Furthermore, from the verbose output of the spatial solver, we also see that we find sparser,
-and more spatially-consistent solution for the network, as evidenced by the smaller number
-of unique parameters.
+Including the (co)variance has decreased our misfit slightly. However, including the variance
+information in the fitting process has led to smaller formal uncertainties in the fitted
+model parameters. Finally, comparing the covariance case with the variance case, we have
+furthermore gained insight that the East-North components of the velocity for stations
+S2, S4, S6, and S8 are strongly correlated.
 
 Correlation of parameters
 -------------------------
@@ -434,6 +481,8 @@ Looking at the covariance::
 
 We now see how only the parameters that have been estimated have correlation entries,
 and again, we see the tradeoff between the one spline and the linear polynomial.
+The figure looks essentially the same as the previous one, confirming our mathematical
+approximation of the L0 regularization worked.
 
 Empirical covariance estimation
 -------------------------------
@@ -480,7 +529,7 @@ and once purely data-based. First, truth-based:
     ...         station["Displacement"].data = \
     ...             station["Truth"].data + generate_model_and_noise(angle, rng)[2]
     ...     # solve, same reweight_func, same penalty = easy
-    ...     net.fit("Displacement", solver="lasso_regression", penalty=5,
+    ...     net.fit("Displacement", solver="lasso_regression", penalty=10,
     ...             reweight_max_iters=5, reweight_func=rw_func,
     ...             use_data_variance=True, use_data_covariance=True,
     ...             formal_covariance=True, progress_desc=f"Fit {i}")
@@ -509,7 +558,7 @@ And second, data-based:
     ...         station["Displacement"].data = \
     ...             orig_data[station.name] + generate_model_and_noise(angle, rng)[2]
     ...     # solve, same reweight_func, same penalty = easy
-    ...     net.fit("Displacement", solver="lasso_regression", penalty=5,
+    ...     net.fit("Displacement", solver="lasso_regression", penalty=10,
     ...             reweight_max_iters=5, reweight_func=rw_func,
     ...             use_data_variance=True, use_data_covariance=True,
     ...             formal_covariance=True, progress_desc=f"Fit {i}")

@@ -39,9 +39,9 @@ def run_single(all_inputs):
                         station=all_stations[station_names[istat]])
     net.spatialfit("Synthetic",
                    penalty=float(pen),
-                   spatial_reweight_models=["Transient"],
+                   spatial_l0_models=["Transient"],
                    spatial_reweight_iters=20,
-                   local_reweight_func=rw_func,
+                   reweight_func=rw_func,
                    spatial_reweight_max_rms=1e-6,
                    dist_weight_min=80,
                    no_pbar=True)
@@ -243,7 +243,7 @@ if __name__ == "__main__":
         plt.close(fig)
 
     # use only j=1, rw_func_scale=1e-1 for single plot
-    pen = penalties[0]
+    pen = penalties[1]
     j = 1
     rw_func_scale = rw_func_scales[j]
     fig, ax = plt.subplots(figsize=(4, 4))
