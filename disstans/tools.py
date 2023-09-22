@@ -695,7 +695,6 @@ def parse_maintenance_table(csvpath: str,
         Parsed maintenance table.
     maint_dict
         Dictionary of that maps the station names to a list of steptimes.
-        TODO define list type
 
     Notes
     -----

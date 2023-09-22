@@ -12,23 +12,23 @@ from warnings import warn
 from .config import defaults
 from .tools import parallelize
 from .models import Step
+from .network import Network
 
 
-def okada_displacement(station_lla, eq_catalog_row):
+def okada_displacement(station_lla: list[float], eq_catalog_row: pd.Series) -> np.ndarray:
     """
     For a single station and a single row from the earthquake catalog as defined by
     :func:`~okada_prior`, calculate the estimated displacement.
 
     Parameters
     ----------
-    station_lla : list
+    station_lla
         Location of the station, see :attr:`~disstans.station.Station.location`.
-    eq_catalog_row : pandas.Series
+    eq_catalog_row
         A single row of the earthquake catalog as defined by :func:`~okada_prior`.
 
     Returns
     -------
-    station_disp : numpy.ndarray
         3D displacement in mm.
     """
     station_lla = np.array(station_lla)
@@ -103,8 +103,14 @@ def _okada_get_cumdisp(time_station_settings):
     return steptimes
 
 
-def okada_prior(network, catalog_path, target_timeseries=None, target_model=None,
-                target_model_regularize=False, no_pbar=False, catalog_prior_kw_args={}):
+def okada_prior(network: Network,
+                catalog_path: str,
+                target_timeseries: str | None = None,
+                target_model: str | None = None,
+                target_model_regularize: bool = False,
+                no_pbar: bool = False,
+                catalog_prior_kw_args: dict = {}
+                ) -> dict[str, list]:
     r"""
     Given a catalog of earthquakes (including moment tensors), calculate an approximate
     displacement for each of the stations in the network.
@@ -114,27 +120,26 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
 
     Parameters
     ---------
-    network : Network
+    network
         Network instance whose stations should be used.
-    catalog_path : str
+    catalog_path
         File name of the earthquake catalog to load. Currently, only the Japanese
         NIED's F-net earthquake mechanism catalog format is supported.
-    target_timeseries : str, optional
+    target_timeseries
         Name of the timeseries to add the model to.
-    target_model : str, optional
+    target_model
         Name of the earthquake model added to ``target_timeseries``.
         Has to be passed if ``target_timeseries`` is passed.
-    target_model_regularize : bool, optional
+    target_model_regularize
         Whether to mark the model for regularization or not.
-    no_pbar : bool, optional
+    no_pbar
         Suppress the progress bar with ``True`` (default: ``False``).
-    catalog_prior_kw_args : dict, optional
+    catalog_prior_kw_args
         A dictionary fine-tuning the displacement calculation and modeling, see
         :attr:`~disstans.config.defaults` for explanations and defaults.
 
     Returns
     -------
-    eq_steps_dict : dict
         Dictionary of that maps the station names to a list of steptimes.
 
     Notes
@@ -231,8 +236,13 @@ def okada_prior(network, catalog_path, target_timeseries=None, target_model=None
     return eq_steps_dict
 
 
-def empirical_prior(network, catalog_path, target_timeseries=None, target_model=None,
-                    target_model_regularize=False, do_add=True):
+def empirical_prior(network: Network,
+                    catalog_path: str,
+                    target_timeseries: str | None = None,
+                    target_model: str | None = None,
+                    target_model_regularize: bool = False,
+                    do_add: bool = True
+                    ) -> dict[str, list]:
     r"""
     Given a catalog of earthquakes, compute whether a station is expected to
     see a step with the following empirical formula (used by the Geodesy group at
@@ -250,22 +260,21 @@ def empirical_prior(network, catalog_path, target_timeseries=None, target_model=
 
     Parameters
     ---------
-    network : Network
+    network
         Network instance whose stations should be used.
-    catalog_path : str
+    catalog_path
         File name of the earthquake catalog to load. Currently, only the Japanese
         NIED's F-net earthquake mechanism catalog format is supported.
-    target_timeseries : str, optional
+    target_timeseries
         Name of the timeseries to add the model to.
-    target_model : str, optional
+    target_model
         Name of the earthquake model added to ``target_timeseries``.
         Has to be passed if ``target_timeseries`` is passed.
-    target_model_regularize : bool, optional
+    target_model_regularize
         Whether to mark the model for regularization or not.
 
     Returns
     -------
-    eq_steps_dict : dict
         Dictionary of that maps the station names to a list of steptimes.
 
 
