@@ -9,7 +9,7 @@ Model (Parent Class)
 .. autoclass:: disstans.models.Model
    :members:
    :special-members:
-   :private-members: _get_arch, _get_mapping
+   :private-members: _get_arch
 
 .. autofunction:: disstans.models.check_model_dict
 

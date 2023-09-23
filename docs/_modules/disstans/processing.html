@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -11,8 +11,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -34,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -68,7 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -138,6 +140,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -218,6 +226,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -232,21 +242,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -303,16 +312,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -334,6 +343,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -402,6 +412,7 @@
 <span class="sd">For general helper functions, see :mod:`~disstans.tools`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -411,15 +422,20 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span> <span class="nn">pandas.api.indexers</span> <span class="kn">import</span> <span class="n">BaseIndexer</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
 <span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
 <span class="kn">from</span> <span class="nn">.compiled</span> <span class="kn">import</span> <span class="n">selectpair</span>
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">Timedelta</span><span class="p">,</span> <span class="n">parallelize</span><span class="p">,</span> <span class="n">tvec_to_numpycol</span><span class="p">,</span> <span class="n">date2decyear</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Polynomial</span>
+<span class="kn">from</span> <span class="nn">.station</span> <span class="kn">import</span> <span class="n">Station</span>
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
 
 
-<div class="viewcode-block" id="unwrap_dict_and_ts"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.unwrap_dict_and_ts">[docs]</a><span class="k">def</span> <span class="nf">unwrap_dict_and_ts</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="unwrap_dict_and_ts"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.unwrap_dict_and_ts">[docs]</a><span class="k">def</span> <span class="nf">unwrap_dict_and_ts</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A wrapper decorator that aims at simplifying the coding of processing functions.</span>
 <span class="sd">    Ideally, a new function that doesn&#39;t need to know if its input is a</span>
@@ -446,6 +462,11 @@
 <span class="sd">        def func(in_array, **kw_args):</span>
 <span class="sd">            # do some things</span>
 <span class="sd">            return out_array</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func</span>
+<span class="sd">        Function to be wrapped.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">):</span>
@@ -516,7 +537,13 @@
 <span class="sd">    For more information, see the pandas documentation about `custom window rolling</span>
 <span class="sd">    &lt;https://pandas.pydata.org/docs/user_guide/window.html#custom-window-rolling&gt;`_.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">get_window_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_values</span><span class="p">,</span> <span class="n">min_periods</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">closed</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_window_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">num_values</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                          <span class="n">min_periods</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+                          <span class="n">center</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+                          <span class="n">closed</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+                          <span class="n">step</span><span class="p">:</span> <span class="n">Any</span>
+                          <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This is the function that needs to be implemented for the</span>
 <span class="sd">        :class:`~pandas.api.indexers.BaseIndexer` class to be used for all</span>
@@ -528,14 +555,14 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        num_values : int</span>
+<span class="sd">        num_values</span>
 <span class="sd">            Total number of values in the array to be rolled through.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        start : np.ndarray</span>
+<span class="sd">        start</span>
 <span class="sd">            Start indices of individual windows.</span>
-<span class="sd">        end  : np.ndarray</span>
+<span class="sd">        end</span>
 <span class="sd">            End indices (exclusive) of individual windows.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># window_size is set by BaseIndexer.__init__</span>
@@ -564,7 +591,7 @@
 
 
 <div class="viewcode-block" id="median"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.median">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
-<span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the rolling median filter column-wise. Missing observations (NaNs) are</span>
 <span class="sd">    ignored during the median calculation, but missing observations are not imputed</span>
@@ -573,18 +600,17 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    array : numpy.ndarray</span>
+<span class="sd">    array</span>
 <span class="sd">        2D input array (can contain NaNs).</span>
 <span class="sd">        Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept</span>
 <span class="sd">        :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and</span>
 <span class="sd">        dictionaries of them as input.</span>
-<span class="sd">    kernel_size : int</span>
+<span class="sd">    kernel_size</span>
 <span class="sd">        Kernel size (length of moving window to compute the median over).</span>
 <span class="sd">        Has to be an odd number.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    filtered : numpy.ndarray</span>
 <span class="sd">        2D filtered array (may still contain NaNs).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># make sure the array is 2D even if it&#39;s only a single column</span>
@@ -600,37 +626,44 @@
 
 
 <div class="viewcode-block" id="decompose"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.decompose">[docs]</a><span class="nd">@unwrap_dict_and_ts</span>
-<span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">return_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">decompose</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+              <span class="n">num_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+              <span class="n">return_sources</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span><span class="kc">None</span>
+              <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decomposes the input signal into different components using PCA or ICA.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    array : numpy.ndarray</span>
+<span class="sd">    array</span>
 <span class="sd">        Input array of shape :math:`(\text{num_observations},\text{n_stations})`</span>
 <span class="sd">        (can contain NaNs).</span>
 <span class="sd">        Wrapped by :func:`~disstans.processing.unwrap_dict_and_ts` to also accept</span>
 <span class="sd">        :class:`~disstans.timeseries.Timeseries`, :class:`~pandas.DataFrame` and</span>
 <span class="sd">        dictionaries of them as input (i.e. the output of</span>
 <span class="sd">        :meth:`~disstans.network.Network.export_network_ts`).</span>
-<span class="sd">    method : str</span>
+<span class="sd">    method</span>
 <span class="sd">        Method to use to decompose the array. Possible values are ``&#39;pca&#39;`` and ``&#39;ica&#39;``:</span>
 <span class="sd">        ``&#39;pca&#39;`` uses :class:`~sklearn.decomposition.PCA` (motivated by [dong06]_), whereas</span>
 <span class="sd">        ``&#39;ica&#39;`` uses :class:`~sklearn.decomposition.FastICA` (motivated by [huang12]_).</span>
-<span class="sd">    num_components : int, optional</span>
-<span class="sd">        Number of components to estimate. Defaults to ``1``. If ``None``, all are used.</span>
-<span class="sd">    return_sources : bool, optional</span>
+<span class="sd">    num_components</span>
+<span class="sd">        Number of components to estimate. If ``None``, all are used.</span>
+<span class="sd">    return_sources</span>
 <span class="sd">        If ``True``, return not only the best-fit model, but also the sources</span>
 <span class="sd">        themselves in space and time. Defaults to ``False``.</span>
+<span class="sd">    rng</span>
+<span class="sd">        Random number generator instance to use to fill missing values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    model : numpy.ndarray</span>
+<span class="sd">    model</span>
 <span class="sd">        Best-fit model with shape :math:`(\text{num_observations},\text{n_stations})`.</span>
-<span class="sd">    temporal : numpy.ndarray</span>
+<span class="sd">    temporal</span>
 <span class="sd">        Only if ``return_sources=True``: Temporal source with shape</span>
 <span class="sd">        :math:`(\text{num_observations},\text{num_components})`.</span>
-<span class="sd">    spatial : numpy.ndarray</span>
+<span class="sd">    spatial</span>
 <span class="sd">        Only if ``return_sources=True``: Spatial source with shape</span>
 <span class="sd">        :math:`(\text{num_components},\text{n_stations})`.</span>
 
@@ -658,7 +691,11 @@
     <span class="n">array_nanmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">array_nansd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">array_nanind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
-    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">),</span> <span class="s2">&quot;&#39;rng&#39; needs to be None or a &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;Generator instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
     <span class="k">for</span> <span class="n">icol</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">array</span><span class="p">[</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">],</span> <span class="n">icol</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_nanmean</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span> <span class="o">+</span> \
             <span class="n">array_nansd</span><span class="p">[</span><span class="n">icol</span><span class="p">]</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">array_nanind</span><span class="p">[:,</span> <span class="n">icol</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
@@ -692,8 +729,12 @@
         <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="clean"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.clean">[docs]</a><span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">ts_in</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">ts_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">clean_kw_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">reference_callable_args</span><span class="o">=</span><span class="p">{}):</span>
+<div class="viewcode-block" id="clean"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.clean">[docs]</a><span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="n">station</span><span class="p">:</span> <span class="n">Station</span><span class="p">,</span>
+          <span class="n">ts_in</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+          <span class="n">reference</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Timeseries</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">,</span>
+          <span class="n">ts_out</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">clean_kw_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>  <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+          <span class="n">reference_callable_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span>  <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{})</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function operating on a single station&#39;s timeseries to clean it from outliers,</span>
 <span class="sd">    and mask it out if the data is not good enough. The criteria are set by</span>
@@ -713,23 +754,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    station : disstans.station.Station</span>
+<span class="sd">    station</span>
 <span class="sd">        Station to operate on.</span>
-<span class="sd">    ts_in : str</span>
+<span class="sd">    ts_in</span>
 <span class="sd">        Description of the timeseries to clean.</span>
-<span class="sd">    reference : str, disstans.timeseries.Timeseries, function</span>
+<span class="sd">    reference</span>
 <span class="sd">        Reference timeseries.</span>
 <span class="sd">        If string, checks for a timeseries with that description in the ``station``.</span>
 <span class="sd">        If a :class:`~disstans.timeseries.Timeseries` instance, use it directly.</span>
 <span class="sd">        If a function, the reference timeseries will be calculated as</span>
 <span class="sd">        ``t_ref = reference(ts_in, **reference_callable_args)``.</span>
-<span class="sd">    ts_out : str, optional</span>
+<span class="sd">    ts_out</span>
 <span class="sd">        If provided, duplicate ``ts_in`` to a new timeseries ``ts_out``</span>
 <span class="sd">        and clean the copy (to preserve the raw timeseries).</span>
-<span class="sd">    clean_kw_args : dict, optional</span>
+<span class="sd">    clean_kw_args</span>
 <span class="sd">        Override the default cleaning criteria in :attr:`~disstans.config.defaults`,</span>
 <span class="sd">        see the explanations above.</span>
-<span class="sd">    reference_callable_args : dict, optional</span>
+<span class="sd">    reference_callable_args</span>
 <span class="sd">        If ``reference`` is a function, ``reference_callable_args`` can be used</span>
 <span class="sd">        to pass additional keyword arguments to the former when calculating</span>
 <span class="sd">        the reference timeseries.</span>
@@ -755,7 +796,7 @@
     <span class="c1"># in the latter case, the input is name of function to call</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">)</span>
             <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">reference</span><span class="p">)):</span>
+            <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">reference</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;reference&#39; has to either be a Timeseries, the name of one, &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;or a function, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">):</span>
@@ -763,7 +804,7 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># get reference time series</span>
         <span class="n">ts_ref</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">reference</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">reference</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">reference</span><span class="p">):</span>
         <span class="n">ts_ref</span> <span class="o">=</span> <span class="n">reference</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="o">**</span><span class="n">reference_callable_args</span><span class="p">)</span>
     <span class="c1"># check that both timeseries have the same data columns</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ts_ref</span><span class="o">.</span><span class="n">data_cols</span> <span class="o">==</span> <span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">:</span>
@@ -811,7 +852,10 @@
         <span class="n">station</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">ts_out</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="midas"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.midas">[docs]</a><span class="k">def</span> <span class="nf">midas</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+<div class="viewcode-block" id="midas"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.midas">[docs]</a><span class="k">def</span> <span class="nf">midas</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">,</span>
+          <span class="n">steps</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateTimeIndex</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span>
+          <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Polynomial</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function performs the MIDAS estimate as described by [blewitt16]_.</span>
 <span class="sd">    It is adapted from the Fortran code provided by the author (see</span>
@@ -825,21 +869,21 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ts : disstans.timeseries.Timeseries</span>
+<span class="sd">    ts</span>
 <span class="sd">        Timeseries to perform the MIDAS algorithm on.</span>
-<span class="sd">    steps : pandas.Series, pandas.DatetimeIndex, optional</span>
+<span class="sd">    steps</span>
 <span class="sd">        If given, a pandas Series or Index of step times, across which no pairs</span>
 <span class="sd">        should be formed.</span>
-<span class="sd">    tolerance : float, optional</span>
+<span class="sd">    tolerance</span>
 <span class="sd">        Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    mdl : disstans.models.Polynomial</span>
+<span class="sd">    mdl</span>
 <span class="sd">        Fitted polynomial (offset &amp; constant velocity) model.</span>
-<span class="sd">    res : disstans.timeseries.Timeseries</span>
+<span class="sd">    res</span>
 <span class="sd">        Residual timeseries.</span>
-<span class="sd">    stats : dict</span>
+<span class="sd">    stats</span>
 <span class="sd">        Fittings statistics computed along the way.</span>
 <span class="sd">        ``&#39;num_epochs&#39;``, ``&#39;num_used&#39;``, ``&#39;num_pairs&#39;``, and ``&#39;nstep&#39;`` are the number of</span>
 <span class="sd">        epochs in ``ts``, the number of epochs used in the velocity pairs, the number of pairs</span>
@@ -958,72 +1002,76 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    kernel_size : int, optional</span>
+<span class="sd">    kernel_size</span>
 <span class="sd">        Window size of the detector. Must be odd.</span>
-<span class="sd">    kernel_size_min : int, optional</span>
+<span class="sd">    kernel_size_min</span>
 <span class="sd">        Minimum window size of the detector (for edges). Must be smaller than or equal</span>
-<span class="sd">        to ``kernel_size``. Defaults to ``0``.</span>
-<span class="sd">    x : numpy.ndarray, optional</span>
+<span class="sd">        to ``kernel_size``.</span>
+<span class="sd">    x</span>
 <span class="sd">        Input array of shape :math:`(\text{num_observations},)`.</span>
 <span class="sd">        Should not contain NaNs.</span>
-<span class="sd">    y : numpy.ndarray, optional</span>
+<span class="sd">    y</span>
 <span class="sd">        Input array of shape :math:`(\text{num_observations}, \text{num_components})`.</span>
 <span class="sd">        Can contain NaNs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">kernel_size_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">=</span> <span class="n">kernel_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span> <span class="o">=</span> <span class="n">kernel_size_min</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Kernel (window) size of the detector. &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;kernel_size&#39; has not yet been set.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span>
 
     <span class="nd">@kernel_size</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">kernel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">kernel_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">),</span> \
                 <span class="sa">f</span><span class="s2">&quot;&#39;kernel_size&#39; must be an odd integer or None, got </span><span class="si">{</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size</span> <span class="o">=</span> <span class="n">kernel_size</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Minimum kernel (window) size of the detector. &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;kernel_size_min&#39; has not yet been set.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span>
 
     <span class="nd">@kernel_size_min</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">kernel_size_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_size_min</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">kernel_size_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">kernel_size_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="s2">&quot;&#39;kernel_size_min&#39; must be smaller &quot;</span> <span class="o">+</span> \
                 <span class="sa">f</span><span class="s2">&quot;or equal to &#39;kernel_size&#39;, but </span><span class="si">{</span><span class="n">kernel_size_min</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_size_min</span> <span class="o">=</span> <span class="n">kernel_size_min</span>
 
 <div class="viewcode-block" id="StepDetector.AIC_c"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.AIC_c">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">AIC_c</span><span class="p">(</span><span class="n">rss</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">AIC_c</span><span class="p">(</span><span class="n">rss</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the Akaike Information Criterion for small samples for Least Squares</span>
 <span class="sd">        regression results. Implementation is based on [burnhamanderson02]_ (ch. 2).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        rss : float</span>
+<span class="sd">        rss</span>
 <span class="sd">            Residual sum of squares.</span>
-<span class="sd">        n : int</span>
+<span class="sd">        n</span>
 <span class="sd">            Number of samples.</span>
-<span class="sd">        K : int</span>
+<span class="sd">        K</span>
 <span class="sd">            Degrees of freedom. If the Least Squares model has :math:`\text{num_parameters}`</span>
 <span class="sd">            parameters (including the mean), then the degrees of freedom are</span>
 <span class="sd">            :math:`K = \text{num_parameters} + 1`</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        float</span>
 <span class="sd">            The Small Sample AIC for Least Squares :math:`\text{AIC}_c`.</span>
 
 <span class="sd">        References</span>
@@ -1045,7 +1093,11 @@
         <span class="k">return</span> <span class="n">AIC</span> <span class="o">+</span> <span class="n">correction</span></div>
 
 <div class="viewcode-block" id="StepDetector.test_single"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.test_single">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">test_single</span><span class="p">(</span><span class="n">xwindow</span><span class="p">,</span> <span class="n">ywindow</span><span class="p">,</span> <span class="n">valid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">test_single</span><span class="p">(</span><span class="n">xwindow</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                    <span class="n">ywindow</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                    <span class="n">valid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">maxdel</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
+                    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a single window (of arbitrary, but odd length), perform the AIC hypothesis test</span>
 <span class="sd">        whether a step is likely present (H1) or not (H0) in the ``y`` data given</span>
@@ -1053,30 +1105,30 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        xwindow : numpy.ndarray</span>
+<span class="sd">        xwindow</span>
 <span class="sd">            Time array of shape :math:`(\text{num_window},)`.</span>
 <span class="sd">            Should not contain NaNs.</span>
-<span class="sd">        ywindow : numpy.ndarray</span>
+<span class="sd">        ywindow</span>
 <span class="sd">            Data array of shape :math:`(\text{num_window},)`.</span>
 <span class="sd">            Should not contain NaNs.</span>
-<span class="sd">        valid : numpy.ndarray, optional</span>
+<span class="sd">        valid</span>
 <span class="sd">            Mask array of the data of shape :math:`(\text{num_window},)`,</span>
 <span class="sd">            with ``1`` where the ``ywindow`` is finite (not NaN or infinity).</span>
 <span class="sd">            If not passed to the function, it is calculated internally, which will slow</span>
 <span class="sd">            down the computation.</span>
-<span class="sd">        maxdel : float, optional</span>
+<span class="sd">        maxdel</span>
 <span class="sd">            Difference in AIC that should be considered not significantly better.</span>
 <span class="sd">            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        int</span>
+<span class="sd">        best_hyp</span>
 <span class="sd">            Best hypothesis (``0`` for no step, ``1`` for step).</span>
-<span class="sd">        float</span>
+<span class="sd">        rel_prob</span>
 <span class="sd">            If H1 is the best hypothesis (and suffices ``maxdel``), its relative probability,</span>
 <span class="sd">            otherwise the relative probability of H0 (which therefore can be ``0`` if H0 is also</span>
 <span class="sd">            the best hypothesis in general).</span>
-<span class="sd">        tuple</span>
+<span class="sd">        msr_hyps</span>
 <span class="sd">            A 2-tuple of the two mean-squared residuals of the H0 and H1 hypotheses,</span>
 <span class="sd">            respectively. Assuming the test is unbiased, this is the residual&#39;s variance.</span>
 <span class="sd">            Is ``NaN`` in an element if the least-squares model did not converge.</span>
@@ -1146,7 +1198,7 @@
             <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Delta_best</span><span class="p">[</span><span class="n">best_hyp</span><span class="p">],</span> <span class="p">(</span><span class="n">rss0</span><span class="o">/</span><span class="n">n_total</span><span class="p">,</span> <span class="n">rss1</span><span class="o">/</span><span class="n">n_total</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span><span class="n">data_and_params</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parallelizable part of the search, search_network and search_catalog methods.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1237,7 +1289,11 @@
             <span class="n">var1</span> <span class="o">=</span> <span class="n">var1</span><span class="p">[</span><span class="n">check_only</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_components</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">probs</span><span class="p">,</span> <span class="n">var0</span><span class="p">,</span> <span class="n">var1</span>
 
-<div class="viewcode-block" id="StepDetector.search"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="StepDetector.search"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+               <span class="n">maxdel</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
+               <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function that will search for steps in the data.</span>
 <span class="sd">        Upon successful completion, it will return the relative step probabilities</span>
@@ -1246,26 +1302,26 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x : numpy.ndarray</span>
+<span class="sd">        x</span>
 <span class="sd">            Input array of shape :math:`(\text{num_observations},)`.</span>
 <span class="sd">            Should not contain NaNs.</span>
-<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">        y</span>
 <span class="sd">            Input array of shape :math:`(\text{num_observations}, \text{num_components})`.</span>
 <span class="sd">            Can contain NaNs.</span>
-<span class="sd">        maxdel : float, optional</span>
+<span class="sd">        maxdel</span>
 <span class="sd">            Difference in AIC that should be considered not significantly better.</span>
 <span class="sd">            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        probabilities : numpy.ndarray</span>
+<span class="sd">        probabilities</span>
 <span class="sd">            Contains the relative probabilities array.</span>
 <span class="sd">            Has shape :math:`(\text{num_observations}, \text{num_components})`.</span>
-<span class="sd">        var0 : numpy.ndarray</span>
+<span class="sd">        var0</span>
 <span class="sd">            Contains the array of the residuals variance of the hypothesis</span>
 <span class="sd">            that no step is present.</span>
 <span class="sd">            Has shape :math:`(\text{num_observations}, \text{num_components})`.</span>
-<span class="sd">        var1 : numpy.ndarray</span>
+<span class="sd">        var1</span>
 <span class="sd">            Contains the array of the residuals variance of the hypothesis</span>
 <span class="sd">            that a step is present.</span>
 <span class="sd">            Has shape :math:`(\text{num_observations}, \text{num_components})`.</span>
@@ -1278,8 +1334,16 @@
         <span class="k">return</span> <span class="n">StepDetector</span><span class="o">.</span><span class="n">_search</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">kernel_size_min</span><span class="p">,</span> <span class="n">maxdel</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StepDetector.search_network"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_network">[docs]</a>    <span class="k">def</span> <span class="nf">search_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">maxdel</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">aggregate_components</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="StepDetector.search_network"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_network">[docs]</a>    <span class="k">def</span> <span class="nf">search_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">net</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span>
+                       <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">maxdel</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                       <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+                       <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+                       <span class="n">gap_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+                       <span class="n">aggregate_components</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="n">no_pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Function that searches for steps in an entire network (possibly in parallel),</span>
 <span class="sd">        thresholds those probabilities, and identifies all the consecutive ranges in which</span>
@@ -1287,37 +1351,37 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        net : disstans.network.Network</span>
+<span class="sd">        net</span>
 <span class="sd">            Network instance to operate on.</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            :class:`~disstans.timeseries.Timeseries` description that will be analyzed.</span>
-<span class="sd">        maxdel : float, optional</span>
+<span class="sd">        maxdel</span>
 <span class="sd">            Difference in AIC that should be considered not significantly better.</span>
 <span class="sd">            (Refers to :math:`\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}`.)</span>
-<span class="sd">        threshold : float, optional</span>
+<span class="sd">        threshold</span>
 <span class="sd">            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.</span>
-<span class="sd">        gap : float, optional</span>
+<span class="sd">        gap</span>
 <span class="sd">            Maximum gap between identified steps to count as a continuous period</span>
 <span class="sd">            of possible steps.</span>
-<span class="sd">        gap_unit : str, optional</span>
+<span class="sd">        gap_unit</span>
 <span class="sd">            Time unit of ``gap``.</span>
-<span class="sd">        aggregate_components : bool, optional</span>
-<span class="sd">            If ``True`` (default), use the maximum step probability across all data components</span>
+<span class="sd">        aggregate_components</span>
+<span class="sd">            If ``True``, use the maximum step probability across all data components</span>
 <span class="sd">            when searching for steps. Otherwise, keep all steps from maximum probabilities in</span>
 <span class="sd">            each component (which could lead to multiple close-by steps).</span>
-<span class="sd">        no_pbar : bool, optional</span>
-<span class="sd">            Suppress the progress bar with ``True`` (default: ``False``).</span>
+<span class="sd">        no_pbar</span>
+<span class="sd">            Suppress the progress bar with ``True``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        step_table : pandas.DataFrame</span>
+<span class="sd">        step_table</span>
 <span class="sd">            A DataFrame containing the columns ``&#39;station&#39;`` (its name), ``&#39;time&#39;``</span>
 <span class="sd">            (a timestamp of the station) and ``&#39;probability&#39;`` (maximum :math:`\Delta_i`</span>
 <span class="sd">            over all components for this timestamp), as well as ``var0``, ``var1``</span>
 <span class="sd">            (the two hypotheses&#39; residuals variances for the component of</span>
 <span class="sd">            maximum step probability) and ``varred`` (the variance reduction in percent,</span>
 <span class="sd">            ``(var0 - var1) / var0``).</span>
-<span class="sd">        step_ranges : list</span>
+<span class="sd">        step_ranges</span>
 <span class="sd">            A list of lists containing continuous periods over all stations of the potential</span>
 <span class="sd">            steps as determined by ``gap`` and ``gap_unit``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1386,42 +1450,50 @@
             <span class="n">step_ranges</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="n">step_table</span><span class="p">,</span> <span class="n">step_ranges</span></div>
 
-<div class="viewcode-block" id="StepDetector.search_catalog"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_catalog">[docs]</a>    <span class="k">def</span> <span class="nf">search_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">gap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">gap_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">keep_nan_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="StepDetector.search_catalog"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.search_catalog">[docs]</a>    <span class="k">def</span> <span class="nf">search_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">net</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span>
+                       <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">catalog</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Dataframe</span><span class="p">,</span>
+                       <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+                       <span class="n">gap_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+                       <span class="n">keep_nan_probs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="n">no_pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search a dictionary of potential step times for each station in the dictionary</span>
 <span class="sd">        and assess the probability for each one.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        net : disstans.network.Network</span>
+<span class="sd">        net</span>
 <span class="sd">            Network instance to operate on.</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            :class:`~disstans.timeseries.Timeseries` description that will be analyzed.</span>
-<span class="sd">        catalog : dict, pandas.DataFrame</span>
+<span class="sd">        catalog</span>
 <span class="sd">            Dictionary where each key is a station name and its value is a list of</span>
 <span class="sd">            :class:`~pandas.Timestamp` compatible potential times/dates.</span>
 <span class="sd">            Alternatively, a DataFrame with at least the columns ``&#39;station&#39;`` and ``&#39;time&#39;``.</span>
-<span class="sd">        threshold : float, optional</span>
+<span class="sd">        threshold</span>
 <span class="sd">            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.</span>
-<span class="sd">        gap : float, optional</span>
+<span class="sd">        gap</span>
 <span class="sd">            Maximum gap between identified steps to count as a continuous period</span>
 <span class="sd">            of possible steps.</span>
-<span class="sd">        gap_unit : str, optional</span>
+<span class="sd">        gap_unit</span>
 <span class="sd">            Time unit of ``gap``.</span>
-<span class="sd">        keep_nan_probs : bool, optional</span>
+<span class="sd">        keep_nan_probs</span>
 <span class="sd">            (Only applies to a DataFrame-type ``catalog`` input.)</span>
 <span class="sd">            If a catalogued station is not in the network, or if a catalogued timestamp</span>
 <span class="sd">            is after the available timeseries, no step probability can be calculated</span>
 <span class="sd">            and the results will contain NaNs.</span>
-<span class="sd">            If ``True`` (default), those entries will be kept in the output, and if</span>
-<span class="sd">            ``False``, they will be dropped.</span>
-<span class="sd">        no_pbar : bool, optional</span>
-<span class="sd">            Suppress the progress bar with ``True`` (default: ``False``).</span>
+<span class="sd">            If ``True``, those entries will be kept in the output, and if ``False``,</span>
+<span class="sd">            they will be dropped.</span>
+<span class="sd">        no_pbar</span>
+<span class="sd">            Suppress the progress bar with ``True``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        step_table : pandas.DataFrame</span>
+<span class="sd">        step_table</span>
 <span class="sd">            A DataFrame containing the columns ``&#39;station&#39;`` (its name), ``&#39;time&#39;``</span>
 <span class="sd">            (a timestamp of the station) and ``&#39;probability&#39;`` (maximum :math:`\Delta_i`</span>
 <span class="sd">            over all components for this timestamp) for each potential step in ``catalog``,</span>
@@ -1429,7 +1501,7 @@
 <span class="sd">            for the component of maximum step probability).</span>
 <span class="sd">            If a DataFrame was passed as ``catalog``, a copy of that will be returned, with</span>
 <span class="sd">            the added columns specified above.</span>
-<span class="sd">        step_ranges : list</span>
+<span class="sd">        step_ranges</span>
 <span class="sd">            A list of lists containing continuous periods over all stations of the potential</span>
 <span class="sd">            steps as determined by ``gap`` and ``gap_unit``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1545,29 +1617,34 @@
         <span class="k">return</span> <span class="n">step_table</span><span class="p">,</span> <span class="n">step_ranges</span></div>
 
 <div class="viewcode-block" id="StepDetector.steps"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.StepDetector.steps">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">steps</span><span class="p">(</span><span class="n">probabilities</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxsteps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">aggregate_components</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-              <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">steps</span><span class="p">(</span><span class="n">probabilities</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+              <span class="n">maxsteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+              <span class="n">aggregate_components</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+              <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+              <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Threshold the probabilities to return a list of steps.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        threshold : float, optional</span>
+<span class="sd">        probabilities</span>
+<span class="sd">            Array of probabilities.</span>
+<span class="sd">        threshold</span>
 <span class="sd">            Minimum :math:`\Delta_i \geq 0` that needs to be satisfied in order to be a step.</span>
-<span class="sd">        maxsteps : int, optional</span>
+<span class="sd">        maxsteps</span>
 <span class="sd">            Return at most ``maxsteps`` number of steps. Can be useful if a good value for</span>
 <span class="sd">            ``threshold`` has not been found yet.</span>
-<span class="sd">        aggregate_components : bool, optional</span>
-<span class="sd">            If ``True`` (default), use the maximum step probability across all data components</span>
-<span class="sd">            when searching for steps. Otherwise, keep all steps from maximum probabilities in</span>
+<span class="sd">        aggregate_components</span>
+<span class="sd">            If ``True``, use the maximum step probability across all data components when</span>
+<span class="sd">            searching for steps. Otherwise, keep all steps from maximum probabilities in</span>
 <span class="sd">            each component (which could lead to multiple close-by steps).</span>
-<span class="sd">        verbose : bool, optional</span>
-<span class="sd">            If ``True`` (default), print warnings when there will be a large number of</span>
-<span class="sd">            steps identified given the ``threshold``.</span>
+<span class="sd">        verbose</span>
+<span class="sd">            If ``True``, print warnings when there will be a large number of steps</span>
+<span class="sd">            identified given the ``threshold``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        steps : list</span>
 <span class="sd">            Returns a list of :class:`~numpy.ndarray` arrays that contain the indices of steps</span>
 <span class="sd">            for each component.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

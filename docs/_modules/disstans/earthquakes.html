@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.earthquakes &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>disstans.earthquakes &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -11,8 +11,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -34,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -68,7 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -138,6 +140,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -218,6 +226,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -232,21 +242,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -303,16 +312,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -334,6 +343,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -399,32 +409,35 @@
 <span class="sd">of earthquakes.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">okada_wrapper</span> <span class="kn">import</span> <span class="n">dc3d0wrapper</span> <span class="k">as</span> <span class="n">dc3d0</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">defaults</span>
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">parallelize</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Step</span>
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
 
 
-<div class="viewcode-block" id="okada_displacement"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_displacement">[docs]</a><span class="k">def</span> <span class="nf">okada_displacement</span><span class="p">(</span><span class="n">station_lla</span><span class="p">,</span> <span class="n">eq_catalog_row</span><span class="p">):</span>
+<div class="viewcode-block" id="okada_displacement"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_displacement">[docs]</a><span class="k">def</span> <span class="nf">okada_displacement</span><span class="p">(</span><span class="n">station_lla</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">eq_catalog_row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For a single station and a single row from the earthquake catalog as defined by</span>
 <span class="sd">    :func:`~okada_prior`, calculate the estimated displacement.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    station_lla : list</span>
+<span class="sd">    station_lla</span>
 <span class="sd">        Location of the station, see :attr:`~disstans.station.Station.location`.</span>
-<span class="sd">    eq_catalog_row : pandas.Series</span>
+<span class="sd">    eq_catalog_row</span>
 <span class="sd">        A single row of the earthquake catalog as defined by :func:`~okada_prior`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    station_disp : numpy.ndarray</span>
 <span class="sd">        3D displacement in mm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">station_lla</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">station_lla</span><span class="p">)</span>
@@ -445,7 +458,7 @@
     <span class="k">return</span> <span class="n">station_disp</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_okada_get_displacements</span><span class="p">(</span><span class="n">station_and_parameters</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_okada_get_displacements</span><span class="p">(</span><span class="n">station_and_parameters</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallelizable sub-function of okada_prior that for a single earthquake</span>
 <span class="sd">    source calculates the displacement response for many locations.</span>
@@ -478,7 +491,7 @@
     <span class="k">return</span> <span class="n">disp</span>
 
 
-<span class="k">def</span> <span class="nf">_okada_get_cumdisp</span><span class="p">(</span><span class="n">time_station_settings</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_okada_get_cumdisp</span><span class="p">(</span><span class="n">time_station_settings</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallelizable sub-function of okada_prior that for a single station</span>
 <span class="sd">    calculates the cumulative displacements at the timestamps contained</span>
@@ -499,8 +512,14 @@
     <span class="k">return</span> <span class="n">steptimes</span>
 
 
-<div class="viewcode-block" id="okada_prior"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_prior">[docs]</a><span class="k">def</span> <span class="nf">okada_prior</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">,</span> <span class="n">target_timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">target_model_regularize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">catalog_prior_kw_args</span><span class="o">=</span><span class="p">{}):</span>
+<div class="viewcode-block" id="okada_prior"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.okada_prior">[docs]</a><span class="k">def</span> <span class="nf">okada_prior</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span>
+                <span class="n">catalog_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">target_timeseries</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">target_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">target_model_regularize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">no_pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">catalog_prior_kw_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a catalog of earthquakes (including moment tensors), calculate an approximate</span>
 <span class="sd">    displacement for each of the stations in the network.</span>
@@ -510,27 +529,26 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ---------</span>
-<span class="sd">    network : Network</span>
+<span class="sd">    network</span>
 <span class="sd">        Network instance whose stations should be used.</span>
-<span class="sd">    catalog_path : str</span>
+<span class="sd">    catalog_path</span>
 <span class="sd">        File name of the earthquake catalog to load. Currently, only the Japanese</span>
 <span class="sd">        NIED&#39;s F-net earthquake mechanism catalog format is supported.</span>
-<span class="sd">    target_timeseries : str, optional</span>
+<span class="sd">    target_timeseries</span>
 <span class="sd">        Name of the timeseries to add the model to.</span>
-<span class="sd">    target_model : str, optional</span>
+<span class="sd">    target_model</span>
 <span class="sd">        Name of the earthquake model added to ``target_timeseries``.</span>
 <span class="sd">        Has to be passed if ``target_timeseries`` is passed.</span>
-<span class="sd">    target_model_regularize : bool, optional</span>
+<span class="sd">    target_model_regularize</span>
 <span class="sd">        Whether to mark the model for regularization or not.</span>
-<span class="sd">    no_pbar : bool, optional</span>
-<span class="sd">        Suppress the progress bar with ``True`` (default: ``False``).</span>
-<span class="sd">    catalog_prior_kw_args : dict, optional</span>
+<span class="sd">    no_pbar</span>
+<span class="sd">        Suppress the progress bar with ``True``.</span>
+<span class="sd">    catalog_prior_kw_args</span>
 <span class="sd">        A dictionary fine-tuning the displacement calculation and modeling, see</span>
 <span class="sd">        :attr:`~disstans.config.defaults` for explanations and defaults.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    eq_steps_dict : dict</span>
 <span class="sd">        Dictionary of that maps the station names to a list of steptimes.</span>
 
 <span class="sd">    Notes</span>
@@ -627,8 +645,13 @@
     <span class="k">return</span> <span class="n">eq_steps_dict</span></div>
 
 
-<div class="viewcode-block" id="empirical_prior"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.empirical_prior">[docs]</a><span class="k">def</span> <span class="nf">empirical_prior</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">,</span> <span class="n">target_timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">target_model_regularize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">do_add</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="empirical_prior"><a class="viewcode-back" href="../../disstans/earthquakes.html#disstans.earthquakes.empirical_prior">[docs]</a><span class="k">def</span> <span class="nf">empirical_prior</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span>
+                    <span class="n">catalog_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">target_timeseries</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">target_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">target_model_regularize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="n">do_add</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a catalog of earthquakes, compute whether a station is expected to</span>
 <span class="sd">    see a step with the following empirical formula (used by the Geodesy group at</span>
@@ -646,22 +669,21 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ---------</span>
-<span class="sd">    network : Network</span>
+<span class="sd">    network</span>
 <span class="sd">        Network instance whose stations should be used.</span>
-<span class="sd">    catalog_path : str</span>
+<span class="sd">    catalog_path</span>
 <span class="sd">        File name of the earthquake catalog to load. Currently, only the Japanese</span>
 <span class="sd">        NIED&#39;s F-net earthquake mechanism catalog format is supported.</span>
-<span class="sd">    target_timeseries : str, optional</span>
+<span class="sd">    target_timeseries</span>
 <span class="sd">        Name of the timeseries to add the model to.</span>
-<span class="sd">    target_model : str, optional</span>
+<span class="sd">    target_model</span>
 <span class="sd">        Name of the earthquake model added to ``target_timeseries``.</span>
 <span class="sd">        Has to be passed if ``target_timeseries`` is passed.</span>
-<span class="sd">    target_model_regularize : bool, optional</span>
+<span class="sd">    target_model_regularize</span>
 <span class="sd">        Whether to mark the model for regularization or not.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    eq_steps_dict : dict</span>
 <span class="sd">        Dictionary of that maps the station names to a list of steptimes.</span>
 
 

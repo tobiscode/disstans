@@ -28,7 +28,7 @@ if __name__ == "__main__":
     lons, lats = np.cos(angles)/10, np.sin(angles)/10
     net = Network(name=net_name)
     for (istat, stat_name), lon, lat in zip(enumerate(station_names), lons, lats):
-        net[stat_name] = Station(name=stat_name, location=[lat, lon, 0])
+        net[stat_name] = Station(name=stat_name, location=[lat, lon, 0.0])
 
     # create timevector
     import pandas as pd
@@ -140,10 +140,10 @@ if __name__ == "__main__":
     # good penalty etc., but much easier with spatial L0
     print("\nSpatial L0, only data\n")
     stats = net.spatialfit("Displacement",
-                           penalty=5,
-                           spatial_reweight_models=["Transient"],
+                           penalty=10,
+                           spatial_l0_models=["Transient"],
                            spatial_reweight_iters=20,
-                           local_reweight_func=rw_func,
+                           reweight_func=rw_func,
                            use_data_variance=False,
                            use_data_covariance=False,
                            formal_covariance=True,
@@ -155,13 +155,18 @@ if __name__ == "__main__":
     vel_en_est["onlydata"] = \
         np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
 
+    # save estimated velocity covariances
+    cov_en_est = {}
+    cov_en_est["onlydata"] = \
+        np.stack([s.models["Displacement"]["Secular"].cov[[2, 3, 2], [2, 3, 3]] for s in net])
+
     # solve using the data variance
     print("\nSpatial L0, with variance\n")
     stats = net.spatialfit("Displacement",
-                           penalty=5,
-                           spatial_reweight_models=["Transient"],
+                           penalty=10,
+                           spatial_l0_models=["Transient"],
                            spatial_reweight_iters=20,
-                           local_reweight_func=rw_func,
+                           reweight_func=rw_func,
                            use_data_variance=True,
                            use_data_covariance=False,
                            formal_covariance=True,
@@ -172,13 +177,17 @@ if __name__ == "__main__":
     vel_en_est["withvar"] = \
         np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
 
+    # save estimated velocity covariances
+    cov_en_est["withvar"] = \
+        np.stack([s.models["Displacement"]["Secular"].cov[[2, 3, 2], [2, 3, 3]] for s in net])
+
     # solve with the data variance and covariance
     print("\nSpatial L0, with variance and covariance\n")
     stats = net.spatialfit("Displacement",
-                           penalty=5,
-                           spatial_reweight_models=["Transient"],
+                           penalty=10,
+                           spatial_l0_models=["Transient"],
                            spatial_reweight_iters=20,
-                           local_reweight_func=rw_func,
+                           reweight_func=rw_func,
                            use_data_variance=True,
                            use_data_covariance=True,
                            formal_covariance=True,
@@ -188,6 +197,10 @@ if __name__ == "__main__":
     # save estimated velocity components
     vel_en_est["withvarcov"] = \
         np.stack([s.models["Displacement"]["Secular"].parameters[1, :] for s in net])
+
+    # save estimated velocity covariances
+    cov_en_est["withvarcov"] = \
+        np.stack([s.models["Displacement"]["Secular"].cov[[2, 3, 2], [2, 3, 3]] for s in net])
 
     # plot a timeseries and scalogram
     net.gui(station="S2", save=True, timeseries=["Displacement"],
@@ -208,7 +221,7 @@ if __name__ == "__main__":
         zip(["Data", "Data + Variance", "Data + Variance + Covariance"],
             ["onlydata", "withvar", "withvarcov"]):
         # error statistics
-        print(f"\nStatistics for {title}:")
+        print(f"\nError Statistics for {title}:")
         # get amplitude errors
         norm_est = np.sqrt(np.sum(vel_en_est[case]**2, axis=1))
         err_amp = norm_est - norm_true
@@ -223,6 +236,11 @@ if __name__ == "__main__":
         # print rms of both
         print(f"RMS Amplitude: {np.sqrt(np.mean(err_amp**2)):.11g}")
         print(f"RMS Angle: {np.sqrt(np.mean(err_angle**2)):.11g}")
+        # print covariances
+        print("Secular (Co)Variances")
+        print(pd.DataFrame(index=station_names,
+                           data=cov_en_est[case],
+                           columns=["E-E", "N-N", "E-N"]))
 
     # save current covariance
     spat_cov = {sta_name: net[sta_name].models["Displacement"].cov
@@ -282,7 +300,7 @@ if __name__ == "__main__":
             station["Displacement"].data = \
                 station["Truth"].data + generate_model_and_noise(angle, rng)[2]
         # solve, same reweight_func, same penalty = easy
-        net.fit("Displacement", solver="lasso_regression", penalty=5,
+        net.fit("Displacement", solver="lasso_regression", penalty=10,
                 reweight_max_iters=5, reweight_func=rw_func,
                 use_data_variance=True, use_data_covariance=True,
                 formal_covariance=True, progress_desc=f"Fit {i}")
@@ -315,7 +333,7 @@ if __name__ == "__main__":
             station["Displacement"].data = \
                 orig_data[station.name] + generate_model_and_noise(angle, rng)[2]
         # solve, same reweight_func, same penalty = easy
-        net.fit("Displacement", solver="lasso_regression", penalty=5,
+        net.fit("Displacement", solver="lasso_regression", penalty=10,
                 reweight_max_iters=5, reweight_func=rw_func,
                 use_data_variance=True, use_data_covariance=True,
                 formal_covariance=True, progress_desc=f"Fit {i}")

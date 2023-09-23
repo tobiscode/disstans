@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -12,15 +12,17 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="DISSTANS" href="../disstans.html" />
+    <link rel="next" title="Frequently Asked Questions" href="../faq.html" />
     <link rel="prev" title="Example 1: Long Valley Caldera Transient Motions" href="example_1.html" /> 
 </head>
 
@@ -37,7 +39,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -71,7 +73,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -141,6 +143,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -221,6 +229,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -235,21 +245,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -306,16 +315,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -337,6 +346,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -406,23 +416,32 @@
 <p>This example builds on the data from <a class="reference internal" href="example_1.html"><span class="doc">Example 1</span></a> and compares secular
 velocity model results with published data. On the way, it shows how to do coordinate
 transformations from the cartesian to the local geodetic reference frame.</p>
-<nav class="contents local" id="table-of-contents">
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figures and numbers presented in this example no longer exactly match what is
+presented in <a class="reference internal" href="../disstans/models.html#koehne23" id="id1"><span>[koehne23]</span></a>. This is because significant code improvements to DISSTANS
+were introduced with version 2, and the effect of the hyperparameters changed.
+Care has been taken to recreate this example to match what is in the published study,
+although small quantitative changes remain. The qualitative interpretations are
+unchanged.</p>
+</div>
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#preparations" id="id3">Preparations</a></p></li>
-<li><p><a class="reference internal" href="#homogenous-translation-rotation-and-strain" id="id4">Homogenous translation, rotation, and strain</a></p></li>
-<li><p><a class="reference internal" href="#rotation-about-an-euler-pole" id="id5">Rotation about an Euler pole</a></p></li>
-<li><p><a class="reference internal" href="#comparison-of-different-methods" id="id6">Comparison of different methods</a></p></li>
-<li><p><a class="reference internal" href="#loading-other-different-datasets" id="id7">Loading other different datasets</a></p></li>
-<li><p><a class="reference internal" href="#north-american-reference-frame" id="id8">North American reference frame</a></p></li>
-<li><p><a class="reference internal" href="#estimate-euler-poles-for-datasets" id="id9">Estimate Euler poles for datasets</a></p></li>
-<li><p><a class="reference internal" href="#map-view-comparison-of-datasets" id="id10">Map view comparison of datasets</a></p></li>
-<li><p><a class="reference internal" href="#quantitative-comparison-of-datasets" id="id11">Quantitative comparison of datasets</a></p></li>
-<li><p><a class="reference internal" href="#references" id="id12">References</a></p></li>
+<li><p><a class="reference internal" href="#preparations" id="id4">Preparations</a></p></li>
+<li><p><a class="reference internal" href="#homogenous-translation-rotation-and-strain" id="id5">Homogenous translation, rotation, and strain</a></p></li>
+<li><p><a class="reference internal" href="#rotation-about-an-euler-pole" id="id6">Rotation about an Euler pole</a></p></li>
+<li><p><a class="reference internal" href="#comparison-of-different-methods" id="id7">Comparison of different methods</a></p></li>
+<li><p><a class="reference internal" href="#loading-other-different-datasets" id="id8">Loading other different datasets</a></p></li>
+<li><p><a class="reference internal" href="#north-american-reference-frame" id="id9">North American reference frame</a></p></li>
+<li><p><a class="reference internal" href="#estimate-euler-poles-for-datasets" id="id10">Estimate Euler poles for datasets</a></p></li>
+<li><p><a class="reference internal" href="#map-view-comparison-of-datasets" id="id11">Map view comparison of datasets</a></p></li>
+<li><p><a class="reference internal" href="#quantitative-comparison-of-datasets" id="id12">Quantitative comparison of datasets</a></p></li>
+<li><p><a class="reference internal" href="#references" id="id13">References</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
 <p>Here are the imports we will need throughout the example:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
@@ -456,7 +475,7 @@ transformations from the cartesian to the local geodetic reference frame.</p>
 for the secular, linear velocities previously estimated, using two different methods.</p>
 </section>
 <section id="homogenous-translation-rotation-and-strain">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Homogenous translation, rotation, and strain</a><a class="headerlink" href="#homogenous-translation-rotation-and-strain" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5">Homogenous translation, rotation, and strain</a><a class="headerlink" href="#homogenous-translation-rotation-and-strain" title="Permalink to this heading"></a></h2>
 <p>The first method determines the best-fit displacement gradient tensor for the
 entire network, which in turn can be decomposed into a rotation and a strain (rate) tensor
 (plus a velocity offset term). More information can be found in the
@@ -478,7 +497,7 @@ curious what the quantities mean. For now, let’s move on to the other method
 included in DISSTANS, which might be a bit more intuitive.</p>
 </section>
 <section id="rotation-about-an-euler-pole">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Rotation about an Euler pole</a><a class="headerlink" href="#rotation-about-an-euler-pole" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6">Rotation about an Euler pole</a><a class="headerlink" href="#rotation-about-an-euler-pole" title="Permalink to this heading"></a></h2>
 <p>The second method assumes that all observations lie on a rigid body that can move
 freely on a sphere, but not deform. All rigid-body motion on a sphere can be
 expressed about a rotation around a location on the sphere, and we’ll use the
@@ -502,14 +521,14 @@ convenient Euler pole notation using <a class="reference internal" href="../diss
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Latitude:  </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> °</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Rate:      </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.2g</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.2g</span><span class="si">}</span><span class="s2"> °/a&quot;</span><span class="p">)</span>
 <span class="go">Euler pole results (with one s.d.):</span>
-<span class="go">Longitude: 61.059 +/- 0.003 °</span>
-<span class="go">Latitude:  31.733 +/- 0.625 °</span>
-<span class="go">Rate:      0.0019 +/- 2.2e-05 °/a</span>
+<span class="go">Longitude: 56.979 +/- 0.040 °</span>
+<span class="go">Latitude:  -52.711 +/- 0.444 °</span>
+<span class="go">Rate:      0.00071 +/- 5.3e-06 °/a</span>
 </pre></div>
 </div>
 </section>
 <section id="comparison-of-different-methods">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Comparison of different methods</a><a class="headerlink" href="#comparison-of-different-methods" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7">Comparison of different methods</a><a class="headerlink" href="#comparison-of-different-methods" title="Permalink to this heading"></a></h2>
 <p>Plotting the resulting two velocity fields (see script file) gives us the plot
 below. We can clearly see that the Euler pole solution gives a rotation pattern
 about some center south of the plot. The solution assuming a Homogenous
@@ -518,12 +537,12 @@ with associated extension.</p>
 <img alt="../_images/example_2_single.png" src="../_images/example_2_single.png" />
 </section>
 <section id="loading-other-different-datasets">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Loading other different datasets</a><a class="headerlink" href="#loading-other-different-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id8">Loading other different datasets</a><a class="headerlink" href="#loading-other-different-datasets" title="Permalink to this heading"></a></h2>
 <p>We will now compare the DISSTANS-derived secular velocities with other published
 datasets. Specifically, we will be using the MIDAS-calculated velocities from UNR
-(<a class="reference internal" href="../disstans/processing.html#blewitt16" id="id1"><span>[blewitt16]</span></a> - <cite>link to file &lt;http://geodesy.unr.edu/velocities/midas.IGS14.txt&gt;`_</cite>)
-and from the Geodesy Advancing Geosciences and EarthScope (GAGE) facility (<a class="reference internal" href="#herring16" id="id2"><span>[herring16]</span></a> -
-<cite>link to file &lt;https://data.unavco.org/archive/gnss/products/velocity/pbo.final_igs14.vel&gt;`_</cite>).</p>
+(<a class="reference internal" href="../disstans/processing.html#blewitt16" id="id2"><span>[blewitt16]</span></a> - <a class="reference external" href="http://geodesy.unr.edu/velocities/midas.IGS14.txt">MIDAS velocities</a>)
+and from the Geodesy Advancing Geosciences and EarthScope (GAGE) facility (<a class="reference internal" href="#herring16" id="id3"><span>[herring16]</span></a> -
+<a class="reference external" href="https://data.unavco.org/archive/gnss/products/velocity/pbo.final_igs14.vel">GAGE velocities</a>).</p>
 <p>To load them, we rely on pandas:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># MIDAS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fname_midas</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">/midas.IGS14.txt&quot;</span><span class="p">)</span>
@@ -590,7 +609,7 @@ same way:</p>
 </div>
 </section>
 <section id="north-american-reference-frame">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">North American reference frame</a><a class="headerlink" href="#north-american-reference-frame" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id9">North American reference frame</a><a class="headerlink" href="#north-american-reference-frame" title="Permalink to this heading"></a></h2>
 <p>Even though removing an average velocity field with either method will remove any large-scale
 plate motion from the IGS14-referenced data, for plotting purposes, we want to be able to see
 the velocity field relative to stable North America. We could have downloaded the data in that
@@ -617,7 +636,7 @@ plate moving around Earth to get the velocity relative to the NA plate:</p>
 </div>
 </section>
 <section id="estimate-euler-poles-for-datasets">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">Estimate Euler poles for datasets</a><a class="headerlink" href="#estimate-euler-poles-for-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id10">Estimate Euler poles for datasets</a><a class="headerlink" href="#estimate-euler-poles-for-datasets" title="Permalink to this heading"></a></h2>
 <p>Since an Euler pole captures a more “explainable” signal, while still approximating most
 of the velocity field, we will only use this method for the comparison between fields.
 Instead of creating timeseries and <a class="reference internal" href="../disstans/models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a> models, and adding
@@ -652,15 +671,15 @@ background velocity at every station, and calculate the residuals:</p>
 </div>
 </section>
 <section id="map-view-comparison-of-datasets">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Map view comparison of datasets</a><a class="headerlink" href="#map-view-comparison-of-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id11">Map view comparison of datasets</a><a class="headerlink" href="#map-view-comparison-of-datasets" title="Permalink to this heading"></a></h2>
 <p>Let’s now have a look at the modeled velocities, the background velocity field, as
 well as the residual velocities, for all three datasets. For the plotting code, see the
 script file.</p>
 <p>First off, we can see that qualitatively, the three secular velocity models (DISSTANS,
 GAGE, and MIDAS) mostly match each other. Zooming into the caldera region, however, there
 are some significant differences.</p>
-<img alt="../_images/example_2_observed_igs.png" src="../_images/example_2_observed_igs.png" />
-<img alt="../_images/example_2_observed_na.png" src="../_images/example_2_observed_na.png" />
+<img alt="../_images/example_2_modeled_igs.png" src="../_images/example_2_modeled_igs.png" />
+<img alt="../_images/example_2_modeled_na.png" src="../_images/example_2_modeled_na.png" />
 <p>In terms of the background vleocity field derived from the best-fit Euler poles, we see
 that qualitatively, all three estimates mostly match each other again, with some differences
 for the DISSTANS background field in the east of the study area.</p>
@@ -680,7 +699,7 @@ format.</p>
 </div>
 </section>
 <section id="quantitative-comparison-of-datasets">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Quantitative comparison of datasets</a><a class="headerlink" href="#quantitative-comparison-of-datasets" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id12">Quantitative comparison of datasets</a><a class="headerlink" href="#quantitative-comparison-of-datasets" title="Permalink to this heading"></a></h2>
 <p>To put into numbers what we gathered by looking at the maps, we will perform a couple of
 root-mean-square (RMS) calculations of the residuals of the different models and station
 subsets. In order to do that, we first need to define a region close to the caldera center,
@@ -757,50 +776,53 @@ fields:</p>
 <span class="gp">... </span>       <span class="p">)</span> <span class="o">/</span> <span class="n">rmses_res</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <span class="go">Difference between model predictions</span>
-<span class="go">             D2M      D2G       M2G</span>
-<span class="go">common  0.001528  0.00169  0.000678</span>
-<span class="go">outer   0.001536  0.00177  0.000693</span>
+<span class="go">             D2M       D2G       M2G</span>
+<span class="go">common  0.000310  0.000864  0.000678</span>
+<span class="go">outer   0.000362  0.000388  0.000693</span>
 
 <span class="go">Residuals common_stations</span>
 <span class="go">       DISSTANS     MIDAS      GAGE</span>
-<span class="go">all    0.002692  0.003065  0.003883</span>
-<span class="go">outer  0.002880  0.002788  0.002789</span>
-<span class="go">inner  0.002490  0.003318  0.004730</span>
+<span class="go">all    0.002487  0.003065  0.003883</span>
+<span class="go">outer  0.002883  0.002788  0.002789</span>
+<span class="go">inner  0.002015  0.003318  0.004730</span>
 
 <span class="go">Residuals outer_stations</span>
 <span class="go">       DISSTANS     MIDAS      GAGE</span>
-<span class="go">all    0.002642  0.003084  0.003989</span>
-<span class="go">outer  0.002743  0.002755  0.002888</span>
-<span class="go">inner  0.002537  0.003381  0.004846</span>
+<span class="go">all    0.002598  0.003084  0.003989</span>
+<span class="go">outer  0.002901  0.002755  0.002888</span>
+<span class="go">inner  0.002254  0.003381  0.004846</span>
 
 <span class="go">Difference of residuals between station subsets</span>
 <span class="go">       DISSTANS     MIDAS      GAGE</span>
-<span class="go">all    0.000430  0.000471  0.000505</span>
-<span class="go">outer  0.000447  0.000472  0.000505</span>
-<span class="go">inner  0.000412  0.000471  0.000505</span>
+<span class="go">all    0.000990  0.000471  0.000505</span>
+<span class="go">outer  0.001000  0.000472  0.000505</span>
+<span class="go">inner  0.000979  0.000471  0.000505</span>
 
 <span class="go">Relative improvement from other models to DISSTANS</span>
 <span class="go">          MIDAS      GAGE</span>
-<span class="go">all    0.121536  0.306674</span>
-<span class="go">outer -0.033071 -0.032699</span>
-<span class="go">inner  0.249614  0.473615</span>
+<span class="go">all    0.188404  0.359450</span>
+<span class="go">outer -0.034228 -0.033855</span>
+<span class="go">inner  0.392870  0.574107</span>
 </pre></div>
 </div>
 <p>There’s a lot to unpack here, so let’s jump right in:</p>
 <ol class="arabic simple">
-<li><p>The MIDAs and GAGE modeled velocity fields are similar to each other at the scale of
-less than 1 mm/a, the DISSTANS field is still comparable, with an RMS difference of
-less than 2 mm/a.</p></li>
+<li><p>The DISSTANS, MIDAS and GAGE modeled velocity fields are all similar to each other at
+the scale of less than 1 mm/a, at least using the root-mean-square differences.</p></li>
 <li><p>Excluding the stations inside the LVCR from the Euler pole estimation does not
 significantly affect the results for any of the datasets. The differences are below
 the level of 1 mm/a.</p></li>
-<li><p>Across the board, the DISSTANS solution has the lowest residuals. Looking more closely,
+<li><p>Across all stations, the DISSTANS solution has the lowest residuals. Looking more closely,
 this is mainly driven by lower residuals inside the LVCR, where the relative
-improvements are 25% to 47%. Outside the LVCR, DISSTANS’ residuals are slightly larger
-by about 3%.</p></li>
-<li><p>While there are large differences between residuals inside and outside the LVCR for
-the MIDAS (33% to 28%, respectively) and GAGE (47% to 28%) models, the residuals for
-the DISSTANS model are the most similar (25% to 29%).</p></li>
+improvements are 39% and 57% relative to MIDAS and GAGE, respectively. Outside the LVCR,
+DISSTANS’ residuals are slightly larger by about 3%.</p></li>
+<li><p>There are large differences between residuals inside and outside the LVCR for
+the DISSTANS (20% to 29%, respectively), MIDAS (33% to 28%) and GAGE (47% to 28%) models,
+DISSTANS’ residuals are larger outside than inside, whereas MIDAS and GAGE residuals are
+larger inside. It should be noted, however, that that puts all three models in relative
+equivalence for the region outside the LVCR. This further shows DISSTANS’ ability to fit
+the transient signals inside the LVCR without significantly compromising the fit quality
+outside the LVCR.</p></li>
 </ol>
 <p>Keep in mind that this of course does not mean that DISSTANS’ solution is “better” than
 the MIDAS or GAGE solutions. After all, neither of those models explicitly aim to model
@@ -808,17 +830,16 @@ transient episodes, nor do they require significant user interaction. This compa
 does show, however, how the explicit modeling of transients changes the results.</p>
 </section>
 <section id="references">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
-<div role="list" class="citation-list">
-<div class="citation" id="herring16" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">herring16</a><span class="fn-bracket">]</span></span>
-<p>Herring, T. A., Melbourne, T. I., Murray, M. H., Floyd, M. A.,
+<h2><a class="toc-backref" href="#id13">References</a><a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<dl class="citation">
+<dt class="label" id="herring16"><span class="brackets"><a class="fn-backref" href="#id3">herring16</a></span></dt>
+<dd><p>Herring, T. A., Melbourne, T. I., Murray, M. H., Floyd, M. A.,
 Szeliga, W. M., King, R. W., et al. (2016). <em>Plate Boundary Observatory and related
 networks: GPS data analysis methods and geodetic products</em>.
 Reviews of Geophysics, 54(4), 759–808.
 doi:<a class="reference external" href="https://doi.org/10.1002/2016RG000529">10.1002/2016RG000529</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </section>
 </section>
 
@@ -827,7 +848,7 @@ doi:<a class="reference external" href="https://doi.org/10.1002/2016RG000529">10
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="example_1.html" class="btn btn-neutral float-left" title="Example 1: Long Valley Caldera Transient Motions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../disstans.html" class="btn btn-neutral float-right" title="DISSTANS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

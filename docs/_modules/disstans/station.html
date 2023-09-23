@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.station &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>disstans.station &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -11,8 +11,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -34,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -68,7 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -138,6 +140,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -218,6 +226,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -232,21 +242,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -303,16 +312,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -334,6 +343,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -407,6 +417,8 @@
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sparse</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">models</span> <span class="k">as</span> <span class="n">disstans_models</span>
 <span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
@@ -425,14 +437,20 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    name : str</span>
+<span class="sd">    name</span>
 <span class="sd">        Name of the station.</span>
-<span class="sd">    location : tuple, list, numpy.ndarray</span>
+<span class="sd">    location</span>
 <span class="sd">        Location (Latitude [°], Longitude [°], Altitude [m]) of the station.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">location</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Name of the station. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">location</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">location</span><span class="p">])</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">location</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Location of the station (Latitude [°], Longitude [°], Altitude [m]). &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span> <span class="o">=</span> <span class="p">{}</span>
@@ -471,14 +489,13 @@
 <span class="sd">            stat.fits[&#39;myts&#39;][&#39;mymodel&#39;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Station.__str__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.__str__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Special function that returns a readable summary of the station.</span>
 <span class="sd">        Accessed, for example, by Python&#39;s ``print()`` built-in function.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        info : str</span>
 <span class="sd">            Station summary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="si">}</span><span class="s2"> with timeseries&quot;</span>
@@ -490,19 +507,18 @@
                 <span class="n">info</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> - Fits: </span><span class="si">{</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">info</span></div>
 
-<div class="viewcode-block" id="Station.__getitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.__getitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Timeseries</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience special function that provides a shorthand notation</span>
 <span class="sd">        to access the station&#39;s timeseries.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Description of the timeseries.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        disstans.timeseries.Timeseries</span>
 <span class="sd">            Timeseries in station.</span>
 
 <span class="sd">        Example</span>
@@ -517,7 +533,7 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Station </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: No timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39; present.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Station.__setitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__setitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">timeseries</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.__setitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__setitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeseries</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience special function that allows a dictionary-like adding of timeseries to</span>
 <span class="sd">        the station by wrapping :meth:`~add_timeseries`.</span>
@@ -528,7 +544,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">timeseries</span><span class="p">,</span> <span class="n">warn_existing</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.__delitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__delitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.__delitem__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__delitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience special function that allows a dictionary-like removing of timeseries from</span>
 <span class="sd">        the station by wrapping :meth:`~remove_timeseries`.</span>
@@ -539,7 +555,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_timeseries</span><span class="p">(</span><span class="n">ts_description</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.__contains__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.__contains__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Special function that allows to check whether a certain timeseries</span>
 <span class="sd">        is in the station.</span>
@@ -556,7 +572,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ts_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span></div>
 
-<div class="viewcode-block" id="Station.__iter__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.__iter__"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Timeseries</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience special function that allows for a shorthand notation to quickly</span>
 <span class="sd">        iterate over all timeseries.</span>
@@ -577,16 +593,20 @@
             <span class="k">yield</span> <span class="n">ts</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Abbreviation for :attr:`~timeseries`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span>
 
-<div class="viewcode-block" id="Station.get_arch"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.get_arch">[docs]</a>    <span class="k">def</span> <span class="nf">get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.get_arch"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.get_arch">[docs]</a>    <span class="k">def</span> <span class="nf">get_arch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a dictionary describing the architecture of this station,</span>
 <span class="sd">        to be used when creating a network JSON configuration file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            Ditionary of attributes.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -612,10 +632,18 @@
                 <span class="n">stat_arch</span><span class="p">[</span><span class="s2">&quot;models&quot;</span><span class="p">][</span><span class="n">ts_description</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">get_arch</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">stat_arch</span></div>
 
-<div class="viewcode-block" id="Station.add_timeseries"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">add_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">timeseries</span><span class="p">,</span> <span class="n">uncertainties_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">override_src</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">override_data_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">override_data_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">override_var_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">override_cov_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_models</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">warn_existing</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.add_timeseries"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">add_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">timeseries</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">,</span>
+                       <span class="n">uncertainties_from</span><span class="p">:</span> <span class="n">Timeseries</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">override_src</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">override_data_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">override_data_cols</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">override_var_cols</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">override_cov_cols</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">add_models</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Model</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">warn_existing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+                       <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a timeseries to the station.</span>
 
@@ -624,31 +652,33 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Description of the timeseries.</span>
-<span class="sd">        timeseries : disstans.timeseries.Timeseries</span>
+<span class="sd">        timeseries</span>
 <span class="sd">            Timeseries object to add.</span>
-<span class="sd">        uncertainties_from : disstans.timeseries.Timeseries, optional</span>
+<span class="sd">        uncertainties_from</span>
 <span class="sd">            If the variance and covariance data should come from another timeseries,</span>
 <span class="sd">            specify the source timeseries here.</span>
-<span class="sd">        override_src : str, optional</span>
+<span class="sd">        override_src</span>
 <span class="sd">            Override the :attr:`~disstans.timeseries.Timeseries.src`</span>
 <span class="sd">            attribute of ``timeseries``.</span>
-<span class="sd">        override_data_unit : str, optional</span>
+<span class="sd">        override_data_unit</span>
 <span class="sd">            Override the :attr:`~disstans.timeseries.Timeseries.data_unit`</span>
 <span class="sd">            attribute of ``timeseries``.</span>
-<span class="sd">        override_data_cols : str, optional</span>
+<span class="sd">        override_data_cols</span>
 <span class="sd">            Override the :attr:`~disstans.timeseries.Timeseries.data_cols`</span>
 <span class="sd">            attribute of ``timeseries``.</span>
-<span class="sd">        override_var_cols : str, optional</span>
+<span class="sd">        override_var_cols</span>
 <span class="sd">            Override the :attr:`~disstans.timeseries.Timeseries.var_cols`</span>
 <span class="sd">            attribute of ``timeseries``.</span>
-<span class="sd">        override_cov_cols : str, optional</span>
+<span class="sd">        override_cov_cols</span>
 <span class="sd">            Override the :attr:`~disstans.timeseries.Timeseries.cov_cols`</span>
 <span class="sd">            attribute of ``timeseries``.</span>
-<span class="sd">        add_models : dict, optional</span>
+<span class="sd">        add_models</span>
 <span class="sd">            Dictionary of models to add to the timeseries, where the keys are the</span>
 <span class="sd">            model description and the values are :class:`~disstans.models.Model` objects.</span>
+<span class="sd">        warn_existing</span>
+<span class="sd">            Issue a warning if a station&#39;s timeseries is being overwritten.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -690,13 +720,13 @@
         <span class="k">if</span> <span class="n">add_models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_local_model_dict</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">model_kw_args</span><span class="o">=</span><span class="n">add_models</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.remove_timeseries"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.remove_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">remove_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.remove_timeseries"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.remove_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">remove_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a timeseries (including associated fits and models) from the station.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Description of the timeseries.</span>
 
 <span class="sd">        See Also</span>
@@ -720,18 +750,22 @@
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Station.add_local_model"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_description</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.add_local_model"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="n">model_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="n">model</span><span class="p">:</span> <span class="n">Model</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a model to a timeseries (overwrites the model if it has already</span>
 <span class="sd">        been added with the same description).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to add the model to.</span>
-<span class="sd">        model_description : str</span>
+<span class="sd">        model_description</span>
 <span class="sd">            Model description.</span>
-<span class="sd">        model : disstans.models.Model</span>
+<span class="sd">        model</span>
 <span class="sd">            Model object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -749,7 +783,7 @@
                  <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">model_description</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span></div>
 
-<div class="viewcode-block" id="Station.add_local_model_dict"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model_dict">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.add_local_model_dict"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model_dict">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Model</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a dictionary of models to a timeseries (overwrites the models if they have already</span>
 <span class="sd">        been added with the same description).</span>
@@ -758,9 +792,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to add the model to.</span>
-<span class="sd">        model_dict : dict</span>
+<span class="sd">        model_dict</span>
 <span class="sd">            Dictionary of ``{model_description: model}`` key-value pairs to add.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> \
@@ -768,7 +802,10 @@
         <span class="k">for</span> <span class="n">mdl_desc</span><span class="p">,</span> <span class="n">mdl</span> <span class="ow">in</span> <span class="n">model_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">mdl_desc</span><span class="p">,</span> <span class="n">mdl</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.add_local_model_kwargs"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_kw_args</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.add_local_model_kwargs"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">add_local_model_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                               <span class="n">model_kw_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+                               <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add models to a timeseries from a dictionary of keyword arguments needed to create</span>
 <span class="sd">        them (overwrites the models if they have already been added with the same description).</span>
@@ -777,9 +814,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to add the model to.</span>
-<span class="sd">        model_kw_args : dict</span>
+<span class="sd">        model_kw_args</span>
 <span class="sd">            Dictionary of structure ``{model_name: {&quot;type&quot;: modelclass, &quot;kw_args&quot;:</span>
 <span class="sd">            {**kw_args}}}`` that contains the names, types and necessary keyword arguments</span>
 <span class="sd">            to create each model object.</span>
@@ -791,19 +828,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="n">ts_description</span><span class="p">,</span>
                                  <span class="n">model_description</span><span class="o">=</span><span class="n">mdl_desc</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">mdl</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.remove_local_models"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.remove_local_models">[docs]</a>    <span class="k">def</span> <span class="nf">remove_local_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_descriptions</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.remove_local_models"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.remove_local_models">[docs]</a>    <span class="k">def</span> <span class="nf">remove_local_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                            <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                            <span class="n">model_descriptions</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                            <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove models from a timeseries.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to remove the model from.</span>
-<span class="sd">        model_descriptions : str or list</span>
+<span class="sd">        model_descriptions</span>
 <span class="sd">            Model description(s).</span>
-<span class="sd">        verbose : bool, optional</span>
-<span class="sd">            If ``True`` (default: ``False``), raise a warning if a timeseries or model</span>
-<span class="sd">            could not be found in the network.</span>
+<span class="sd">        verbose</span>
+<span class="sd">            If ``True``, raise a warning if a timeseries or model could not be found</span>
+<span class="sd">            in the network.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># unpack list</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_descriptions</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -826,27 +867,31 @@
                      <span class="sa">f</span><span class="s2">&quot;couldn&#39;t delete local model &#39;</span><span class="si">{</span><span class="n">mdl_desc</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">,</span>
                      <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Station.add_fit"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_fit">[docs]</a>    <span class="k">def</span> <span class="nf">add_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">fit</span><span class="p">,</span> <span class="n">model_description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.add_fit"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.add_fit">[docs]</a>    <span class="k">def</span> <span class="nf">add_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">fit</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
+                <span class="n">model_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">return_ts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Timeseries</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a fit dictionary to a timeseries&#39; model (overwrites the fit if it has</span>
 <span class="sd">        already been added for the model).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to add the fit to.</span>
-<span class="sd">        fit : dict</span>
+<span class="sd">        fit</span>
 <span class="sd">            Dictionary with the keys ``&#39;time&#39;``, ``&#39;fit&#39;``, ``&#39;var&#39;`` and ``&#39;cov&#39;``</span>
 <span class="sd">            (the latter two can be set to ``None``).</span>
-<span class="sd">        model_description : str, optional</span>
+<span class="sd">        model_description</span>
 <span class="sd">            Model description the fit applies to.</span>
 <span class="sd">            If ``None``, the fit is the sum of all individual model fits.</span>
-<span class="sd">        return_ts : bool, optional</span>
-<span class="sd">            If ``True`` (default: ``False``), return the created timeseries.</span>
+<span class="sd">        return_ts</span>
+<span class="sd">            If ``True``, return the created timeseries.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        fit_ts : disstans.timeseries.Timeseries</span>
 <span class="sd">            (If ``return_ts=True``.) The fit as a Timeseries object.</span>
 
 <span class="sd">        See Also</span>
@@ -878,15 +923,15 @@
         <span class="k">if</span> <span class="n">return_ts</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">fit_ts</span></div>
 
-<div class="viewcode-block" id="Station.remove_fit"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.remove_fit">[docs]</a>    <span class="k">def</span> <span class="nf">remove_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">model_description</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.remove_fit"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.remove_fit">[docs]</a>    <span class="k">def</span> <span class="nf">remove_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a fit from a timeseries&#39; model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to remove the fit from.</span>
-<span class="sd">        model_description : str</span>
+<span class="sd">        model_description</span>
 <span class="sd">            Model description to remove the fit from.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ts_description</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeseries</span><span class="p">:</span>
@@ -904,23 +949,26 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">model_description</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Station.sum_fits"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.sum_fits">[docs]</a>    <span class="k">def</span> <span class="nf">sum_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">fit_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.sum_fits"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.sum_fits">[docs]</a>    <span class="k">def</span> <span class="nf">sum_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">fit_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to quickly sum fits of a timeseries.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries whose fits to sum.</span>
-<span class="sd">        fit_list : list, optional</span>
+<span class="sd">        fit_list</span>
 <span class="sd">            List of strings containing the model names of the subset of the fitted models</span>
-<span class="sd">            to be summed. Defaults to all fitted models.</span>
+<span class="sd">            to be summed. ``None`` defaults to all fitted models.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        fit_sum : numpy.ndarray</span>
+<span class="sd">        fit_sum</span>
 <span class="sd">            2D array of shape :math:`(\text{n_observations},\text{n_components})`</span>
-<span class="sd">        fit_sum_var : numpy.ndarray or None</span>
+<span class="sd">        fit_sum_var</span>
 <span class="sd">            2D array of shape :math:`(\text{n_observations},\text{n_components})`.</span>
 <span class="sd">            Returns ``None`` if no standard deviations are available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -947,50 +995,54 @@
                 <span class="n">fit_sum_var</span> <span class="o">+=</span> <span class="n">fit</span><span class="o">.</span><span class="n">vars</span><span class="o">.</span><span class="n">values</span>
         <span class="k">return</span> <span class="n">fit_sum</span><span class="p">,</span> <span class="n">fit_sum_var</span></div>
 
-<div class="viewcode-block" id="Station.analyze_residuals"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.analyze_residuals">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">t_start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">mean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rms</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_observations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                          <span class="n">std_outlier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_rolling_dev</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.analyze_residuals"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.analyze_residuals">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="n">t_start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">t_end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">mean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="n">std</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="n">rms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="n">n_observations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="n">std_outlier</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                          <span class="n">max_rolling_dev</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+                          <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Analyze, print and return the residuals of a station&#39;s timeseries according</span>
 <span class="sd">        to certain metrics defined in the arguments.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries to analyze. Method assumes it already is a residual.</span>
-<span class="sd">        verbose : bool, optional</span>
-<span class="sd">            If True, additionally print the results. Defaults to ``False``.</span>
-<span class="sd">        t_start : str or pandas.Timestamp, optional</span>
+<span class="sd">        verbose</span>
+<span class="sd">            If True, additionally print the results.</span>
+<span class="sd">        t_start</span>
 <span class="sd">            If set, specify a lower bound for the analysis. ``t_start`` should be a</span>
 <span class="sd">            Timestamp-convertible string of the start time, or a datetime-like object.</span>
-<span class="sd">            Defaults to the first timestamp present in the timeseries.</span>
-<span class="sd">        t_end : str or pandas.Timestamp, optional</span>
+<span class="sd">            ``None`` defaults to the first timestamp present in the timeseries.</span>
+<span class="sd">        t_end</span>
 <span class="sd">            If set, specify an upper bound for the analysis. ``t_end`` should be a</span>
 <span class="sd">            Timestamp-convertible string of the end time, or a datetime-like object.</span>
-<span class="sd">            Defaults to the last timestamp present in the timeseries.</span>
-<span class="sd">        mean : bool, optional</span>
+<span class="sd">            ``None`` defaults to the last timestamp present in the timeseries.</span>
+<span class="sd">        mean</span>
 <span class="sd">            If ``True``, calculate the mean of the timeseries.</span>
 <span class="sd">            Adds the key ``&#39;Mean&#39;`` to the output dictionary.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        std : bool, optional</span>
+<span class="sd">        std</span>
 <span class="sd">            If ``True``, calculate the standard deviation of the timeseries.</span>
 <span class="sd">            Adds the key ``&#39;Standard Deviation&#39;`` to the output dictionary.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        rms : bool, list, optional</span>
+<span class="sd">        rms</span>
 <span class="sd">            If ``True``, calculate the root-mean-squared over all components combined,</span>
 <span class="sd">            or if ``rms`` is a list, only using those components.</span>
 <span class="sd">            Adds the key ``&#39;RMS&#39;`` to the output dictionary.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        n_observations : bool, optional</span>
+<span class="sd">        n_observations</span>
 <span class="sd">            If ``True``, count the number of observations (excluding NaNs) and NaNs.</span>
 <span class="sd">            Adds the keys ``&#39;Observations&#39;`` and ``&#39;Gaps&#39;`` to the output dictionary.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        std_outlier : int, float</span>
+<span class="sd">        std_outlier</span>
 <span class="sd">            If ``std_outlier &gt; 0``, count the number of non-NaN outliers, defined</span>
 <span class="sd">            by the number of standard deviations they are away from the mean.</span>
 <span class="sd">            Adds the key ``&#39;Outliers&#39;`` to the output dictionary.</span>
-<span class="sd">            Defaults to ``0``.</span>
-<span class="sd">        max_rolling_dev : int, optional</span>
+<span class="sd">        max_rolling_dev</span>
 <span class="sd">            If ``max_rolling_dev &gt; 0``, calculate the (sign-aware) maximum of the</span>
 <span class="sd">            rolling deviation from the mean with window size ``max_rolling_dev`` for</span>
 <span class="sd">            each component. If this is significantly larger than the standard deviation,</span>
@@ -999,7 +1051,6 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        results : dict</span>
 <span class="sd">            Dictionary that includes the results as defined by the arguments.</span>
 <span class="sd">            Empty by default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1062,54 +1113,62 @@
             <span class="n">results</span><span class="p">[</span><span class="s2">&quot;RMS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rms_result</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
-<div class="viewcode-block" id="Station.get_trend"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.get_trend">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">fit_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">t_start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_formal_variance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_sigma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">ignore_missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Station.get_trend"><a class="viewcode-back" href="../../disstans/station.html#disstans.station.Station.get_trend">[docs]</a>    <span class="k">def</span> <span class="nf">get_trend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">fit_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">components</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">total</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">t_start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">t_end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">use_formal_variance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">include_sigma</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+                  <span class="n">ignore_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                  <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates a linear trend through the desired model fits and over some time span.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ts_description : str</span>
+<span class="sd">        ts_description</span>
 <span class="sd">            Timeseries whose fits to use.</span>
-<span class="sd">        fit_list : list, optional</span>
+<span class="sd">        fit_list</span>
 <span class="sd">            List of strings containing the model names of the subset of the fitted models</span>
-<span class="sd">            to be used. Defaults to all fitted models.</span>
+<span class="sd">            to be used. ``None`` defaults to all fitted models.</span>
 <span class="sd">            If ``ts_description`` does not contain any fits, and the trend of the timeseries</span>
 <span class="sd">            itself is to be calculated, pass an empty list (``[]``).</span>
-<span class="sd">        components : list, optional</span>
+<span class="sd">        components</span>
 <span class="sd">            List of the numerical indices of which components of the timeseries to use.</span>
-<span class="sd">            Defaults to all components.</span>
-<span class="sd">        total : bool, optional</span>
-<span class="sd">            By default (``False``), the function will return the trend per ``time_unit``.</span>
+<span class="sd">            ``None`` defaults to all components.</span>
+<span class="sd">        total</span>
+<span class="sd">            By default, the function will return the trend per ``time_unit``.</span>
 <span class="sd">            If ``True``, the function will instead give the total difference over the</span>
 <span class="sd">            entire timespan.</span>
-<span class="sd">        t_start : str or pandas.Timestamp, optional</span>
+<span class="sd">        t_start</span>
 <span class="sd">            Timestamp-convertible string of the start time.</span>
-<span class="sd">            Defaults to the first timestamp present in the timeseries.</span>
-<span class="sd">        t_end : str or pandas.Timestamp, optional</span>
+<span class="sd">            ``None`` defaults to the first timestamp present in the timeseries.</span>
+<span class="sd">        t_end</span>
 <span class="sd">            Timestamp-convertible string of the end time.</span>
-<span class="sd">            Defaults to the last timestamp present in the timeseries.</span>
-<span class="sd">        use_formal_variance : bool, optional</span>
+<span class="sd">            ``None`` defaults to the last timestamp present in the timeseries.</span>
+<span class="sd">        use_formal_variance</span>
 <span class="sd">            By default, the trend fitting will use variance information if present. This usually</span>
 <span class="sd">            makes sense for actual timeseries, but not for fitted models where the formal variance</span>
 <span class="sd">            can be very unphysical. Setting this parameter overrides the default behavior.</span>
-<span class="sd">        include_sigma : bool, optional</span>
+<span class="sd">        include_sigma</span>
 <span class="sd">            If ``True``, also calculate the formal standard deviation on the trend estimate.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        time_unit : str, optional</span>
+<span class="sd">        time_unit</span>
 <span class="sd">            Time unit for output (only required if ``total=False``).</span>
-<span class="sd">        ignore_missing : bool, optional</span>
-<span class="sd">            By default (``False``), this method will throw an error if the timeseries or</span>
+<span class="sd">        ignore_missing</span>
+<span class="sd">            By default, this method will throw an error if the timeseries or</span>
 <span class="sd">            the models are not present in  the station. Set to ``True`` if the method</span>
 <span class="sd">            should return ``(None, None)`` instead (as done when the requested timespan</span>
 <span class="sd">            is outside the observed one).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        trend : numpy.ndarray</span>
+<span class="sd">        trend</span>
 <span class="sd">            1D array of size ``len(components)`` containing the trends.</span>
-<span class="sd">        trend_sigma : numpy.ndarray or None</span>
+<span class="sd">        trend_sigma</span>
 <span class="sd">            1D array of size ``len(components)`` containing the standard deviation of</span>
 <span class="sd">            the trend estimate. Returns ``None`` if no standard deviations are available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

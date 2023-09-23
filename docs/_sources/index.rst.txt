@@ -24,6 +24,7 @@ The DISSTANS Python package <https://doi.org/10.1016/j.cageo.2022.105247>`_.
    installation
    tutorials
    examples
+   faq
 
 
 .. toctree::

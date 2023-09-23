@@ -15,6 +15,14 @@ that arise due to equipment changes or earthquakes, even though they appear to b
 as we will see later. Today, the data is for example accessible through the
 University of Nevada at Reno's `Nevada Geodetic Laboratory <http://geodesy.unr.edu/>`_.
 
+.. note::
+    The figures and numbers presented in this example no longer exactly match what is
+    presented in [koehne23]_. This is because significant code improvements to DISSTANS
+    were introduced with version 2, and the effect of the hyperparameters changed.
+    Care has been taken to recreate this example to match what is in the published study,
+    although small quantitative changes remain. The qualitative interpretations are
+    unchanged.
+
 .. contents:: Table of contents
     :local:
 
@@ -307,17 +315,17 @@ print the results::
 
     >>> print(step_table)
          station       time  probability           var0       var1    varred
-    2803    TILC 2008-07-27   432.592147   16398.517922  13.140219  0.999199
-    554     LINC 1998-09-15   407.113500  433129.225394   6.736510  0.999984
-    323     DOND 2016-04-20   226.227819     469.133121  11.074441  0.976394
-    2828    WATC 2002-06-18   214.896877     414.423305  11.779896  0.971575
-    2826    WATC 2002-04-04   194.728898     421.507356  16.675928  0.960437
+    2695    TILC 2008-07-27   430.924992   16395.453772  13.501776  0.999176
+    533     LINC 1998-09-15   407.759523  433194.978720   6.620916  0.999985
+    301     DOND 2016-04-20   226.904492     468.961996  10.948276  0.976654
+    2719    WATC 2002-06-18   212.178569     413.455601  12.287948  0.970280
+    2717    WATC 2002-04-04   197.117193     420.587254  16.000638  0.961956
     ...      ...        ...          ...            ...        ...       ...
-    1254    P627 2007-12-17    20.007536       1.051037   0.729199  0.306210
-    114     CA99 2008-11-04    20.005889      16.810578  11.663321  0.306192
-    1085    P311 2011-05-25    20.002984      15.671794  10.873741  0.306159
-    2238    P650 2010-04-13    20.002579       1.763096   1.223317  0.306154
-    524     KRAC 2010-03-17    20.001845      26.343070  18.278256  0.306146
+    1760    P641 2019-12-26    20.006713       0.755176   0.523940  0.306201
+    1430    P630 2019-12-22    20.006086       2.051820   1.423566  0.306194
+    345     HOTK 2004-07-07    20.005607      13.094301   9.084979  0.306188
+    2074    P649 2007-05-31    20.001774       1.370673   0.951049  0.306145
+    2519    PMTN 2020-10-03    20.000979       1.154305   0.800931  0.306136
     <BLANKLINE>
     [2883 rows x 6 columns]
 
@@ -334,15 +342,14 @@ restrict ourselves to a subset of the table where the variance reduction is more
     >>> step_table_above90 = step_table[step_table["varred"] > 0.9]
     >>> print(step_table_above90)
          station       time  probability           var0        var1    varred
-    2803    TILC 2008-07-27   432.592147   16398.517922   13.140219  0.999199
-    554     LINC 1998-09-15   407.113500  433129.225394    6.736510  0.999984
-    323     DOND 2016-04-20   226.227819     469.133121   11.074441  0.976394
-    2828    WATC 2002-06-18   214.896877     414.423305   11.779896  0.971575
-    2826    WATC 2002-04-04   194.728898     421.507356   16.675928  0.960437
-    1367    P628 2017-01-08   168.021602    1902.333674  116.604770  0.938704
-    1368    P628 2017-01-09   151.188220    1871.194656  151.145501  0.919225
-    1642    P636 2011-09-15   145.406735     645.981933   57.366504  0.911195
-    1383    P628 2019-04-28   144.924585    1412.259909  126.411142  0.910490
+    2695    TILC 2008-07-27   430.924992   16395.453772   13.501776  0.999176
+    533     LINC 1998-09-15   407.759523  433194.978720    6.620916  0.999985
+    301     DOND 2016-04-20   226.904492     468.961996   10.948276  0.976654
+    2719    WATC 2002-06-18   212.178569     413.455601   12.287948  0.970280
+    2717    WATC 2002-04-04   197.117193     420.587254   16.000638  0.961956
+    1295    P628 2017-01-08   168.150793    1901.053013  116.279744  0.938834
+    1550    P636 2011-09-15   145.308204     646.741009   57.526760  0.911051
+    1306    P628 2019-04-28   144.801182    1410.954183  126.550018  0.910309
     >>> net.gui(timeseries="final", mark_events=step_table_above90)
 
 .. doctest::
@@ -503,11 +510,11 @@ station, and then sort the stations according to that. The first five entries ar
 
     >>> resids_df["total"].head()
     Station
-    P723    19.298688
-    CASA    13.519355
-    MUSB    11.264231
-    KNOL     9.993418
-    JNPR     9.973603
+    P723    19.294751
+    CASA    13.495480
+    MUSB    11.255935
+    KNOL     9.994158
+    JNPR     9.969613
     Name: total, dtype: float64
 
 .. doctest::
@@ -660,17 +667,15 @@ The station-time pairs that will be dropped are therefore those in
 
     >>> print(merged_table[merged_table["merged"] != "left_only"])
          station       time  probability       var0      var1    varred merged
-    3       P469 2019-07-06    89.232324   2.665930  0.594600  0.776963   both
-    13      P652 2020-05-15    63.770193   1.314950  0.445210  0.661424   both
-    27      P627 2020-05-15    57.036696   2.352315  0.889388  0.621910   both
-    42      P726 2019-07-06    51.874552   1.888100  0.776914  0.588521   both
-    123     P627 2020-10-13    42.560855  16.570964  7.943382  0.520645   both
-    217     P652 2019-07-06    37.581517   1.104752  0.574610  0.479874   both
-    596     P651 2020-05-15    30.160953   1.543170  0.906470  0.412592   both
-    762     P653 2019-07-06    28.413357   0.996481  0.602353  0.395520   both
-    879     P650 2020-05-15    27.262764   0.880887  0.542617  0.384010   both
-    1946    P311 2019-07-06    22.124524   0.447579  0.299934  0.329875   both
-    2703    P651 2019-07-06    20.063574   0.941452  0.652570  0.306847   both
+    2       P469 2019-07-06    88.308209   2.687111  0.608473  0.773559   both
+    13      P652 2020-05-15    63.960107   1.304687  0.440362  0.662477   both
+    26      P627 2020-05-15    57.037992   2.340962  0.885077  0.621918   both
+    39      P726 2019-07-06    51.852389   1.889589  0.777809  0.588371   both
+    113     P627 2020-10-13    43.031786  16.601206  7.896678  0.524331   both
+    203     P652 2019-07-06    37.722798   1.103478  0.572620  0.481077   both
+    713     P653 2019-07-06    28.500037   1.000467  0.603904  0.396378   both
+    887     P650 2020-05-15    26.926617   0.879756  0.544915  0.380606   both
+    1873    P311 2019-07-06    22.190388   0.451269  0.302080  0.330598   both
 
 So only a couple of entries in our ``step_table`` have an easy explanation, leaving the entries
 in ``unknown_table`` either as false detections, or steps with unknown causes.
@@ -812,18 +817,18 @@ as well as the total timespan, is set so that there is exactly one basis per yea
     ...                                "t_end": "2022-01-01"}}}
     >>> net.add_local_models(new_models, "final")
 
-This time, we specify a reweighting function explicitly for the spatial solution:
+We still need to specify a reweighting function for the spatial solution:
 
 .. doctest::
 
-    >>> rw_func = disstans.solvers.InverseReweighting(eps=1e-5, scale=1e-3)
+    >>> rw_func = disstans.solvers.InverseReweighting(eps=1e-5, scale=0.01)
 
 Finally, we can run the estimation. Note that we're doing a couple of things:
 
 - We have a different penalty parameter for every component, based on the fact that
   the Up component is usually much noisier.
-- We do not include the seasonal deviation models in either ``spatial_reweight_models``
-  (or ``continuous_reweight_models``, not discussed here), which means that this model
+- We do not include the seasonal deviation models in either ``spatial_l0_models``
+  (or ``local_l0_models``, not discussed here), which means that this model
   will be L1-regularized.
 - We want to see the ``extended_stats`` during the fit, and save them in the ``stats``
   variable.
@@ -835,10 +840,10 @@ Finally, we can run the estimation. Note that we're doing a couple of things:
 .. doctest::
 
     >>> stats = net.spatialfit("final",
-    ...                        penalty=[20, 20, 2],
-    ...                        spatial_reweight_models=["Transient"],
-    ...                        spatial_reweight_iters=20,
-    ...                        local_reweight_func=rw_func,
+    ...                        penalty=[100, 100, 30],
+    ...                        spatial_l0_models=["Transient"],
+    ...                        spatial_reweight_iters=10,
+    ...                        reweight_func=rw_func,
     ...                        formal_covariance=True,
     ...                        use_data_covariance=True,
     ...                        verbose=True,
@@ -1008,21 +1013,21 @@ with the published MIDAS velocities in [blewitt16]_ (everything in [m/a]):
 |         +-----------+-----------+-----------+-----------+-----------+-----------+
 | Station |      East |     North |        Up |      East |     North |        Up |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    P308 | -0.022020 | -0.002283 | -0.000174 | -0.022473 | -0.002419 | +0.000957 |
+|    P308 | -0.023492 | -0.002113 | +0.003550 | -0.022473 | -0.002419 | +0.000957 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    DOND | -0.019113 | -0.003761 | +0.003988 | -0.022462 | -0.002837 | +0.001112 |
+|    DOND | -0.022342 | -0.003775 | +0.005945 | -0.022462 | -0.002837 | +0.001112 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    KRAC | -0.019325 | -0.001209 | +0.005940 | -0.018233 | -0.000377 | +0.005676 |
+|    KRAC | -0.019850 | -0.002254 | +0.005677 | -0.018233 | -0.000377 | +0.005676 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    CASA | -0.022449 | -0.007270 | -0.001678 | -0.022905 | -0.007212 | +0.003864 |
+|    CASA | -0.019807 | -0.011862 | +0.003984 | -0.022905 | -0.007212 | +0.003864 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    CA99 | -0.023492 | -0.004736 | +0.003763 | -0.023294 | -0.006609 | +0.004616 |
+|    CA99 | -0.023732 | -0.004979 | +0.003318 | -0.023294 | -0.006609 | +0.004616 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    P724 | -0.019636 | -0.002419 | -0.000284 | -0.019328 | -0.003772 | +0.000314 |
+|    P724 | -0.020188 | -0.002225 | +0.004065 | -0.019328 | -0.003772 | +0.000314 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    P469 | -0.017844 | -0.006150 | -0.000317 | -0.017806 | -0.006302 | +0.000086 |
+|    P469 | -0.017818 | -0.006153 | +0.000993 | -0.017806 | -0.006302 | +0.000086 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
-|    P627 | -0.016661 | -0.006193 | -0.000305 | -0.016974 | -0.005181 | -0.000166 |
+|    P627 | -0.017011 | -0.004866 | +0.000249 | -0.016974 | -0.005181 | -0.000166 |
 +---------+-----------+-----------+-----------+-----------+-----------+-----------+
 
 In general, the two solutions are very similar, and differences might very well be because our

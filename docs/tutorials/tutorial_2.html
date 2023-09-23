@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 2: Advanced Models and Fitting &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>Tutorial 2: Advanced Models and Fitting &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -12,8 +12,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -37,7 +39,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -71,7 +73,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -141,6 +143,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -221,6 +229,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -235,21 +245,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -306,16 +315,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -337,6 +346,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -405,10 +415,10 @@
 </aside>
 <p>This tutorial recreates the basics of the synthetic timeseries example as described in
 Bryan Riel’s <a class="reference internal" href="../disstans/network.html#riel14" id="id1"><span>[riel14]</span></a> paper on detecting geodetic transients.
-To do this, we’ll be building on and expanding the workflow from the first one.
+To do this, we’ll be building on the workflow from the first example.
 This time though, we’ll first focus a bit more on making the synthetic data, before
 creating the station itself.</p>
-<nav class="contents local" id="table-of-contents">
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#creating-more-complex-synthetic-data" id="id3">Creating more complex synthetic data</a></p></li>
@@ -418,12 +428,12 @@ creating the station itself.</p>
 <li><p><a class="reference internal" href="#advanced-plotting" id="id7">Advanced plotting</a></p></li>
 <li><p><a class="reference internal" href="#repeat-with-l2-regularization" id="id8">Repeat with L2 regularization</a></p></li>
 <li><p><a class="reference internal" href="#repeat-with-l1-regularization" id="id9">Repeat with L1 regularization</a></p></li>
-<li><p><a class="reference internal" href="#adding-reweighting-iterations" id="id10">Adding reweighting iterations</a></p></li>
+<li><p><a class="reference internal" href="#repeat-with-l0-regularization" id="id10">Repeat with L0 regularization</a></p></li>
 <li><p><a class="reference internal" href="#comparing-specific-parameters" id="id11">Comparing specific parameters</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="creating-more-complex-synthetic-data">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Creating more complex synthetic data</a><a class="headerlink" href="#creating-more-complex-synthetic-data" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Creating more complex synthetic data</a><a class="headerlink" href="#creating-more-complex-synthetic-data" title="Permalink to this heading"></a></h2>
 <p>Let’s start with creating the timestamps for our synthetic data:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
@@ -499,6 +509,7 @@ and the total noise <code class="docutils literal notranslate"><span class="pre"
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pandas.plotting</span> <span class="kn">import</span> <span class="n">register_matplotlib_converters</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">register_matplotlib_converters</span><span class="p">()</span>  <span class="c1"># improve how time data looks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">sum_seas_sec</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Seasonal + Secular&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">sum_transient</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Transient&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timevector</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.5&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Noise&quot;</span><span class="p">)</span>
@@ -517,7 +528,7 @@ transients alongside a strong secular signal, and seasonal signals plus the colo
 noise make it look a bit more realistic.</p>
 </section>
 <section id="spline-models-for-transients">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Spline models for transients</a><a class="headerlink" href="#spline-models-for-transients" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Spline models for transients</a><a class="headerlink" href="#spline-models-for-transients" title="Permalink to this heading"></a></h2>
 <p>How do we model the transients though? For this, we will use an over-complete set
 of basis functions, built by a collection of integrated B-Splines. For more on that,
 see the class documentations for <a class="reference internal" href="../disstans/models.html#disstans.models.BSpline" title="disstans.models.BSpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">BSpline</span></code></a> and
@@ -539,14 +550,14 @@ subintervals. The <code class="docutils literal notranslate"><span class="pre">s
 behavior.</p>
 </section>
 <section id="building-a-network">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Building a Network</a><a class="headerlink" href="#building-a-network" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5">Building a Network</a><a class="headerlink" href="#building-a-network" title="Permalink to this heading"></a></h2>
 <p>Now, we’re ready to build our synthetic network and add our generated data.
 Again, we start by creating a <a class="reference internal" href="../disstans/station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a> object, but this time,
 we’ll also assign it to a <a class="reference internal" href="../disstans/network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> object:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans</span> <span class="kn">import</span> <span class="n">Network</span><span class="p">,</span> <span class="n">Station</span><span class="p">,</span> <span class="n">Timeseries</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net_name</span> <span class="o">=</span> <span class="s2">&quot;TutorialLand&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stat_name</span> <span class="o">=</span> <span class="s2">&quot;TUT&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">caltech_lla</span> <span class="o">=</span> <span class="p">(</span><span class="mf">34.1375</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.125</span><span class="p">,</span> <span class="mi">263</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caltech_lla</span> <span class="o">=</span> <span class="p">(</span><span class="mf">34.1375</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.125</span><span class="p">,</span> <span class="mf">263.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">net_name</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span> <span class="o">=</span> <span class="n">Station</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">stat_name</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">location</span><span class="o">=</span><span class="n">caltech_lla</span><span class="p">)</span>
@@ -581,7 +592,7 @@ to the station:</p>
 </div>
 </section>
 <section id="fitting-an-entire-network">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Fitting an entire network</a><a class="headerlink" href="#fitting-an-entire-network" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6">Fitting an entire network</a><a class="headerlink" href="#fitting-an-entire-network" title="Permalink to this heading"></a></h2>
 <p>At this point, we’re ready to do the fitting using the simple linear non-regularized
 least-squares we used in the previous tutorial:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;linear_regression&quot;</span><span class="p">)</span>
@@ -593,15 +604,15 @@ least-squares we used in the previous tutorial:</p>
 <p>We saved a lot of lines and hassle compared to the previous fitting by using the
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> methods. We already calculated the residuals and
 errors, so let’s print some statistics:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_noreg&quot;</span><span class="p">,</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_noreg&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">TUT: Res_noreg                          Mean  Standard Deviation</span>
-<span class="go">Total-Displacement_Model_Total  1.624258e-08            2.046006</span>
+<span class="go">Total-Displacement_Model_Total -2.193582e-08            2.046182</span>
 </pre></div>
 </div>
 </section>
 <section id="advanced-plotting">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">Advanced plotting</a><a class="headerlink" href="#advanced-plotting" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7">Advanced plotting</a><a class="headerlink" href="#advanced-plotting" title="Permalink to this heading"></a></h2>
 <p>What do our fit, residuals (between the observations and our fit) and errors
 (between the fit and the true displacement signal) look like compared to the
 data and noise?</p>
@@ -652,7 +663,7 @@ regularization, the set is quite heavily populated in order to minimize the resi
 <img alt="../_images/tutorial_2c.png" src="../_images/tutorial_2c.png" />
 </section>
 <section id="repeat-with-l2-regularization">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">Repeat with L2 regularization</a><a class="headerlink" href="#repeat-with-l2-regularization" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id8">Repeat with L2 regularization</a><a class="headerlink" href="#repeat-with-l2-regularization" title="Permalink to this heading"></a></h2>
 <p>Now, we can do the exact same thing as above, but choose a ridge regression (L2-regularized)
 solver:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;ridge_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -662,10 +673,10 @@ solver:</p>
 </pre></div>
 </div>
 <p>Giving us the statistics:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L2&quot;</span><span class="p">,</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L2&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">TUT: Res_L2                             Mean  Standard Deviation</span>
-<span class="go">Total-Displacement_Model_Total  1.656468e-09            2.087589</span>
+<span class="go">Total-Displacement_Model_Total -5.627219e-09            2.088274</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -704,9 +715,14 @@ better. However, most splines are actually non-zero. This might produced the bes
 but our physical knowledge of the processes happening tell us that our station is not
 always moving - there are discrete processes. A higher penalty parameter might make
 those parameters even smaller, but they will not become significantly sparser.</p>
+<p>Let’s save the parameter values of the transient spline model such that we can compare
+them later to cases with different regularizations:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params_transient_L2</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
 <section id="repeat-with-l1-regularization">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">Repeat with L1 regularization</a><a class="headerlink" href="#repeat-with-l1-regularization" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id9">Repeat with L1 regularization</a><a class="headerlink" href="#repeat-with-l1-regularization" title="Permalink to this heading"></a></h2>
 <p>Using L1-regularized lasso regression, we finally hope to get rid of all the small,
 basically-zero splines in the transient dictionary:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -716,10 +732,10 @@ basically-zero splines in the transient dictionary:</p>
 </pre></div>
 </div>
 <p>Giving us the statistics:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L1&quot;</span><span class="p">,</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L1&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">TUT: Res_L1                         Mean  Standard Deviation</span>
-<span class="go">Total-Displacement_Model_Total  0.000003            2.121951</span>
+<span class="go">TUT: Res_L1                             Mean  Standard Deviation</span>
+<span class="go">Total-Displacement_Model_Total  2.171535e-10             2.07782</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -753,10 +769,14 @@ basically-zero splines in the transient dictionary:</p>
 </div>
 <img alt="../_images/tutorial_2g.png" src="../_images/tutorial_2g.png" />
 <p>This looks much better - the scalogram now shows us that we only select splines around
-where we put the Arctangent models, and is close to zero otherwise.</p>
+where we put the Arctangent models, and is close to zero otherwise. We again sae the
+transient model parameters for later.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params_transient_L1</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
-<section id="adding-reweighting-iterations">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Adding reweighting iterations</a><a class="headerlink" href="#adding-reweighting-iterations" title="Permalink to this heading"></a></h2>
+<section id="repeat-with-l0-regularization">
+<h2><a class="toc-backref" href="#id10">Repeat with L0 regularization</a><a class="headerlink" href="#repeat-with-l0-regularization" title="Permalink to this heading"></a></h2>
 <p>Okay, one last thing about fitting, I promise. L1 regularization aims to penalize the sum of
 the absolute values of our model parameters. However, that’s also not actually what we want.
 In fact, transient signals in the real world have no constraint to be as small as possible.
@@ -767,32 +787,43 @@ rigorously.</p>
 values even closer to zero, but leaves significant values unperturbed, one can approximate
 such an L0 regularization by iteratively solving the L1-regularized problem. That is exactly
 what the option <code class="docutils literal notranslate"><span class="pre">reweight_max_iters</span></code> does. You can find more information about it in
-the notes of <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>. Let’s try it:</p>
+the notes of <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>.</p>
+<p>The solver requires the definition of a reweighting function - i.e., a function that
+helps the solver distinguish between significant and insignificant parameters.
+A reweighting function takes in parameter values, and outputs a weight to add in the
+regularization process. Small parameters (insignificant) will get a very high weight
+(penalty), whereas large parameters will get a weight close to zero. For more information,
+refer to <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.ReweightingFunction" title="disstans.solvers.ReweightingFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code></a>. Let’s define one:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.solvers</span> <span class="kn">import</span> <span class="n">InverseReweighting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">InverseReweighting</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With this, we can now run the L1 solver iteratively to approximate the L0 solution:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L1R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1R&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span>
+<span class="gp">... </span>        <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_L0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L0&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L0&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Giving us the statistics:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L1R&quot;</span><span class="p">,</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L0&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">TUT: Res_L1R                            Mean  Standard Deviation</span>
-<span class="go">Total-Displacement_Model_Total  9.511036e-08            2.117921</span>
+<span class="go">TUT: Res_L0                             Mean  Standard Deviation</span>
+<span class="go">Total-Displacement_Model_Total  4.663455e-13            2.071561</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Synthetic&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fit&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Fit_L0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Fit&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Displacement [mm]&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Reweighted L1 Regularization&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Res_L0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;0.3&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
 <span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sum_noise</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
 <span class="gp">... </span>        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L1R&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s2">&quot;Err_L0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Error [mm]&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">custom_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;0.3&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
@@ -816,11 +847,40 @@ the notes of <a class="reference internal" href="../disstans/solvers.html#dissta
 compared to the previous scalogram, and all the values that were small but not really
 zero in the previous case are now <em>really</em> close to zero.
 This did not come at a significant increase in residual variance.</p>
+<p>We can quantify this by plotting a histogram of the magnitudes of the transient parameters
+for the three different regularization schemes. One last time, we save the parameter
+values:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params_transient_L0</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Transient&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ZERO</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of nonzero spline parameters:</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;L2: </span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">params_transient_L2</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ZERO</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;L1: </span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">params_transient_L1</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ZERO</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;L0: </span><span class="si">{</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">params_transient_L0</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ZERO</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Number of nonzero spline parameters:</span>
+<span class="go">L2: 264</span>
+<span class="go">L1: 76</span>
+<span class="go">L0: 67</span>
+</pre></div>
+</div>
+<p>As we can see, the L0-regularized solver gives a more sparse solution than both the L1- and
+L2-regularized solvers. A histogram can show this to use more visually:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">14.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stacked_params</span> <span class="o">=</span> \
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">params_transient_L2</span><span class="p">,</span> <span class="n">params_transient_L1</span><span class="p">,</span> <span class="n">params_transient_L0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">stacked_params</span><span class="p">)),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;L2&quot;</span><span class="p">,</span> <span class="s2">&quot;L1&quot;</span><span class="p">,</span> <span class="s2">&quot;L0&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\log_</span><span class="si">{10}</span><span class="s2">$ Parameter Magnitude [-]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Count [-]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s2">/tutorial_2j.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/tutorial_2j.png" src="../_images/tutorial_2j.png" />
 </section>
 <section id="comparing-specific-parameters">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Comparing specific parameters</a><a class="headerlink" href="#comparing-specific-parameters" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id11">Comparing specific parameters</a><a class="headerlink" href="#comparing-specific-parameters" title="Permalink to this heading"></a></h2>
 <p>Before we finish up, let’s just print some differences between the ground truth and our
-L1R-fitted model:</p>
+L0-fitted model:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reldiff_sec</span> <span class="o">=</span> <span class="p">(</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span>
 <span class="gp">... </span>               <span class="o">/</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">reldiff_ann_amp</span> <span class="o">=</span> <span class="p">(</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amplitude</span>
@@ -829,33 +889,35 @@ L1R-fitted model:</p>
 <span class="gp">... </span>                   <span class="o">/</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">absdiff_ann_ph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span>
 <span class="gp">... </span>                            <span class="o">-</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">absdiff_ann_ph</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">absdiff_ann_ph</span> <span class="o">-=</span> <span class="mi">360</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">absdiff_sem_ph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span>
 <span class="gp">... </span>                            <span class="o">-</span> <span class="n">stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Semi-Annual&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">phase</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">absdiff_sem_ph</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">absdiff_sem_ph</span> <span class="o">-=</span> <span class="mi">360</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Percent Error Constant:              </span><span class="si">{</span><span class="n">reldiff_sec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2"> .3%</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Percent Error Linear:                </span><span class="si">{</span><span class="n">reldiff_sec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2"> .3%</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Percent Error Annual Amplitude:      </span><span class="si">{</span><span class="n">reldiff_ann_amp</span><span class="si">:</span><span class="s2"> .3%</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Percent Error Semi-Annual Amplitude: </span><span class="si">{</span><span class="n">reldiff_sem_amp</span><span class="si">:</span><span class="s2"> .3%</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Absolute Error Annual Phase:         </span><span class="si">{</span><span class="n">absdiff_ann_ph</span><span class="si">:</span><span class="s2"> .3f</span><span class="si">}</span><span class="s2">°</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Absolute Error Semi-Annual Phase:    </span><span class="si">{</span><span class="n">absdiff_sem_ph</span><span class="si">:</span><span class="s2"> .3f</span><span class="si">}</span><span class="s2">°&quot;</span><span class="p">)</span>
-<span class="go">Percent Error Constant:              -44.024%</span>
-<span class="go">Percent Error Linear:                 20.780%</span>
-<span class="go">Percent Error Annual Amplitude:      -0.234%</span>
-<span class="go">Percent Error Semi-Annual Amplitude:  0.062%</span>
-<span class="go">Absolute Error Annual Phase:          0.917°</span>
-<span class="go">Absolute Error Semi-Annual Phase:    -0.982°</span>
+<span class="go">Percent Error Constant:               7.264%</span>
+<span class="go">Percent Error Linear:                -1.378%</span>
+<span class="go">Percent Error Annual Amplitude:       2.308%</span>
+<span class="go">Percent Error Semi-Annual Amplitude: -0.407%</span>
+<span class="go">Absolute Error Annual Phase:         -1.836°</span>
+<span class="go">Absolute Error Semi-Annual Phase:    -1.284°</span>
 </pre></div>
 </div>
-<p>Apart from the trade-off between the polynomial trend and long-term splines, which can be
-expected in this synthetic example, we got pretty close to our ground truth. Let’s finish
-up by calculating an average velocity of the station using
-<a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend" title="disstans.station.Station.get_trend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_trend()</span></code></a> around the time when it’s rapidly moving
-(around the middle of 2002). We don’t want a normal trend through the data, since that
-is also influenced by the secular velocity, the noise, etc., so we choose to only fit our
-transient model:</p>
+<p>As we can see, we got pretty close to our ground truth. Let’s finish up by calculating
+an average velocity of the station using <a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend" title="disstans.station.Station.get_trend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_trend()</span></code></a> around
+the time when it’s rapidly moving (around the middle of 2002). We don’t want a normal trend
+through the data, since that is also influenced by the secular velocity, the noise, etc.,
+so we choose to only fit our transient model:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trend</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">get_trend</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">fit_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                          <span class="n">t_start</span><span class="o">=</span><span class="s2">&quot;2002-06-01&quot;</span><span class="p">,</span> <span class="n">t_end</span><span class="o">=</span><span class="s2">&quot;2002-08-01&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transient Velocity: </span><span class="si">{</span><span class="n">trend</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ts</span><span class="o">.</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">/D&quot;</span><span class="p">)</span>
-<span class="go">Transient Velocity: 0.121516 mm/D</span>
+<span class="go">Transient Velocity: 0.105952 mm/D</span>
 </pre></div>
 </div>
 <p>We can use average velocities like these when we want to create velocity maps for

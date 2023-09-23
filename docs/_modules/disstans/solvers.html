@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.solvers &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>disstans.solvers &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -11,8 +11,10 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -34,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -68,7 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -138,6 +140,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -218,6 +226,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -232,21 +242,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -303,16 +312,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -334,6 +343,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -399,6 +409,7 @@
 <span class="sd">of stations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sparse</span>
@@ -408,6 +419,7 @@
 
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="kn">import</span> <span class="n">block_permutation</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">ModelCollection</span>
+<span class="kn">from</span> <span class="nn">.timeseries</span> <span class="kn">import</span> <span class="n">Timeseries</span>
 
 
 <div class="viewcode-block" id="Solution"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution">[docs]</a><span class="k">class</span> <span class="nc">Solution</span><span class="p">():</span>
@@ -418,31 +430,37 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    disstans.models.ModelCollection</span>
+<span class="sd">    models</span>
 <span class="sd">        Model collection object that describes which models were used by the solver.</span>
-<span class="sd">    parameters : numpy.ndarray</span>
+<span class="sd">    parameters</span>
 <span class="sd">        Model collection parameters of shape</span>
 <span class="sd">        :math:`(\text{num_solved}, \text{num_components})`.</span>
-<span class="sd">    covariances : numpy.ndarray, optional</span>
+<span class="sd">    covariances</span>
 <span class="sd">        Full model variance-covariance matrix that has a square shape with dimensions</span>
 <span class="sd">        :math:`\text{num_solved} * \text{num_components}`.</span>
-<span class="sd">    weights : numpy.ndarray, optional</span>
+<span class="sd">    weights</span>
 <span class="sd">        Model parameter regularization weights of shape</span>
 <span class="sd">        :math:`(\text{num_solved}, \text{num_components})`.</span>
-<span class="sd">    obs_indices : numpy.ndarray, optional</span>
+<span class="sd">    obs_indices</span>
 <span class="sd">        Observation mask of shape :math:`(\text{num_parameters}, )`</span>
 <span class="sd">        with ``True`` at indices where the parameter was actually estimated,</span>
 <span class="sd">        and ``False`` where the estimation was skipped due to observability or</span>
 <span class="sd">        other reasons.</span>
-<span class="sd">        Defaults to all ``True``, which implies that</span>
+<span class="sd">        ``None`` defaults to all ``True``, which implies that</span>
 <span class="sd">        :math:`\text{num_parameters} = \text{num_solved}`.</span>
-<span class="sd">    reg_indices : numpy.ndarray, optional</span>
+<span class="sd">    reg_indices</span>
 <span class="sd">        Regularization mask of shape :math:`(\text{num_solved}, )`</span>
 <span class="sd">        with ``True`` where a parameter was subject to regularization,</span>
-<span class="sd">        and ``False`` otherwise. Defaults to all ``False``.</span>
+<span class="sd">        and ``False`` otherwise. ``None`` defaults to all ``False``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">covariances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">obs_indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">models</span><span class="p">:</span> <span class="n">ModelCollection</span><span class="p">,</span>
+                 <span class="n">parameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">covariances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">obs_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reg_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># input checks</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">ModelCollection</span><span class="p">),</span> \
             <span class="sa">f</span><span class="s2">&quot;&#39;models&#39; is not a valid ModelCollection object, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">models</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
@@ -517,13 +535,16 @@
 <span class="sd">        converged), ``False`` otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Special function to check whether the solution contains a certain model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">mdl_description</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_slice_ranges</span>
 
-<div class="viewcode-block" id="Solution.get_model_indices"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.get_model_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">for_cov</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Solution.get_model_indices"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.get_model_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_model_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">models</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                          <span class="n">for_cov</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                          <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a model name or multiple names, returns an array of integer indices that</span>
 <span class="sd">        can be used to extract the relevant entries from :attr:`~parameters` and</span>
@@ -531,15 +552,14 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        models : str, list</span>
+<span class="sd">        models</span>
 <span class="sd">            Name(s) of model(s).</span>
-<span class="sd">        for_cov : bool, optional</span>
-<span class="sd">            If ``False`` (default), return the indices for :attr:`~parameters`, otherwise</span>
+<span class="sd">        for_cov</span>
+<span class="sd">            If ``False``, return the indices for :attr:`~parameters`, otherwise</span>
 <span class="sd">            for :attr:`~covariances`</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
 <span class="sd">            Integer index array for the models.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># (returns empty index array if models not found)</span>
@@ -558,22 +578,24 @@
                                           <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">model_list</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">combined_ranges</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Solution.parameters_by_model"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.parameters_by_model">[docs]</a>    <span class="k">def</span> <span class="nf">parameters_by_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">zeroed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Solution.parameters_by_model"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.parameters_by_model">[docs]</a>    <span class="k">def</span> <span class="nf">parameters_by_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                            <span class="n">models</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                            <span class="n">zeroed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function that uses :meth:`~get_model_indices` to quickly</span>
 <span class="sd">        return the parameters for (a) specific model(s).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        models : str, list</span>
+<span class="sd">        models</span>
 <span class="sd">            Name(s) of model(s).</span>
-<span class="sd">        zeroed : bool, optional</span>
-<span class="sd">            If ``False`` (default), use :attr:`~parameters`, else</span>
+<span class="sd">        zeroed</span>
+<span class="sd">            If ``False``, use :attr:`~parameters`, else</span>
 <span class="sd">            :attr:`~parameters_zeroed`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
 <span class="sd">            Parameters of the model subset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_indices</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
@@ -582,22 +604,24 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span></div>
 
-<div class="viewcode-block" id="Solution.covariances_by_model"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.covariances_by_model">[docs]</a>    <span class="k">def</span> <span class="nf">covariances_by_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">zeroed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Solution.covariances_by_model"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.covariances_by_model">[docs]</a>    <span class="k">def</span> <span class="nf">covariances_by_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">models</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                             <span class="n">zeroed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function that uses :meth:`~get_model_indices` to quickly</span>
 <span class="sd">        return the covariances for (a) specific model(s).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        models : str, list</span>
+<span class="sd">        models</span>
 <span class="sd">            Name(s) of model(s).</span>
-<span class="sd">        zeroed : bool, optional</span>
-<span class="sd">            If ``False`` (default), use :attr:`~covariances`, else</span>
+<span class="sd">        zeroed</span>
+<span class="sd">            If ``False``, use :attr:`~covariances`, else</span>
 <span class="sd">            :attr:`~covariances_zeroed`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
 <span class="sd">            Covariances of the model subset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -607,19 +631,18 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">covariances</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">indices</span><span class="p">)]</span></div>
 
-<div class="viewcode-block" id="Solution.weights_by_model"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.weights_by_model">[docs]</a>    <span class="k">def</span> <span class="nf">weights_by_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">):</span>
+<div class="viewcode-block" id="Solution.weights_by_model"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.weights_by_model">[docs]</a>    <span class="k">def</span> <span class="nf">weights_by_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">models</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function that uses :meth:`~get_model_indices` to quickly</span>
 <span class="sd">        return the weights for specific model parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        models : str, list</span>
+<span class="sd">        models</span>
 <span class="sd">            Name(s) of model(s).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
 <span class="sd">            Weights of the model parameter subset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -627,7 +650,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">parameters_zeroed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parameters_zeroed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the model parameters but sets the unobservable ones to zero</span>
 <span class="sd">        to distinguish between unobservable ones and observable ones that</span>
@@ -638,7 +661,7 @@
         <span class="k">return</span> <span class="n">par</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">covariances_zeroed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">covariances_zeroed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the model covariances but sets the unobservable ones to zero</span>
 <span class="sd">        to distinguish between unobservable ones and observable ones that</span>
@@ -652,14 +675,19 @@
             <span class="k">return</span> <span class="n">cov</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">model_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">model_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; List of models present in the solution. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_slice_ranges</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 <div class="viewcode-block" id="Solution.aggregate_models"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.Solution.aggregate_models">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">aggregate_models</span><span class="p">(</span><span class="n">results_dict</span><span class="p">,</span> <span class="n">mdl_description</span><span class="p">,</span> <span class="n">key_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                         <span class="n">stack_parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stack_covariances</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">stack_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zeroed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">aggregate_models</span><span class="p">(</span><span class="n">results_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Solution</span><span class="p">],</span>
+                         <span class="n">mdl_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                         <span class="n">key_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">stack_parameters</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                         <span class="n">stack_covariances</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                         <span class="n">stack_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                         <span class="n">zeroed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                         <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a dictionary of Solution objects (e.g. one per station) and a given</span>
 <span class="sd">        model description, aggregate the model parameters, variances and parameter</span>
@@ -672,34 +700,31 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        results_dict : dict</span>
+<span class="sd">        results_dict</span>
 <span class="sd">            Dictionary of Solution objects.</span>
-<span class="sd">        mdl_description : str</span>
+<span class="sd">        mdl_description</span>
 <span class="sd">            Name of the model to aggregate the parameters, variances and weights for.</span>
-<span class="sd">        key_list : list, optional</span>
+<span class="sd">        key_list</span>
 <span class="sd">            If provided, aggregate only the selected keys in the dictionary.</span>
-<span class="sd">            Defaults to all keys.</span>
-<span class="sd">        stack_parameters : bool, optional</span>
+<span class="sd">            ``None`` defaults to all keys.</span>
+<span class="sd">        stack_parameters</span>
 <span class="sd">            If ``True``, stack the parameters, otherwise just return ``None``.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        stack_covariances : bool, optional</span>
+<span class="sd">        stack_covariances</span>
 <span class="sd">            If ``True``, stack the covariances, otherwise just return ``None``.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        stack_weights : bool, optional</span>
+<span class="sd">        stack_weights</span>
 <span class="sd">            If ``True``, stack the weights, otherwise just return ``None``.</span>
-<span class="sd">            Defaults to ``False``.</span>
-<span class="sd">        zeroed : bool, optional</span>
-<span class="sd">            If ``False`` (default), use :attr:`~parameters` and :attr:`~covariances`,</span>
+<span class="sd">        zeroed</span>
+<span class="sd">            If ``False``, use :attr:`~parameters` and :attr:`~covariances`,</span>
 <span class="sd">            else :attr:`~parameters_zeroed` and :attr:`~covariances_zeroed`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray</span>
+<span class="sd">        stacked_parameters</span>
 <span class="sd">            If ``stack_parameters=True``, the stacked model parameters.</span>
-<span class="sd">        numpy.ndarray</span>
+<span class="sd">        stacked_covariances</span>
 <span class="sd">            If ``stack_covariances=True`` and covariances are present in the models,</span>
 <span class="sd">            the stacked component covariances, ``None`` if not present everywhere.</span>
-<span class="sd">        numpy.ndarray</span>
+<span class="sd">        stacked_weights</span>
 <span class="sd">            If ``stack_weights=True`` and regularization weights are present in the models,</span>
 <span class="sd">            the stacked weights, ``None`` if not present everywhere.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -765,39 +790,38 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    eps : int, float</span>
+<span class="sd">    eps</span>
 <span class="sd">        Stability parameter to use for the reweighting function.</span>
-<span class="sd">    scale : float, optional</span>
+<span class="sd">    scale</span>
 <span class="sd">        Scale parameter applied to reweighting result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Stability parameter to use for the reweighting function. &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Scaling factor applied to reweighting result. &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ReweightingFunction.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.ReweightingFunction.__call__">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="ReweightingFunction.from_name"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.ReweightingFunction.from_name">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReweightingFunction</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search the local namespace for a reweighting function of that name</span>
 <span class="sd">        and return an initialized instance of it.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        name : str</span>
+<span class="sd">        name</span>
 <span class="sd">            Name (or abbreviation) of the reweighting function.</span>
-<span class="sd">        *args : list</span>
+<span class="sd">        *args</span>
 <span class="sd">            Argument list passed on to function initialization.</span>
-<span class="sd">        **kw_args : dict</span>
+<span class="sd">        **kw_args</span>
 <span class="sd">            Keyword arguments passed on to function initialization.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ReweightingFunction</span>
 <span class="sd">            An instantiated reweighting function object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;inv&quot;</span><span class="p">,</span> <span class="s2">&quot;InverseReweighting&quot;</span><span class="p">]:</span>
@@ -812,7 +836,7 @@
 
 
 <div class="viewcode-block" id="InverseReweighting"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.InverseReweighting">[docs]</a><span class="k">class</span> <span class="nc">InverseReweighting</span><span class="p">(</span><span class="n">ReweightingFunction</span><span class="p">):</span>
-<div class="viewcode-block" id="InverseReweighting.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.InverseReweighting.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="viewcode-block" id="InverseReweighting.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.InverseReweighting.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reweighting function based on the inverse of the input based on [candes08]_:</span>
 
@@ -825,14 +849,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        m : numpy.ndarray</span>
+<span class="sd">        m</span>
 <span class="sd">            :math:`\mathbf{m}`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            Weights</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="InverseSquaredReweighting"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.InverseSquaredReweighting">[docs]</a><span class="k">class</span> <span class="nc">InverseSquaredReweighting</span><span class="p">(</span><span class="n">ReweightingFunction</span><span class="p">):</span>
-<div class="viewcode-block" id="InverseSquaredReweighting.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.InverseSquaredReweighting.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="viewcode-block" id="InverseSquaredReweighting.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.InverseSquaredReweighting.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reweighting function based on the inverse squared of the input based on [candes08]_:</span>
 
@@ -845,14 +873,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        m : numpy.ndarray</span>
+<span class="sd">        m</span>
 <span class="sd">            :math:`\mathbf{m}`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            Weights</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="LogarithmicReweighting"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.LogarithmicReweighting">[docs]</a><span class="k">class</span> <span class="nc">LogarithmicReweighting</span><span class="p">(</span><span class="n">ReweightingFunction</span><span class="p">):</span>
-<div class="viewcode-block" id="LogarithmicReweighting.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.LogarithmicReweighting.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="viewcode-block" id="LogarithmicReweighting.__call__"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.LogarithmicReweighting.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reweighting function based on the logarithm of the input based on [andrecut11]_:</span>
 
@@ -873,8 +905,12 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        m : numpy.ndarray</span>
+<span class="sd">        m</span>
 <span class="sd">            :math:`\mathbf{m}`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            Weights</span>
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
@@ -888,9 +924,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="n">weight</span></div></div>
 
 
-<div class="viewcode-block" id="linear_regression"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.linear_regression">[docs]</a><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                      <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="n">check_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="linear_regression"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.linear_regression">[docs]</a><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">,</span>
+                      <span class="n">models</span><span class="p">:</span> <span class="n">ModelCollection</span><span class="p">,</span>
+                      <span class="n">formal_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                      <span class="n">use_data_variance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                      <span class="n">use_data_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                      <span class="n">check_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+                      <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Solution</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs linear, unregularized least squares using :mod:`~scipy.linalg`.</span>
 
@@ -919,25 +959,24 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ts : disstans.timeseries.Timeseries</span>
+<span class="sd">    ts</span>
 <span class="sd">        Timeseries to fit.</span>
-<span class="sd">    models : disstans.models.ModelCollection</span>
+<span class="sd">    models</span>
 <span class="sd">        Model collection used for fitting.</span>
-<span class="sd">    formal_covariance : bool, optional</span>
-<span class="sd">        If ``True``, calculate the formal model covariance. Defaults to ``False``.</span>
-<span class="sd">    use_data_variance : bool, optional</span>
-<span class="sd">        If ``True`` (default) and ``ts`` contains variance information, this</span>
-<span class="sd">        uncertainty information will be used.</span>
-<span class="sd">    use_data_covariance : bool, optional</span>
-<span class="sd">        If ``True`` (default), ``ts`` contains variance and covariance information, and</span>
+<span class="sd">    formal_covariance</span>
+<span class="sd">        If ``True``, calculate the formal model covariance.</span>
+<span class="sd">    use_data_variance</span>
+<span class="sd">        If ``True`` and ``ts`` contains variance information, this uncertainty</span>
+<span class="sd">        information will be used.</span>
+<span class="sd">    use_data_covariance</span>
+<span class="sd">        If ``True``, ``ts`` contains variance and covariance information, and</span>
 <span class="sd">        ``use_data_variance`` is also ``True``, this uncertainty information will be used.</span>
-<span class="sd">    check_constraints : bool, optional</span>
-<span class="sd">        If ``True`` (default), check whether models have sign constraints that should</span>
+<span class="sd">    check_constraints</span>
+<span class="sd">        If ``True``, check whether models have sign constraints that should</span>
 <span class="sd">        be enforced.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Solution</span>
 <span class="sd">        Result of the regression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -988,9 +1027,14 @@
                     <span class="n">obs_indices</span><span class="o">=</span><span class="n">obs_indices</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ridge_regression"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.ridge_regression">[docs]</a><span class="k">def</span> <span class="nf">ridge_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">penalty</span><span class="p">,</span> <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">check_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ridge_regression"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.ridge_regression">[docs]</a><span class="k">def</span> <span class="nf">ridge_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">,</span>
+                     <span class="n">models</span><span class="p">:</span> <span class="n">ModelCollection</span><span class="p">,</span>
+                     <span class="n">penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                     <span class="n">formal_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                     <span class="n">use_data_variance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">use_data_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">check_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+                     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Solution</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs linear, L2-regularized least squares using :mod:`~scipy.linalg`.</span>
 
@@ -1026,29 +1070,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ts : disstans.timeseries.Timeseries</span>
+<span class="sd">    ts</span>
 <span class="sd">        Timeseries to fit.</span>
-<span class="sd">    models : disstans.models.ModelCollection</span>
+<span class="sd">    models</span>
 <span class="sd">        Model collection used for fitting.</span>
-<span class="sd">    penalty : float, list, numpy.ndarray</span>
+<span class="sd">    penalty</span>
 <span class="sd">        Penalty hyperparameter :math:`\lambda`.</span>
 <span class="sd">        It can either be a single value used for all components, or a list or NumPy array</span>
 <span class="sd">        specifying a penalty for each component in the data.</span>
-<span class="sd">    formal_covariance : bool, optional</span>
-<span class="sd">        If ``True``, calculate the formal model covariance. Defaults to ``False``.</span>
-<span class="sd">    use_data_variance : bool, optional</span>
-<span class="sd">        If ``True`` (default) and ``ts`` contains variance information, this</span>
-<span class="sd">        uncertainty information will be used.</span>
-<span class="sd">    use_data_covariance : bool, optional</span>
-<span class="sd">        If ``True`` (default), ``ts`` contains variance and covariance information, and</span>
+<span class="sd">    formal_covariance</span>
+<span class="sd">        If ``True``, calculate the formal model covariance.</span>
+<span class="sd">    use_data_variance</span>
+<span class="sd">        If ``True`` and ``ts`` contains variance information, this uncertainty</span>
+<span class="sd">        information will be used.</span>
+<span class="sd">    use_data_covariance</span>
+<span class="sd">        If ``True``, ``ts`` contains variance and covariance information, and</span>
 <span class="sd">        ``use_data_variance`` is also ``True``, this uncertainty information will be used.</span>
-<span class="sd">    check_constraints : bool, optional</span>
-<span class="sd">        If ``True`` (default), check whether models have sign constraints that should</span>
+<span class="sd">    check_constraints</span>
+<span class="sd">        If ``True``, check whether models have sign constraints that should</span>
 <span class="sd">        be enforced.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Solution</span>
 <span class="sd">        Result of the regression.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check input penalty shape and value</span>
@@ -1115,12 +1158,23 @@
                     <span class="n">obs_indices</span><span class="o">=</span><span class="n">obs_indices</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="lasso_regression"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.lasso_regression">[docs]</a><span class="k">def</span> <span class="nf">lasso_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">penalty</span><span class="p">,</span> <span class="n">reweight_max_iters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reweight_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">reweight_max_rss</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">reweight_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reweight_coupled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">use_internal_scales</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cov_zero_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">return_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="n">check_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="n">cvxpy_kw_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;CVXOPT&quot;</span><span class="p">,</span> <span class="s2">&quot;kktsolver&quot;</span><span class="p">:</span> <span class="s2">&quot;robust&quot;</span><span class="p">}):</span>
+<div class="viewcode-block" id="lasso_regression"><a class="viewcode-back" href="../../disstans/solvers.html#disstans.solvers.lasso_regression">[docs]</a><span class="k">def</span> <span class="nf">lasso_regression</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">,</span>
+                     <span class="n">models</span><span class="p">:</span> <span class="n">ModelCollection</span><span class="p">,</span>
+                     <span class="n">penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                     <span class="n">reweight_max_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">reweight_func</span><span class="p">:</span> <span class="n">ReweightingFunction</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">reweight_max_rss</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span><span class="p">,</span>
+                     <span class="n">reweight_init</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">reweight_coupled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">formal_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                     <span class="n">use_data_variance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">use_data_covariance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">use_internal_scales</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">cov_zero_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
+                     <span class="n">return_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                     <span class="n">check_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                     <span class="n">cvxpy_kw_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;SCS&quot;</span><span class="p">}</span>
+                     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Solution</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs linear, L1-regularized least squares using</span>
 <span class="sd">    `CVXPY &lt;https://www.cvxpy.org/index.html&gt;`_.</span>
@@ -1162,26 +1216,25 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ts : disstans.timeseries.Timeseries</span>
+<span class="sd">    ts</span>
 <span class="sd">        Timeseries to fit.</span>
-<span class="sd">    models : disstans.models.ModelCollection</span>
+<span class="sd">    models</span>
 <span class="sd">        Model collection used for fitting.</span>
-<span class="sd">    penalty : float, list, numpy.ndarray</span>
+<span class="sd">    penalty</span>
 <span class="sd">        Penalty hyperparameter :math:`\lambda`.</span>
 <span class="sd">        It can either be a single value used for all components, or a list or NumPy array</span>
 <span class="sd">        specifying a penalty for each component in the data.</span>
-<span class="sd">    reweight_max_iters : int, optional</span>
+<span class="sd">    reweight_max_iters</span>
 <span class="sd">        If an integer, number of solver iterations (see Notes), resulting in reweighting.</span>
-<span class="sd">        Defaults to no reweighting (``None``).</span>
-<span class="sd">    reweight_func : ReweightingFunction, optional</span>
+<span class="sd">        ``None`` defaults to no reweighting.</span>
+<span class="sd">    reweight_func</span>
 <span class="sd">        If reweighting is active, the reweighting function instance to be used.</span>
-<span class="sd">        Defaults to an inverse reweighting with stability parameter ``eps=1e-4``.</span>
-<span class="sd">    reweight_max_rss : float, optional</span>
+<span class="sd">    reweight_max_rss</span>
 <span class="sd">        When reweighting is active and the maximum number of iterations has not yet</span>
 <span class="sd">        been reached, let the iteration stop early if the solutions do not change much</span>
 <span class="sd">        anymore (see Notes).</span>
 <span class="sd">        Set to ``0`` to deactivate early stopping.</span>
-<span class="sd">    reweight_init : numpy.ndarray, dict, list, optional</span>
+<span class="sd">    reweight_init</span>
 <span class="sd">        When reweighting is active, use this array to initialize the weights.</span>
 <span class="sd">        It has to have size :math:`\text{num_components} * \text{num_reg}`, where</span>
 <span class="sd">        :math:`\text{num_components}=1` if covariances are not used (and the actual</span>
@@ -1192,42 +1245,35 @@
 <span class="sd">        output shape (no check is performed). If it is a dictionary, the keys need to be</span>
 <span class="sd">        model names, and the values are then the NumPy arrays which will be arranged</span>
 <span class="sd">        properly to match the mapping matrix.</span>
-<span class="sd">    reweight_coupled : bool, optional</span>
-<span class="sd">        If ``True`` (default) and reweighting is active, the L1 penalty hyperparameter</span>
-<span class="sd">        is coupled with the reweighting weights (see Notes).</span>
-<span class="sd">    formal_covariance : bool, optional</span>
-<span class="sd">        If ``True``, calculate the formal model covariance. Defaults to ``False``.</span>
-<span class="sd">    use_data_variance : bool, optional</span>
-<span class="sd">        If ``True`` (default) and ``ts`` contains variance information, this</span>
-<span class="sd">        uncertainty information will be used.</span>
-<span class="sd">    use_data_covariance : bool, optional</span>
-<span class="sd">        If ``True`` (default), ``ts`` contains variance and covariance information, and</span>
+<span class="sd">    reweight_coupled</span>
+<span class="sd">        If ``True`` and reweighting is active, the L1 penalty hyperparameter is coupled</span>
+<span class="sd">        with the reweighting weights (see Notes).</span>
+<span class="sd">    formal_covariance</span>
+<span class="sd">        If ``True``, calculate the formal model covariance.</span>
+<span class="sd">    use_data_variance</span>
+<span class="sd">        If ``True`` and ``ts`` contains variance information, this uncertainty information</span>
+<span class="sd">        will be used.</span>
+<span class="sd">    use_data_covariance</span>
+<span class="sd">        If ``True``, ``ts`` contains variance and covariance information, and</span>
 <span class="sd">        ``use_data_variance`` is also ``True``, this uncertainty information will be used.</span>
-<span class="sd">    use_internal_scales : bool, optional</span>
-<span class="sd">        If ``True`` (default), the reweighting takes into account potential</span>
-<span class="sd">        model-specific internal scaling parameters, otherwise ignores them.</span>
-<span class="sd">    cov_zero_threshold : float, optional</span>
+<span class="sd">    use_internal_scales</span>
+<span class="sd">        If ``True``, the reweighting takes into account potential model-specific internal</span>
+<span class="sd">        scaling parameters, otherwise ignores them.</span>
+<span class="sd">    cov_zero_threshold</span>
 <span class="sd">        When extracting the formal covariance matrix, assume parameters with absolute</span>
 <span class="sd">        values smaller than ``cov_zero_threshold`` are effectively zero.</span>
 <span class="sd">        Internal scales are always respected.</span>
-<span class="sd">    return_weights : bool, optional</span>
+<span class="sd">    return_weights</span>
 <span class="sd">        When reweighting is active, set to ``True`` to return the weights after the last</span>
 <span class="sd">        update.</span>
-<span class="sd">        Defaults to ``False``.</span>
-<span class="sd">    check_constraints : bool, optional</span>
-<span class="sd">        If ``True`` (default), check whether models have sign constraints that should</span>
+<span class="sd">    check_constraints</span>
+<span class="sd">        If ``True``, check whether models have sign constraints that should</span>
 <span class="sd">        be enforced.</span>
-<span class="sd">    cvxpy_kw_args : dict</span>
+<span class="sd">    cvxpy_kw_args</span>
 <span class="sd">        Additional keyword arguments passed on to CVXPY&#39;s ``solve()`` function.</span>
-<span class="sd">        By default, the CVXPY solver options are set to use CVXOPT as the solver</span>
-<span class="sd">        library, together with CVXPY&#39;s *robust* ``kktsolver`` option. This slows down</span>
-<span class="sd">        the solution significantly, but in general will converge more reliably</span>
-<span class="sd">        when using L1 regularization. If you want to switch to default CVXPY settings,</span>
-<span class="sd">        pass an empty dictionary.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Solution</span>
 <span class="sd">        Result of the regression.</span>
 
 <span class="sd">    Notes</span>
@@ -1295,7 +1341,7 @@
         <span class="sa">f</span><span class="s2">&quot;&#39;cov_zero_threshold needs to be non-negative, got </span><span class="si">{</span><span class="n">cov_zero_threshold</span><span class="si">}</span><span class="s2">.&quot;</span>
 
     <span class="c1"># get mapping and regularization matrix</span>
-    <span class="n">G</span><span class="p">,</span> <span class="n">obs_indices</span><span class="p">,</span> <span class="n">num_time</span><span class="p">,</span> <span class="n">num_params</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">num_obs</span><span class="p">,</span> <span class="n">num_reg</span><span class="p">,</span> <span class="n">reg_indices</span><span class="p">,</span> \
+    <span class="n">G</span><span class="p">,</span> <span class="n">obs_indices</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">num_obs</span><span class="p">,</span> <span class="n">num_reg</span><span class="p">,</span> <span class="n">reg_indices</span><span class="p">,</span> \
         <span class="n">reweight_init</span><span class="p">,</span> <span class="n">weights_scaling</span><span class="p">,</span> <span class="n">sign_constraints</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">prepare_LS</span><span class="p">(</span>
             <span class="n">ts</span><span class="p">,</span> <span class="n">reweight_init</span><span class="o">=</span><span class="n">reweight_init</span><span class="p">,</span> <span class="n">use_internal_scales</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">check_constraints</span><span class="o">=</span><span class="n">check_constraints</span><span class="p">)</span>
@@ -1309,12 +1355,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reweight_max_iters</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">reweight_max_iters</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="n">n_iters</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">reweight_max_iters</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">reweight_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rw_func</span> <span class="o">=</span> <span class="n">ReweightingFunction</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="s2">&quot;inv&quot;</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reweight_func</span><span class="p">,</span> <span class="n">ReweightingFunction</span><span class="p">),</span> <span class="s2">&quot;&#39;reweight_func&#39; &quot;</span> \
-                <span class="sa">f</span><span class="s2">&quot;needs to be None or a ReweightingFunction, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reweight_func</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="n">rw_func</span> <span class="o">=</span> <span class="n">reweight_func</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reweight_func</span><span class="p">,</span> <span class="n">ReweightingFunction</span><span class="p">),</span> <span class="s2">&quot;&#39;reweight_func&#39; &quot;</span> \
+            <span class="sa">f</span><span class="s2">&quot;needs to be a ReweightingFunction, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">reweight_func</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
     <span class="c1"># determine if reg_indices and weights_scaling need a reshape</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">cov_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">use_data_covariance</span><span class="p">:</span>
         <span class="n">reg_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">reg_indices</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">)</span>
@@ -1329,8 +1371,8 @@
     <span class="c1"># solve CVXPY problem while checking for convergence</span>
     <span class="k">def</span> <span class="nf">solve_problem</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">pen</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">init_weights</span><span class="p">,</span> <span class="n">nonneg</span><span class="p">,</span> <span class="n">nonpos</span><span class="p">):</span>
         <span class="c1"># build objective function</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">GtWd</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="n">objective</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">GtWG</span> <span class="o">@</span> <span class="n">m</span> <span class="o">-</span> <span class="n">GtWd</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">GtWG</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">psd_wrap</span><span class="p">(</span><span class="n">GtWG</span><span class="p">))</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">GtWd</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">m</span>
         <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">check_constraints</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">nonneg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1338,19 +1380,19 @@
             <span class="k">if</span> <span class="n">nonpos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">nonpos</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">regularize</span><span class="p">:</span>
+            <span class="n">weights_size</span> <span class="o">=</span> <span class="n">num_reg</span> <span class="o">*</span> <span class="n">num_comps</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">weights_size</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">reweight_max_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">reweight_size</span> <span class="o">=</span> <span class="n">num_reg</span> <span class="o">*</span> <span class="n">num_comps</span>
                 <span class="k">if</span> <span class="n">init_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">init_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">reweight_size</span><span class="p">)</span>
+                    <span class="n">init_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">weights_size</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">reweight_coupled</span><span class="p">:</span>
                         <span class="n">init_weights</span> <span class="o">*=</span> <span class="n">pen</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">assert</span> <span class="n">init_weights</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">reweight_size</span><span class="p">,</span> \
-                        <span class="sa">f</span><span class="s2">&quot;&#39;init_weights&#39; must have a size of </span><span class="si">{</span><span class="n">reweight_size</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="o">+</span> \
+                    <span class="k">assert</span> <span class="n">init_weights</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">weights_size</span><span class="p">,</span> \
+                        <span class="sa">f</span><span class="s2">&quot;&#39;init_weights&#39; must have a size of </span><span class="si">{</span><span class="n">weights_size</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="o">+</span> \
                         <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">init_weights</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="n">weights</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">reweight_size</span><span class="p">,</span>
+                <span class="n">weights</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">weights_size</span><span class="p">,</span>
                                        <span class="n">value</span><span class="o">=</span><span class="n">init_weights</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">z</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">reweight_size</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">reweight_coupled</span><span class="p">:</span>
                     <span class="n">objective</span> <span class="o">=</span> <span class="n">objective</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1362,7 +1404,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">lambd</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">()</span> <span class="k">if</span> <span class="n">num_comps</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">pen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
                                      <span class="n">value</span><span class="o">=</span><span class="n">pen</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">objective</span> <span class="o">=</span> <span class="n">objective</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">lambd</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">]))</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span> <span class="o">==</span> <span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">lambd</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">]))</span>
+                <span class="n">objective</span> <span class="o">=</span> <span class="n">objective</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
         <span class="c1"># define problem</span>
         <span class="n">problem</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">),</span> <span class="n">constraints</span><span class="p">)</span>
         <span class="c1"># solve</span>
@@ -1384,9 +1427,9 @@
                 <span class="k">if</span> <span class="n">regularize</span> <span class="ow">and</span> <span class="n">reweight_max_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="c1"># update weights</span>
                     <span class="k">if</span> <span class="n">use_internal_scales</span> <span class="ow">and</span> <span class="p">(</span><span class="n">weights_scaling</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                        <span class="n">weights</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">rw_func</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">]</span><span class="o">*</span><span class="n">weights_scaling</span><span class="p">)</span>
+                        <span class="n">weights</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">reweight_func</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">]</span><span class="o">*</span><span class="n">weights_scaling</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">weights</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">rw_func</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">])</span>
+                        <span class="n">weights</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">reweight_func</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">reg_indices</span><span class="p">])</span>
                     <span class="c1"># check if the solution changed to previous iteration</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">old_m</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">reweight_max_rss</span><span class="p">):</span>
                         <span class="k">break</span>

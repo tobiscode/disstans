@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 4: The use and estimation of covariance &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>Tutorial 4: The use and estimation of covariance &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -12,8 +12,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -37,7 +39,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -71,7 +73,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -141,6 +143,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -221,6 +229,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -235,21 +245,20 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -306,16 +315,16 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -337,6 +346,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -405,11 +415,11 @@
 </aside>
 <p>As seen in Tutorial 3, DISSTANS can also make use of data variance and covariance if provided
 in the timeseries. While this was not specifically addressed in the previous tutorial,
-taking advantage of that information can improve the fit to the data, especially when
-there is a large amount of correlation across components. This tutorial
-will explore this with a small synthetic network that has large but strongly
-correlated errors.</p>
-<nav class="contents local" id="table-of-contents">
+taking advantage of that information can improve the fit to the data and provide insight into
+fitted model parameter covariances, especially when there is a large amount of correlation
+across components. This tutorial will explore this with a small synthetic network that has
+large but strongly correlated errors.</p>
+<div class="contents local topic" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#making-a-noisy-network" id="id1">Making a noisy network</a></p></li>
@@ -419,9 +429,9 @@ correlated errors.</p>
 <li><p><a class="reference internal" href="#simple-linear-regression-with-restricted-spline-set" id="id5">Simple linear regression with restricted spline set</a></p></li>
 <li><p><a class="reference internal" href="#empirical-covariance-estimation" id="id6">Empirical covariance estimation</a></p></li>
 </ul>
-</nav>
+</div>
 <section id="making-a-noisy-network">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Making a noisy network</a><a class="headerlink" href="#making-a-noisy-network" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1">Making a noisy network</a><a class="headerlink" href="#making-a-noisy-network" title="Permalink to this heading"></a></h2>
 <p>The setup should be familiar:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># initialize RNG</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -435,7 +445,7 @@ correlated errors.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">/</span><span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">net_name</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">istat</span><span class="p">,</span> <span class="n">stat_name</span><span class="p">),</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">station_names</span><span class="p">),</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">net</span><span class="p">[</span><span class="n">stat_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Station</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">stat_name</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">net</span><span class="p">[</span><span class="n">stat_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Station</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">stat_name</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># create timevector</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
@@ -445,7 +455,7 @@ correlated errors.</p>
 </div>
 <p>This will create a network of 8 stations, arranged in a circle, and define the timespan
 we’re interested in.</p>
-<p>In the next step, like i the previous tutorial, we will create a function that returns
+<p>In the next step, like in the previous tutorial, we will create a function that returns
 model parameters for the generation of the synthetic data.
 The function most crucially though will also create the correlated noise. It does that
 by defining a (constant) noise covariance matrix, and then rotating that based on the
@@ -552,76 +562,87 @@ out of them, add them to the station as the two timeseries <code class="docutils
 <img alt="../_images/tutorial_4b_ts_S1.png" src="../_images/tutorial_4b_ts_S1.png" />
 </section>
 <section id="fitting-the-models-with-the-spatial-l0-solver">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Fitting the models with the spatial L0 solver</a><a class="headerlink" href="#fitting-the-models-with-the-spatial-l0-solver" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2">Fitting the models with the spatial L0 solver</a><a class="headerlink" href="#fitting-the-models-with-the-spatial-l0-solver" title="Permalink to this heading"></a></h2>
 <p>The following steps are nothing new - we will solve for model parameters with the
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a> method. However, this time we’re explicitly
 specifying if we want the solver to use data (co)variance.</p>
 <p>This first run doesn’t use either the data variance or covariance, and we will save
-the estimated linear velocity parameter for every station and component for later
-comparison.</p>
+the estimated linear velocity parameter and covariance for every station and component
+for later comparison.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define a reweighting function</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.solvers</span> <span class="kn">import</span> <span class="n">LogarithmicReweighting</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func</span> <span class="o">=</span> <span class="n">LogarithmicReweighting</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># solve without using the data variance</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">spatialfit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">spatial_l0_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                       <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">Calculating scale lengths</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 <span class="go">Done</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_onlydata&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity components</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span><span class="p">[</span><span class="s2">&quot;onlydata&quot;</span><span class="p">]</span> <span class="o">=</span> \
 <span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity covariances</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cov_en_est</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cov_en_est</span><span class="p">[</span><span class="s2">&quot;onlydata&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>In the next two runs, we will first add the variance, and then the covariance. At the end,
-for future comparison, we save the estimated parameters and covariance.</p>
+for future comparison, we save the estimated parameters and covariances.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># solve using the data variance</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">spatialfit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">spatial_l0_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                       <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">Calculating scale lengths</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 <span class="go">Done</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_withvar&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity components</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span><span class="p">[</span><span class="s2">&quot;withvar&quot;</span><span class="p">]</span> <span class="o">=</span> \
 <span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity covariances</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cov_en_est</span><span class="p">[</span><span class="s2">&quot;withvar&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># solve with the data variance and covariance</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">spatialfit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">spatial_reweight_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">spatial_l0_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Transient&quot;</span><span class="p">],</span>
 <span class="gp">... </span>                       <span class="n">spatial_reweight_iters</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-<span class="gp">... </span>                       <span class="n">local_reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>                       <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">Calculating scale lengths</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 <span class="go">Done</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">output_description</span><span class="o">=</span><span class="s2">&quot;Fit_withvarcov&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity components</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_est</span><span class="p">[</span><span class="s2">&quot;withvarcov&quot;</span><span class="p">]</span> <span class="o">=</span> \
 <span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># save estimated velocity covariances</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cov_en_est</span><span class="p">[</span><span class="s2">&quot;withvarcov&quot;</span><span class="p">]</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">net</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Notice that right off the bat, including the variance and covariance data in the estimation
-has reduced the number of unique splines from up to 3 per component to 1 per component.</p>
+has reduced the number of iterations necessary, and has pushed the spatial solver to select only
+a single spline per component and station to model the transient.</p>
 <p>Just to get an idea of the fit, we can again use the GUI function to show us the fits and
 scalograms:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span><span class="o">.</span><span class="n">gui</span><span class="p">(</span><span class="n">station</span><span class="o">=</span><span class="s2">&quot;S2&quot;</span><span class="p">,</span> <span class="n">timeseries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">],</span>
@@ -632,7 +653,7 @@ scalograms:</p>
 <p><a class="reference internal" href="../_images/tutorial_4c_ts_S2.png"><img alt="4c_ts_S2" src="../_images/tutorial_4c_ts_S2.png" style="width: 49%;" /></a> <a class="reference internal" href="../_images/tutorial_4c_scalo_S2.png"><img alt="4c_scalo_S2" src="../_images/tutorial_4c_scalo_S2.png" style="width: 49%;" /></a></p>
 </section>
 <section id="quality-of-the-fits">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Quality of the fits</a><a class="headerlink" href="#quality-of-the-fits" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3">Quality of the fits</a><a class="headerlink" href="#quality-of-the-fits" title="Permalink to this heading"></a></h2>
 <p>We now want to see how close we got to the true secular velocity. For that, we first need
 to collect the true velocity vectors at all stations:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vel_en_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">mdl_coll_synth</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="s2">&quot;Secular&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
@@ -641,13 +662,13 @@ to collect the true velocity vectors at all stations:</p>
 </pre></div>
 </div>
 <p>Now we can calculate the deviation of the estimate both in terms of magnitude and direction
-from the true values:</p>
+from the true values, and print the estimated model parameter covariance:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">err_stats</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">case</span> <span class="ow">in</span> \
 <span class="gp">... </span>    <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Data + Variance&quot;</span><span class="p">,</span> <span class="s2">&quot;Data + Variance + Covariance&quot;</span><span class="p">],</span>
 <span class="gp">... </span>        <span class="p">[</span><span class="s2">&quot;onlydata&quot;</span><span class="p">,</span> <span class="s2">&quot;withvar&quot;</span><span class="p">,</span> <span class="s2">&quot;withvarcov&quot;</span><span class="p">]):</span>
 <span class="gp">... </span>    <span class="c1"># error statistics</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Statistics for </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error Statistics for </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="c1"># get amplitude errors</span>
 <span class="gp">... </span>    <span class="n">norm_est</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vel_en_est</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 <span class="gp">... </span>    <span class="n">err_amp</span> <span class="o">=</span> <span class="n">norm_est</span> <span class="o">-</span> <span class="n">norm_true</span>
@@ -662,54 +683,90 @@ from the true values:</p>
 <span class="gp">... </span>    <span class="c1"># print rms of both</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RMS Amplitude: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">err_amp</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RMS Angle: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">err_angle</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="si">:</span><span class="s2">.11g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="c1"># print covariances</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Secular (Co)Variances&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">station_names</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">data</span><span class="o">=</span><span class="n">cov_en_est</span><span class="p">[</span><span class="n">case</span><span class="p">],</span>
+<span class="gp">... </span>                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;E-E&quot;</span><span class="p">,</span> <span class="s2">&quot;N-N&quot;</span><span class="p">,</span> <span class="s2">&quot;E-N&quot;</span><span class="p">]))</span>
 
-<span class="go">Statistics for Data:</span>
+<span class="go">Error Statistics for Data:</span>
 <span class="go">    Amplitude      Angle</span>
-<span class="go">S1   1.697651   4.359484</span>
-<span class="go">S2   0.328071   0.261513</span>
-<span class="go">S3  -0.677940   4.072121</span>
-<span class="go">S4  -0.659412  13.525467</span>
-<span class="go">S5  -0.898881   4.207969</span>
-<span class="go">S6   0.819918  10.613691</span>
-<span class="go">S7   0.157743  13.085969</span>
-<span class="go">S8   0.894263  15.771350</span>
-<span class="go">RMS Amplitude: 0.87955367999</span>
-<span class="go">RMS Angle: 9.8038857489</span>
+<span class="go">S1   2.598428   1.215275</span>
+<span class="go">S2   0.505623   4.063633</span>
+<span class="go">S3  -0.823852  11.933309</span>
+<span class="go">S4  -1.309459  14.540778</span>
+<span class="go">S5  -1.895504  10.011640</span>
+<span class="go">S6   0.477857   8.026414</span>
+<span class="go">S7   0.292104  12.141594</span>
+<span class="go">S8   0.863249   6.090901</span>
+<span class="go">RMS Amplitude: 1.3253632716</span>
+<span class="go">RMS Angle: 9.4934302719</span>
+<span class="go">Secular (Co)Variances</span>
+<span class="go">         E-E       N-N  E-N</span>
+<span class="go">S1  0.063691  0.063691  0.0</span>
+<span class="go">S2  0.063691  0.063691  0.0</span>
+<span class="go">S3  0.063691  0.063691  0.0</span>
+<span class="go">S4  0.063691  0.063691  0.0</span>
+<span class="go">S5  0.088382  0.063691  0.0</span>
+<span class="go">S6  0.063691  0.063691  0.0</span>
+<span class="go">S7  0.063691  0.063691  0.0</span>
+<span class="go">S8  0.063691  0.063691  0.0</span>
 
-<span class="go">Statistics for Data + Variance:</span>
+<span class="go">Error Statistics for Data + Variance:</span>
 <span class="go">    Amplitude     Angle</span>
-<span class="go">S1   1.511762  1.839559</span>
-<span class="go">S2   1.496591  0.231865</span>
-<span class="go">S3   1.594666  1.128778</span>
-<span class="go">S4  -1.494915  6.149112</span>
-<span class="go">S5  -0.972639  6.333535</span>
-<span class="go">S6   0.683505  6.031706</span>
-<span class="go">S7   0.000223  1.616320</span>
-<span class="go">S8   0.708014  4.211801</span>
-<span class="go">RMS Amplitude: 1.1841362945</span>
-<span class="go">RMS Angle: 4.1738823044</span>
+<span class="go">S1   1.680626  1.263873</span>
+<span class="go">S2   0.245351  1.477345</span>
+<span class="go">S3  -0.928216  2.238697</span>
+<span class="go">S4  -0.985113  6.066963</span>
+<span class="go">S5  -1.082151  7.696245</span>
+<span class="go">S6   0.995734  3.697095</span>
+<span class="go">S7   0.106339  1.188509</span>
+<span class="go">S8   0.572923  3.609512</span>
+<span class="go">RMS Amplitude: 0.94992227405</span>
+<span class="go">RMS Angle: 4.0764805213</span>
+<span class="go">Secular (Co)Variances</span>
+<span class="go">         E-E       N-N  E-N</span>
+<span class="go">S1  0.397303  0.226716  0.0</span>
+<span class="go">S2  0.327963  0.327963  0.0</span>
+<span class="go">S3  0.226716  0.397303  0.0</span>
+<span class="go">S4  0.327963  0.327963  0.0</span>
+<span class="go">S5  0.397303  0.226716  0.0</span>
+<span class="go">S6  0.327963  0.327963  0.0</span>
+<span class="go">S7  0.226716  0.397303  0.0</span>
+<span class="go">S8  0.327963  0.327963  0.0</span>
 
-<span class="go">Statistics for Data + Variance + Covariance:</span>
-<span class="go">    Amplitude     Angle</span>
-<span class="go">S1   1.572796  1.954775</span>
-<span class="go">S2   0.767869  3.342269</span>
-<span class="go">S3  -0.656516  2.929676</span>
-<span class="go">S4  -0.903166  9.659920</span>
-<span class="go">S5  -1.009938  6.237068</span>
-<span class="go">S6   0.562830  6.694827</span>
-<span class="go">S7   0.015474  1.011020</span>
-<span class="go">S8   0.728856  5.113027</span>
-<span class="go">RMS Amplitude: 0.87879575059</span>
-<span class="go">RMS Angle: 5.3359148666</span>
+<span class="go">Error Statistics for Data + Variance + Covariance:</span>
+<span class="go">    Amplitude      Angle</span>
+<span class="go">S1   1.888550   1.969501</span>
+<span class="go">S2   0.414432   2.517659</span>
+<span class="go">S3  -0.811653   4.516261</span>
+<span class="go">S4  -0.993368  10.887050</span>
+<span class="go">S5  -1.305148   6.773861</span>
+<span class="go">S6   0.738884   5.765371</span>
+<span class="go">S7   0.169693   3.082705</span>
+<span class="go">S8   0.815215   5.680584</span>
+<span class="go">RMS Amplitude: 1.0202124819</span>
+<span class="go">RMS Angle: 5.8098923752</span>
+<span class="go">Secular (Co)Variances</span>
+<span class="go">         E-E       N-N           E-N</span>
+<span class="go">S1  0.397303  0.226716 -1.915294e-16</span>
+<span class="go">S2  0.312009  0.312009  8.529381e-02</span>
+<span class="go">S3  0.226716  0.397303 -1.291082e-15</span>
+<span class="go">S4  0.312009  0.312009 -8.529381e-02</span>
+<span class="go">S5  0.397303  0.226716  9.883866e-17</span>
+<span class="go">S6  0.312009  0.312009  8.529381e-02</span>
+<span class="go">S7  0.097160  0.397303  3.061551e-16</span>
+<span class="go">S8  0.312009  0.312009 -8.529381e-02</span>
 </pre></div>
 </div>
-<p>Clearly, the fit using all the available information leads to the best set of parameters.
-Furthermore, from the verbose output of the spatial solver, we also see that we find sparser,
-and more spatially-consistent solution for the network, as evidenced by the smaller number
-of unique parameters.</p>
+<p>Including the (co)variance has decreased our misfit slightly. However, including the variance
+information in the fitting process has led to smaller formal uncertainties in the fitted
+model parameters. Finally, comparing the covariance case with the variance case, we have
+furthermore gained insight that the East-North components of the velocity for stations
+S2, S4, S6, and S8 are strongly correlated.</p>
 </section>
 <section id="correlation-of-parameters">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Correlation of parameters</a><a class="headerlink" href="#correlation-of-parameters" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4">Correlation of parameters</a><a class="headerlink" href="#correlation-of-parameters" title="Permalink to this heading"></a></h2>
 <p>Let’s have a closer look at how we can estimate the error in our prediction (i.e. fitted
 timeseries). By default, if the formal covariance is estimated by the solver, that formal
 uncertainty is passed on to the <a class="reference internal" href="../disstans/models.html#disstans.models.ModelCollection" title="disstans.models.ModelCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelCollection</span></code></a> object where
@@ -764,7 +821,7 @@ yielding in empty correlation rows. This threshold can be set with the
 parameter uncertainty.</p>
 </section>
 <section id="simple-linear-regression-with-restricted-spline-set">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Simple linear regression with restricted spline set</a><a class="headerlink" href="#simple-linear-regression-with-restricted-spline-set" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5">Simple linear regression with restricted spline set</a><a class="headerlink" href="#simple-linear-regression-with-restricted-spline-set" title="Permalink to this heading"></a></h2>
 <p>The goal of the L0 solver is to find the minimum set of splines necessary to model
 the transient signal, based on an overcomplete dictionary of splines. Once
 that subset is found (e.g., the one spline in shown above), it is mathematically
@@ -792,10 +849,12 @@ value of their parameters. This is accomplished with the
 </div>
 <img alt="../_images/tutorial_4e_corr_S2.png" src="../_images/tutorial_4e_corr_S2.png" />
 <p>We now see how only the parameters that have been estimated have correlation entries,
-and again, we see the tradeoff between the one spline and the linear polynomial.</p>
+and again, we see the tradeoff between the one spline and the linear polynomial.
+The figure looks essentially the same as the previous one, confirming our mathematical
+approximation of the L0 regularization worked.</p>
 </section>
 <section id="empirical-covariance-estimation">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Empirical covariance estimation</a><a class="headerlink" href="#empirical-covariance-estimation" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6">Empirical covariance estimation</a><a class="headerlink" href="#empirical-covariance-estimation" title="Permalink to this heading"></a></h2>
 <p>Now that we have the formal covariance, we can also try to estimate the empirical (sample)
 parameters covariance. With synthetic data, this is straightforward: we create a large number
 of timeseries, all with the same truth signal underlying it, but with different noise
@@ -831,7 +890,7 @@ and once purely data-based. First, truth-based:</p>
 <span class="gp">... </span>        <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> \
 <span class="gp">... </span>            <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Truth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">generate_model_and_noise</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">rng</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">... </span>    <span class="c1"># solve, same reweight_func, same penalty = easy</span>
-<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fit </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -858,7 +917,7 @@ and once purely data-based. First, truth-based:</p>
 <span class="gp">... </span>        <span class="n">station</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> \
 <span class="gp">... </span>            <span class="n">orig_data</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="n">generate_model_and_noise</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">rng</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">... </span>    <span class="c1"># solve, same reweight_func, same penalty = easy</span>
-<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lasso_regression&quot;</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">reweight_max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">reweight_func</span><span class="o">=</span><span class="n">rw_func</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">use_data_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>            <span class="n">formal_covariance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fit </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

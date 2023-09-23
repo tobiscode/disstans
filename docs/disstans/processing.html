@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Processing &mdash; DISSTANS 1.2b2 documentation</title>
+  <title>Processing &mdash; DISSTANS 2.0rc0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -12,8 +12,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -38,7 +40,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2b2
+                2.0rc0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -72,7 +74,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#advanced-plotting">Advanced plotting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l2-regularization">Repeat with L2 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l1-regularization">Repeat with L1 regularization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#adding-reweighting-iterations">Adding reweighting iterations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#repeat-with-l0-regularization">Repeat with L0 regularization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/tutorial_2.html#comparing-specific-parameters">Comparing specific parameters</a></li>
 </ul>
 </li>
@@ -142,6 +144,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/example_2.html#references">References</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-do-i-know-which-penalties-to-use-in-subst">1. How do I know which penalties to use in <code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ReweightingFunction</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html#how-can-i-save-my-network-object-to-save-time">2. How can I save my <code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code> object to save time?</a></li>
 </ul>
 </li>
 </ul>
@@ -222,6 +230,8 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.euler_rot_field"><code class="docutils literal notranslate"><span class="pre">Network.euler_rot_field()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.evaluate"><code class="docutils literal notranslate"><span class="pre">Network.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.export_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.export_network_ts()</span></code></a></li>
@@ -236,21 +246,20 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.import_network_ts"><code class="docutils literal notranslate"><span class="pre">Network.import_network_ts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.load_maintenance_dict"><code class="docutils literal notranslate"><span class="pre">Network.load_maintenance_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.math"><code class="docutils literal notranslate"><span class="pre">Network.math()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.mean_longitude"><code class="docutils literal notranslate"><span class="pre">Network.mean_longitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.to_json"><code class="docutils literal notranslate"><span class="pre">Network.to_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.unfreeze"><code class="docutils literal notranslate"><span class="pre">Network.unfreeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.update_default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.update_default_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.wormplot"><code class="docutils literal notranslate"><span class="pre">Network.wormplot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.default_local_models"><code class="docutils literal notranslate"><span class="pre">Network.default_local_models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.default_location_path"><code class="docutils literal notranslate"><span class="pre">Network.default_location_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.station_locations"><code class="docutils literal notranslate"><span class="pre">Network.station_locations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.station_names"><code class="docutils literal notranslate"><span class="pre">Network.station_names</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.stations"><code class="docutils literal notranslate"><span class="pre">Network.stations</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -307,16 +316,16 @@
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_local_model_kwargs"><code class="docutils literal notranslate"><span class="pre">Station.add_local_model_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.add_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.add_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.analyze_residuals"><code class="docutils literal notranslate"><span class="pre">Station.analyze_residuals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.remove_fit"><code class="docutils literal notranslate"><span class="pre">Station.remove_fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.remove_local_models"><code class="docutils literal notranslate"><span class="pre">Station.remove_local_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Station.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.sum_fits"><code class="docutils literal notranslate"><span class="pre">Station.sum_fits()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.timeseries"><code class="docutils literal notranslate"><span class="pre">Station.timeseries</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.ts"><code class="docutils literal notranslate"><span class="pre">Station.ts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.unused_models"><code class="docutils literal notranslate"><span class="pre">Station.unused_models</span></code></a></li>
@@ -338,6 +347,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tools.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#best-utmzone">best_utmzone</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#block-permutation">block_permutation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#cov2corr">cov2corr</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#create-powerlaw-noise">create_powerlaw_noise</a></li>
@@ -408,11 +418,11 @@ be initialized.</p>
 <h2>unwrap_dict_and_ts<a class="headerlink" href="#unwrap-dict-and-ts" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.processing.unwrap_dict_and_ts">
-<span class="sig-prename descclassname"><span class="pre">&#64;</span></span><span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">unwrap_dict_and_ts</span></span><a class="reference internal" href="../_modules/disstans/processing.html#unwrap_dict_and_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.unwrap_dict_and_ts" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">&#64;</span></span><span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">unwrap_dict_and_ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#unwrap_dict_and_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.unwrap_dict_and_ts" title="Permalink to this definition"></a></dt>
 <dd><p>A wrapper decorator that aims at simplifying the coding of processing functions.
 Ideally, a new function that doesn’t need to know if its input is a
-<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>,
-<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or a dictionary containing them, should not need to reimplement
+<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.0.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>,
+<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or a dictionary containing them, should not need to reimplement
 a check and conversion for all of these because they just represent a data
 array of some form. So, by providing this function decorator, a wrapped function
 only needs to be able to work for a single array (plus some optional keyword arguments).
@@ -433,6 +443,14 @@ to be able to also take and return all the other data forms:</p>
     <span class="k">return</span> <span class="n">out_array</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>) – Function to be wrapped.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -460,23 +478,26 @@ that the residual between reference and input timeseries is allowed to have.</p>
 observations the timeseries has to contain.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>station</strong> (<a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station"><em>disstans.station.Station</em></a>) – Station to operate on.</p></li>
-<li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Description of the timeseries to clean.</p></li>
-<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a><em>, </em><em>function</em>) – Reference timeseries.
+<li><p><strong>station</strong> (<a class="reference internal" href="station.html#disstans.station.Station" title="disstans.station.Station"><code class="xref py py-class docutils literal notranslate"><span class="pre">Station</span></code></a>) – Station to operate on.</p></li>
+<li><p><strong>ts_in</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Description of the timeseries to clean.</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> | <a class="reference external" href="https://docs.python.org/3.11/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>) – Reference timeseries.
 If string, checks for a timeseries with that description in the <code class="docutils literal notranslate"><span class="pre">station</span></code>.
 If a <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> instance, use it directly.
 If a function, the reference timeseries will be calculated as
 <code class="docutils literal notranslate"><span class="pre">t_ref</span> <span class="pre">=</span> <span class="pre">reference(ts_in,</span> <span class="pre">**reference_callable_args)</span></code>.</p></li>
-<li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, duplicate <code class="docutils literal notranslate"><span class="pre">ts_in</span></code> to a new timeseries <code class="docutils literal notranslate"><span class="pre">ts_out</span></code>
+<li><p><strong>ts_out</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – If provided, duplicate <code class="docutils literal notranslate"><span class="pre">ts_in</span></code> to a new timeseries <code class="docutils literal notranslate"><span class="pre">ts_out</span></code>
 and clean the copy (to preserve the raw timeseries).</p></li>
-<li><p><strong>clean_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – Override the default cleaning criteria in <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>,
+<li><p><strong>clean_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">{}</span></code>) – Override the default cleaning criteria in <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a>,
 see the explanations above.</p></li>
-<li><p><strong>reference_callable_args</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">reference</span></code> is a function, <code class="docutils literal notranslate"><span class="pre">reference_callable_args</span></code> can be used
+<li><p><strong>reference_callable_args</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">{}</span></code>) – If <code class="docutils literal notranslate"><span class="pre">reference</span></code> is a function, <code class="docutils literal notranslate"><span class="pre">reference_callable_args</span></code> can be used
 to pass additional keyword arguments to the former when calculating
 the reference timeseries.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 </dl>
 <div class="admonition warning">
@@ -491,54 +512,56 @@ the raw input timeseries, specify <code class="docutils literal notranslate"><sp
 <h3>decompose<a class="headerlink" href="#decompose" title="Permalink to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.processing.decompose">
-<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.decompose" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.processing.</span></span><span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.decompose" title="Permalink to this definition"></a></dt>
 <dd><p>Decomposes the input signal into different components using PCA or ICA.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>
+<li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>
 (can contain NaNs).
 Wrapped by <a class="reference internal" href="#disstans.processing.unwrap_dict_and_ts" title="disstans.processing.unwrap_dict_and_ts"><code class="xref py py-func docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a> to also accept
-<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> and
+<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.0.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> and
 dictionaries of them as input (i.e. the output of
 <a class="reference internal" href="network.html#disstans.network.Network.export_network_ts" title="disstans.network.Network.export_network_ts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">export_network_ts()</span></code></a>).</p></li>
-<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Method to use to decompose the array. Possible values are <code class="docutils literal notranslate"><span class="pre">'pca'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ica'</span></code>:
-<code class="docutils literal notranslate"><span class="pre">'pca'</span></code> uses <a class="reference external" href="https://scikit-learn.org/1.2/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA" title="(in scikit-learn v1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCA</span></code></a> (motivated by <a class="reference internal" href="#dong06" id="id1"><span>[dong06]</span></a>), whereas
-<code class="docutils literal notranslate"><span class="pre">'ica'</span></code> uses <a class="reference external" href="https://scikit-learn.org/1.2/modules/generated/sklearn.decomposition.FastICA.html#sklearn.decomposition.FastICA" title="(in scikit-learn v1.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastICA</span></code></a> (motivated by <a class="reference internal" href="#huang12" id="id2"><span>[huang12]</span></a>).</p></li>
-<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Number of components to estimate. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all are used.</p></li>
-<li><p><strong>return_sources</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, return not only the best-fit model, but also the sources
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Method to use to decompose the array. Possible values are <code class="docutils literal notranslate"><span class="pre">'pca'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ica'</span></code>:
+<code class="docutils literal notranslate"><span class="pre">'pca'</span></code> uses <a class="reference external" href="https://scikit-learn.org/1.3/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCA</span></code></a> (motivated by <a class="reference internal" href="#dong06" id="id1"><span>[dong06]</span></a>), whereas
+<code class="docutils literal notranslate"><span class="pre">'ica'</span></code> uses <a class="reference external" href="https://scikit-learn.org/1.3/modules/generated/sklearn.decomposition.FastICA.html#sklearn.decomposition.FastICA" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastICA</span></code></a> (motivated by <a class="reference internal" href="#huang12" id="id2"><span>[huang12]</span></a>).</p></li>
+<li><p><strong>num_components</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">1</span></code>) – Number of components to estimate. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all are used.</p></li>
+<li><p><strong>return_sources</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, return not only the best-fit model, but also the sources
 themselves in space and time. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Random number generator instance to use to fill missing values.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>model</strong> (<em>numpy.ndarray</em>) – Best-fit model with shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>.</p></li>
-<li><p><strong>temporal</strong> (<em>numpy.ndarray</em>) – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Temporal source with shape
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>], <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>model</em> – Best-fit model with shape <span class="math notranslate nohighlight">\((\text{num_observations},\text{n_stations})\)</span>.</p></li>
+<li><p><em>temporal</em> – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Temporal source with shape
 <span class="math notranslate nohighlight">\((\text{num_observations},\text{num_components})\)</span>.</p></li>
-<li><p><strong>spatial</strong> (<em>numpy.ndarray</em>) – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Spatial source with shape
+<li><p><em>spatial</em> – Only if <code class="docutils literal notranslate"><span class="pre">return_sources=True</span></code>: Spatial source with shape
 <span class="math notranslate nohighlight">\((\text{num_components},\text{n_stations})\)</span>.</p></li>
 </ul>
 </p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="dong06" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">dong06</a><span class="fn-bracket">]</span></span>
-<p>Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L.,
+<dl class="citation">
+<dt class="label" id="dong06"><span class="brackets"><a class="fn-backref" href="#id1">dong06</a></span></dt>
+<dd><p>Dong, D., Fang, P., Bock, Y., Webb, F., Prawirodirdjo, L.,
 Kedar, S., &amp; Jamason, P. (2006). <em>Spatiotemporal filtering using principal component
 analysis and Karhunen-Loeve expansion approaches for regional GPS network analysis</em>.
 Journal of Geophysical Research: Solid Earth, 111(B3).
 doi:<a class="reference external" href="https://doi.org/10.1029/2005JB003806">10.1029/2005JB003806</a>.</p>
-</div>
-<div class="citation" id="huang12" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">huang12</a><span class="fn-bracket">]</span></span>
-<p>Huang, D. W., Dai, W. J., &amp; Luo, F. X. (2012).
+</dd>
+<dt class="label" id="huang12"><span class="brackets"><a class="fn-backref" href="#id2">huang12</a></span></dt>
+<dd><p>Huang, D. W., Dai, W. J., &amp; Luo, F. X. (2012).
 <em>ICA Spatiotemporal Filtering Method and Its Application in GPS Deformation Monitoring</em>.
 Applied Mechanics and Materials, 204–208, 2806–2812.
 doi:<a class="reference external" href="http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806">10.4028/www.scientific.net/AMM.204-208.2806</a>.</p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -552,21 +575,21 @@ ignored during the median calculation, but missing observations are not imputed
 from the rolling median (i.e., a NaN value remains a NaN value, but does not
 affect surrounding values).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – 2D input array (can contain NaNs).
+<li><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – 2D input array (can contain NaNs).
 Wrapped by <a class="reference internal" href="#disstans.processing.unwrap_dict_and_ts" title="disstans.processing.unwrap_dict_and_ts"><code class="xref py py-func docutils literal notranslate"><span class="pre">unwrap_dict_and_ts()</span></code></a> to also accept
-<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> and
+<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.0.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> and
 dictionaries of them as input.</p></li>
-<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Kernel size (length of moving window to compute the median over).
+<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Kernel size (length of moving window to compute the median over).
 Has to be an odd number.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>filtered</strong> – 2D filtered array (may still contain NaNs).</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>2D filtered array (may still contain NaNs).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -586,19 +609,19 @@ crossing known step epochs and using a fixed period, the influence of unmodeled
 jumps and seasonal variations can be minimized. At the end, an empirical estimate
 of the velocities’ uncertainty is calculated as well.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><em>disstans.timeseries.Timeseries</em></a>) – Timeseries to perform the MIDAS algorithm on.</p></li>
-<li><p><strong>steps</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v1.5.3)"><em>pandas.Series</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v1.5.3)"><em>pandas.DatetimeIndex</em></a><em>, </em><em>optional</em>) – If given, a pandas Series or Index of step times, across which no pairs
+<li><p><strong>ts</strong> – Timeseries to perform the MIDAS algorithm on.</p></li>
+<li><p><strong>steps</strong> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – If given, a pandas Series or Index of step times, across which no pairs
 should be formed.</p></li>
-<li><p><strong>tolerance</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</p></li>
+<li><p><strong>tolerance</strong> (default: <code class="docutils literal notranslate"><span class="pre">0.001</span></code>) – Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>mdl</strong> (<em>disstans.models.Polynomial</em>) – Fitted polynomial (offset &amp; constant velocity) model.</p></li>
-<li><p><strong>res</strong> (<em>disstans.timeseries.Timeseries</em>) – Residual timeseries.</p></li>
-<li><p><strong>stats</strong> (<em>dict</em>) – Fittings statistics computed along the way.
+<li><p><em>mdl</em> – Fitted polynomial (offset &amp; constant velocity) model.</p></li>
+<li><p><em>res</em> – Residual timeseries.</p></li>
+<li><p><em>stats</em> – Fittings statistics computed along the way.
 <code class="docutils literal notranslate"><span class="pre">'num_epochs'</span></code>, <code class="docutils literal notranslate"><span class="pre">'num_used'</span></code>, <code class="docutils literal notranslate"><span class="pre">'num_pairs'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'nstep'</span></code> are the number of
 epochs in <code class="docutils literal notranslate"><span class="pre">ts</span></code>, the number of epochs used in the velocity pairs, the number of pairs
 formed, and the number of included steps, respectively. <code class="docutils literal notranslate"><span class="pre">'frac_removed'</span></code> and
@@ -610,15 +633,14 @@ deviation of the velocity pairs, respectively, and for each component.</p></li>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="blewitt16" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">blewitt16</a><span class="fn-bracket">]</span></span>
-<p>Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).
+<dl class="citation">
+<dt class="label" id="blewitt16"><span class="brackets"><a class="fn-backref" href="#id3">blewitt16</a></span></dt>
+<dd><p>Blewitt, G., Kreemer, C., Hammond, W. C., &amp; Gazeaux, J. (2016).
 <em>MIDAS robust trend estimator for accurate GPS station velocities without step detection.</em>
 Journal of Geophysical Research: Solid Earth, 121(3), 2054–2068.
 doi:<a class="reference external" href="https://doi.org/10.1002/2015JB012552">10.1002/2015JB012552</a></p>
-</div>
-</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -642,14 +664,14 @@ calls its method <a class="reference internal" href="#disstans.processing.StepDe
 Running the method again with a different <code class="docutils literal notranslate"><span class="pre">kernel_size</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code> or <code class="docutils literal notranslate"><span class="pre">y</span></code> will overwrite
 previous results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Window size of the detector. Must be odd.</p></li>
-<li><p><strong>kernel_size_min</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum window size of the detector (for edges). Must be smaller than or equal
-to <code class="docutils literal notranslate"><span class="pre">kernel_size</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
-<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},)\)</span>.
+<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Window size of the detector. Must be odd.</p></li>
+<li><p><strong>kernel_size_min</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">0</span></code>) – Minimum window size of the detector (for edges). Must be smaller than or equal
+to <code class="docutils literal notranslate"><span class="pre">kernel_size</span></code>.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},)\)</span>.
 Should not contain NaNs.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.
 Can contain NaNs.</p></li>
 </ul>
 </dd>
@@ -660,60 +682,74 @@ Can contain NaNs.</p></li>
 <dd><p>Calculates the Akaike Information Criterion for small samples for Least Squares
 regression results. Implementation is based on <a class="reference internal" href="#burnhamanderson02" id="id4"><span>[burnhamanderson02]</span></a> (ch. 2).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rss</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Residual sum of squares.</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of samples.</p></li>
-<li><p><strong>K</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Degrees of freedom. If the Least Squares model has <span class="math notranslate nohighlight">\(\text{num_parameters}\)</span>
+<li><p><strong>rss</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – Residual sum of squares.</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of samples.</p></li>
+<li><p><strong>K</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Degrees of freedom. If the Least Squares model has <span class="math notranslate nohighlight">\(\text{num_parameters}\)</span>
 parameters (including the mean), then the degrees of freedom are
 <span class="math notranslate nohighlight">\(K = \text{num_parameters} + 1\)</span></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The Small Sample AIC for Least Squares <span class="math notranslate nohighlight">\(\text{AIC}_c\)</span>.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The Small Sample AIC for Least Squares <span class="math notranslate nohighlight">\(\text{AIC}_c\)</span>.</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="burnhamanderson02" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">burnhamanderson02</a><span class="fn-bracket">]</span></span>
-<p>(2002) <em>Information and Likelihood Theory:
+<dl class="citation">
+<dt class="label" id="burnhamanderson02"><span class="brackets"><a class="fn-backref" href="#id4">burnhamanderson02</a></span></dt>
+<dd><p>(2002) <em>Information and Likelihood Theory:
 A Basis for Model Selection and Inference.</em> In: Burnham K.P., Anderson D.R. (eds)
 Model Selection and Multimodel Inference. Springer, New York, NY.
 doi:<a class="reference external" href="https://doi.org/10.1007/978-0-387-22456-5_2">10.1007/978-0-387-22456-5_2</a>.</p>
-</div>
-</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="disstans.processing.StepDetector.kernel_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size" title="Permalink to this definition"></a></dt>
+<dd><p>Kernel (window) size of the detector.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="disstans.processing.StepDetector.kernel_size_min">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_size_min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size_min" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum kernel (window) size of the detector.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search">
-<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search" title="Permalink to this definition"></a></dt>
 <dd><p>Function that will search for steps in the data.
 Upon successful completion, it will return the relative step probabilities
 as well as the residuals variances of the two hypotheses tested
 (as reported by <a class="reference internal" href="#disstans.processing.StepDetector.test_single" title="disstans.processing.StepDetector.test_single"><code class="xref py py-meth docutils literal notranslate"><span class="pre">test_single()</span></code></a>).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},)\)</span>.
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations},)\)</span>.
 Should not contain NaNs.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – Input array of shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.
 Can contain NaNs.</p></li>
-<li><p><strong>maxdel</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Difference in AIC that should be considered not significantly better.
+<li><p><strong>maxdel</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) – Difference in AIC that should be considered not significantly better.
 (Refers to <span class="math notranslate nohighlight">\(\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}\)</span>.)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>probabilities</strong> (<em>numpy.ndarray</em>) – Contains the relative probabilities array.
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>probabilities</em> – Contains the relative probabilities array.
 Has shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.</p></li>
-<li><p><strong>var0</strong> (<em>numpy.ndarray</em>) – Contains the array of the residuals variance of the hypothesis
+<li><p><em>var0</em> – Contains the array of the residuals variance of the hypothesis
 that no step is present.
 Has shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.</p></li>
-<li><p><strong>var1</strong> (<em>numpy.ndarray</em>) – Contains the array of the residuals variance of the hypothesis
+<li><p><em>var1</em> – Contains the array of the residuals variance of the hypothesis
 that a step is present.
 Has shape <span class="math notranslate nohighlight">\((\text{num_observations}, \text{num_components})\)</span>.</p></li>
 </ul>
@@ -731,40 +767,40 @@ Has shape <span class="math notranslate nohighlight">\((\text{num_observations},
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search_catalog">
-<span class="sig-name descname"><span class="pre">search_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_nan_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_catalog" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">search_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_nan_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_catalog" title="Permalink to this definition"></a></dt>
 <dd><p>Search a dictionary of potential step times for each station in the dictionary
 and assess the probability for each one.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>net</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><em>disstans.network.Network</em></a>) – Network instance to operate on.</p></li>
-<li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be analyzed.</p></li>
-<li><p><strong>catalog</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>, </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><em>pandas.DataFrame</em></a>) – Dictionary where each key is a station name and its value is a list of
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/1.5.3/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v1.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> compatible potential times/dates.
+<li><p><strong>net</strong> – Network instance to operate on.</p></li>
+<li><p><strong>ts_description</strong> – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be analyzed.</p></li>
+<li><p><strong>catalog</strong> – Dictionary where each key is a station name and its value is a list of
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.0.3/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v2.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a> compatible potential times/dates.
 Alternatively, a DataFrame with at least the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> and <code class="docutils literal notranslate"><span class="pre">'time'</span></code>.</p></li>
-<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
-<li><p><strong>gap</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum gap between identified steps to count as a continuous period
+<li><p><strong>threshold</strong> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
+<li><p><strong>gap</strong> (default: <code class="docutils literal notranslate"><span class="pre">2.0</span></code>) – Maximum gap between identified steps to count as a continuous period
 of possible steps.</p></li>
-<li><p><strong>gap_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit of <code class="docutils literal notranslate"><span class="pre">gap</span></code>.</p></li>
-<li><p><strong>keep_nan_probs</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – (Only applies to a DataFrame-type <code class="docutils literal notranslate"><span class="pre">catalog</span></code> input.)
+<li><p><strong>gap_unit</strong> (default: <code class="docutils literal notranslate"><span class="pre">'D'</span></code>) – Time unit of <code class="docutils literal notranslate"><span class="pre">gap</span></code>.</p></li>
+<li><p><strong>keep_nan_probs</strong> (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – (Only applies to a DataFrame-type <code class="docutils literal notranslate"><span class="pre">catalog</span></code> input.)
 If a catalogued station is not in the network, or if a catalogued timestamp
 is after the available timeseries, no step probability can be calculated
 and the results will contain NaNs.
-If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), those entries will be kept in the output, and if
-<code class="docutils literal notranslate"><span class="pre">False</span></code>, they will be dropped.</p></li>
-<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+If <code class="docutils literal notranslate"><span class="pre">True</span></code>, those entries will be kept in the output, and if <code class="docutils literal notranslate"><span class="pre">False</span></code>,
+they will be dropped.</p></li>
+<li><p><strong>no_pbar</strong> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>step_table</strong> (<em>pandas.DataFrame</em>) – A DataFrame containing the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> (its name), <code class="docutils literal notranslate"><span class="pre">'time'</span></code>
+<li><p><em>step_table</em> – A DataFrame containing the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> (its name), <code class="docutils literal notranslate"><span class="pre">'time'</span></code>
 (a timestamp of the station) and <code class="docutils literal notranslate"><span class="pre">'probability'</span></code> (maximum <span class="math notranslate nohighlight">\(\Delta_i\)</span>
 over all components for this timestamp) for each potential step in <code class="docutils literal notranslate"><span class="pre">catalog</span></code>,
 as well as <code class="docutils literal notranslate"><span class="pre">var0</span></code> and <code class="docutils literal notranslate"><span class="pre">var1</span></code> (the two hypotheses’ residuals variances
 for the component of maximum step probability).
 If a DataFrame was passed as <code class="docutils literal notranslate"><span class="pre">catalog</span></code>, a copy of that will be returned, with
 the added columns specified above.</p></li>
-<li><p><strong>step_ranges</strong> (<em>list</em>) – A list of lists containing continuous periods over all stations of the potential
+<li><p><em>step_ranges</em> – A list of lists containing continuous periods over all stations of the potential
 steps as determined by <code class="docutils literal notranslate"><span class="pre">gap</span></code> and <code class="docutils literal notranslate"><span class="pre">gap_unit</span></code>.</p></li>
 </ul>
 </p>
@@ -774,36 +810,39 @@ steps as determined by <code class="docutils literal notranslate"><span class="p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.search_network">
-<span class="sig-name descname"><span class="pre">search_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_network" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">search_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.search_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.search_network" title="Permalink to this definition"></a></dt>
 <dd><p>Function that searches for steps in an entire network (possibly in parallel),
 thresholds those probabilities, and identifies all the consecutive ranges in which
 steps happen over the network.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>net</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><em>disstans.network.Network</em></a>) – Network instance to operate on.</p></li>
-<li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be analyzed.</p></li>
-<li><p><strong>maxdel</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Difference in AIC that should be considered not significantly better.
+<li><p><strong>net</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>) – Network instance to operate on.</p></li>
+<li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a> description that will be analyzed.</p></li>
+<li><p><strong>maxdel</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) – Difference in AIC that should be considered not significantly better.
 (Refers to <span class="math notranslate nohighlight">\(\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}\)</span>.)</p></li>
-<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
-<li><p><strong>gap</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum gap between identified steps to count as a continuous period
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">20.0</span></code>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
+<li><p><strong>gap</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">2.0</span></code>) – Maximum gap between identified steps to count as a continuous period
 of possible steps.</p></li>
-<li><p><strong>gap_unit</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – Time unit of <code class="docutils literal notranslate"><span class="pre">gap</span></code>.</p></li>
-<li><p><strong>aggregate_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), use the maximum step probability across all data components
+<li><p><strong>gap_unit</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">'D'</span></code>) – Time unit of <code class="docutils literal notranslate"><span class="pre">gap</span></code>.</p></li>
+<li><p><strong>aggregate_components</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, use the maximum step probability across all data components
 when searching for steps. Otherwise, keep all steps from maximum probabilities in
 each component (which could lead to multiple close-by steps).</p></li>
-<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>step_table</strong> (<em>pandas.DataFrame</em>) – A DataFrame containing the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> (its name), <code class="docutils literal notranslate"><span class="pre">'time'</span></code>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.0.3/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>step_table</em> – A DataFrame containing the columns <code class="docutils literal notranslate"><span class="pre">'station'</span></code> (its name), <code class="docutils literal notranslate"><span class="pre">'time'</span></code>
 (a timestamp of the station) and <code class="docutils literal notranslate"><span class="pre">'probability'</span></code> (maximum <span class="math notranslate nohighlight">\(\Delta_i\)</span>
 over all components for this timestamp), as well as <code class="docutils literal notranslate"><span class="pre">var0</span></code>, <code class="docutils literal notranslate"><span class="pre">var1</span></code>
 (the two hypotheses’ residuals variances for the component of
 maximum step probability) and <code class="docutils literal notranslate"><span class="pre">varred</span></code> (the variance reduction in percent,
 <code class="docutils literal notranslate"><span class="pre">(var0</span> <span class="pre">-</span> <span class="pre">var1)</span> <span class="pre">/</span> <span class="pre">var0</span></code>).</p></li>
-<li><p><strong>step_ranges</strong> (<em>list</em>) – A list of lists containing continuous periods over all stations of the potential
+<li><p><em>step_ranges</em> – A list of lists containing continuous periods over all stations of the potential
 steps as determined by <code class="docutils literal notranslate"><span class="pre">gap</span></code> and <code class="docutils literal notranslate"><span class="pre">gap_unit</span></code>.</p></li>
 </ul>
 </p>
@@ -813,59 +852,63 @@ steps as determined by <code class="docutils literal notranslate"><span class="p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.steps">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.steps" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probabilities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.steps" title="Permalink to this definition"></a></dt>
 <dd><p>Threshold the probabilities to return a list of steps.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
-<li><p><strong>maxsteps</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – Return at most <code class="docutils literal notranslate"><span class="pre">maxsteps</span></code> number of steps. Can be useful if a good value for
+<li><p><strong>probabilities</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – Array of probabilities.</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">2.0</span></code>) – Minimum <span class="math notranslate nohighlight">\(\Delta_i \geq 0\)</span> that needs to be satisfied in order to be a step.</p></li>
+<li><p><strong>maxsteps</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">inf</span></code>) – Return at most <code class="docutils literal notranslate"><span class="pre">maxsteps</span></code> number of steps. Can be useful if a good value for
 <code class="docutils literal notranslate"><span class="pre">threshold</span></code> has not been found yet.</p></li>
-<li><p><strong>aggregate_components</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), use the maximum step probability across all data components
-when searching for steps. Otherwise, keep all steps from maximum probabilities in
+<li><p><strong>aggregate_components</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, use the maximum step probability across all data components when
+searching for steps. Otherwise, keep all steps from maximum probabilities in
 each component (which could lead to multiple close-by steps).</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), print warnings when there will be a large number of
-steps identified given the <code class="docutils literal notranslate"><span class="pre">threshold</span></code>.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print warnings when there will be a large number of steps
+identified given the <code class="docutils literal notranslate"><span class="pre">threshold</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>steps</strong> – Returns a list of <a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> arrays that contain the indices of steps
-for each component.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Returns a list of <a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> arrays that contain the indices of steps
+for each component.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.processing.StepDetector.test_single">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xwindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ywindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.test_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.test_single" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xwindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ywindow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/processing.html#StepDetector.test_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.processing.StepDetector.test_single" title="Permalink to this definition"></a></dt>
 <dd><p>For a single window (of arbitrary, but odd length), perform the AIC hypothesis test
 whether a step is likely present (H1) or not (H0) in the <code class="docutils literal notranslate"><span class="pre">y</span></code> data given
 <code class="docutils literal notranslate"><span class="pre">x</span></code> coordinates.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>xwindow</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Time array of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>.
+<li><p><strong>xwindow</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – Time array of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>.
 Should not contain NaNs.</p></li>
-<li><p><strong>ywindow</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – Data array of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>.
+<li><p><strong>ywindow</strong> (<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – Data array of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>.
 Should not contain NaNs.</p></li>
-<li><p><strong>valid</strong> (<a class="reference external" href="https://numpy.org/doc/1.24/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Mask array of the data of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>,
+<li><p><strong>valid</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/1.25/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.25)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Mask array of the data of shape <span class="math notranslate nohighlight">\((\text{num_window},)\)</span>,
 with <code class="docutils literal notranslate"><span class="pre">1</span></code> where the <code class="docutils literal notranslate"><span class="pre">ywindow</span></code> is finite (not NaN or infinity).
 If not passed to the function, it is calculated internally, which will slow
 down the computation.</p></li>
-<li><p><strong>maxdel</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Difference in AIC that should be considered not significantly better.
+<li><p><strong>maxdel</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) – Difference in AIC that should be considered not significantly better.
 (Refers to <span class="math notranslate nohighlight">\(\Delta_i = \text{AIC}_{c,i} - \text{AIC}_{c,\text{min}}\)</span>.)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>int</em> – Best hypothesis (<code class="docutils literal notranslate"><span class="pre">0</span></code> for no step, <code class="docutils literal notranslate"><span class="pre">1</span></code> for step).</p></li>
-<li><p><em>float</em> – If H1 is the best hypothesis (and suffices <code class="docutils literal notranslate"><span class="pre">maxdel</span></code>), its relative probability,
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>], <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>])]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>best_hyp</em> – Best hypothesis (<code class="docutils literal notranslate"><span class="pre">0</span></code> for no step, <code class="docutils literal notranslate"><span class="pre">1</span></code> for step).</p></li>
+<li><p><em>rel_prob</em> – If H1 is the best hypothesis (and suffices <code class="docutils literal notranslate"><span class="pre">maxdel</span></code>), its relative probability,
 otherwise the relative probability of H0 (which therefore can be <code class="docutils literal notranslate"><span class="pre">0</span></code> if H0 is also
 the best hypothesis in general).</p></li>
-<li><p><em>tuple</em> – A 2-tuple of the two mean-squared residuals of the H0 and H1 hypotheses,
+<li><p><em>msr_hyps</em> – A 2-tuple of the two mean-squared residuals of the H0 and H1 hypotheses,
 respectively. Assuming the test is unbiased, this is the residual’s variance.
 Is <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in an element if the least-squares model did not converge.</p></li>
 </ul>
@@ -879,18 +922,6 @@ Is <code class="docutils literal notranslate"><span class="pre">NaN</span></code
 </dd>
 </dl>
 </div>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="disstans.processing.StepDetector.kernel_size">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_size</span></span><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size" title="Permalink to this definition"></a></dt>
-<dd><p>Kernel (window) size of the detector.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="disstans.processing.StepDetector.kernel_size_min">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_size_min</span></span><a class="headerlink" href="#disstans.processing.StepDetector.kernel_size_min" title="Permalink to this definition"></a></dt>
-<dd><p>Minimum kernel (window) size of the detector.</p>
 </dd></dl>
 
 </dd></dl>

@@ -43,7 +43,7 @@ if __name__ == "__main__":
     for (istat, stat_name), lon, lat in zip(enumerate(station_names),
                                             lons.ravel(), lats.ravel()):
         temp_loc = [lat + rng.normal()*0.02 + int(istat % 2 == 0)*0.1,
-                    lon + rng.normal()*0.01, 0]
+                    lon + rng.normal()*0.01, 0.0]
         net[stat_name] = Station(name=stat_name,
                                  location=temp_loc)
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # for synthetic data network, define a function that takes location
     # and returns common signal parameters and the noise vector
     def generate_parameters_noise(loc, rng):
-        lon, lat = loc[1], loc[0]  # noqa: F841
+        lon = loc[1]
         p_sec = np.array([[0, 0], [1, -1]])
         p_seas = rng.uniform(-0.3, 0.3, size=(2, 2))
         p_sse1 = np.array([[6, -6]])*np.exp(-(3 * lon**2))  # from the west
@@ -213,8 +213,8 @@ if __name__ == "__main__":
     # estimate the common mode, either with a visualization of the result or not
     # (same underlying function)
     net.graphical_cme(ts_in="Residual", ts_out="CME", method="ica",
-                      save=True, save_kw_args={"format": fmt, "dpi": 300})
-    # net.call_netwide_func("decompose", ts_in="Residual", ts_out="CME", method="ica")
+                      save=True, save_kw_args={"format": fmt, "dpi": 300}, rng=rng)
+    # net.call_netwide_func("decompose", ts_in="Residual", ts_out="CME", method="ica", rng=rng)
     # now remove the common mode, call it the "Displacement" timeseries,
     for station in net:
         # calculate the clean timeseries
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     # fit everything with L1 regularization and create residuals
     print()
     net.fitevalres(ts_description="Displacement", solver="lasso_regression",
-                   penalty=1, output_description="Fit_L1", residual_description="Res_L1")
+                   penalty=10, output_description="Fit_L1", residual_description="Res_L1")
     for stat in net:
         stat["Trans_L1"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
     net.math("Err_L1", "Fit_L1", "-", "Truth")
@@ -253,13 +253,13 @@ if __name__ == "__main__":
                                    "cmaprange": 2})
 
     # get number of (unique) non-zero parameters
-    ZERO = 1e-4  # this is from the default in Network.spatialfit
+    ZERO = 1e-6
     num_total = sum([s.models["Displacement"]["Transient"].parameters.size for s in net])
     num_uniques_base = \
         np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
                                 > ZERO for s in net]), axis=0), axis=0)
-    num_nonzero_base = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO
-                             ).sum() for s in net])
+    num_nonzero_base = sum([(np.abs(s.models["Displacement"]["Transient"].parameters.ravel())
+                             > ZERO).sum() for s in net])
     print(f"Number of reweighted non-zero parameters: {num_nonzero_base}/{num_total}")
     print("Number of unique reweighted non-zero parameters per component: "
           + str(num_uniques_base.tolist()))
@@ -270,12 +270,13 @@ if __name__ == "__main__":
 
     # repeat everything with reweighted L1 regularization
     print()
+    rw_func = disstans.solvers.InverseReweighting(eps=1e-7, scale=1e-4)
     net.fitevalres(ts_description="Displacement", solver="lasso_regression",
-                   penalty=1, reweight_max_iters=5,
-                   output_description="Fit_L1R5", residual_description="Res_L1R5")
+                   penalty=10, reweight_max_iters=10, reweight_func=rw_func,
+                   output_description="Fit_L1R10", residual_description="Res_L1R10")
     for stat in net:
-        stat["Trans_L1R5"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
-    net.math("Err_L1R5", "Fit_L1R5", "-", "Truth")
+        stat["Trans_L1R10"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
+    net.math("Err_L1R10", "Fit_L1R10", "-", "Truth")
 
     # get spatial correlation matrix for later
     cor_localiters = np.corrcoef(np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1]
@@ -284,7 +285,7 @@ if __name__ == "__main__":
     # quick looks
     for s in figure_stations:
         net.gui(station=s, save="local", save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R5"]
+                timeseries=["Displacement", "Res_L1R10"]
                 if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
@@ -293,23 +294,21 @@ if __name__ == "__main__":
     num_uniques_local = \
         np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
                                 > ZERO for s in net]), axis=0), axis=0)
-    num_nonzero_local = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO
-                              ).sum() for s in net])
+    num_nonzero_local = sum([(np.abs(s.models["Displacement"]["Transient"].parameters.ravel())
+                              > ZERO).sum() for s in net])
     print(f"Number of reweighted non-zero parameters: {num_nonzero_local}/{num_total}")
     print("Number of unique reweighted non-zero parameters per component: "
           + str(num_uniques_local.tolist()))
 
-    # define reweighting function for spatial L0
-    rw_func = disstans.solvers.InverseReweighting(eps=1e-4, scale=0.1)
-
     # lasso fit, 1 spatial reweighting, 1 local reweightings
     print()
     stats = net.spatialfit("Displacement",
-                           penalty=1,
-                           spatial_reweight_models=["Transient"],
+                           penalty=10,
+                           spatial_l0_models=["Transient"],
                            spatial_reweight_iters=1,
-                           local_reweight_func=rw_func,
+                           reweight_func=rw_func,
                            formal_covariance=True,
+                           zero_threshold=ZERO,
                            verbose=True)
     net.evaluate("Displacement", output_description="Fit_L1R1S1")
     for stat in net:
@@ -332,40 +331,41 @@ if __name__ == "__main__":
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
 
-    # repeat with 20 spatial iterations
+    # repeat with 10 spatial iterations
     print()
     stats = net.spatialfit("Displacement",
-                           penalty=1,
-                           spatial_reweight_models=["Transient"],
-                           spatial_reweight_iters=20,
-                           local_reweight_func=rw_func,
+                           penalty=10,
+                           spatial_l0_models=["Transient"],
+                           spatial_reweight_iters=10,
+                           reweight_func=rw_func,
                            formal_covariance=True,
+                           zero_threshold=ZERO,
                            verbose=True)
-    net.evaluate("Displacement", output_description="Fit_L1R1S20")
+    net.evaluate("Displacement", output_description="Fit_L1R1S10")
     for stat in net:
-        stat["Trans_L1R1S20"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
+        stat["Trans_L1R1S10"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
 
     # residual
-    net.math("Res_L1R1S20", "Displacement", "-", "Fit_L1R1S20")
-    net.math("Err_L1R1S20", "Fit_L1R1S20", "-", "Truth")
+    net.math("Res_L1R1S10", "Displacement", "-", "Fit_L1R1S10")
+    net.math("Err_L1R1S10", "Fit_L1R1S10", "-", "Truth")
 
     # get spatial correlation matrix for later
-    cor_spatialiters20 = \
+    cor_spatialiters10 = \
         np.corrcoef(np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1]
                               for s in net]))
 
     # plot
     for s in figure_stations:
-        net.gui(station=s, save="spatial20",
+        net.gui(station=s, save="spatial10",
                 save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R1S20"]
+                timeseries=["Displacement", "Res_L1R1S10"]
                 if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
 
     # for each solution case, and each station, move the files to the output folder and rename
     from itertools import product
-    for case, station in product(["base", "local", "spatial1", "spatial20"],
+    for case, station in product(["base", "local", "spatial1", "spatial10"],
                                  figure_stations):
         for imgfile in curdir.glob(f"*_{station}_{case}_*.{fmt}"):  # ts_, scalo_ and map_
             prefix = imgfile.name.split("_")[0]
@@ -380,7 +380,7 @@ if __name__ == "__main__":
     # do L1 again
     print()
     net.fitevalres(ts_description="Displacement", solver="lasso_regression",
-                   penalty=1, output_description="Fit_L1M", residual_description="Res_L1M")
+                   penalty=10, output_description="Fit_L1M", residual_description="Res_L1M")
     for stat in net:
         stat["Trans_L1M"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
     net.math("Err_L1M", "Fit_L1M", "-", "Truth")
@@ -395,8 +395,8 @@ if __name__ == "__main__":
     num_uniques_base_M = \
         np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
                                 > ZERO for s in net]), axis=0), axis=0)
-    num_nonzero_base_M = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO
-                               ).sum() for s in net])
+    num_nonzero_base_M = sum([(np.abs(s.models["Displacement"]["Transient"].parameters.ravel())
+                               > ZERO).sum() for s in net])
     print(f"Number of reweighted non-zero parameters: {num_nonzero_base_M}/{num_total}")
     print("Number of unique reweighted non-zero parameters per component: "
           + str(num_uniques_base_M.tolist()))
@@ -407,18 +407,18 @@ if __name__ == "__main__":
     # do the local-L0 fit again
     print()
     net.fitevalres(ts_description="Displacement", solver="lasso_regression",
-                   penalty=1, reweight_max_iters=5,
-                   output_description="Fit_L1R5M", residual_description="Res_L1R5M")
+                   penalty=10, reweight_max_iters=10, reweight_func=rw_func,
+                   output_description="Fit_L1R10M", residual_description="Res_L1R10M")
     for stat in net:
-        stat["Trans_L1R5M"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
-    net.math("Err_L1R5M", "Fit_L1R5M", "-", "Truth")
+        stat["Trans_L1R10M"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
+    net.math("Err_L1R10M", "Fit_L1R10M", "-", "Truth")
     # get spatial correlation matrix for later
     cor_localiters_M = np.corrcoef(
         np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1] for s in net]))
     # quick looks
     for s in figure_stations:
         net.gui(station=s, save="localM", save_kw_args={"format": fmt, "dpi": 300},
-                timeseries=["Displacement", "Res_L1R5M"]
+                timeseries=["Displacement", "Res_L1R10M"]
                 if include_resids else ["Displacement"],
                 scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                    "cmaprange": 2})
@@ -426,8 +426,8 @@ if __name__ == "__main__":
     num_uniques_local_M = \
         np.sum(np.any(np.stack([np.abs(s.models["Displacement"]["Transient"].parameters)
                                 > ZERO for s in net]), axis=0), axis=0)
-    num_nonzero_local_M = sum([(s.models["Displacement"]["Transient"].parameters.ravel() > ZERO
-                                ).sum() for s in net])
+    num_nonzero_local_M = sum([(np.abs(s.models["Displacement"]["Transient"].parameters.ravel())
+                                > ZERO).sum() for s in net])
     print(f"Number of reweighted non-zero parameters: {num_nonzero_local_M}/{num_total}")
     print("Number of unique reweighted non-zero parameters per component: "
           + str(num_uniques_local_M.tolist()))
@@ -438,44 +438,45 @@ if __name__ == "__main__":
     secfits_locl0 = {name: stat.fits["Displacement"]["Secular"].data
                      for name, stat in net.stations.items()}
 
-    # and now for 20 spatial iterations
+    # and now for 10 spatial iterations
     print()
     stats = net.spatialfit("Displacement",
-                           penalty=1,
-                           spatial_reweight_models=["Transient"],
-                           spatial_reweight_iters=20,
-                           local_reweight_func=rw_func,
+                           penalty=10,
+                           spatial_l0_models=["Transient"],
+                           spatial_reweight_iters=10,
+                           reweight_func=rw_func,
                            formal_covariance=True,
+                           zero_threshold=ZERO,
                            verbose=True)
-    net.evaluate("Displacement", output_description="Fit_L1R1S20M")
+    net.evaluate("Displacement", output_description="Fit_L1R1S10M")
     for stat in net:
-        stat["Trans_L1R1S20M"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
+        stat["Trans_L1R1S10M"] = stat.fits["Displacement"]["Transient"].copy(only_data=True)
     # residual
-    net.math("Res_L1R1S20M", "Displacement", "-", "Fit_L1R1S20M")
-    net.math("Err_L1R1S20M", "Fit_L1R1S20M", "-", "Truth")
+    net.math("Res_L1R1S10M", "Displacement", "-", "Fit_L1R1S10M")
+    net.math("Err_L1R1S10M", "Fit_L1R1S10M", "-", "Truth")
     # get spatial correlation matrix for later
-    cor_spatialiters20_M = np.corrcoef(
+    cor_spatialiters10_M = np.corrcoef(
         np.stack([s.fits["Displacement"]["Transient"].data.values[:, 1] for s in net]))
     # plot again
     for s in figure_stations:
         if s == "Corko":
-            net.gui(station=s, save="spatial20M", save_map=True,
+            net.gui(station=s, save="spatial10M", save_map=True,
                     save_kw_args={"format": fmt, "dpi": 300},
-                    timeseries=["Displacement", "Res_L1R1S20M"]
+                    timeseries=["Displacement", "Res_L1R1S10M"]
                     if include_resids else ["Displacement"],
                     scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                        "cmaprange": 2},
-                    rms_on_map={"ts": "Res_L1R1S20M", "comps": [0], "c_max": 1})
+                    rms_on_map={"ts": "Res_L1R1S10M", "comps": [0], "c_max": 1})
         else:
-            net.gui(station=s, save="spatial20M",
+            net.gui(station=s, save="spatial10M",
                     save_kw_args={"format": fmt, "dpi": 300},
-                    timeseries=["Displacement", "Res_L1R1S20M"]
+                    timeseries=["Displacement", "Res_L1R1S10M"]
                     if include_resids else ["Displacement"],
                     scalogram_kw_args={"ts": "Displacement", "model": "Transient",
                                        "cmaprange": 2})
 
     # for each new solution case, and each station, move & rename again
-    for case, station in product(["baseM", "localM", "spatial20M"], figure_stations):
+    for case, station in product(["baseM", "localM", "spatial10M"], figure_stations):
         for imgfile in curdir.glob(f"*_{station}_{case}_*.{fmt}"):  # ts_, scalo_ and map_
             prefix = imgfile.name.split("_")[0]
             newfile = outdir / f"tutorial_3c_{prefix}_{station}_{case}.{fmt}"
@@ -489,16 +490,16 @@ if __name__ == "__main__":
     from disstans.processing import StepDetector
     stepdet = StepDetector(kernel_size=51)
     for title, case, res_ts, err_ts, cormat in \
-        zip(["No reweighting (no M)", "5 Local Reweightings (no M)",
-             "1 Local, 1 Spatial Reweighting (no M)", "1 Local, 20 Spatial Reweighting (no M)",
-             "No reweighting", "5 Local Reweightings", "1 Local, 20 Spatial Reweighting"],
-            ["base", "local", "spatial1", "spatial20", "baseM", "localM", "spatial20M"],
-            ["Res_L1", "Res_L1R5", "Res_L1R1S1", "Res_L1R1S20",
-             "Res_L1M", "Res_L1R5M", "Res_L1R1S20M"],
-            ["Err_L1", "Err_L1R5", "Err_L1R1S1", "Err_L1R1S20",
-             "Err_L1M", "Err_L1R5M", "Err_L1R1S20M"],
-            [cor_base, cor_localiters, cor_spatialiters1, cor_spatialiters20,
-             cor_base_M, cor_localiters_M, cor_spatialiters20_M]):
+        zip(["No reweighting (no M)", "10 Local Reweightings (no M)",
+             "1 Local, 1 Spatial Reweighting (no M)", "1 Local, 10 Spatial Reweighting (no M)",
+             "No reweighting", "10 Local Reweightings", "1 Local, 10 Spatial Reweighting"],
+            ["base", "local", "spatial1", "spatial10", "baseM", "localM", "spatial10M"],
+            ["Res_L1", "Res_L1R10", "Res_L1R1S1", "Res_L1R1S10",
+             "Res_L1M", "Res_L1R10M", "Res_L1R1S10M"],
+            ["Err_L1", "Err_L1R10", "Err_L1R1S1", "Err_L1R1S10",
+             "Err_L1M", "Err_L1R10M", "Err_L1R1S10M"],
+            [cor_base, cor_localiters, cor_spatialiters1, cor_spatialiters10,
+             cor_base_M, cor_localiters_M, cor_spatialiters10_M]):
         print(f"\nStatistics for {title}:")
         # residuals statistics
         print(f"\nResiduals for {res_ts}:")
@@ -561,20 +562,20 @@ if __name__ == "__main__":
     ax1.plot(stats["list_nonzeros"], c="k", marker=".")
     ax1.scatter(-0.1, num_nonzero_base_M, s=100, c="k")
     ax1.scatter(-0.1, num_nonzero_local_M, s=60, c="k", marker="D")
-    ax1.set_ylim([0, 1000])
-    ax1.set_yticks(range(0, 1200, 200))
+    ax1.set_ylim([0, 3500])
+    ax1.set_yticks(range(0, 4000, 500))
     ax2.plot(stats["arr_uniques"][:, 0], c="C0", marker=".")
     ax2.plot(stats["arr_uniques"][:, 1], c="C1", marker=".")
-    ax2.scatter(23, num_uniques_base_M[0], s=100, c="C0")
-    ax2.scatter(23, num_uniques_local_M[0], s=60, c="C0", marker="D")
-    ax2.scatter(23, num_uniques_base_M[1], s=100, c="C1")
-    ax2.scatter(23, num_uniques_local_M[1], s=60, c="C1", marker="D")
-    ax2.set_ylim([0, 250])
-    ax2.set_yticks(range(0, 300, 50))
+    ax2.scatter(13, num_uniques_base_M[0], s=100, c="C0")
+    ax2.scatter(13, num_uniques_local_M[0], s=60, c="C0", marker="D")
+    ax2.scatter(13, num_uniques_base_M[1], s=100, c="C1")
+    ax2.scatter(13, num_uniques_local_M[1], s=60, c="C1", marker="D")
+    ax2.set_ylim([0, 300])
+    ax2.set_yticks(range(0, 350, 50))
     ax1.set_xscale("symlog", linthresh=1)
-    ax1.set_xlim([-0.1, 23])
-    ax1.set_xticks([0, 1, 5, 10, 15, 20])
-    ax1.set_xticklabels(["0", "1", "5", "10", "15", "20"])
+    ax1.set_xlim([-0.1, 13])
+    ax1.set_xticks([0, 1, 5, 10])
+    ax1.set_xticklabels(["0", "1", "5", "10"])
     ax1.set_xlabel("Iteration")
     ax1.set_ylabel("Total number of non-zero parameters")
     ax2.set_ylabel("Unique number of non-zero parameters")
@@ -592,17 +593,18 @@ if __name__ == "__main__":
     # second figure is for dict_rms_diff, dict_num_changed
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
-    ax1.plot(range(1, 21), stats["dict_rms_diff"]["Transient"], c="C0", marker=".")
+    ax1.plot(range(1, 11), stats["dict_rms_diff"]["Transient"], c="C0", marker=".")
     ax1.set_yscale("log")
-    ax1.set_ylim([1e-4, 10])
-    ax2.plot(range(1, 21), stats["dict_num_changed"]["Transient"], c="C1", marker=".")
+    ax1.set_ylim([1e-6, 10])
+    ax2.plot(range(1, 11), stats["dict_num_changed"]["Transient"], c="C1", marker=".")
     ax2.set_yscale("symlog", linthresh=10)
-    ax2.set_ylim([0, 1000])
-    ax2.set_yticks([0, 2, 4, 6, 8, 10, 100, 1000])
-    ax2.set_yticklabels([0, 2, 4, 6, 8, 10, 100, 1000])
+    ax2.set_ylim([0, 10000])
+    ax2.set_yticks([0, 2, 4, 6, 8, 10, 100, 1000, 10000])
+    ax2.set_yticklabels([0, 2, 4, 6, 8, 10, 100, 1000, 10000])
     ax1.set_xscale("symlog", linthresh=1)
-    ax1.set_xlim([-0.1, 23])
-    ax1.set_xticks([0, 1, 5, 10, 20])
+    ax1.set_xlim([-0.1, 13])
+    ax1.set_xticks([0, 1, 5, 10])
+    ax1.set_xticklabels(["0", "1", "5", "10"])
     ax1.set_xlabel("Iteration")
     ax1.set_ylabel("RMS difference of parameters")
     ax2.set_ylabel("Number of changed parameters")
@@ -617,12 +619,12 @@ if __name__ == "__main__":
     ax.plot(stats["list_nonzeros"], c="k", marker=".")
     ax.axhline(num_nonzero_local_M, ls="--", lw=1, c="0.5", zorder=-1)
     ax.axhline(num_nonzero_base_M, ls=":", lw=1, c="0.5", zorder=-1)
-    ax.set_ylim([0, 1000])
-    ax.set_yticks(range(0, 1200, 200))
+    ax1.set_ylim([0, 3500])
+    ax1.set_yticks(range(0, 4000, 500))
     ax.set_xscale("symlog", linthresh=1)
-    ax.set_xlim([-0.1, 23])
-    ax.set_xticks([0, 1, 5, 10, 20])
-    ax.set_xticklabels(["0", "1", "5", "10", "20"])
+    ax.set_xlim([-0.1, 13])
+    ax.set_xticks([0, 1, 5, 10])
+    ax.set_xticklabels(["0", "1", "5", "10"])
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Non-zero parameters")
     custom_lines = [Line2D([0], [0], c="0.5", ls=":", lw=1),
@@ -678,7 +680,8 @@ if __name__ == "__main__":
                         "C1", label="Truth")
         axes[1, 1].plot(timevector,
                         sta.fits["Displacement"]["Earthquake"].data.iloc[:, i] +
-                        sta.fits["Displacement"]["Postseismic"].data.iloc[:, i], "C0", label="Fit")
+                        sta.fits["Displacement"]["Postseismic"].data.iloc[:, i],
+                        "C0", label="Fit")
         axes[1, 1].legend()
         axes[1, 1].set_xlabel("Time")
         axes[1, 1].set_title("Earthquake")
@@ -687,12 +690,12 @@ if __name__ == "__main__":
 
     # worm plots (animated only for the final cases with the maintenance step)
     for title, case, trans_ts in \
-        zip(["No reweighting (no M)", "5 Local Reweightings (no M)",
-             "1 Local, 1 Spatial Reweighting (no M)", "1 Local, 20 Spatial Reweighting (no M)",
-             "No reweighting", "5 Local Reweightings", "1 Local, 20 Spatial Reweighting"],
-            ["base", "local", "spatial1", "spatial20", "baseM", "localM", "spatial20M"],
-            ["Trans_L1", "Trans_L1R5", "Trans_L1R1S1", "Trans_L1R1S20",
-             "Trans_L1M", "Trans_L1R5M", "Trans_L1R1S20M"]):
+        zip(["No reweighting (no M)", "10 Local Reweightings (no M)",
+             "1 Local, 1 Spatial Reweighting (no M)", "1 Local, 10 Spatial Reweighting (no M)",
+             "No reweighting", "10 Local Reweightings", "1 Local, 10 Spatial Reweighting"],
+            ["base", "local", "spatial1", "spatial10", "baseM", "localM", "spatial10M"],
+            ["Trans_L1", "Trans_L1R10", "Trans_L1R1S1", "Trans_L1R1S10",
+             "Trans_L1M", "Trans_L1R10M", "Trans_L1R1S10M"]):
         print(f"Wormplot for {title}")
         net.wormplot(ts_description=trans_ts,
                      fname=outdir / f"tutorial_3h_worm_{case}",
@@ -704,7 +707,7 @@ if __name__ == "__main__":
                      lon_min=-0.1, lon_max=1.1, lat_min=-0.3, lat_max=0.1)
 
     # make a difference wormplot
-    net.math("diff-local-spatial", "Trans_L1R5M", "-", "Trans_L1R1S20M")
+    net.math("diff-local-spatial", "Trans_L1R10M", "-", "Trans_L1R1S10M")
     print("Wormplot for Local-Spatial")
     net.wormplot(ts_description="diff-local-spatial",
                  fname=outdir / "tutorial_3h_worm_diff",
