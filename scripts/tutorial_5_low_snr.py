@@ -116,7 +116,7 @@ if __name__ == "__main__":
         all_stations = {}
         for i, (stat_name, lat, lon) in enumerate(zip(station_names,
                                                       latlons[:, 0], latlons[:, 1])):
-            stat = Station(name=stat_name, location=[lat, lon, 0])
+            stat = Station(name=stat_name, location=[lat, lon, 0.0])
             stat.add_timeseries("Truth",
                                 Timeseries.from_array(timevector=timevector, data=truth,
                                                       src="synth", data_unit="mm",

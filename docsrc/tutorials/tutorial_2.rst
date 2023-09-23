@@ -162,7 +162,7 @@ we'll also assign it to a :class:`~disstans.network.Network` object:
     >>> from disstans import Network, Station, Timeseries
     >>> net_name = "TutorialLand"
     >>> stat_name = "TUT"
-    >>> caltech_lla = (34.1375, -118.125, 263)
+    >>> caltech_lla = (34.1375, -118.125, 263.0)
     >>> net = Network(name=net_name)
     >>> stat = Station(name=stat_name,
     ...                location=caltech_lla)

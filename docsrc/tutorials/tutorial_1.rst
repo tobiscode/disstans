@@ -23,7 +23,7 @@ Let's create an empty synthetic station "TUT" located in Los Angeles using
 .. doctest::
 
     >>> from disstans import Station
-    >>> synth_stat = Station(name="TUT", location=(34.05, -118.25, 93))
+    >>> synth_stat = Station(name="TUT", location=(34.05, -118.25, 93.0))
 
 Now, let's create a dictionary of :class:`~disstans.models.Model` objects which we would
 like to use to create our synthetic timeseries. We'll start with a linear trend, an annual

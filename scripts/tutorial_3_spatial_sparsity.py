@@ -43,7 +43,7 @@ if __name__ == "__main__":
     for (istat, stat_name), lon, lat in zip(enumerate(station_names),
                                             lons.ravel(), lats.ravel()):
         temp_loc = [lat + rng.normal()*0.02 + int(istat % 2 == 0)*0.1,
-                    lon + rng.normal()*0.01, 0]
+                    lon + rng.normal()*0.01, 0.0]
         net[stat_name] = Station(name=stat_name,
                                  location=temp_loc)
 

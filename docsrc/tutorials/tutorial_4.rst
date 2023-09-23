@@ -34,7 +34,7 @@ The setup should be familiar:
     >>> lons, lats = np.cos(angles)/10, np.sin(angles)/10
     >>> net = Network(name=net_name)
     >>> for (istat, stat_name), lon, lat in zip(enumerate(station_names), lons, lats):
-    ...     net[stat_name] = Station(name=stat_name, location=[lat, lon, 0])
+    ...     net[stat_name] = Station(name=stat_name, location=[lat, lon, 0.0])
     >>> # create timevector
     >>> import pandas as pd
     >>> t_start_str = "2000-01-01"

@@ -94,7 +94,7 @@ instantiate a :class:`~disstans.network.Network` object, and add the correspondi
     >>> for (istat, stat_name), lon, lat in zip(enumerate(station_names),
     ...                                         lons.ravel(), lats.ravel()):
     ...     temp_loc = [lat + rng.normal()*0.02 + int(istat % 2 == 0)*0.1,
-    ...                 lon + rng.normal()*0.01, 0]
+    ...                 lon + rng.normal()*0.01, 0.0]
     ...     net[stat_name] = Station(name=stat_name,
     ...                              location=temp_loc)
 
@@ -279,7 +279,7 @@ Let's have a look at the summary of the first station to see what we added:
 .. doctest::
 
     >>> print(net["Jeckle"])
-    Station Jeckle at [0.0025146044218678637, -0.0013210486329130189, 0] with timeseries
+    Station Jeckle at [0.0025146044218678637, -0.0013210486329130189, 0.0] with timeseries
     Truth
      - Source: synthetic
      - Units: mm
@@ -382,7 +382,7 @@ To inspect the result, we can again have a look at the network with
 .. doctest::
 
     >>> print(net["Jeckle"])
-    Station Jeckle at [0.0025146044218678637, -0.0013210486329130189, 0] with timeseries
+    Station Jeckle at [0.0025146044218678637, -0.0013210486329130189, 0.0] with timeseries
     Truth
      - Source: synthetic
      - Units: mm

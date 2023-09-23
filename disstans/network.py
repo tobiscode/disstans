@@ -2348,9 +2348,9 @@ class Network():
             matrix to Euler pole and covariance notation
         """
         # input check
-        assert (isinstance(comps, list) and len(comps) == 2 and
+        assert (isinstance(comps, tuple) and len(comps) == 2 and
                 all([isinstance(c, int) for c in comps])), \
-            f"'comps' needs to be a length-2 list of integers, got {comps}."
+            f"'comps' needs to be a length-2 tuple of integers, got {comps}."
         stat_names_valid = sorted(self.get_stations_with(ts_description))
         stat_names_valid, stat_names_in, stat_names_out = \
             self._subset_stations(stat_names_valid, subset_stations, extrapolate)

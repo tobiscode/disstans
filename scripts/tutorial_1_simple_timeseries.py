@@ -9,7 +9,7 @@ os.makedirs(outdir, exist_ok=True)
 
 # build a station
 from disstans import Station  # noqa: E402
-synth_stat = Station(name="TUT", location=(34.05, -118.25, 93))
+synth_stat = Station(name="TUT", location=(34.05, -118.25, 93.0))
 
 # make a model collection
 import numpy as np  # noqa: E402

@@ -38,7 +38,7 @@ class Station():
     """
     def __init__(self,
                  name: str,
-                 location: list[float] | np.ndarray
+                 location: list[float] | tuple[float, float, float] | np.ndarray
                  ) -> np.ndarray:
         self.name = str(name)
         """ Name of the station. """
