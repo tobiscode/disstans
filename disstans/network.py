@@ -3296,7 +3296,7 @@ class Network():
         network_df = self.export_network_ts(ts_description, subset_stations)
         if isinstance(en_col_names, tuple) and (len(en_col_names) == 2) and \
            all([isinstance(comp, int) for comp in en_col_names]):
-            col_east, col_north = np.array(list(network_df.keys()))[en_col_names].tolist()
+            col_east, col_north = np.array(list(network_df.keys()))[list(en_col_names)].tolist()
         elif (isinstance(en_col_names, tuple) and (len(en_col_names) == 2) and
               all([isinstance(comp, str) for comp in en_col_names])):
             col_east, col_north = en_col_names
@@ -3322,8 +3322,8 @@ class Network():
             if name in nan_stations:
                 continue
             xy_notnan = np.logical_and(~np.isnan(disp_x[name]), ~np.isnan(disp_y[name]))
-            rel_disp_x[name] = disp_x[name] - disp_x[name][xy_notnan][0]
-            rel_disp_y[name] = disp_y[name] - disp_y[name][xy_notnan][0]
+            rel_disp_x[name] = disp_x[name] - disp_x[name][xy_notnan].iloc[0]
+            rel_disp_y[name] = disp_y[name] - disp_y[name][xy_notnan].iloc[0]
 
         # get times and respective colors
         reltimes = ((disp_x.time - disp_x.time[0]) / pd.Timedelta(1, "D")).values

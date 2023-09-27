@@ -213,7 +213,7 @@ def median(array: np.ndarray, kernel_size: int) -> np.ndarray:
     # the indexer object will tell pandas over which windows to calculate the median
     indexer = ExpandingRollingIndexer(window_size=kernel_size)
     # now we calculate the rolling median (this is compiled-optimized by pandas)
-    filtered = pd.DataFrame(array).rolling(indexer, min_periods=1, axis=0).median().values
+    filtered = pd.DataFrame(array).rolling(indexer, min_periods=1).median().values
     # add NaNs again to where they were initially
     filtered[np.isnan(array)] = np.NaN
     return filtered
@@ -224,7 +224,7 @@ def decompose(array: np.ndarray,
               method: str,
               num_components: int = 1,
               return_sources: bool = False,
-              rng: np.random.Generator | None =None
+              rng: np.random.Generator | None = None
               ) -> tuple[np.ndarray, np.ndarray | None, np.ndarray | None]:
     r"""
     Decomposes the input signal into different components using PCA or ICA.
@@ -313,7 +313,7 @@ def decompose(array: np.ndarray,
         model = newmod
     if return_sources:
         spatial = decomposer.components_
-        if nan_cols != []:
+        if nan_cols.size > 0:
             newspat = np.empty((spatial.shape[0], len(finite_cols) + len(nan_cols)))
             newspat[:, finite_cols] = spatial
             newspat[:, nan_cols] = np.NaN
