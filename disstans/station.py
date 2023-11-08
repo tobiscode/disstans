@@ -720,7 +720,8 @@ class Station():
                   ignore_missing: bool = False
                   ) -> tuple[np.ndarray | None, np.ndarray | None]:
         r"""
-        Calculates a linear trend through the desired model fits and over some time span.
+        Calculates a linear trend through the desired model fits (or timeseries data)
+        and over some time span.
 
         Parameters
         ----------
@@ -729,8 +730,8 @@ class Station():
         fit_list
             List of strings containing the model names of the subset of the fitted models
             to be used. ``None`` defaults to all fitted models.
-            If ``ts_description`` does not contain any fits, and the trend of the timeseries
-            itself is to be calculated, pass an empty list (``[]``).
+            If ``ts_description`` the trend of the timeseries itself is to be calculated,
+            pass an empty list (``[]``).
         components
             List of the numerical indices of which components of the timeseries to use.
             ``None`` defaults to all components.
@@ -866,4 +867,4 @@ class Station():
                     trend_sigma[icomp] = 0
                 else:
                     trend_sigma[icomp] = np.sqrt(sp.linalg.pinvh(GtWG)[1, 1])
-        return trend, trend_sigma if include_sigma else None
+        return trend, trend_sigma if include_sigma else trend, None
