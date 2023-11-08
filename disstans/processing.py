@@ -1124,7 +1124,8 @@ class StepDetector():
                               for sta_name, steptimes in catalog.items()}
         # check if there is at least one station with the desired timeseries
         if len([ts_description in net[sta_name].timeseries
-                for sta_name in catalog.keys()]) == 0:
+                for sta_name in catalog.keys()
+                if sta_name in net.stations.keys()]) == 0:
             warn(f"No station containing timeseries '{ts_description}' found.",
                  stacklevel=2)
             return pd.DataFrame(columns=out_cols), []
