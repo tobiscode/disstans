@@ -868,3 +868,92 @@ class Station():
                 else:
                     trend_sigma[icomp] = np.sqrt(sp.linalg.pinvh(GtWG)[1, 1])
         return trend, trend_sigma if include_sigma else trend, None
+
+    def get_trend_change(self,
+                         ts_description: str,
+                         check_times: pd.Series | pd.DatetimeIndex,
+                         window_size: float,
+                         window_unit: str = "D",
+                         min_change: float = 0.0,
+                         return_signs: bool = True
+                         ) -> list[list[int | None]]:
+        """
+        Calculates the (linear) trends of a timeseries before and after given timestamps,
+        and return for each one whether the trend increased, decreased, or stayed the same.
+
+        Parameters
+        ----------
+        ts
+            Timeseries to analyze.
+        check_times
+            Timestamps to check the trend before and after.
+        window_size
+            Width of the trend calculation window.
+        window_unit
+            Time unit of ``window_size``.
+        min_change
+            The minimum magnitude of trend change to be considered correct.
+            If greater than ``0``, the returned trend change elements can include
+            ``None`` if the observed trend change magnitude is smaller than
+            ``min_change``.
+        return_signs
+            If ``True``, only the sign of the change is returned, if ``False``,
+            the numerical value of the trend difference is returned.
+
+        Returns
+        -------
+            A nested array containing for each checked timestamp (first level) and each
+            Timeseries data component (second level) whether the trend change is positive
+            (``+1``), negative (``-1``), or undetermined (``None``, either due to missing
+            data or a ``min_change`` larger than ``0``).
+        """
+        # initial check
+        assert min_change >= 0, f"'min_change' needs to be non-negative, got {min_change}."
+        # initialize output
+        ts = self[ts_description]
+        trend_change = []
+        window = pd.Timedelta(window_size, unit=window_unit)
+        # loop over timestamps
+        for i, t in enumerate(check_times):
+            # make sure there is data available
+            if ((ts.time <= t).sum() == 0) or ((ts.time >= t).sum() == 0):
+                trend_change.append([None] * ts.num_components)
+                continue
+            # get the available timestamps right before and after the tested times
+            t_plus = ts.time[ts.time >= t][0]
+            t_minus = ts.time[ts.time < t][-1]
+            # calculate the two trends
+            trend_before = self.get_trend(ts_description=ts_description,
+                                          fit_list=[],
+                                          components=None,
+                                          total=False,
+                                          t_start=t - window,
+                                          t_end=t_minus,
+                                          use_formal_variance=True,
+                                          include_sigma=False,
+                                          time_unit=window_unit,
+                                          ignore_missing=False)[0]
+            trend_after = self.get_trend(ts_description=ts_description,
+                                         fit_list=[],
+                                         components=None,
+                                         total=False,
+                                         t_start=t_plus,
+                                         t_end=t + window,
+                                         use_formal_variance=True,
+                                         include_sigma=False,
+                                         time_unit=window_unit,
+                                         ignore_missing=False)[0]
+            # if at least one trend couldn't be calculated, continue early
+            if (trend_before is None) or (trend_after is None):
+                trend_change.append([None] * ts.num_components)
+                continue
+            # save trend change
+            trend_diff = trend_after - trend_before
+            if return_signs:
+                trend_change.append([np.sign(td).astype(int) if np.abs(td) > min_change
+                                     else None for td in trend_diff])
+            else:
+                trend_change.append([td if np.abs(td) > min_change
+                                     else None for td in trend_diff])
+        # done
+        return trend_change

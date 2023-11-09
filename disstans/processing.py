@@ -447,7 +447,7 @@ def clean(station: Station,
 
 
 def midas(ts: Timeseries,
-          steps: pd.Series | pd.DateTimeIndex | None = None,
+          steps: pd.Series | pd.DatetimeIndex | None = None,
           tolerance: float = 0.001
           ) -> tuple[Polynomial, Timeseries, dict[str, Any]]:
     """
