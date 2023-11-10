@@ -14,11 +14,16 @@ Specialized Classes
 -------------------
 
 GipsyTimeseries
-..................
+...............
 
 .. autoclass:: disstans.timeseries.GipsyTimeseries
    :members:
    :special-members:
+
+GipsyXTimeseries
+................
+
+.. autoclass:: disstans.timeseries.GipsyXTimeseries
 
 UNRTimeseries
 .............

@@ -1154,8 +1154,7 @@ class GipsyTimeseries(Timeseries):
     """
     Subclasses :class:`~Timeseries`.
 
-    Timeseries subclass for GNSS measurements in JPL's Gipsy ``.tseries`` file format.
-    The data and (co)variances are converted into millimeters (squared).
+    Timeseries subclass for GNSS measurements in JPL's Gipsy(X) ``.tseries`` file format.
 
     Parameters
     ----------
@@ -1191,9 +1190,6 @@ class GipsyTimeseries(Timeseries):
     +---------------+-------------------------------------------------+
 
     Time is GPS time, and the time series are relative to each station's first epoch.
-
-    (Note that the documentation says covariance, but it is actually correlation,
-    as per personal communication with Angelyn Moore, JPL.)
 
     .. _JPL's website: https://sideshow.jpl.nasa.gov/pub/JPL_GPS_Timeseries/\
 repro2018a/raw/position/envseries/0000_README.format
@@ -1269,12 +1265,15 @@ repro2018a/raw/position/envseries/0000_README.format
                 "kw_args": {"path": self._path}}
 
 
+GipsyXTimeseries = GipsyTimeseries
+""" Alias for :class:`~GipsyTimeseries`. """
+
+
 class UNRTimeseries(Timeseries):
     """
     Subclasses :class:`~Timeseries`.
 
     Timeseries subclass for GNSS measurements in UNR's ``.tenv3`` file format.
-    The data and (co)variances are converted into millimeters (squared).
 
     Parameters
     ----------
@@ -1455,7 +1454,6 @@ class UNRHighRateTimeseries(Timeseries):
     Subclasses :class:`~Timeseries`.
 
     Timeseries subclass for GNSS measurements in UNR's ``.kenv`` file format.
-    The data and (co)variances are converted into millimeters (squared).
 
     Parameters
     ----------
