@@ -319,7 +319,7 @@ def empirical_prior(network: Network,
     eq_steps_dict = {}
     station_names = network.station_names
     for istation, station in enumerate(station_names):
-        steps = [str(eq_times.iloc[i]) for i in range(n_eq) if needs_steps[i, istation]]
+        steps = [eq_times.iloc[i] for i in range(n_eq) if needs_steps[i, istation]]
         eq_steps_dict[station] = steps
         if do_add:
             stepmodel = Step(steptimes=steps, regularize=target_model_regularize)

@@ -726,8 +726,9 @@ def parse_maintenance_table(csvpath: str,
     # get site column name
     sitecolname = maint_table.columns[0]
     # load and parse time
-    time = pd.read_csv(csvpath, delimiter=delimiter, usecols=datecols, squeeze=True,
-                       parse_dates=[list(range(len(datecols)))] if len(datecols) > 1 else True)
+    time = pd.read_csv(csvpath, delimiter=delimiter, usecols=datecols,
+                       parse_dates=[list(range(len(datecols)))] if len(datecols) > 1 else True
+                       ).squeeze("columns")
     timecolname = time.name
     # connect time and data
     maint_table = maint_table.join(time)

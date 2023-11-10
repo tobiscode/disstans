@@ -1267,7 +1267,7 @@ class Network():
                                    for name in station_names])
         all_distances = np.empty((num_stations, num_stations))
         net_avg_closests = []
-        for i, name in enumerate(station_names):
+        for i in range(num_stations):
             all_distances[i, :] = np.array(geoid.inverse(station_lonlat[i, :].reshape(1, 2),
                                                          station_lonlat))[:, 0]
             net_avg_closests.append(np.sort(all_distances[i, :])
