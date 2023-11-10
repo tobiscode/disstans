@@ -867,7 +867,7 @@ class Station():
                     trend_sigma[icomp] = 0
                 else:
                     trend_sigma[icomp] = np.sqrt(sp.linalg.pinvh(GtWG)[1, 1])
-        return trend, trend_sigma if include_sigma else trend, None
+        return (trend, trend_sigma) if include_sigma else (trend, None)
 
     def get_trend_change(self,
                          ts_description: str,
@@ -909,19 +909,22 @@ class Station():
         """
         # initial check
         assert min_change >= 0, f"'min_change' needs to be non-negative, got {min_change}."
+        assert ts_description in self, \
+            f"Timeseries '{ts_description}' not present in Station {self.name}."
         # initialize output
         ts = self[ts_description]
         trend_change = []
         window = pd.Timedelta(window_size, unit=window_unit)
         # loop over timestamps
-        for i, t in enumerate(check_times):
+        for t in check_times:
             # make sure there is data available
             if ((ts.time <= t).sum() == 0) or ((ts.time >= t).sum() == 0):
                 trend_change.append([None] * ts.num_components)
                 continue
             # get the available timestamps right before and after the tested times
-            t_plus = ts.time[ts.time >= t][0]
-            t_minus = ts.time[ts.time < t][-1]
+            t_rounded = pd.Timestamp(t.to_pydatetime().date())
+            t_plus = ts.time[ts.time >= t_rounded][0]
+            t_minus = ts.time[ts.time < t_rounded][-1]
             # calculate the two trends
             trend_before = self.get_trend(ts_description=ts_description,
                                           fit_list=[],

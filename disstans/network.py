@@ -1267,7 +1267,7 @@ class Network():
                                    for name in station_names])
         all_distances = np.empty((num_stations, num_stations))
         net_avg_closests = []
-        for i, name in enumerate(station_names):
+        for i in range(num_stations):
             all_distances[i, :] = np.array(geoid.inverse(station_lonlat[i, :].reshape(1, 2),
                                                          station_lonlat))[:, 0]
             net_avg_closests.append(np.sort(all_distances[i, :])
@@ -2392,6 +2392,96 @@ class Network():
         df_v_pred = pd.DataFrame(data=v_pred_enu[:, :2],
                                  index=stat_names_out, columns=v_pred_cols)
         return df_v_pred, rotation_vector, rotation_covariance
+
+    def get_trend_change(self,
+                         subset_stations: list[str] | None = None,
+                         spatial_mean: float = 0.0,
+                         **kw_args
+                         ) -> dict[str, list[list[int | None]]]:
+        """
+        For each station, calculates the (linear) trends of a timeseries before and after given
+        timestamps, and return for each one whether the trend increased, decreased, or stayed
+        the same.
+
+        Parameters
+        ----------
+        subset_stations
+            If specified, only analyze a subset of stations.
+        spatial_mean
+            If a value larger than ``0``, use this distance in km as the exponential smoothing
+            factor for a spatially-weighted mean before returning the trend changes.
+        **kw_args
+            Arguments passed on to :meth:`~disstans.station.Station.get_trend_change`.
+
+        Returns
+        -------
+            Dictionary containing the trend change results for each station analyzed.
+        """
+        assert float(spatial_mean) >= 0, \
+            f"'spatial_mean' needs to be non-negative, got {spatial_mean}."
+        # default to all stations
+        if subset_stations is None:
+            subset_stations = self.station_names
+        # create list of stations that contain the timeseries
+        try:
+            check_stations = {s: self.stations[s] for s in subset_stations
+                              if kw_args["ts_description"] in self.stations[s]}
+        except KeyError as e:
+            raise KeyError("Missing required keyword argument 'ts_description'."
+                           ).with_traceback(e.__traceback__) from e
+        # warn if no station available with that timeseries
+        if len(check_stations) == 0:
+            raise RuntimeError("No stations found that contain timeseries "
+                               f"'{kw_args['ts_description']}'.")
+        # if we're applying a spatial mean, we need the raw trend change values
+        if spatial_mean:
+            return_signs = kw_args.get("return_signs", True)
+            min_change = kw_args.get("min_change", 0.0)
+            kw_args["return_signs"] = False
+            kw_args["min_change"] = 0.0
+        # calculate the trend change at all valid stations
+        tc_dict = {sta_name: sta.get_trend_change(**kw_args)
+                   for sta_name, sta in tqdm(check_stations.items(),
+                                             desc="Calculating trends", unit="Station")}
+        # if desired, perform a spatially weighted mean
+        if spatial_mean:
+            # stack all valuyes into an array
+            tc_arr = np.ma.masked_invalid(np.stack(list(tc_dict.values())).astype(float))
+            # get distances between stations
+            stat_lonlats = np.stack([self.stations[sta_name].location[1::-1]
+                                     for sta_name in tc_dict.keys()])
+            geoid = cgeod.Geodesic()
+            num_stations = len(tc_dict)
+            all_distances = np.empty((num_stations, num_stations))
+            for i in range(num_stations):
+                all_distances[i, :] = np.array(geoid.inverse(stat_lonlats[i, :][None, :],
+                                                             stat_lonlats))[:, 0]
+            # convert to weights
+            distance_weights = np.exp(-all_distances / (spatial_mean * 1e3))
+            # calculate weighted mean
+            tc_arr_means = np.empty(tc_arr.shape)
+            for i in range(num_stations):
+                tc_arr_means[i, :, :] = np.ma.average(tc_arr,
+                                                      axis=0, weights=distance_weights[i, :])
+            # re-mask where original data was None
+            tc_arr_means[tc_arr.mask] = np.NaN
+            # set to NaN where the values is below minimum
+            if min_change > 0:
+                tc_arr_means[np.abs(tc_arr_means) < min_change] = np.NaN
+            # apply sign return type
+            if return_signs:
+                tc_arr_means = np.sign(tc_arr_means)
+            # convert array to correct output type
+            tc_arr_means_obj = tc_arr_means.astype(object)
+            tc_arr_means_obj[np.isnan(tc_arr_means)] = None
+            if return_signs:
+                tc_arr_means_obj[~np.isnan(tc_arr_means)] = \
+                    tc_arr_means_obj[~np.isnan(tc_arr_means)].astype(int)
+            # pack array into dictionary
+            tc_dict = {sta_name: tc_arr_means_obj[i, :, :].tolist()
+                       for i, sta_name in enumerate(tc_dict.keys())}
+        # done
+        return tc_dict
 
     def _create_map_figure(self,
                            gui_settings: dict[str, Any],
