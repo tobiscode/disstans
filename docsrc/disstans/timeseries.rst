@@ -33,3 +33,17 @@ UNRHighRateTimeseries
 .. autoclass:: disstans.timeseries.UNRHighRateTimeseries
    :members:
    :special-members:
+
+F5File
+......
+
+.. autoclass:: disstans.timeseries.F5File
+   :members:
+   :special-members:
+
+F5Timeseries
+............
+
+.. autoclass:: disstans.timeseries.F5Timeseries
+   :members:
+   :special-members:

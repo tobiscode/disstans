@@ -12,9 +12,11 @@ from io import BytesIO
 from warnings import warn
 from copy import deepcopy
 from pathlib import Path
+from collections import defaultdict
+from tqdm import tqdm
 from typing import Literal
 
-from .tools import get_cov_dims, make_cov_index_map, get_cov_indices
+from .tools import get_cov_dims, make_cov_index_map, get_cov_indices, R_ecef2enu
 
 
 class Timeseries():
@@ -1615,3 +1617,179 @@ class UNRHighRateTimeseries(Timeseries):
         """
         return {"type": "UNRHighRateTimeseries",
                 "kw_args": {"path": self._path}}
+
+
+class F5File():
+    """
+    Reader class that parses the contents of a single F5 file.
+
+    Parameters
+    ----------
+    path
+        Path to the F5 ``.pos`` file.
+    """
+    F5COLUMNS = ["yyyy", "mm", "dd", "HH:MM:SS",
+                 "X (m)", "Y (m)", "Z (m)", "Lat. (deg.)", "Lon. (deg.)", "Height (m)"]
+    """ Expected columns in the F5 file """
+    F5DTYPES = defaultdict(lambda: "float", {c: str for c in F5COLUMNS[:4]})
+    """ Data types in the F5 file """
+
+    def __init__(self,
+                 path: str,
+                 ) -> None:
+        # open file
+        with open(path, mode="rt") as f:
+            # continuously check whether the format is as expected
+            assert f.readline() == "+SITE/INF\n"
+            # read site info
+            self.site = {elem[0]: elem[1]
+                         for elem in [f.readline().split() for _ in range(4)]}
+            """ Site information """
+            assert f.readline() == "-SITE/INF\n"
+            assert f.readline() == "\n"
+            assert f.readline() == "+SOLVER/INF\n"
+            # read solver info
+            self.solver = {elem[0]: "  ".join(elem[1:])
+                           for elem in [f.readline().split() for _ in range(7)]}
+            """ Solver information """
+            assert f.readline() == "-SOLVER/INF\n"
+            assert f.readline() == "\n"
+            assert f.readline() == "+DATA\n"
+            # read data (omitting final "-DATA" row)
+            data = pd.read_csv(f, delim_whitespace=True, comment="*", engine="c",
+                               names=self.F5COLUMNS, dtype=self.F5DTYPES).iloc[:-1, :]
+            # parse date columns as datetime
+            data["yyyy"] = data[["yyyy", "mm", "dd", "HH:MM:SS"]].agg(" ".join, axis=1)
+            data.drop(self.F5COLUMNS[1:4], axis="columns", inplace=True)
+            data.rename(columns={"yyyy": "time"}, inplace=True)
+            data["time"] = pd.to_datetime(data["time"], format=r"%Y %m %d %H:%M:%S")
+            data.set_index("time", inplace=True)
+            # done
+            self.data = data
+            """ Data block """
+
+
+class F5Timeseries(Timeseries):
+    """Subclasses :class:`~Timeseries`.
+
+    Timeseries subclass for GNSS measurements in GEONET's ``.pos`` F5 file format.
+    There is no (co)variance information, and the absolute coordinates are converted
+    into differences in ENU coordinates from the first data point.
+
+    Parameters
+    ----------
+    paths
+        List of filenames for the same station that are combined.
+    data_unit
+        Can be ``'mm'`` or ``'m'``.
+
+
+    Additional keyword arguments will be passed onto :class:`~Timeseries`.
+
+    Notes
+    -----
+
+    The column format is described in :attr:`~F5File.F5COLUMNS`
+    The timezone assumed with each observation is UTC.
+
+    """
+    def __init__(self,
+                 paths: list[str],
+                 data_unit: Literal["mm", "m"] = "mm",
+                 **kw_args
+                 ) -> None:
+        # initialize
+        assert (isinstance(paths, list) and all([isinstance(p, str) for p in paths])
+                and (len(paths) > 0)), \
+            f"'paths' needs to be a list of string paths, got {paths}."
+        self._paths = paths
+        if data_unit == "m":
+            factor = 1
+        elif data_unit == "mm":
+            factor = 1000
+        else:
+            raise ValueError(f"'data_unit' needs to be 'mm' or 'm', got {data_unit}.")
+        # load individual files
+        f5files = [F5File(p) for p in self._paths]
+        # check that they're all for the same station
+        longname = f5files[0].site["ID"]
+        assert all([longname == f.site["ID"] for f in f5files]), \
+            f"Found files for different stations: {set([f.site['ID'] for f in f5files])}"
+        shortname = f5files[0].site["RINEX"]
+        assert all([shortname == f.site["RINEX"] for f in f5files]), \
+            f"Found files for different stations: {set([f.site['RINEX'] for f in f5files])}"
+        # concatenate the data into a joint DataFrame
+        f5data = pd.concat([f.data for f in f5files])
+        f5data.sort_index(inplace=True)
+        # get first lat/lon/alt coordinates
+        ref_latlonalt = f5data[["Lat. (deg.)", "Lon. (deg.)", "Height (m)"]
+                               ].iloc[0, :].values
+        # get XYZ differences from first observations
+        rel_xyz = (f5data[["X (m)", "Y (m)", "Z (m)"]].values
+                   - f5data[["X (m)", "Y (m)", "Z (m)"]].iloc[0, :].values)
+        # calculate relative displacement in ENU
+        rot_mat = R_ecef2enu(ref_latlonalt[1], ref_latlonalt[0])
+        rel_enu = rel_xyz @ rot_mat.T
+        # convert away from m if desired
+        if data_unit != "m":
+            rel_enu *= factor
+        # build timeseries dataframe
+        data_cols = ["east", "north", "up"]
+        df = pd.DataFrame(index=f5data.index, data=rel_enu,
+                          columns=data_cols)
+        # attach station ID and location
+        self._id = longname
+        self._rinex = shortname
+        self._location = ref_latlonalt.tolist()
+        # construct Timeseries object
+        super().__init__(dataframe=df, src="F5", data_unit=data_unit,
+                         data_cols=data_cols, **kw_args)
+
+    @staticmethod
+    def from_folder(folder: str,
+                    show_warnings: bool = False,
+                    **kw_args
+                    ) -> tuple[list[str], list[tuple[float, float, float]], list[F5Timeseries]]:
+        """
+        Given the base folder of an F5 repository, find all F5 files and extract station names,
+        locations, and timeseries.
+
+        Parameters
+        ----------
+        folder
+            Base folder that contains the "YYYY" year folders with annual ``.pos`` F5 files
+            inside of them.
+        show_warnings
+            If ``True``, warn if there are data inconsistencies encountered while loading.
+        **kw_args
+            Extra arguments that are passed on to the :class:`~F5Timeseries` constructor.
+
+        Returns
+        -------
+        names
+            Station names.
+        locations
+            Station locations.
+        timeseries
+            Station :class:`~F5Timeseries` objects.
+        """
+        # define filename patterns
+        globfile5 = "[12][0-9][0-9][0-9]/[0-9][0-9][0-9][0-9][0-9].[0-9][0-9].pos"
+        globfile6 = "[12][0-9][0-9][0-9]/[0-9][0-9][0-9][0-9][0-9][0-9].[0-9][0-9].pos"
+        # find all files matching the 5- and 6-character length formats
+        p = Path(folder)
+        names = sorted(list(set([f.parts[-1].split(".")[0] for f in p.glob(globfile5)] +
+                                [f.parts[-1].split(".")[0] for f in p.glob(globfile6)])))
+        locations = []
+        timeseries = []
+        # loop over all stations to load their files
+        for n in tqdm(names, desc="Loading station files", unit="Station"):
+            globstation = f"[0-9][0-9][0-9][0-9]/{n}.[0-9][0-9].pos"
+            stationfiles = [str(sf) for sf in p.glob(globstation)]
+            ts = F5Timeseries(stationfiles, **kw_args)
+            locations.append(ts._location)
+            timeseries.append(ts)
+            if show_warnings and (ts._id != n):
+                warn(f"Files loaded for station ID '{n}' were named '{ts._id}'.")
+        # done
+        return names, locations, timeseries
