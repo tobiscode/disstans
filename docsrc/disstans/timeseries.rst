@@ -26,3 +26,10 @@ UNRTimeseries
 .. autoclass:: disstans.timeseries.UNRTimeseries
    :members:
    :special-members:
+
+UNRHighRateTimeseries
+.....................
+
+.. autoclass:: disstans.timeseries.UNRHighRateTimeseries
+   :members:
+   :special-members:
