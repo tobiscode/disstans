@@ -25,8 +25,8 @@ With DISSTANS, you can:
 - Detect jumps in the data using a simple step detector.
 - Run the [MIDAS](https://doi.org/10.1002/2015JB012552) algorithm.
 - Generate synthetic timeseries.
-- Load timeseries in JPL's `.tseries` or UNR's `.tenv3` and `.kenv` formats natively,
-  or load standard NumPy and pandas data.
+- Load timeseries in JPL's `.(t)series`, UNR's `.tenv3` and `.kenv`, and Japan's
+  F5 `.pos` formats natively, or load standard NumPy and pandas data.
 
 All from within your Python shell, and everything in standard Python object-oriented
 programming style, allowing you to easily subclass existing code to suit your individual
