@@ -1245,7 +1245,7 @@ repro2018a/raw/position/envseries/0000_README.format
                  stacklevel=2)
             df.sort_index(inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src=".tseries", data_unit=data_unit,
+        super().__init__(dataframe=df, src="Gipsy", data_unit=data_unit,
                          data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols,
                          **kw_args)
 
@@ -1424,7 +1424,7 @@ class UNRTimeseries(Timeseries):
         # remove columns that are no longer needed
         df.drop(columns=["site", "reflon"], inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src=".tenv3", data_unit=data_unit,
+        super().__init__(dataframe=df, src="UNR", data_unit=data_unit,
                          data_cols=["east", "north", "up"],
                          var_cols=["east_var", "north_var", "up_var"],
                          cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"],
@@ -1594,7 +1594,7 @@ class UNRHighRateTimeseries(Timeseries):
                  stacklevel=2)
             df.sort_index(inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src=".kenv", data_unit=data_unit,
+        super().__init__(dataframe=df, src="UNRHighRate", data_unit=data_unit,
                          data_cols=["east", "north", "up"],
                          var_cols=["east_var", "north_var", "up_var"],
                          **kw_args)
