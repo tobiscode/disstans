@@ -2441,8 +2441,8 @@ class Network():
             kw_args["min_change"] = 0.0
         # calculate the trend change at all valid stations
         tc_dict = {sta_name: sta.get_trend_change(**kw_args)
-                   for sta_name, sta in tqdm(check_stations.items(),
-                                             desc="Calculating trends", unit="Station")}
+                   for sta_name, sta in tqdm(check_stations.items(), desc="Calculating trends",
+                                             unit="Station", ascii=True)}
         # if desired, perform a spatially weighted mean
         if spatial_mean:
             # stack all valuyes into an array
