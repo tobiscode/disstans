@@ -838,8 +838,9 @@ class Network():
                                   ((pd.Timestamp(st) >= tmin) and (pd.Timestamp(st) <= tmax))]
                 else:
                     localsteps = steptimes
-                self[station].add_local_model(ts_description, model_description,
-                                              disstans_models.Step(localsteps))
+                if len(localsteps) > 0:
+                    self[station].add_local_model(ts_description, model_description,
+                                                  disstans_models.Step(localsteps))
 
     def freeze(self,
                ts_description: str,
