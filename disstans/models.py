@@ -1056,12 +1056,12 @@ class BSpline(Model):
                   * (in_power * (in_power >= 0))**(self.degree))
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
         # to avoid numerical issues, set to zero manually outside of valid domains
-        coefs[np.abs(tnorm.squeeze()) > self.order / 2] = 0
+        coefs[np.abs(tnorm.squeeze(axis=2)) > self.order / 2] = 0
         # to avoid even more numerical issues, set a basis function to zero if we only
         # observe (somewhat arbitrarily) some fraction of the spline's valid domain
         # (setting an entire column to zero will make the calling get_mapping() method
         # flag this parameter as unobservable)
-        del_t = np.max(trel.squeeze(), axis=0) - np.min(trel.squeeze(), axis=0)
+        del_t = np.max(trel.squeeze(axis=2), axis=0) - np.min(trel.squeeze(axis=2), axis=0)
         set_unobservable = del_t < self.scale * self.observability_scale
         coefs[:, set_unobservable] = 0
         return coefs
@@ -1195,13 +1195,13 @@ class ISpline(Model):
                   * (in_power * (in_power >= 0))**(self.degree + 1))
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree + 1)
         # to avoid numerical issues, set to zero or one manually outside of valid domains
-        coefs[tnorm.squeeze() < - self.order / 2] = 0
-        coefs[tnorm.squeeze() > self.order / 2] = 1
+        coefs[tnorm.squeeze(axis=2) < - self.order / 2] = 0
+        coefs[tnorm.squeeze(axis=2) > self.order / 2] = 1
         # to avoid even more numerical issues, set a basis function to zero if we only
         # observe (somewhat arbitrarily) < a scale length
         # (setting an entire column to zero will make the calling get_mapping() method
         # flag this parameter as unobservable)
-        del_t = np.max(trel.squeeze(), axis=0) - np.min(trel.squeeze(), axis=0)
+        del_t = np.max(trel.squeeze(axis=2), axis=0) - np.min(trel.squeeze(axis=2), axis=0)
         set_unobservable = del_t < self.scale * self.observability_scale
         coefs[:, set_unobservable] = 0
         return coefs
@@ -1679,8 +1679,6 @@ class DecayingSplineSet(BaseSplineSet):
         Degree of the splines to be created.
     t_center_start
         First center time of the spline set.
-    time_unit
-        Time unit of scale, spacing and model parameters.
     list_scales
         List of scales to use for each of the sub-splines.
     list_num_splines
@@ -1697,7 +1695,7 @@ class DecayingSplineSet(BaseSplineSet):
                  degree: int,
                  t_center_start: str | pd.Timestamp,
                  list_scales: list[float],
-                 list_num_splines: list[int],
+                 list_num_splines: int | list[int],
                  time_unit: str = "D",
                  splineclass: BSpline | ISpline = ISpline,
                  regularize: bool = True,
