@@ -2531,7 +2531,7 @@ class Network():
 
     def gui(self,
             station: str | None = None,
-            timeseries: list[str] | None = None,
+            timeseries: str | list[str] | None = None,
             fit_list: list[str] | None = None,
             sum_models: bool = True,
             verbose: bool = False,
@@ -2580,7 +2580,7 @@ class Network():
         station
             Pre-select a station.
         timeseries
-            List of strings with the descriptions of the timeseries to plot.
+            String or list of strings with the descriptions of the timeseries to plot.
             ``None`` defaults to all timeseries.
         fit_list
             List of strings containing the model names of the subset of the models
@@ -2668,6 +2668,15 @@ class Network():
         gui_kw_args
             Override default GUI settings of :attr:`~disstans.config.defaults`.
         """
+
+        # check the timeseries setting
+        if isinstance(timeseries, str):
+            timeseries = [timeseries]
+        else:
+            assert (timeseries is None) or (isinstance(timeseries, list) and
+                                            all([isinstance(t, str) for t in timeseries])), \
+                f"'timeseries' must be None, a string, or list of strings, got '{timeseries}'."
+
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)

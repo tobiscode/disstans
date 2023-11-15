@@ -1006,7 +1006,7 @@ def lasso_regression(ts: Timeseries,
         for i in range(n_iters):  # always solve at least once
             try:
                 problem.solve(enforce_dpp=True, **cvxpy_kw_args)
-            except cp.error.SolverError as e:
+            except BaseException as e:
                 # no solution found, but actually a more serious problem
                 warn(str(e), stacklevel=2)
                 converged = False
