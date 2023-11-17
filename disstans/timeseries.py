@@ -1496,8 +1496,6 @@ class UNRHighRateTimeseries(Timeseries):
     is loaded.
     The timestamp associated with each observation is in Terrestrial Time.
 
-    .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_kenv.txt
-
     """
     def __init__(self,
                  path: str,
