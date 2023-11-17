@@ -760,6 +760,25 @@ class Network():
                                         model_description=model_description,
                                         model=mdl)
 
+    def remove_models(self, ts_description: str, *mdls_to_remove: str) -> None:
+        """
+        Convenience function that scans all stations for models of given names
+        associated with a specific timeseries and removes them (together with fits).
+
+        Parameters
+        ----------
+        ts_description
+            Timeseries
+        *mdls_to_remove
+            Pass all models to remove as function arguments.
+
+        See Also
+        --------
+        disstans.station.Station.remove_local_models : Station-specific equivalent
+        """
+        for station in self:
+            station.remove_local_models(ts_description, mdls_to_remove)
+
     def remove_timeseries(self, *ts_to_remove: str) -> None:
         """
         Convenience function that scans all stations for timeseries of given names
