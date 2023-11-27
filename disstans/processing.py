@@ -11,13 +11,14 @@ import numpy as np
 import pandas as pd
 import warnings
 from functools import wraps
+from numpy.polynomial.polynomial import Polynomial as NpPolynomial
 from sklearn.decomposition import PCA, FastICA
 from scipy.signal import find_peaks
 from tqdm import tqdm
 from warnings import warn
 from pandas.api.indexers import BaseIndexer
 from collections.abc import Callable
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Literal
 
 from .config import defaults
 from .timeseries import Timeseries
@@ -221,13 +222,17 @@ def median(array: np.ndarray, kernel_size: int) -> np.ndarray:
 
 @unwrap_dict_and_ts
 def decompose(array: np.ndarray,
-              method: str,
+              method: Literal["pca", "ica"],
               num_components: int = 1,
               return_sources: bool = False,
+              detrend: bool | np.ndarray = False,
+              impute: bool = False,
               rng: np.random.Generator | None = None
-              ) -> tuple[np.ndarray, np.ndarray | None, np.ndarray | None]:
+              ) -> np.ndarray | tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""
     Decomposes the input signal into different components using PCA or ICA.
+    Optionally detrends the data and/or fills missing data using the data
+    decomposition model.
 
     Parameters
     ----------
@@ -247,6 +252,14 @@ def decompose(array: np.ndarray,
     return_sources
         If ``True``, return not only the best-fit model, but also the sources
         themselves in space and time. Defaults to ``False``.
+    detrend
+        If ``True``, detrend the data before decomposing it assuming uniform data
+        sampling. Alternatively, a 1D array containing the data indices for detrending.
+    impute
+        If ``False``, the input data is overwritten with the fitted model, and missing
+        data is kept missing.
+        If ``True``, input data is kept and the fitted data decomposition model is
+        only used to fill the missing values.
     rng
         Random number generator instance to use to fill missing values.
 
@@ -281,10 +294,32 @@ def decompose(array: np.ndarray,
     finite_cols = np.nonzero(~array_nanind.all(axis=0))[0]
     nan_cols = np.nonzero(array_nanind.all(axis=0))[0]
     array = array[:, finite_cols]
+    array_nanind = np.isnan(array)
+    # save values for later reinsertion if imputing data
+    if impute:
+        array_in = array.copy()
+    # detrend if desired
+    if isinstance(detrend, np.ndarray) or (isinstance(detrend, bool) and detrend):
+        if isinstance(detrend, np.ndarray):
+            assert (detrend.ndim == 1) and (detrend.size == array.shape[0]), \
+                f"'detrend' array needs to be 1D with length {array.shape[0]}, got " \
+                f"shape {detrend.shape} instead."
+            x = detrend
+        else:
+            x = np.arange(array.shape[0])
+        fits = [NpPolynomial.fit(x[~array_nanind[:, i]],
+                                 array[:, i][~array_nanind[:, i]], 1)
+                for i in range(array.shape[1])]
+        array_trend = np.stack([f(x) for f in fits], axis=1)
+        array -= array_trend
+        detrended = True
+    elif not isinstance(detrend, bool):
+        raise ValueError(f"Unrecognized 'detrend' argument type: '{type(detrend)}'.")
+    else:
+        detrended = False
     # fill NaNs with white Gaussian noise
     array_nanmean = np.nanmean(array, axis=0)
     array_nansd = np.nanstd(array, axis=0)
-    array_nanind = np.isnan(array)
     if rng is None:
         rng = np.random.default_rng()
     else:
@@ -294,9 +329,9 @@ def decompose(array: np.ndarray,
         array[array_nanind[:, icol], icol] = array_nanmean[icol] + \
             array_nansd[icol] * rng.normal(size=array_nanind[:, icol].sum())
     # decompose using the specified solver
-    if method == 'pca':
+    if method.lower() == 'pca':
         decomposer = PCA(n_components=num_components, whiten=True)
-    elif method == 'ica':
+    elif method.lower() == 'ica':
         decomposer = FastICA(n_components=num_components, whiten="unit-variance")
     else:
         raise NotImplementedError("Cannot estimate the common mode error "
@@ -304,19 +339,26 @@ def decompose(array: np.ndarray,
     # extract temporal component and build model
     temporal = decomposer.fit_transform(array)
     model = decomposer.inverse_transform(temporal)
-    # reduce to where original timeseries were not NaNs and return
-    model[array_nanind] = np.NaN
+    # add trends back in if they were removed
+    if detrended:
+        model += array_trend
+    # restore original data
+    if impute:
+        for icol in range(model.shape[1]):
+            model[~array_nanind[:, icol], icol] = array_in[~array_nanind[:, icol], icol]
+    # reduce to where original timeseries were not NaNs
+    else:
+        model[array_nanind] = np.NaN
     if nan_cols.size > 0:
-        newmod = np.empty((temporal.shape[0], len(finite_cols) + len(nan_cols)))
+        newmod = np.full((temporal.shape[0], len(finite_cols) + len(nan_cols)), np.NaN)
         newmod[:, finite_cols] = model
-        newmod[:, nan_cols] = np.NaN
         model = newmod
+    # extract spatial component if to be returned, else done
     if return_sources:
         spatial = decomposer.components_
         if nan_cols.size > 0:
-            newspat = np.empty((spatial.shape[0], len(finite_cols) + len(nan_cols)))
+            newspat = np.full((spatial.shape[0], len(finite_cols) + len(nan_cols)), np.NaN)
             newspat[:, finite_cols] = spatial
-            newspat[:, nan_cols] = np.NaN
             spatial = newspat
         return model, temporal, spatial
     else:
