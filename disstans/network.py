@@ -2135,7 +2135,6 @@ class Network():
                              mdl_description: str,
                              index: int,
                              comps: tuple[int, int],
-                             num_mdl_comps: int,
                              use_vars: bool,
                              use_covs: bool
                              ) -> tuple[np.ndarray, np.ndarray | None]:
@@ -2151,10 +2150,9 @@ class Network():
                              .var[index, comps]
                              for station in stat_list_in], axis=0)
             if use_covs:
-                linear_index_cov = index * num_mdl_comps
                 covlist = [station
                            .models[ts_description][mdl_description]
-                           .cov[linear_index_cov + comps[0], linear_index_cov + comps[1]]
+                           .get_cov_by_index(index)[comps]
                            for station in stat_list_in]
                 covs = np.concatenate([covs, np.array(covlist).reshape(-1, 1)], axis=1)
         else:
@@ -2272,7 +2270,6 @@ class Network():
         lat0, lon0 = ref_stat.location[0], ref_stat.location[1]
         linear_index = ref_stat.models[ts_description][mdl_description].get_exp_index(1)
         use_vars &= ref_stat.models[ts_description][mdl_description].cov is not None
-        num_mdl_comps = ref_stat.models[ts_description][mdl_description].num_parameters
         v_pred_cols = [ref_stat[ts_description].data_cols[c] for c in comps]
         # for the inversion, we need the indices of the subsets
         ix_in = [n in stat_names_in for n in stat_names_valid]
@@ -2288,7 +2285,7 @@ class Network():
         # get all velocities and weights for subset
         vels, weights = self._get_2comp_pars_covs(stat_list_in, ts_description,
                                                   mdl_description, linear_index, comps,
-                                                  num_mdl_comps, use_vars, use_covs)
+                                                  use_vars, use_covs)
         # calculate homogenous translation, strain, and rotation
         v_O, epsilon, omega = get_hom_vel_strain_rot(lon_lat_in, vels, weights,
                                                      utmzone=utmzone, reference=[lon0, lat0])
@@ -2382,7 +2379,6 @@ class Network():
         ref_stat = stat_list_in[reference_index]
         linear_index = ref_stat.models[ts_description][mdl_description].get_exp_index(1)
         use_vars &= ref_stat.models[ts_description][mdl_description].cov is not None
-        num_mdl_comps = ref_stat.models[ts_description][mdl_description].num_parameters
         v_pred_cols = [ref_stat[ts_description].data_cols[c] for c in comps]
         # for the inversion, we need the indices of the subsets
         ix_in = [n in stat_names_in for n in stat_names_valid]
@@ -2396,7 +2392,7 @@ class Network():
         # get all velocities and weights for subset
         vels, weights = self._get_2comp_pars_covs(stat_list_in, ts_description,
                                                   mdl_description, linear_index, comps,
-                                                  num_mdl_comps, use_vars, use_covs)
+                                                  use_vars, use_covs)
         # calculate Euler pole from input list
         rotation_vector, rotation_covariance = \
             estimate_euler_pole(lon_lat_in, vels, weights)
