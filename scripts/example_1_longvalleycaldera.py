@@ -100,9 +100,12 @@ if __name__ == "__main__":
 
     # estimate the common mode, either with a visualization of the result or not
     # (same underlying function)
-    # net.graphical_cme(ts_in="raw_filt_res", ts_out="common", method="ica")
+    # net.graphical_cme(ts_in="raw_filt_res", ts_out="common",
+    #                   method="ica", rng=np.random.default_rng(0))
     # calculate common mode
-    net.call_netwide_func("decompose", ts_in="raw_filt_res", ts_out="common", method="ica")
+    net.call_netwide_func("decompose", ts_in="raw_filt_res", ts_out="common",
+                          method="ica", rng=np.random.default_rng(0))
+    # now remove the common mode, call it the "intermed" timeseries,
     # now remove the common mode, call it the "intermed" timeseries,
     for station in net:
         station.add_timeseries("intermed", station["raw_clean"] - station["common"],
