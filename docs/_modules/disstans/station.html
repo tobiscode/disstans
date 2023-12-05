@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.station &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>disstans.station &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1126,7 +1126,8 @@
                   <span class="n">ignore_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
                   <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates a linear trend through the desired model fits and over some time span.</span>
+<span class="sd">        Calculates a linear trend through the desired model fits (or timeseries data)</span>
+<span class="sd">        and over some time span.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1135,8 +1136,8 @@
 <span class="sd">        fit_list</span>
 <span class="sd">            List of strings containing the model names of the subset of the fitted models</span>
 <span class="sd">            to be used. ``None`` defaults to all fitted models.</span>
-<span class="sd">            If ``ts_description`` does not contain any fits, and the trend of the timeseries</span>
-<span class="sd">            itself is to be calculated, pass an empty list (``[]``).</span>
+<span class="sd">            If ``ts_description`` the trend of the timeseries itself is to be calculated,</span>
+<span class="sd">            pass an empty list (``[]``).</span>
 <span class="sd">        components</span>
 <span class="sd">            List of the numerical indices of which components of the timeseries to use.</span>
 <span class="sd">            ``None`` defaults to all components.</span>
@@ -1272,7 +1273,7 @@
                     <span class="n">trend_sigma</span><span class="p">[</span><span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">trend_sigma</span><span class="p">[</span><span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">GtWG</span><span class="p">)[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">trend</span><span class="p">,</span> <span class="n">trend_sigma</span> <span class="k">if</span> <span class="n">include_sigma</span> <span class="k">else</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">trend</span><span class="p">,</span> <span class="n">trend_sigma</span><span class="p">)</span> <span class="k">if</span> <span class="n">include_sigma</span> <span class="k">else</span> <span class="p">(</span><span class="n">trend</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

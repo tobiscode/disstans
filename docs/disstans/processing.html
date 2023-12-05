@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Processing &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>Processing &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -40,7 +40,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -611,14 +611,17 @@ of the velocities’ uncertainty is calculated as well.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ts</strong> – Timeseries to perform the MIDAS algorithm on.</p></li>
-<li><p><strong>steps</strong> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – If given, a pandas Series or Index of step times, across which no pairs
+<li><p><strong>ts</strong> (<a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>) – Timeseries to perform the MIDAS algorithm on.</p></li>
+<li><p><strong>steps</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/types.html#types.UnionType" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnionType</span></code></a>[<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.1.1/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a>, <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.1.1/reference/api/pandas.DatetimeIndex.html#pandas.DatetimeIndex" title="(in pandas v2.1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatetimeIndex</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – If given, a pandas Series or Index of step times, across which no pairs
 should be formed.</p></li>
-<li><p><strong>tolerance</strong> (default: <code class="docutils literal notranslate"><span class="pre">0.001</span></code>) – Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</p></li>
+<li><p><strong>tolerance</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">0.001</span></code>) – Tolerance when enforcing the one-year period of pairs (in 365.25-days-long years`).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference internal" href="models.html#disstans.models.Polynomial" title="disstans.models.Polynomial"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polynomial</span></code></a>, <a class="reference internal" href="timeseries.html#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
 <li><p><em>mdl</em> – Fitted polynomial (offset &amp; constant velocity) model.</p></li>
 <li><p><em>res</em> – Residual timeseries.</p></li>
 <li><p><em>stats</em> – Fittings statistics computed along the way.

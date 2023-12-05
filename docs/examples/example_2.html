@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -39,7 +39,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -521,9 +521,9 @@ convenient Euler pole notation using <a class="reference internal" href="../diss
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Latitude:  </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> °</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Rate:      </span><span class="si">{</span><span class="n">euler_pole</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.2g</span><span class="si">}</span><span class="s2"> +/- </span><span class="si">{</span><span class="n">euler_pole_sd</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s2">.2g</span><span class="si">}</span><span class="s2"> °/a&quot;</span><span class="p">)</span>
 <span class="go">Euler pole results (with one s.d.):</span>
-<span class="go">Longitude: 56.979 +/- 0.040 °</span>
-<span class="go">Latitude:  -52.711 +/- 0.444 °</span>
-<span class="go">Rate:      0.00071 +/- 5.3e-06 °/a</span>
+<span class="go">Longitude: 60.045 +/- 0.007 °</span>
+<span class="go">Latitude:  -43.775 +/- 0.312 °</span>
+<span class="go">Rate:      0.0017 +/- 9.2e-06 °/a</span>
 </pre></div>
 </div>
 </section>
@@ -777,32 +777,32 @@ fields:</p>
 
 <span class="go">Difference between model predictions</span>
 <span class="go">             D2M       D2G       M2G</span>
-<span class="go">common  0.000310  0.000864  0.000678</span>
-<span class="go">outer   0.000362  0.000388  0.000693</span>
+<span class="go">common  0.000382  0.000884  0.000678</span>
+<span class="go">outer   0.000706  0.000640  0.000693</span>
 
 <span class="go">Residuals common_stations</span>
 <span class="go">       DISSTANS     MIDAS      GAGE</span>
-<span class="go">all    0.002487  0.003065  0.003883</span>
-<span class="go">outer  0.002883  0.002788  0.002789</span>
-<span class="go">inner  0.002015  0.003318  0.004730</span>
+<span class="go">all    0.002740  0.003065  0.003883</span>
+<span class="go">outer  0.003058  0.002788  0.002789</span>
+<span class="go">inner  0.002378  0.003318  0.004730</span>
 
 <span class="go">Residuals outer_stations</span>
 <span class="go">       DISSTANS     MIDAS      GAGE</span>
-<span class="go">all    0.002598  0.003084  0.003989</span>
-<span class="go">outer  0.002901  0.002755  0.002888</span>
-<span class="go">inner  0.002254  0.003381  0.004846</span>
+<span class="go">all    0.002838  0.003084  0.003989</span>
+<span class="go">outer  0.003150  0.002755  0.002888</span>
+<span class="go">inner  0.002488  0.003381  0.004846</span>
 
 <span class="go">Difference of residuals between station subsets</span>
 <span class="go">       DISSTANS     MIDAS      GAGE</span>
-<span class="go">all    0.000990  0.000471  0.000505</span>
-<span class="go">outer  0.001000  0.000472  0.000505</span>
-<span class="go">inner  0.000979  0.000471  0.000505</span>
+<span class="go">all    0.001006  0.000471  0.000505</span>
+<span class="go">outer  0.001007  0.000472  0.000505</span>
+<span class="go">inner  0.001006  0.000471  0.000505</span>
 
 <span class="go">Relative improvement from other models to DISSTANS</span>
 <span class="go">          MIDAS      GAGE</span>
-<span class="go">all    0.188404  0.359450</span>
-<span class="go">outer -0.034228 -0.033855</span>
-<span class="go">inner  0.392870  0.574107</span>
+<span class="go">all    0.106031  0.294437</span>
+<span class="go">outer -0.097020 -0.096624</span>
+<span class="go">inner  0.283198  0.497174</span>
 </pre></div>
 </div>
 <p>There’s a lot to unpack here, so let’s jump right in:</p>
@@ -814,10 +814,10 @@ significantly affect the results for any of the datasets. The differences are be
 the level of 1 mm/a.</p></li>
 <li><p>Across all stations, the DISSTANS solution has the lowest residuals. Looking more closely,
 this is mainly driven by lower residuals inside the LVCR, where the relative
-improvements are 39% and 57% relative to MIDAS and GAGE, respectively. Outside the LVCR,
-DISSTANS’ residuals are slightly larger by about 3%.</p></li>
+improvements are 28% and 50% relative to MIDAS and GAGE, respectively. Outside the LVCR,
+DISSTANS’ residuals are slightly larger by about 10%.</p></li>
 <li><p>There are large differences between residuals inside and outside the LVCR for
-the DISSTANS (20% to 29%, respectively), MIDAS (33% to 28%) and GAGE (47% to 28%) models,
+the DISSTANS (24% to 31%, respectively), MIDAS (33% to 28%) and GAGE (47% to 28%) models.
 DISSTANS’ residuals are larger outside than inside, whereas MIDAS and GAGE residuals are
 larger inside. It should be noted, however, that that puts all three models in relative
 equivalence for the region outside the LVCR. This further shows DISSTANS’ ability to fit

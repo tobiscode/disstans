@@ -93,10 +93,10 @@ in our study region.
     ...       f"Shearing rate:   {shear:.2e} 1/a\n"
     ...       f"Rotation rate:   {rotation:.2e} rad/a")
     Homogenous transation, rotation, and strain field results:
-    Dilatation rate: 2.83e-04 1/a
-    Strain rate:     2.06e-04 1/a
-    Shearing rate:   8.93e-05 1/a
-    Rotation rate:   2.29e-05 rad/a
+    Dilatation rate: 6.58e-05 1/a
+    Strain rate:     5.76e-05 1/a
+    Shearing rate:   3.06e-05 1/a
+    Rotation rate:   2.43e-05 rad/a
 
 So, there is a little bit of everything going on here. We're not going to dwell on
 it here, since we're mostly focused on the resulting predicted velocities, but you
@@ -135,9 +135,9 @@ convenient Euler pole notation using :func:`~disstans.tools.rotvec2eulerpole`:
     ...       f"Latitude:  {euler_pole[1]:.3f} +/- {euler_pole_sd[1]:.3f} °\n"
     ...       f"Rate:      {euler_pole[2]:.2g} +/- {euler_pole_sd[2]:.2g} °/a")
     Euler pole results (with one s.d.):
-    Longitude: 56.979 +/- 0.040 °
-    Latitude:  -52.711 +/- 0.444 °
-    Rate:      0.00071 +/- 5.3e-06 °/a
+    Longitude: 60.045 +/- 0.007 °
+    Latitude:  -43.775 +/- 0.312 °
+    Rate:      0.0017 +/- 9.2e-06 °/a
 
 Comparison of different methods
 -------------------------------
@@ -426,32 +426,32 @@ Finally, let's print out all the statistics we just calculated:
     <BLANKLINE>
     Difference between model predictions
                  D2M       D2G       M2G
-    common  0.000310  0.000864  0.000678
-    outer   0.000362  0.000388  0.000693
+    common  0.000382  0.000884  0.000678
+    outer   0.000706  0.000640  0.000693
     <BLANKLINE>
     Residuals common_stations
            DISSTANS     MIDAS      GAGE
-    all    0.002487  0.003065  0.003883
-    outer  0.002883  0.002788  0.002789
-    inner  0.002015  0.003318  0.004730
+    all    0.002740  0.003065  0.003883
+    outer  0.003058  0.002788  0.002789
+    inner  0.002378  0.003318  0.004730
     <BLANKLINE>
     Residuals outer_stations
            DISSTANS     MIDAS      GAGE
-    all    0.002598  0.003084  0.003989
-    outer  0.002901  0.002755  0.002888
-    inner  0.002254  0.003381  0.004846
+    all    0.002838  0.003084  0.003989
+    outer  0.003150  0.002755  0.002888
+    inner  0.002488  0.003381  0.004846
     <BLANKLINE>
     Difference of residuals between station subsets
            DISSTANS     MIDAS      GAGE
-    all    0.000990  0.000471  0.000505
-    outer  0.001000  0.000472  0.000505
-    inner  0.000979  0.000471  0.000505
+    all    0.001006  0.000471  0.000505
+    outer  0.001007  0.000472  0.000505
+    inner  0.001006  0.000471  0.000505
     <BLANKLINE>
     Relative improvement from other models to DISSTANS
               MIDAS      GAGE
-    all    0.188404  0.359450
-    outer -0.034228 -0.033855
-    inner  0.392870  0.574107
+    all    0.106031  0.294437
+    outer -0.097020 -0.096624
+    inner  0.283198  0.497174
     <BLANKLINE>
 
 There's a lot to unpack here, so let's jump right in:
@@ -463,10 +463,10 @@ There's a lot to unpack here, so let's jump right in:
    the level of 1 mm/a.
 3. Across all stations, the DISSTANS solution has the lowest residuals. Looking more closely,
    this is mainly driven by lower residuals inside the LVCR, where the relative
-   improvements are 39% and 57% relative to MIDAS and GAGE, respectively. Outside the LVCR,
-   DISSTANS' residuals are slightly larger by about 3%.
+   improvements are 28% and 50% relative to MIDAS and GAGE, respectively. Outside the LVCR,
+   DISSTANS' residuals are slightly larger by about 10%.
 4. There are large differences between residuals inside and outside the LVCR for
-   the DISSTANS (20% to 29%, respectively), MIDAS (33% to 28%) and GAGE (47% to 28%) models,
+   the DISSTANS (24% to 31%, respectively), MIDAS (33% to 28%) and GAGE (47% to 28%) models.
    DISSTANS' residuals are larger outside than inside, whereas MIDAS and GAGE residuals are
    larger inside. It should be noted, however, that that puts all three models in relative
    equivalence for the region outside the LVCR. This further shows DISSTANS' ability to fit

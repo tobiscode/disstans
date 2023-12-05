@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -853,7 +853,7 @@
 
 
 <div class="viewcode-block" id="midas"><a class="viewcode-back" href="../../disstans/processing.html#disstans.processing.midas">[docs]</a><span class="k">def</span> <span class="nf">midas</span><span class="p">(</span><span class="n">ts</span><span class="p">:</span> <span class="n">Timeseries</span><span class="p">,</span>
-          <span class="n">steps</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateTimeIndex</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">steps</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
           <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span>
           <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Polynomial</span><span class="p">,</span> <span class="n">Timeseries</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1530,7 +1530,8 @@
                               <span class="k">for</span> <span class="n">sta_name</span><span class="p">,</span> <span class="n">steptimes</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="c1"># check if there is at least one station with the desired timeseries</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">ts_description</span> <span class="ow">in</span> <span class="n">net</span><span class="p">[</span><span class="n">sta_name</span><span class="p">]</span><span class="o">.</span><span class="n">timeseries</span>
-                <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">sta_name</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No station containing timeseries &#39;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="s2">&#39; found.&quot;</span><span class="p">,</span>
                  <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">out_cols</span><span class="p">),</span> <span class="p">[]</span>

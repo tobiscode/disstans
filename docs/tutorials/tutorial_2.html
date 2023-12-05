@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 2: Advanced Models and Fitting &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>Tutorial 2: Advanced Models and Fitting &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -39,7 +39,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -607,7 +607,7 @@ errors, so let’s print some statistics:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_noreg&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">TUT: Res_noreg                          Mean  Standard Deviation</span>
-<span class="go">Total-Displacement_Model_Total -2.193582e-08            2.046182</span>
+<span class="go">Total-Displacement_Model_Total -2.193765e-08            2.046182</span>
 </pre></div>
 </div>
 </section>
@@ -676,7 +676,7 @@ solver:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">analyze_residuals</span><span class="p">(</span><span class="n">ts_description</span><span class="o">=</span><span class="s2">&quot;Res_L2&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                           <span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">TUT: Res_L2                             Mean  Standard Deviation</span>
-<span class="go">Total-Displacement_Model_Total -5.627219e-09            2.088274</span>
+<span class="go">Total-Displacement_Model_Total -5.627180e-09            2.088274</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

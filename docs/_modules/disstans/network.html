@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.network &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>disstans.network &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1244,8 +1244,9 @@
                                   <span class="p">((</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">st</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tmin</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">st</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tmax</span><span class="p">))]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">localsteps</span> <span class="o">=</span> <span class="n">steptimes</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">station</span><span class="p">]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">model_description</span><span class="p">,</span>
-                                              <span class="n">disstans_models</span><span class="o">.</span><span class="n">Step</span><span class="p">(</span><span class="n">localsteps</span><span class="p">))</span></div>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">localsteps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">station</span><span class="p">]</span><span class="o">.</span><span class="n">add_local_model</span><span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">model_description</span><span class="p">,</span>
+                                                  <span class="n">disstans_models</span><span class="o">.</span><span class="n">Step</span><span class="p">(</span><span class="n">localsteps</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Network.freeze"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.freeze">[docs]</a>    <span class="k">def</span> <span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">ts_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1673,7 +1674,7 @@
                                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">station_names</span><span class="p">])</span>
         <span class="n">all_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_stations</span><span class="p">,</span> <span class="n">num_stations</span><span class="p">))</span>
         <span class="n">net_avg_closests</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">station_names</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_stations</span><span class="p">):</span>
             <span class="n">all_distances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">geoid</span><span class="o">.</span><span class="n">inverse</span><span class="p">(</span><span class="n">station_lonlat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
                                                          <span class="n">station_lonlat</span><span class="p">))[:,</span> <span class="mi">0</span><span class="p">]</span>
             <span class="n">net_avg_closests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">all_distances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
@@ -2521,7 +2522,6 @@
                              <span class="n">mdl_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                              <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                              <span class="n">comps</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-                             <span class="n">num_mdl_comps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                              <span class="n">use_vars</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
                              <span class="n">use_covs</span><span class="p">:</span> <span class="nb">bool</span>
                              <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
@@ -2537,10 +2537,9 @@
                              <span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">comps</span><span class="p">]</span>
                              <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_in</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">use_covs</span><span class="p">:</span>
-                <span class="n">linear_index_cov</span> <span class="o">=</span> <span class="n">index</span> <span class="o">*</span> <span class="n">num_mdl_comps</span>
                 <span class="n">covlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">station</span>
                            <span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span>
-                           <span class="o">.</span><span class="n">cov</span><span class="p">[</span><span class="n">linear_index_cov</span> <span class="o">+</span> <span class="n">comps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linear_index_cov</span> <span class="o">+</span> <span class="n">comps</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                           <span class="o">.</span><span class="n">get_cov_by_index</span><span class="p">(</span><span class="n">index</span><span class="p">)[</span><span class="n">comps</span><span class="p">]</span>
                            <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stat_list_in</span><span class="p">]</span>
                 <span class="n">covs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">covs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">covlist</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2658,7 +2657,6 @@
         <span class="n">lat0</span><span class="p">,</span> <span class="n">lon0</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">linear_index</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">get_exp_index</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">use_vars</span> <span class="o">&amp;=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">num_mdl_comps</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">num_parameters</span>
         <span class="n">v_pred_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref_stat</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
         <span class="c1"># for the inversion, we need the indices of the subsets</span>
         <span class="n">ix_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_in</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
@@ -2674,7 +2672,7 @@
         <span class="c1"># get all velocities and weights for subset</span>
         <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_2comp_pars_covs</span><span class="p">(</span><span class="n">stat_list_in</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span>
                                                   <span class="n">mdl_description</span><span class="p">,</span> <span class="n">linear_index</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span>
-                                                  <span class="n">num_mdl_comps</span><span class="p">,</span> <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">)</span>
+                                                  <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">)</span>
         <span class="c1"># calculate homogenous translation, strain, and rotation</span>
         <span class="n">v_O</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">get_hom_vel_strain_rot</span><span class="p">(</span><span class="n">lon_lat_in</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span>
                                                      <span class="n">utmzone</span><span class="o">=</span><span class="n">utmzone</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="p">[</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">])</span>
@@ -2768,7 +2766,6 @@
         <span class="n">ref_stat</span> <span class="o">=</span> <span class="n">stat_list_in</span><span class="p">[</span><span class="n">reference_index</span><span class="p">]</span>
         <span class="n">linear_index</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">get_exp_index</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">use_vars</span> <span class="o">&amp;=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">cov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">num_mdl_comps</span> <span class="o">=</span> <span class="n">ref_stat</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">ts_description</span><span class="p">][</span><span class="n">mdl_description</span><span class="p">]</span><span class="o">.</span><span class="n">num_parameters</span>
         <span class="n">v_pred_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref_stat</span><span class="p">[</span><span class="n">ts_description</span><span class="p">]</span><span class="o">.</span><span class="n">data_cols</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
         <span class="c1"># for the inversion, we need the indices of the subsets</span>
         <span class="n">ix_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_in</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">stat_names_valid</span><span class="p">]</span>
@@ -2782,7 +2779,7 @@
         <span class="c1"># get all velocities and weights for subset</span>
         <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_2comp_pars_covs</span><span class="p">(</span><span class="n">stat_list_in</span><span class="p">,</span> <span class="n">ts_description</span><span class="p">,</span>
                                                   <span class="n">mdl_description</span><span class="p">,</span> <span class="n">linear_index</span><span class="p">,</span> <span class="n">comps</span><span class="p">,</span>
-                                                  <span class="n">num_mdl_comps</span><span class="p">,</span> <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">)</span>
+                                                  <span class="n">use_vars</span><span class="p">,</span> <span class="n">use_covs</span><span class="p">)</span>
         <span class="c1"># calculate Euler pole from input list</span>
         <span class="n">rotation_vector</span><span class="p">,</span> <span class="n">rotation_covariance</span> <span class="o">=</span> \
             <span class="n">estimate_euler_pole</span><span class="p">(</span><span class="n">lon_lat_in</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
@@ -2936,7 +2933,7 @@
 
 <div class="viewcode-block" id="Network.gui"><a class="viewcode-back" href="../../disstans/network.html#disstans.network.Network.gui">[docs]</a>    <span class="k">def</span> <span class="nf">gui</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">station</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">timeseries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">timeseries</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">fit_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">sum_models</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -2985,7 +2982,7 @@
 <span class="sd">        station</span>
 <span class="sd">            Pre-select a station.</span>
 <span class="sd">        timeseries</span>
-<span class="sd">            List of strings with the descriptions of the timeseries to plot.</span>
+<span class="sd">            String or list of strings with the descriptions of the timeseries to plot.</span>
 <span class="sd">            ``None`` defaults to all timeseries.</span>
 <span class="sd">        fit_list</span>
 <span class="sd">            List of strings containing the model names of the subset of the models</span>
@@ -3073,6 +3070,15 @@
 <span class="sd">        gui_kw_args</span>
 <span class="sd">            Override default GUI settings of :attr:`~disstans.config.defaults`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># check the timeseries setting</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">timeseries</span> <span class="o">=</span> <span class="p">[</span><span class="n">timeseries</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="n">timeseries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span>
+                                            <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="p">])),</span> \
+                <span class="sa">f</span><span class="s2">&quot;&#39;timeseries&#39; must be None, a string, or list of strings, got &#39;</span><span class="si">{</span><span class="n">timeseries</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+
         <span class="c1"># create map and timeseries figures</span>
         <span class="n">gui_settings</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;gui&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">gui_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gui_kw_args</span><span class="p">)</span>

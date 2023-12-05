@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.timeseries &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>disstans.timeseries &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1558,8 +1558,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subclasses :class:`~Timeseries`.</span>
 
-<span class="sd">    Timeseries subclass for GNSS measurements in JPL&#39;s Gipsy ``.tseries`` file format.</span>
-<span class="sd">    The data and (co)variances are converted into millimeters (squared).</span>
+<span class="sd">    Timeseries subclass for GNSS measurements in JPL&#39;s Gipsy(X) ``.tseries`` file format.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1595,9 +1594,6 @@
 <span class="sd">    +---------------+-------------------------------------------------+</span>
 
 <span class="sd">    Time is GPS time, and the time series are relative to each station&#39;s first epoch.</span>
-
-<span class="sd">    (Note that the documentation says covariance, but it is actually correlation,</span>
-<span class="sd">    as per personal communication with Angelyn Moore, JPL.)</span>
 
 <span class="sd">    .. _JPL&#39;s website: https://sideshow.jpl.nasa.gov/pub/JPL_GPS_Timeseries/\</span>
 <span class="sd">repro2018a/raw/position/envseries/0000_README.format</span>
@@ -1678,7 +1674,6 @@
 <span class="sd">    Subclasses :class:`~Timeseries`.</span>
 
 <span class="sd">    Timeseries subclass for GNSS measurements in UNR&#39;s ``.tenv3`` file format.</span>
-<span class="sd">    The data and (co)variances are converted into millimeters (squared).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1859,7 +1854,6 @@
 <span class="sd">    Subclasses :class:`~Timeseries`.</span>
 
 <span class="sd">    Timeseries subclass for GNSS measurements in UNR&#39;s ``.kenv`` file format.</span>
-<span class="sd">    The data and (co)variances are converted into millimeters (squared).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

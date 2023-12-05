@@ -218,7 +218,7 @@ errors, so let's print some statistics:
     >>> _ = stat.analyze_residuals(ts_description="Res_noreg",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_noreg                          Mean  Standard Deviation
-    Total-Displacement_Model_Total -2.193582e-08            2.046182
+    Total-Displacement_Model_Total -2.193765e-08            2.046182
 
 Advanced plotting
 -----------------
@@ -294,7 +294,7 @@ Giving us the statistics:
     >>> _ = stat.analyze_residuals(ts_description="Res_L2",
     ...                            mean=True, std=True, verbose=True)
     TUT: Res_L2                             Mean  Standard Deviation
-    Total-Displacement_Model_Total -5.627219e-09            2.088274
+    Total-Displacement_Model_Total -5.627180e-09            2.088274
 
 ::
 

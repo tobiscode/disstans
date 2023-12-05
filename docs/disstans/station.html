@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Station &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>Station &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -40,7 +40,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -772,15 +772,16 @@ to be used when creating a network JSON configuration file.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.station.Station.get_trend">
 <span class="sig-name descname"><span class="pre">get_trend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_formal_variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/station.html#Station.get_trend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.station.Station.get_trend" title="Permalink to this definition"></a></dt>
-<dd><p>Calculates a linear trend through the desired model fits and over some time span.</p>
+<dd><p>Calculates a linear trend through the desired model fits (or timeseries data)
+and over some time span.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts_description</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Timeseries whose fits to use.</p></li>
 <li><p><strong>fit_list</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – List of strings containing the model names of the subset of the fitted models
 to be used. <code class="docutils literal notranslate"><span class="pre">None</span></code> defaults to all fitted models.
-If <code class="docutils literal notranslate"><span class="pre">ts_description</span></code> does not contain any fits, and the trend of the timeseries
-itself is to be calculated, pass an empty list (<code class="docutils literal notranslate"><span class="pre">[]</span></code>).</p></li>
+If <code class="docutils literal notranslate"><span class="pre">ts_description</span></code> the trend of the timeseries itself is to be calculated,
+pass an empty list (<code class="docutils literal notranslate"><span class="pre">[]</span></code>).</p></li>
 <li><p><strong>components</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – List of the numerical indices of which components of the timeseries to use.
 <code class="docutils literal notranslate"><span class="pre">None</span></code> defaults to all components.</p></li>
 <li><p><strong>total</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – By default, the function will return the trend per <code class="docutils literal notranslate"><span class="pre">time_unit</span></code>.

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Timeseries &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>Timeseries &mdash; DISSTANS 2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -40,7 +40,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -1130,8 +1130,7 @@ matrix for a single time.</p>
 <dt class="sig sig-object py" id="disstans.timeseries.GipsyTimeseries">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">GipsyTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>.</p>
-<p>Timeseries subclass for GNSS measurements in JPL’s Gipsy <code class="docutils literal notranslate"><span class="pre">.tseries</span></code> file format.
-The data and (co)variances are converted into millimeters (squared).</p>
+<p>Timeseries subclass for GNSS measurements in JPL’s Gipsy(X) <code class="docutils literal notranslate"><span class="pre">.tseries</span></code> file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1176,8 +1175,6 @@ The data and (co)variances are converted into millimeters (squared).</p>
 </tbody>
 </table>
 <p>Time is GPS time, and the time series are relative to each station’s first epoch.</p>
-<p>(Note that the documentation says covariance, but it is actually correlation,
-as per personal communication with Angelyn Moore, JPL.)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="disstans.timeseries.GipsyTimeseries.get_arch">
 <span class="sig-name descname"><span class="pre">get_arch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#GipsyTimeseries.get_arch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.GipsyTimeseries.get_arch" title="Permalink to this definition"></a></dt>
@@ -1209,8 +1206,7 @@ the Timeseries instance (provided the data file is available).</p>
 <dt class="sig sig-object py" id="disstans.timeseries.UNRTimeseries">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">disstans.timeseries.</span></span><span class="sig-name descname"><span class="pre">UNRTimeseries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/timeseries.html#UNRTimeseries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.timeseries.UNRTimeseries" title="Permalink to this definition"></a></dt>
 <dd><p>Subclasses <a class="reference internal" href="#disstans.timeseries.Timeseries" title="disstans.timeseries.Timeseries"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timeseries</span></code></a>.</p>
-<p>Timeseries subclass for GNSS measurements in UNR’s <code class="docutils literal notranslate"><span class="pre">.tenv3</span></code> file format.
-The data and (co)variances are converted into millimeters (squared).</p>
+<p>Timeseries subclass for GNSS measurements in UNR’s <code class="docutils literal notranslate"><span class="pre">.tenv3</span></code> file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

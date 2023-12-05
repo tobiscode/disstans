@@ -106,7 +106,6 @@ if __name__ == "__main__":
     net.call_netwide_func("decompose", ts_in="raw_filt_res", ts_out="common",
                           method="ica", rng=np.random.default_rng(0))
     # now remove the common mode, call it the "intermed" timeseries,
-    # now remove the common mode, call it the "intermed" timeseries,
     for station in net:
         station.add_timeseries("intermed", station["raw_clean"] - station["common"],
                                override_data_cols=station["raw"].data_cols)
@@ -555,8 +554,21 @@ if __name__ == "__main__":
     lvc_data_transient_main = {name: (lvc_data_transient[name][:, :2] @ R(rots[name]))[:, 0]
                                for name in lvc_names}
 
+    # calculate optimal offsets between lines
+    uniq_t = np.unique([i for name in rots_sort_dist.keys() for i in lvc_data[name].index]
+                       ).astype(np.datetime64)
+    full_by_dist = np.full((len(rots_sort_dist), uniq_t.size), np.NaN)
+    for i, name in enumerate(rots_sort_dist.keys()):
+        full_by_dist[i, np.isin(uniq_t, lvc_data[name].index.values)] = \
+            lvc_data_transient_main[name] - lvc_data_transient_main[name][0]
+    temp = full_by_dist[0, :].copy()
+    offsets = [0]
+    for i in range(1, len(rots_sort_dist)):
+        o = -np.nanmin(full_by_dist[i, :] - temp) + 20
+        offsets.append(o)
+        temp = np.fmax(full_by_dist[i - 1, :], full_by_dist[i, :] + o)
+
     # start transient plot by distance
-    offsets = [0, 30, 80, 125, 155, 205, 245, 285, 345, 330, 430, 465, 500, 540]
     fig, ax = plt.subplots(figsize=(5, 8))
     for i, name in enumerate(rots_sort_dist.keys()):
         ax.plot(lvc_data[name].index,
@@ -565,27 +577,11 @@ if __name__ == "__main__":
         ax.plot(lvc_data[name].index,
                 lvc_transient_main[name] - lvc_data_transient_main[name][0] + offsets[i])
         if name == "CASA":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
-                               offsets[i] + 30), ha="left", va="bottom")
-        elif name == "CA99":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"),
-                               offsets[i] - 30), ha="center", va="bottom")
-        elif name == "KRAC":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
-                               offsets[i] + 10), ha="right", va="center")
-        elif name == "DDMN":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
-                               offsets[i] - 10), ha="right", va="center")
-        elif name == "BALD":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
-                               offsets[i] - 10), ha="right", va="center")
-        elif name == "WATC":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
-                               offsets[i] + 10), ha="right", va="center")
+            ax.annotate(name, (lvc_data[name].index[0],
+                               offsets[i] + 20), ha="left", va="bottom")
         else:
             ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
                                offsets[i]), ha="right", va="center")
-        if name != "CASA":
             ax.annotate(f"{rots[name]:.0f}°",
                         (lvc_data[name].index[-1] + pd.Timedelta(100, "D"),
                          lvc_transient_main[name][-1] - lvc_data_transient_main[name][0]
@@ -601,8 +597,19 @@ if __name__ == "__main__":
     fig.savefig(plot_dir / f"example_1g_expansion_dist.{fmt}", dpi=300)
     plt.close(fig)
 
+    # calculate optimal indices by azimuth
+    full_by_azim = np.full((len(rots_sort_azim), uniq_t.size), np.NaN)
+    for i, name in enumerate(rots_sort_azim.keys()):
+        full_by_azim[i, np.isin(uniq_t, lvc_data[name].index.values)] = \
+            lvc_data_transient_main[name] - lvc_data_transient_main[name][0]
+    temp = full_by_azim[0, :].copy()
+    offsets = [0]
+    for i in range(1, len(rots_sort_azim)):
+        o = -np.nanmin(full_by_azim[i, :] - temp) + 20
+        offsets.append(o)
+        temp = np.fmax(full_by_azim[i - 1, :], full_by_azim[i, :] + o)
+
     # start transient plot by azimuth
-    offsets = [0, 50, 70, 90, 145, 165, 210, 250, 280, 310, 360, 405, 445, 485]
     fig, ax = plt.subplots(figsize=(5, 8))
     for i, name in enumerate(rots_sort_azim.keys()):
         ax.plot(lvc_data[name].index,
@@ -611,18 +618,11 @@ if __name__ == "__main__":
         ax.plot(lvc_data[name].index,
                 lvc_transient_main[name] - lvc_data_transient_main[name][0] + offsets[i])
         if name == "CASA":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"), offsets[i] + 30),
-                        ha="left", va="bottom")
-        elif name == "CA99":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(50, "D"), offsets[i] + 10),
-                        ha="center", va="bottom")
-        elif name == "TILC":
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"), offsets[i] + 10),
-                        ha="right", va="center")
+            ax.annotate(name, (lvc_data[name].index[0],
+                               offsets[i] + 30), ha="left", va="bottom")
         else:
-            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"), offsets[i]),
-                        ha="right", va="center")
-        if name != "CASA":
+            ax.annotate(name, (lvc_data[name].index[0] - pd.Timedelta(100, "D"),
+                               offsets[i]), ha="right", va="center")
             ax.annotate(f"{rots[name]:.0f}°",
                         (lvc_data[name].index[-1] + pd.Timedelta(100, "D"),
                          lvc_transient_main[name][-1] - lvc_data_transient_main[name][0]
