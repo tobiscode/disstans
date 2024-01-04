@@ -610,7 +610,7 @@ def linear_regression(ts: Timeseries,
     else:
         GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
                                      use_data_cov=use_data_covariance)
-        bounds = ((bd_lower, bd_upper) if check_constraints
+        bounds = ((bd_lower.ravel(), bd_upper.ravel()) if check_constraints
                   else (-np.inf, np.inf))
         params = sp.optimize.lsq_linear(GtWG, GtWd, bounds=bounds).x.reshape(num_obs, num_comps)
         if formal_covariance:
@@ -741,9 +741,9 @@ def ridge_regression(ts: Timeseries,
                                      use_data_cov=use_data_covariance)
         reg = np.diag((reg_indices.reshape(-1, 1) * penalty.reshape(1, -1)).ravel())
         GtWGreg = GtWG + reg
-        bounds = ((bd_lower, bd_upper) if check_constraints
+        bounds = ((bd_lower.ravel(), bd_upper.ravel()) if check_constraints
                   else (-np.inf, np.inf))
-        params = sp.optimize.lsq_linear(GtWGreg, GtWd).x.reshape(num_obs, num_comps)
+        params = sp.optimize.lsq_linear(GtWGreg, GtWd, bounds=bounds).x.reshape(num_obs, num_comps)
         if formal_covariance:
             cov = sp.linalg.pinvh(GtWGreg)
 
