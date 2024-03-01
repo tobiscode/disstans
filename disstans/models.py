@@ -123,7 +123,7 @@ class Model():
             f"got {self.num_parameters}."
         self.regularize = bool(regularize)
         """ Indicate to solvers to regularize this model (``True``) or not. """
-        self.time_unit = str(time_unit)
+        self.time_unit = None if time_unit is None else str(time_unit)
         """ Stores the time unit of the parameters as a string. """
         self.t_start_str = None if t_start is None else str(t_start)
         """ String representation of the start time (or ``None``). """
