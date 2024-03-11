@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python>=3.11
+  - python=3.11
   - numpy>=1.26
   - pandas>=2.1
   - scipy>=1.11
@@ -16,7 +16,7 @@ dependencies:
   - cvxopt
   - tqdm
   - sqlalchemy
-  - ffmpeg
+  - ffmpeg=5
   - jupyterlab  # optional
   - sphinx>=5.3  # optional
   - docutils  # optional
