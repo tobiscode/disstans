@@ -40,7 +40,7 @@ class Timeseries():
     data_cols
         List of strings with the names of the columns of ``dataframe`` that
         contain the data.
-        The length cooresponds to the number of components :attr:`~num_components`.
+        The length corresponds to the number of components :attr:`~num_components`.
     var_cols
         List of strings with the names of the columns of ``dataframe`` that contain the
         data's variance.
@@ -1164,6 +1164,11 @@ class GipsyTimeseries(Timeseries):
         If ``True``, warn if there are data inconsistencies encountered while loading.
     data_unit
         Can be ``'mm'`` or ``'m'``.
+    keep_duplicates
+        Argument passed on to :class:`~pandas.DataFrame.drop_duplicates` as the ``keep``
+        parameter when finding duplicate times, but with ``False`` as the default
+        (since duplicate timestamps usually imply bad data - legacy behavior would be
+        to pass ``'first'``).
 
 
     Additional keyword arguments will be passed onto :class:`~Timeseries`.
@@ -1199,9 +1204,11 @@ repro2018a/raw/position/envseries/0000_README.format
                  path: str,
                  show_warnings: bool = True,
                  data_unit: Literal["mm", "m"] = "mm",
+                 keep_duplicates: Literal["first", "last", False] = False,
                  **kw_args
                  ) -> None:
         self._path = str(path)
+        self._keep_duplicates = keep_duplicates
         if data_unit == "m":
             factor = 1
         elif data_unit == "mm":
@@ -1231,12 +1238,16 @@ repro2018a/raw/position/envseries/0000_README.format
         data.loc[:, var_cols + cov_cols] *= factor**2
         # combine dataframe with time
         df = time.join(data)
-        # check for duplicate timestamps and create time index
+        # check for duplicate timestamps
         num_duplicates = int(df.duplicated(subset="time").sum())
-        if show_warnings and (num_duplicates > 0):
-            warn(f"Timeseries file {self._path} contains data for {num_duplicates} "
-                 "duplicate dates. Keeping first occurrences.", stacklevel=2)
-        df = df.drop_duplicates(subset="time").set_index("time")
+        if num_duplicates > 0:
+            if show_warnings:
+                warn(f"Timeseries file {self._path} contains data for {num_duplicates} "
+                     f"duplicate times, dealing with them using 'keep={self._keep_duplicates}'.",
+                     stacklevel=2)
+            df.drop_duplicates(subset="time", keep=self._keep_duplicates, inplace=True)
+        # create time index
+        df.set_index("time", inplace=True)
         # check for monotonic time index
         if not df.index.is_monotonic_increasing:
             warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.",
@@ -1262,7 +1273,8 @@ repro2018a/raw/position/envseries/0000_README.format
         Timeseries.get_arch : For further information.
         """
         return {"type": "GipsyTimeseries",
-                "kw_args": {"path": self._path}}
+                "kw_args": {"path": self._path,
+                            "keep_duplicates": self._keep_duplicates}}
 
 
 GipsyXTimeseries = GipsyTimeseries
