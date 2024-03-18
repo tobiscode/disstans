@@ -140,7 +140,7 @@ if __name__ == "__main__":
     # load MIDAS velocities
     print("Reading MIDAS and GAGE velocities... ", end="", flush=True)
     v_mdl_midas = pd.read_csv(fname_midas,
-                              header=0, delim_whitespace=True,
+                              header=0, delimiter=r"\s+",
                               names=["sta", "label", "t(1)", "t(m)", "delt", "m", "mgood",
                                      "n", "ve50", "vn50", "vu50", "sve", "svn", "svu",
                                      "xe50", "xn50", "xu50", "fe", "fn", "fu",

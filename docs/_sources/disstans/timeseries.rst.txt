@@ -14,7 +14,7 @@ Specialized Classes
 -------------------
 
 GipsyTimeseries
-..................
+...............
 
 .. autoclass:: disstans.timeseries.GipsyTimeseries
    :members:

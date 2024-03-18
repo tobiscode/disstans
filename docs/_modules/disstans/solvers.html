@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.solvers &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>disstans.solvers &mdash; DISSTANS 2.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1016,7 +1016,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">build_LS</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">obs_indices</span><span class="p">,</span> <span class="n">use_data_var</span><span class="o">=</span><span class="n">use_data_variance</span><span class="p">,</span>
                                      <span class="n">use_data_cov</span><span class="o">=</span><span class="n">use_data_covariance</span><span class="p">)</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">((</span><span class="n">bd_lower</span><span class="p">,</span> <span class="n">bd_upper</span><span class="p">)</span> <span class="k">if</span> <span class="n">check_constraints</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">((</span><span class="n">bd_lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">bd_upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="k">if</span> <span class="n">check_constraints</span>
                   <span class="k">else</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">lsq_linear</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_obs</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">formal_covariance</span><span class="p">:</span>
@@ -1147,9 +1147,9 @@
                                      <span class="n">use_data_cov</span><span class="o">=</span><span class="n">use_data_covariance</span><span class="p">)</span>
         <span class="n">reg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">((</span><span class="n">reg_indices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">penalty</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
         <span class="n">GtWGreg</span> <span class="o">=</span> <span class="n">GtWG</span> <span class="o">+</span> <span class="n">reg</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">((</span><span class="n">bd_lower</span><span class="p">,</span> <span class="n">bd_upper</span><span class="p">)</span> <span class="k">if</span> <span class="n">check_constraints</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">((</span><span class="n">bd_lower</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">bd_upper</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="k">if</span> <span class="n">check_constraints</span>
                   <span class="k">else</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">lsq_linear</span><span class="p">(</span><span class="n">GtWGreg</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_obs</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">lsq_linear</span><span class="p">(</span><span class="n">GtWGreg</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_obs</span><span class="p">,</span> <span class="n">num_comps</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">formal_covariance</span><span class="p">:</span>
             <span class="n">cov</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">GtWGreg</span><span class="p">)</span>
 
@@ -1412,7 +1412,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iters</span><span class="p">):</span>  <span class="c1"># always solve at least once</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">problem</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">enforce_dpp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cvxpy_kw_args</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">cp</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">SolverError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="c1"># no solution found, but actually a more serious problem</span>
                 <span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
                 <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1560,7 +1560,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.models &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>disstans.models &mdash; DISSTANS 2.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1462,12 +1462,12 @@
                   <span class="o">*</span> <span class="p">(</span><span class="n">in_power</span> <span class="o">*</span> <span class="p">(</span><span class="n">in_power</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degree</span><span class="p">))</span>
         <span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">in_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degree</span><span class="p">)</span>
         <span class="c1"># to avoid numerical issues, set to zero manually outside of valid domains</span>
-        <span class="n">coefs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tnorm</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">coefs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tnorm</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># to avoid even more numerical issues, set a basis function to zero if we only</span>
         <span class="c1"># observe (somewhat arbitrarily) some fraction of the spline&#39;s valid domain</span>
         <span class="c1"># (setting an entire column to zero will make the calling get_mapping() method</span>
         <span class="c1"># flag this parameter as unobservable)</span>
-        <span class="n">del_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">del_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">set_unobservable</span> <span class="o">=</span> <span class="n">del_t</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">observability_scale</span>
         <span class="n">coefs</span><span class="p">[:,</span> <span class="n">set_unobservable</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">coefs</span></div>
@@ -1601,13 +1601,13 @@
                   <span class="o">*</span> <span class="p">(</span><span class="n">in_power</span> <span class="o">*</span> <span class="p">(</span><span class="n">in_power</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">in_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># to avoid numerical issues, set to zero or one manually outside of valid domains</span>
-        <span class="n">coefs</span><span class="p">[</span><span class="n">tnorm</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span> <span class="o">&lt;</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">coefs</span><span class="p">[</span><span class="n">tnorm</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">coefs</span><span class="p">[</span><span class="n">tnorm</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">coefs</span><span class="p">[</span><span class="n">tnorm</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="c1"># to avoid even more numerical issues, set a basis function to zero if we only</span>
         <span class="c1"># observe (somewhat arbitrarily) &lt; a scale length</span>
         <span class="c1"># (setting an entire column to zero will make the calling get_mapping() method</span>
         <span class="c1"># flag this parameter as unobservable)</span>
-        <span class="n">del_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">del_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">trel</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">set_unobservable</span> <span class="o">=</span> <span class="n">del_t</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">observability_scale</span>
         <span class="n">coefs</span><span class="p">[:,</span> <span class="n">set_unobservable</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">coefs</span></div>
@@ -2085,8 +2085,6 @@
 <span class="sd">        Degree of the splines to be created.</span>
 <span class="sd">    t_center_start</span>
 <span class="sd">        First center time of the spline set.</span>
-<span class="sd">    time_unit</span>
-<span class="sd">        Time unit of scale, spacing and model parameters.</span>
 <span class="sd">    list_scales</span>
 <span class="sd">        List of scales to use for each of the sub-splines.</span>
 <span class="sd">    list_num_splines</span>
@@ -2103,7 +2101,7 @@
                  <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">t_center_start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span>
                  <span class="n">list_scales</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-                 <span class="n">list_num_splines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                 <span class="n">list_num_splines</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                  <span class="n">time_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
                  <span class="n">splineclass</span><span class="p">:</span> <span class="n">BSpline</span> <span class="o">|</span> <span class="n">ISpline</span> <span class="o">=</span> <span class="n">ISpline</span><span class="p">,</span>
                  <span class="n">regularize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -3719,7 +3717,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

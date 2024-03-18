@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Models &mdash; DISSTANS 2.0rc0 documentation</title>
+  <title>Models &mdash; DISSTANS 2.0.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -40,7 +40,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -2535,10 +2535,9 @@ manually.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Degree of the splines to be created.</p></li>
 <li><p><strong>t_center_start</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.1.1/reference/api/pandas.Timestamp.html#pandas.Timestamp" title="(in pandas v2.1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Timestamp</span></code></a>) – First center time of the spline set.</p></li>
-<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">'D'</span></code>) – Time unit of scale, spacing and model parameters.</p></li>
 <li><p><strong>list_scales</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]) – List of scales to use for each of the sub-splines.</p></li>
-<li><p><strong>list_num_splines</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – Number of splines to create for each scale.</p></li>
-<li><p><strong>time_unit</strong> – Time unit of scale, spacing and model parameters.</p></li>
+<li><p><strong>list_num_splines</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – Number of splines to create for each scale.</p></li>
+<li><p><strong>time_unit</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">'D'</span></code>) – Time unit of scale, spacing and model parameters.</p></li>
 <li><p><strong>splineclass</strong> (<a class="reference internal" href="#disstans.models.BSpline" title="disstans.models.BSpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">BSpline</span></code></a> | <a class="reference internal" href="#disstans.models.ISpline" title="disstans.models.ISpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISpline</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">&lt;class</span> <span class="pre">'disstans.models.ISpline'&gt;</span></code>) – Model class to use for the splines.</p></li>
 </ul>
 </dd>
@@ -2718,7 +2717,7 @@ h_j (t) \sin \left( \omega t \right) \right)\]</div>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

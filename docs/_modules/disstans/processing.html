@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 2.0 documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 2.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
@@ -36,7 +36,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0
+                2.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -837,7 +837,7 @@
                                                  <span class="o">&lt;</span> <span class="n">q1</span> <span class="o">-</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">,</span>
                                                  <span class="n">residual</span><span class="p">[</span><span class="n">mask_copy</span><span class="p">]</span>
                                                  <span class="o">&gt;</span> <span class="n">q3</span> <span class="o">+</span> <span class="n">clean_settings</span><span class="p">[</span><span class="s2">&quot;iqr_outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">iqr</span><span class="p">)</span>
-            <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+            <span class="n">ts</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">dcol</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
             <span class="n">residual</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">ts_ref</span><span class="p">[</span><span class="n">dcol</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span>
         <span class="c1"># check for minimum number of clean observations</span>
@@ -1681,7 +1681,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

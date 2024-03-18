@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 2.0 documentation</title>
+  <title>Example 2: Long Valley Caldera Comparisons &mdash; DISSTANS 2.0.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
@@ -39,7 +39,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0
+                2.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -547,7 +547,7 @@ and from the Geodesy Advancing Geosciences and EarthScope (GAGE) facility (<a cl
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># MIDAS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fname_midas</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">/midas.IGS14.txt&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">v_mdl_midas</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fname_midas</span><span class="p">,</span>
-<span class="gp">... </span>                          <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>                          <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                          <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sta&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;t(1)&quot;</span><span class="p">,</span> <span class="s2">&quot;t(m)&quot;</span><span class="p">,</span> <span class="s2">&quot;delt&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;mgood&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                                 <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;ve50&quot;</span><span class="p">,</span> <span class="s2">&quot;vn50&quot;</span><span class="p">,</span> <span class="s2">&quot;vu50&quot;</span><span class="p">,</span> <span class="s2">&quot;sve&quot;</span><span class="p">,</span> <span class="s2">&quot;svn&quot;</span><span class="p">,</span> <span class="s2">&quot;svu&quot;</span><span class="p">,</span>
 <span class="gp">... </span>                                 <span class="s2">&quot;xe50&quot;</span><span class="p">,</span> <span class="s2">&quot;xn50&quot;</span><span class="p">,</span> <span class="s2">&quot;xu50&quot;</span><span class="p">,</span> <span class="s2">&quot;fe&quot;</span><span class="p">,</span> <span class="s2">&quot;fn&quot;</span><span class="p">,</span> <span class="s2">&quot;fu&quot;</span><span class="p">,</span>
@@ -854,7 +854,7 @@ doi:<a class="reference external" href="https://doi.org/10.1002/2016RG000529">10
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
