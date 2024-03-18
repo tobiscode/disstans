@@ -44,6 +44,9 @@ and explained as follows:
 |             |                        | ``std_outliers`` standard deviations away from    |
 |             |                        | the reference.                                    |
 +-------------+------------------------+---------------------------------------------------+
+|             | ``std_bad``            | Outliers are defined by having an absolute        |
+|             |                        | standard deviation of at least ``std_bad``.       |
++-------------+------------------------+---------------------------------------------------+
 |             | ``iqr_outlier``        | Outliers are defined by being at least            |
 |             |                        | ``iqr_outliers`` inter-quartile ranges (IQR,      |
 |             |                        | difference between the 25th and 75th percentile)  |
@@ -94,6 +97,7 @@ defaults["gui"] = {"projection": "Mercator",
 # cleaning timeseries
 defaults["clean"] = {"min_obs": 100,
                      "std_outlier": 10,
+                     "std_bad": None,
                      "iqr_outlier": None,
                      "min_clean_obs": 100,
                      "std_thresh": 100}

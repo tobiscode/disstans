@@ -380,6 +380,8 @@ def clean(station: Station,
     - ``'min_obs'``: Minimum number of observations the timeseries has to contain.
     - ``'std_outlier'``: Classify as an outlier any observation that is this many
       standard deviations away from the reference.
+    - ``'std_bad'``: Classify as an outlier any observation that has an absolute standard
+      deviation larger than this.
     - ``'iqr_outlier'``: Classify as an outlier any observation that is this many
       inter-quartile ranges (IQR, difference between the 25th and 75th percentile)
       away from the reference's 25th-75th percentile range.
@@ -446,11 +448,24 @@ def clean(station: Station,
     if not ts_ref.data_cols == ts.data_cols:
         raise ValueError("Reference time series has to have the same data columns as "
                          f"input time series, but got {ts_ref.data_cols} and {ts.data_cols}.")
+    # find variance columns if necessary
+    if clean_settings["std_bad"] is not None:
+        if station[ts_in].var_cols is None:
+            check_bad = False
+        else:
+            d2v = {station[ts_in].data_cols[i]: station[ts_in].var_cols[i]
+                   for i in range(ts.num_components)}
+            check_bad = True
+    # iterate cleaning over all data components
     for dcol in ts.data_cols:
         # check for minimum number of observations
         if ts[dcol].count() < clean_settings["min_obs"]:
             ts.mask_out(dcol)
             continue
+        # remove outliers by absolute uncertainty
+        if (clean_settings["std_bad"] is not None) and check_bad:
+            mask_bad = station[ts_in][d2v[dcol]] >= clean_settings["std_bad"] ** 2
+            ts.df.loc[mask_bad, dcol] = np.NaN
         # compute residuals
         if (clean_settings["std_outlier"] is not None) \
            or (clean_settings["iqr_outlier"] is not None) \
