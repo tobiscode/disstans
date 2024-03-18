@@ -473,7 +473,7 @@ def clean(station: Station,
                                                  < q1 - clean_settings["iqr_outlier"] * iqr,
                                                  residual[mask_copy]
                                                  > q3 + clean_settings["iqr_outlier"] * iqr)
-            ts[dcol][mask] = np.NaN
+            ts.df.loc[mask, dcol] = np.NaN
             residual = ts[dcol].values - ts_ref[dcol].values
             sd = np.nanstd(residual)
         # check for minimum number of clean observations
