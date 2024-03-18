@@ -432,6 +432,37 @@ class Timeseries():
                                  (self.num_components, self.num_components))
         return cov_mat
 
+    def check_covariances(self) -> np.ndarray:
+        r"""
+        Check the covariance for each observation and determine whether it's
+        positive-definite or not.
+
+        Returns
+        -------
+            An boolean array of size :math:`(\text{n_observations}, )` containing
+            the result of the positive-definite check (``True`` if passed).
+        """
+        # quick check
+        if self._cov_cols is None:
+            raise ValueError("No covariances present to check.")
+        # prepare input and output
+        varcov = self.var_cov.values
+        is_posdef = np.full(self.num_observations, False, dtype=bool)
+        # loop over timestamps
+        for i in range(self.num_observations):
+            # test using Cholesky decomposition
+            try:
+                # skip all the checks that Timeseries.cov_at does
+                _ = np.linalg.cholesky(np.reshape(varcov[i, self.var_cov_map],
+                                                  (self.num_components, self.num_components)))
+                is_posdef[i] = True
+            # catch if not positive-definite
+            except np.linalg.LinAlgError as e:
+                if "Matrix is not positive definite" not in str(e):
+                    raise e
+        # done
+        return is_posdef
+
     def cut(self,
             t_min: pd.Timestamp | str | None = None,
             t_max: pd.Timestamp | str | None = None,
