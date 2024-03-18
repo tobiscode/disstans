@@ -313,7 +313,7 @@ class Network():
         return station_list
 
     def export_network_ts(self,
-                          ts_description: str | (str, str),
+                          ts_description: str | tuple[str, str],
                           subset_stations: list[str] | None = None
                           ) -> dict[str, Timeseries]:
         """
@@ -1651,8 +1651,8 @@ class Network():
                 stat.add_fit(ts_description, fit, model_description)
 
     @staticmethod
-    def _evaluate_single_station(parameter_tuple: (pd.Series | pd.DatetimeIndex,
-                                                   ModelCollection)
+    def _evaluate_single_station(parameter_tuple: tuple[pd.Series | pd.DatetimeIndex,
+                                                        ModelCollection]
                                  ) -> tuple[dict[str, np.ndarray],
                                             dict[str, dict[str, np.ndarray]]]:
         station_time, station_models = parameter_tuple
