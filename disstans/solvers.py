@@ -526,7 +526,7 @@ def linear_regression(ts: Timeseries,
                       check_constraints: bool = True
                       ) -> Solution:
     r"""
-    Performs linear, unregularized least squares using :mod:`~scipy.linalg`.
+    Performs linear, unregularized least squares using :mod:`~scipy.optimize.lsq_linear`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single mapping matrix
@@ -630,7 +630,7 @@ def ridge_regression(ts: Timeseries,
                      check_constraints: bool = True
                      ) -> Solution:
     r"""
-    Performs linear, L2-regularized least squares using :mod:`~scipy.linalg`.
+    Performs linear, L2-regularized least squares using :mod:`~scipy.optimize.lsq_linear`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single mapping matrix
@@ -875,8 +875,8 @@ def lasso_regression(ts: Timeseries,
 
     The L0-regularization approximation used by setting ``reweight_max_iters >= 0`` is based
     on [candes08]_. The idea here is to iteratively reduce the cost (before multiplication
-    with :math:`\lambda`) of regularized, but significant parameters to 1, and iteratively
-    increasing the cost of a regularized, but small parameter to a much larger value.
+    with :math:`\lambda`) of regularized, but significant, parameters to 0, and iteratively
+    increase the cost of a regularized, but small, parameter to a much larger value.
 
     This is achieved by introducing an additional parameter vector :math:`\mathbf{w}`
     of the same shape as the regularized parameters, inserting it into the L1 cost,

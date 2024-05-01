@@ -798,6 +798,37 @@ class Network():
                 if ts_description in station.timeseries:
                     station.remove_timeseries(ts_description)
 
+    def copy_timeseries(self,
+                        origin_ts: str,
+                        target_ts: str,
+                        with_models: bool = True,
+                        ts_copy_kw_args: dict = {},
+                        mdl_copy_kw_args: dict = {},
+                        ) -> None:
+        """
+        Convenience function that copies a timeseries to a new one for all
+        stations in the network.
+
+        Parameters
+        ----------
+        origin_ts
+            Name of the timeseries to copy.
+        target_ts
+            Name of the new, copied timeseries.
+        with_models
+            If ``True``, also copy the model definitions.
+        ts_copy_kw_args
+            Passed on to :meth:`~disstans.timeseries.Timeseries.copy`.
+        mdl_copy_kw_args
+            Passed on to :meth:`~disstans.models.ModelCollection.copy`.
+        """
+        for station in self:
+            if origin_ts in station.timeseries.keys():
+                station[target_ts] = station[origin_ts].copy(**ts_copy_kw_args)
+                if with_models:
+                    station.models[target_ts] = \
+                        station.models[origin_ts].copy(**mdl_copy_kw_args)
+
     def copy_uncertainties(self, origin_ts: str, target_ts: str) -> None:
         """
         Convenience function that copies the uncertainties of one timeseries
