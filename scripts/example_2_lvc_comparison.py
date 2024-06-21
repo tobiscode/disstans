@@ -176,7 +176,7 @@ if __name__ == "__main__":
     station_lolaal = net.station_locations.loc[
         common_stations, ["Longitude [°]", "Latitude [°]", "Altitude [m]"]].to_numpy()
     lons, lats, alts = station_lolaal[:, 0], station_lolaal[:, 1], station_lolaal[:, 2]
-    inner_bbox = [-119-12/60, -118-33/60, 37+30/60, 37+50/60]
+    inner_bbox = [-119 - 12 / 60, -118 - 33 / 60, 37 + 30 / 60, 37 + 50 / 60]
     inner_shell = ((lons > 360 + inner_bbox[0]) &
                    (lons < 360 + inner_bbox[1]) &
                    (lats > inner_bbox[2]) &

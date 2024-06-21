@@ -260,7 +260,7 @@ def make_cov_index_map(num_components: int) -> tuple[np.ndarray, np.ndarray]:
 
     """
     index_map = np.empty((num_components, num_components))
-    index_map[:] = np.NaN
+    index_map[:] = np.nan
     seq_ix = 0
     for irow in range(num_components):
         for icol in range(irow + 1, num_components):
@@ -375,7 +375,7 @@ def full_cov_mat_to_columns(cov_mat: np.ndarray,
         assert raveled_indices.size == cov_dims
         covariance = np.empty((num_elements, cov_dims))
         for iobs, iblock in zip(range(num_elements),
-                                range(0, num_components*num_elements, num_components)):
+                                range(0, num_components * num_elements, num_components)):
             sub_mat = cov_mat[iblock:iblock + num_components,
                               iblock:iblock + num_components]
             covariance[iobs, :] = sub_mat.ravel()[raveled_indices]
@@ -457,8 +457,8 @@ def cov2corr(cov: np.ndarray) -> np.ndarray:
     var_nonzero = np.flatnonzero(var)
     cov_nonzero = np.ix_(var_nonzero, var_nonzero)
     corr = np.empty_like(cov)
-    corr[:] = np.NaN
-    Dinv = np.diag(1/np.sqrt(var[var_nonzero]))
+    corr[:] = np.nan
+    Dinv = np.diag(1 / np.sqrt(var[var_nonzero]))
     corr[cov_nonzero] = Dinv @ cov[cov_nonzero] @ Dinv
     return corr
 
@@ -613,9 +613,9 @@ def create_powerlaw_noise(size: int | list | tuple,
     freqs = np.fft.rfftfreq(size)
     # the scaling later can't handle zero frequency, so we need to set it
     # to the minimum frequency possible
-    freqs[0] = 1/size
+    freqs[0] = 1 / size
     # scale the frequencies
-    freqs_scaled = freqs**(-exponent/2)
+    freqs_scaled = freqs**(-exponent / 2)
     # create an empty array and loop over the dimensions
     out = np.empty([size, ndims])
     for idim in range(ndims):
@@ -1422,7 +1422,7 @@ def get_hom_vel_strain_rot(locations: np.ndarray,
     # build weight matrix
     if covariances is not None:
         if covariances.shape[1] == 2:
-            W = sparse.diags(1/np.concatenate([covariances[:, 0], covariances[:, 1]]))
+            W = sparse.diags(1 / np.concatenate([covariances[:, 0], covariances[:, 1]]))
         elif covariances.shape[1] == 3:
             Wblocks = [sp.linalg.pinvh(np.reshape(covariances[i, [0, 2, 2, 1]], (2, 2)))
                        for i in range(num_stations)]
@@ -1610,16 +1610,16 @@ def estimate_euler_pole(locations: np.ndarray,
     if enu:
         lon, lat = np.deg2rad(locations[:, 0]), np.deg2rad(locations[:, 1])
         # stacking of eq. 11 (note difference row ordering to match input format)
-        G = np.stack([-np.sin(lat)*np.cos(lon), -np.sin(lat)*np.sin(lon), np.cos(lat),
+        G = np.stack([-np.sin(lat) * np.cos(lon), -np.sin(lat) * np.sin(lon), np.cos(lat),
                       np.sin(lon), -np.cos(lon), np.zeros(num_stations)],
-                     axis=1).reshape(2*num_stations, 3) * 6378137
+                     axis=1).reshape(2 * num_stations, 3) * 6378137
     else:
         x, y, z = locations[:, 0], locations[:, 1], locations[:, 2]
         # stacking of eq. 2
         G = np.stack([np.zeros(num_stations), z, -y,
                       -z, np.zeros(num_stations), x,
                       y, -x, np.zeros(num_stations)],
-                     axis=1).reshape(3*num_stations, 3)
+                     axis=1).reshape(3 * num_stations, 3)
     # add uncertainties
     if covariances is not None:
         if not use_covs:
@@ -1687,8 +1687,8 @@ def rotvec2eulerpole(rotation_vector: np.ndarray,
     # uncertainty, eq. 18
     if rotation_covariance is not None:
         jac = np.array([[-ω_y / ω_xy_mag**2, ω_x / ω_xy_mag**2, 0],
-                        [-ω_x*ω_z / (ω_xy_mag * ω_mag**2),
-                         -ω_y*ω_z / (ω_xy_mag * ω_mag**2),
+                        [-ω_x * ω_z / (ω_xy_mag * ω_mag**2),
+                         -ω_y * ω_z / (ω_xy_mag * ω_mag**2),
                          -ω_xy_mag / ω_mag**2],
                         [ω_x / ω_mag, ω_y / ω_mag, ω_z / ω_mag]])
         euler_pole_covariance = jac @ rotation_covariance @ jac.T
@@ -1739,9 +1739,9 @@ def eulerpole2rotvec(euler_pole: np.ndarray,
     rotation_vector = np.array([ω_x, ω_y, ω_z])
     # uncertainty, eq. 6 (no scaling)
     if euler_pole_covariance is not None:
-        jac = np.array([[-Ω*cosΩlat*sinΩlon, -Ω*sinΩlat*cosΩlon, cosΩlat*cosΩlon],
-                        [Ω*cosΩlat*cosΩlon, -Ω*sinΩlat*sinΩlon, cosΩlat*sinΩlon],
-                        [0, Ω*cosΩlat, sinΩlat]])
+        jac = np.array([[-Ω * cosΩlat * sinΩlon, -Ω * sinΩlat * cosΩlon, cosΩlat * cosΩlon],
+                        [Ω * cosΩlat * cosΩlon, -Ω * sinΩlat * sinΩlon, cosΩlat * sinΩlon],
+                        [0, Ω * cosΩlat, sinΩlat]])
         rotation_covariance = jac @ euler_pole_covariance @ jac.T
     # return
     if euler_pole_covariance is not None:
@@ -1786,8 +1786,8 @@ def R_ecef2enu(lon: float, lat: float) -> np.ndarray:
         raise ValueError("Input longitude & latitude are not convertible to scalars "
                          f"(got {lon} and {lat}).").with_traceback(e.__traceback__) from e
     return np.array([[-np.sin(lon), np.cos(lon), 0],
-                     [-np.sin(lat)*np.cos(lon), -np.sin(lat)*np.sin(lon), np.cos(lat)],
-                     [np.cos(lat)*np.cos(lon), np.cos(lat)*np.sin(lon), np.sin(lat)]])
+                     [-np.sin(lat) * np.cos(lon), -np.sin(lat) * np.sin(lon), np.cos(lat)],
+                     [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)]])
 
 
 def R_enu2ecef(lon: float, lat: float) -> np.ndarray:
@@ -2530,7 +2530,7 @@ class RINEXDataHolding():
                  figsize: tuple | None = None,
                  saveas: str | None = None,
                  dpi: float | None = None,
-                 gui_kw_args: dict[str,  Any] = {}
+                 gui_kw_args: dict[str, Any] = {}
                  ) -> None:
         """
         Plot a map of all the stations present in the RINEX database.
@@ -2560,7 +2560,7 @@ class RINEXDataHolding():
         gui_settings.update(gui_kw_args)
         # get basemap
         fig, ax, proj_gui, proj_lla, stat_points, stat_names = \
-            self._create_map_figure(gui_settings, annotate_stations, figsize)
+            self._create_map_figure(gui_settings, annotate_stations, figsize)  # noqa: F841
         # add colors
         if metric in self.METRICCOLS:
             # get metric in the same order as the stations in the figure
@@ -2575,6 +2575,7 @@ class RINEXDataHolding():
             elif metric in ["age", "recency"]:
                 met_ref = min(met_fmt)
                 met_raw = np.array([(m - met_ref).total_seconds() for m in met_fmt])
+
                 # make a helper function for the tick formatting
                 @FuncFormatter  # noqa: E306
                 def tickformat(x, pos):
@@ -2582,6 +2583,7 @@ class RINEXDataHolding():
             # metric is a timedelta, need to convert
             elif metric == "length":
                 met_raw = np.array([m.value for m in met_fmt])
+
                 # make a helper function for the tick formatting
                 @FuncFormatter  # noqa: E306
                 def tickformat(x, pos):
@@ -2644,7 +2646,7 @@ class RINEXDataHolding():
             sort_stations = list(reversed(sorted([s.lower() for s in self.list_stations])))
         n_stations = len(sort_stations)
         # make an empty figure and start a color loop
-        fig, ax = plt.subplots(figsize=(6, 0.25*n_stations))
+        fig, ax = plt.subplots(figsize=(6, 0.25 * n_stations))
         colors = [plt.cm.tab10(i) for i in range(10)]
         icolor = 0
         n_files = []

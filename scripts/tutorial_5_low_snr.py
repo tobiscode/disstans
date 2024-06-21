@@ -88,7 +88,7 @@ if __name__ == "__main__":
     max_num_stations = 20
     station_names = [f"S{i:02d}" for i in range(1, max_num_stations + 1)]
     latlons = rng.uniform([-1, -1], [1, 1], (max_num_stations, 2))
-    x_range = np.arange(1, max_num_stations+1)
+    x_range = np.arange(1, max_num_stations + 1)
 
     # create timevector
     t_start_str = "2000-01-01"
@@ -96,12 +96,12 @@ if __name__ == "__main__":
     timevector = pd.date_range(start=t_start_str, end=t_end_str, freq="1D")
 
     # create an I-Spline model
-    ispl = ISpline(degree=2, scale=367/20, t_reference=t_start_str,
+    ispl = ISpline(degree=2, scale=367 / 20, t_reference=t_start_str,
                    time_unit="D", num_splines=21)
     # add a reversing transient in the middle
     ispl_params = np.zeros(ispl.num_parameters)
-    ispl_params[ispl.num_parameters//2-2] = 1
-    ispl_params[ispl.num_parameters//2+2] = -1
+    ispl_params[ispl.num_parameters // 2 - 2] = 1
+    ispl_params[ispl.num_parameters // 2 + 2] = -1
     ispl.read_parameters(ispl_params)
     # create all true timeseries
     truth = ispl.evaluate(timevector)["fit"]
@@ -124,11 +124,11 @@ if __name__ == "__main__":
             stat.add_timeseries("Synthetic",
                                 Timeseries.from_array(timevector=timevector,
                                                       data=synth[:, i].reshape(-1, 1),
-                                                      var=float(noise_sd)*np.ones((truth.size, 1)),
+                                                      var=np.full((truth.size, 1), noise_sd),
                                                       src="synth", data_unit="mm",
                                                       data_cols=["up"]))
             stat.add_local_model("Synthetic", "Transient",
-                                 ISpline(degree=1, scale=367/20, t_reference=t_start_str,
+                                 ISpline(degree=1, scale=367 / 20, t_reference=t_start_str,
                                          time_unit="D", num_splines=21))
             all_stations[stat_name] = stat
 
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         for r in tqdm(parallelize(run_single, all_iter_inputs), ascii=True,
                       desc="Looping over station/sample combos", total=len(all_iter_inputs)):
             i = r[2]
-            all_iter_rmses[i-2].append(r[0])
+            all_iter_rmses[i - 2].append(r[0])
             last_net = r[1]
 
         # since spatialfit doesn't work with one station, do the first fits manually
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     #         results[f"{noise_sd}_{pen}_{rw_func_scale}"] = pickle.load(fp)
 
     # plot for each penalty
-    x_range_small = np.linspace(0.5, max_num_stations+0.5, num=100)
+    x_range_small = np.linspace(0.5, max_num_stations + 0.5, num=100)
     cycleable_colors = ["#393b79", "#5254a3", "#6b6ecf", "#9c9ede", "#637939", "#8ca252",
                         "#b5cf6b", "#cedb9c", "#8c6d31", "#bd9e39", "#e7ba52", "#e7cb94",
                         "#843c39", "#ad494a", "#d6616b", "#e7969c", "#7b4173", "#a55194",
@@ -217,14 +217,14 @@ if __name__ == "__main__":
         fig, ax = plt.subplots(figsize=(6, 8))
         for i, noise_sd in enumerate(noise_sds):
             for j, rw_func_scale in enumerate(rw_func_scales):
-                col = cycleable_colors[i*4 + j]
+                col = cycleable_colors[i * 4 + j]
                 ecol = col + "30"
                 last_rmse = results[f"{noise_sd}_{pen}_{rw_func_scale}"]
                 mean_mean = np.array([np.mean(np.mean(rr, axis=1)) for rr in last_rmse])
                 mean_sd = np.array([np.std(np.mean(rr, axis=1)) for rr in last_rmse])
                 ax.errorbar(x=x_range, y=mean_mean, yerr=mean_sd, color=col, ecolor=ecol,
                             label=f"$\\sigma$={noise_sd}, $\\alpha$={rw_func_scale}")
-        ax.plot(x_range_small, 1/np.sqrt(x_range_small) * 2, c="0.5", ls=":", lw=1)
+        ax.plot(x_range_small, 1 / np.sqrt(x_range_small) * 2, c="0.5", ls=":", lw=1)
         ax.axhline(np.sqrt(np.mean(truth**2)), color="0.5", linewidth=1, linestyle="--", zorder=-1)
         ax.set_xscale("log")
         ax.set_xlim([0.8, max_num_stations + 3])
@@ -250,14 +250,14 @@ if __name__ == "__main__":
     for i, noise_sd in enumerate(noise_sds):
         if i == 0:
             continue
-        col = cycleable_colors[i*4 + j]
+        col = cycleable_colors[i * 4 + j]
         ecol = col + "30"
         last_rmse = results[f"{noise_sd}_{pen}_{rw_func_scale}"]
         mean_mean = np.array([np.mean(np.mean(rr, axis=1)) for rr in last_rmse])
         mean_sd = np.array([np.std(np.mean(rr, axis=1)) for rr in last_rmse])
         ax.errorbar(x=x_range, y=mean_mean, yerr=mean_sd, color=col, ecolor=ecol,
                     label=f"$\\sigma$={noise_sd}")
-    ax.plot(x_range_small, 1/np.sqrt(x_range_small) * 2, c="0.5", ls=":", lw=1)
+    ax.plot(x_range_small, 1 / np.sqrt(x_range_small) * 2, c="0.5", ls=":", lw=1)
     ax.axhline(np.sqrt(np.mean(truth**2)), color="0.5", linewidth=1, linestyle="--", zorder=-1)
     ax.set_xscale("log")
     ax.set_xlim([0.8, max_num_stations + 3])

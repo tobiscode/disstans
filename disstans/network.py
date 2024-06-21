@@ -71,7 +71,7 @@ class Network():
                  default_location_path: str | None = None,
                  auto_add: bool = False,
                  auto_add_filter: bool | None = None,
-                 default_local_models: dict[str,  Any] = {}
+                 default_local_models: dict[str, Any] = {}
                  ) -> None:
         self.name = str(name)
         """ Network name. """
@@ -511,8 +511,8 @@ class Network():
                   path: str,
                   add_default_local_models: bool = True,
                   no_pbar: bool = False,
-                  station_kw_args: dict[str,  Any] = {},
-                  timeseries_kw_args: dict[str,  Any] = {}
+                  station_kw_args: dict[str, Any] = {},
+                  timeseries_kw_args: dict[str, Any] = {}
                   ) -> Network:
         """
         Create a :class:`~disstans.network.Network` instance from a JSON configuration file.
@@ -1377,13 +1377,13 @@ class Network():
         assert num_components == num_uniques.size, f"Expected {num_components} data " \
             f"components from statistics, got {num_uniques.size}."
         arr_uniques = np.empty((spatial_reweight_iters + 1, num_components))
-        arr_uniques[:] = np.NaN
+        arr_uniques[:] = np.nan
         arr_uniques[0, :] = num_uniques
-        list_nonzeros = [np.NaN for _ in range(spatial_reweight_iters + 1)]
+        list_nonzeros = [np.nan for _ in range(spatial_reweight_iters + 1)]
         list_nonzeros[0] = num_nonzero
-        dict_rms_diff = {m: [np.NaN for _ in range(spatial_reweight_iters)]
+        dict_rms_diff = {m: [np.nan for _ in range(spatial_reweight_iters)]
                          for m in all_reweight_models}
-        dict_num_changed = {m: [np.NaN for _ in range(spatial_reweight_iters)]
+        dict_num_changed = {m: [np.nan for _ in range(spatial_reweight_iters)]
                             for m in all_reweight_models}
 
         # track parameters of weights of the reweighted models for early stopping
@@ -1512,13 +1512,13 @@ class Network():
                             penalty * np.ones((mdl.num_parameters, num_components))
             # next solver step
             if verbose:
-                tqdm.write(f"Fit after {i+1} reweightings")
+                tqdm.write(f"Fit after {i + 1} reweightings")
             solutions = self.fit(ts_description,
                                  solver="lasso_regression",
                                  return_solutions=True,
                                  local_input=new_net_weights,
                                  progress_desc=None if verbose
-                                 else f"Fit after {i+1} reweightings",
+                                 else f"Fit after {i + 1} reweightings",
                                  no_pbar=no_pbar,
                                  penalty=penalty,
                                  reweight_max_iters=local_reweight_iters,
@@ -1539,8 +1539,8 @@ class Network():
                                         > zero_threshold for s in valid_stations.values()]),
                                axis=0), axis=0) for m in all_reweight_models]), axis=0)
             # save statistics
-            arr_uniques[i+1, :] = num_uniques
-            list_nonzeros[i+1] = num_nonzero
+            arr_uniques[i + 1, :] = num_uniques
+            list_nonzeros[i + 1] = num_nonzero
             # print
             if verbose:
                 tqdm.write("Number of reweighted non-zero parameters: "
@@ -1561,7 +1561,7 @@ class Network():
                 num_changed = np.logical_xor(np.abs(old_params[mdl_description]) < zero_threshold,
                                              np.abs(stacked_params) < zero_threshold).sum()
                 early_stop &= (rms_diff < spatial_reweight_max_rms) or \
-                              (num_changed/num_total < spatial_reweight_max_changed)
+                              (num_changed / num_total < spatial_reweight_max_changed)
                 old_params[mdl_description] = stacked_params
                 # save statistics
                 dict_rms_diff[mdl_description][i] = rms_diff
@@ -2511,10 +2511,10 @@ class Network():
                 tc_arr_means[i, :, :] = np.ma.average(tc_arr,
                                                       axis=0, weights=distance_weights[i, :])
             # re-mask where original data was None
-            tc_arr_means[tc_arr.mask] = np.NaN
+            tc_arr_means[tc_arr.mask] = np.nan
             # set to NaN where the values is below minimum
             if min_change > 0:
-                tc_arr_means[np.abs(tc_arr_means) < min_change] = np.NaN
+                tc_arr_means[np.abs(tc_arr_means) < min_change] = np.nan
             # apply sign return type
             if return_signs:
                 tc_arr_means = np.sign(tc_arr_means)
@@ -2919,7 +2919,7 @@ class Network():
                     else:
                         trend[i, :] = stat_trend[:2]
                 else:
-                    trend[i, :] = np.NaN
+                    trend[i, :] = np.nan
                 # save uncertainty
                 if stat_trend_sigma is not None:
                     if stat_trend_sigma.size == 1:
@@ -2927,7 +2927,7 @@ class Network():
                     else:
                         trend_sigma[i, :] = stat_trend_sigma[:2]
                 else:
-                    trend_sigma[i, :] = np.NaN
+                    trend_sigma[i, :] = np.nan
             # plot arrows
             quiv = ax_map.quiver(np.array(stat_lons), np.array(stat_lats),
                                  trend[:, 0], trend[:, 1],
@@ -3271,7 +3271,7 @@ class Network():
                     splset = self[station_name].models[scalo_ts][scalo_model]
                     if isinstance(fig_scalo, plt.Figure):
                         plt.close(fig_scalo)
-                    fig_scalo, ax_scalo = splset.make_scalogram(t_left, t_right,
+                    fig_scalo, ax_scalo = splset.make_scalogram(t_left, t_right,  # noqa: F841
                                                                 **scalogram_kw_args)
                     # save figure or show
                     if save and not stepdetector:
@@ -3421,7 +3421,7 @@ class Network():
         gui_settings.update({"wmts_show": False})
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = \
-            self._create_map_figure(gui_settings, annotate_stations,
+            self._create_map_figure(gui_settings, annotate_stations,  # noqa: F841
                                     subset_stations=subset_stations,
                                     center_longitude=self.mean_longitude)
         gui_settings.update({"wmts_show": prev_wmts_show})
@@ -3473,7 +3473,7 @@ class Network():
 
         # get times and respective colors
         reltimes = ((disp_x.time - disp_x.time[0]) / pd.Timedelta(1, "D")).values
-        reltimes = (reltimes - reltimes[0])/(reltimes[-1] - reltimes[0])
+        reltimes = (reltimes - reltimes[0]) / (reltimes[-1] - reltimes[0])
         relcolors = scm.batlow(reltimes)
         relcolors[:, 3] = 0
         num_timesteps = relcolors.shape[0]
@@ -3485,13 +3485,13 @@ class Network():
         geoid = cgeod.Geodesic()
         stat_lonlats = {name: np.array(self[name].location)[[1, 0]].reshape(1, 2)
                         for name in rel_disp_x.keys()}
-        azi = {name: 90 - np.arctan2(rel_disp_y[name], rel_disp_x[name])*180/np.pi
+        azi = {name: 90 - np.arctan2(rel_disp_y[name], rel_disp_x[name]) * 180 / np.pi
                for name in rel_disp_x.keys()}
         dist = {name: np.sqrt(rel_disp_x[name]**2 + rel_disp_y[name]**2)
                 for name in rel_disp_x.keys()}
         disp_latlon = \
             {name: np.array(geoid.direct(stat_lonlats[name], azi[name],
-                                         dist[name]*scale)[:, :2])
+                                         dist[name] * scale)[:, :2])
              for name in rel_disp_x.keys()}
         lines = \
             {name: ax_map.scatter(disp_latlon[name][:, 0], disp_latlon[name][:, 1],
@@ -3505,7 +3505,7 @@ class Network():
                 src = WMTSRasterSource(wmts=gui_settings["wmts_server"],
                                        layer_name=gui_settings["wmts_layer"])
                 bbox = ax_map.get_window_extent().transformed(fig_map.dpi_scale_trans.inverted())
-                width_height_px = round(bbox.width*fig_map.dpi), round(bbox.height*fig_map.dpi)
+                width_height_px = round(bbox.width * fig_map.dpi), round(bbox.height * fig_map.dpi)
                 imgs = src.fetch_raster(proj_gui, ax_map.get_extent(), width_height_px)
                 for img in imgs:
                     ax_map.imshow(img.image, origin="upper", zorder=-1,
@@ -3533,7 +3533,7 @@ class Network():
                 ax_map.scatter(ref_loc[:, 0], ref_loc[:, 1],
                                facecolor=relcolors[:, :3], edgecolor="none",
                                zorder=10, transform=proj_lla, rasterized=True)
-                ax_map.annotate(legend_ref_dict["label"], ref_loc[num_timesteps//2, :],
+                ax_map.annotate(legend_ref_dict["label"], ref_loc[num_timesteps // 2, :],
                                 xytext=(0, -6), textcoords="offset points",
                                 ha="center", va="top", zorder=10, transform=proj_lla,
                                 xycoords=proj_lla._as_mpl_transform(ax_map))
@@ -3551,7 +3551,7 @@ class Network():
                 ax_map.set_title(f"{disp_x.time[0].date()} to {disp_x.time[0].date()}")
 
             def update(i):
-                relcolors[:i+1, 3] = 1
+                relcolors[:i + 1, 3] = 1
                 for name in rel_disp_x.keys():
                     lines[name].set_facecolors(relcolors)
                 ax_map.set_title(f"{disp_x.time[0].date()} to {disp_x.time[i].date()}")
@@ -3675,7 +3675,7 @@ class Network():
         gui_settings.update(gui_kw_args)
         fig_map, ax_map, proj_gui, proj_lla, default_station_edges, \
             stat_points, stat_lats, stat_lons = \
-            self._create_map_figure(gui_settings, annotate_stations,
+            self._create_map_figure(gui_settings, annotate_stations,  # noqa: F841
                                     subset_stations=subset_stations,
                                     center_longitude=self.mean_longitude)
 
@@ -3729,7 +3729,7 @@ class Network():
         if month_range is None:
             cmap = scm.romaO
             vmin, vmax = 1, 13 - 1e-3
-            phase_cols = (np.array(phases) % (2*np.pi)) / (2*np.pi)
+            phase_cols = (np.array(phases) % (2 * np.pi)) / (2 * np.pi)
         else:
             assert (isinstance(month_range, tuple) and len(month_range) == 2 and
                     all([isinstance(m, int) and (1 <= m <= 12) for m in month_range])), \
@@ -3737,12 +3737,12 @@ class Network():
             cmap = scm.batlow
             vmin = month_range[0]
             vmax = month_range[1] + 1 - 1e-3
-            phase_cols = ((np.array(phases) % (2*np.pi)) / (2*np.pi) * 12 - month_range[0]
+            phase_cols = ((np.array(phases) % (2 * np.pi)) / (2 * np.pi) * 12 - month_range[0]
                           ) / (month_range[1] + 1 - month_range[0])
 
         # update the station marker sizes
         stat_points.set_zorder(1)
-        stat_points.set_sizes(20*scale*np.array(amps).ravel()**2)
+        stat_points.set_sizes(20 * scale * np.array(amps).ravel()**2)
 
         # update the marker colors
         if phase and (len(phases) > 0):
@@ -3759,12 +3759,12 @@ class Network():
             ref_lons = [(map_extent_lonlat[0] + map_extent_lonlat[1]) / 2] * num_legends
             ref_lats = [(map_extent_lonlat[2] + map_extent_lonlat[3]) / 2] * num_legends
             ref_scatter = ax_map.scatter(ref_lons, ref_lats,
-                                         s=20*scale*np.array(legend_refs)**2,
+                                         s=20 * scale * np.array(legend_refs)**2,
                                          visible=False, marker='o', transform=proj_lla)
             ref_handles = ref_scatter.legend_elements(
                 prop="sizes", num=None,
                 markerfacecolor="none", markeredgecolor="k", visible=True,
-                func=lambda s: np.sqrt(s / (20*scale)))[0]
+                func=lambda s: np.sqrt(s / (20 * scale)))[0]
             ax_map.legend(ref_handles, legend_labels)
 
         # add a colorbar
@@ -3819,7 +3819,7 @@ class Network():
             sort_stations = list(reversed(sorted([s.lower() for s in self.station_names])))
         n_stations = len(sort_stations)
         # make an empty figure and start a color loop
-        fig, ax = plt.subplots(figsize=(6, 0.25*n_stations))
+        fig, ax = plt.subplots(figsize=(6, 0.25 * n_stations))
         colors = [plt.cm.tab10(i) for i in range(10)]
         icolor = 0
         n_dates = []

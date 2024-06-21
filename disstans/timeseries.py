@@ -306,7 +306,7 @@ class Timeseries():
     @property
     def sigmas(self) -> pd.DataFrame:
         """ View of only the data standard deviation columns in :attr:`~df`. """
-        return self.vars ** (1/2)
+        return self.vars ** (1 / 2)
 
     @sigmas.setter
     def sigmas(self, new_sigma: np.ndarray) -> None:
@@ -693,16 +693,16 @@ class Timeseries():
             Name of the data column to mask out.
         """
         icomp = self._data_cols.index(dcol)
-        self._df[dcol] = np.NaN
+        self._df[dcol] = np.nan
         self._df[dcol] = self._df[dcol].astype(pd.SparseDtype(dtype=float))
         if self._var_cols is not None:
             vcol = self._var_cols[icomp]
-            self._df[vcol] = np.NaN
+            self._df[vcol] = np.nan
             self._df[vcol] = self._df[vcol].astype(pd.SparseDtype(dtype=float))
             if self._cov_cols is not None:
                 for iccol in get_cov_indices(icomp, index_map=self.index_map):
                     ccol = self._cov_cols[iccol]
-                    self._df[ccol] = np.NaN
+                    self._df[ccol] = np.nan
                     self._df[ccol] = self._df[ccol].astype(pd.SparseDtype(dtype=float))
 
     @staticmethod

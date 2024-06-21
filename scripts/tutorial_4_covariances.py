@@ -24,8 +24,8 @@ if __name__ == "__main__":
     net_name = "CircleVolcano"
     num_stations = 8
     station_names = [f"S{i:1d}" for i in range(1, num_stations + 1)]
-    angles = np.linspace(0, 2*np.pi, num=num_stations, endpoint=False)
-    lons, lats = np.cos(angles)/10, np.sin(angles)/10
+    angles = np.linspace(0, 2 * np.pi, num=num_stations, endpoint=False)
+    lons, lats = np.cos(angles) / 10, np.sin(angles) / 10
     net = Network(name=net_name)
     for (istat, stat_name), lon, lat in zip(enumerate(station_names), lons, lats):
         net[stat_name] = Station(name=stat_name, location=[lat, lon, 0.0])

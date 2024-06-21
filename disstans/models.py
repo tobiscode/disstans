@@ -212,8 +212,8 @@ class Model():
             f"'index' needs to be an integer less than the number of parameters, got {index}."
         if self._cov is not None:
             num_comps = self._par.shape[1]
-            return self._cov[index*num_comps:(index+1)*num_comps,
-                             index*num_comps:(index+1)*num_comps]
+            return self._cov[index * num_comps:(index + 1) * num_comps,
+                             index * num_comps:(index + 1) * num_comps]
         else:
             return None
 
@@ -229,7 +229,7 @@ class Model():
         arch = self.get_arch()
         info = f"{arch['type']} model ({self.num_parameters} parameters)"
         for k, v in arch["kw_args"].items():
-            info += f"\n  {k+':':<15}{v}"
+            info += f"\n  {k + ':':<15}{v}"
         return info
 
     def __eq__(self, other: Model) -> bool:
@@ -473,7 +473,7 @@ class Model():
             assert coefs.shape[1] == self.num_parameters, \
                 f"The child function 'get_mapping_single' of model {type(self).__name__} " \
                 f"returned an invalid shape. " \
-                f"Expected was ({last-first+1}, {self.num_parameters}), got {coefs.shape}."
+                f"Expected was ({last - first + 1}, {self.num_parameters}), got {coefs.shape}."
             # if model is frozen, zero out inactive parameters
             if (self.active_parameters is not None) and (not ignore_active_parameters):
                 coefs[:, ~self.active_parameters] = 0
@@ -993,13 +993,13 @@ class BSpline(Model):
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
             model_kw_args["t_start"] = (pd.Timestamp(t_reference)
                                         - Timedelta(self.scale, time_unit)
-                                        * (self.degree + 1)/2).isoformat()
+                                        * (self.degree + 1) / 2).isoformat()
         if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
             model_kw_args["t_end"] = (pd.Timestamp(t_reference)
                                       + Timedelta(self.spacing, time_unit)
                                       * num_splines
                                       + Timedelta(self.scale, time_unit)
-                                      * (self.degree + 1)/2).isoformat()
+                                      * (self.degree + 1) / 2).isoformat()
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
                          time_unit=time_unit, regularize=regularize, **model_kw_args)
 
@@ -1051,7 +1051,7 @@ class BSpline(Model):
         tnorm = trel / self.scale
         # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
-        in_power = tnorm + self.order/2 - krange
+        in_power = tnorm + self.order / 2 - krange
         in_sum = ((-1)**krange * comb(self.order, krange)
                   * (in_power * (in_power >= 0))**(self.degree))
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
@@ -1137,13 +1137,13 @@ class ISpline(Model):
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
             model_kw_args["t_start"] = (pd.Timestamp(t_reference)
                                         - Timedelta(self.scale, time_unit)
-                                        * (self.degree + 1)/2).isoformat()
+                                        * (self.degree + 1) / 2).isoformat()
         if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
             model_kw_args["t_end"] = (pd.Timestamp(t_reference)
                                       + Timedelta(self.spacing, time_unit)
                                       * num_splines
                                       + Timedelta(self.scale, time_unit)
-                                      * (self.degree + 1)/2).isoformat()
+                                      * (self.degree + 1) / 2).isoformat()
         super().__init__(num_parameters=num_splines, t_reference=t_reference,
                          time_unit=time_unit, zero_after=zero_after,
                          regularize=regularize, **model_kw_args)
@@ -1190,7 +1190,7 @@ class ISpline(Model):
         tnorm = trel / self.scale
         # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
-        in_power = tnorm + self.order/2 - krange
+        in_power = tnorm + self.order / 2 - krange
         in_sum = ((-1)**krange * comb(self.order, krange)
                   * (in_power * (in_power >= 0))**(self.degree + 1))
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree + 1)
@@ -1448,7 +1448,7 @@ class BaseSplineSet(Model):
         # determine dimensions
         num_components = self.par.shape[1]
         num_scales = len(self.splines)
-        dy_scale = 1/num_scales
+        dy_scale = 1 / num_scales
         t_plot = pd.Series(pd.date_range(start=t_left, end=t_right, periods=resolution))
         # get range of values (if not provided)
         if cmaprange is not None:
@@ -1470,7 +1470,7 @@ class BaseSplineSet(Model):
                                gridspec_kw={"height_ratios": height_ratios})
         for i, model in enumerate(self.splines):
             # where to put this scale
-            y_off = 1 - (i + 1)*dy_scale
+            y_off = 1 - (i + 1) * dy_scale
             # get normalized values
             if isinstance(model, BSpline):
                 mdl_mapping = model.get_mapping(t_plot, ignore_active_parameters=True).A
@@ -1490,22 +1490,22 @@ class BaseSplineSet(Model):
                     facecol = cmap.to_rgba(model.par[j, k]
                                            if np.abs(model.par[j, k]) >= min_param_mag else 0)
                     ax[k].fill_between(t_plot,
-                                       y_off + y_norm[:, j]*dy_scale,
-                                       y_off + y_norm[:, j+1]*dy_scale,
+                                       y_off + y_norm[:, j] * dy_scale,
+                                       y_off + y_norm[:, j + 1] * dy_scale,
                                        facecolor=facecol, zorder=-2)
             # plot vertical lines at centerpoints
             for j, k in product(range(model.num_parameters), range(num_components)):
                 ax[k].axvline(model.t_reference
-                              + Timedelta(j*model.spacing, model.time_unit),
+                              + Timedelta(j * model.spacing, model.time_unit),
                               y_off, y_off + dy_scale, c='0.5', lw=0.5, zorder=-1)
         # finish plot by adding relevant gridlines and labels
         for k in range(num_components):
             for i in range(1, num_scales):
-                ax[k].axhline(i*dy_scale, c='0.5', lw=0.5, zorder=-1)
+                ax[k].axhline(i * dy_scale, c='0.5', lw=0.5, zorder=-1)
             ax[k].set_xlim(t_left, t_right)
             ax[k].set_ylim(0, 1)
-            ax[k].set_yticks([i*dy_scale for i in range(num_scales + 1)])
-            ax[k].set_yticks([(i + 0.5)*dy_scale for i in range(num_scales)], minor=True)
+            ax[k].set_yticks([i * dy_scale for i in range(num_scales + 1)])
+            ax[k].set_yticks([(i + 0.5) * dy_scale for i in range(num_scales)], minor=True)
             ax[k].set_yticklabels(reversed([f"{model.scale:.4g} {model.time_unit}"
                                            for model in self.splines]), minor=True)
             ax[k].tick_params(axis='both', labelleft=False, direction='out')
@@ -1592,7 +1592,7 @@ class SplineSet(BaseSplineSet):
         t_range_tdelta = t_center_end_tstamp - t_center_start_tstamp
         # if a complete set is requested, we need to find the number of overlaps
         # given the degree on a single side
-        num_overlaps = int(np.floor(degree/2)) if complete else 0
+        num_overlaps = int(np.floor(degree / 2)) if complete else 0
         # for each scale, make a spline object
         splines = []
         obs_scale = model_kw_args.pop("obs_scale", 1)
@@ -1606,9 +1606,9 @@ class SplineSet(BaseSplineSet):
                 scale_float = scale_tdelta / Timedelta(1, time_unit)
             # find the number of center points between t_center_start and t_center_end,
             # plus the overlapping ones
-            num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2*num_overlaps
+            num_centerpoints = int(t_range_tdelta / scale_tdelta) + 1 + 2 * num_overlaps
             # shift the reference to be the first spline
-            t_ref = t_center_start_tstamp - num_overlaps*scale_tdelta
+            t_ref = t_center_start_tstamp - num_overlaps * scale_tdelta
             # create model and append
             splines.append(splineclass(degree, scale_float,
                                        num_splines=num_centerpoints,
@@ -1826,7 +1826,7 @@ class Sinusoid(Model):
             Coefficients of the mapping matrix.
         """
         dt = self.tvec_to_numpycol(timevector)
-        phase = 2*np.pi * dt / self.period
+        phase = 2 * np.pi * dt / self.period
         coefs = np.stack([np.cos(phase), np.sin(phase)], axis=1)
         return coefs
 
@@ -1911,7 +1911,7 @@ class AmpPhModulatedSinusoid(Model):
         # define basis functions
         num_knots = int(num_bases) - int(degree) + 1
         inner_knots = np.linspace(0, 1, num=num_knots)
-        full_knots = np.concatenate([[0]*self.degree, inner_knots, [1]*self.degree])
+        full_knots = np.concatenate([[0] * self.degree, inner_knots, [1] * self.degree])
         self._bases = [sp_bspl.basis_element(full_knots[i:i + self.degree + 2],
                                              extrapolate=False)
                        for i in range(self.num_bases)]
@@ -1948,7 +1948,7 @@ class AmpPhModulatedSinusoid(Model):
         """
         # get phase and normalized [0, 1) phase
         dt = self.tvec_to_numpycol(timevector)
-        phase = 2*np.pi * dt.reshape(-1, 1) / self.period
+        phase = 2 * np.pi * dt.reshape(-1, 1) / self.period
         t_span = self.t_end - self.t_start
         phase_norm = (timevector - self.t_start) / t_span
         # get the mapping matrices of the sinusoid
@@ -1964,7 +1964,7 @@ class AmpPhModulatedSinusoid(Model):
         avg_scale = t_span / (num_bases - 1)
         is_nonzero = np.abs(coef_bspl) > 0
         t_min_max = np.empty((num_bases, 2))
-        t_min_max[:] = np.NaN
+        t_min_max[:] = np.nan
         for i in range(num_bases):
             if np.any(is_nonzero[:, i]):
                 t_min_max[i, :] = [dt[is_nonzero[:, i]].min(), dt[is_nonzero[:, i]].max()]
@@ -2523,7 +2523,7 @@ class ModelCollection():
         """
         info = f"ModelCollection ({self.num_parameters} parameters)"
         for k, v in self.collection.items():
-            info += f"\n  {k+':':<15}{v.get_arch()['type']}"
+            info += f"\n  {k + ':':<15}{v.get_arch()['type']}"
         return info
 
     def __eq__(self, other: Model) -> bool:
@@ -3026,7 +3026,7 @@ class ModelCollection():
                         init_weights.append(reweight_init[mdl_description])
                     else:
                         temp_weights = np.empty((model.num_parameters, num_comps))
-                        temp_weights[:] = np.NaN
+                        temp_weights[:] = np.nan
                         init_weights.append(temp_weights)
                 init_weights = \
                     np.concatenate(init_weights)[np.logical_and(reg_mask_full, obs_mask)]
@@ -3042,12 +3042,12 @@ class ModelCollection():
         if check_constraints:
             # check for constraints
             sign_constraints = np.empty((num_params, num_comps))
-            sign_constraints[:] = np.NaN
+            sign_constraints[:] = np.nan
             i = 0
             for mdl_name, model in self.items():
                 try:
                     # one sign is broadcasted, or the list is inserted into the array
-                    sign_constraints[i:i+model.num_parameters, :] = model.sign_constraint
+                    sign_constraints[i:i + model.num_parameters, :] = model.sign_constraint
                 except AttributeError:  # model hasn't implemented constraints, just skip
                     pass
                 except ValueError as e:  # list doesn't match number of components
@@ -3127,14 +3127,14 @@ class ModelCollection():
         if icomp is not None:
             assert isinstance(icomp, int) and icomp in list(range(num_comps)), \
                 "'icomp' must be a valid integer component index (between 0 and " \
-                f"{num_comps-1}), got {icomp}."
+                f"{num_comps - 1}), got {icomp}."
             # d and G are dense
             d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
             dnotnan = ~np.isnan(d).squeeze()
             Gout = G.A[np.ix_(dnotnan, obs_mask)]
             # W is sparse
             if (ts.var_cols is not None) and use_data_var:
-                W = sparse.diags(1/ts.df[ts.var_cols[icomp]].values[dnotnan])
+                W = sparse.diags(1 / ts.df[ts.var_cols[icomp]].values[dnotnan])
             else:
                 W = sparse.eye(dnotnan.sum())
         else:
@@ -3154,7 +3154,7 @@ class ModelCollection():
                 if dnotnan.sum() < dnotnan.size:
                     W = W[dnotnan, :].tocsc()[:, dnotnan]
             elif (ts.var_cols is not None) and use_data_var:
-                W = sparse.diags(1/ts.vars.values.ravel()[dnotnan])
+                W = sparse.diags(1 / ts.vars.values.ravel()[dnotnan])
             else:
                 W = sparse.eye(dnotnan.sum())
         if dnotnan.sum() < dnotnan.size:
@@ -3238,13 +3238,13 @@ class ModelCollection():
                             model_labels.append(f"{model_description}\n"
                                                 f"{m.scale:.4g} {m.time_unit}")
                             boundary_indices.append(start_index + num_nonzero)
-                            label_centerpoints.append(start_index + num_nonzero/2)
+                            label_centerpoints.append(start_index + num_nonzero / 2)
                             start_index += num_nonzero
             else:
                 if plot_empty:
                     model_labels.append(model_description)
                     boundary_indices.append(start_index + model.num_parameters * num_comps)
-                    label_centerpoints.append((boundary_indices[-1] + boundary_indices[-2])/2)
+                    label_centerpoints.append((boundary_indices[-1] + boundary_indices[-2]) / 2)
                     start_index += model.num_parameters * num_comps
                 else:
                     mod_nonzero = ~np.all(model.cov == 0, axis=0)
@@ -3252,7 +3252,7 @@ class ModelCollection():
                     if num_nonzero > 0:
                         model_labels.append(model_description)
                         boundary_indices.append(start_index + num_nonzero)
-                        label_centerpoints.append(start_index + num_nonzero/2)
+                        label_centerpoints.append(start_index + num_nonzero / 2)
                         start_index += num_nonzero
         # get whatever needs to be plotted
         if not use_corr_coef:  # stick with covariance

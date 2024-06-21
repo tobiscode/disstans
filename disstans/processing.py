@@ -172,14 +172,14 @@ class ExpandingRollingIndexer(BaseIndexer):
         max_ix_end = min(max(1, num_values // 2), self.window_size // 2)
         # starting interval
         start[:max_ix_start] = np.zeros(max_ix_start)
-        end[:max_ix_start] = 2*np.arange(max_ix_start)
+        end[:max_ix_start] = 2 * np.arange(max_ix_start)
         # ending interval
         start[-max_ix_end:] = num_values - 1 - 2 * np.arange(max_ix_end - 1, -1, -1)
         end[-max_ix_end:] = (num_values - 1) * np.ones(max_ix_end)
         # middle, regular interval
-        start[self.window_size//2:-(self.window_size//2)] = \
+        start[self.window_size // 2:-(self.window_size // 2)] = \
             np.arange(0, num_values - self.window_size + 1)
-        end[self.window_size//2:-(self.window_size//2)] = \
+        end[self.window_size // 2:-(self.window_size // 2)] = \
             np.arange(self.window_size - 1, num_values)
         # return
         return start, end + 1
@@ -216,7 +216,7 @@ def median(array: np.ndarray, kernel_size: int) -> np.ndarray:
     # now we calculate the rolling median (this is compiled-optimized by pandas)
     filtered = pd.DataFrame(array).rolling(indexer, min_periods=1).median().values
     # add NaNs again to where they were initially
-    filtered[np.isnan(array)] = np.NaN
+    filtered[np.isnan(array)] = np.nan
     return filtered
 
 
@@ -348,16 +348,16 @@ def decompose(array: np.ndarray,
             model[~array_nanind[:, icol], icol] = array_in[~array_nanind[:, icol], icol]
     # reduce to where original timeseries were not NaNs
     else:
-        model[array_nanind] = np.NaN
+        model[array_nanind] = np.nan
     if nan_cols.size > 0:
-        newmod = np.full((temporal.shape[0], len(finite_cols) + len(nan_cols)), np.NaN)
+        newmod = np.full((temporal.shape[0], len(finite_cols) + len(nan_cols)), np.nan)
         newmod[:, finite_cols] = model
         model = newmod
     # extract spatial component if to be returned, else done
     if return_sources:
         spatial = decomposer.components_
         if nan_cols.size > 0:
-            newspat = np.full((spatial.shape[0], len(finite_cols) + len(nan_cols)), np.NaN)
+            newspat = np.full((spatial.shape[0], len(finite_cols) + len(nan_cols)), np.nan)
             newspat[:, finite_cols] = spatial
             spatial = newspat
         return model, temporal, spatial
@@ -369,8 +369,8 @@ def clean(station: Station,
           ts_in: str,
           reference: str | Timeseries | Callable,
           ts_out: str = None,
-          clean_kw_args: dict[str,  Any] = {},
-          reference_callable_args: dict[str,  Any] = {}) -> None:
+          clean_kw_args: dict[str, Any] = {},
+          reference_callable_args: dict[str, Any] = {}) -> None:
     """
     Function operating on a single station's timeseries to clean it from outliers,
     and mask it out if the data is not good enough. The criteria are set by
@@ -465,7 +465,7 @@ def clean(station: Station,
         # remove outliers by absolute uncertainty
         if (clean_settings["std_bad"] is not None) and check_bad:
             mask_bad = station[ts_in][d2v[dcol]] >= clean_settings["std_bad"] ** 2
-            ts.df.loc[mask_bad, dcol] = np.NaN
+            ts.df.loc[mask_bad, dcol] = np.nan
         # compute residuals
         if (clean_settings["std_outlier"] is not None) \
            or (clean_settings["iqr_outlier"] is not None) \
@@ -488,7 +488,7 @@ def clean(station: Station,
                                                  < q1 - clean_settings["iqr_outlier"] * iqr,
                                                  residual[mask_copy]
                                                  > q3 + clean_settings["iqr_outlier"] * iqr)
-            ts.df.loc[mask, dcol] = np.NaN
+            ts.df.loc[mask, dcol] = np.nan
             residual = ts[dcol].values - ts_ref[dcol].values
             sd = np.nanstd(residual)
         # check for minimum number of clean observations
@@ -597,7 +597,7 @@ def midas(ts: Timeseries,
     # (based on theoretical factor 1.4826)
     sd_velpairs = 1.4826 * d50
     # delete velocities more than 2 s.d. from MAD
-    v[d >= 2*sd_velpairs] = np.NaN
+    v[d >= 2 * sd_velpairs] = np.nan
     num_kept = (~np.isnan(v)).sum(axis=0, keepdims=True)
     # recompute median, absolute deviation, MAD, and estimated s.d.
     v50 = np.nanmedian(v, axis=0, keepdims=True)
@@ -736,9 +736,9 @@ class StepDetector():
         # input check
         if n - K - 1 <= 0:
             # can't return meaningful statistic, hypothesis unlikely
-            return np.NaN
+            return np.nan
         # calculate AIC for LS
-        AIC = n * np.log(rss / n) + 2*K
+        AIC = n * np.log(rss / n) + 2 * K
         # apply small sample size correction
         correction = 2 * K * (K + 1) / (n - K - 1)
         return AIC + correction
@@ -808,7 +808,7 @@ class StepDetector():
         n_total = n_pre + n_post
         # return with 0, 0 if we will not be able to get an estimate because of not enough data
         if (n_pre < 2) or (n_post < 2):
-            return 0, 0, (np.NaN, np.NaN)
+            return 0, 0, (np.nan, np.nan)
         xfinite = xwindow[valid]
         yfinite = ywindow[valid]
         # build mapping matrix for model H1
@@ -826,27 +826,27 @@ class StepDetector():
         try:
             rss1 = float(np.linalg.lstsq(G1, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
-            return 0, 0, (np.NaN, np.NaN)
+            return 0, 0, (np.nan, np.nan)
         # now we can fit for H0, and again just go with that if there is no solution
         try:
             rss0 = float(np.linalg.lstsq(G0, yfinite, rcond=None)[1])
         except np.linalg.LinAlgError:
-            return 0, 0, (np.NaN, rss1/n_total)
+            return 0, 0, (np.nan, rss1 / n_total)
         # now that both models produce results, let's get the AIC_c values
         # we'll again return the H0 if not both models have a valid AIC_c value
         aic = [StepDetector.AIC_c(rss, n_total, dof) for (rss, dof)
                in zip([rss0, rss1], [3, 4])]
         if np.isnan(aic).sum() > 0:
-            return 0, 0, (rss0/n_total, rss1/n_total)
+            return 0, 0, (rss0 / n_total, rss1 / n_total)
         # let's check the difference between the two as a measure of evidence
         best_hyp = aic.index(min(aic))
         Delta_best = [a - aic[best_hyp] for a in aic]
         # we will only recommend H1 if it has the both the minimum AIC_c, and
         # the difference to H0 is larger than maxdel
         if (best_hyp == 1) and (Delta_best[0] > maxdel):
-            return 1, Delta_best[0], (rss0/n_total, rss1/n_total)
+            return 1, Delta_best[0], (rss0 / n_total, rss1 / n_total)
         else:
-            return 0, Delta_best[best_hyp], (rss0/n_total, rss1/n_total)
+            return 0, Delta_best[best_hyp], (rss0 / n_total, rss1 / n_total)
 
     @staticmethod
     def _search(data_and_params: tuple[Any]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -884,7 +884,7 @@ class StepDetector():
         valid = np.isfinite(y)
         # make output arrays
         probs = np.empty((num_observations, num_components))
-        probs[:] = np.NaN
+        probs[:] = np.nan
         var0, var1 = probs.copy(), probs.copy()
         # loop over all columns
         for icomp in range(num_components):
@@ -893,13 +893,13 @@ class StepDetector():
             halfwindow = 0
             for i in range(kernel_size // 2):
                 if (check_only and (i not in check_only)) or \
-                   (halfwindow*2 + 1 < kernel_size_min):
+                   (halfwindow * 2 + 1 < kernel_size_min):
                     halfwindow += 1
                     continue
                 hyp, Del, (rss0, rss1) = \
-                    StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                             y[i-halfwindow:i+halfwindow+1, icomp],
-                                             valid[i-halfwindow:i+halfwindow+1, icomp],
+                    StepDetector.test_single(x[i - halfwindow:i + halfwindow + 1],
+                                             y[i - halfwindow:i + halfwindow + 1, icomp],
+                                             valid[i - halfwindow:i + halfwindow + 1, icomp],
                                              maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
@@ -912,9 +912,9 @@ class StepDetector():
                 range_main = [i for i in range_main if i in check_only]
             for i in range_main:
                 hyp, Del, (rss0, rss1) = \
-                    StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                             y[i-halfwindow:i+halfwindow+1, icomp],
-                                             valid[i-halfwindow:i+halfwindow+1, icomp],
+                    StepDetector.test_single(x[i - halfwindow:i + halfwindow + 1],
+                                             y[i - halfwindow:i + halfwindow + 1, icomp],
+                                             valid[i - halfwindow:i + halfwindow + 1, icomp],
                                              maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
@@ -923,12 +923,12 @@ class StepDetector():
             for i in range(num_observations - halfwindow, num_observations):
                 halfwindow -= 1
                 if (check_only and (i not in check_only)) or \
-                   (halfwindow*2 + 1 < kernel_size_min):
+                   (halfwindow * 2 + 1 < kernel_size_min):
                     continue
                 hyp, Del, (rss0, rss1) = \
-                    StepDetector.test_single(x[i-halfwindow:i+halfwindow+1],
-                                             y[i-halfwindow:i+halfwindow+1, icomp],
-                                             valid[i-halfwindow:i+halfwindow+1, icomp],
+                    StepDetector.test_single(x[i - halfwindow:i + halfwindow + 1],
+                                             y[i - halfwindow:i + halfwindow + 1, icomp],
+                                             valid[i - halfwindow:i + halfwindow + 1, icomp],
                                              maxdel=maxdel)
                 if hyp == 1:
                     probs[i, icomp] = Del
@@ -1072,7 +1072,7 @@ class StepDetector():
             maxstepvar1 = np.take_along_axis(stepsvar1, maxprobindices, axis=1).squeeze()
             # isolate the actual timestamps and add to the list of DataFrames
             steptimes = station[ts_description].time[unique_steps]
-            step_tables.append(pd.DataFrame({"station": [name]*len(steptimes),
+            step_tables.append(pd.DataFrame({"station": [name] * len(steptimes),
                                              "time": steptimes,
                                              "probability": maxstepprobs,
                                              "var0": maxstepvar0,
@@ -1233,7 +1233,7 @@ class StepDetector():
             # isolate the original timestamps and add to the list of DataFrames
             steptimes = [origtime for i, origtime in enumerate(catalog[name])
                          if catalog_timeexists[name][i] and has_steps[i]]
-            step_tables.append(pd.DataFrame({"station": [name]*len(steptimes),
+            step_tables.append(pd.DataFrame({"station": [name] * len(steptimes),
                                              "time": steptimes,
                                              "probability": maxstepprobs,
                                              "var0": maxstepvar0,
@@ -1245,9 +1245,9 @@ class StepDetector():
         step_table = pd.concat(step_tables, ignore_index=True)
         # merge it with the input dataframe, if provided
         if augment_df:
-            catalog_df["probability"] = np.NaN
-            catalog_df["var0"] = np.NaN
-            catalog_df["var1"] = np.NaN
+            catalog_df["probability"] = np.nan
+            catalog_df["var0"] = np.nan
+            catalog_df["var1"] = np.nan
             for _, row in step_table.iterrows():
                 row_location = (catalog_df["station"] == row["station"]) & \
                                (catalog_df["time"] == row["time"])

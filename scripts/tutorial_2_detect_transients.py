@@ -23,7 +23,7 @@ timevector = pd.date_range(start=t_start_str, end=t_end_str, freq="1D")
 from disstans.models import Arctangent, Polynomial, Sinusoid  # noqa: E402
 mdl_secular = Polynomial(order=1, t_reference=t_start_str)
 mdl_annual = Sinusoid(period=365.25, t_reference=t_start_str)
-mdl_semiannual = Sinusoid(period=365.25/2, t_reference=t_start_str)
+mdl_semiannual = Sinusoid(period=365.25 / 2, t_reference=t_start_str)
 mdl_transient_1 = Arctangent(tau=100, t_reference="2002-07-01")
 mdl_transient_2 = Arctangent(tau=50, t_reference="2010-01-01")
 mdl_transient_3 = Arctangent(tau=300, t_reference="2016-01-01")
@@ -42,7 +42,7 @@ mdl_coll = deepcopy({"Secular": mdl_secular,
 
 # add parameters
 import numpy as np  # noqa: E402
-mdl_secular.read_parameters(np.array([-20, 200/(20*365.25)]))
+mdl_secular.read_parameters(np.array([-20, 200 / (20 * 365.25)]))
 mdl_annual.read_parameters(np.array([-5, 0]))
 mdl_semiannual.read_parameters(np.array([0, 5]))
 mdl_transient_1.read_parameters(np.array([40]))

@@ -36,11 +36,11 @@ def okada_displacement(station_lla: list[float], eq_catalog_row: pd.Series) -> n
     """
     station_lla = np.array(station_lla)
     station_lla[2] /= 1000
-    eq_lla = eq_catalog_row[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values.squeeze()
+    eq_lla = eq_catalog_row[['Latitude(°)', 'Longitude(°)', 'MT_Depth(km)']].values.squeeze()
     eq_lla[2] *= -1
     station_rel = np.array(station_lla - eq_lla)
-    station_rel[0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[0]*np.pi/180)
-    station_rel[1] *= 111.41284*np.cos(eq_lla[0]*np.pi/180)
+    station_rel[0] *= 111.13292 - 0.55982 * np.cos(2 * eq_lla[0] * np.pi / 180)
+    station_rel[1] *= 111.41284 * np.cos(eq_lla[0] * np.pi / 180)
     station_rel[2] = 0
     eq_info = {'alpha': defaults["prior"]["alpha"],
                'lat': eq_lla[0], 'lon': eq_lla[1],
@@ -60,15 +60,15 @@ def _okada_get_displacements(station_and_parameters: tuple[Any]) -> np.ndarray:
     # unpack inputs
     stations, eq = station_and_parameters
     # rotate from relative lat, lon, alt to xyz
-    strike_rad = eq['strike']*np.pi/180
-    R = np.array([[np.cos(strike_rad),  np.sin(strike_rad), 0],
+    strike_rad = eq['strike'] * np.pi / 180
+    R = np.array([[np.cos(strike_rad), np.sin(strike_rad), 0],
                   [np.sin(strike_rad), -np.cos(strike_rad), 0],
                   [0, 0, 1]])
     stations = stations @ R
     # get displacements in xyz-frame
     disp = np.zeros_like(stations)
     for i in range(stations.shape[0]):
-        success, u, grad_u = dc3d0(eq['alpha'], stations[i, :],
+        success, u, grad_u = dc3d0(eq['alpha'], stations[i, :],  # noqa: F841
                                    eq['depth'], eq['dip'], eq['potency'])
         # unit for u is [unit of potency] / [unit of station location & depth]^2
         # unit for grad_u is [unit of potency] / [unit of station location & depth]^3
@@ -191,15 +191,15 @@ def okada_prior(network: Network,
     # load earthquake catalog
     catalog = pd.read_csv(catalog_path, header=0, parse_dates=[[0, 1]])
     eq_times = catalog['Date_Origin_Time(JST)']
-    eq_lla = catalog[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values
+    eq_lla = catalog[['Latitude(°)', 'Longitude(°)', 'MT_Depth(km)']].values
     eq_lla[:, 2] *= -1
     n_eq = eq_lla.shape[0]
     # relative position in lla
     stations_rel = [np.array(stations_lla - eq_lla[i, :].reshape(1, -1)) for i in range(n_eq)]
     # transform to xyz space, coarse approximation, ignores z-component of stations
     for i in range(n_eq):
-        stations_rel[i][:, 0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[i, 0]*np.pi/180)
-        stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
+        stations_rel[i][:, 0] *= 111.13292 - 0.55982 * np.cos(2 * eq_lla[i, 0] * np.pi / 180)
+        stations_rel[i][:, 1] *= 111.41284 * np.cos(eq_lla[i, 0] * np.pi / 180)
         stations_rel[i][:, 2] = 0
     # stations_rel is now in km, just like depth
 
@@ -297,15 +297,15 @@ def empirical_prior(network: Network,
     # load earthquake catalog
     catalog = pd.read_csv(catalog_path, header=0, parse_dates=[[0, 1]])
     eq_times = catalog['Date_Origin_Time(JST)']
-    eq_lla = catalog[['Latitude(°)', 'Longitude(°)',  'MT_Depth(km)']].values
+    eq_lla = catalog[['Latitude(°)', 'Longitude(°)', 'MT_Depth(km)']].values
     eq_lla[:, 2] *= -1
     n_eq = eq_lla.shape[0]
     # relative position in lla
     stations_rel = [np.array(stations_lla - eq_lla[i, :].reshape(1, -1)) for i in range(n_eq)]
     # transform to xyz space, coarse approximation
     for i in range(n_eq):
-        stations_rel[i][:, 0] *= 111.13292 - 0.55982*np.cos(2*eq_lla[i, 0]*np.pi/180)
-        stations_rel[i][:, 1] *= 111.41284*np.cos(eq_lla[i, 0]*np.pi/180)
+        stations_rel[i][:, 0] *= 111.13292 - 0.55982 * np.cos(2 * eq_lla[i, 0] * np.pi / 180)
+        stations_rel[i][:, 1] *= 111.41284 * np.cos(eq_lla[i, 0] * np.pi / 180)
         # stations_rel is now in km, just like depth
         # get scalar distances
         stations_rel[i] = np.sqrt(np.sum(stations_rel[i] ** 2, axis=1))
@@ -313,7 +313,7 @@ def empirical_prior(network: Network,
 
     # get moment magnitudes and for each station and earthquake, apply formula
     eq_mw = catalog['MT_Magnitude(Mw)'].values.reshape(-1, 1)
-    needs_steps = stations_rel < 10**(eq_mw/2 - 0.8)
+    needs_steps = stations_rel < 10**(eq_mw / 2 - 0.8)
 
     # loop over stations and add a step where necessary:
     eq_steps_dict = {}

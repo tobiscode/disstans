@@ -83,17 +83,17 @@ class Solution():
             pack_weights = False
         # make full arrays to fill with values
         par_full = np.empty((num_parameters, num_components))
-        par_full[:] = np.NaN
+        par_full[:] = np.nan
         par_full[obs_indices, :] = parameters
         if covariances is not None:
             params_times_comps = num_parameters * num_components
             cov_full = np.empty((params_times_comps, params_times_comps))
-            cov_full[:] = np.NaN
+            cov_full[:] = np.nan
             mask_cov = np.repeat(obs_indices, num_components)
             cov_full[np.ix_(mask_cov, mask_cov)] = covariances
         if pack_weights:
             weights_full = np.empty((num_parameters, num_components))
-            weights_full[:] = np.NaN
+            weights_full[:] = np.nan
             weights_full[np.flatnonzero(obs_indices)[reg_indices], :] = weights
         # start the iteration over the models
         model_ix_start_len = {}
@@ -167,7 +167,7 @@ class Solution():
                              f"got {models}.")
         # build combined slice
         nc = self.num_components if for_cov else 1
-        combined_ranges = np.concatenate([np.arange(ix*nc, (ix+num)*nc) for m, (ix, num)
+        combined_ranges = np.concatenate([np.arange(ix * nc, (ix + num) * nc) for m, (ix, num)
                                           in self._model_slice_ranges.items()
                                           if m in model_list]).astype(int)
         return np.sort(combined_ranges)
@@ -514,7 +514,7 @@ class LogarithmicReweighting(ReweightingFunction):
         """
         mags = np.abs(m)
         size = mags.size
-        weight = np.log((mags.sum() + size*self.eps) / (mags + self.eps)) / np.log(size)
+        weight = np.log((mags.sum() + size * self.eps) / (mags + self.eps)) / np.log(size)
         return self.scale * weight
 
 
@@ -576,7 +576,9 @@ def linear_regression(ts: Timeseries,
 
     # get mapping matrix and sizes
     G, obs_indices, num_time, num_params, num_comps, num_obs, sign_constraints = \
-        models.prepare_LS(ts, include_regularization=False, check_constraints=check_constraints)
+        models.prepare_LS(ts,  # noqa: F841
+                          include_regularization=False,
+                          check_constraints=check_constraints)
     # make constraint bounds
     if check_constraints and np.isfinite(sign_constraints).sum() > 0:
         bd_upper = np.inf * np.ones_like(sign_constraints)
@@ -703,7 +705,8 @@ def ridge_regression(ts: Timeseries,
 
     # get mapping and regularization matrix and sizes
     G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, \
-        _, _, sign_constraints = models.prepare_LS(ts, check_constraints=check_constraints)
+        _, _, sign_constraints = models.prepare_LS(ts,  # noqa: F841
+                                                   check_constraints=check_constraints)
     # make constraint bounds
     if check_constraints and np.isfinite(sign_constraints).sum() > 0:
         bd_upper = np.inf * np.ones_like(sign_constraints)
@@ -1021,7 +1024,7 @@ def lasso_regression(ts: Timeseries,
                 if regularize and reweight_max_iters is not None:
                     # update weights
                     if use_internal_scales and (weights_scaling is not None):
-                        weights.value = reweight_func(m.value[reg_indices]*weights_scaling)
+                        weights.value = reweight_func(m.value[reg_indices] * weights_scaling)
                     else:
                         weights.value = reweight_func(m.value[reg_indices])
                     # check if the solution changed to previous iteration
@@ -1069,13 +1072,13 @@ def lasso_regression(ts: Timeseries,
                                           else None)
             # store results
             if solution is None:
-                params[:, i] = np.NaN
+                params[:, i] = np.nan
                 if formal_covariance:
                     temp_cov = np.empty_like(GtWG)
-                    temp_cov[:] = np.NaN
+                    temp_cov[:] = np.nan
                     cov.append(temp_cov)
                 if regularize and return_weights:
-                    weights[:, i] = np.NaN
+                    weights[:, i] = np.nan
             else:
                 params[:, i] = solution
                 # if desired, estimate formal variance here
@@ -1116,13 +1119,13 @@ def lasso_regression(ts: Timeseries,
         # store results
         if solution is None:
             params = np.empty((num_obs, num_comps))
-            params[:] = np.NaN
+            params[:] = np.nan
             if formal_covariance:
                 cov = np.empty((num_obs * num_comps, num_obs * num_comps))
-                cov[:] = np.NaN
+                cov[:] = np.nan
             if regularize and return_weights:
                 weights = np.empty((num_reg, num_comps))
-                weights[:] = np.NaN
+                weights[:] = np.nan
         else:
             params = solution.reshape(num_obs, num_comps)
             # if desired, estimate formal variance here

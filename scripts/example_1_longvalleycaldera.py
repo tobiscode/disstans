@@ -128,7 +128,7 @@ if __name__ == "__main__":
                          "kw_args": {"period": 365.25,
                                      "t_reference": "2000-01-01"}},
               "Biannual": {"type": "Sinusoid",
-                           "kw_args": {"period": 365.25/2,
+                           "kw_args": {"period": 365.25 / 2,
                                        "t_reference": "2000-01-01"}},
               "Linear": {"type": "Polynomial",
                          "kw_args": {"order": 1,
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
     # make a plot of the curve of probability values to find an L-curve
     # inflection point
-    plt.plot(np.arange(unknown_table.shape[0])/unknown_table.shape[0],
+    plt.plot(np.arange(unknown_table.shape[0]) / unknown_table.shape[0],
              unknown_table["probability"].values, label="Unknown")
     plt.plot(np.arange(maint_table.shape[0]) /
              np.isfinite(maint_table["probability"].values).sum(),
@@ -320,7 +320,7 @@ if __name__ == "__main__":
                        "kw_args": {"degree": 2,
                                    "t_center_start": net["CASA"]["final"].time.min(),
                                    "t_center_end": net["CA99"]["final"].time.max(),
-                                   "list_num_knots": [int(1+2**n) for n in range(4, 8)]}},
+                                   "list_num_knots": [int(1 + 2**n) for n in range(4, 8)]}},
          "AnnualDev": {"type": "AmpPhModulatedSinusoid",
                        "kw_args": {"period": 365.25,
                                    "degree": 2,

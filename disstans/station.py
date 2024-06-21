@@ -685,10 +685,10 @@ class Station():
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
         if max_rolling_dev > 0:
             roll_mean = (ts - ts.mean()).rolling(max_rolling_dev,
-                                                 min_periods=max_rolling_dev//2
+                                                 min_periods=max_rolling_dev // 2
                                                  ).mean().values
             if np.isfinite(roll_mean.ravel()).sum() == 0:
-                results["Maximum Rolling Deviation"] = np.NaN
+                results["Maximum Rolling Deviation"] = np.nan
             else:
                 roll_mean_max_ix = np.nanargmax(np.abs(roll_mean), axis=0)
                 max_rolling_dev = np.take_along_axis(roll_mean,
@@ -855,7 +855,7 @@ class Station():
                 if Gsub.shape[0] < 2:
                     return None, None
             if fit_sum_var is not None:
-                GtW = Gsub.T @ sparse.diags(1/fit_sum_var[inside, icomp][validsub])
+                GtW = Gsub.T @ sparse.diags(1 / fit_sum_var[inside, icomp][validsub])
                 GtWG = GtW @ Gsub
                 GtWd = GtW @ fit_sum[inside, icomp][validsub]
             else:
