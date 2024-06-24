@@ -13,6 +13,7 @@ classes of DISSTANS, namely
 
 # imports for preparations later
 import multiprocessing
+import importlib.metadata
 from pandas.plotting import register_matplotlib_converters
 from matplotlib import rcParams
 
@@ -34,7 +35,7 @@ from .station import Station
 from .network import Network
 
 # package version
-__version__ = '2.1.dev1'
+__version__ = importlib.metadata.version("disstans")
 
 # preparational steps
 multiprocessing.set_start_method('spawn', True)

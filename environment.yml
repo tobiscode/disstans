@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python>=3.11
+  - python>=3.12
   - numpy>=1.26
   - pandas>=2.1
   - scipy>=1.11
