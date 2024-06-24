@@ -22,8 +22,7 @@ from typing import Any, TYPE_CHECKING, Literal
 
 from .config import defaults
 from .timeseries import Timeseries
-from .compiled import selectpair
-from .tools import Timedelta, parallelize, tvec_to_numpycol, date2decyear
+from .tools import Timedelta, parallelize, tvec_to_numpycol, date2decyear, selectpair
 from .models import Polynomial
 from .station import Station
 if TYPE_CHECKING:
@@ -510,7 +509,7 @@ def midas(ts: Timeseries,
     """
     This function performs the MIDAS estimate as described by [blewitt16]_.
     It is adapted from the Fortran code provided by the author (see
-    :func:`~disstans.compiled.selectpair` for more details and original copyright).
+    :func:`~disstans.tools.selectpair` for more details and original copyright).
 
     MIDAS returns the median estimate of secular (constant) velocities in all data
     components using data pairs spanning exactly one year. By not including pairs
@@ -564,23 +563,17 @@ def midas(ts: Timeseries,
         tstep_back = np.concatenate([-steps_decyear[::-1], tstep])
         tstep = np.concatenate([steps_decyear, tstep])
     # get forward and backwards time pairs
-    num_pairs, ip = selectpair(t, tstep, tolerance)
-    if num_pairs >= ip.shape[1]:
-        warn(f"Forward call to selectpair returned maximum number of pairs ({num_pairs} "
-             f"with a maximum of {ip.shape[1]}). Consider re-compiling DISSTANS "
-             "with a higher maxn constant in compiled.f90.", stacklevel=2)
-    nb, ipb = selectpair(-t[::-1], tstep_back, tolerance)
-    if nb >= ipb.shape[1]:
-        warn(f"Backward call to selectpair returned maximum number of pairs ({nb} "
-             f"with a maximum of {ipb.shape[1]}). Consider re-compiling DISSTANS "
-             "with a higher maxn constant in compiled.f90.", stacklevel=2)
+    ip = selectpair(t, tstep, tol=tolerance)
+    num_pairs = ip.shape[1]
+    ipb = selectpair(-t[::-1], tstep_back, tol=tolerance)
+    nb = ipb.shape[1]
     if num_pairs + nb < 10:
         warn(f"Only found {num_pairs} forward and {nb} backward pairs; solution will be bad.",
              stacklevel=2)
     # convert backward indices to forward ones
-    ipb = t.size - ipb[[1, 0], :nb]
+    ipb = t.size - ipb[[1, 0], :]
     # combine the two index collections, and make them more readable
-    ip = np.concatenate([ip[:, :num_pairs] - 1, ipb], axis=1)
+    ip = np.concatenate([ip - 1, ipb], axis=1)
     ip_from, ip_to = ip[0, :], ip[1, :]
     num_pairs += nb
     # calculate number of points used in pairing

@@ -1815,6 +1815,74 @@ def R_enu2ecef(lon: float, lat: float) -> np.ndarray:
     return R_ecef2enu(lon, lat).T
 
 
+# This function is taken from midas.f, downloaded from
+# http://geodesy.unr.edu/MIDAS_release.tar on 2021-09-13,
+# converted to Python, slightly modified, and without maxn or returned n.
+# License of the original file:
+# Author: Geoff Blewitt.  Copyright (C) 2015.
+def selectpair(t, tstep, tol=0.001):
+    """
+    Given a time tag array t(m), select pairs ip(2,n)
+
+    Moves forward in time: for each time tag, pair it with only
+    one future time tag.
+    First attempt to form a pair within tolerance tol of 1 year.
+    If this fails, then find next unused partner.
+    If this fails, cycle through all possible future partners again.
+
+    MIDAS calls this twice -- firstly forward in time, and
+    secondly backward in time with negative tags and data.
+    This ensures a time symmetric solution.
+
+    2010-10-12: now allow for apriori list of step epochs
+    - do not select pairs that span or include the step epoch
+    """
+    m = t.size
+    nstep = tstep.size - 1
+    k = 0
+    n = 0
+    ip0, ip1 = [], []
+    istep = 1
+    for i in range(1, m + 1):
+        if t[i - 1] > (t[m - 1] + tol - 1.0):
+            break
+        # scroll through steps until next step time is later than epoch 1
+        while (istep <= nstep) and (t[i - 1] >= tstep[istep - 1] + tol):
+            istep += 1
+        if (istep <= nstep) and (t[i - 1] > tstep[istep - 1] + tol - 1.0):
+            continue
+        for j in range(i + 1, m + 1):
+            if k < j:
+                k = j
+            if (istep <= nstep) and (t[j - 1] > tstep[istep - 1] - tol):
+                break
+            dt = t[j - 1] - t[i - 1]
+            # time difference from 1 year
+            fdt = dt - 1.0
+            # keep searching IF pair less than one year
+            if fdt < -tol:
+                continue
+            # try to find a matching pair within tolerance of 1 year
+            if fdt < tol:
+                i2 = j
+            # otherwise, if greater than 1 year, cycle through remaining data
+            else:
+                i2 = k
+                dt = t[i2 - 1] - t[i - 1]
+                if (istep <= nstep) and (t[i2 - 1] > tstep[istep - 1] - tol):
+                    k = 0
+                    continue
+                if k == m:
+                    k = 0
+                k += 1
+            # data pair has been found
+            n += 1
+            ip0.append(i)
+            ip1.append(i2)
+            break
+    return np.array([ip0, ip1])
+
+
 class RINEXDataHolding():
     """
     Container class for a database of RINEX files.
