@@ -13,7 +13,6 @@ dependencies:
   - owslib
   - cmcrameri
   - cvxpy>=1.3
-  - cvxopt
   - tqdm
   - sqlalchemy
   - ffmpeg
@@ -23,7 +22,7 @@ dependencies:
   - docutils  # optional
   - doc8  # optional
   - rstcheck  # optional
-  - flake8  # optional
+  - ruff  # optional
   - build  # optional
   - twine  # optional
   - sphinx-rtd-theme  # optional
