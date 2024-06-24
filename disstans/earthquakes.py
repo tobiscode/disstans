@@ -7,9 +7,18 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from okada_wrapper import dc3d0wrapper as dc3d0
 from warnings import warn
 from typing import Any, TYPE_CHECKING
+
+# check whether okada_wrapper is installed
+try:
+    from okada_wrapper import dc3d0wrapper as dc3d0
+except ModuleNotFoundError:
+    OKADA_LOADED = False
+    """ Module 'okada_wrapper' is not loaded. """
+else:
+    OKADA_LOADED = True
+    """ Module 'okada_wrapper' is loaded. """
 
 from .config import defaults
 from .tools import parallelize
@@ -67,18 +76,26 @@ def _okada_get_displacements(station_and_parameters: tuple[Any]) -> np.ndarray:
     stations = stations @ R
     # get displacements in xyz-frame
     disp = np.zeros_like(stations)
-    for i in range(stations.shape[0]):
-        success, u, grad_u = dc3d0(eq['alpha'], stations[i, :],  # noqa: F841
-                                   eq['depth'], eq['dip'], eq['potency'])
-        # unit for u is [unit of potency] / [unit of station location & depth]^2
-        # unit for grad_u is [unit of potency] / [unit of station location & depth]^3
-        # assume potency is Nm/GPa = 1e-9 m^3 and locations are in km,
-        # then u is in [1e-15 m] and grad_u in [1e-18 m]
-        if success == 0:
-            disp[i, :] = u / 10**12  # output is now in mm
+    try:
+        for i in range(stations.shape[0]):
+            success, u, grad_u = dc3d0(eq['alpha'], stations[i, :],  # noqa: F841
+                                       eq['depth'], eq['dip'], eq['potency'])
+            # unit for u is [unit of potency] / [unit of station location & depth]^2
+            # unit for grad_u is [unit of potency] / [unit of station location & depth]^3
+            # assume potency is Nm/GPa = 1e-9 m^3 and locations are in km,
+            # then u is in [1e-15 m] and grad_u in [1e-18 m]
+            if success == 0:
+                disp[i, :] = u / 10**12  # output is now in mm
+            else:
+                warn(f"Success = {success} for station {i}!",
+                     category=RuntimeWarning, stacklevel=2)
+    except NameError as e:
+        if "dc3d0" in str(e) and not OKADA_LOADED:
+            raise RuntimeError("The module 'okada_wrapper' is not found in this environment, so "
+                               "the functions 'okada_displacement' and 'okada_prior' "
+                               "cannot be used.").with_traceback(e.__traceback__) from e
         else:
-            warn(f"Success = {success} for station {i}!",
-                 category=RuntimeWarning, stacklevel=2)
+            raise e
     # transform back to lat, lon, alt
     # yes this is the same matrix
     disp = disp @ R

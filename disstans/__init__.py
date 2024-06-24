@@ -17,7 +17,6 @@ from pandas.plotting import register_matplotlib_converters
 from matplotlib import rcParams
 
 # import submodules
-from . import compiled
 from . import config
 from . import earthquakes
 from . import models

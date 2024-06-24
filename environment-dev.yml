@@ -17,6 +17,7 @@ dependencies:
   - tqdm
   - sqlalchemy
   - ffmpeg
+  - pip
   - jupyterlab  # optional
   - sphinx>=5.3  # optional
   - docutils  # optional
@@ -28,7 +29,5 @@ dependencies:
   - sphinx-rtd-theme  # optional
   - sphinx-autodoc-typehints  # optional
   - pygmt  # optional
-  - pip
   - pip:
-    - git+https://github.com/tbenthompson/okada_wrapper.git
     - git+https://github.com/sphinx-contrib/video.git  # optional

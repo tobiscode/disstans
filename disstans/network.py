@@ -35,7 +35,7 @@ from .timeseries import Timeseries
 from .station import Station
 from .tools import (parallelize, Timedelta, Click, weighted_median, R_ecef2enu,
                     get_hom_vel_strain_rot, best_utmzone, estimate_euler_pole)
-from .earthquakes import okada_displacement
+from .earthquakes import OKADA_LOADED, okada_displacement
 from .solvers import Solution, ReweightingFunction
 from .models import ModelCollection
 
@@ -3184,7 +3184,7 @@ class Network():
                         sub_cat = sub_cat.iloc[np.any(np.stack([distances <= eqcircle,
                                                                 large_ones]), axis=0), :].copy()
                         # print
-                        if not sub_cat.empty:
+                        if OKADA_LOADED and (not sub_cat.empty):
                             # calculate probable earthquake offsets
                             station_disp = np.zeros((sub_cat.shape[0], 3))
                             for i in range(sub_cat.shape[0]):

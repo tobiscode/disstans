@@ -18,5 +18,3 @@ dependencies:
   - sqlalchemy
   - ffmpeg
   - pip
-  - pip:
-    - git+https://github.com/tbenthompson/okada_wrapper.git
