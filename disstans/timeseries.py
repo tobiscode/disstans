@@ -1196,7 +1196,7 @@ class GipsyTimeseries(Timeseries):
     data_unit
         Can be ``'mm'`` or ``'m'``.
     keep_duplicates
-        Argument passed on to :class:`~pandas.DataFrame.drop_duplicates` as the ``keep``
+        Argument passed on to :meth:`~pandas.DataFrame.drop_duplicates` as the ``keep``
         parameter when finding duplicate times, but with ``False`` as the default
         (since duplicate timestamps usually imply bad data - legacy behavior would be
         to pass ``'first'``).

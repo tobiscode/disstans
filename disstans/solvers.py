@@ -526,7 +526,7 @@ def linear_regression(ts: Timeseries,
                       check_constraints: bool = True
                       ) -> Solution:
     r"""
-    Performs linear, unregularized least squares using :mod:`~scipy.optimize.lsq_linear`.
+    Performs linear, unregularized least squares using :func:`~scipy.optimize.lsq_linear`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single mapping matrix
@@ -632,7 +632,7 @@ def ridge_regression(ts: Timeseries,
                      check_constraints: bool = True
                      ) -> Solution:
     r"""
-    Performs linear, L2-regularized least squares using :mod:`~scipy.optimize.lsq_linear`.
+    Performs linear, L2-regularized least squares using :func:`~scipy.optimize.lsq_linear`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single mapping matrix
