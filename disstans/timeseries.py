@@ -1251,11 +1251,11 @@ repro2018a/raw/position/envseries/0000_README.format
         var_cols = ["east_var", "north_var", "up_var"]
         cov_cols = ["east_north_cov", "east_up_cov", "north_up_cov"]
         all_cols = data_cols + var_cols + cov_cols
-        time = pd.read_csv(self._path, delim_whitespace=True, header=None,
+        time = pd.read_csv(self._path, sep=r"\s+", header=None,
                            usecols=[11, 12, 13, 14, 15, 16],
                            names=["year", "month", "day", "hour", "minute", "second"])
         time = pd.to_datetime(time).to_frame(name="time")
-        data = pd.read_csv(self._path, delim_whitespace=True, header=None,
+        data = pd.read_csv(self._path, sep=r"\s+", header=None,
                            usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
                            names=all_cols)
         # compute covariance from correlation, still in meters
@@ -1396,7 +1396,7 @@ class UNRTimeseries(Timeseries):
         else:
             raise ValueError(f"'data_unit' needs to be 'mm' or 'm', got {data_unit}.")
         # load data and check for some warnings
-        df = pd.read_csv(self._path, delim_whitespace=True,
+        df = pd.read_csv(self._path, sep=r"\s+",
                          usecols=[0, 3] + list(range(6, 13)) + list(range(14, 20)))
         if show_warnings and len(df['site'].unique()) > 1:
             warn(f"Timeseries file {self._path} contains multiple site codes: "
@@ -1588,18 +1588,18 @@ class UNRHighRateTimeseries(Timeseries):
                                        ).with_traceback(e.__traceback__) from e
             # load data into pandas
             f.seek(0)
-            df = pd.read_csv(f, delim_whitespace=True,
+            df = pd.read_csv(f, sep=r"\s+",
                              names=["site", "sec-J2000", "___e-ref(m)", "___n-ref(m)",
                                     "___v-ref(m)", "sig_e(m)", "sig_n(m)", "sig_v(m)"],
                              usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
         # if the path is a .kenv.gz file, we only need to extract the single file
         elif pathobj.match("*.kenv.gz"):
             with gzip.open(self._path, mode="r") as f:
-                df = pd.read_csv(f, delim_whitespace=True,
+                df = pd.read_csv(f, sep=r"\s+",
                                  usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
         # in all other cases, try loading directly
         else:
-            df = pd.read_csv(self._path, delim_whitespace=True,
+            df = pd.read_csv(self._path, sep=r"\s+",
                              usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
         # check for duplicate sites
         if show_warnings and len(df['site'].unique()) > 1:
@@ -1695,7 +1695,7 @@ class F5File():
             assert f.readline() == "\n"
             assert f.readline() == "+DATA\n"
             # read data (omitting final "-DATA" row)
-            data = pd.read_csv(f, delim_whitespace=True, comment="*", engine="c",
+            data = pd.read_csv(f, sep=r"\s+", comment="*", engine="c",
                                names=self.F5COLUMNS, dtype=self.F5DTYPES).iloc[:-1, :]
             # parse date columns as datetime
             data["yyyy"] = data[["yyyy", "mm", "dd", "HH:MM:SS"]].agg(" ".join, axis=1)

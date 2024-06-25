@@ -166,7 +166,7 @@ To load them, we rely on pandas:
     >>> # MIDAS
     >>> fname_midas = Path(f"{data_dir}/midas.IGS14.txt")
     >>> v_mdl_midas = pd.read_csv(fname_midas,
-    ...                           header=0, delim_whitespace=True,
+    ...                           header=0, sep=r"\s+",
     ...                           names=["sta", "label", "t(1)", "t(m)", "delt", "m", "mgood",
     ...                                  "n", "ve50", "vn50", "vu50", "sve", "svn", "svu",
     ...                                  "xe50", "xn50", "xu50", "fe", "fn", "fu",

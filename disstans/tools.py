@@ -998,7 +998,7 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     except error.HTTPError as e:
         raise RuntimeError("Failed to download the station list from "
                            f"{station_list_url}.").with_traceback(e.__traceback__) from e
-    stations = pd.read_csv(station_list_path, delim_whitespace=True, usecols=list(range(11)),
+    stations = pd.read_csv(station_list_path, sep=r"\s+", usecols=list(range(11)),
                            parse_dates=[7, 8, 9])
     # subset according to station_list_or_bbox
     if all([isinstance(site, str) for site in station_list_or_bbox]):
@@ -1261,7 +1261,7 @@ def parse_unr_steps(filepath: str,
     # load the file
     col_names = ["station", "time", "code", "type", "distance", "magnitude", "usgsid"]
     # (for earthquake events, the "type" column is actually the "threshold" column)
-    raw = pd.read_csv(filepath, names=col_names, delim_whitespace=True)
+    raw = pd.read_csv(filepath, names=col_names, sep=r"\s+")
     # we now have a locale-dependent time column in the non-standard format yymmmdd
     # (%y%b%d in strptime language) which we need to convert in a hard-coded way, because we
     # shouldn't change the locale temporarily as it affects the entire system
