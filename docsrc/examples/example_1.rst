@@ -956,7 +956,7 @@ Which yields the following map:
 
 And animation:
 
-.. video:: ../_static/example_1f.mp4
+.. video:: ../img/example_1f.mp4
 
 This is a relatively long timespan, so we can nicely see individual periods of coherent motion
 of the network; the strongest one most notable being the radial outwards motion of the stations
