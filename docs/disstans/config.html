@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration &mdash; DISSTANS 2.0rc0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Configuration &mdash; DISSTANS 2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=1413ff29"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=c4a36953"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/copybutton.js?v=c8c824eb"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Earthquakes" href="earthquakes.html" />
-    <link rel="prev" title="Compiled" href="compiled.html" /> 
+    <link rel="prev" title="DISSTANS" href="../disstans.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -39,7 +40,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -155,14 +156,6 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
-</ul>
-</li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
 </ul>
@@ -226,6 +219,7 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.copy_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.copy_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
@@ -239,6 +233,7 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Network.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
@@ -249,6 +244,7 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_models"><code class="docutils literal notranslate"><span class="pre">Network.remove_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
@@ -318,6 +314,7 @@
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Station.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
@@ -339,7 +336,11 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#gipsyxtimeseries">GipsyXTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#unrhighratetimeseries">UNRHighRateTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#f5file">F5File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#f5timeseries">F5Timeseries</a></li>
 </ul>
 </li>
 </ul>
@@ -365,6 +366,7 @@
 <li class="toctree-l4"><a class="reference internal" href="tools.html#r-ecef2enu">R_ecef2enu</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#r-enu2ecef">R_enu2ecef</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#selectpair">selectpair</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
@@ -408,11 +410,11 @@
            <div itemprop="articleBody">
              
   <section id="module-disstans.config">
-<span id="configuration"></span><h1>Configuration<a class="headerlink" href="#module-disstans.config" title="Permalink to this heading"></a></h1>
+<span id="configuration"></span><h1>Configuration<a class="headerlink" href="#module-disstans.config" title="Link to this heading"></a></h1>
 <p>This module contains the global default configuration dictionary.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="disstans.config.defaults">
-<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'clean':</span> <span class="pre">{'iqr_outlier':</span> <span class="pre">None,</span> <span class="pre">'min_clean_obs':</span> <span class="pre">100,</span> <span class="pre">'min_obs':</span> <span class="pre">100,</span> <span class="pre">'std_outlier':</span> <span class="pre">10,</span> <span class="pre">'std_thresh':</span> <span class="pre">100},</span> <span class="pre">'general':</span> <span class="pre">{'num_threads':</span> <span class="pre">0},</span> <span class="pre">'gui':</span> <span class="pre">{'coastlines_res':</span> <span class="pre">'50m',</span> <span class="pre">'coastlines_show':</span> <span class="pre">True,</span> <span class="pre">'plot_sigmas':</span> <span class="pre">3,</span> <span class="pre">'plot_sigmas_alpha':</span> <span class="pre">0.5,</span> <span class="pre">'projection':</span> <span class="pre">'Mercator',</span> <span class="pre">'wmts_alpha':</span> <span class="pre">0.2,</span> <span class="pre">'wmts_layer':</span> <span class="pre">'World_Imagery',</span> <span class="pre">'wmts_server':</span> <span class="pre">'https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',</span> <span class="pre">'wmts_show':</span> <span class="pre">False},</span> <span class="pre">'prior':</span> <span class="pre">{'alpha':</span> <span class="pre">0.667,</span> <span class="pre">'mu':</span> <span class="pre">48,</span> <span class="pre">'threshold':</span> <span class="pre">3}}</span></em><a class="headerlink" href="#disstans.config.defaults" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'clean':</span> <span class="pre">{'iqr_outlier':</span> <span class="pre">None,</span> <span class="pre">'min_clean_obs':</span> <span class="pre">100,</span> <span class="pre">'min_obs':</span> <span class="pre">100,</span> <span class="pre">'std_bad':</span> <span class="pre">None,</span> <span class="pre">'std_outlier':</span> <span class="pre">10,</span> <span class="pre">'std_thresh':</span> <span class="pre">100},</span> <span class="pre">'general':</span> <span class="pre">{'num_threads':</span> <span class="pre">0},</span> <span class="pre">'gui':</span> <span class="pre">{'coastlines_res':</span> <span class="pre">'50m',</span> <span class="pre">'coastlines_show':</span> <span class="pre">True,</span> <span class="pre">'plot_sigmas':</span> <span class="pre">3,</span> <span class="pre">'plot_sigmas_alpha':</span> <span class="pre">0.5,</span> <span class="pre">'projection':</span> <span class="pre">'Mercator',</span> <span class="pre">'wmts_alpha':</span> <span class="pre">0.2,</span> <span class="pre">'wmts_layer':</span> <span class="pre">'World_Imagery',</span> <span class="pre">'wmts_server':</span> <span class="pre">'https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/WMTS/1.0.0/WMTSCapabilities.xml',</span> <span class="pre">'wmts_show':</span> <span class="pre">False},</span> <span class="pre">'prior':</span> <span class="pre">{'alpha':</span> <span class="pre">0.667,</span> <span class="pre">'mu':</span> <span class="pre">48,</span> <span class="pre">'threshold':</span> <span class="pre">3}}</span></em><a class="headerlink" href="#disstans.config.defaults" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -421,14 +423,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="compiled.html" class="btn btn-neutral float-left" title="Compiled" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../disstans.html" class="btn btn-neutral float-left" title="DISSTANS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="earthquakes.html" class="btn btn-neutral float-right" title="Earthquakes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

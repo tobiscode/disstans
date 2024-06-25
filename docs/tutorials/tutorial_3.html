@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 3: Incorporating Spatial Coherence &mdash; DISSTANS 2.0rc0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Tutorial 3: Incorporating Spatial Coherence &mdash; DISSTANS 2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=1413ff29"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=c4a36953"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/copybutton.js?v=c8c824eb"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -40,7 +41,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -156,14 +157,6 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#selectpair">selectpair</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/config.html">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/config.html#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
 </ul>
@@ -227,6 +220,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.copy_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
@@ -240,6 +234,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Network.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
@@ -250,6 +245,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_models"><code class="docutils literal notranslate"><span class="pre">Network.remove_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
@@ -319,6 +315,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Station.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
@@ -340,7 +337,11 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#gipsyxtimeseries">GipsyXTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#unrhighratetimeseries">UNRHighRateTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#f5file">F5File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#f5timeseries">F5Timeseries</a></li>
 </ul>
 </li>
 </ul>
@@ -366,6 +367,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#selectpair">selectpair</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
@@ -409,7 +411,7 @@
            <div itemprop="articleBody">
              
   <section id="tutorial-3-incorporating-spatial-coherence">
-<h1>Tutorial 3: Incorporating Spatial Coherence<a class="headerlink" href="#tutorial-3-incorporating-spatial-coherence" title="Permalink to this heading"></a></h1>
+<h1>Tutorial 3: Incorporating Spatial Coherence<a class="headerlink" href="#tutorial-3-incorporating-spatial-coherence" title="Link to this heading"></a></h1>
 <aside class="sidebar">
 <p class="sidebar-title">Download full script</p>
 <p><a class="reference download internal" download="" href="../_downloads/84a7eb6a58150010066b7acdbed85558/tutorial_3_spatial_sparsity.py"><code class="xref download docutils literal notranslate"><span class="pre">tutorial_3_spatial_sparsity.py</span></code></a></p>
@@ -449,7 +451,7 @@ Care has been taken to recreate this example to match what is in the published s
 although small quantitative changes remain. The qualitative interpretations are
 unchanged.</p>
 </div>
-<div class="contents local topic" id="table-of-contents">
+<nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id4">Preparations</a></p></li>
@@ -464,9 +466,9 @@ unchanged.</p>
 <li><p><a class="reference internal" href="#transient-visualization-with-worm-plots" id="id13">Transient visualization with worm plots</a></p></li>
 <li><p><a class="reference internal" href="#secular-velocity-comparisons" id="id14">Secular velocity comparisons</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id4">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Link to this heading"></a></h2>
 <p>We need to prepare two things: parallelization (which can differ from the machine used to
 test this tutorial to yours, see the note above) and a random number seed to make the data
 and figures reproducible.
@@ -485,7 +487,7 @@ in the script does the trick, and we can set the number of threads manually:</p>
 </div>
 </section>
 <section id="dreaming-up-a-network">
-<h2><a class="toc-backref" href="#id5">Dreaming up a network</a><a class="headerlink" href="#dreaming-up-a-network" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Dreaming up a network</a><a class="headerlink" href="#dreaming-up-a-network" title="Link to this heading"></a></h2>
 <p>The network we’re dreaming of is a collection of 16 stations situated on the beautiful
 <a class="reference external" href="https://en.wikipedia.org/wiki/Null_Island">Null Island</a>. There is no reason the
 stations shouldn’t be named after fake kitten names created by a neural network of
@@ -514,7 +516,7 @@ instantiate a <a class="reference internal" href="../disstans/network.html#disst
 </div>
 </section>
 <section id="fantasizing-data">
-<h2><a class="toc-backref" href="#id6">Fantasizing data</a><a class="headerlink" href="#fantasizing-data" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Fantasizing data</a><a class="headerlink" href="#fantasizing-data" title="Link to this heading"></a></h2>
 <p>Just as above, we first need a vector of time stamps:</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
@@ -720,7 +722,7 @@ at all stations from west to east.</p>
 </div>
 </section>
 <section id="removing-the-common-mode-error">
-<h2><a class="toc-backref" href="#id7">Removing the Common Mode Error</a><a class="headerlink" href="#removing-the-common-mode-error" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Removing the Common Mode Error</a><a class="headerlink" href="#removing-the-common-mode-error" title="Link to this heading"></a></h2>
 <p>To remove the common mode error that we added, we first need a high-pass filtered
 version of our <code class="docutils literal notranslate"><span class="pre">'Raw'</span></code> timeseries. We can do this effectively and step-insensitive
 by calculating the running median of the timeseries, and then removing this
@@ -792,7 +794,7 @@ defined above. Lastly, we can remove the now-obsolete intermediate timeseries.</
 </div>
 </section>
 <section id="fitting-the-data-using-reweighted-l1-regularization">
-<h2><a class="toc-backref" href="#id8">Fitting the data using reweighted L1 regularization</a><a class="headerlink" href="#fitting-the-data-using-reweighted-l1-regularization" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Fitting the data using reweighted L1 regularization</a><a class="headerlink" href="#fitting-the-data-using-reweighted-l1-regularization" title="Link to this heading"></a></h2>
 <p>We’ll basically do the same processing as at the end of the previous tutorial, but make
 use of yet another high-level function to reduce the amount of lines we have to write:
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.fitevalres" title="disstans.network.Network.fitevalres"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fitevalres()</span></code></a>, which combines the two functions
@@ -931,7 +933,7 @@ between the stations (which is computationally still unfeasible for any real reg
 network), we need to think of a better way to reduce the number of unique splines.</p>
 </section>
 <section id="fitting-the-data-using-a-spatially-aware-l1-reweighting">
-<h2><a class="toc-backref" href="#id9">Fitting the data using a spatially-aware L1 reweighting</a><a class="headerlink" href="#fitting-the-data-using-a-spatially-aware-l1-reweighting" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Fitting the data using a spatially-aware L1 reweighting</a><a class="headerlink" href="#fitting-the-data-using-a-spatially-aware-l1-reweighting" title="Link to this heading"></a></h2>
 <p><a class="reference internal" href="../disstans/network.html#riel14" id="id2"><span>[riel14]</span></a> solves the problem by alternating between a station-specific solution, and a step
 where the parameter weights of each L1-regularized problems are gathered, compared, and
 updated based on a weighting scheme. In DISSTANS, this is handled by the
@@ -1169,7 +1171,7 @@ levels is presented in <a class="reference internal" href="tutorial_5.html"><spa
 </div>
 </section>
 <section id="finding-unmodeled-jumps">
-<h2><a class="toc-backref" href="#id10">Finding unmodeled jumps</a><a class="headerlink" href="#finding-unmodeled-jumps" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Finding unmodeled jumps</a><a class="headerlink" href="#finding-unmodeled-jumps" title="Link to this heading"></a></h2>
 <p>When looking at the errors that we just printed out, we are painfully reminded that
 we added an unmodeled maintenance step to the station Corko. Lets’s use the
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.gui" title="disstans.network.Network.gui"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gui()</span></code></a> function to plot the scalograms and timeseries
@@ -1238,7 +1240,7 @@ and rerun the local and spatial L0 fits.</p>
 </div>
 </section>
 <section id="statistics-of-spatial-reweighting">
-<h2><a class="toc-backref" href="#id11">Statistics of spatial reweighting</a><a class="headerlink" href="#statistics-of-spatial-reweighting" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Statistics of spatial reweighting</a><a class="headerlink" href="#statistics-of-spatial-reweighting" title="Link to this heading"></a></h2>
 <p>Let’s have a look at the statistics saved by ourselves as well as those returned
 by <a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a> into the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary.
 The first three variables contain the key numbers we used before to show how
@@ -1387,7 +1389,7 @@ that our <em>errors</em> are smaller.</p>
 </div>
 </section>
 <section id="model-parameter-correlations">
-<h2><a class="toc-backref" href="#id12">Model parameter correlations</a><a class="headerlink" href="#model-parameter-correlations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">Model parameter correlations</a><a class="headerlink" href="#model-parameter-correlations" title="Link to this heading"></a></h2>
 <p>While a more detailed exploration of the parameter correlations is left to the next tutorial,
 let’s have a quick look at the correlation matrices at station Jeckle.
 The following code will produce the annotated correlation plot using the
@@ -1413,7 +1415,7 @@ are omitted, yielding the following plot:</p>
 splines and the other models.</p>
 </section>
 <section id="transient-visualization-with-worm-plots">
-<h2><a class="toc-backref" href="#id13">Transient visualization with worm plots</a><a class="headerlink" href="#transient-visualization-with-worm-plots" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">Transient visualization with worm plots</a><a class="headerlink" href="#transient-visualization-with-worm-plots" title="Link to this heading"></a></h2>
 <p>The reason we saved the transient model fits as separate timeseries
 (e.g. <code class="docutils literal notranslate"><span class="pre">'Trans_L1R1S10'</span></code>) is because we will make use of the
 <a class="reference internal" href="../disstans/network.html#disstans.network.Network.wormplot" title="disstans.network.Network.wormplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wormplot()</span></code></a> method to show the motion of the different
@@ -1449,7 +1451,7 @@ which we know to be the true direction of motion. This is also visible in
 the far east of the network, where the signal is close or below the noise floor.</p>
 </section>
 <section id="secular-velocity-comparisons">
-<h2><a class="toc-backref" href="#id14">Secular velocity comparisons</a><a class="headerlink" href="#secular-velocity-comparisons" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">Secular velocity comparisons</a><a class="headerlink" href="#secular-velocity-comparisons" title="Link to this heading"></a></h2>
 <p>To highlight the importance of modeling transients explicitly, we are now going to look
 at the estimated linear (secular) velocity that every station experiences. That velocity
 is stored in the following parameter in our network (for station Jeckle, e.g.):</p>
@@ -1588,7 +1590,7 @@ remind the user that this tradeoff would only be worse in real data.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

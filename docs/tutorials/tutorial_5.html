@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 5: Signal Recovery at Low SNR &mdash; DISSTANS 2.0rc0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Tutorial 5: Signal Recovery at Low SNR &mdash; DISSTANS 2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=1413ff29"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=c4a36953"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/copybutton.js?v=c8c824eb"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -40,7 +41,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -156,14 +157,6 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../disstans/compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#selectpair">selectpair</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../disstans/compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../disstans/compiled.html#source-code">Source Code</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="../disstans/config.html">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/config.html#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
 </ul>
@@ -227,6 +220,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.copy_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
@@ -240,6 +234,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Network.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
@@ -250,6 +245,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_models"><code class="docutils literal notranslate"><span class="pre">Network.remove_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
@@ -319,6 +315,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Station.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
@@ -340,7 +337,11 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../disstans/timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#gipsyxtimeseries">GipsyXTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#unrhighratetimeseries">UNRHighRateTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#f5file">F5File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/timeseries.html#f5timeseries">F5Timeseries</a></li>
 </ul>
 </li>
 </ul>
@@ -366,6 +367,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-ecef2enu">R_ecef2enu</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#r-enu2ecef">R_enu2ecef</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#selectpair">selectpair</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../disstans/tools.html#weighted-median">weighted_median</a></li>
@@ -409,7 +411,7 @@
            <div itemprop="articleBody">
              
   <section id="tutorial-5-signal-recovery-at-low-snr">
-<h1>Tutorial 5: Signal Recovery at Low SNR<a class="headerlink" href="#tutorial-5-signal-recovery-at-low-snr" title="Permalink to this heading"></a></h1>
+<h1>Tutorial 5: Signal Recovery at Low SNR<a class="headerlink" href="#tutorial-5-signal-recovery-at-low-snr" title="Link to this heading"></a></h1>
 <aside class="sidebar">
 <p class="sidebar-title">Download full script</p>
 <p><a class="reference download internal" download="" href="../_downloads/32a07a6e409c83530fb6f799642ded4f/tutorial_5_low_snr.py"><code class="xref download docutils literal notranslate"><span class="pre">tutorial_5_low_snr.py</span></code></a></p>
@@ -428,7 +430,7 @@ Care has been taken to recreate this example to match what is in the published s
 although small quantitative changes remain. The qualitative interpretations are
 unchanged.</p>
 </div>
-<div class="contents local topic" id="table-of-contents">
+<nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#preparations" id="id2">Preparations</a></p></li>
@@ -436,9 +438,9 @@ unchanged.</p>
 <li><p><a class="reference internal" href="#running-test-cases" id="id4">Running test cases</a></p></li>
 <li><p><a class="reference internal" href="#results" id="id5">Results</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id2">Preparations</a><a class="headerlink" href="#preparations" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Link to this heading"></a></h2>
 <p>By now, not every import needs to be explained, so I’ll just get those out of the
 way first:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
@@ -495,7 +497,7 @@ as clearly as possible, without having to worry about other models:</p>
 </div>
 </section>
 <section id="defining-the-variables-and-hyperparameter-space">
-<h2><a class="toc-backref" href="#id3">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Link to this heading"></a></h2>
 <p>So now that we have a network, a true signal shared by all stations, and a different
 noise realization for every station, what are the variables and hyperparameters we want
 to examine?</p>
@@ -530,7 +532,7 @@ for now. Here is the suite of parameters we want to consider:</p>
 </div>
 </section>
 <section id="running-test-cases">
-<h2><a class="toc-backref" href="#id4">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Link to this heading"></a></h2>
 <p>It becomes clear that this is best done in parallel, given the sheer number of
 hyperparameter combinations, not to mention that we have to do each combination a number
 of times with different station subsets to get a statistically valid result. To do this
@@ -553,7 +555,7 @@ standard deviation of that. Finally, we can plot this mean and standard deviatio
 mean RMSE for all different number of stations.</p>
 </section>
 <section id="results">
-<h2><a class="toc-backref" href="#id5">Results</a><a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Results</a><a class="headerlink" href="#results" title="Link to this heading"></a></h2>
 <p>When we then plot all of the different cases in one big plot, we can see the big picture:</p>
 <img alt="../_images/tutorial_5_S20N50_10.png" src="../_images/tutorial_5_S20N50_10.png" />
 <p>Here for example, we compare, for an initial penalty parameter of 10, the effect that
@@ -593,7 +595,7 @@ when fit individually).</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

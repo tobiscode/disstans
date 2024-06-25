@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Earthquakes &mdash; DISSTANS 2.0rc0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Earthquakes &mdash; DISSTANS 2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=1413ff29"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=c4a36953"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/copybutton.js?v=c8c824eb"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -40,7 +41,7 @@
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.0rc0
+                2.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -156,14 +157,6 @@
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../disstans.html">DISSTANS</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="compiled.html">Compiled</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#selectpair">selectpair</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="compiled.html#disstans.compiled.selectpair"><code class="docutils literal notranslate"><span class="pre">selectpair()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="compiled.html#source-code">Source Code</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="config.html#disstans.config.defaults"><code class="docutils literal notranslate"><span class="pre">config.defaults</span></code></a></li>
 </ul>
@@ -227,6 +220,7 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_func_no_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_no_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_func_ts_return"><code class="docutils literal notranslate"><span class="pre">Network.call_func_ts_return()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.call_netwide_func"><code class="docutils literal notranslate"><span class="pre">Network.call_netwide_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.copy_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.copy_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.copy_uncertainties"><code class="docutils literal notranslate"><span class="pre">Network.copy_uncertainties()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.create_station"><code class="docutils literal notranslate"><span class="pre">Network.create_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.decompose"><code class="docutils literal notranslate"><span class="pre">Network.decompose()</span></code></a></li>
@@ -240,6 +234,7 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.freeze"><code class="docutils literal notranslate"><span class="pre">Network.freeze()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.from_json"><code class="docutils literal notranslate"><span class="pre">Network.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.get_stations_with"><code class="docutils literal notranslate"><span class="pre">Network.get_stations_with()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Network.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.graphical_cme"><code class="docutils literal notranslate"><span class="pre">Network.graphical_cme()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.gui"><code class="docutils literal notranslate"><span class="pre">Network.gui()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.hom_velocity_field"><code class="docutils literal notranslate"><span class="pre">Network.hom_velocity_field()</span></code></a></li>
@@ -250,6 +245,7 @@
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.name"><code class="docutils literal notranslate"><span class="pre">Network.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.num_stations"><code class="docutils literal notranslate"><span class="pre">Network.num_stations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.plot_availability"><code class="docutils literal notranslate"><span class="pre">Network.plot_availability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_models"><code class="docutils literal notranslate"><span class="pre">Network.remove_models()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_station"><code class="docutils literal notranslate"><span class="pre">Network.remove_station()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.remove_timeseries"><code class="docutils literal notranslate"><span class="pre">Network.remove_timeseries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="network.html#disstans.network.Network.spatialfit"><code class="docutils literal notranslate"><span class="pre">Network.spatialfit()</span></code></a></li>
@@ -319,6 +315,7 @@
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.fits"><code class="docutils literal notranslate"><span class="pre">Station.fits</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_arch"><code class="docutils literal notranslate"><span class="pre">Station.get_arch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_trend"><code class="docutils literal notranslate"><span class="pre">Station.get_trend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.get_trend_change"><code class="docutils literal notranslate"><span class="pre">Station.get_trend_change()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.location"><code class="docutils literal notranslate"><span class="pre">Station.location</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.models"><code class="docutils literal notranslate"><span class="pre">Station.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="station.html#disstans.station.Station.name"><code class="docutils literal notranslate"><span class="pre">Station.name</span></code></a></li>
@@ -340,7 +337,11 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="timeseries.html#specialized-classes">Specialized Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="timeseries.html#gipsytimeseries">GipsyTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#gipsyxtimeseries">GipsyXTimeseries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="timeseries.html#unrtimeseries">UNRTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#unrhighratetimeseries">UNRHighRateTimeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#f5file">F5File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="timeseries.html#f5timeseries">F5Timeseries</a></li>
 </ul>
 </li>
 </ul>
@@ -366,6 +367,7 @@
 <li class="toctree-l4"><a class="reference internal" href="tools.html#r-ecef2enu">R_ecef2enu</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#r-enu2ecef">R_enu2ecef</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#rotvec2eulerpole">rotvec2eulerpole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tools.html#selectpair">selectpair</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#strain-rotation-invariants">strain_rotation_invariants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#tvec-to-numpycol">tvec_to_numpycol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tools.html#weighted-median">weighted_median</a></li>
@@ -409,25 +411,25 @@
            <div itemprop="articleBody">
              
   <section id="module-disstans.earthquakes">
-<span id="earthquakes"></span><h1>Earthquakes<a class="headerlink" href="#module-disstans.earthquakes" title="Permalink to this heading"></a></h1>
+<span id="earthquakes"></span><h1>Earthquakes<a class="headerlink" href="#module-disstans.earthquakes" title="Link to this heading"></a></h1>
 <p>This module contains functions relating to the processing and representation
 of earthquakes.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.earthquakes.okada_displacement">
-<span class="sig-prename descclassname"><span class="pre">disstans.earthquakes.</span></span><span class="sig-name descname"><span class="pre">okada_displacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_lla</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_catalog_row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/earthquakes.html#okada_displacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.earthquakes.okada_displacement" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.earthquakes.</span></span><span class="sig-name descname"><span class="pre">okada_displacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_lla</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq_catalog_row</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/earthquakes.html#okada_displacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.earthquakes.okada_displacement" title="Link to this definition"></a></dt>
 <dd><p>For a single station and a single row from the earthquake catalog as defined by
 <a class="reference internal" href="#disstans.earthquakes.okada_prior" title="disstans.earthquakes.okada_prior"><code class="xref py py-func docutils literal notranslate"><span class="pre">okada_prior()</span></code></a>, calculate the estimated displacement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>station_lla</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]) – Location of the station, see <a class="reference internal" href="station.html#disstans.station.Station.location" title="disstans.station.Station.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location</span></code></a>.</p></li>
-<li><p><strong>eq_catalog_row</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.1.1/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a>) – A single row of the earthquake catalog as defined by <a class="reference internal" href="#disstans.earthquakes.okada_prior" title="disstans.earthquakes.okada_prior"><code class="xref py py-func docutils literal notranslate"><span class="pre">okada_prior()</span></code></a>.</p></li>
+<li><p><strong>station_lla</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Location of the station, see <a class="reference internal" href="station.html#disstans.station.Station.location" title="disstans.station.Station.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location</span></code></a>.</p></li>
+<li><p><strong>eq_catalog_row</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/version/2.2.2/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></a></span>) – A single row of the earthquake catalog as defined by <a class="reference internal" href="#disstans.earthquakes.okada_prior" title="disstans.earthquakes.okada_prior"><code class="xref py py-func docutils literal notranslate"><span class="pre">okada_prior()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.26/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/1.26/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>3D displacement in mm.</p>
 </dd>
 </dl>
@@ -435,30 +437,30 @@ of earthquakes.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.earthquakes.okada_prior">
-<span class="sig-prename descclassname"><span class="pre">disstans.earthquakes.</span></span><span class="sig-name descname"><span class="pre">okada_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model_regularize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_prior_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/earthquakes.html#okada_prior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.earthquakes.okada_prior" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.earthquakes.</span></span><span class="sig-name descname"><span class="pre">okada_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model_regularize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_prior_kw_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/earthquakes.html#okada_prior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.earthquakes.okada_prior" title="Link to this definition"></a></dt>
 <dd><p>Given a catalog of earthquakes (including moment tensors), calculate an approximate
 displacement for each of the stations in the network.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code> and <code class="docutils literal notranslate"><span class="pre">target_model</span></code> are passed, the function adds
 step models to the respective station’s timeseries and models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>) – Network instance whose stations should be used.</p></li>
-<li><p><strong>catalog_path</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – File name of the earthquake catalog to load. Currently, only the Japanese
+<li><p><strong>network</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a></span>) – Network instance whose stations should be used.</p></li>
+<li><p><strong>catalog_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – File name of the earthquake catalog to load. Currently, only the Japanese
 NIED’s F-net earthquake mechanism catalog format is supported.</p></li>
-<li><p><strong>target_timeseries</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the timeseries to add the model to.</p></li>
-<li><p><strong>target_model</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the earthquake model added to <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code>.
+<li><p><strong>target_timeseries</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the timeseries to add the model to.</p></li>
+<li><p><strong>target_model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the earthquake model added to <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code>.
 Has to be passed if <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code> is passed.</p></li>
-<li><p><strong>target_model_regularize</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Whether to mark the model for regularization or not.</p></li>
-<li><p><strong>no_pbar</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>catalog_prior_kw_args</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">{}</span></code>) – A dictionary fine-tuning the displacement calculation and modeling, see
+<li><p><strong>target_model_regularize</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Whether to mark the model for regularization or not.</p></li>
+<li><p><strong>no_pbar</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Suppress the progress bar with <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>catalog_prior_kw_args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">{}</span></code>) – A dictionary fine-tuning the displacement calculation and modeling, see
 <a class="reference internal" href="config.html#disstans.config.defaults" title="disstans.config.defaults"><code class="xref py py-attr docutils literal notranslate"><span class="pre">defaults</span></code></a> for explanations and defaults.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dictionary of that maps the station names to a list of steptimes.</p>
 </dd>
 </dl>
@@ -471,11 +473,6 @@ Fortran and wrapped by the Python package <a class="reference external" href="ht
 <em>mxx,mxy,mxz,myy,myz,mzz,Unit(Nm),Number_of_Stations</em></p>
 <p>The keywords in <code class="docutils literal notranslate"><span class="pre">catalog_prior_kw_args</span></code> are:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 7%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Keyword</p></th>
 <th class="head"><p>Units</p></th>
@@ -500,18 +497,19 @@ to surpass in order for a step to be added to the model.</p></td>
 </tbody>
 </table>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="okada92"><span class="brackets"><a class="fn-backref" href="#id1">okada92</a></span></dt>
-<dd><p>Okada, Y. (1992).
+<div role="list" class="citation-list">
+<div class="citation" id="okada92" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">okada92</a><span class="fn-bracket">]</span></span>
+<p>Okada, Y. (1992).
 <em>Internal deformation due to shear and tensile faults in a half-space</em>.
 Bulletin of the Seismological Society of America, 82(2), 1018–1040.</p>
-</dd>
-</dl>
+</div>
+</div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="disstans.earthquakes.empirical_prior">
-<span class="sig-prename descclassname"><span class="pre">disstans.earthquakes.</span></span><span class="sig-name descname"><span class="pre">empirical_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model_regularize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_add</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/earthquakes.html#empirical_prior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.earthquakes.empirical_prior" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">disstans.earthquakes.</span></span><span class="sig-name descname"><span class="pre">empirical_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_model_regularize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_add</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/disstans/earthquakes.html#empirical_prior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#disstans.earthquakes.empirical_prior" title="Link to this definition"></a></dt>
 <dd><p>Given a catalog of earthquakes, compute whether a station is expected to
 see a step with the following empirical formula (used by the Geodesy group at
 UNR, see <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/steps_readme.txt">unr_steps</a>):</p>
@@ -522,21 +520,21 @@ and <span class="math notranslate nohighlight">\(\text{M}_\text{w}\)</span> is t
 <p>If <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code> and <code class="docutils literal notranslate"><span class="pre">target_model</span></code> are passed, the function adds
 step models to the respective station’s timeseries and models.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>) – Network instance whose stations should be used.</p></li>
-<li><p><strong>catalog_path</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – File name of the earthquake catalog to load. Currently, only the Japanese
+<li><p><strong>network</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="network.html#disstans.network.Network" title="disstans.network.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a></span>) – Network instance whose stations should be used.</p></li>
+<li><p><strong>catalog_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – File name of the earthquake catalog to load. Currently, only the Japanese
 NIED’s F-net earthquake mechanism catalog format is supported.</p></li>
-<li><p><strong>target_timeseries</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the timeseries to add the model to.</p></li>
-<li><p><strong>target_model</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the earthquake model added to <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code>.
+<li><p><strong>target_timeseries</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the timeseries to add the model to.</p></li>
+<li><p><strong>target_model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – Name of the earthquake model added to <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code>.
 Has to be passed if <code class="docutils literal notranslate"><span class="pre">target_timeseries</span></code> is passed.</p></li>
-<li><p><strong>target_model_regularize</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Whether to mark the model for regularization or not.</p></li>
+<li><p><strong>target_model_regularize</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>) – Whether to mark the model for regularization or not.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</span></p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dictionary of that maps the station names to a list of steptimes.</p>
 </dd>
 </dl>
@@ -555,7 +553,7 @@ Has to be passed if <code class="docutils literal notranslate"><span class="pre"
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Tobias Köhne.</p>
+    <p>&#169; Copyright 2024, Tobias Köhne.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

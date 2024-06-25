@@ -140,7 +140,7 @@ if __name__ == "__main__":
     # load MIDAS velocities
     print("Reading MIDAS and GAGE velocities... ", end="", flush=True)
     v_mdl_midas = pd.read_csv(fname_midas,
-                              header=0, delim_whitespace=True,
+                              header=0, sep=r"\s+",
                               names=["sta", "label", "t(1)", "t(m)", "delt", "m", "mgood",
                                      "n", "ve50", "vn50", "vu50", "sve", "svn", "svu",
                                      "xe50", "xn50", "xu50", "fe", "fn", "fu",
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     station_lolaal = net.station_locations.loc[
         common_stations, ["Longitude [°]", "Latitude [°]", "Altitude [m]"]].to_numpy()
     lons, lats, alts = station_lolaal[:, 0], station_lolaal[:, 1], station_lolaal[:, 2]
-    inner_bbox = [-119-12/60, -118-33/60, 37+30/60, 37+50/60]
+    inner_bbox = [-119 - 12 / 60, -118 - 33 / 60, 37 + 30 / 60, 37 + 50 / 60]
     inner_shell = ((lons > 360 + inner_bbox[0]) &
                    (lons < 360 + inner_bbox[1]) &
                    (lats > inner_bbox[2]) &

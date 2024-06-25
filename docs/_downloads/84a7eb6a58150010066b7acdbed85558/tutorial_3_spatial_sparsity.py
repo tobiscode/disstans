@@ -42,8 +42,8 @@ if __name__ == "__main__":
     net = Network(name=net_name)
     for (istat, stat_name), lon, lat in zip(enumerate(station_names),
                                             lons.ravel(), lats.ravel()):
-        temp_loc = [lat + rng.normal()*0.02 + int(istat % 2 == 0)*0.1,
-                    lon + rng.normal()*0.01, 0.0]
+        temp_loc = [lat + rng.normal() * 0.02 + int(istat % 2 == 0) * 0.1,
+                    lon + rng.normal() * 0.01, 0.0]
         net[stat_name] = Station(name=stat_name,
                                  location=temp_loc)
 
@@ -74,9 +74,9 @@ if __name__ == "__main__":
         lon = loc[1]
         p_sec = np.array([[0, 0], [1, -1]])
         p_seas = rng.uniform(-0.3, 0.3, size=(2, 2))
-        p_sse1 = np.array([[6, -6]])*np.exp(-(3 * lon**2))  # from the west
-        p_sse2 = np.array([[4, -4]])*np.exp(-(3 * lon**2))  # from the west
-        p_sse3 = np.array([[8, -8]])*np.exp(-(3 * lon**2))  # from the west
+        p_sse1 = np.array([[6, -6]]) * np.exp(-(3 * lon**2))  # from the west
+        p_sse2 = np.array([[4, -4]]) * np.exp(-(3 * lon**2))  # from the west
+        p_sse3 = np.array([[8, -8]]) * np.exp(-(3 * lon**2))  # from the west
         p_eq = np.array([[-3, 3]])
         meas_noise = rng.multivariate_normal(mean=(0, 0), cov=noise_cov,
                                              size=timevector.size)
@@ -118,7 +118,7 @@ if __name__ == "__main__":
         mdl_trans = SplineSet(degree=2,
                               t_center_start=t_start_str,
                               t_center_end=t_end_str,
-                              list_num_knots=[int(1+2**n) for n in range(3, 8)])
+                              list_num_knots=[int(1 + 2**n) for n in range(3, 8)])
         # collect the models in the dictionary
         mdl_coll_synth[station.name] = {"Secular": mdl_sec,
                                         "Seasonal": mdl_seas,
@@ -134,7 +134,7 @@ if __name__ == "__main__":
         mdl_sec.read_parameters(p_sec)
         mdl_seas.read_parameters(p_seas)
         mdl_eq.read_parameters(p_eq)
-        mdl_post.read_parameters(p_eq/5)
+        mdl_post.read_parameters(p_eq / 5)
         mdl_sse1.read_parameters(p_sse1)
         mdl_sse2.read_parameters(p_sse2)
         mdl_sse3.read_parameters(p_sse3)
@@ -154,8 +154,8 @@ if __name__ == "__main__":
         # noise variance is the same as before
         # but: only in the second half, where there are no strong, short-term signals
         if station.name == "Cylon":
-            gen_data["noise"][timevector.size//2:, :] = \
-                (gen_data["noise"][timevector.size//2:, :] +
+            gen_data["noise"][timevector.size // 2:, :] = \
+                (gen_data["noise"][timevector.size // 2:, :] +
                  create_powerlaw_noise(size=(timevector.size // 2, 2),
                                        exponent=1, seed=rng
                                        ) * np.sqrt(np.array([[var_e, var_n]]))

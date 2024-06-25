@@ -101,6 +101,11 @@ rotvec2eulerpole
 
 .. autofunction:: disstans.tools.rotvec2eulerpole
 
+selectpair
+..........
+
+.. autofunction:: disstans.tools.selectpair
+
 strain_rotation_invariants
 ..........................
 
