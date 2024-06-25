@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-okada = ["okada_wrapper>=24.06.15"]
+okada = ["okada-wrapper>=24.6.15"]
 
 [project.urls]
 Repository = "https://github.com/tobiscode/disstans"

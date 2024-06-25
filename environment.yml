@@ -17,3 +17,5 @@ dependencies:
   - sqlalchemy
   - ffmpeg
   - pip
+  - pip:
+    - okada-wrapper>=24.6.15  # required for disstans.earthquakes okada functions

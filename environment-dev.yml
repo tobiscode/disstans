@@ -29,4 +29,5 @@ dependencies:
   - sphinx-autodoc-typehints  # optional
   - pygmt  # optional
   - pip:
+    - okada-wrapper>=24.6.15  # required for disstans.earthquakes okada functions
     - sphinxcontrib-video  # optional
