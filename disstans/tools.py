@@ -1818,27 +1818,55 @@ def R_enu2ecef(lon: float, lat: float) -> np.ndarray:
 # This function is taken from midas.f, downloaded from
 # http://geodesy.unr.edu/MIDAS_release.tar on 2021-09-13,
 # converted to Python, slightly modified, and without maxn or returned n.
+#
 # License of the original file:
+#
 # Author: Geoff Blewitt.  Copyright (C) 2015.
-def selectpair(t, tstep, tol=0.001):
+#
+# Original function description:
+#
+# Given a time tag array t(m), select pairs ip(2,n)
+# Moves forward in time: for each time tag, pair it with only
+# one future time tag.
+# First attempt to form a pair within tolerance tol of 1 year.
+# If this fails, then find next unused partner.
+# If this fails, cycle through all possible future partners again.
+# MIDAS calls this twice -- firstly forward in time, and
+# secondly backward in time with negative tags and data.
+# This ensures a time symmetric solution.
+# 2010-10-12: now allow for apriori list of step epochs
+# - do not select pairs that span or include the step epoch
+def selectpair(t: np.ndarray, tstep: np.ndarray, tol: float = 0.001) -> np.ndarray:
     """
-    Given a time tag array t(m), select pairs ip(2,n)
+    Key function to calculate the MIDAS velocity estimates,
+    described in detail in [blewitt16]_. It selects pairs of timestamps for a
+    one-year period (within a specified tolerance, and not crossing the specified
+    step times), but relaxes that assumption if no match can be found.
 
-    Moves forward in time: for each time tag, pair it with only
-    one future time tag.
-    First attempt to form a pair within tolerance tol of 1 year.
-    If this fails, then find next unused partner.
-    If this fails, cycle through all possible future partners again.
+    Parameters
+    ----------
+    t
+        Array of timestamps [decimal years].
+    tstep
+        Array of step epochs [decimal years] (with an additional, but required
+        unused element necessarily added at the end).
+    tol
+        Tolerance [days] specifying how exactly the one-year period should be matched
+        when searching for pairs.
 
-    MIDAS calls this twice -- firstly forward in time, and
-    secondly backward in time with negative tags and data.
-    This ensures a time symmetric solution.
+    Returns
+    -------
+        Array of shape :math:`(2, n)`, where the columns contain the
+        1-indexed indices [-] of the pairs to use in the MIDAS calculation.
 
-    2010-10-12: now allow for apriori list of step epochs
-    - do not select pairs that span or include the step epoch
+    See Also
+    --------
+    :func:`~disstans.processing.midas` : The entire MIDAS routine.
     """
+    # determine input shapes
     m = t.size
     nstep = tstep.size - 1
+    # initialize loop
     k = 0
     n = 0
     ip0, ip1 = [], []
@@ -1880,6 +1908,7 @@ def selectpair(t, tstep, tol=0.001):
             ip0.append(i)
             ip1.append(i2)
             break
+    # stack and return
     return np.array([ip0, ip1])
 
 
