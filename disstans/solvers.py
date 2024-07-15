@@ -1091,7 +1091,7 @@ def lasso_regression(ts: Timeseries,
                     Gsub = Gnonan[:, best_ind]
                     GtWG = Gsub.T @ Wnonan @ Gsub
                     if isinstance(GtWG, sparse.spmatrix):
-                        GtWG = GtWG.A
+                        GtWG = GtWG.toarray()
                     temp_cov[np.ix_(best_ind, best_ind)] = sp.linalg.pinvh(GtWG)
                     cov.append(temp_cov)
                 if regularize and return_weights:
@@ -1137,7 +1137,7 @@ def lasso_regression(ts: Timeseries,
                 Gsub = Gnonan.tocsc()[:, best_ind]
                 GtWG = Gsub.T @ Wnonan @ Gsub
                 if isinstance(GtWG, sparse.spmatrix):
-                    GtWG = GtWG.A
+                    GtWG = GtWG.toarray()
                 cov = np.zeros((num_obs * num_comps, num_obs * num_comps))
                 cov[np.ix_(best_ind, best_ind)] = sp.linalg.pinvh(GtWG)
             if regularize and return_weights:

@@ -693,7 +693,7 @@ class Model():
             rowcolnonzero = ~np.all(var_full == 0, axis=0)
             assert np.all(rowcolnonzero == ~np.all(var_full == 0, axis=1))
             var_full = var_full[np.ix_(rowcolnonzero, rowcolnonzero)]
-            map_mat = map_mat[:, rowcolnonzero].A
+            map_mat = map_mat[:, rowcolnonzero].toarray()
             # calculate the predicted variance
             pred_var = np.matmul(map_mat @ var_full, map_mat.T,
                                  dtype=self.EVAL_PREDVAR_PRECISION, casting="same_kind")
@@ -1302,7 +1302,7 @@ class BaseSplineSet(Model):
         ix_coefs = 0
         for model in self.splines:
             coefs[:, ix_coefs:ix_coefs + model.num_parameters] = \
-                model.get_mapping(timevector).A
+                model.get_mapping(timevector).toarray()
             ix_coefs += model.num_parameters
         if self.internal_scaling:
             coefs *= self.internal_scales.reshape(1, self.num_parameters)
@@ -1473,10 +1473,10 @@ class BaseSplineSet(Model):
             y_off = 1 - (i + 1) * dy_scale
             # get normalized values
             if isinstance(model, BSpline):
-                mdl_mapping = model.get_mapping(t_plot, ignore_active_parameters=True).A
+                mdl_mapping = model.get_mapping(t_plot, ignore_active_parameters=True).toarray()
             elif isinstance(model, ISpline):
                 mdl_mapping = np.gradient(
-                    model.get_mapping(t_plot, ignore_active_parameters=True).A, axis=0)
+                    model.get_mapping(t_plot, ignore_active_parameters=True).toarray(), axis=0)
             else:
                 raise NotImplementedError("Scalogram undefined for a SplineSet of class "
                                           f"{type(model)}.")
@@ -3131,7 +3131,7 @@ class ModelCollection():
             # d and G are dense
             d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
             dnotnan = ~np.isnan(d).squeeze()
-            Gout = G.A[np.ix_(dnotnan, obs_mask)]
+            Gout = G.toarray()[np.ix_(dnotnan, obs_mask)]
             # W is sparse
             if (ts.var_cols is not None) and use_data_var:
                 W = sparse.diags(1 / ts.df[ts.var_cols[icomp]].values[dnotnan])
@@ -3167,7 +3167,7 @@ class ModelCollection():
         GtWG = GtW @ Gout
         GtWd = (GtW @ d).squeeze()
         if isinstance(GtWG, sparse.spmatrix):
-            GtWG = GtWG.A
+            GtWG = GtWG.toarray()
         if return_W_G:
             return Gout, W, GtWG, GtWd
         else:
