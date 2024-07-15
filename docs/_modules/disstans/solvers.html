@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.solvers &mdash; DISSTANS 2.1 documentation</title>
+  <title>disstans.solvers &mdash; DISSTANS 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=1413ff29"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=c4a36953"></script>
+        <script src="../../_static/documentation_options.js?v=841abef3"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../_static/copybutton.js?v=c8c824eb"></script>
@@ -37,7 +37,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.1
+                2.1.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -1552,7 +1552,7 @@
                     <span class="n">Gsub</span> <span class="o">=</span> <span class="n">Gnonan</span><span class="p">[:,</span> <span class="n">best_ind</span><span class="p">]</span>
                     <span class="n">GtWG</span> <span class="o">=</span> <span class="n">Gsub</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Wnonan</span> <span class="o">@</span> <span class="n">Gsub</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">sparse</span><span class="o">.</span><span class="n">spmatrix</span><span class="p">):</span>
-                        <span class="n">GtWG</span> <span class="o">=</span> <span class="n">GtWG</span><span class="o">.</span><span class="n">A</span>
+                        <span class="n">GtWG</span> <span class="o">=</span> <span class="n">GtWG</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
                     <span class="n">temp_cov</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">best_ind</span><span class="p">,</span> <span class="n">best_ind</span><span class="p">)]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">GtWG</span><span class="p">)</span>
                     <span class="n">cov</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_cov</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">regularize</span> <span class="ow">and</span> <span class="n">return_weights</span><span class="p">:</span>
@@ -1598,7 +1598,7 @@
                 <span class="n">Gsub</span> <span class="o">=</span> <span class="n">Gnonan</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()[:,</span> <span class="n">best_ind</span><span class="p">]</span>
                 <span class="n">GtWG</span> <span class="o">=</span> <span class="n">Gsub</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Wnonan</span> <span class="o">@</span> <span class="n">Gsub</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">sparse</span><span class="o">.</span><span class="n">spmatrix</span><span class="p">):</span>
-                    <span class="n">GtWG</span> <span class="o">=</span> <span class="n">GtWG</span><span class="o">.</span><span class="n">A</span>
+                    <span class="n">GtWG</span> <span class="o">=</span> <span class="n">GtWG</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
                 <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_obs</span> <span class="o">*</span> <span class="n">num_comps</span><span class="p">,</span> <span class="n">num_obs</span> <span class="o">*</span> <span class="n">num_comps</span><span class="p">))</span>
                 <span class="n">cov</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">best_ind</span><span class="p">,</span> <span class="n">best_ind</span><span class="p">)]</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">GtWG</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">regularize</span> <span class="ow">and</span> <span class="n">return_weights</span><span class="p">:</span>
