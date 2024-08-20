@@ -1711,6 +1711,10 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
     Given a strain (rate) and/or rotation (rate) tensor, calculate scalar
     invariant quantities of interest. See [tape09]_ for an introduction.
 
+    The inputs can either be single matrices or stacks (along the first
+    axis) of multiple matrices. The outputs will be scalars or vectors,
+    respectively.
+
     Parameters
     ----------
     epsilon
@@ -1750,6 +1754,11 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
         shear = np.sqrt(np.trace(np.einsum("ijk,ikl->ijl", epsilon, epsilon),
                                  axis1=1, axis2=2) / 2 -
                         np.trace(epsilon, axis1=1, axis2=2)**2 / 6)
+        # return scalars if single input
+        if epsilon.shape[0] == 1:
+            dilatation = dilatation[0]
+            strain = strain[0]
+            shear = shear[0]
     if omega is not None:
         assert isinstance(omega, np.ndarray) and (omega.ndim in [2, 3]), \
             f"'omega' needs to be a 2D or 3D NumPy array, got {omega}."
@@ -1757,6 +1766,9 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
             omega = omega[None, ...]
         # scalar rotation (rate)
         rotation = np.linalg.norm(omega, ord="fro", axis=(1, 2)) / np.sqrt(2)
+        # return scalars if single input
+        if omega.shape[0] == 1:
+            rotation = rotation[0]
     # return quantities
     if epsilon is not None:
         if omega is not None:
