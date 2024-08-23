@@ -1575,15 +1575,10 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     References
     ----------
 
-    .. [tape09] Tape, C., Musé, P., Simons, M., Dong, D., & Webb, F. (2009),
-       *Multiscale estimation of GPS velocity fields*,
-       Geophysical Journal International, 179(2), 945–971,
-       doi:`10.1111/j.1365-246X.2009.04337.x <https://doi.org/10.1111/j.1365-246X.2009.04337.x>`_.
-
     .. [shen09] Shen, Z.-K., Wang, M., Zeng, Y., Wang, F. (2015),
        *Optimal Interpolation of Spatially Discretized Geodetic Data*,
-        Bulletin of the Seismological Society of America, 105(4), 2117–2127,
-        doi:`10.1785/0120140247 <https://doi.org/10.1785/0120140247>`_.
+       Bulletin of the Seismological Society of America, 105(4), 2117–2127,
+       doi:`10.1785/0120140247 <https://doi.org/10.1785/0120140247>`_.
     """
     # prepare
     assert isinstance(field, np.ndarray) and field.ndim == 2 and field.shape[1] == 2, \
