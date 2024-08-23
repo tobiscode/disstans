@@ -27,6 +27,7 @@ With DISSTANS, you can:
 - Generate synthetic timeseries.
 - Load timeseries in JPL's `.(t)series`, UNR's `.tenv3` and `.kenv`, and Japan's
   F5 `.pos` formats natively, or load standard NumPy and pandas data.
+- Calculate velocity, strain, and rotation fields.
 
 All from within your Python shell, and everything in standard Python object-oriented
 programming style, allowing you to easily subclass existing code to suit your individual
