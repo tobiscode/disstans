@@ -1,0 +1,50 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: DISSTANS
+message: >-
+  If you use this software, please cite the published study
+  linked here, and note the version used.
+type: software
+authors:
+  - given-names: Tobias
+    family-names: Köhne
+    email: 47008700+tobiscode@users.noreply.github.com
+    orcid: 'https://orcid.org/0000-0002-8400-7255'
+repository-code: 'https://github.com/tobiscode/disstans'
+url: 'https://tobiscode.github.io/disstans/'
+abstract: >-
+  Package repository for the Decomposition and Inference of 
+  Sources through Spatiotemporal Analysis of Network Signals
+  (DISSTANS) toolbox.
+license: GPL-3.0
+preferred-citation:
+  title: >-
+    Decomposition and Inference of Sources through Spatiotemporal Analysis of Network Signals: The DISSTANS Python package
+  abstract: |
+    Dense, regional-scale, continuously-operating Global Navigation Satellite System (GNSS) networks enable the monitoring of plate motion and regional surface deformation. The spatial extent and density of these networks, as well as the length of observation records, have steadily increased in the past three decades. Software to efficiently analyze the ever-increasing amount of available timeseries should be geographically portable and computationally efficient, allow for automation, use spatial correlation (exploiting the fact that nearby stations experience common signals), and have openly accessible source code as well as documentation. We introduce the DISSTANS Python package, which aims to be generic (therefore portable), parallelizable (fast), and able to exploit the spatial structure of the observation records in a user-assisted, semi-automated framework that includes uncertainty propagation. DISSTANS is open-source, includes an application interface documentation as well as usage tutorials, and is easily extendable. We present two case studies that demonstrate our code, one using a synthetic dataset and one using real GNSS network timeseries.
+  type: article
+  database: ScienceDirect
+  issn: 0098-3004
+  journal: Computers & Geosciences
+  languages: 
+    - en
+  pages: 105247
+  volume: 170
+  url: https://www.sciencedirect.com/science/article/pii/S0098300422001960
+  keywords: 
+    - GNSS
+    - Python
+    - Geodesy
+  authors: 
+    - family-names: Köhne
+      given-names: Tobias
+    - family-names: Riel
+      given-names: Bryan
+    - family-names: Simons
+      given-names: Mark
+  date-published: '2023-01-01'
+  identifiers: 
+    - type: doi
+      value: 10.1016/j.cageo.2022.105247
