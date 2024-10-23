@@ -1515,7 +1515,7 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     r"""
     For a set of horizontal velocities on a 2D cartesian grid, estimate the
     interpolated velocity, strain, and rotation at target locations assuming
-    a locally homogenous velocity field. See [tape09]_ and [shen09]_ for an introduction.
+    a locally homogenous velocity field. See [tape09]_ and [shen15]_ for an introduction.
 
     This function uses a local approximation to the spherical Earth by
     converting all station and target locations into a suitable UTM zone, and only
@@ -1534,7 +1534,7 @@ def get_field_vel_strain_rot(locations: np.ndarray,
         longitude and latitude [°] of the target field coordinates.
     weighting_threshold
         Weighting parameter that determines the smoothness of the output
-        (:math:`W_t` in [shen09]_).
+        (:math:`W_t` in [shen15]_).
     covariances
         Array of shape :math:`(\text{num_stations}, 2)` containing the
         variances in the East and North velocities [m^2/time^2]. Alternatively,
@@ -1546,10 +1546,10 @@ def get_field_vel_strain_rot(locations: np.ndarray,
         respective UTM zone will be used.
     distance_method
         The method used to calculate the distance weighting starting at a
-        target point to all stations (:math:`L_i` in [shen09]_).
+        target point to all stations (:math:`L_i` in [shen15]_).
     coverage_method
         The method used to calculate the distance weighting starting at a
-        target point to all stations (:math:`Z_i` in [shen09]_).
+        target point to all stations (:math:`Z_i` in [shen15]_).
     estimate_within
         If set, only estimate the values at target points that are this distance [m]
         away from the convx hull of all stations.
@@ -1575,7 +1575,7 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     References
     ----------
 
-    .. [shen09] Shen, Z.-K., Wang, M., Zeng, Y., Wang, F. (2015),
+    .. [shen15] Shen, Z.-K., Wang, M., Zeng, Y., Wang, F. (2015),
        *Optimal Interpolation of Spatially Discretized Geodetic Data*,
        Bulletin of the Seismological Society of America, 105(4), 2117–2127,
        doi:`10.1785/0120140247 <https://doi.org/10.1785/0120140247>`_.

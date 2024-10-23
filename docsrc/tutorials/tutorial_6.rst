@@ -105,7 +105,7 @@ Average strain and rotation
 
 All of the next calculations assume that plates are rigid, and that rigid motion on a
 sphere can be expressed as a rotation around a pole on the sphere. For more details
-on the algorithms, please refer to, e.g., [tape09]_, [shen09]_, or [goudarzi14]_.
+on the algorithms, please refer to, e.g., [tape09]_, [shen15]_, or [goudarzi14]_.
 Let's start by getting the average velocity, strain, and rotation values of the entire
 area using :func:`~disstans.tools.get_hom_vel_strain_rot` and
 :func:`~disstans.tools.strain_rotation_invariants`:
