@@ -2677,6 +2677,8 @@ class Network():
             save_kw_args: dict[str, Any] = {"format": "png"},
             scalogram_kw_args: dict[str, Any] | None = None,
             mark_events: pd.DataFrame | list[pd.DataFrame] | None = None,
+            t_min: str | pd.Timestamp | None = None,
+            t_max: str | pd.Timestamp | None = None,
             lon_min: float | None = None,
             lon_max: float | None = None,
             lat_min: float | None = None,
@@ -2700,7 +2702,7 @@ class Network():
         Stations are selected by clicking on their markers on the map.
         Optionally, this function can
 
-        - start with a station pre-selected,
+        - start with a station, geographical area, or time period pre-selected,
         - show only a subset of fitted models,
         - sum the models to an aggregate one,
         - mark events associated with a station's timeseries,
@@ -2752,6 +2754,10 @@ class Network():
             If passed, a DataFrame or list of DataFrames that contain the columns
             ``'station'`` and ``'time'``. For each timestamp, a vertical line is plotted
             onto the station's timeseries and the relevant entries are printed out.
+        t_min
+            Specify the timeseries' earliest timestamp to show.
+        t_max
+            Specify the timeseries' latest timestamp to show.
         lon_min
             Specify the map's minimum longitude (in degrees).
         lon_max
@@ -2812,6 +2818,12 @@ class Network():
             assert (timeseries is None) or (isinstance(timeseries, list) and
                                             all([isinstance(t, str) for t in timeseries])), \
                 f"'timeseries' must be None, a string, or list of strings, got '{timeseries}'."
+        if t_min is not None:
+            if not isinstance(t_min, pd.Timestamp):
+                t_min = pd.Timestamp(t_min)
+        if t_max is not None:
+            if not isinstance(t_max, pd.Timestamp):
+                t_max = pd.Timestamp(t_max)
 
         # create map and timeseries figures
         gui_settings = defaults["gui"].copy()
@@ -3025,7 +3037,7 @@ class Network():
             if scalogram_kw_args is not None:
                 nonlocal fig_scalo
                 t_left, t_right = None, None
-            for its, (ts_description, ts) in enumerate(ts_to_plot.items()):
+            for ts_description, ts in ts_to_plot.items():
                 for icol, (data_col, var_col) in enumerate(zip(ts.data_cols,
                                                                [None] * len(ts.data_cols)
                                                                if ts.var_cols is None
@@ -3113,6 +3125,7 @@ class Network():
                             ax.plot(fit.time, fit.df[fit.data_cols[icol]],
                                     label=model_description)
                     ax.set_ylabel(f"{ts_description}\n{data_col} [{ts.data_unit}]")
+                    ax.set_xlim(left=t_min, right=t_max)
                     ax.grid()
                     if len(self[station_name].fits[ts_description]) > 0:
                         ax.legend()
