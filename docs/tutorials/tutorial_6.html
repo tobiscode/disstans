@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial 5: Signal Recovery at Low SNR &mdash; DISSTANS 2.1.2 documentation</title>
+  <title>Tutorial 6: Spatially-variable Strain Field &mdash; DISSTANS 2.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -20,12 +20,11 @@
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/copybutton.js?v=c8c824eb"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Tutorial 6: Spatially-variable Strain Field" href="tutorial_6.html" />
-    <link rel="prev" title="Tutorial 4: The use and estimation of covariance" href="tutorial_4.html" /> 
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="Tutorial 5: Signal Recovery at Low SNR" href="tutorial_5.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -102,17 +101,17 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorial_4.html#empirical-covariance-estimation">Empirical covariance estimation</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 5: Signal Recovery at Low SNR</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#preparations">Preparations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-test-cases">Running test cases</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#results">Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_5.html">Tutorial 5: Signal Recovery at Low SNR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#running-test-cases">Running test cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_5.html#results">Results</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_6.html">Tutorial 6: Spatially-variable Strain Field</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorial_6.html#preparations">Preparations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial_6.html#average-strain-and-rotation">Average strain and rotation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorial_6.html#spatially-variable-velocity-strain-and-rotation">Spatially-variable velocity, strain, and rotation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial 6: Spatially-variable Strain Field</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#average-strain-and-rotation">Average strain and rotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spatially-variable-velocity-strain-and-rotation">Spatially-variable velocity, strain, and rotation</a></li>
 </ul>
 </li>
 </ul>
@@ -407,9 +406,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">Tutorial 5: Signal Recovery at Low SNR</li>
+      <li class="breadcrumb-item active">Tutorial 6: Spatially-variable Strain Field</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/tutorials/tutorial_5.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorials/tutorial_6.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -417,177 +416,182 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="tutorial-5-signal-recovery-at-low-snr">
-<h1>Tutorial 5: Signal Recovery at Low SNR<a class="headerlink" href="#tutorial-5-signal-recovery-at-low-snr" title="Link to this heading"></a></h1>
+  <section id="tutorial-6-spatially-variable-strain-field">
+<h1>Tutorial 6: Spatially-variable Strain Field<a class="headerlink" href="#tutorial-6-spatially-variable-strain-field" title="Link to this heading"></a></h1>
 <aside class="sidebar">
 <p class="sidebar-title">Download full script</p>
-<p><a class="reference download internal" download="" href="../_downloads/32a07a6e409c83530fb6f799642ded4f/tutorial_5_low_snr.py"><code class="xref download docutils literal notranslate"><span class="pre">tutorial_5_low_snr.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/4f184f3f94246ef6b41327d4c80affae/tutorial_6_strain.py"><code class="xref download docutils literal notranslate"><span class="pre">tutorial_6_strain.py</span></code></a></p>
 </aside>
-<p>In <a class="reference internal" href="tutorial_3.html"><span class="doc">Tutorial 3</span></a>, we looked at how using the spatiotemporal,
-L0-regularized solver is able to better recover signals affected by noise, although
-we didn’t have time to explore how the reweighting hyperparameters affected the quality
-of the results. This tutorial will explore a bit more quantitatively how using more
-and more stations improves the recovery of a synthetic signal.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The figures and numbers presented in this example no longer exactly match what is
-presented in <a class="reference internal" href="../disstans/models.html#koehne23" id="id1"><span>[koehne23]</span></a>. This is because significant code improvements to DISSTANS
-were introduced with version 2, and the effect of the hyperparameters changed.
-Care has been taken to recreate this example to match what is in the published study,
-although small quantitative changes remain. The qualitative interpretations are
-unchanged.</p>
-</div>
+<p>In this tutorial, we will create a synthetic secular velocity field of two plates
+moving past each other, with one also containing an inflating volcano.
+We will then recover the Euler Pole of a plate, as well as some strain
+(field) quantities.</p>
 <nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#preparations" id="id2">Preparations</a></p></li>
-<li><p><a class="reference internal" href="#defining-the-variables-and-hyperparameter-space" id="id3">Defining the variables and hyperparameter space</a></p></li>
-<li><p><a class="reference internal" href="#running-test-cases" id="id4">Running test cases</a></p></li>
-<li><p><a class="reference internal" href="#results" id="id5">Results</a></p></li>
+<li><p><a class="reference internal" href="#preparations" id="id4">Preparations</a></p></li>
+<li><p><a class="reference internal" href="#average-strain-and-rotation" id="id5">Average strain and rotation</a></p></li>
+<li><p><a class="reference internal" href="#spatially-variable-velocity-strain-and-rotation" id="id6">Spatially-variable velocity, strain, and rotation</a></p></li>
 </ul>
 </nav>
 <section id="preparations">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Link to this heading"></a></h2>
-<p>By now, not every import needs to be explained, so I’ll just get those out of the
-way first:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pickle</span>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Preparations</a><a class="headerlink" href="#preparations" title="Link to this heading"></a></h2>
+<p>We will start by some (hopefully) self-explanatory imports, including the strain tools
+from the <a class="reference internal" href="../disstans/tools.html#module-disstans.tools" title="disstans.tools"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tools</span></code></a> module:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># imports</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">detrend</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">binom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">permutations</span><span class="p">,</span> <span class="n">product</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">disstans</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans</span> <span class="kn">import</span> <span class="n">Network</span><span class="p">,</span> <span class="n">Station</span><span class="p">,</span> <span class="n">Timeseries</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.tools</span> <span class="kn">import</span> <span class="n">parallelize</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.solvers</span> <span class="kn">import</span> <span class="n">InverseReweighting</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.models</span> <span class="kn">import</span> <span class="n">ISpline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cmcrameri</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">disstans.tools</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_hom_vel_strain_rot</span><span class="p">,</span> <span class="n">get_field_vel_strain_rot</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">strain_rotation_invariants</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">estimate_euler_pole</span><span class="p">,</span> <span class="n">rotvec2eulerpole</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Let’s create a random number generator, a network and a time vector:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># random numbers</span>
+<p>Let’s continue to set up some output formats:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># decide output quality, looks &amp; folder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/tutorial_6/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.sans-serif&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;NewComputerModernSans10&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;14&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We now build up a synthetic network of stations with random locations
+and velocities:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># initialize RNG</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create random locations in a uniform square</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">max_num_stations</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">station_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;S</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_num_stations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">latlons</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="n">max_num_stations</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create timevector</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t_start_str</span> <span class="o">=</span> <span class="s2">&quot;2000-01-01&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t_end_str</span> <span class="o">=</span> <span class="s2">&quot;2001-01-01&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">timevector</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">t_end_str</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># make stations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locs</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">121</span><span class="p">,</span> <span class="mi">33</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="n">high</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">116</span><span class="p">,</span> <span class="mi">37</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_locs</span> <span class="o">=</span> <span class="n">locs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># get indices west and east of plate boundary</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i_west</span> <span class="o">=</span> <span class="n">locs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">119</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i_east</span> <span class="o">=</span> <span class="o">~</span><span class="n">i_west</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locs_west</span> <span class="o">=</span> <span class="n">locs</span><span class="p">[</span><span class="n">i_west</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locs_east</span> <span class="o">=</span> <span class="n">locs</span><span class="p">[</span><span class="n">i_east</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># make velocities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create noisy zero background velocity field</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_locs</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># add far away euler pole motion to the western plate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels</span><span class="p">[</span><span class="n">i_west</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.055</span><span class="p">,</span> <span class="mf">0.045</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># add inflation motion from volcano based on distance and direction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">center_vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">117.1</span><span class="p">,</span> <span class="mf">35.4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dist_vol</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">locs</span><span class="p">,</span> <span class="n">center_vol</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vecs_vol</span> <span class="o">=</span> <span class="n">locs</span> <span class="o">-</span> <span class="n">center_vol</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">azims_vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">vecs_vol</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vecs_vol</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels_volcano</span> <span class="o">=</span> <span class="p">(</span><span class="n">vecs_vol</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vecs_vol</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">... </span>                <span class="o">/</span> <span class="n">dist_vol</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">70</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels</span> <span class="o">+=</span> <span class="n">vels_volcano</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># make for uncertainties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels_var</span> <span class="o">=</span> <span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">9e-3</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">11e-3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_locs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels_cov</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_locs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vels_varcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">vels_var</span><span class="p">,</span> <span class="n">vels_cov</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The last important thing we need is a simple signal we want to recover, and
-a noise realization that is affecting the recovery. For the signal, we are going
-to have a simple transient rise-and-fall, which we will define parametrically
-with a single <a class="reference internal" href="../disstans/models.html#disstans.models.ISpline" title="disstans.models.ISpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISpline</span></code></a> object:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># create an I-Spline model</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ispl</span> <span class="o">=</span> <span class="n">ISpline</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">367</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_reference</span><span class="o">=</span><span class="n">t_start_str</span><span class="p">,</span>
-<span class="gp">... </span>               <span class="n">time_unit</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">num_splines</span><span class="o">=</span><span class="mi">21</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># add a reversing transient in the middle</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ispl_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ispl</span><span class="o">.</span><span class="n">num_parameters</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ispl_params</span><span class="p">[</span><span class="n">ispl</span><span class="o">.</span><span class="n">num_parameters</span><span class="o">//</span><span class="mi">2</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ispl_params</span><span class="p">[</span><span class="n">ispl</span><span class="o">.</span><span class="n">num_parameters</span><span class="o">//</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ispl</span><span class="o">.</span><span class="n">read_parameters</span><span class="p">(</span><span class="n">ispl_params</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create all true timeseries</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">truth</span> <span class="o">=</span> <span class="n">ispl</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">timevector</span><span class="p">)[</span><span class="s2">&quot;fit&quot;</span><span class="p">]</span>
-</pre></div>
+<p>With these commands, we have effectively created a toy representation of California.
+On the west side, we have a plate that moves northwest relative to the east side.
+On the east side, there is a volcanic caldera inflating outwards.
+Let’s have a look (all plotting code can be found in the script):</p>
+<img alt="../_images/tutorial_6a.png" src="../_images/tutorial_6a.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the plots, we have not converted latitude and longitude to a cartesian grid
+like UTM, or used a geodetic map projection. This is only to keep this tutorial
+simple; usually, we would either convert to UTM or use proper map plotting.</p>
 </div>
-<p>Finally, the noise will be normally-distributed, although we remove a linear trend
-before the actual estimation. This is because we want to have the simplest possible
-setup to be able to see the effect of estimating spatially-coherent transient splines
-as clearly as possible, without having to worry about other models:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">noise</span> <span class="o">=</span> <span class="n">detrend</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">truth</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">max_num_stations</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="defining-the-variables-and-hyperparameter-space">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Defining the variables and hyperparameter space</a><a class="headerlink" href="#defining-the-variables-and-hyperparameter-space" title="Link to this heading"></a></h2>
-<p>So now that we have a network, a true signal shared by all stations, and a different
-noise realization for every station, what are the variables and hyperparameters we want
-to examine?</p>
-<p>The first one is easy: we want to see the effect of increasing the <em>number of stations</em>
-being used. At the base level, every station will be fitted with a purely local L0 fit
-(iterative <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a>). Then, we want to turn on the spatial
-awareness by using <a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a> - first only considering
-pairs of two stations, then triplets of three stations, and so forth, and at the end,
-using all stations available.</p>
-<p>Of course, if we have a network of, for example, 20 stations, there’s many ways to
-select “subnetworks” of two, three or four stations. And, because of the different noise
-realizations at each station, the resulting fits will also be different. So, we’ll have to
-sample from the big network a couple of times, make fits each time, and then calculate a mean
-and standard deviation to get a better understanding of our results for each number of
-stations involved in the solution process.</p>
-<p>The hyperparameters we care about are the following:</p>
-<ul class="simple">
-<li><p>The noise standard deviation,</p></li>
-<li><p>The initial <code class="docutils literal notranslate"><span class="pre">penalty</span></code> parameter (for <a class="reference internal" href="../disstans/solvers.html#disstans.solvers.lasso_regression" title="disstans.solvers.lasso_regression"><code class="xref py py-func docutils literal notranslate"><span class="pre">lasso_regression()</span></code></a> and
-<a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a>), and</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">scale</span></code> of the reweighting function (here, we will use the
-<a class="reference internal" href="../disstans/solvers.html#disstans.solvers.InverseReweighting" title="disstans.solvers.InverseReweighting"><code class="xref py py-class docutils literal notranslate"><span class="pre">InverseReweighting</span></code></a> function with <code class="docutils literal notranslate"><span class="pre">eps=1e-4</span></code>).</p></li>
-</ul>
-<p>Of course, other things could be of interest - a different functional form for the
-reweighting function, or different shapes of true signal, etc., but we’ll focus on those
-for now. Here is the suite of parameters we want to consider:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_samples</span> <span class="o">=</span> <span class="mi">50</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">noise_sds</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;0.1&quot;</span><span class="p">,</span> <span class="s2">&quot;0.3&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">penalties</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;30&quot;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rw_func_scales</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;1e-2&quot;</span><span class="p">,</span> <span class="s2">&quot;1e-1&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">]</span>
-</pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This tutorial is only to show the strain tools, which are independent of the
+Network/Station/Timeseries structure of DISSTANS, since they only require locations
+and velocities. Both of these can, of course, be derived from the standard DISSTANS
+classes, like <a class="reference internal" href="../disstans/network.html#disstans.network.Network.station_locations" title="disstans.network.Network.station_locations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">station_locations</span></code></a> or
+<a class="reference internal" href="../disstans/models.html#disstans.models.Model.parameters" title="disstans.models.Model.parameters"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parameters</span></code></a>.</p>
 </div>
 </section>
-<section id="running-test-cases">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Running test cases</a><a class="headerlink" href="#running-test-cases" title="Link to this heading"></a></h2>
-<p>It becomes clear that this is best done in parallel, given the sheer number of
-hyperparameter combinations, not to mention that we have to do each combination a number
-of times with different station subsets to get a statistically valid result. To do this
-in parallel, it’s necessary to write functions that can then be called by the individual
-processes. There’s a lot of bookkeeping involved as well, and so we’re not going to go
-through all the code here; just refer to the linked code file at the top of this page.</p>
-<p>The key is that for each combination of noise standard deviation, penalty, and reweighting
-function scale parameters, we perform a <a class="reference internal" href="../disstans/network.html#disstans.network.Network.spatialfit" title="disstans.network.Network.spatialfit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">spatialfit()</span></code></a> for
-each number of stations (from two to whatever the maximum number is). For each of these
-cases, we sample multiple possible subnets. For example if we have stations with numbers
-1 through 10, and wanted to test the performance of when we use three of those stations,
-our subnetwork samples would look like triplets like (1, 2, 3), (1, 5, 10), etc.
-If all stations are used, then there is of course just a single possible combination of
-all stations, and if we only use one station at a time, we would use the regular
-<a class="reference internal" href="../disstans/network.html#disstans.network.Network.fit" title="disstans.network.Network.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>.</p>
-<p>Then, for each fitted subnetwork, we compute the root-mean-squared error (RMSE) of the
-transient signal for every station, and then take the mean of all those RMSEs. We can then
-use all the different subnetworks to calculate the mean of those mean-RMSEs, and the
-standard deviation of that. Finally, we can plot this mean and standard deviation of the
-mean RMSE for all different number of stations.</p>
+<section id="average-strain-and-rotation">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Average strain and rotation</a><a class="headerlink" href="#average-strain-and-rotation" title="Link to this heading"></a></h2>
+<p>All of the next calculations assume that plates are rigid, and that rigid motion on a
+sphere can be expressed as a rotation around a pole on the sphere. For more details
+on the algorithms, please refer to, e.g., <a class="reference internal" href="../disstans/tools.html#tape09" id="id1"><span>[tape09]</span></a>, <a class="reference internal" href="../disstans/tools.html#shen15" id="id2"><span>[shen15]</span></a>, or <a class="reference internal" href="../disstans/tools.html#goudarzi14" id="id3"><span>[goudarzi14]</span></a>.
+Let’s start by getting the average velocity, strain, and rotation values of the entire
+area using <a class="reference internal" href="../disstans/tools.html#disstans.tools.get_hom_vel_strain_rot" title="disstans.tools.get_hom_vel_strain_rot"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_hom_vel_strain_rot()</span></code></a> and
+<a class="reference internal" href="../disstans/tools.html#disstans.tools.strain_rotation_invariants" title="disstans.tools.strain_rotation_invariants"><code class="xref py py-func docutils literal notranslate"><span class="pre">strain_rotation_invariants()</span></code></a>:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># get global strain somewhere in the west</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_hom</span><span class="p">,</span> <span class="n">eps_hom</span><span class="p">,</span> <span class="n">om_hom</span> <span class="o">=</span> <span class="n">get_hom_vel_strain_rot</span><span class="p">(</span><span class="n">locs</span><span class="p">,</span>
+<span class="gp">... </span>                                                <span class="n">vels</span><span class="p">,</span>
+<span class="gp">... </span>                                                <span class="n">covariances</span><span class="o">=</span><span class="n">vels_varcov</span><span class="p">,</span>
+<span class="gp">... </span>                                                <span class="n">reference</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">120.5</span><span class="p">,</span> <span class="mi">35</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># convert to scalars</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dil_hom</span><span class="p">,</span> <span class="n">strain_hom</span><span class="p">,</span> <span class="n">shear_hom</span><span class="p">,</span> <span class="n">rot_hom</span> <span class="o">=</span> <span class="n">strain_rotation_invariants</span><span class="p">(</span><span class="n">eps_hom</span><span class="p">,</span> <span class="n">om_hom</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average motion = [</span><span class="si">{</span><span class="n">v_hom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">v_hom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">] mm/a</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Average rotation = </span><span class="si">{</span><span class="n">rot_hom</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> rad/Ma&quot;</span><span class="p">)</span>
+<span class="go">Average motion = [-58.92, 41.94] mm/a</span>
+<span class="go">Average rotation = 0.0851 rad/Ma</span>
+</pre></div>
+</div>
+<p>The average motion is dominated by the motion of the western plate, and the rotation
+arises from the relative motion of the two plates.
+Let’s see if we can recover the Euler plate motion of the western plate using
+<a class="reference internal" href="../disstans/tools.html#disstans.tools.estimate_euler_pole" title="disstans.tools.estimate_euler_pole"><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_euler_pole()</span></code></a> and
+<a class="reference internal" href="../disstans/tools.html#disstans.tools.rotvec2eulerpole" title="disstans.tools.rotvec2eulerpole"><code class="xref py py-func docutils literal notranslate"><span class="pre">rotvec2eulerpole()</span></code></a>:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># get euler pole for the western plate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rotvec_west</span><span class="p">,</span> <span class="n">rotcov_west</span> <span class="o">=</span> <span class="n">estimate_euler_pole</span><span class="p">(</span><span class="n">locs</span><span class="p">[</span><span class="n">i_west</span><span class="p">,</span> <span class="p">:],</span>
+<span class="gp">... </span>                                               <span class="n">vels</span><span class="p">[</span><span class="n">i_west</span><span class="p">,</span> <span class="p">:],</span>
+<span class="gp">... </span>                                               <span class="n">covariances</span><span class="o">=</span><span class="n">vels_varcov</span><span class="p">[</span><span class="n">i_west</span><span class="p">,</span> <span class="p">:])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># convert to more readable format</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ep_west</span><span class="p">,</span> <span class="n">ep_cov_west</span> <span class="o">=</span> <span class="n">rotvec2eulerpole</span><span class="p">(</span><span class="n">rotvec_west</span><span class="p">,</span> <span class="n">rotcov_west</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ep_west_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">ep_west</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Longitude = </span><span class="si">{</span><span class="n">ep_west_deg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> °E</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Latitude = </span><span class="si">{</span><span class="n">ep_west_deg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> °N</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">... </span>      <span class="sa">f</span><span class="s2">&quot;Rotation = </span><span class="si">{</span><span class="n">ep_west_deg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> °/Ma&quot;</span><span class="p">)</span>
+<span class="go">Longitude = 6.7 °E</span>
+<span class="go">Latitude = -39.3 °N</span>
+<span class="go">Rotation = 0.6 °/Ma</span>
+</pre></div>
+</div>
+<p>These are indeed (very approximately) the Euler pole values of the Pacific plate.</p>
 </section>
-<section id="results">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Results</a><a class="headerlink" href="#results" title="Link to this heading"></a></h2>
-<p>When we then plot all of the different cases in one big plot, we can see the big picture:</p>
-<img alt="../_images/tutorial_5_S20N50_10.png" src="../_images/tutorial_5_S20N50_10.png" />
-<p>Here for example, we compare, for an initial penalty parameter of 10, the effect that
-different noise standard deviations (lines of different colors) and reweighting function
-scales (lines of different shading) have. Two auxiliary lines are also plotted: a general
-<span class="math notranslate nohighlight">\(1/\sqrt{N}\)</span> curve (since that is the expected behavior when more and more stations
-are added, dotted line), and the mean RMSE we get if we don’t fit any transient function
-at all (anything above it is therefore overfitting, dashed line).</p>
-<p>We can observe the following things:</p>
-<ul class="simple">
-<li><p>Adding the information of more and more stations follows approximately the expected
-<span class="math notranslate nohighlight">\(1/\sqrt{N}\)</span> shape, leading to lower mean RMSEs.</p></li>
-<li><p>Compared to only local L0-regularized fits, solutions that take advantage of spatial
-coherence can obtain lower RMSEs, and provide more robust estimates (less variance
-in the RMSE).</p></li>
-<li><p>Spatial reweighting can decrease the RMSE in this particular example by about half
-an order of magnitude. Put the other way around, spatial reweighting reaches the same
-RMSE as a local solution with higher signal-to-noise-ratio.</p></li>
-<li><p>If the noise is too high to recover any signal, spatial reweighting does not lead to
-overfitting as long as enough stations are used.</p></li>
-<li><p>If the wrong reweighting function scale is used (in this case, too small scales,
-i.e., weak regularization), spatially-aware fitting at worst makes all stations
-converge to a common “wrong” fit (compared to wide variance of RMSEs at each station
-when fit individually).</p></li>
-</ul>
+<section id="spatially-variable-velocity-strain-and-rotation">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Spatially-variable velocity, strain, and rotation</a><a class="headerlink" href="#spatially-variable-velocity-strain-and-rotation" title="Link to this heading"></a></h2>
+<p>Finally, we know by construction that there’s more going on than those average values.
+We want to be able to see the strain and velocity field as it transitions from the
+west to the east is affected by the volcano we put there.
+Let’s create a field of where we want to evalute the interpolated values, and then
+call the field-based <a class="reference internal" href="../disstans/tools.html#disstans.tools.get_field_vel_strain_rot" title="disstans.tools.get_field_vel_strain_rot"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_field_vel_strain_rot()</span></code></a>:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># define field coordinates</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">121</span><span class="p">,</span> <span class="o">-</span><span class="mi">116</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_mesh</span><span class="p">,</span> <span class="n">y_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xy_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x_mesh</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y_mesh</span><span class="o">.</span><span class="n">ravel</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># get strain fields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_field</span><span class="p">,</span> <span class="n">eps_field</span><span class="p">,</span> <span class="n">om_field</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">get_field_vel_strain_rot</span><span class="p">(</span><span class="n">locs</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">vels</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">xy_mesh</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">covariances</span><span class="o">=</span><span class="n">vels_varcov</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">estimate_within</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">distance_method</span><span class="o">=</span><span class="s2">&quot;quadratic&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">coverage_method</span><span class="o">=</span><span class="s2">&quot;voronoi&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># convert to scalar fields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dil_field</span><span class="p">,</span> <span class="n">strain_field</span><span class="p">,</span> <span class="n">shear_field</span><span class="p">,</span> <span class="n">rot_field</span> <span class="o">=</span> \
+<span class="gp">... </span>    <span class="n">strain_rotation_invariants</span><span class="p">(</span><span class="n">eps_field</span><span class="p">,</span> <span class="n">om_field</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Yielding the following northwards velocity field:</p>
+<img alt="../_images/tutorial_6b.png" src="../_images/tutorial_6b.png" />
+<p>The velocity field indeed shows a transition from one plate to the other.
+The border is relatively smooth because there aren’t a lot of stations close to the
+dividing line. The smoothness can also be controlled by the parameters of
+<a class="reference internal" href="../disstans/tools.html#disstans.tools.get_field_vel_strain_rot" title="disstans.tools.get_field_vel_strain_rot"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_field_vel_strain_rot()</span></code></a>.
+The north-south velocity around the volcano is also recovered.
+Finally, the strain map also shows the plate interface and the volcano:</p>
+<img alt="../_images/tutorial_6c.png" src="../_images/tutorial_6c.png" />
 </section>
 </section>
 
@@ -595,8 +599,8 @@ when fit individually).</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tutorial_4.html" class="btn btn-neutral float-left" title="Tutorial 4: The use and estimation of covariance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorial_6.html" class="btn btn-neutral float-right" title="Tutorial 6: Spatially-variable Strain Field" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorial_5.html" class="btn btn-neutral float-left" title="Tutorial 5: Signal Recovery at Low SNR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

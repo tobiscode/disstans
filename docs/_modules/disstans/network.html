@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.network &mdash; DISSTANS 2.1.1 documentation</title>
+  <title>disstans.network &mdash; DISSTANS 2.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=1413ff29"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=841abef3"></script>
+        <script src="../../_static/documentation_options.js?v=b3e23499"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../_static/copybutton.js?v=c8c824eb"></script>
@@ -37,7 +37,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.1.1
+                2.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -103,6 +103,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_6.html">Tutorial 6: Spatially-variable Strain Field</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_6.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_6.html#average-strain-and-rotation">Average strain and rotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_6.html#spatially-variable-velocity-strain-and-rotation">Spatially-variable velocity, strain, and rotation</a></li>
 </ul>
 </li>
 </ul>
@@ -356,6 +362,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-field-vel-strain-rot">get_field_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
@@ -3209,6 +3216,8 @@
             <span class="n">save_kw_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">},</span>
             <span class="n">scalogram_kw_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">mark_events</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">t_min</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">t_max</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">lon_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">lon_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">lat_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3232,7 +3241,7 @@
 <span class="sd">        Stations are selected by clicking on their markers on the map.</span>
 <span class="sd">        Optionally, this function can</span>
 
-<span class="sd">        - start with a station pre-selected,</span>
+<span class="sd">        - start with a station, geographical area, or time period pre-selected,</span>
 <span class="sd">        - show only a subset of fitted models,</span>
 <span class="sd">        - sum the models to an aggregate one,</span>
 <span class="sd">        - mark events associated with a station&#39;s timeseries,</span>
@@ -3284,6 +3293,10 @@
 <span class="sd">            If passed, a DataFrame or list of DataFrames that contain the columns</span>
 <span class="sd">            ``&#39;station&#39;`` and ``&#39;time&#39;``. For each timestamp, a vertical line is plotted</span>
 <span class="sd">            onto the station&#39;s timeseries and the relevant entries are printed out.</span>
+<span class="sd">        t_min</span>
+<span class="sd">            Specify the timeseries&#39; earliest timestamp to show.</span>
+<span class="sd">        t_max</span>
+<span class="sd">            Specify the timeseries&#39; latest timestamp to show.</span>
 <span class="sd">        lon_min</span>
 <span class="sd">            Specify the map&#39;s minimum longitude (in degrees).</span>
 <span class="sd">        lon_max</span>
@@ -3344,6 +3357,12 @@
             <span class="k">assert</span> <span class="p">(</span><span class="n">timeseries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span>
                                             <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="p">])),</span> \
                 <span class="sa">f</span><span class="s2">&quot;&#39;timeseries&#39; must be None, a string, or list of strings, got &#39;</span><span class="si">{</span><span class="n">timeseries</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="k">if</span> <span class="n">t_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_min</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
+                <span class="n">t_min</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">t_min</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_max</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
+                <span class="n">t_max</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">t_max</span><span class="p">)</span>
 
         <span class="c1"># create map and timeseries figures</span>
         <span class="n">gui_settings</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;gui&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -3557,7 +3576,7 @@
             <span class="k">if</span> <span class="n">scalogram_kw_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">nonlocal</span> <span class="n">fig_scalo</span>
                 <span class="n">t_left</span><span class="p">,</span> <span class="n">t_right</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">its</span><span class="p">,</span> <span class="p">(</span><span class="n">ts_description</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ts_to_plot</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">ts_description</span><span class="p">,</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">ts_to_plot</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">icol</span><span class="p">,</span> <span class="p">(</span><span class="n">data_col</span><span class="p">,</span> <span class="n">var_col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">,</span>
                                                                <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">data_cols</span><span class="p">)</span>
                                                                <span class="k">if</span> <span class="n">ts</span><span class="o">.</span><span class="n">var_cols</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -3645,6 +3664,7 @@
                             <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fit</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">fit</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">fit</span><span class="o">.</span><span class="n">data_cols</span><span class="p">[</span><span class="n">icol</span><span class="p">]],</span>
                                     <span class="n">label</span><span class="o">=</span><span class="n">model_description</span><span class="p">)</span>
                     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ts_description</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">data_col</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">ts</span><span class="o">.</span><span class="n">data_unit</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">t_min</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">t_max</span><span class="p">)</span>
                     <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">station_name</span><span class="p">]</span><span class="o">.</span><span class="n">fits</span><span class="p">[</span><span class="n">ts_description</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>

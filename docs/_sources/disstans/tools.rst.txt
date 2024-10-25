@@ -66,6 +66,11 @@ get_cov_indices
 
 .. autofunction:: disstans.tools.get_cov_indices
 
+get_field_vel_strain_rot
+........................
+
+.. autofunction:: disstans.tools.get_field_vel_strain_rot
+
 get_hom_vel_strain_rot
 ......................
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.tools &mdash; DISSTANS 2.1.1 documentation</title>
+  <title>disstans.tools &mdash; DISSTANS 2.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=1413ff29"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=841abef3"></script>
+        <script src="../../_static/documentation_options.js?v=b3e23499"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../_static/copybutton.js?v=c8c824eb"></script>
@@ -37,7 +37,7 @@
               <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.1.1
+                2.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -103,6 +103,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#defining-the-variables-and-hyperparameter-space">Defining the variables and hyperparameter space</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#running-test-cases">Running test cases</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_5.html#results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/tutorial_6.html">Tutorial 6: Spatially-variable Strain Field</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_6.html#preparations">Preparations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_6.html#average-strain-and-rotation">Average strain and rotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/tutorial_6.html#spatially-variable-velocity-strain-and-rotation">Spatially-variable velocity, strain, and rotation</a></li>
 </ul>
 </li>
 </ul>
@@ -356,6 +362,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-dims">get_cov_dims</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#make-cov-index-map">make_cov_index_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-cov-indices">get_cov_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-field-vel-strain-rot">get_field_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#get-hom-vel-strain-rot">get_hom_vel_strain_rot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parallelize">parallelize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../disstans/tools.html#parse-maintenance-table">parse_maintenance_table</a></li>
@@ -433,10 +440,14 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">matplotlib.path</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">MplPath</span>
 <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">FuncFormatter</span>
 <span class="kn">from</span> <span class="nn">matplotlib.backend_bases</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">MouseButton</span>
 <span class="kn">from</span> <span class="nn">cmcrameri</span> <span class="kn">import</span> <span class="n">cm</span> <span class="k">as</span> <span class="n">scm</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">circmean</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">Voronoi</span><span class="p">,</span> <span class="n">ConvexHull</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">brentq</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
@@ -1774,6 +1785,106 @@
 
 
 
+<span class="k">def</span> <span class="nf">_prepare_vel_strain_rot</span><span class="p">(</span><span class="n">locations</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                            <span class="n">velocities</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                            <span class="n">covariances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">utmzone</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">reference</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                            <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="c1"># input checks</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">locations</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+            <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;locations&#39; needs to be a NumPy array with two columns.&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">velocities</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">velocities</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+            <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
+        <span class="s2">&quot;&#39;velocities&#39; needs to be a NumPy array with two columns.&quot;</span>
+    <span class="k">assert</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> \
+        <span class="sa">f</span><span class="s2">&quot;Mismatch between locations shape </span><span class="si">{</span><span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and velocities &quot;</span> \
+        <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="n">num_stations</span> <span class="o">=</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">covariances</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
+                <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_stations</span> <span class="ow">and</span>
+                <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> \
+            <span class="s2">&quot;Invalid covariance input type or shape.&quot;</span>
+    <span class="c1"># parse reference</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">reference</span> <span class="o">&lt;</span> <span class="n">num_stations</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2"> is not an integer index less than </span><span class="si">{</span><span class="n">num_stations</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span> <span class="o">=</span> <span class="n">locations</span><span class="p">[</span><span class="n">reference</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">reference</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">reference</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;reference&#39; needs to be a two-column array, got shape </span><span class="si">{</span><span class="n">reference</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid input for &#39;reference&#39;: </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="c1"># make sure we&#39;re not inverting if we don&#39;t have enough data points</span>
+    <span class="k">if</span> <span class="n">num_stations</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_stations</span><span class="si">}</span><span class="s2"> stations are less stations than &quot;</span>
+                         <span class="s2">&quot;necessary (6) for a stable computation.&quot;</span><span class="p">)</span>
+    <span class="c1"># determine UTM zone if needed</span>
+    <span class="k">if</span> <span class="n">utmzone</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">utmzone</span> <span class="o">=</span> <span class="n">best_utmzone</span><span class="p">(</span><span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># convert to UTM eastings &amp; northings</span>
+    <span class="n">crs_lla</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geodetic</span><span class="p">()</span>
+    <span class="n">crs_utm</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">UTM</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">utmzone</span><span class="p">)</span>
+    <span class="n">EN</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">ENO</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">reference</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">reference</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ENO</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_point</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">crs_lla</span><span class="p">))</span>
+    <span class="c1"># stack observations</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">velocities</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">velocities</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># build covariances</span>
+    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">covariances</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">covariances</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]))</span>
+        <span class="k">elif</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">Wblocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">covariances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+                       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)]</span>
+            <span class="n">main_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">]])</span>
+            <span class="n">off_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">])</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">diagonals</span><span class="o">=</span><span class="p">[</span><span class="n">main_diag</span><span class="p">,</span> <span class="n">off_diag</span><span class="p">,</span> <span class="n">off_diag</span><span class="p">],</span>
+                             <span class="n">offsets</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">num_stations</span><span class="p">,</span> <span class="n">num_stations</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># done</span>
+    <span class="k">return</span> <span class="n">EN</span><span class="p">,</span> <span class="n">ENO</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">d</span>
+
+
+<span class="k">def</span> <span class="nf">_get_vel_strain_rot_mapping</span><span class="p">(</span><span class="n">dE</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">dN</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">num_stations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">out</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+                                <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="c1"># input checks</span>
+    <span class="k">if</span> <span class="n">num_stations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">dE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">num_stations</span> <span class="o">=</span> <span class="n">dE</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># build output array if necessary</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">num_stations</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">G</span><span class="p">[:</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">G</span><span class="p">[</span><span class="n">num_stations</span><span class="p">:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">num_stations</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">out</span>
+    <span class="c1"># add data if present</span>
+    <span class="k">if</span> <span class="n">dE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">G</span><span class="p">[:</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dE</span>
+        <span class="n">G</span><span class="p">[</span><span class="n">num_stations</span><span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dE</span>
+    <span class="k">if</span> <span class="n">dN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">G</span><span class="p">[:</span><span class="n">num_stations</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dN</span>
+        <span class="n">G</span><span class="p">[</span><span class="n">num_stations</span><span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">dN</span>
+    <span class="c1"># done</span>
+    <span class="k">return</span> <span class="n">G</span>
+
+
 <div class="viewcode-block" id="get_hom_vel_strain_rot">
 <a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.get_hom_vel_strain_rot">[docs]</a>
 <span class="k">def</span> <span class="nf">get_hom_vel_strain_rot</span><span class="p">(</span><span class="n">locations</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -1805,7 +1916,7 @@
 <span class="sd">        variances in the East and North velocities [m^2/time^2]. Alternatively,</span>
 <span class="sd">        array of shape :math:`(\text{num_stations}, 3)` additionally</span>
 <span class="sd">        containing the East-North covariance [m2/time^2].</span>
-<span class="sd">    utmzome</span>
+<span class="sd">    utmzone</span>
 <span class="sd">        If provided, the UTM zone to use for the horizontal approximation.</span>
 <span class="sd">        If ``None``, the average longitude will be calculated, and the</span>
 <span class="sd">        respective UTM zone will be used.</span>
@@ -1826,6 +1937,7 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    strain_rotation_invariants : For calculation of invariants of the tensors.</span>
+<span class="sd">    get_field_vel_strain_rot : To get a spatially-variable output field.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -1835,76 +1947,233 @@
 <span class="sd">       Geophysical Journal International, 179(2), 945–971,</span>
 <span class="sd">       doi:`10.1111/j.1365-246X.2009.04337.x &lt;https://doi.org/10.1111/j.1365-246X.2009.04337.x&gt;`_.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># input checks</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">locations</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
-            <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
-        <span class="s2">&quot;&#39;locations&#39; needs to be a NumPy array with two columns.&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">velocities</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">velocities</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
-            <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
-        <span class="s2">&quot;&#39;velocities&#39; needs to be a NumPy array with two columns.&quot;</span>
-    <span class="k">assert</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> \
-        <span class="sa">f</span><span class="s2">&quot;Mismatch between locations shape </span><span class="si">{</span><span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and velocities &quot;</span> \
-        <span class="sa">f</span><span class="s2">&quot;shape </span><span class="si">{</span><span class="n">velocities</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
-    <span class="n">num_stations</span> <span class="o">=</span> <span class="n">locations</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">covariances</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">covariances</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>
-                <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">num_stations</span> <span class="ow">and</span>
-                <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> \
-            <span class="s2">&quot;Invalid covariance input type or shape.&quot;</span>
-    <span class="c1"># parse reference</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">reference</span> <span class="o">&lt;</span> <span class="n">num_stations</span><span class="p">,</span> \
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2"> is not an integer index less than </span><span class="si">{</span><span class="n">num_stations</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span> <span class="o">=</span> <span class="n">locations</span><span class="p">[</span><span class="n">reference</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">):</span>
-        <span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid input for &#39;reference&#39;: </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-    <span class="c1"># make sure we&#39;re not inverting if we don&#39;t have enough data points</span>
-    <span class="k">if</span> <span class="n">num_stations</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_stations</span><span class="si">}</span><span class="s2"> stations are less stations than &quot;</span>
-                         <span class="s2">&quot;necessary (6) for a stable computation.&quot;</span><span class="p">)</span>
-    <span class="c1"># determine UTM zone if needed</span>
-    <span class="k">if</span> <span class="n">utmzone</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">utmzone</span> <span class="o">=</span> <span class="n">best_utmzone</span><span class="p">(</span><span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
-    <span class="c1"># convert to UTM eastings &amp; northings</span>
-    <span class="n">crs_lla</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Geodetic</span><span class="p">()</span>
-    <span class="n">crs_utm</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">UTM</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">utmzone</span><span class="p">)</span>
-    <span class="n">ENU</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_points</span><span class="p">(</span><span class="n">crs_lla</span><span class="p">,</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">locations</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="n">E</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">ENU</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">ENU</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># prepare</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;&#39;reference&#39; cannot be an array.&quot;</span>
+    <span class="n">EN</span><span class="p">,</span> <span class="n">ENO</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> \
+        <span class="n">_prepare_vel_strain_rot</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">velocities</span><span class="p">,</span> <span class="n">covariances</span><span class="p">,</span> <span class="n">utmzone</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
+    <span class="c1"># extract positions</span>
+    <span class="n">E</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">EN</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">EN</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="c1"># get all positions relative to reference station</span>
-    <span class="n">EO</span><span class="p">,</span> <span class="n">NO</span> <span class="o">=</span> <span class="n">crs_utm</span><span class="o">.</span><span class="n">transform_point</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">crs_lla</span><span class="p">)</span>
+    <span class="n">EO</span><span class="p">,</span> <span class="n">NO</span> <span class="o">=</span> <span class="n">ENO</span>
     <span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span> <span class="o">=</span> <span class="n">E</span> <span class="o">-</span> <span class="n">EO</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="n">NO</span>
-    <span class="c1"># build individual G</span>
-    <span class="n">GE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span>
-                   <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dEO</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">GN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span><span class="p">,</span>
-                   <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_stations</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dNO</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># combine components</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">GE</span><span class="p">,</span> <span class="n">GN</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">velocities</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">velocities</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># build global G</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">_get_vel_strain_rot_mapping</span><span class="p">(</span><span class="n">dEO</span><span class="p">,</span> <span class="n">dNO</span><span class="p">)</span>
     <span class="c1"># build weight matrix</span>
-    <span class="k">if</span> <span class="n">covariances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">covariances</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">covariances</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]))</span>
-        <span class="k">elif</span> <span class="n">covariances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="n">Wblocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">covariances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
-                       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_stations</span><span class="p">)]</span>
-            <span class="n">main_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">],</span>
-                                        <span class="p">[</span><span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">]])</span>
-            <span class="n">off_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">Wblocks</span><span class="p">])</span>
-            <span class="n">W</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">diagonals</span><span class="o">=</span><span class="p">[</span><span class="n">main_diag</span><span class="p">,</span> <span class="n">off_diag</span><span class="p">,</span> <span class="n">off_diag</span><span class="p">],</span>
-                             <span class="n">offsets</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">num_stations</span><span class="p">,</span> <span class="n">num_stations</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">W</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">d</span>
         <span class="n">G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span> <span class="o">@</span> <span class="n">G</span>
     <span class="c1"># solve</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">d</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="c1"># extract wanted quantities</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">3</span><span class="p">]]])</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">m</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">epsilon</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># strain rate</span>
     <span class="n">omega</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># rotation rate</span>
     <span class="n">v_O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">m</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">5</span><span class="p">]])</span>  <span class="c1"># velocity of origin</span>
     <span class="k">return</span> <span class="n">v_O</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span></div>
+
+
+
+<div class="viewcode-block" id="get_field_vel_strain_rot">
+<a class="viewcode-back" href="../../disstans/tools.html#disstans.tools.get_field_vel_strain_rot">[docs]</a>
+<span class="k">def</span> <span class="nf">get_field_vel_strain_rot</span><span class="p">(</span><span class="n">locations</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                             <span class="n">velocities</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                             <span class="n">field</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                             <span class="n">weighting_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                             <span class="n">covariances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">utmzone</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">distance_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;quadratic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+                             <span class="n">coverage_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;azimuth&quot;</span><span class="p">,</span> <span class="s2">&quot;voronoi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;voronoi&quot;</span><span class="p">,</span>
+                             <span class="n">estimate_within</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">no_pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+                             <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a set of horizontal velocities on a 2D cartesian grid, estimate the</span>
+<span class="sd">    interpolated velocity, strain, and rotation at target locations assuming</span>
+<span class="sd">    a locally homogenous velocity field. See [tape09]_ and [shen15]_ for an introduction.</span>
+
+<span class="sd">    This function uses a local approximation to the spherical Earth by</span>
+<span class="sd">    converting all station and target locations into a suitable UTM zone, and only</span>
+<span class="sd">    considering the horizontal velocities.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    locations</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, 2)` containing the</span>
+<span class="sd">        longitude and latitude [°] of the observations (stations).</span>
+<span class="sd">    velocities</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, 2)` containing the</span>
+<span class="sd">        East and North velocities [m/time] of the observations</span>
+<span class="sd">    field</span>
+<span class="sd">        Array of shape :math:`(\text{num_field}, 2)` containing the</span>
+<span class="sd">        longitude and latitude [°] of the target field coordinates.</span>
+<span class="sd">    weighting_threshold</span>
+<span class="sd">        Weighting parameter that determines the smoothness of the output</span>
+<span class="sd">        (:math:`W_t` in [shen15]_).</span>
+<span class="sd">    covariances</span>
+<span class="sd">        Array of shape :math:`(\text{num_stations}, 2)` containing the</span>
+<span class="sd">        variances in the East and North velocities [m^2/time^2]. Alternatively,</span>
+<span class="sd">        array of shape :math:`(\text{num_stations}, 3)` additionally</span>
+<span class="sd">        containing the East-North covariance [m2/time^2].</span>
+<span class="sd">    utmzone</span>
+<span class="sd">        If provided, the UTM zone to use for the horizontal approximation.</span>
+<span class="sd">        If ``None``, the average longitude will be calculated, and the</span>
+<span class="sd">        respective UTM zone will be used.</span>
+<span class="sd">    distance_method</span>
+<span class="sd">        The method used to calculate the distance weighting starting at a</span>
+<span class="sd">        target point to all stations (:math:`L_i` in [shen15]_).</span>
+<span class="sd">    coverage_method</span>
+<span class="sd">        The method used to calculate the distance weighting starting at a</span>
+<span class="sd">        target point to all stations (:math:`Z_i` in [shen15]_).</span>
+<span class="sd">    estimate_within</span>
+<span class="sd">        If set, only estimate the values at target points that are this distance [m]</span>
+<span class="sd">        away from the convex hull of all stations.</span>
+<span class="sd">    no_pbar</span>
+<span class="sd">        Suppress the progress bar with ``True``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    v</span>
+<span class="sd">        Velocity of the field :math:`\mathbf{v}`, shape :math:`(\text{num_field}, 2)`.</span>
+<span class="sd">    epsilon</span>
+<span class="sd">        :math:`2 \times 2` strain tensor :math:`\mathbf{\varepsilon}` field,</span>
+<span class="sd">        shape :math:`(\text{num_field}, 2, 2)`.</span>
+<span class="sd">    omega</span>
+<span class="sd">        :math:`2 \times 2` rotation tensor :math:`\mathbf{\omega}` field,</span>
+<span class="sd">        shape :math:`(\text{num_field}, 2, 2)`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    strain_rotation_invariants : For calculation of invariants of the individual tensors.</span>
+<span class="sd">    get_hom_vel_strain_rot : To get a single set of values for all observations.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [shen15] Shen, Z.-K., Wang, M., Zeng, Y., Wang, F. (2015),</span>
+<span class="sd">       *Optimal Interpolation of Spatially Discretized Geodetic Data*,</span>
+<span class="sd">       Bulletin of the Seismological Society of America, 105(4), 2117–2127,</span>
+<span class="sd">       doi:`10.1785/0120140247 &lt;https://doi.org/10.1785/0120140247&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># prepare</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+        <span class="s2">&quot;&#39;field&#39; has to be a two-column array.&quot;</span>
+    <span class="n">EN</span><span class="p">,</span> <span class="n">ENf</span><span class="p">,</span> <span class="n">Wdata</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> \
+        <span class="n">_prepare_vel_strain_rot</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">velocities</span><span class="p">,</span> <span class="n">covariances</span><span class="p">,</span> <span class="n">utmzone</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+    <span class="n">num_stations</span> <span class="o">=</span> <span class="n">EN</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">num_field</span> <span class="o">=</span> <span class="n">ENf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">all_vectors</span> <span class="o">=</span> <span class="n">EN</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">ENf</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">if</span> <span class="n">Wdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Wdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">num_stations</span><span class="p">)</span>  <span class="c1"># C^-1 in Shen paper</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># need dense representation</span>
+        <span class="n">Wdata</span> <span class="o">=</span> <span class="n">Wdata</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="c1"># buld convex hull of network</span>
+    <span class="n">chull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">EN</span><span class="p">)</span>
+    <span class="n">chull_path</span> <span class="o">=</span> <span class="n">MplPath</span><span class="p">(</span><span class="n">chull</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">chull</span><span class="o">.</span><span class="n">vertices</span><span class="p">])</span>
+    <span class="c1"># find field points that are inside the station network</span>
+    <span class="k">if</span> <span class="n">estimate_within</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">estimate_within</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">ENf</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">ENf</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">ix_field_inside</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">chull_path</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">ENf</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">estimate_within</span><span class="p">))</span>
+    <span class="n">num_field_inside</span> <span class="o">=</span> <span class="n">ix_field_inside</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="c1"># define distance weighting function for various scale distances (L_i in Shen paper)</span>
+    <span class="n">all_dists</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">ENf</span><span class="p">[</span><span class="n">ix_field_inside</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">EN</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">distance_method</span> <span class="o">==</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">dist_weight_fun</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="n">all_dists</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dist</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">distance_method</span> <span class="o">==</span> <span class="s2">&quot;quadratic&quot;</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">dist_weight_fun</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="n">all_dists</span><span class="p">):</span> <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">dist</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># define coverage weighting function (Z_i in Shen paper)</span>
+    <span class="k">if</span> <span class="n">coverage_method</span> <span class="o">==</span> <span class="s2">&quot;azimuth&quot;</span><span class="p">:</span>
+        <span class="c1"># get direction from all field points to all stations</span>
+        <span class="n">all_azimuths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">all_vectors</span><span class="p">[</span><span class="n">ix_field_inside</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">all_vectors</span><span class="p">[</span><span class="n">ix_field_inside</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># sort by azimuth</span>
+        <span class="n">all_sortings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">all_azimuths</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_azimuths_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">all_azimuths</span><span class="p">,</span> <span class="n">all_sortings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># calculate the difference in azimuths between each station</span>
+        <span class="n">all_azimuths_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">all_azimuths_sorted</span><span class="p">,</span>
+             <span class="p">(</span><span class="n">all_azimuths_sorted</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">all_azimuths_sorted</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># sum both sides of azimuthal difference</span>
+        <span class="n">all_thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">all_thetas</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">],</span>
+             <span class="n">all_thetas</span><span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_thetas</span> <span class="o">=</span> <span class="n">all_thetas</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">all_thetas</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="c1"># calculate final weight</span>
+        <span class="n">coverage_weight</span> <span class="o">=</span> <span class="n">num_stations</span> <span class="o">*</span> <span class="n">all_thetas</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">coverage_method</span> <span class="o">==</span> <span class="s2">&quot;voronoi&quot;</span><span class="p">:</span>
+        <span class="c1"># build Voronoi network of observations</span>
+        <span class="n">vor</span> <span class="o">=</span> <span class="n">Voronoi</span><span class="p">(</span><span class="n">EN</span><span class="p">)</span>
+        <span class="c1"># calculate areas, default is based on closest neighbors</span>
+        <span class="n">vor_areas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span><span class="n">EN</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">EN</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c1"># update with actual area if not infinite or larger than twice the default</span>
+        <span class="k">for</span> <span class="n">i_station</span><span class="p">,</span> <span class="n">i_region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vor</span><span class="o">.</span><span class="n">point_region</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i_station</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chull</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="n">vor</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i_region</span><span class="p">]</span>
+                <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+                    <span class="n">area</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">vor</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span><span class="o">.</span><span class="n">volume</span>
+                    <span class="k">if</span> <span class="n">area</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">vor_areas</span><span class="p">[</span><span class="n">i_station</span><span class="p">]:</span>
+                        <span class="n">vor_areas</span><span class="p">[</span><span class="n">i_station</span><span class="p">]</span> <span class="o">=</span> <span class="n">area</span>
+        <span class="c1"># calculate final weights</span>
+        <span class="n">coverage_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">num_stations</span> <span class="o">*</span> <span class="n">vor_areas</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vor_areas</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">num_field_inside</span><span class="p">,</span> <span class="n">num_stations</span><span class="p">))</span>
+
+    <span class="c1"># calculate optimal scale distance</span>
+    <span class="k">def</span> <span class="nf">total_weight_fun_elem</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dist_weight_fun</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">all_dists</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span> <span class="o">*</span> <span class="n">coverage_weight</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+                    <span class="p">)</span> <span class="o">-</span> <span class="n">weighting_threshold</span>
+    <span class="n">optim_x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">all_dists</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">optimal_dist_scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">brentq</span><span class="p">(</span><span class="n">total_weight_fun_elem</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">optim_x1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_field_inside</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">optimal_dist_scales</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Optimal distance scale probably not found.&quot;</span><span class="p">,</span>
+             <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># calculate final optimal weights (L_i in Shen paper)</span>
+    <span class="n">distance_weight</span> <span class="o">=</span> <span class="n">dist_weight_fun</span><span class="p">(</span><span class="n">optimal_dist_scales</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span>
+
+    <span class="c1"># calculate joint covariance matrix (G_i in Shen paper)</span>
+    <span class="n">joint_weight</span> <span class="o">=</span> <span class="n">coverage_weight</span> <span class="o">*</span> <span class="n">distance_weight</span>
+
+    <span class="c1"># build dummy G (from Tape paper, not Shen) (matrix A in Shen)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">_get_vel_strain_rot_mapping</span><span class="p">(</span><span class="n">num_stations</span><span class="o">=</span><span class="n">num_stations</span><span class="p">)</span>
+
+    <span class="c1"># create empty field output</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_field</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_field</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_field</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="c1"># start loop</span>
+    <span class="k">for</span> <span class="n">i_field_sub</span><span class="p">,</span> <span class="n">i_field</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">ix_field_inside</span><span class="p">,</span>
+                                               <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Interpolating field&quot;</span><span class="p">,</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                               <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">)):</span>
+        <span class="c1"># get local G</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">_get_vel_strain_rot_mapping</span><span class="p">(</span><span class="n">dE</span><span class="o">=</span><span class="n">all_vectors</span><span class="p">[</span><span class="n">i_field</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
+                                        <span class="n">dN</span><span class="o">=</span><span class="n">all_vectors</span><span class="p">[</span><span class="n">i_field</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+                                        <span class="n">out</span><span class="o">=</span><span class="n">G</span><span class="p">)</span>
+        <span class="c1"># get local W (C^-1 in Shen paper)</span>
+        <span class="c1"># this is technically different from the paper because of the off-diagonals</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">Wdata</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">joint_weight</span><span class="p">[</span><span class="n">i_field_sub</span><span class="p">,</span> <span class="p">:],</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="c1"># get weighted least squares input</span>
+        <span class="n">GtWG</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">W</span>
+        <span class="n">GtWd</span> <span class="o">=</span> <span class="n">GtWG</span> <span class="o">@</span> <span class="n">d</span>
+        <span class="n">GtWG</span> <span class="o">=</span> <span class="n">GtWG</span> <span class="o">@</span> <span class="n">G</span>
+        <span class="c1"># solve</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">GtWG</span><span class="p">,</span> <span class="n">GtWd</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># extract wanted quantities</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">m</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i_field</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>  <span class="c1"># velocity of point</span>
+        <span class="n">epsilon</span><span class="p">[</span><span class="n">i_field</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># strain rate</span>
+        <span class="n">omega</span><span class="p">[</span><span class="n">i_field</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># rotation rate</span>
+
+    <span class="c1"># done</span>
+    <span class="k">return</span> <span class="n">v</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">omega</span></div>
 
 
 
@@ -1916,6 +2185,10 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a strain (rate) and/or rotation (rate) tensor, calculate scalar</span>
 <span class="sd">    invariant quantities of interest. See [tape09]_ for an introduction.</span>
+
+<span class="sd">    The inputs can either be single matrices or stacks (along the first</span>
+<span class="sd">    axis) of multiple matrices. The outputs will be scalars or vectors,</span>
+<span class="sd">    respectively.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1944,19 +2217,33 @@
 <span class="sd">        by :math:`\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epsilon</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
-            <span class="sa">f</span><span class="s2">&quot;&#39;epsilon&#39; needs to be a 2D NumPy array, got </span><span class="si">{</span><span class="n">epsilon</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epsilon</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;epsilon&#39; needs to be a 2D or 3D NumPy array, got </span><span class="si">{</span><span class="n">epsilon</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="n">epsilon</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
         <span class="c1"># scalar dilatation (rate)</span>
-        <span class="n">dilatation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">dilatation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">axis1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="c1"># scalar strain (rate)</span>
-        <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)</span>
+        <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="c1"># scalar shearing (rate)</span>
-        <span class="n">shear</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">@</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">shear</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ijk,ikl-&gt;ijl&quot;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">),</span>
+                                 <span class="n">axis1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">axis1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="c1"># return scalars if single input</span>
+        <span class="k">if</span> <span class="n">epsilon</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dilatation</span> <span class="o">=</span> <span class="n">dilatation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">strain</span> <span class="o">=</span> <span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">shear</span> <span class="o">=</span> <span class="n">shear</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">omega</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span> \
-            <span class="sa">f</span><span class="s2">&quot;&#39;omega&#39; needs to be a 2D NumPy array, got </span><span class="si">{</span><span class="n">omega</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">omega</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> \
+            <span class="sa">f</span><span class="s2">&quot;&#39;omega&#39; needs to be a 2D or 3D NumPy array, got </span><span class="si">{</span><span class="n">omega</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">if</span> <span class="n">omega</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">omega</span> <span class="o">=</span> <span class="n">omega</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
         <span class="c1"># scalar rotation (rate)</span>
-        <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># return scalars if single input</span>
+        <span class="k">if</span> <span class="n">omega</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="n">rotation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="c1"># return quantities</span>
     <span class="k">if</span> <span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

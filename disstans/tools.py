@@ -1552,7 +1552,7 @@ def get_field_vel_strain_rot(locations: np.ndarray,
         target point to all stations (:math:`Z_i` in [shen15]_).
     estimate_within
         If set, only estimate the values at target points that are this distance [m]
-        away from the convx hull of all stations.
+        away from the convex hull of all stations.
     no_pbar
         Suppress the progress bar with ``True``.
 
@@ -1658,6 +1658,9 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     optimal_dist_scales = np.array(
         [brentq(total_weight_fun_elem, 1, optim_x1[i], args=(i, ))
         for i in range(num_field_inside)])
+    if np.any(np.isclose(optimal_dist_scales, 1)):
+        warn("Optimal distance scale probably not found.",
+             category=RuntimeWarning, stacklevel=2)
     # calculate final optimal weights (L_i in Shen paper)
     distance_weight = dist_weight_fun(optimal_dist_scales[:, None])
 
