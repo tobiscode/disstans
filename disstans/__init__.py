@@ -9,6 +9,7 @@ classes of DISSTANS, namely
 - ``disstans.Station`` for ``disstans.station.Station``, and
 - ``disstans.Network`` for ``disstans.network.Network``.
 """
+
 # flake8: noqa
 
 # imports for preparations later
@@ -38,6 +39,6 @@ from .network import Network
 __version__ = importlib.metadata.version("disstans")
 
 # preparational steps
-multiprocessing.set_start_method('spawn', True)
+multiprocessing.set_start_method("spawn", True)
 register_matplotlib_converters()
-rcParams['figure.constrained_layout.use'] = "True"
+rcParams["figure.constrained_layout.use"] = "True"

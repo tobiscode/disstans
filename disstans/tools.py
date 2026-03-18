@@ -58,7 +58,7 @@ class Timedelta(pd.Timedelta):
         return super().__new__(cls, *args, **kwargs)
 
 
-class Click():
+class Click:
     """
     Class that enables a GUI to distinguish between clicks (mouse press and release)
     and dragging event (mouse press, move, then release).
@@ -68,25 +68,33 @@ class Click():
     ax
         Axis on which to look for clicks.
     func
-        Function to call, with the Matplotlib clicking :class:`~matplotlib.backend_bases.Event`
-        as its first argument.
+        Function to call, with the Matplotlib clicking
+        :class:`~matplotlib.backend_bases.Event` as its first argument.
     button
-        Which mouse button to operate on, see :class:`~matplotlib.backend_bases.MouseButton`
-        for accepted values.
+        Which mouse button to operate on, see
+        :class:`~matplotlib.backend_bases.MouseButton` for accepted values.
     """
-    def __init__(self,
-                 ax: mpl.Axis,
-                 func: Callable[[Event], None],
-                 button: MouseButton = MouseButton.LEFT
-                 ) -> None:
+
+    def __init__(
+        self,
+        ax: mpl.Axis,
+        func: Callable[[Event], None],
+        button: MouseButton = MouseButton.LEFT,
+    ) -> None:
         self._ax = ax
         self._func = func
         self._button = button
         self._press = False
         self._move = False
-        self._c1 = self._ax.figure.canvas.mpl_connect('button_press_event', self._onpress)
-        self._c2 = self._ax.figure.canvas.mpl_connect('button_release_event', self._onrelease)
-        self._c3 = self._ax.figure.canvas.mpl_connect('motion_notify_event', self._onmove)
+        self._c1 = self._ax.figure.canvas.mpl_connect(
+            "button_press_event", self._onpress
+        )
+        self._c2 = self._ax.figure.canvas.mpl_connect(
+            "button_release_event", self._onrelease
+        )
+        self._c3 = self._ax.figure.canvas.mpl_connect(
+            "motion_notify_event", self._onmove
+        )
 
     def __del__(self) -> None:
         for cid in [self._c1, self._c2, self._c3]:
@@ -111,10 +119,11 @@ class Click():
         self._move = False
 
 
-def tvec_to_numpycol(timevector: pd.Series | pd.DatetimeIndex,
-                     t_reference: str | pd.Timestamp | None = None,
-                     time_unit: str | None = "D"
-                     ) -> np.ndarray:
+def tvec_to_numpycol(
+    timevector: pd.Series | pd.DatetimeIndex,
+    t_reference: str | pd.Timestamp | None = None,
+    time_unit: str | None = "D",
+) -> np.ndarray:
     """
     Converts a Pandas timestamp series into a NumPy array of relative
     time to a reference time in the given time unit.
@@ -141,14 +150,16 @@ def tvec_to_numpycol(timevector: pd.Series | pd.DatetimeIndex,
         t_reference = timevector[0]
     else:
         t_reference = pd.Timestamp(t_reference)
-    assert isinstance(t_reference, pd.Timestamp), \
-        f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
+    assert isinstance(
+        t_reference, pd.Timestamp
+    ), f"'t_reference' must be a pandas.Timestamp object, got {type(t_reference)}."
     # return Numpy array
     return ((timevector - t_reference) / Timedelta(1, time_unit)).values
 
 
-def date2decyear(dates: pd.Series | pd.DatetimeIndex | pd.Timestamp | datetime
-                 ) -> np.ndarray:
+def date2decyear(
+    dates: pd.Series | pd.DatetimeIndex | pd.Timestamp | datetime,
+) -> np.ndarray:
     """
     Convert dates (just year, month, day, each day assumed to be centered at noon)
     to decimal years, assuming all years have 365.25 days (JPL convention for
@@ -270,19 +281,20 @@ def make_cov_index_map(num_components: int) -> tuple[np.ndarray, np.ndarray]:
         for icol in range(irow + 1, num_components):
             index_map[irow, icol] = seq_ix
             seq_ix += 1
-    var_cov_map = (np.triu(index_map + num_components, 1) +
-                   np.triu(index_map + num_components, 1).T)
+    var_cov_map = (
+        np.triu(index_map + num_components, 1)
+        + np.triu(index_map + num_components, 1).T
+    )
     var_cov_map = (var_cov_map + np.diag(np.arange(num_components))).astype(int).ravel()
     return index_map, var_cov_map
 
 
-def get_cov_indices(icomp: int,
-                    index_map: np.ndarray | None = None,
-                    num_components: int | None = None
-                    ) -> list[int]:
+def get_cov_indices(
+    icomp: int, index_map: np.ndarray | None = None, num_components: int | None = None
+) -> list[int]:
     """
-    Given a data or variance component index, retrieve the indices in the covariance columns
-    of a timeseries or model that are associated with that component.
+    Given a data or variance component index, retrieve the indices in the covariance
+    columns of a timeseries or model that are associated with that component.
     Exactly one of ``index_map`` or ``num_components`` must be provided as input.
 
     Parameters
@@ -313,20 +325,23 @@ def get_cov_indices(icomp: int,
         raise ValueError("Need to specify either 'index_map' or 'num_components'.")
     if index_map is None:
         index_map = make_cov_index_map(num_components)[0]
-    assert icomp < int(np.unique(index_map.shape)), "Invalid 'index_map' shape " \
-        f"{index_map.shape} for the index {icomp}."
+    assert icomp < int(np.unique(index_map.shape)), (
+        "Invalid 'index_map' shape " f"{index_map.shape} for the index {icomp}."
+    )
     from_row = index_map[icomp, :]
     from_col = index_map[:, icomp]
-    indices = [int(i) for i in from_row if np.isfinite(i)] + \
-              [int(i) for i in from_col if np.isfinite(i)]
+    indices = [int(i) for i in from_row if np.isfinite(i)] + [
+        int(i) for i in from_col if np.isfinite(i)
+    ]
     return sorted(indices)
 
 
-def full_cov_mat_to_columns(cov_mat: np.ndarray,
-                            num_components: int,
-                            include_covariance: bool = False,
-                            return_single: bool = False
-                            ) -> tuple[np.ndarray, ...]:
+def full_cov_mat_to_columns(
+    cov_mat: np.ndarray,
+    num_components: int,
+    include_covariance: bool = False,
+    return_single: bool = False,
+) -> tuple[np.ndarray, ...]:
     r"""
     Converts a full variance(-covariance) matrix with multiple components into a
     column-based representation like the one used by :class:`~disstans.models.Model` or
@@ -365,23 +380,31 @@ def full_cov_mat_to_columns(cov_mat: np.ndarray,
         If ``include_covariance=True`` and ``return_single=False``, array of shape
         :math:`\text{num_components}) + (\text{num_components}*(\text{num_components}-1))/2`.
     """
-    assert (cov_mat.ndim == 2) and (cov_mat.shape[0] == cov_mat.shape[1]), \
-        f"'cov_mat' must be a 2D square matrix, got array of shape {cov_mat.shape}."
-    assert (cov_mat.shape[0] % num_components) == 0, f"'cov_mat' can not be divided " \
+    assert (cov_mat.ndim == 2) and (
+        cov_mat.shape[0] == cov_mat.shape[1]
+    ), f"'cov_mat' must be a 2D square matrix, got array of shape {cov_mat.shape}."
+    assert (cov_mat.shape[0] % num_components) == 0, (
+        f"'cov_mat' can not be divided "
         f"into {num_components} components because of incompatible dimensions."
+    )
     num_elements = int(cov_mat.shape[0] / num_components)
-    variance = np.diag(cov_mat) \
-        .reshape(num_elements, num_components).astype(dtype=np.double, casting="safe")
+    variance = (
+        np.diag(cov_mat)
+        .reshape(num_elements, num_components)
+        .astype(dtype=np.double, casting="safe")
+    )
     if include_covariance:
         cov_dims = get_cov_dims(num_components)
         index_map = make_cov_index_map(num_components)[0]
         raveled_indices = np.nonzero(np.isfinite(index_map).ravel())[0]
         assert raveled_indices.size == cov_dims
         covariance = np.empty((num_elements, cov_dims))
-        for iobs, iblock in zip(range(num_elements),
-                                range(0, num_components * num_elements, num_components)):
-            sub_mat = cov_mat[iblock:iblock + num_components,
-                              iblock:iblock + num_components]
+        for iobs, iblock in zip(
+            range(num_elements), range(0, num_components * num_elements, num_components)
+        ):
+            sub_mat = cov_mat[
+                iblock : iblock + num_components, iblock : iblock + num_components
+            ]
             covariance[iobs, :] = sub_mat.ravel()[raveled_indices]
     else:
         covariance = None
@@ -398,7 +421,8 @@ def block_permutation(n_outer: int, n_inner: int) -> np.ndarray:
     individual ``n_inner``-sized blocks will become ``n_inner`` outside blocks of
     individual ``n_outer``-sized blocks.
 
-    Transposing the result is equivalent to calling this function with swapped arguments.
+    Transposing the result is equivalent to calling this function with swapped
+    arguments.
 
     Parameters
     ----------
@@ -467,11 +491,12 @@ def cov2corr(cov: np.ndarray) -> np.ndarray:
     return corr
 
 
-def parallelize(func: Callable[[Any], Any],
-                iterable: Iterable,
-                num_threads: int | None = None,
-                chunksize: int = 1
-                ) -> Iterator[Any]:
+def parallelize(
+    func: Callable[[Any], Any],
+    iterable: Iterable,
+    num_threads: int | None = None,
+    chunksize: int = 1,
+) -> Iterator[Any]:
     """
     Convenience wrapper that given a function, an iterable set of inputs
     and parallelization settings automatically either runs the function
@@ -485,16 +510,18 @@ def parallelize(func: Callable[[Any], Any],
     threads will give the default number of threads to all new Python threads,
     completely overloading the system since it's now out of processors, slowing
     down the computations by a lot. The Python :mod:`~multiprocessing`
-    module does not change these settings, since it is apparently hard to guess which backend
-    NumPy uses, see `this thread on GitHub <https://github.com/numpy/numpy/issues/11826>`_.
+    module does not change these settings, since it is apparently hard to guess which
+    backend NumPy uses, see
+    `this thread on GitHub <https://github.com/numpy/numpy/issues/11826>`_.
     So, it is sadly currently up to the user to disable this behavior when using
     multiple Python threads as achieved with this function. For example,
     this snipped might be enough to put at the beginning of a script:
-    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of DISSTANS cores
-    can be set by e.g. ``import disstans; disstans.defaults["general"]["num_threads"] = 10``.
-    Another important note is that if you're experiencing problems when running a script,
-    make sure the settings and the rest of the script are encapsulated in the standard
-    ``if __name__ == "__main__": ...`` clause.
+    ``import os; os.environ['OMP_NUM_THREADS'] = '1'``. Then, the number of DISSTANS
+    cores can be set by e.g.
+    ``import disstans; disstans.defaults["general"]["num_threads"] = 10``.
+    Another important note is that if you're experiencing problems when running a
+    script, make sure the settings and the rest of the script are encapsulated in the
+    standard ``if __name__ == "__main__": ...`` clause.
 
     Parameters
     ----------
@@ -551,10 +578,11 @@ def parallelize(func: Callable[[Any], Any],
             yield func(parameter)
 
 
-def create_powerlaw_noise(size: int | list | tuple,
-                          exponent: int,
-                          seed: int | np.random.Generator | None = None
-                          ) -> np.ndarray:
+def create_powerlaw_noise(
+    size: int | list | tuple,
+    exponent: int,
+    seed: int | np.random.Generator | None = None,
+) -> np.ndarray:
     """
     Creates synthetic noise according to a Power Law model [langbein04]_.
 
@@ -596,9 +624,10 @@ def create_powerlaw_noise(size: int | list | tuple,
     """
     # parse desired output shape as list
     if isinstance(size, tuple) or isinstance(size, list):
-        assert all([isinstance(dim, int) for dim in size]), \
-            "If passing a non-integer shape, 'size' must be a list or tuple " + \
-            f"of integers, got {size}."
+        assert all([isinstance(dim, int) for dim in size]), (
+            "If passing a non-integer shape, 'size' must be a list or tuple "
+            + f"of integers, got {size}."
+        )
         shape = [*size]
         if len(shape) == 1:
             shape.append(1)
@@ -619,7 +648,7 @@ def create_powerlaw_noise(size: int | list | tuple,
     # to the minimum frequency possible
     freqs[0] = 1 / size
     # scale the frequencies
-    freqs_scaled = freqs**(-exponent / 2)
+    freqs_scaled = freqs ** (-exponent / 2)
     # create an empty array and loop over the dimensions
     out = np.empty([size, ndims])
     for idim in range(ndims):
@@ -651,16 +680,17 @@ def create_powerlaw_noise(size: int | list | tuple,
     return out
 
 
-def parse_maintenance_table(csvpath: str,
-                            sitecol: int,
-                            datecols: list,
-                            siteformatter: Callable[[str], str] | None = None,
-                            delimiter: str = ',',
-                            codecol: int | None = None,
-                            exclude: list[str] | None = None,
-                            include: list[str] | None = None,
-                            verbose: bool = False
-                            ) -> tuple[pd.DataFrame, dict[str, list]]:
+def parse_maintenance_table(
+    csvpath: str,
+    sitecol: int,
+    datecols: list,
+    siteformatter: Callable[[str], str] | None = None,
+    delimiter: str = ",",
+    codecol: int | None = None,
+    exclude: list[str] | None = None,
+    include: list[str] | None = None,
+    verbose: bool = False,
+) -> tuple[pd.DataFrame, dict[str, list]]:
     """
     Function that loads a maintenance table from a .csv file (or similar) and returns
     a list of step times for each station. It also provides an interface to ignore
@@ -684,8 +714,8 @@ def parse_maintenance_table(csvpath: str,
     codecol
         Column index of the maintenance code.
     exclude
-        Maintenance records that exactly match an element in ``exclude`` will be ignored.
-        ``codecol`` has to be set.
+        Maintenance records that exactly match an element in ``exclude`` will be
+        ignored. ``codecol`` has to be set.
     include
         Only maintenance records that include an element of ``include`` will be used.
         No exact match is required.
@@ -708,19 +738,22 @@ def parse_maintenance_table(csvpath: str,
     """
     # load codes and tables
     if codecol is not None:
-        assert isinstance(codecol, int), \
-            f"'codecol' needs to be an integer, got {codecol}."
+        assert isinstance(
+            codecol, int
+        ), f"'codecol' needs to be an integer, got {codecol}."
         if exclude is not None:
-            assert (isinstance(exclude, list) and
-                    all([isinstance(ecode, str) for ecode in exclude])), \
-                f"'exclude' needs to be a list of strings, got {exclude}."
+            assert isinstance(exclude, list) and all(
+                [isinstance(ecode, str) for ecode in exclude]
+            ), f"'exclude' needs to be a list of strings, got {exclude}."
         if include is not None:
-            assert (isinstance(include, list) and
-                    all([isinstance(icode, str) for icode in include])), \
-                f"'include' needs to be a list of strings, got {include}."
-        maint_table = pd.read_csv(csvpath, delimiter=delimiter, usecols=[sitecol, codecol])
-        # because we don't know the column names, we need to make sure that the site will
-        # always be in the first column for later
+            assert isinstance(include, list) and all(
+                [isinstance(icode, str) for icode in include]
+            ), f"'include' needs to be a list of strings, got {include}."
+        maint_table = pd.read_csv(
+            csvpath, delimiter=delimiter, usecols=[sitecol, codecol]
+        )
+        # because we don't know the column names, we need to make sure that the site
+        # will always be in the first column for later
         if codecol < sitecol:
             maint_table = maint_table.iloc[:, [1, 0]]
         # save code column name for later
@@ -730,22 +763,29 @@ def parse_maintenance_table(csvpath: str,
     # get site column name
     sitecolname = maint_table.columns[0]
     # load and parse time
-    time = pd.read_csv(csvpath, delimiter=delimiter, usecols=datecols,
-                       parse_dates=[list(range(len(datecols)))] if len(datecols) > 1 else True
-                       ).squeeze("columns")
+    time = pd.read_csv(
+        csvpath,
+        delimiter=delimiter,
+        usecols=datecols,
+        parse_dates=[list(range(len(datecols)))] if len(datecols) > 1 else True,
+    ).squeeze("columns")
     timecolname = time.name
     # connect time and data
     maint_table = maint_table.join(time)
     if verbose:
         print(f"Loaded {maint_table.shape[0]} maintenance entries.")
-    # process site name column with siteformatter and make sure we're not combining stations
+    # process site name column with siteformatter
+    # and make sure we're not combining stations
     if siteformatter is not None:
-        assert callable(siteformatter), \
-            f"'siteformatter' needs to be a callable, got {siteformatter}."
+        assert callable(
+            siteformatter
+        ), f"'siteformatter' needs to be a callable, got {siteformatter}."
         unique_pre = len(maint_table[sitecolname].unique())
         maint_table[sitecolname] = maint_table[sitecolname].apply(siteformatter)
         unique_post = len(maint_table[sitecolname].unique())
-        assert unique_pre == unique_post, "While applying siteformatter, stations were merged."
+        assert (
+            unique_pre == unique_post
+        ), "While applying siteformatter, stations were merged."
     # now drop all columns where code is exactly one of the elements in exclude
     if (codecol is not None) and (exclude is not None):
         droprows = maint_table[codecolname].isin(exclude)
@@ -754,27 +794,35 @@ def parse_maintenance_table(csvpath: str,
         maint_table = maint_table[~droprows]
     # now drop all columns where the code does not contain an element of 'include'
     if (codecol is not None) and (include is not None):
-        keeprows = np.any([maint_table[codecolname].str.contains(pat).values
-                           for pat in include], axis=0)
+        keeprows = np.any(
+            [maint_table[codecolname].str.contains(pat).values for pat in include],
+            axis=0,
+        )
         if verbose:
-            print(f"Dropping {maint_table.shape[0] - keeprows.sum()} rows "
-                  f"because of include={include}.")
+            print(
+                f"Dropping {maint_table.shape[0] - keeprows.sum()} rows "
+                f"because of include={include}."
+            )
         maint_table = maint_table.iloc[keeprows, :]
-    # now produce a dictionary that maps sites to a list of step dates: {station: [steptimes]}
+    # now produce a dictionary that maps sites to a list of step dates:
+    # {station: [steptimes]}
     maint_dict = dict(maint_table.groupby(sitecolname)[timecolname].apply(list))
     # rename columns
-    maint_table.rename(columns={sitecolname: "station", codecolname: "code",
-                                timecolname: "time"}, inplace=True)
+    maint_table.rename(
+        columns={sitecolname: "station", codecolname: "code", timecolname: "time"},
+        inplace=True,
+    )
     return maint_table, maint_dict
 
 
-def weighted_median(values: np.ndarray,
-                    weights: np.ndarray,
-                    axis: int = 0,
-                    percentile: float = 0.5,
-                    keepdims: bool = False,
-                    visualize: bool = False
-                    ) -> np.ndarray:
+def weighted_median(
+    values: np.ndarray,
+    weights: np.ndarray,
+    axis: int = 0,
+    percentile: float = 0.5,
+    keepdims: bool = False,
+    visualize: bool = False,
+) -> np.ndarray:
     """
     Calculates the weighted median along a given axis.
 
@@ -798,15 +846,20 @@ def weighted_median(values: np.ndarray,
         Weighted median of input.
     """
     # some checks
-    assert isinstance(values, np.ndarray) and isinstance(weights, np.ndarray), \
-        "'values' and 'weights' must be NumPy arrays, got " + \
-        f"{type(values)} and {type(weights)}."
-    assert isinstance(axis, int) and (axis < len(values.shape)), \
-        f"Axis {axis} is not a valid index for the shape of 'values' ({values.shape})."
-    assert (percentile >= 0) and (percentile <= 1), \
-        f"'percentile' must be between 0 and 1, got {percentile}."
-    assert np.all(np.any(~np.isnan(values), axis=axis)), "'values' must at least " + \
-        f"contain a single non-NaN element along axis {axis} for every other dimension."
+    assert isinstance(values, np.ndarray) and isinstance(weights, np.ndarray), (
+        "'values' and 'weights' must be NumPy arrays, got "
+        + f"{type(values)} and {type(weights)}."
+    )
+    assert isinstance(axis, int) and (
+        axis < len(values.shape)
+    ), f"Axis {axis} is not a valid index for the shape of 'values' ({values.shape})."
+    assert (percentile >= 0) and (
+        percentile <= 1
+    ), f"'percentile' must be between 0 and 1, got {percentile}."
+    assert np.all(np.any(~np.isnan(values), axis=axis)), (
+        "'values' must at least contain a single "
+        + f"non-NaN element along axis {axis} for every other dimension."
+    )
     # broadcast the weights
     other_axes = [i for i in range(len(values.shape)) if i != axis]
     weights = np.expand_dims(weights, other_axes)
@@ -840,8 +893,14 @@ def weighted_median(values: np.ndarray,
             i_medians = temp_medians[0, i]
             plt.figure()
             plt.bar(i_cumsum, i_values, -i_weights, align="edge", color="C0")
-            plt.bar(i_cumsum, i_cumsum, -i_weights, align="edge",
-                    edgecolor="C1", facecolor=None)
+            plt.bar(
+                i_cumsum,
+                i_cumsum,
+                -i_weights,
+                align="edge",
+                edgecolor="C1",
+                facecolor=None,
+            )
             plt.axhline(i_cutoff, color="k", linestyle="--")
             plt.axvline(i_cumsum[i_index], color="r", linestyle="--")
             plt.title(f"axis {i}: {i_medians}")
@@ -852,17 +911,18 @@ def weighted_median(values: np.ndarray,
     return medians
 
 
-def download_unr_data(station_list_or_bbox: list[str] | list[float],
-                      data_dir: str,
-                      solution: Literal["final", "rapid", "ultra"] = "final",
-                      rate: Literal["24h", "5min"] = "24h",
-                      reference: str = "IGS14",
-                      min_solutions: int = 100,
-                      t_min: str | pd.Timestamp | None = None,
-                      t_max: str | pd.Timestamp | None = None,
-                      verbose: bool = False,
-                      no_pbar: bool = False
-                      ) -> pd.DataFrame:
+def download_unr_data(
+    station_list_or_bbox: list[str] | list[float],
+    data_dir: str,
+    solution: Literal["final", "rapid", "ultra"] = "final",
+    rate: Literal["24h", "5min"] = "24h",
+    reference: str = "IGS14",
+    min_solutions: int = 100,
+    t_min: str | pd.Timestamp | None = None,
+    t_max: str | pd.Timestamp | None = None,
+    verbose: bool = False,
+    no_pbar: bool = False,
+) -> pd.DataFrame:
     """
     Downloads GNSS timeseries data from the University of Nevada at Reno's
     `Nevada Geodetic Laboratory`_. When using this data, please cite [blewitt18]_,
@@ -883,7 +943,8 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     data_dir
         Folder for data.
     solution
-        Which timeseries solution to download. See the Notes for approximate latency times.
+        Which timeseries solution to download. See the Notes for approximate
+        latency times.
     rate
         Which sample rate to download. See the Notes for a table of which rates are
         available for each solution.
@@ -947,14 +1008,17 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     parse_unr_steps : Function to download and parse UNR's main step file.
     """
     # do some checks
-    assert solution in ["final", "rapid", "ultra"], \
-        f"Please choose a valid orbit solution (got {solution})."
-    assert rate in ["24h", "5min"], \
-        f"Please choose a valid sample rate (got {rate})."
+    assert solution in [
+        "final",
+        "rapid",
+        "ultra",
+    ], f"Please choose a valid orbit solution (got {solution})."
+    assert rate in ["24h", "5min"], f"Please choose a valid sample rate (got {rate})."
     if (solution == "ultra") and (rate == "24h"):
         raise ValueError("There are no ultra-rapid daily solutions available.")
-    assert isinstance(station_list_or_bbox, list), \
-        f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
+    assert isinstance(
+        station_list_or_bbox, list
+    ), f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
     # make the necessary folders
     atr_dir = os.path.join(data_dir, "attributions")
     if verbose:
@@ -963,53 +1027,79 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     os.makedirs(atr_dir, exist_ok=True)
     # set master station list URL and define the function that returns the URL
     # (since we don't know which stations and times to actually download)
-    base_url = "http://geodesy.unr.edu/gps_timeseries/"
+    base_ts = "http://geodesy.unr.edu/gps_timeseries/"
+    base_stations = "http://geodesy.unr.edu/NGLStationPages/"
     if solution == "final":
         if rate == "24h":
             if reference == "IGS14":
+
                 def get_sta_url(sta):
-                    return base_url + f"tenv3/IGS14/{sta}.tenv3"
+                    return base_ts + f"tenv3/IGS14/{sta}.tenv3"
+
             else:
+
                 def get_sta_url(sta):
-                    return base_url + f"tenv3/plates/{reference}/{sta}.{reference}.tenv3"
+                    return base_ts + f"tenv3/plates/{reference}/{sta}.{reference}.tenv3"
+
         elif rate == "5min":
+
             def get_sta_url(sta, year):
-                return base_url + f"kenv/{sta}/{sta}.{year}.kenv.zip"
-        station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldings.txt"
+                return base_ts + f"kenv/{sta}/{sta}.{year}.kenv.zip"
+
+        station_list_url = base_stations + "DataHoldings.txt"
     elif solution == "rapid":
         if rate == "24h":
             if reference == "IGS14":
+
                 def get_sta_url(sta):
-                    return base_url + f"rapids/tenv3/{sta}.tenv3"
+                    return base_ts + f"rapids/tenv3/{sta}.tenv3"
+
             else:
+
                 def get_sta_url(sta):
-                    return base_url + f"rapids/plates/tenv3/{reference}/{sta}.{reference}.tenv3"
-            station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsRapid24hr.txt"
+                    return (
+                        base_ts
+                        + f"rapids/plates/tenv3/{reference}/{sta}.{reference}.tenv3"
+                    )
+
+            station_list_url = base_stations + "DataHoldingsRapid24hr.txt"
         elif rate == "5min":
+
             def get_sta_url(sta, year):
-                return base_url + f"rapids_5min/kenv/{sta}/{sta}.{year}.kenv.zip"
-            station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsRapid5min.txt"
+                return base_ts + f"rapids_5min/kenv/{sta}/{sta}.{year}.kenv.zip"
+
+            station_list_url = base_stations + "DataHoldingsRapid5min.txt"
     elif solution == "ultra":
+
         def get_sta_url(sta, year, doy, date):
-            return base_url + f"ultracombo/kenv/{year}/{doy}/{date}{sta}_fix.kenv"
-        station_list_url = "http://geodesy.unr.edu/NGLStationPages/DataHoldingsUltra5min.txt"
+            return base_ts + f"ultracombo/kenv/{year}/{doy}/{date}{sta}_fix.kenv"
+
+        station_list_url = base_stations + "DataHoldingsUltra5min.txt"
     station_list_path = os.path.join(data_dir, station_list_url.split("/")[-1])
     # download the station list and parse to a DataFrame
     if verbose:
-        print(f"Downloading station list from {station_list_url} to {station_list_path}.")
+        print(
+            f"Downloading station list from {station_list_url} to {station_list_path}."
+        )
     try:
         request.urlretrieve(station_list_url, station_list_path)
     except error.HTTPError as e:
-        raise RuntimeError("Failed to download the station list from "
-                           f"{station_list_url}.").with_traceback(e.__traceback__) from e
-    stations = pd.read_csv(station_list_path, sep=r"\s+", usecols=list(range(11)),
-                           parse_dates=[7, 8, 9])
+        raise RuntimeError(
+            "Failed to download the station list from " f"{station_list_url}."
+        ).with_traceback(e.__traceback__) from e
+    stations = pd.read_csv(
+        station_list_path, sep=r"\s+", usecols=list(range(11)), parse_dates=[7, 8, 9]
+    )
     # subset according to station_list_or_bbox
     if all([isinstance(site, str) for site in station_list_or_bbox]):
         # list contains stations names
         stations = stations[stations["Sta"].isin(station_list_or_bbox)]
-    elif all([isinstance(value, float) or isinstance(value, int)
-              for value in station_list_or_bbox]):
+    elif all(
+        [
+            isinstance(value, float) or isinstance(value, int)
+            for value in station_list_or_bbox
+        ]
+    ):
         if len(station_list_or_bbox) == 4:
             # list is a bounding box
             [lon_min, lon_max, lat_min, lat_max] = station_list_or_bbox
@@ -1017,15 +1107,18 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
             lon_min = (lon_min + 360) % 360
             lon_max = (lon_max + 360) % 360
             if lon_min < lon_max:
-                lon_subset = (stations["Long(deg)"] <= lon_max) & \
-                             (stations["Long(deg)"] >= lon_min)
+                lon_subset = (stations["Long(deg)"] <= lon_max) & (
+                    stations["Long(deg)"] >= lon_min
+                )
             elif lon_min > lon_max:
-                lon_subset = (stations["Long(deg)"] <= lon_max) | \
-                             (stations["Long(deg)"] >= lon_min)
+                lon_subset = (stations["Long(deg)"] <= lon_max) | (
+                    stations["Long(deg)"] >= lon_min
+                )
             else:
                 lon_subset = True
-            lat_subset = (stations["Lat(deg)"] <= lat_max) & \
-                         (stations["Lat(deg)"] >= lat_min)
+            lat_subset = (stations["Lat(deg)"] <= lat_max) & (
+                stations["Lat(deg)"] >= lat_min
+            )
             stations = stations[lat_subset & lon_subset]
         elif len(station_list_or_bbox) == 3:
             # list is a location and radius
@@ -1037,11 +1130,13 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
             distances = np.array(distances)[:, 0] / 1e3
             stations = stations[distances <= radius]
         else:
-            raise ValueError("Could not parse 'station_list_or_bbox' " +
-                             str(station_list_or_bbox))
+            raise ValueError(
+                "Could not parse 'station_list_or_bbox' " + str(station_list_or_bbox)
+            )
     else:
-        raise ValueError("Could not parse 'station_list_or_bbox' " +
-                         str(station_list_or_bbox))
+        raise ValueError(
+            "Could not parse 'station_list_or_bbox' " + str(station_list_or_bbox)
+        )
     # subset according to data availability
     stations = stations[stations["NumSol"] >= min_solutions]
     if t_min is not None:
@@ -1065,21 +1160,25 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
         dict_urls = {}
         if (solution == "final") or (solution == "rapid"):
             if solution == "final":
-                index_url = base_url + "kenv/"
+                index_url = base_ts + "kenv/"
             else:
-                index_url = base_url + "rapids_5min/kenv/"
-            iter_stations_list = tqdm(stations_list, desc="Parsing index pages",
-                                      ascii=True, unit="station", disable=no_pbar)
+                index_url = base_ts + "rapids_5min/kenv/"
+            iter_stations_list = tqdm(
+                stations_list,
+                desc="Parsing index pages",
+                ascii=True,
+                unit="station",
+                disable=no_pbar,
+            )
             for sta in iter_stations_list:
-                pattern = r'(?<=<a href=")' + str(sta) + \
-                          r'\.(\d{4})\.kenv\.zip(?=">)'
+                pattern = r'(?<=<a href=")' + str(sta) + r'\.(\d{4})\.kenv\.zip(?=">)'
                 extractor = re.compile(pattern, re.IGNORECASE)
                 with request.urlopen(index_url + f"{sta}/") as f:
                     index_page = f.read().decode("windows-1252")
                     avail_years = extractor.findall(index_page)
                 dict_urls[sta] = [get_sta_url(sta, year) for year in avail_years]
         elif solution == "ultra":
-            index_url = base_url + "ultracombo/kenv/"
+            index_url = base_ts + "ultracombo/kenv/"
             pattern_y = r'(?<=<a href=")(\d{4})/(?=">)'
             pattern_d = r'(?<=<a href=")(\d{3})/(?=">)'
             pattern_f = r'(?<=<a href=")(\d{2}\w{3}\d{2})(\w{4})_fix\.kenv(?=">)'
@@ -1094,8 +1193,13 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
             if verbose:
                 print("Done")
             dict_urls[sta] = []
-            iter_avail_years = tqdm(avail_years, desc="Parsing daily index pages",
-                                    ascii=True, unit="year", disable=no_pbar)
+            iter_avail_years = tqdm(
+                avail_years,
+                desc="Parsing daily index pages",
+                ascii=True,
+                unit="year",
+                disable=no_pbar,
+            )
             for year in iter_avail_years:
                 with request.urlopen(index_url + f"{year}/") as f:
                     index_page = f.read().decode("windows-1252")
@@ -1112,14 +1216,16 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     if num_urls == 0:
         raise RuntimeError("No files to download after looking on the server.")
     elif (num_urls > 10000) and (not no_pbar):
-        answer = input("WARNING: The current selection criteria would lead to "
-                       f"downloading {num_urls} files (from "
-                       f"{len(stations_list)} stations).\nPress ENTER to continue, "
-                       "or anything else to abort.")
+        answer = input(
+            "WARNING: The current selection criteria would lead to "
+            f"downloading {num_urls} files (from "
+            f"{len(stations_list)} stations).\nPress ENTER to continue, "
+            "or anything else to abort."
+        )
         if answer != "":
             exit()
     # prepare list of attribution files
-    atr_base_url = "http://geodesy.unr.edu/NGLStationPages/attributions/"
+    atr_base_url = base_stations + "attributions/"
     pattern_atr = r'(?<=<a href=")(\w{4}\.atr\d?)(?=">)'
     extractor_atr = re.compile(pattern_atr, re.IGNORECASE)
     if verbose:
@@ -1129,12 +1235,20 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
         avail_atr_files = extractor_atr.findall(index_page)
     if verbose:
         print("Done")
-    dict_atr_urls = {sta: [atr_base_url + atr_file
-                           for atr_file in avail_atr_files if sta in atr_file]
-                     for sta in stations_list}
+    dict_atr_urls = {
+        sta: [
+            atr_base_url + atr_file for atr_file in avail_atr_files if sta in atr_file
+        ]
+        for sta in stations_list
+    }
     # loop over list of URLs
-    iter_stations = tqdm(stations_list, desc="Downloading station timeseries",
-                         ascii=True, unit="station", disable=no_pbar)
+    iter_stations = tqdm(
+        stations_list,
+        desc="Downloading station timeseries",
+        ascii=True,
+        unit="station",
+        disable=no_pbar,
+    )
     for sta in iter_stations:
         staurls = dict_urls[sta]
         atrurls = dict_atr_urls[sta]
@@ -1142,7 +1256,8 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
         if rate == "24h":
             local_path = os.path.join(data_dir, staurls[0].split("/")[-1])
             _download_update_file(local_path, staurls[0], verbose)
-        # if we're potentially downloading multiple files (for high-rate timeseries), make a folder
+        # if we're potentially downloading multiple files (for high-rate timeseries),
+        # make a folder
         else:
             os.makedirs(data_dir / sta, exist_ok=True)
             for staurl in staurls:
@@ -1156,15 +1271,14 @@ def download_unr_data(station_list_or_bbox: list[str] | list[float],
     return stations
 
 
-def _download_update_file(local_path: str,
-                          remote_path: str,
-                          verbose: bool = False
-                          ) -> None:
+def _download_update_file(
+    local_path: str, remote_path: str, verbose: bool = False
+) -> None:
     # check if local file exists and if so, get its last-modified time
     if os.path.isfile(local_path):
-        local_time = \
-            pd.Timestamp(datetime.fromtimestamp(os.path.getmtime(local_path),
-                                                tz=timezone.utc))
+        local_time = pd.Timestamp(
+            datetime.fromtimestamp(os.path.getmtime(local_path), tz=timezone.utc)
+        )
         local_time_str = local_time.isoformat()
     else:
         local_time, local_time_str = None, "N/A"
@@ -1182,19 +1296,26 @@ def _download_update_file(local_path: str,
             else:
                 status = "SKIPPED"
     except error.HTTPError as e:
-        warn(f"Failed to download the remote file from {remote_path}.\n"
-             f"HTTP Error {e.code}: {e.reason}", category=RuntimeWarning, stacklevel=2)
+        warn(
+            f"Failed to download the remote file from {remote_path}.\n"
+            f"HTTP Error {e.code}: {e.reason}",
+            category=RuntimeWarning,
+            stacklevel=2,
+        )
     else:
         if verbose:
-            tqdm.write(f"[{status}] '{remote_path}' ({remote_time.isoformat()})"
-                       f" -> '{local_path}' ({local_time_str})")
+            tqdm.write(
+                f"[{status}] '{remote_path}' ({remote_time.isoformat()})"
+                f" -> '{local_path}' ({local_time_str})"
+            )
 
 
-def parse_unr_steps(filepath: str,
-                    check_update: bool = True,
-                    only_stations: list[str] | None = None,
-                    verbose: bool = False
-                    ) -> tuple[pd.DataFrame, dict[str, list], pd.DataFrame, dict[str, list]]:
+def parse_unr_steps(
+    filepath: str,
+    check_update: bool = True,
+    only_stations: list[str] | None = None,
+    verbose: bool = False,
+) -> tuple[pd.DataFrame, dict[str, list], pd.DataFrame, dict[str, list]]:
     """
     This functions parses the main step file from UNR and produces two step databases,
     one for maintenance and one for earthquake-related events.
@@ -1210,7 +1331,8 @@ def parse_unr_steps(filepath: str,
     check_update
         If ``True``, check UNR's server for an updated step file.
     only_stations
-        If specified, a list of station IDs. Other stations are not included in the output.
+        If specified, a list of station IDs.
+        Other stations are not included in the output.
     verbose
         If ``True``, print actions.
 
@@ -1223,19 +1345,22 @@ def parse_unr_steps(filepath: str,
     eq_table
         Parsed earthquake table.
     eq_dict
-        Dictionary of that maps the station names to a list of earthquake-related steptimes.
+        Dictionary of that maps the station names to a list of earthquake-related
+        steptimes.
     """
     # check if local file exists
     local_exists = os.path.isfile(filepath)
     # abort if no local file exists but also no update should be performed
-    assert local_exists or check_update, \
-        "The local file does not exist and no update was requested. No parsing possible."
+    assert (
+        local_exists or check_update
+    ), "The local file does not exist and no update was requested. No parsing possible."
     # see if we need to download a newer step file
     if check_update:
         # check local last-modified time
         if local_exists:
-            local_time = pd.Timestamp(datetime.fromtimestamp(os.path.getmtime(filepath),
-                                                             tz=timezone.utc))
+            local_time = pd.Timestamp(
+                datetime.fromtimestamp(os.path.getmtime(filepath), tz=timezone.utc)
+            )
             local_time_str = local_time.isoformat()
         else:
             local_time, local_time_str = None, "N/A"
@@ -1255,27 +1380,43 @@ def parse_unr_steps(filepath: str,
                 else:
                     status = "SKIPPED"
         except error.HTTPError as e:
-            raise RuntimeError(f"Failed to download the remote file from {remote_url}.\n"
-                               f"HTTP Error {e.code}: {e.reason}"
-                               ).with_traceback(e.__traceback__) from e
+            raise RuntimeError(
+                f"Failed to download the remote file from {remote_url}.\n"
+                f"HTTP Error {e.code}: {e.reason}"
+            ).with_traceback(e.__traceback__) from e
         else:
             if verbose:
-                tqdm.write(f"[{status}] '{remote_url}' ({remote_time.isoformat()})"
-                           f" -> '{filepath}' ({local_time_str})")
+                tqdm.write(
+                    f"[{status}] '{remote_url}' ({remote_time.isoformat()})"
+                    f" -> '{filepath}' ({local_time_str})"
+                )
     # load the file
     col_names = ["station", "time", "code", "type", "distance", "magnitude", "usgsid"]
     # (for earthquake events, the "type" column is actually the "threshold" column)
     raw = pd.read_csv(filepath, names=col_names, sep=r"\s+")
     # we now have a locale-dependent time column in the non-standard format yymmmdd
-    # (%y%b%d in strptime language) which we need to convert in a hard-coded way, because we
-    # shouldn't change the locale temporarily as it affects the entire system
-    unrmonthmap = {"JAN": "01", "FEB": "02", "MAR": "03", "APR": "04",
-                   "MAY": "05", "JUN": "06", "JUL": "07", "AUG": "08",
-                   "SEP": "09", "OCT": "10", "NOV": "11", "DEC": "12"}
+    # (%y%b%d in strptime language) which we need to convert in a hard-coded way,
+    # because we shouldn't change the locale temporarily as it affects the entire system
+    unrmonthmap = {
+        "JAN": "01",
+        "FEB": "02",
+        "MAR": "03",
+        "APR": "04",
+        "MAY": "05",
+        "JUN": "06",
+        "JUL": "07",
+        "AUG": "08",
+        "SEP": "09",
+        "OCT": "10",
+        "NOV": "11",
+        "DEC": "12",
+    }
     raw["time"] = pd.to_datetime(
-        raw["time"].apply(lambda yymmmdd:
-                          yymmmdd[:2] + unrmonthmap[yymmmdd[2:5]] + yymmmdd[-2:]),
-        format=r"%y%m%d")
+        raw["time"].apply(
+            lambda yymmmdd: yymmmdd[:2] + unrmonthmap[yymmmdd[2:5]] + yymmmdd[-2:]
+        ),
+        format=r"%y%m%d",
+    )
     # subset to specified stations
     if only_stations:
         raw = raw[raw["station"].isin(only_stations)]
@@ -1283,7 +1424,8 @@ def parse_unr_steps(filepath: str,
     maint_table = raw[raw["code"] == 1].iloc[:, [0, 1, 3]]
     eq_table = raw[raw["code"] == 2].iloc[:, [0, 1, 3, 4, 5, 6]]
     eq_table.rename(columns={"type": "threshold"}, inplace=True)
-    del raw  # raw also contains a lot of NaNs because of extra columns we don't need to keep
+    # raw also contains a lot of NaNs because of extra columns we don't need to keep
+    del raw
     # print the different maintenance codes and sizes
     if verbose:
         unique_descs = maint_table["type"].unique().tolist()
@@ -1310,53 +1452,61 @@ def best_utmzone(longitudes: np.ndarray) -> int:
     -------
         UTM zone at the average input longitude.
     """
-    lon_mean = np.rad2deg(circmean(np.deg2rad(longitudes),
-                                   low=-np.pi, high=np.pi))
+    lon_mean = np.rad2deg(circmean(np.deg2rad(longitudes), low=-np.pi, high=np.pi))
     utmzone = int(np.ceil(((lon_mean + 180) / 6)))
     return utmzone
 
 
-def _prepare_vel_strain_rot(locations: np.ndarray,
-                            velocities: np.ndarray,
-                            covariances: np.ndarray | None,
-                            utmzone: int | None,
-                            reference: int | list | np.ndarray,
-                            ) -> tuple[np.ndarray,
-                                       np.ndarray | None,
-                                       np.ndarray | None,
-                                       np.ndarray]:
+def _prepare_vel_strain_rot(
+    locations: np.ndarray,
+    velocities: np.ndarray,
+    covariances: np.ndarray | None,
+    utmzone: int | None,
+    reference: int | list | np.ndarray,
+) -> tuple[np.ndarray, np.ndarray | None, np.ndarray | None, np.ndarray]:
     # input checks
-    assert (isinstance(locations, np.ndarray) and locations.ndim == 2 and
-            locations.shape[1] == 2), \
-        "'locations' needs to be a NumPy array with two columns."
-    assert (isinstance(velocities, np.ndarray) and velocities.ndim == 2 and
-            velocities.shape[1] == 2), \
-        "'velocities' needs to be a NumPy array with two columns."
-    assert locations.shape[0] == velocities.shape[0], \
-        f"Mismatch between locations shape {locations.shape} and velocities " \
+    assert (
+        isinstance(locations, np.ndarray)
+        and locations.ndim == 2
+        and locations.shape[1] == 2
+    ), "'locations' needs to be a NumPy array with two columns."
+    assert (
+        isinstance(velocities, np.ndarray)
+        and velocities.ndim == 2
+        and velocities.shape[1] == 2
+    ), "'velocities' needs to be a NumPy array with two columns."
+    assert locations.shape[0] == velocities.shape[0], (
+        f"Mismatch between locations shape {locations.shape} and velocities "
         f"shape {velocities.shape}."
+    )
     num_stations = locations.shape[0]
     if covariances is not None:
-        assert (isinstance(covariances, np.ndarray) and covariances.ndim == 2 and
-                covariances.shape[0] == num_stations and
-                covariances.shape[1] in [2, 3]), \
-            "Invalid covariance input type or shape."
+        assert (
+            isinstance(covariances, np.ndarray)
+            and covariances.ndim == 2
+            and covariances.shape[0] == num_stations
+            and covariances.shape[1] in [2, 3]
+        ), "Invalid covariance input type or shape."
     # parse reference
     if isinstance(reference, int):
-        assert 0 <= reference < num_stations, \
-            f"{reference} is not an integer index less than {num_stations}."
+        assert (
+            0 <= reference < num_stations
+        ), f"{reference} is not an integer index less than {num_stations}."
         lon0, lat0 = locations[reference, :]
     elif isinstance(reference, list) and (len(reference) >= 2):
         lon0, lat0 = float(reference[0]), float(reference[1])
     elif isinstance(reference, np.ndarray):
-        assert reference.ndim == 2 and reference.shape[1] == 2, \
-            f"'reference' needs to be a two-column array, got shape {reference.shape}."
+        assert (
+            reference.ndim == 2 and reference.shape[1] == 2
+        ), f"'reference' needs to be a two-column array, got shape {reference.shape}."
     else:
         raise ValueError(f"Invalid input for 'reference': {reference}.")
     # make sure we're not inverting if we don't have enough data points
     if num_stations < 6:
-        raise ValueError(f"{num_stations} stations are less stations than "
-                         "necessary (6) for a stable computation.")
+        raise ValueError(
+            f"{num_stations} stations are less stations than "
+            "necessary (6) for a stable computation."
+        )
     # determine UTM zone if needed
     if utmzone is None:
         utmzone = best_utmzone(locations[:, 0])
@@ -1375,24 +1525,31 @@ def _prepare_vel_strain_rot(locations: np.ndarray,
         if covariances.shape[1] == 2:
             W = sparse.diags(1 / np.concatenate([covariances[:, 0], covariances[:, 1]]))
         elif covariances.shape[1] == 3:
-            Wblocks = [sp.linalg.pinvh(np.reshape(covariances[i, [0, 2, 2, 1]], (2, 2)))
-                       for i in range(num_stations)]
-            main_diag = np.concatenate([[block[0, 0] for block in Wblocks],
-                                        [block[1, 1] for block in Wblocks]])
+            Wblocks = [
+                sp.linalg.pinvh(np.reshape(covariances[i, [0, 2, 2, 1]], (2, 2)))
+                for i in range(num_stations)
+            ]
+            main_diag = np.concatenate(
+                [[block[0, 0] for block in Wblocks], [block[1, 1] for block in Wblocks]]
+            )
             off_diag = np.array([block[0, 1] for block in Wblocks])
-            W = sparse.diags(diagonals=[main_diag, off_diag, off_diag],
-                             offsets=[0, -num_stations, num_stations], format='csr')
+            W = sparse.diags(
+                diagonals=[main_diag, off_diag, off_diag],
+                offsets=[0, -num_stations, num_stations],
+                format="csr",
+            )
     else:
         W = None
     # done
     return EN, ENO, W, d
 
 
-def _get_vel_strain_rot_mapping(dE: np.ndarray | None = None,
-                                dN: np.ndarray | None = None,
-                                num_stations: int | None = None,
-                                out: np.ndarray | None = None
-                                ) -> np.ndarray:
+def _get_vel_strain_rot_mapping(
+    dE: np.ndarray | None = None,
+    dN: np.ndarray | None = None,
+    num_stations: int | None = None,
+    out: np.ndarray | None = None,
+) -> np.ndarray:
     # input checks
     if num_stations is None:
         assert (dE is not None) and (dN is not None)
@@ -1416,12 +1573,13 @@ def _get_vel_strain_rot_mapping(dE: np.ndarray | None = None,
     return G
 
 
-def get_hom_vel_strain_rot(locations: np.ndarray,
-                           velocities: np.ndarray,
-                           covariances: np.ndarray | None = None,
-                           utmzone: int | None = None,
-                           reference: int | list = 0
-                           ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def get_hom_vel_strain_rot(
+    locations: np.ndarray,
+    velocities: np.ndarray,
+    covariances: np.ndarray | None = None,
+    utmzone: int | None = None,
+    reference: int | list = 0,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""
     For a set of horizontal velocities on a 2D cartesian grid, estimate the
     best-fit displacement gradient matrix to calculate a homogenous velocity
@@ -1478,8 +1636,9 @@ def get_hom_vel_strain_rot(locations: np.ndarray,
     """
     # prepare
     assert not isinstance(reference, np.ndarray), "'reference' cannot be an array."
-    EN, ENO, W, d = \
-        _prepare_vel_strain_rot(locations, velocities, covariances, utmzone, reference)
+    EN, ENO, W, d = _prepare_vel_strain_rot(
+        locations, velocities, covariances, utmzone, reference
+    )
     # extract positions
     E, N = EN[:, 0], EN[:, 1]
     # get all positions relative to reference station
@@ -1501,21 +1660,23 @@ def get_hom_vel_strain_rot(locations: np.ndarray,
     return v_O, epsilon, omega
 
 
-def get_field_vel_strain_rot(locations: np.ndarray,
-                             velocities: np.ndarray,
-                             field: np.ndarray,
-                             weighting_threshold: float,
-                             covariances: np.ndarray | None = None,
-                             utmzone: int | None = None,
-                             distance_method: Literal["gaussian", "quadratic"] = "gaussian",
-                             coverage_method: Literal["azimuth", "voronoi"] = "voronoi",
-                             estimate_within: float | None = None,
-                             no_pbar: bool = False
-                             ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def get_field_vel_strain_rot(
+    locations: np.ndarray,
+    velocities: np.ndarray,
+    field: np.ndarray,
+    weighting_threshold: float,
+    covariances: np.ndarray | None = None,
+    utmzone: int | None = None,
+    distance_method: Literal["gaussian", "quadratic"] = "gaussian",
+    coverage_method: Literal["azimuth", "voronoi"] = "voronoi",
+    estimate_within: float | None = None,
+    no_pbar: bool = False,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""
     For a set of horizontal velocities on a 2D cartesian grid, estimate the
     interpolated velocity, strain, and rotation at target locations assuming
-    a locally homogenous velocity field. See [tape09]_ and [shen15]_ for an introduction.
+    a locally homogenous velocity field.
+    See [tape09]_ and [shen15]_ for an introduction.
 
     This function uses a local approximation to the spherical Earth by
     converting all station and target locations into a suitable UTM zone, and only
@@ -1569,7 +1730,8 @@ def get_field_vel_strain_rot(locations: np.ndarray,
 
     See Also
     --------
-    strain_rotation_invariants : For calculation of invariants of the individual tensors.
+    strain_rotation_invariants
+        For calculation of invariants of the individual tensors.
     get_hom_vel_strain_rot : To get a single set of values for all observations.
 
     References
@@ -1581,10 +1743,12 @@ def get_field_vel_strain_rot(locations: np.ndarray,
        doi:`10.1785/0120140247 <https://doi.org/10.1785/0120140247>`_.
     """
     # prepare
-    assert isinstance(field, np.ndarray) and field.ndim == 2 and field.shape[1] == 2, \
-        "'field' has to be a two-column array."
-    EN, ENf, Wdata, d = \
-        _prepare_vel_strain_rot(locations, velocities, covariances, utmzone, field)
+    assert (
+        isinstance(field, np.ndarray) and field.ndim == 2 and field.shape[1] == 2
+    ), "'field' has to be a two-column array."
+    EN, ENf, Wdata, d = _prepare_vel_strain_rot(
+        locations, velocities, covariances, utmzone, field
+    )
     num_stations = EN.shape[0]
     num_field = ENf.shape[0]
     all_vectors = EN[:, :2][None, :, :] - ENf[:, :2][:, None, :]
@@ -1599,35 +1763,40 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     # find field points that are inside the station network
     if estimate_within is None:
         estimate_within = np.sort(cdist(ENf[:, :2], ENf[:, :2]), axis=1)[:, 1].min()
-    ix_field_inside = np.flatnonzero(chull_path.contains_points(ENf, radius=estimate_within))
+    ix_field_inside = np.flatnonzero(
+        chull_path.contains_points(ENf, radius=estimate_within)
+    )
     num_field_inside = ix_field_inside.size
 
     # define distance weighting function for various scale distances (L_i in Shen paper)
     all_dists = cdist(ENf[ix_field_inside, :2], EN[:, :2])
     if distance_method == "gaussian":
-        def dist_weight_fun(scale, dist=all_dists): return np.exp(-(dist / scale)**2)
+
+        def dist_weight_fun(scale, dist=all_dists):
+            return np.exp(-((dist / scale) ** 2))
+
     elif distance_method == "quadratic":
-        def dist_weight_fun(scale, dist=all_dists): return 1 / (1 + (dist / scale)**2)
+
+        def dist_weight_fun(scale, dist=all_dists):
+            return 1 / (1 + (dist / scale) ** 2)
 
     # define coverage weighting function (Z_i in Shen paper)
     if coverage_method == "azimuth":
         # get direction from all field points to all stations
-        all_azimuths = np.arctan2(all_vectors[ix_field_inside, :, 1],
-                                  all_vectors[ix_field_inside, :, 0])
+        all_azimuths = np.arctan2(
+            all_vectors[ix_field_inside, :, 1], all_vectors[ix_field_inside, :, 0]
+        )
         # sort by azimuth
         all_sortings = np.argsort(all_azimuths, axis=1)
         all_azimuths_sorted = np.take_along_axis(all_azimuths, all_sortings, axis=1)
         # calculate the difference in azimuths between each station
         all_azimuths_sorted = np.concatenate(
-            [all_azimuths_sorted,
-             (all_azimuths_sorted[:, 0] + 2 * np.pi)[:, None]],
-            axis=1)
+            [all_azimuths_sorted, (all_azimuths_sorted[:, 0] + 2 * np.pi)[:, None]],
+            axis=1,
+        )
         all_thetas = np.diff(all_azimuths_sorted, axis=1)
         # sum both sides of azimuthal difference
-        all_thetas = np.concatenate(
-            [all_thetas[:, -1][:, None],
-             all_thetas],
-            axis=1)
+        all_thetas = np.concatenate([all_thetas[:, -1][:, None], all_thetas], axis=1)
         all_thetas = all_thetas[:, :-1] + all_thetas[:, 1:]
         # calculate final weight
         coverage_weight = num_stations * all_thetas / (4 * np.pi)
@@ -1635,8 +1804,10 @@ def get_field_vel_strain_rot(locations: np.ndarray,
         # build Voronoi network of observations
         vor = Voronoi(EN)
         # calculate areas, default is based on closest neighbors
-        vor_areas = np.pi * \
-            np.mean(np.sort(cdist(EN[:, :2], EN[:, :2]), axis=1)[:, 1:7], axis=1)**2
+        vor_areas = (
+            np.pi
+            * np.mean(np.sort(cdist(EN[:, :2], EN[:, :2]), axis=1)[:, 1:7], axis=1) ** 2
+        )
         # update with actual area if not infinite or larger than twice the default
         for i_station, i_region in enumerate(vor.point_region):
             if i_station not in chull.vertices:
@@ -1648,19 +1819,29 @@ def get_field_vel_strain_rot(locations: np.ndarray,
         # calculate final weights
         coverage_weight = np.broadcast_to(
             num_stations * vor_areas / np.sum(vor_areas),
-            (num_field_inside, num_stations))
+            (num_field_inside, num_stations),
+        )
 
     # calculate optimal scale distance
     def total_weight_fun_elem(scale, i):
-        return np.sum(dist_weight_fun(scale, all_dists[i, :]) * coverage_weight[i, :]
-                    ) - weighting_threshold
+        return (
+            np.sum(dist_weight_fun(scale, all_dists[i, :]) * coverage_weight[i, :])
+            - weighting_threshold
+        )
+
     optim_x1 = np.max(all_dists, axis=1)
     optimal_dist_scales = np.array(
-        [brentq(total_weight_fun_elem, 1, optim_x1[i], args=(i, ))
-        for i in range(num_field_inside)])
+        [
+            brentq(total_weight_fun_elem, 1, optim_x1[i], args=(i,))
+            for i in range(num_field_inside)
+        ]
+    )
     if np.any(np.isclose(optimal_dist_scales, 1)):
-        warn("Optimal distance scale probably not found.",
-             category=RuntimeWarning, stacklevel=2)
+        warn(
+            "Optimal distance scale probably not found.",
+            category=RuntimeWarning,
+            stacklevel=2,
+        )
     # calculate final optimal weights (L_i in Shen paper)
     distance_weight = dist_weight_fun(optimal_dist_scales[:, None])
 
@@ -1676,13 +1857,19 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     omega = np.full((num_field, 2, 2), np.nan)
 
     # start loop
-    for i_field_sub, i_field in enumerate(tqdm(ix_field_inside,
-                                               desc="Interpolating field", ascii=True,
-                                               unit="point", disable=no_pbar)):
+    for i_field_sub, i_field in enumerate(
+        tqdm(
+            ix_field_inside,
+            desc="Interpolating field",
+            ascii=True,
+            unit="point",
+            disable=no_pbar,
+        )
+    ):
         # get local G
-        G = _get_vel_strain_rot_mapping(dE=all_vectors[i_field, :, 0],
-                                        dN=all_vectors[i_field, :, 1],
-                                        out=G)
+        G = _get_vel_strain_rot_mapping(
+            dE=all_vectors[i_field, :, 0], dN=all_vectors[i_field, :, 1], out=G
+        )
         # get local W (C^-1 in Shen paper)
         # this is technically different from the paper because of the off-diagonals
         W = Wdata @ np.diag(np.tile(joint_weight[i_field_sub, :], 2))
@@ -1702,9 +1889,9 @@ def get_field_vel_strain_rot(locations: np.ndarray,
     return v, epsilon, omega
 
 
-def strain_rotation_invariants(epsilon: np.ndarray | None = None,
-                               omega: np.ndarray | None = None
-                               ) -> tuple[float, ...]:
+def strain_rotation_invariants(
+    epsilon: np.ndarray | None = None, omega: np.ndarray | None = None
+) -> tuple[float, ...]:
     r"""
     Given a strain (rate) and/or rotation (rate) tensor, calculate scalar
     invariant quantities of interest. See [tape09]_ for an introduction.
@@ -1731,8 +1918,8 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
         by the Frobenius norm of the strain (rate) tensor
         :math:`\Sigma = \lVert \mathbf{\varepsilon} \rVert_F`
     shear
-        Only if ``epsilon`` is provided. Scalar shearing (rate) as defined
-        by the square root of the second invariant of the deviatoric strain (rate) tensor
+        Only if ``epsilon`` is provided. Scalar shearing (rate) as defined by
+        the square root of the second invariant of the deviatoric strain (rate) tensor
         :math:`\text{T} = \sqrt{\frac{1}{2} \text{Tr}(\mathbf{\varepsilon}^2)
         - \frac{1}{6} \text{Tr}(\mathbf{\varepsilon})^2}`.
     rotation
@@ -1740,8 +1927,9 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
         by :math:`\Omega = \frac{1}{\sqrt{2}} \lVert \mathbf{\omega} \rVert_F`.
     """
     if epsilon is not None:
-        assert isinstance(epsilon, np.ndarray) and (epsilon.ndim in [2, 3]), \
-            f"'epsilon' needs to be a 2D or 3D NumPy array, got {epsilon}."
+        assert isinstance(epsilon, np.ndarray) and (
+            epsilon.ndim in [2, 3]
+        ), f"'epsilon' needs to be a 2D or 3D NumPy array, got {epsilon}."
         if epsilon.ndim == 2:
             epsilon = epsilon[None, ...]
         # scalar dilatation (rate)
@@ -1749,17 +1937,19 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
         # scalar strain (rate)
         strain = np.linalg.norm(epsilon, ord="fro", axis=(1, 2))
         # scalar shearing (rate)
-        shear = np.sqrt(np.trace(np.einsum("ijk,ikl->ijl", epsilon, epsilon),
-                                 axis1=1, axis2=2) / 2 -
-                        np.trace(epsilon, axis1=1, axis2=2)**2 / 6)
+        shear = np.sqrt(
+            np.trace(np.einsum("ijk,ikl->ijl", epsilon, epsilon), axis1=1, axis2=2) / 2
+            - np.trace(epsilon, axis1=1, axis2=2) ** 2 / 6
+        )
         # return scalars if single input
         if epsilon.shape[0] == 1:
             dilatation = dilatation[0]
             strain = strain[0]
             shear = shear[0]
     if omega is not None:
-        assert isinstance(omega, np.ndarray) and (omega.ndim in [2, 3]), \
-            f"'omega' needs to be a 2D or 3D NumPy array, got {omega}."
+        assert isinstance(omega, np.ndarray) and (
+            omega.ndim in [2, 3]
+        ), f"'omega' needs to be a 2D or 3D NumPy array, got {omega}."
         if omega.ndim == 2:
             omega = omega[None, ...]
         # scalar rotation (rate)
@@ -1777,11 +1967,12 @@ def strain_rotation_invariants(epsilon: np.ndarray | None = None,
         return rotation
 
 
-def estimate_euler_pole(locations: np.ndarray,
-                        velocities: np.ndarray,
-                        covariances: np.ndarray | None = None,
-                        enu: bool = True
-                        ) -> tuple[np.ndarray, np.ndarray]:
+def estimate_euler_pole(
+    locations: np.ndarray,
+    velocities: np.ndarray,
+    covariances: np.ndarray | None = None,
+    enu: bool = True,
+) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Estimate a best-fit Euler pole assuming all velocities lie on the same
     rigid plate on a sphere. The calculations are based on [goudarzi14]_.
@@ -1823,7 +2014,8 @@ def estimate_euler_pole(locations: np.ndarray,
         Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
         rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
     rotation_covariance
-        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation
+        vector.
 
     Notes
     -----
@@ -1834,9 +2026,9 @@ def estimate_euler_pole(locations: np.ndarray,
     :class:`~disstans.timeseries.Timeseries` is being used.
 
     Contrary to [goudarzi14]_, the estimated covariance matrix is not scaled by the a
-    posteriori sigma, to match the covariance definition throughout the rest of DISSTANS.
-    The time unit is also not assumed to be in years, and then scaled to millions
-    of years.
+    posteriori sigma, to match the covariance definition throughout the rest of
+    DISSTANS. The time unit is also not assumed to be in years, and then scaled to
+    millions of years.
 
     See Also
     --------
@@ -1851,52 +2043,94 @@ def estimate_euler_pole(locations: np.ndarray,
        doi:`10.1007/s10291-013-0354-4 <https://doi.org/10.1007/s10291-013-0354-4>`_.
     """
     # input checks
-    assert (isinstance(locations, np.ndarray) and locations.ndim == 2 and
-            locations.shape[1] == 2 if enu else 3), \
-        "'locations' needs to be a NumPy Array with either 2 or 3 columns."
-    assert (isinstance(velocities, np.ndarray) and velocities.ndim == 2 and
-            velocities.shape[1] == 2 if enu else 3), \
-        "'velocities' needs to be a NumPy Array with either 2 or 3 columns."
-    assert locations.shape[0] == velocities.shape[0], "Shape mismatch between " \
+    assert (
+        isinstance(locations, np.ndarray)
+        and locations.ndim == 2
+        and locations.shape[1] == 2
+        if enu
+        else 3
+    ), "'locations' needs to be a NumPy Array with either 2 or 3 columns."
+    assert (
+        isinstance(velocities, np.ndarray)
+        and velocities.ndim == 2
+        and velocities.shape[1] == 2
+        if enu
+        else 3
+    ), "'velocities' needs to be a NumPy Array with either 2 or 3 columns."
+    assert locations.shape[0] == velocities.shape[0], (
+        "Shape mismatch between "
         f"locations {locations.shape} and velocities {velocities.shape}."
+    )
     num_stations, num_components = velocities.shape
     if covariances is not None:
-        assert isinstance(covariances, np.ndarray), \
-            "If specified, 'covariances' needs to be a NumPy array."
+        assert isinstance(
+            covariances, np.ndarray
+        ), "If specified, 'covariances' needs to be a NumPy array."
         if enu:
             if covariances.shape == (num_stations, 2):
                 use_covs = False
-            elif (covariances.shape == (num_stations, 3) or
-                  covariances.shape == (num_stations, 2, 2)):
+            elif covariances.shape == (num_stations, 3) or covariances.shape == (
+                num_stations,
+                2,
+                2,
+            ):
                 use_covs = True
             else:
-                raise ValueError("'covariances' is not a compatible shape "
-                                 f"for ENU: {covariances.shape}.")
+                raise ValueError(
+                    "'covariances' is not a compatible shape "
+                    f"for ENU: {covariances.shape}."
+                )
         else:
             if covariances.shape == (num_stations, 3):
                 use_covs = False
-            elif (covariances.shape == (num_stations, 6) or
-                  covariances.shape == (num_stations, 3, 3)):
+            elif covariances.shape == (num_stations, 6) or covariances.shape == (
+                num_stations,
+                3,
+                3,
+            ):
                 use_covs = True
             else:
-                raise ValueError("'covariances' is not a compatible shape "
-                                 f"for ECEF: {covariances.shape}.")
+                raise ValueError(
+                    "'covariances' is not a compatible shape "
+                    f"for ECEF: {covariances.shape}."
+                )
     # stack velocities
     d = velocities.reshape(-1, 1)
     # build mapping matrix
     if enu:
         lon, lat = np.deg2rad(locations[:, 0]), np.deg2rad(locations[:, 1])
         # stacking of eq. 11 (note difference row ordering to match input format)
-        G = np.stack([-np.sin(lat) * np.cos(lon), -np.sin(lat) * np.sin(lon), np.cos(lat),
-                      np.sin(lon), -np.cos(lon), np.zeros(num_stations)],
-                     axis=1).reshape(2 * num_stations, 3) * 6378137
+        G = (
+            np.stack(
+                [
+                    -np.sin(lat) * np.cos(lon),
+                    -np.sin(lat) * np.sin(lon),
+                    np.cos(lat),
+                    np.sin(lon),
+                    -np.cos(lon),
+                    np.zeros(num_stations),
+                ],
+                axis=1,
+            ).reshape(2 * num_stations, 3)
+            * 6378137
+        )
     else:
         x, y, z = locations[:, 0], locations[:, 1], locations[:, 2]
         # stacking of eq. 2
-        G = np.stack([np.zeros(num_stations), z, -y,
-                      -z, np.zeros(num_stations), x,
-                      y, -x, np.zeros(num_stations)],
-                     axis=1).reshape(3 * num_stations, 3)
+        G = np.stack(
+            [
+                np.zeros(num_stations),
+                z,
+                -y,
+                -z,
+                np.zeros(num_stations),
+                x,
+                y,
+                -x,
+                np.zeros(num_stations),
+            ],
+            axis=1,
+        ).reshape(3 * num_stations, 3)
     # add uncertainties
     if covariances is not None:
         if not use_covs:
@@ -1906,14 +2140,22 @@ def estimate_euler_pole(locations: np.ndarray,
             if covariances.ndim == 2:
                 # off-diagonals included, in column notation
                 _, var_cov_map = make_cov_index_map(num_components)
-                Wblocks = [sp.linalg.pinvh(np.reshape(covariances[iobs, var_cov_map],
-                                                      (num_components, num_components)))
-                           for iobs in range(num_stations)]
+                Wblocks = [
+                    sp.linalg.pinvh(
+                        np.reshape(
+                            covariances[iobs, var_cov_map],
+                            (num_components, num_components),
+                        )
+                    )
+                    for iobs in range(num_stations)
+                ]
             elif covariances.ndim == 3:
                 # off-diagonals included, in third dimension
-                Wblocks = [sp.linalg.pinvh(covariances[iobs, :, :])
-                           for iobs in range(num_stations)]
-            W = sparse.block_diag(Wblocks, format='csr')
+                Wblocks = [
+                    sp.linalg.pinvh(covariances[iobs, :, :])
+                    for iobs in range(num_stations)
+                ]
+            W = sparse.block_diag(Wblocks, format="csr")
             W.eliminate_zeros()
         d = G.T @ W @ d
         G = G.T @ W @ G
@@ -1924,9 +2166,9 @@ def estimate_euler_pole(locations: np.ndarray,
     return rotation_vector, rotation_covariance
 
 
-def rotvec2eulerpole(rotation_vector: np.ndarray,
-                     rotation_covariance: np.ndarray | None = None
-                     ) -> tuple[np.ndarray, ...]:
+def rotvec2eulerpole(
+    rotation_vector: np.ndarray, rotation_covariance: np.ndarray | None = None
+) -> tuple[np.ndarray, ...]:
     r"""
     Convert a rotation vector containing the diagonals of a :math:`3 \times 3`
     rotation matrix (and optionally, its formal covariance) into an Euler
@@ -1938,7 +2180,8 @@ def rotvec2eulerpole(rotation_vector: np.ndarray,
         Rotation vector [rad/time] containing the diagonals of the :math:`3 \times 3`
         rotation matrix specifying the Euler pole in cartesian, ECEF coordinates.
     rotation_covariance
-        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation vector.
+        Formal :math:`3 \times 3` covariance matrix [rad^2/time^2] of the rotation
+        vector.
 
     Returns
     -------
@@ -1946,8 +2189,8 @@ def rotvec2eulerpole(rotation_vector: np.ndarray,
         NumPy Array containing the longitude [rad], latitude [rad], and rotation
         rate [rad/time] of the Euler pole.
     euler_pole_covariance
-        If ``rotation_covariance`` was given, a NumPy Array of the propagated uncertainty
-        for the Euler Pole for all three components.
+        If ``rotation_covariance`` was given, a NumPy Array of the propagated
+        uncertainty for the Euler Pole for all three components.
 
     See Also
     --------
@@ -1958,16 +2201,20 @@ def rotvec2eulerpole(rotation_vector: np.ndarray,
     ω_xy_mag = np.linalg.norm(rotation_vector[:2])
     ω_mag = np.linalg.norm(rotation_vector)
     # Euler pole, eq. 15
-    euler_pole = np.array([np.arctan(ω_y / ω_x),
-                           np.arctan(ω_z / ω_xy_mag),
-                           ω_mag])
+    euler_pole = np.array([np.arctan(ω_y / ω_x), np.arctan(ω_z / ω_xy_mag), ω_mag])
     # uncertainty, eq. 18
     if rotation_covariance is not None:
-        jac = np.array([[-ω_y / ω_xy_mag**2, ω_x / ω_xy_mag**2, 0],
-                        [-ω_x * ω_z / (ω_xy_mag * ω_mag**2),
-                         -ω_y * ω_z / (ω_xy_mag * ω_mag**2),
-                         -ω_xy_mag / ω_mag**2],
-                        [ω_x / ω_mag, ω_y / ω_mag, ω_z / ω_mag]])
+        jac = np.array(
+            [
+                [-ω_y / ω_xy_mag**2, ω_x / ω_xy_mag**2, 0],
+                [
+                    -ω_x * ω_z / (ω_xy_mag * ω_mag**2),
+                    -ω_y * ω_z / (ω_xy_mag * ω_mag**2),
+                    -ω_xy_mag / ω_mag**2,
+                ],
+                [ω_x / ω_mag, ω_y / ω_mag, ω_z / ω_mag],
+            ]
+        )
         euler_pole_covariance = jac @ rotation_covariance @ jac.T
     # return
     if rotation_covariance is not None:
@@ -1976,9 +2223,9 @@ def rotvec2eulerpole(rotation_vector: np.ndarray,
         return euler_pole
 
 
-def eulerpole2rotvec(euler_pole: np.ndarray,
-                     euler_pole_covariance: np.ndarray | None = None
-                     ) -> tuple[np.ndarray, ...]:
+def eulerpole2rotvec(
+    euler_pole: np.ndarray, euler_pole_covariance: np.ndarray | None = None
+) -> tuple[np.ndarray, ...]:
     r"""
     Convert an Euler pole (and optionally, its formal covariance) into a rotation
     vector and associated covariance matrix. Based on [goudarzi14]_.
@@ -2016,9 +2263,13 @@ def eulerpole2rotvec(euler_pole: np.ndarray,
     rotation_vector = np.array([ω_x, ω_y, ω_z])
     # uncertainty, eq. 6 (no scaling)
     if euler_pole_covariance is not None:
-        jac = np.array([[-Ω * cosΩlat * sinΩlon, -Ω * sinΩlat * cosΩlon, cosΩlat * cosΩlon],
-                        [Ω * cosΩlat * cosΩlon, -Ω * sinΩlat * sinΩlon, cosΩlat * sinΩlon],
-                        [0, Ω * cosΩlat, sinΩlat]])
+        jac = np.array(
+            [
+                [-Ω * cosΩlat * sinΩlon, -Ω * sinΩlat * cosΩlon, cosΩlat * cosΩlon],
+                [Ω * cosΩlat * cosΩlon, -Ω * sinΩlat * sinΩlon, cosΩlat * sinΩlon],
+                [0, Ω * cosΩlat, sinΩlat],
+            ]
+        )
         rotation_covariance = jac @ euler_pole_covariance @ jac.T
     # return
     if euler_pole_covariance is not None:
@@ -2060,11 +2311,17 @@ def R_ecef2enu(lon: float, lat: float) -> np.ndarray:
     try:
         lon, lat = np.deg2rad(float(lon)), np.deg2rad(float(lat))
     except (TypeError, ValueError) as e:
-        raise ValueError("Input longitude & latitude are not convertible to scalars "
-                         f"(got {lon} and {lat}).").with_traceback(e.__traceback__) from e
-    return np.array([[-np.sin(lon), np.cos(lon), 0],
-                     [-np.sin(lat) * np.cos(lon), -np.sin(lat) * np.sin(lon), np.cos(lat)],
-                     [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)]])
+        raise ValueError(
+            "Input longitude & latitude are not convertible to scalars "
+            f"(got {lon} and {lat})."
+        ).with_traceback(e.__traceback__) from e
+    return np.array(
+        [
+            [-np.sin(lon), np.cos(lon), 0],
+            [-np.sin(lat) * np.cos(lon), -np.sin(lat) * np.sin(lon), np.cos(lat)],
+            [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)],
+        ]
+    )
 
 
 def R_enu2ecef(lon: float, lat: float) -> np.ndarray:
@@ -2189,7 +2446,7 @@ def selectpair(t: np.ndarray, tstep: np.ndarray, tol: float = 0.001) -> np.ndarr
     return np.array([ip0, ip1])
 
 
-class RINEXDataHolding():
+class RINEXDataHolding:
     """
     Container class for a database of RINEX files.
 
@@ -2212,15 +2469,29 @@ class RINEXDataHolding():
     GLOBPATTERN = "[0-9][0-9][0-9][0-9]/[0-9][0-9][0-9]/*"
     """ The ``YYYY/DDD`` folder pattern in a glob-readable format. """
 
-    RINEXPATTERN = r"(?P<site>\w{4})(?P<day>\d{3})(?P<sequence>\w{1})\." + \
-                   r"(?P<yy>\d{2})(?P<type>\w{1})\.(?P<compression>\w+)"
+    RINEXPATTERN = (
+        r"(?P<site>\w{4})(?P<day>\d{3})(?P<sequence>\w{1})\."
+        + r"(?P<yy>\d{2})(?P<type>\w{1})\.(?P<compression>\w+)"
+    )
     """ The regex-style filename pattern for RINEX files. """
 
     COMPRFILEEXTS = (".Z", ".gz")
     """ The valid (compressed) RINEX file extensions to search for. """
 
-    COLUMNS = ("station", "station_raw", "year", "day", "date", "sequence", "type",
-               "compression", "filesize", "filetimeutc", "network", "basefolder")
+    COLUMNS = (
+        "station",
+        "station_raw",
+        "year",
+        "day",
+        "date",
+        "sequence",
+        "type",
+        "compression",
+        "filesize",
+        "filetimeutc",
+        "network",
+        "basefolder",
+    )
     """ The necessary information about each RINEX file. """
 
     METRICCOLS = ("number", "age", "recency", "length", "reliability")
@@ -2236,22 +2507,22 @@ class RINEXDataHolding():
 
     @property
     def num_files(self) -> int:
-        """ Number of files in the database. """
+        """Number of files in the database."""
         return self.df.shape[0]
 
     @property
     def list_stations(self) -> list[str]:
-        """ List of stations in the database. """
+        """List of stations in the database."""
         return self.df["station"].unique().tolist()
 
     @property
     def num_stations(self) -> int:
-        """ Number of stations in the database. """
+        """Number of stations in the database."""
         return len(self.list_stations)
 
     @property
     def df(self) -> pd.DataFrame:
-        """ Pandas DataFrame object containing the RINEX files database. """
+        """Pandas DataFrame object containing the RINEX files database."""
         if self._df is None:
             raise RuntimeError("RINEX files database has not been loaded yet.")
         return self._df
@@ -2259,41 +2530,65 @@ class RINEXDataHolding():
     @df.setter
     def df(self, new_df: pd.DataFrame) -> None:
         try:
-            assert all([col in new_df.columns for col in self.COLUMNS]), \
-                "Input DataFrame does not contain the necessary columns, try using the " + \
-                "class constructor methods."
+            assert all([col in new_df.columns for col in self.COLUMNS]), (
+                "Input DataFrame does not contain the necessary columns, try using the "
+                + "class constructor methods."
+            )
         except AttributeError as e:
-            raise TypeError("Cannot interpret input as a Pandas DataFrame for the RINEX "
-                            "file database.").with_traceback(e.__traceback__) from e
+            raise TypeError(
+                "Cannot interpret input as a Pandas DataFrame for the RINEX "
+                "file database."
+            ).with_traceback(e.__traceback__) from e
         self._df = new_df
 
     @property
     def locations_xyz(self) -> pd.DataFrame:
         """
-        Dataframe of approximate positions of stations in WGS-84 (x, y, z) [m] coordinates.
+        Dataframe of approximate positions of stations in WGS-84 (x, y, z) [m]
+        coordinates.
         """
         if self._locations_xyz is None:
             raise RuntimeError("Locations have not been loaded yet.")
-        if not all([station in self._locations_xyz["station"].values
-                    for station in self.list_stations]):
-            warn("Locations have likely not been updated since the database changed, "
-                 "there are stations missing.", category=RuntimeWarning, stacklevel=2)
+        if not all(
+            [
+                station in self._locations_xyz["station"].values
+                for station in self.list_stations
+            ]
+        ):
+            warn(
+                "Locations have likely not been updated since the database changed, "
+                "there are stations missing.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         return self._locations_xyz
 
     @locations_xyz.setter
     def locations_xyz(self, new_xyz: pd.DataFrame) -> None:
-        if not (isinstance(new_xyz, pd.DataFrame) and
-                all([col in new_xyz.columns for col in ["station", "x", "y", "z"]])):
-            raise ValueError("Unrecognized input format. 'new_xyz' needs to be a "
-                             "Pandas DataFrame with the columns ['station', 'x', 'y', 'z'].")
-        if not all([station in new_xyz["station"].values for station in self.list_stations]):
-            warn("The new location DataFrame does not contain all stations "
-                 "that are currently in the database.", category=RuntimeWarning, stacklevel=2)
+        if not (
+            isinstance(new_xyz, pd.DataFrame)
+            and all([col in new_xyz.columns for col in ["station", "x", "y", "z"]])
+        ):
+            raise ValueError(
+                "Unrecognized input format. 'new_xyz' needs to be a "
+                "Pandas DataFrame with the columns ['station', 'x', 'y', 'z']."
+            )
+        if not all(
+            [station in new_xyz["station"].values for station in self.list_stations]
+        ):
+            warn(
+                "The new location DataFrame does not contain all stations "
+                "that are currently in the database.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         all_xyz = new_xyz[["x", "y", "z"]].values
-        all_lla = ccrs.Geodetic().transform_points(ccrs.Geocentric(), all_xyz[:, 0],
-                                                   all_xyz[:, 1], all_xyz[:, 2])
-        new_lla = pd.DataFrame(new_xyz["station"]
-                               ).join(pd.DataFrame(all_lla, columns=["lon", "lat", "alt"]))
+        all_lla = ccrs.Geodetic().transform_points(
+            ccrs.Geocentric(), all_xyz[:, 0], all_xyz[:, 1], all_xyz[:, 2]
+        )
+        new_lla = pd.DataFrame(new_xyz["station"]).join(
+            pd.DataFrame(all_lla, columns=["lon", "lat", "alt"])
+        )
         self._locations_xyz = new_xyz
         self._locations_lla = new_lla
 
@@ -2305,55 +2600,85 @@ class RINEXDataHolding():
         """
         if self._locations_lla is None:
             raise RuntimeError("Locations have not been loaded yet.")
-        if not all([station in self._locations_lla["station"].values
-                    for station in self.list_stations]):
-            warn("Locations have likely not been updated since the database changed, "
-                 "there are stations missing.", category=RuntimeWarning, stacklevel=2)
+        if not all(
+            [
+                station in self._locations_lla["station"].values
+                for station in self.list_stations
+            ]
+        ):
+            warn(
+                "Locations have likely not been updated since the database changed, "
+                "there are stations missing.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         return self._locations_lla
 
     @locations_lla.setter
     def locations_lla(self, new_lla: pd.DataFrame) -> None:
-        if not (isinstance(new_lla, pd.DataFrame) and
-                all([col in new_lla.columns for col in ["station", "lon", "lat", "alt"]])):
-            raise ValueError("Unrecognized input format. 'new_lla' needs to be a "
-                             "Pandas DataFrame with the columns "
-                             "['station', 'lon', 'lat', 'alt'].")
-        if not all([station in new_lla["station"].values for station in self.list_stations]):
-            warn("The new location DataFrame does not contain all stations "
-                 "that are currently in the database.", category=RuntimeWarning, stacklevel=2)
+        if not (
+            isinstance(new_lla, pd.DataFrame)
+            and all(
+                [col in new_lla.columns for col in ["station", "lon", "lat", "alt"]]
+            )
+        ):
+            raise ValueError(
+                "Unrecognized input format. 'new_lla' needs to be a "
+                "Pandas DataFrame with the columns "
+                "['station', 'lon', 'lat', 'alt']."
+            )
+        if not all(
+            [station in new_lla["station"].values for station in self.list_stations]
+        ):
+            warn(
+                "The new location DataFrame does not contain all stations "
+                "that are currently in the database.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         all_lla = new_lla[["lon", "lat", "alt"]].values
-        all_xyz = ccrs.Geocentric().transform_points(ccrs.Geodetic(), all_lla[:, 0],
-                                                     all_lla[:, 1], all_lla[:, 2])
-        new_xyz = pd.DataFrame(new_lla["station"]
-                               ).join(pd.DataFrame(all_xyz, columns=["x", "y", "z"]))
+        all_xyz = ccrs.Geocentric().transform_points(
+            ccrs.Geodetic(), all_lla[:, 0], all_lla[:, 1], all_lla[:, 2]
+        )
+        new_xyz = pd.DataFrame(new_lla["station"]).join(
+            pd.DataFrame(all_xyz, columns=["x", "y", "z"])
+        )
         self._locations_xyz = new_xyz
         self._locations_lla = new_lla
 
     @property
     def metrics(self) -> pd.DataFrame:
         """
-        Contains the station metric calculated by :meth:`calculate_availability_metrics`.
+        Contains the station metric calculated by
+        :meth:`calculate_availability_metrics`.
         """
         if self._metrics is None:
             raise RuntimeError("Metrics have not been calculated yet.")
-        if not all([station in self._metrics["station"].values
-                    for station in self.list_stations]):
-            warn("Metrics have likely not been updated since the database changed, "
-                 "there are stations missing.", category=RuntimeWarning, stacklevel=2)
+        if not all(
+            [
+                station in self._metrics["station"].values
+                for station in self.list_stations
+            ]
+        ):
+            warn(
+                "Metrics have likely not been updated since the database changed, "
+                "there are stations missing.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         return self._metrics
 
     @metrics.setter
     def metrics(self, metrics: pd.DataFrame) -> None:
-        assert all([col in metrics.columns for col in self.METRICCOLS]), \
-            "Not all metrics are in the new DataFrame."
+        assert all(
+            [col in metrics.columns for col in self.METRICCOLS]
+        ), "Not all metrics are in the new DataFrame."
         self._metrics = metrics
 
     @classmethod
-    def from_folders(cls,
-                     folders: tuple | list[tuple],
-                     verbose: bool = False,
-                     no_pbar: bool = False
-                     ) -> RINEXDataHolding:
+    def from_folders(
+        cls, folders: tuple | list[tuple], verbose: bool = False, no_pbar: bool = False
+    ) -> RINEXDataHolding:
         """
         Convenience class method that creates a new RINEXDataHolding object and directly
         calls :meth:`~load_db_from_folders`.
@@ -2377,11 +2702,9 @@ class RINEXDataHolding():
         instance.load_db_from_folders(folders, verbose=verbose, no_pbar=no_pbar)
         return instance
 
-    def load_db_from_folders(self,
-                             folders: tuple | list[tuple],
-                             verbose: bool = False,
-                             no_pbar: bool = False
-                             ) -> None:
+    def load_db_from_folders(
+        self, folders: tuple | list[tuple], verbose: bool = False, no_pbar: bool = False
+    ) -> None:
         """
         Loads a RINEX database from folders in the file system.
         The data should be located in one or multiple folder structure(s) organized by
@@ -2402,17 +2725,22 @@ class RINEXDataHolding():
         # input checks
         if isinstance(folders, tuple):
             folders = [folders]
-        if not (isinstance(folders, list) and
-                all([isinstance(tup, tuple) and len(tup) == 2 for tup in folders]) and
-                all([all([isinstance(elem, str) for elem in tup]) for tup in folders])):
-            raise ValueError("Invalid 'folder' argument, pass a list of tuples "
-                             "composed of a name and folder string each, "
-                             f"got {folders}.")
+        if not (
+            isinstance(folders, list)
+            and all([isinstance(tup, tuple) and len(tup) == 2 for tup in folders])
+            and all([all([isinstance(elem, str) for elem in tup]) for tup in folders])
+        ):
+            raise ValueError(
+                "Invalid 'folder' argument, pass a list of tuples "
+                "composed of a name and folder string each, "
+                f"got {folders}."
+            )
         # empty starting values
         dfdict = {col: [] for col in self.COLUMNS}
         # determine iterator based on verbosity
-        iterfolders = tqdm(folders, desc="Loading folders", ascii=True,
-                           unit="folder", disable=no_pbar)
+        iterfolders = tqdm(
+            folders, desc="Loading folders", ascii=True, unit="folder", disable=no_pbar
+        )
         # loop over folder(s)
         for network, folder in iterfolders:
             # initialize pattern extraction
@@ -2429,31 +2757,51 @@ class RINEXDataHolding():
                     if len(year) != 4:
                         if len(year) == 2:
                             year = "20" + year
-                            warn(f"Parsing {str(pathobj)} assumes a two-digit year is "
-                                 "post-2000.", category=RuntimeWarning, stacklevel=2)
+                            warn(
+                                f"Parsing {str(pathobj)} assumes a two-digit year is "
+                                "post-2000.",
+                                category=RuntimeWarning,
+                                stacklevel=2,
+                            )
                         else:
-                            warn(f"File {str(pathobj)} doesn't have a recognizable year, "
-                                 "skipping file.", category=RuntimeWarning, stacklevel=2)
+                            warn(
+                                f"File {str(pathobj)} doesn't have a recognizable "
+                                "year, skipping file.",
+                                category=RuntimeWarning,
+                                stacklevel=2,
+                            )
                             continue
                     day = re.findall(r"\d+", day)[0]
                     day = f"{int(day):03d}"
                     if not (0 < int(day) < 367):
-                        warn(f"File {str(pathobj)} doesn't have a valid day, "
-                             "skipping file.", category=RuntimeWarning, stacklevel=2)
+                        warn(
+                            f"File {str(pathobj)} doesn't have a valid day, "
+                            "skipping file.",
+                            category=RuntimeWarning,
+                            stacklevel=2,
+                        )
                         continue
                 # only continue if this is a valid file extension
                 if filename.endswith(self.COMPRFILEEXTS):
                     info = rinex_pattern.match(filename)
                     if info is None:
-                        warn(f"File {str(pathobj)} can't match RINEX filename pattern, "
-                             "skipping file.", category=RuntimeWarning, stacklevel=2)
+                        warn(
+                            f"File {str(pathobj)} can't match RINEX filename pattern, "
+                            "skipping file.",
+                            category=RuntimeWarning,
+                            stacklevel=2,
+                        )
                         continue
                     info = info.groupdict()
-                    if (info["yy"] != year[-2:] or info["day"] != day):
-                        skipmsg = f"File '{str(pathobj)} has conflicting year/day information, " \
-                                  "skipping file "
-                        trystem = f"{info['site']}{day}{info['sequence']}." \
-                                  f"{year[-2:]}{info['type']}"
+                    if info["yy"] != year[-2:] or info["day"] != day:
+                        skipmsg = (
+                            f"File '{str(pathobj)} has conflicting year/day "
+                            "information, skipping file "
+                        )
+                        trystem = (
+                            f"{info['site']}{day}{info['sequence']}."
+                            f"{year[-2:]}{info['type']}"
+                        )
                         tryfile = Path(pathobj.parents[0], trystem + pathobj.suffix)
                         if tryfile.is_file():
                             skipmsg += f"(but {str(tryfile)} exists)."
@@ -2467,7 +2815,9 @@ class RINEXDataHolding():
                     date = datetime.strptime(f"{year} {day}", "%Y %j").date()
                     filestat = os.stat(pathobj)
                     filesize = filestat.st_size
-                    filetime = datetime.fromtimestamp(filestat.st_mtime, tz=timezone.utc)
+                    filetime = datetime.fromtimestamp(
+                        filestat.st_mtime, tz=timezone.utc
+                    )
                     dfdict["station"].append(info["site"].upper())
                     dfdict["station_raw"].append(info["site"])
                     dfdict["year"].append(year)
@@ -2482,7 +2832,9 @@ class RINEXDataHolding():
                     dfdict["basefolder"].append(folder)
         # build DataFrame and save some space
         df = pd.DataFrame(dfdict)
-        df = df.astype({"network": pd.CategoricalDtype(), "basefolder": pd.CategoricalDtype()})
+        df = df.astype(
+            {"network": pd.CategoricalDtype(), "basefolder": pd.CategoricalDtype()}
+        )
         if verbose:
             print(f"\nFound {df.shape[0]} files.\nSample:\n")
             print(df.iloc[0, :])
@@ -2490,16 +2842,17 @@ class RINEXDataHolding():
         self.df = df
 
     @classmethod
-    def from_file(cls,
-                  db_file: str,
-                  locations_file: str | None = None,
-                  metrics_file: str | None = None,
-                  verbose: bool = False
-                  ) -> RINEXDataHolding:
+    def from_file(
+        cls,
+        db_file: str,
+        locations_file: str | None = None,
+        metrics_file: str | None = None,
+        verbose: bool = False,
+    ) -> RINEXDataHolding:
         """
         Convenience class method that creates a new RINEXDataHolding object from a file
-        using :meth:`~load_db_from_file` and then optionally loads the locations and metrics
-        from their respective files.
+        using :meth:`~load_db_from_file` and then optionally loads the locations and
+        metrics from their respective files.
 
         Parameters
         ----------
@@ -2545,11 +2898,12 @@ class RINEXDataHolding():
         # save to attribute
         self.df = df
 
-    def load_locations_from_rinex(self,
-                                  keep: Literal["last", "first", "mean"] = "last",
-                                  replace_not_found: bool = False,
-                                  no_pbar: bool = True
-                                  ) -> None:
+    def load_locations_from_rinex(
+        self,
+        keep: Literal["last", "first", "mean"] = "last",
+        replace_not_found: bool = False,
+        no_pbar: bool = True,
+    ) -> None:
         """
         Scan the RINEX files' headers for approximate locations for
         plotting purposes.
@@ -2571,14 +2925,19 @@ class RINEXDataHolding():
             Suppress the progress bar with ``True``.
         """
         # prepare
-        assert keep in ["first", "last", "mean"], \
-            f"Unrecognized 'keep' option {keep}."
+        assert keep in ["first", "last", "mean"], f"Unrecognized 'keep' option {keep}."
         XYZ = ["x", "y", "z"]
         df = pd.DataFrame({"station": self.list_stations})
         df = df.join(pd.DataFrame(np.zeros((self.num_stations, 3)), columns=XYZ))
         # get xyz for each station
-        iterfiles = tqdm(df.itertuples(), total=df.shape[0], ascii=True, unit="file",
-                         desc="Reading RINEX headers", disable=no_pbar)
+        iterfiles = tqdm(
+            df.itertuples(),
+            total=df.shape[0],
+            ascii=True,
+            unit="file",
+            desc="Reading RINEX headers",
+            disable=no_pbar,
+        )
         for row in iterfiles:
             subset = self.get_files_by(station=row.station).sort_values(by=["date"])
             filenames = self.make_filenames(subset)
@@ -2595,12 +2954,17 @@ class RINEXDataHolding():
                     break
             if len(approx_xyz) == 0:
                 if replace_not_found:
-                    warn("Couldn't find an approximate location in the RINEX "
-                         f"headers for {row.station}. Using Null Island.", stacklevel=2)
+                    warn(
+                        "Couldn't find an approximate location in the RINEX "
+                        f"headers for {row.station}. Using Null Island.",
+                        stacklevel=2,
+                    )
                     approx_xyz.append([0, 6378137, 0])
                 else:
-                    raise RuntimeError("Couldn't find an approximate location in "
-                                       f"the RINEX headers for {row.station}.")
+                    raise RuntimeError(
+                        "Couldn't find an approximate location in "
+                        f"the RINEX headers for {row.station}."
+                    )
             approx_xyz = np.array(approx_xyz)
             if keep == "mean":
                 approx_xyz = np.mean(approx_xyz, axis=0)
@@ -2625,16 +2989,19 @@ class RINEXDataHolding():
         elif all(col in df.columns for col in ["lon", "lat", "alt"]):
             self.locations_lla = df
         else:
-            raise ValueError(f"Unrecognized DataFrame columns in {filepath}: " +
-                             str(df.columns.tolist()))
+            raise ValueError(
+                f"Unrecognized DataFrame columns in {filepath}: "
+                + str(df.columns.tolist())
+            )
 
-    def get_files_by(self,
-                     station: str | list[str] | None = None,
-                     network: str | list[str] | None = None,
-                     year: int | list[int] | None = None,
-                     between: tuple | None = None,
-                     verbose: bool = False
-                     ) -> pd.DataFrame:
+    def get_files_by(
+        self,
+        station: str | list[str] | None = None,
+        network: str | list[str] | None = None,
+        year: int | list[int] | None = None,
+        between: tuple | None = None,
+        verbose: bool = False,
+    ) -> pd.DataFrame:
         """
         Return a subset of the database by criteria.
 
@@ -2662,49 +3029,60 @@ class RINEXDataHolding():
             if isinstance(station, str):
                 station = [station]
             elif isinstance(station, list):
-                assert (all([isinstance(s, str) for s in station])), \
-                    "Found non-string station entries in 'station'."
+                assert all(
+                    [isinstance(s, str) for s in station]
+                ), "Found non-string station entries in 'station'."
             else:
-                raise TypeError("Invalid input form for 'station', must be a string or "
-                                f"list of strings, got {station}.")
+                raise TypeError(
+                    "Invalid input form for 'station', must be a string or "
+                    f"list of strings, got {station}."
+                )
             subset &= self.df["station"].isin(station)
         # subset by network
         if network is not None:
             if isinstance(network, str):
                 network = [network]
             elif isinstance(network, list):
-                assert (all([isinstance(s, str) for s in network])), \
-                    "Found non-string network entries in 'network'."
+                assert all(
+                    [isinstance(s, str) for s in network]
+                ), "Found non-string network entries in 'network'."
             else:
-                raise TypeError("Invalid input form for 'network', must be a string or "
-                                f"list of strings, got {network}.")
+                raise TypeError(
+                    "Invalid input form for 'network', must be a string or "
+                    f"list of strings, got {network}."
+                )
             subset &= self.df["network"].isin(network)
         # subset by year
         if year is not None:
             if isinstance(year, int) or isinstance(year, str):
                 year = [year]
             elif isinstance(year, list):
-                assert ((all([isinstance(y, int) for y in year]) or
-                         all([isinstance(y, str) for y in year]))), \
-                    "Found non-string/integer year entries in 'year'."
+                assert all([isinstance(y, int) for y in year]) or all(
+                    [isinstance(y, str) for y in year]
+                ), "Found non-string/integer year entries in 'year'."
             else:
-                raise TypeError("Invalid input form for 'year', must be an integer, string or "
-                                f"list of integers or strings, got {year}.")
+                raise TypeError(
+                    "Invalid input form for 'year', must be an integer, string or "
+                    f"list of integers or strings, got {year}."
+                )
             try:
                 year = [str(int(y)) for y in year]
             except TypeError as e:
-                raise TypeError("Invalid input form for 'year', must be an integer, string or "
-                                f"list of integers or strings, got {year}."
-                                ).with_traceback(e.__traceback__) from e
+                raise TypeError(
+                    "Invalid input form for 'year', must be an integer, string or "
+                    f"list of integers or strings, got {year}."
+                ).with_traceback(e.__traceback__) from e
             subset &= self.df["year"].isin(year)
         # subset by time span
         if between is not None:
             try:
                 between = (pd.Timestamp(between[0]), pd.Timestamp(between[1]))
             except (ValueError, TypeError, IndexError) as e:
-                raise TypeError("Invalid input form for 'between', needs to be a length-two "
-                                "tuple of entries that can be converted to Pandas Timestamps, "
-                                f"got {between}.").with_traceback(e.__traceback__) from e
+                raise TypeError(
+                    "Invalid input form for 'between', needs to be a length-two "
+                    "tuple of entries that can be converted to Pandas Timestamps, "
+                    f"got {between}."
+                ).with_traceback(e.__traceback__) from e
             subset &= (self.df["date"] >= between[0]) & (self.df["date"] <= between[1])
         # return
         if verbose:
@@ -2729,14 +3107,19 @@ class RINEXDataHolding():
         """
         loc_df = self.locations_lla if lla else self.locations_xyz
         try:
-            return loc_df[loc_df["station"] == station].iloc[0] \
-                   .drop("station").rename(station)
+            return (
+                loc_df[loc_df["station"] == station]
+                .iloc[0]
+                .drop("station")
+                .rename(station)
+            )
         except IndexError:
             raise KeyError(f"Station {station} not present.")
 
     def load_metrics_from_file(self, filepath: str) -> None:
         """
-        Load a previously-saved DataFrame containing the calculated availability metrics.
+        Load a previously-saved DataFrame containing the calculated availability
+        metrics.
 
         Parameters
         ----------
@@ -2762,19 +3145,34 @@ class RINEXDataHolding():
         Raises
         ------
         NotImplementedError
-            If :attr:`~GLOBPATTERN` or :attr:`~RINEXPATTERN` for this instance are not the
-            same as the default values. In this case, redefine this function with the
-            appropriate folder and file patterns.
+            If :attr:`~GLOBPATTERN` or :attr:`~RINEXPATTERN` for this instance are not
+            the same as the default values. In this case, redefine this function with
+            the appropriate folder and file patterns.
         """
-        if (self.GLOBPATTERN != RINEXDataHolding.GLOBPATTERN) or \
-           (self.RINEXPATTERN != RINEXDataHolding.RINEXPATTERN):
-            raise NotImplementedError("GLOBPATTERN or RINEXPATTERN of this instance have been "
-                                      "modified, therefore the default way of creating full "
-                                      "filenames is no longer valid.")
-        return [os.path.join(row.basefolder, row.year, row.day,
-                             row.station_raw + row.day + row.sequence + "." +
-                             row.year[-2:] + row.type + "." + row.compression)
-                for row in db.itertuples()]
+        if (self.GLOBPATTERN != RINEXDataHolding.GLOBPATTERN) or (
+            self.RINEXPATTERN != RINEXDataHolding.RINEXPATTERN
+        ):
+            raise NotImplementedError(
+                "GLOBPATTERN or RINEXPATTERN of this instance have been "
+                "modified, therefore the default way of creating full "
+                "filenames is no longer valid."
+            )
+        return [
+            os.path.join(
+                row.basefolder,
+                row.year,
+                row.day,
+                row.station_raw
+                + row.day
+                + row.sequence
+                + "."
+                + row.year[-2:]
+                + row.type
+                + "."
+                + row.compression,
+            )
+            for row in db.itertuples()
+        ]
 
     def get_rinex_header(self, filepath: str) -> dict[str, str]:
         """
@@ -2794,19 +3192,23 @@ class RINEXDataHolding():
         # it to decompress on-the-fly
         try:
             if filepath.endswith(self.COMPRFILEEXTS):
-                rinexfile = subprocess.check_output(["gzip", "-dc", filepath],
-                                                    text=True, errors="replace")
+                rinexfile = subprocess.check_output(
+                    ["gzip", "-dc", filepath], text=True, errors="replace"
+                )
             else:
                 with open(filepath, mode="rt", errors="replace") as f:
                     rinexfile = f.read()
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Couldn't read compressed RINEX file {filepath}. "
-                               "Check if 'gzip' is available on your machine, or "
-                               "decompress the RINEX file before using this "
-                               "function.").with_traceback(e.__traceback__) from e
+            raise RuntimeError(
+                f"Couldn't read compressed RINEX file {filepath}. "
+                "Check if 'gzip' is available on your machine, or "
+                "decompress the RINEX file before using this "
+                "function."
+            ).with_traceback(e.__traceback__) from e
         except UnicodeError as e:
-            raise RuntimeError(f"Can't read file {filepath}."
-                               ).with_traceback(e.__traceback__) from e
+            raise RuntimeError(f"Can't read file {filepath}.").with_traceback(
+                e.__traceback__
+            ) from e
         # extract headers
         headers = {}
         for line in rinexfile.splitlines():
@@ -2819,9 +3221,9 @@ class RINEXDataHolding():
                 headers[descriptor] = content
         return headers
 
-    def calculate_availability_metrics(self,
-                                       sampling: Timedelta = Timedelta(1, "D")
-                                       ) -> None:
+    def calculate_availability_metrics(
+        self, sampling: Timedelta = Timedelta(1, "D")
+    ) -> None:
         """
         Calculates the following metrics and stores them in the :attr:`~metrics`
         DataFrame:
@@ -2841,27 +3243,39 @@ class RINEXDataHolding():
         """
         # initialize empty DataFrame
         metrics = pd.DataFrame(self.list_stations, columns=["station"])
-        metrics = metrics.join(pd.DataFrame(np.zeros((self.num_stations, 5)),
-                                            columns=self.METRICCOLS))
+        metrics = metrics.join(
+            pd.DataFrame(np.zeros((self.num_stations, 5)), columns=self.METRICCOLS)
+        )
         # calculate metrics station by station
         for row in metrics.itertuples():
             subset = self.get_files_by(station=row.station)
-            metrics.loc[row.Index, ["number", "age", "recency"]] = \
-                [subset.shape[0], subset["date"].min(), subset["date"].max()]
-            metrics.loc[row.Index, "length"] = \
-                metrics.loc[row.Index, "recency"] - metrics.loc[row.Index, "age"] + sampling
-            metrics.loc[row.Index, "reliability"] = (subset.shape[0] * sampling) / \
-                metrics.loc[row.Index, "length"]
+            metrics.loc[row.Index, ["number", "age", "recency"]] = [
+                subset.shape[0],
+                subset["date"].min(),
+                subset["date"].max(),
+            ]
+            metrics.loc[row.Index, "length"] = (
+                metrics.loc[row.Index, "recency"]
+                - metrics.loc[row.Index, "age"]
+                + sampling
+            )
+            metrics.loc[row.Index, "reliability"] = (
+                subset.shape[0] * sampling
+            ) / metrics.loc[row.Index, "length"]
         # set attribute
         metrics = metrics.astype({"number": int})
         self.metrics = metrics
 
-    def _create_map_figure(self,
-                           gui_settings: dict,
-                           annotate_stations: bool,
-                           figsize: tuple
-                           ) -> tuple[mpl.Figure, mpl.Axis, ccrs.CRS, ccrs.CRS,
-                                      matplotlib.collections.PathCollection, list[str]]:
+    def _create_map_figure(
+        self, gui_settings: dict, annotate_stations: bool, figsize: tuple
+    ) -> tuple[
+        mpl.Figure,
+        mpl.Axis,
+        ccrs.CRS,
+        ccrs.CRS,
+        matplotlib.collections.PathCollection,
+        list[str],
+    ]:
         # get location data and projections
         stat_lats = self.locations_lla["lat"].values
         stat_lons = self.locations_lla["lon"].values
@@ -2871,41 +3285,61 @@ class RINEXDataHolding():
         # create figure and plot stations
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(projection=proj_gui)
-        stat_points = ax.scatter(stat_lons, stat_lats, s=100, facecolor='C0',
-                                 linestyle='None', marker='.', transform=proj_lla,
-                                 edgecolor='None', zorder=1000)
+        stat_points = ax.scatter(
+            stat_lons,
+            stat_lats,
+            s=100,
+            facecolor="C0",
+            linestyle="None",
+            marker=".",
+            transform=proj_lla,
+            edgecolor="None",
+            zorder=1000,
+        )
         if annotate_stations:
             for sname, slon, slat in zip(stat_names, stat_lons, stat_lats):
-                ax.annotate(sname, (slon, slat),
-                            xycoords=proj_lla._as_mpl_transform(ax),
-                            annotation_clip=True, textcoords="offset pixels",
-                            xytext=(0, 5), ha="center")
+                ax.annotate(
+                    sname,
+                    (slon, slat),
+                    xycoords=proj_lla._as_mpl_transform(ax),
+                    annotation_clip=True,
+                    textcoords="offset pixels",
+                    xytext=(0, 5),
+                    ha="center",
+                )
         # create underlay
         map_underlay = False
         if gui_settings["wmts_show"]:
             try:
-                ax.add_wmts(gui_settings["wmts_server"],
-                            layer_name=gui_settings["wmts_layer"],
-                            alpha=gui_settings["wmts_alpha"])
+                ax.add_wmts(
+                    gui_settings["wmts_server"],
+                    layer_name=gui_settings["wmts_layer"],
+                    alpha=gui_settings["wmts_alpha"],
+                )
                 map_underlay = True
             except Exception as exc:
                 print(exc)
         if gui_settings["coastlines_show"]:
-            ax.add_feature(cfeature.BORDERS.with_scale(gui_settings["coastlines_res"]),
-                           edgecolor="white" if map_underlay else "black")
-            ax.add_feature(cfeature.COASTLINE.with_scale(gui_settings["coastlines_res"]),
-                           edgecolor="white" if map_underlay else "black")
+            ax.add_feature(
+                cfeature.BORDERS.with_scale(gui_settings["coastlines_res"]),
+                edgecolor="white" if map_underlay else "black",
+            )
+            ax.add_feature(
+                cfeature.COASTLINE.with_scale(gui_settings["coastlines_res"]),
+                edgecolor="white" if map_underlay else "black",
+            )
         return fig, ax, proj_gui, proj_lla, stat_points, stat_names
 
-    def plot_map(self,
-                 metric: str | None = None,
-                 orientation: Literal["horizontal", "vertical"] = "horizontal",
-                 annotate_stations: bool = True,
-                 figsize: tuple | None = None,
-                 saveas: str | None = None,
-                 dpi: float | None = None,
-                 gui_kw_args: dict[str, Any] = {}
-                 ) -> None:
+    def plot_map(
+        self,
+        metric: str | None = None,
+        orientation: Literal["horizontal", "vertical"] = "horizontal",
+        annotate_stations: bool = True,
+        figsize: tuple | None = None,
+        saveas: str | None = None,
+        dpi: float | None = None,
+        gui_kw_args: dict[str, Any] = {},
+    ) -> None:
         """
         Plot a map of all the stations present in the RINEX database.
         The markers can be colored by the different availability metrics calculated
@@ -2933,14 +3367,17 @@ class RINEXDataHolding():
         gui_settings = defaults["gui"].copy()
         gui_settings.update(gui_kw_args)
         # get basemap
-        fig, ax, proj_gui, proj_lla, stat_points, stat_names = \
-            self._create_map_figure(gui_settings, annotate_stations, figsize)  # noqa: F841
+        fig, ax, proj_gui, proj_lla, stat_points, stat_names = self._create_map_figure(
+            gui_settings, annotate_stations, figsize
+        )  # noqa: F841
         # add colors
         if metric in self.METRICCOLS:
             # get metric in the same order as the stations in the figure
             met = self.metrics[["station", metric]]
-            met_fmt = [met[met["station"] == station][metric].values[0]
-                       for station in stat_names]
+            met_fmt = [
+                met[met["station"] == station][metric].values[0]
+                for station in stat_names
+            ]
             # metric is a normal numeric value
             if metric in ["number", "reliability"]:
                 met_raw = np.array(met_fmt)
@@ -2954,6 +3391,7 @@ class RINEXDataHolding():
                 @FuncFormatter  # noqa: E306
                 def tickformat(x, pos):
                     return (met_ref + pd.Timedelta(x, "s")).strftime(r"%Y-%m-%d")
+
             # metric is a timedelta, need to convert
             elif metric == "length":
                 met_raw = np.array([m.value for m in met_fmt])
@@ -2962,17 +3400,25 @@ class RINEXDataHolding():
                 @FuncFormatter  # noqa: E306
                 def tickformat(x, pos):
                     return str(pd.Timedelta(x, "ns").days)
+
             # get data range and make colormap
             cmin, cmax = met_raw.min(), met_raw.max()
-            cmap = mpl.cm.ScalarMappable(cmap=scm.batlow,
-                                         norm=mpl.colors.Normalize(vmin=cmin, vmax=cmax))
+            cmap = mpl.cm.ScalarMappable(
+                cmap=scm.batlow, norm=mpl.colors.Normalize(vmin=cmin, vmax=cmax)
+            )
             # set marker facecolors
             stat_points.set_facecolor(cmap.to_rgba(met_raw))
             fig.canvas.draw_idle()
             # add the colorbar
-            cbar = fig.colorbar(cmap, ax=ax, orientation=orientation,
-                                fraction=0.05 if orientation == "horizontal" else 0.2,
-                                pad=0.03, aspect=10, format=tickformat)
+            cbar = fig.colorbar(
+                cmap,
+                ax=ax,
+                orientation=orientation,
+                fraction=0.05 if orientation == "horizontal" else 0.2,
+                pad=0.03,
+                aspect=10,
+                format=tickformat,
+            )
             cticks = cbar.get_ticks()
             if cticks[0] != cmin:
                 cticks = [cmin, *cticks]
@@ -2981,19 +3427,22 @@ class RINEXDataHolding():
             cbar.set_ticks(cticks)
             cbar.set_label(metric)
         elif metric is not None:
-            warn(f"Could not interpret '{metric}' as a metric to use for plotting.",
-                 stacklevel=2)
+            warn(
+                f"Could not interpret '{metric}' as a metric to use for plotting.",
+                stacklevel=2,
+            )
         # save
         if saveas is not None:
             fig.savefig(saveas)
         # show
         plt.show()
 
-    def plot_availability(self,
-                          sampling: Timedelta = Timedelta(1, "D"),
-                          sort_by_latitude: bool = True,
-                          saveas: str = None
-                          ) -> None:
+    def plot_availability(
+        self,
+        sampling: Timedelta = Timedelta(1, "D"),
+        sort_by_latitude: bool = True,
+        saveas: str = None,
+    ) -> None:
         """
         Create an availability figure for the dataset.
 
@@ -3013,11 +3462,15 @@ class RINEXDataHolding():
         if sort_by_latitude:
             try:
                 sort_indices = np.argsort(self.locations_lla["lat"].values)
-                sort_stations = self.locations_lla["station"].iloc[sort_indices].tolist()
+                sort_stations = (
+                    self.locations_lla["station"].iloc[sort_indices].tolist()
+                )
             except RuntimeError:
                 pass
         if sort_stations is None:
-            sort_stations = list(reversed(sorted([s.lower() for s in self.list_stations])))
+            sort_stations = list(
+                reversed(sorted([s.lower() for s in self.list_stations]))
+            )
         n_stations = len(sort_stations)
         # make an empty figure and start a color loop
         fig, ax = plt.subplots(figsize=(6, 0.25 * n_stations))
@@ -3041,19 +3494,24 @@ class RINEXDataHolding():
                 intervals = [all_dates]
             # plot a line for each chunk
             for chunk in intervals:
-                ax.fill_between([chunk[0], chunk[-1]],
-                                [offset + 0.7, offset + 0.7], [offset + 1.3, offset + 1.3],
-                                fc=colors[icolor])
+                ax.fill_between(
+                    [chunk[0], chunk[-1]],
+                    [offset + 0.7, offset + 0.7],
+                    [offset + 1.3, offset + 1.3],
+                    fc=colors[icolor],
+                )
             icolor = (icolor + 1) % 10
         # add station labels
         ax.set_yticks(np.arange(n_stations) + 1)
         ax.set_yticklabels(sort_stations)
         ax.tick_params(which="major", axis="y", left=False)
         # do some pretty formatting
-        ax.set_title(f"Network(s): {', '.join(self.df['network'].unique().tolist())}\n"
-                     f"Files: {sum(n_files)}")
+        ax.set_title(
+            f"Network(s): {', '.join(self.df['network'].unique().tolist())}\n"
+            f"Files: {sum(n_files)}"
+        )
         ax.grid(which="major", axis="x")
-        ax.xaxis.set_tick_params(labeltop='on')
+        ax.xaxis.set_tick_params(labeltop="on")
         ax.set_axisbelow(True)
         ax.set_ylim(0.5, n_stations + 0.5)
         # add number of files per station

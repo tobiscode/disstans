@@ -19,7 +19,7 @@ from typing import Literal
 from .tools import get_cov_dims, make_cov_index_map, get_cov_indices, R_ecef2enu
 
 
-class Timeseries():
+class Timeseries:
     """
     Object that expands the functionality of a :class:`~pandas.DataFrame` object
     for better integration into DISSTANS. Apart from the data itself, it contains
@@ -73,29 +73,35 @@ class Timeseries():
     | (symmetric)       | (symmetric)       | ``var_cols[2]``   |
     +-------------------+-------------------+-------------------+
     """
-    def __init__(self,
-                 dataframe: pd.DataFrame,
-                 src: str,
-                 data_unit: str,
-                 data_cols: list[str],
-                 var_cols: list[str] | None = None,
-                 cov_cols: list[str] | None = None,
-                 remove_initial_offset: bool = False
-                 ) -> None:
+
+    def __init__(
+        self,
+        dataframe: pd.DataFrame,
+        src: str,
+        data_unit: str,
+        data_cols: list[str],
+        var_cols: list[str] | None = None,
+        cov_cols: list[str] | None = None,
+        remove_initial_offset: bool = False,
+    ) -> None:
         # input type checks
         assert isinstance(dataframe, pd.DataFrame)
         assert dataframe.index.inferred_type == "datetime64"
         assert all([pd.api.types.is_numeric_dtype(dt) for dt in dataframe.dtypes])
         assert isinstance(src, str)
         assert isinstance(data_unit, str)
-        assert isinstance(data_cols, list) and all([isinstance(dcol, str) for dcol in data_cols])
+        assert isinstance(data_cols, list) and all(
+            [isinstance(dcol, str) for dcol in data_cols]
+        )
         assert all([dcol in dataframe.columns for dcol in data_cols])
         # duplicates check
         index_duplicated = dataframe.index.duplicated()
         if index_duplicated.sum() > 0:
-            raise RuntimeError("Input DataFrame cannot have duplicate indices, but found the "
-                               "following duplicate timestamps:\n" +
-                               str(dataframe.index[index_duplicated].to_list()))
+            raise RuntimeError(
+                "Input DataFrame cannot have duplicate indices, but found the "
+                "following duplicate timestamps:\n"
+                + str(dataframe.index[index_duplicated].to_list())
+            )
         # save to private instance variables
         self._df = dataframe
         self._src = src
@@ -103,31 +109,38 @@ class Timeseries():
         self._data_cols = data_cols
         # additional checks for var_cols
         if var_cols is not None:
-            assert isinstance(var_cols, list) and \
-                all([isinstance(vcol, str) for vcol in var_cols]), \
-                f"If not None, 'var_cols' must be a list of strings, got {var_cols}."
-            assert all([vcol in dataframe.columns for vcol in var_cols]), \
-                "All entries in 'var_cols' must be present in the dataframe."
-            assert len(self._data_cols) == len(var_cols), \
-                "If passing variance columns, " \
+            assert isinstance(var_cols, list) and all(
+                [isinstance(vcol, str) for vcol in var_cols]
+            ), f"If not None, 'var_cols' must be a list of strings, got {var_cols}."
+            assert all(
+                [vcol in dataframe.columns for vcol in var_cols]
+            ), "All entries in 'var_cols' must be present in the dataframe."
+            assert len(self._data_cols) == len(var_cols), (
+                "If passing variance columns, "
                 "the list needs to have the same length as the data columns one."
+            )
         self._var_cols = var_cols
         # additional checks for cov_cols
         if cov_cols is not None:
-            assert self.num_components > 1, \
-                "In order to set covariances, the timeseries needs at least 2 components."
-            assert cov_cols is not None, \
-                "If setting covariances, the standard deviations must also be set."
-            assert isinstance(cov_cols, list) and \
-                all([isinstance(ccol, str) for ccol in cov_cols]), \
-                f"If not None, 'cov_cols' must be a list of strings, got {cov_cols}."
-            assert all([ccol in dataframe.columns for ccol in cov_cols]), \
-                "All entries in 'cov_cols' must be present in the dataframe."
+            assert self.num_components > 1, (
+                "In order to set covariances, "
+                "the timeseries needs at least 2 components."
+            )
+            assert (
+                cov_cols is not None
+            ), "If setting covariances, the standard deviations must also be set."
+            assert isinstance(cov_cols, list) and all(
+                [isinstance(ccol, str) for ccol in cov_cols]
+            ), f"If not None, 'cov_cols' must be a list of strings, got {cov_cols}."
+            assert all(
+                [ccol in dataframe.columns for ccol in cov_cols]
+            ), "All entries in 'cov_cols' must be present in the dataframe."
             cov_dims = get_cov_dims(self.num_components)
-            assert len(cov_cols) == cov_dims, \
-                "If passing covariance columns, the list needs to have the appropriate " \
-                "length given the data columns length. " \
+            assert len(cov_cols) == cov_dims, (
+                "If passing covariance columns, the list needs to have the appropriate "
+                "length given the data columns length. "
                 f"Expected {cov_dims}, got {len(cov_cols)}."
+            )
             # everything should be alright, make index maps
             index_map, var_cov_map = make_cov_index_map(self.num_components)
             self.index_map = index_map
@@ -159,9 +172,11 @@ class Timeseries():
         -------
             Timeseries summary.
         """
-        info = f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}" \
-               f"\n - Shape: {self.shape}\n - Offset Removed: {self.offset is not None}" \
-               f"\n - Data: {[key for key in self.data_cols]}"
+        info = (
+            f"Timeseries\n - Source: {self.src}\n - Units: {self.data_unit}"
+            f"\n - Shape: {self.shape}\n - Offset Removed: {self.offset is not None}"
+            f"\n - Data: {[key for key in self.data_cols]}"
+        )
         if self.var_cols is not None:
             info += f"\n - Variances: {[key for key in self.var_cols]}"
         if self.cov_cols is not None:
@@ -191,112 +206,142 @@ class Timeseries():
             ts.df[columns]
             ts[ts_description]
         """
-        if not isinstance(columns, str) and \
-           (not isinstance(columns, list) or
-           not all([isinstance(col, str) for col in columns])):
-            raise KeyError("Error when accessing data in timeseries: 'column' must be a "
-                           f"string or list of strings, given was {columns}.")
+        if not isinstance(columns, str) and (
+            not isinstance(columns, list)
+            or not all([isinstance(col, str) for col in columns])
+        ):
+            raise KeyError(
+                "Error when accessing data in timeseries: 'column' must be a "
+                f"string or list of strings, given was {columns}."
+            )
         return self.df[columns]
 
     @property
     def src(self) -> str:
-        """ Source information. """
+        """Source information."""
         return self._src
 
     @src.setter
     def src(self, new_src: str) -> None:
         if not isinstance(new_src, str):
-            raise TypeError(f"New 'src' attribute has to be a string, got {type(new_src)}.")
+            raise TypeError(
+                f"New 'src' attribute has to be a string, got {type(new_src)}."
+            )
         self._src = new_src
 
     @property
     def data_unit(self) -> str:
-        """ Data unit. """
+        """Data unit."""
         return self._data_unit
 
     @data_unit.setter
     def data_unit(self, new_data_unit: str) -> None:
         if not isinstance(new_data_unit, str):
-            raise TypeError("New 'data_unit' attribute has to be a string, "
-                            f"got {type(new_data_unit)}.")
+            raise TypeError(
+                "New 'data_unit' attribute has to be a string, "
+                f"got {type(new_data_unit)}."
+            )
         self._data_unit = new_data_unit
 
     @property
     def data_cols(self) -> list[str]:
-        """ List of the column names in :attr:`~df` that contain data. """
+        """List of the column names in :attr:`~df` that contain data."""
         return self._data_cols
 
     @data_cols.setter
     def data_cols(self, new_data_cols: list[str]) -> None:
-        assert isinstance(new_data_cols, list) and \
-            all([isinstance(dcol, str) for dcol in new_data_cols]), \
-            "New 'data_cols' attribute must be a list of strings of the same length as the " \
-            f"current 'data_cols' ({len(self._data_cols)}), got {new_data_cols}."
-        self._df.rename(columns={old_col: new_col for old_col, new_col
-                                 in zip(self._data_cols, new_data_cols)},
-                        errors='raise', inplace=True)
+        assert isinstance(new_data_cols, list) and all(
+            [isinstance(dcol, str) for dcol in new_data_cols]
+        ), (
+            "New 'data_cols' attribute must be a list of strings of the same length as "
+            f"the current 'data_cols' ({len(self._data_cols)}), got {new_data_cols}."
+        )
+        self._df.rename(
+            columns={
+                old_col: new_col
+                for old_col, new_col in zip(self._data_cols, new_data_cols)
+            },
+            errors="raise",
+            inplace=True,
+        )
         self._data_cols = new_data_cols
 
     @property
     def var_cols(self) -> list[str] | None:
-        """ List of the column names in :attr:`~df` that contain data variance. """
+        """List of the column names in :attr:`~df` that contain data variance."""
         return self._var_cols
 
     @var_cols.setter
     def var_cols(self, new_var_cols: list[str | None]) -> None:
-        assert self._var_cols is not None, \
-            "No variance columns found that can be renamed."
-        assert isinstance(new_var_cols, list) and \
-            all([(vcol is None) or isinstance(vcol, str) for vcol in new_var_cols]), \
-            "New 'var_cols' attribute must be a list of strings or Nones of the same length " \
-            f"as the current 'var_cols' ({len(self._var_cols)}), got {new_var_cols}."
+        assert (
+            self._var_cols is not None
+        ), "No variance columns found that can be renamed."
+        assert isinstance(new_var_cols, list) and all(
+            [(vcol is None) or isinstance(vcol, str) for vcol in new_var_cols]
+        ), (
+            "New 'var_cols' attribute must be a list of strings or Nones of the same "
+            "length as the current 'var_cols' "
+            f"({len(self._var_cols)}), got {new_var_cols}."
+        )
         for ivcol, vcol in enumerate(new_var_cols):
             if vcol is None:
                 new_var_cols[ivcol] = self._var_cols[ivcol]
-        self._df.rename(columns={old_col: new_col for old_col, new_col
-                                 in zip(self._var_cols, new_var_cols)},
-                        errors='raise')
+        self._df.rename(
+            columns={
+                old_col: new_col
+                for old_col, new_col in zip(self._var_cols, new_var_cols)
+            },
+            errors="raise",
+        )
         self._var_cols = new_var_cols
 
     @property
     def cov_cols(self) -> list[str] | None:
-        """ List of the column names in :attr:`~df` that contain data covariances. """
+        """List of the column names in :attr:`~df` that contain data covariances."""
         return self._cov_cols
 
     @cov_cols.setter
     def cov_cols(self, new_cov_cols: list[str | None]) -> None:
-        assert self._cov_cols is not None, \
-            "No covariance columns found that can be renamed."
-        assert isinstance(new_cov_cols, list) and \
-            all([(ccol is None) or isinstance(ccol, str) for ccol in new_cov_cols]), \
-            "New 'cov_cols' attribute must be a list of strings or Nones of the same length " \
-            f"as the current 'cov_cols' ({len(self._cov_cols)}), got {new_cov_cols}."
+        assert (
+            self._cov_cols is not None
+        ), "No covariance columns found that can be renamed."
+        assert isinstance(new_cov_cols, list) and all(
+            [(ccol is None) or isinstance(ccol, str) for ccol in new_cov_cols]
+        ), (
+            "New 'cov_cols' attribute must be a list of strings or Nones of the same "
+            "length as the current 'cov_cols' "
+            f"({len(self._cov_cols)}), got {new_cov_cols}."
+        )
         for iccol, ccol in enumerate(new_cov_cols):
             if ccol is None:
                 new_cov_cols[iccol] = self._cov_cols[iccol]
-        self._df.rename(columns={old_col: new_col for old_col, new_col
-                                 in zip(self._cov_cols, new_cov_cols)},
-                        errors='raise')
+        self._df.rename(
+            columns={
+                old_col: new_col
+                for old_col, new_col in zip(self._cov_cols, new_cov_cols)
+            },
+            errors="raise",
+        )
         self._cov_cols = new_cov_cols
 
     @property
     def num_components(self) -> int:
-        """ Number of data columns. """
+        """Number of data columns."""
         return len(self._data_cols)
 
     @property
     def df(self) -> pd.DataFrame:
-        """ The entire timeseries' DataFrame. """
+        """The entire timeseries' DataFrame."""
         return self._df
 
     @property
     def num_observations(self) -> int:
-        """ Number of observations (rows in :attr:`~df`). """
+        """Number of observations (rows in :attr:`~df`)."""
         return self._df.shape[0]
 
     @property
     def data(self) -> pd.DataFrame:
-        """ View of only the data columns in :attr:`~df`. """
+        """View of only the data columns in :attr:`~df`."""
         return self._df.loc[:, self._data_cols]
 
     @data.setter
@@ -305,16 +350,16 @@ class Timeseries():
 
     @property
     def sigmas(self) -> pd.DataFrame:
-        """ View of only the data standard deviation columns in :attr:`~df`. """
+        """View of only the data standard deviation columns in :attr:`~df`."""
         return self.vars ** (1 / 2)
 
     @sigmas.setter
     def sigmas(self, new_sigma: np.ndarray) -> None:
-        self.vars = new_sigma ** 2
+        self.vars = new_sigma**2
 
     @property
     def vars(self) -> pd.DataFrame:
-        """ Returns the variances from :attr:`~df`. """
+        """Returns the variances from :attr:`~df`."""
         if self._var_cols is None:
             raise ValueError("No variance columns present to return.")
         return self._df.loc[:, self._var_cols]
@@ -327,7 +372,7 @@ class Timeseries():
 
     @property
     def covs(self) -> pd.DataFrame:
-        """ Returns the covariances from :attr:`~df`. """
+        """Returns the covariances from :attr:`~df`."""
         if self._cov_cols is None:
             raise ValueError("No covariance columns present to return.")
         return self._df.loc[:, self._cov_cols]
@@ -341,8 +386,8 @@ class Timeseries():
     @property
     def var_cov(self) -> pd.DataFrame:
         """
-        Returns the variance as well as covariance columns from :attr:`~df`, to be indexed
-        by :attr:`~var_cov_map` to yield the full variance-covariance matrix.
+        Returns the variance as well as covariance columns from :attr:`~df`, to be
+        indexed by :attr:`~var_cov_map` to yield the full variance-covariance matrix.
         """
         if self._var_cols is None:
             raise ValueError("No variance columns present to return.")
@@ -353,15 +398,16 @@ class Timeseries():
     @var_cov.setter
     def var_cov(self, new_var_cov: np.ndarray) -> None:
         cov_dims = get_cov_dims(self.num_components)
-        assert new_var_cov.shape[1] == self.num_components + cov_dims, \
-            "Setting 'var_cov' requires a column for each variance (first half of array, " \
-            f"{self.num_components}) and covariance (second half, {cov_dims})."
-        self.vars = new_var_cov[:, :self.num_components]
-        self.covs = new_var_cov[:, self.num_components:]
+        assert new_var_cov.shape[1] == self.num_components + cov_dims, (
+            "Setting 'var_cov' requires a column for each variance (first half of "
+            f"array, {self.num_components}) and covariance (second half, {cov_dims})."
+        )
+        self.vars = new_var_cov[:, : self.num_components]
+        self.covs = new_var_cov[:, self.num_components :]
 
     @property
     def time(self) -> pd.Index:
-        """ Timestamps of the timeseries (index of :attr:`~df`). """
+        """Timestamps of the timeseries (index of :attr:`~df`)."""
         return self._df.index
 
     @property
@@ -413,23 +459,26 @@ class Timeseries():
             The full covariance matrix at time ``t``.
         """
         # input checks
-        assert self._var_cols is not None, \
-            "No variances available."
+        assert self._var_cols is not None, "No variances available."
         if isinstance(t, str):
             t = pd.Timestamp(t)
         elif isinstance(t, int):
             t = self.time[t]
-        assert self.time.min() <= t <= self.time.max(), \
-            f"Time {t} not inside available timespan."
-        assert np.any(np.isfinite(self.vars[t].values)), \
-            f"No variances set at time {t}."
+        assert (
+            self.time.min() <= t <= self.time.max()
+        ), f"Time {t} not inside available timespan."
+        assert np.any(
+            np.isfinite(self.vars[t].values)
+        ), f"No variances set at time {t}."
         # only variance is set
         if self._cov_cols is None:
             cov_mat = np.diag(self.vars[t].values)
         # full covariance matrix is available
         else:
-            cov_mat = np.reshape(self.var_cov[t].values[0, self.var_cov_map],
-                                 (self.num_components, self.num_components))
+            cov_mat = np.reshape(
+                self.var_cov[t].values[0, self.var_cov_map],
+                (self.num_components, self.num_components),
+            )
         return cov_mat
 
     def check_covariances(self) -> np.ndarray:
@@ -453,8 +502,12 @@ class Timeseries():
             # test using Cholesky decomposition
             try:
                 # skip all the checks that Timeseries.cov_at does
-                _ = np.linalg.cholesky(np.reshape(varcov[i, self.var_cov_map],
-                                                  (self.num_components, self.num_components)))
+                _ = np.linalg.cholesky(
+                    np.reshape(
+                        varcov[i, self.var_cov_map],
+                        (self.num_components, self.num_components),
+                    )
+                )
                 is_posdef[i] = True
             # catch if not positive-definite
             except np.linalg.LinAlgError as e:
@@ -463,13 +516,14 @@ class Timeseries():
         # done
         return is_posdef
 
-    def cut(self,
-            t_min: pd.Timestamp | str | None = None,
-            t_max: pd.Timestamp | str | None = None,
-            i_min: int | None = None,
-            i_max: int | None = None,
-            keep_inside: bool = True
-            ) -> None:
+    def cut(
+        self,
+        t_min: pd.Timestamp | str | None = None,
+        t_max: pd.Timestamp | str | None = None,
+        i_min: int | None = None,
+        i_max: int | None = None,
+        keep_inside: bool = True,
+    ) -> None:
         """
         Cut the timeseries to contain only data between certain times or indices.
         If both a minimum (maximum) timestamp or index is provided, the later (earlier,
@@ -524,13 +578,14 @@ class Timeseries():
         else:
             self._df = self._df[(self.time < cut_min) | (self.time > cut_max)]
 
-    def add_uncertainties(self,
-                          timeseries: Timeseries | None = None,
-                          var_data: np.ndarray | None = None,
-                          var_cols: list[str] | None = None,
-                          cov_data: np.ndarray | None = None,
-                          cov_cols: list[str] | None = None
-                          ) -> None:
+    def add_uncertainties(
+        self,
+        timeseries: Timeseries | None = None,
+        var_data: np.ndarray | None = None,
+        var_cols: list[str] | None = None,
+        cov_data: np.ndarray | None = None,
+        cov_cols: list[str] | None = None,
+    ) -> None:
         """
         Add variance and covariance data and column names to the timeseries.
 
@@ -544,8 +599,8 @@ class Timeseries():
         var_cols
             List of variance column names.
         cov_data
-            New data covariance.
-            Setting this but not ``var_data`` requires there to already be data variance.
+            New data covariance. Setting this but not ``var_data`` requires there to
+            already be data variance.
         cov_cols
             List of covariance column names.
 
@@ -558,17 +613,19 @@ class Timeseries():
 
         will only work when the respective columns already exist in the dataframe.
         (This is the same behavior for renaming variance columns that do not exist.)
-        If they do not exist, the calls will results in an error because no column names exist,
-        in an effort to make the inner workings more transparent and rigorous.
+        If they do not exist, the calls will results in an error because no column names
+        exist, in an effort to make the inner workings more transparent and rigorous.
 
-        This function allows to override the default behavior, and can also generate column
-        names by itself if none are specified.
+        This function allows to override the default behavior, and can also generate
+        column names by itself if none are specified.
         """
         # check if input is a Timeseries, override rest of input arguments
         if timeseries is not None:
             if not isinstance(timeseries, Timeseries):
-                raise TypeError("Cannot use uncertainty data: "
-                                "'timeseries' is not a Timeseries object.")
+                raise TypeError(
+                    "Cannot use uncertainty data: "
+                    "'timeseries' is not a Timeseries object."
+                )
             # get variance data and description
             if timeseries.var_cols is not None:
                 var_data = timeseries.vars[timeseries.time.isin(self.time)].values
@@ -585,43 +642,59 @@ class Timeseries():
                 cov_cols = None
         # add variance
         if var_data is not None:
-            assert isinstance(var_data, np.ndarray) and var_data.shape == self.shape, \
-                   "'var_data' must be a NumPy array of the same shape as the data " \
-                   f"{self.shape}, got " \
-                   f"{var_data.shape if isinstance(var_data, np.ndarray) else var_data}."
+            assert isinstance(var_data, np.ndarray) and var_data.shape == self.shape, (
+                "'var_data' must be a NumPy array of the same shape as the data "
+                f"{self.shape}, got "
+                f"{var_data.shape if isinstance(var_data, np.ndarray) else var_data}."
+            )
             if var_cols is None:
                 var_cols = [dcol + "_sigma" for dcol in self.data_cols]
             else:
-                assert (isinstance(var_cols, list) and len(var_cols) == self.num_components and
-                        all([isinstance(vcol, str) for vcol in var_cols])), \
-                       "New 'var_cols' attribute must be a list of strings of the same length " \
-                       f"as the current 'data_cols' ({len(self._data_cols)}), got {var_cols}."
+                assert (
+                    isinstance(var_cols, list)
+                    and len(var_cols) == self.num_components
+                    and all([isinstance(vcol, str) for vcol in var_cols])
+                ), (
+                    "New 'var_cols' attribute must be a list of strings of the same "
+                    "length as the current 'data_cols' "
+                    f"({len(self._data_cols)}), got {var_cols}."
+                )
             for ivcol, vcol in enumerate(var_cols):
                 self._df[vcol] = var_data[:, ivcol]
             self._var_cols = var_cols
         # add covariance, check for variance
         if cov_data is not None:
-            assert self._var_cols is not None, \
-                "Cannot set covariance data without first adding variance data."
+            assert (
+                self._var_cols is not None
+            ), "Cannot set covariance data without first adding variance data."
             cov_dims = get_cov_dims(self.num_components)
-            assert (isinstance(cov_data, np.ndarray)
-                    and cov_data.shape[0] == self.num_observations
-                    and cov_data.shape[1] == cov_dims), \
-                "'cov_data' must be a NumPy array of the same length as the data " \
-                "and width corresponding to all possible covariances. Expected shape " \
-                f"({self.num_observations}, {cov_dims}), got " \
+            assert (
+                isinstance(cov_data, np.ndarray)
+                and cov_data.shape[0] == self.num_observations
+                and cov_data.shape[1] == cov_dims
+            ), (
+                "'cov_data' must be a NumPy array of the same length as the data "
+                "and width corresponding to all possible covariances. Expected shape "
+                f"({self.num_observations}, {cov_dims}), got "
                 f"{cov_data.shape if isinstance(cov_data, np.ndarray) else cov_data}."
+            )
             if cov_cols is None:
                 cov_cols = []
                 for i1 in range(self.num_components):
                     for i2 in range(i1 + 1, self.num_components):
-                        cov_cols.append(f"{self.data_cols[i1]}_{self.data_cols[i2]}_cov")
+                        cov_cols.append(
+                            f"{self.data_cols[i1]}_{self.data_cols[i2]}_cov"
+                        )
             else:
-                assert (isinstance(cov_cols, list) and len(cov_cols) == cov_dims and
-                        all([isinstance(vcol, str) for vcol in cov_cols])), \
-                    "New 'cov_cols' attribute must be a list of strings of length " \
-                    "corresponding to all possible covariances " \
+                assert (
+                    isinstance(cov_cols, list)
+                    and len(cov_cols) == cov_dims
+                    and all([isinstance(vcol, str) for vcol in cov_cols])
+                ), (
+                    "New 'cov_cols' attribute must be a list of strings of length "
+                    "corresponding to all possible covariances "
                     f"( expected {cov_dims}, got {len(cov_cols)}."
+                )
             for iccol, ccol in enumerate(cov_cols):
                 self._df[ccol] = cov_data[:, iccol]
             self.index_map, self.var_cov_map = make_cov_index_map(self.num_components)
@@ -634,7 +707,8 @@ class Timeseries():
         Parameters
         ----------
         only_data
-            If ``True``, only copy the data columns and ignore any uncertainty information.
+            If ``True``, only copy the data columns and ignore any uncertainty
+            information.
         src
             Set a new source information attribute for the copy.
             Uses the current one if ``None``.
@@ -646,12 +720,23 @@ class Timeseries():
         """
         new_name = deepcopy(self._src) if src is None else src
         if not only_data:
-            return Timeseries(self._df.copy(), new_name, deepcopy(self._data_unit),
-                              deepcopy(self._data_cols), deepcopy(self._var_cols),
-                              deepcopy(self._cov_cols))
+            return Timeseries(
+                self._df.copy(),
+                new_name,
+                deepcopy(self._data_unit),
+                deepcopy(self._data_cols),
+                deepcopy(self._var_cols),
+                deepcopy(self._cov_cols),
+            )
         else:
-            return Timeseries(self._df[self._data_cols].copy(), new_name,
-                              deepcopy(self._data_unit), deepcopy(self._data_cols), None, None)
+            return Timeseries(
+                self._df[self._data_cols].copy(),
+                new_name,
+                deepcopy(self._data_unit),
+                deepcopy(self._data_cols),
+                None,
+                None,
+            )
 
     def convert_units(self, factor: float, new_data_unit: str) -> None:
         """
@@ -669,8 +754,9 @@ class Timeseries():
         try:
             factor = float(factor)
         except TypeError as e:
-            raise TypeError(f"'factor' and has to be a scalar, got {type(factor)}."
-                            ).with_traceback(e.__traceback__) from e
+            raise TypeError(
+                f"'factor' and has to be a scalar, got {type(factor)}."
+            ).with_traceback(e.__traceback__) from e
         # update data unit (contains input check)
         self.data_unit = new_data_unit
         # convert data
@@ -684,8 +770,9 @@ class Timeseries():
 
     def mask_out(self, dcol: str) -> None:
         """
-        Mask out an entire data column (and if present, its uncertainty column) by setting
-        the entire column to ``NaN``. Converts it to a sparse representation to save memory.
+        Mask out an entire data column (and if present, its uncertainty column) by
+        setting the entire column to ``NaN``. Converts it to a sparse representation to
+        save memory.
 
         Parameters
         ----------
@@ -706,14 +793,15 @@ class Timeseries():
                     self._df[ccol] = self._df[ccol].astype(pd.SparseDtype(dtype=float))
 
     @staticmethod
-    def prepare_math(left: Timeseries | np.ndarray,
-                     right: Timeseries | np.ndarray,
-                     operation: Literal["+", "-", "*", "/"]
-                     ) -> tuple[np.ndarray, np.ndarray, str, str, list[str], pd.Index]:
+    def prepare_math(
+        left: Timeseries | np.ndarray,
+        right: Timeseries | np.ndarray,
+        operation: Literal["+", "-", "*", "/"],
+    ) -> tuple[np.ndarray, np.ndarray, str, str, list[str], pd.Index]:
         r"""
         Tests two timeseries' ability to be cast together in a mathematical operation,
-        and returns output characteristics.
-        Currently, only addition, subtraction, multiplication, and division are supported.
+        and returns output characteristics. Currently, only addition, subtraction,
+        multiplication, and division are supported.
 
         All uncertainty information is lost during mathematical operations.
 
@@ -752,9 +840,9 @@ class Timeseries():
         Raises
         ------
         TypeError
-            If one of the operands is not a :class:`~Timeseries` or :class:`~numpy.ndarray`,
-            or if both are :class:`~numpy.ndarray` (since then this function would never be
-            called anyway).
+            If one of the operands is not a :class:`~Timeseries` or
+            :class:`~numpy.ndarray`, or if both are :class:`~numpy.ndarray` (since then
+            this function would never be called anyway).
         ValueError
             If the number of data columns is not equal between the two operands,
             or if the data units are not the same adding or subtracting.
@@ -780,16 +868,23 @@ class Timeseries():
         """
         # check for valid operator
         if operation not in ["+", "-", "*", "/"]:
-            raise NotImplementedError("Timeseries math problem: "
-                                      f"unknown operation '{operation}'.")
+            raise NotImplementedError(
+                "Timeseries math problem: " f"unknown operation '{operation}'."
+            )
         # check for compatible types
         for operand, position in zip([left, right], ["Left", "Right"]):
-            if (not isinstance(operand, Timeseries)) and (not isinstance(operand, np.ndarray)):
-                raise TypeError(f"{position} operand has to be either a '{Timeseries}' or "
-                                f"'{np.ndarray}' object, got {type(operand)}")
+            if (not isinstance(operand, Timeseries)) and (
+                not isinstance(operand, np.ndarray)
+            ):
+                raise TypeError(
+                    f"{position} operand has to be either a '{Timeseries}' or "
+                    f"'{np.ndarray}' object, got {type(operand)}"
+                )
         if all([isinstance(operand, np.ndarray) for operand in [left, right]]):
-            raise TypeError(f"At least one of the operands has to be a '{Timeseries}' object, "
-                            f"got two '{np.ndarray}' objects.")
+            raise TypeError(
+                f"At least one of the operands has to be a '{Timeseries}' object, "
+                f"got two '{np.ndarray}' objects."
+            )
         # check for same dimensions
         if isinstance(left, Timeseries):
             len_left_data_cols = left.num_components
@@ -800,13 +895,16 @@ class Timeseries():
         else:
             len_right_data_cols = right.shape[1]
         if len_left_data_cols != len_right_data_cols:
-            raise ValueError("Timeseries math problem: conflicting number of data columns "
-                             f"({len_left_data_cols} and {len_right_data_cols}).")
+            raise ValueError(
+                "Timeseries math problem: conflicting number of data columns "
+                f"({len_left_data_cols} and {len_right_data_cols})."
+            )
         # get output attributes
         if isinstance(left, np.ndarray):
-            assert left.shape[0] == right.num_observations, \
-                "Timeseries math problem: conflicting number of observation " + \
-                f"({left.shape[0]} and {right.num_observations})."
+            assert left.shape[0] == right.num_observations, (
+                "Timeseries math problem: conflicting number of observation "
+                + f"({left.shape[0]} and {right.num_observations})."
+            )
             out_time = right.time
             out_src = right.src
             out_data_unit = right.data_unit
@@ -814,9 +912,10 @@ class Timeseries():
             left_data = left
             right_data = right.data.loc[out_time, :].values
         elif isinstance(right, np.ndarray):
-            assert left.num_observations == right.shape[0], \
-                "Timeseries math problem: conflicting number of observation " + \
-                f"({left.num_observations} and {right.shape[0]})."
+            assert left.num_observations == right.shape[0], (
+                "Timeseries math problem: conflicting number of observation "
+                + f"({left.num_observations} and {right.shape[0]})."
+            )
             out_time = left.time
             out_src = left.src
             out_data_unit = left.data_unit
@@ -830,18 +929,24 @@ class Timeseries():
             # define new src and data_cols
             if operation in ["+", "-"]:
                 if left.data_unit != right.data_unit:
-                    raise ValueError("Timeseries math problem: conflicting data units "
-                                     f"'{left.data_unit}' and '{right.data_unit}'.")
+                    raise ValueError(
+                        "Timeseries math problem: conflicting data units "
+                        f"'{left.data_unit}' and '{right.data_unit}'."
+                    )
                 else:
                     out_data_unit = left.data_unit
                     out_src = f"{left.src}{operation}{right.src}"
-                    out_data_cols = [f"{lcol}{operation}{rcol}" for lcol, rcol
-                                     in zip(left.data_cols, right.data_cols)]
+                    out_data_cols = [
+                        f"{lcol}{operation}{rcol}"
+                        for lcol, rcol in zip(left.data_cols, right.data_cols)
+                    ]
             elif operation in ["*", "/"]:
                 out_data_unit = f"({left.data_unit}){operation}({right.data_unit})"
                 out_src = f"({left.src}){operation}({right.src})"
-                out_data_cols = [f"({lcol}){operation}({rcol})" for lcol, rcol
-                                 in zip(left.data_cols, right.data_cols)]
+                out_data_cols = [
+                    f"({lcol}){operation}({rcol})"
+                    for lcol, rcol in zip(left.data_cols, right.data_cols)
+                ]
             left_data = left.data.loc[out_time, :].values
             right_data = right.data.loc[out_time, :].values
         # return data unit and column names
@@ -869,25 +974,35 @@ class Timeseries():
 
         Example
         -------
-        Add two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Add two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as
+        ``ts3``::
 
             ts3 = ts1 + ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(self, other, '+')
-        return Timeseries(pd.DataFrame(left_data + right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(self, other, "+")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data + right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __radd__(self, other: Timeseries) -> Timeseries:
         """
-        Reflected operation of :meth:`~__add__` (necessary if first operand is a NumPy array).
+        Reflected operation of :meth:`~__add__`
+        (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(other, self, '+')
-        return Timeseries(pd.DataFrame(left_data + right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(other, self, "+")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data + right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __sub__(self, other: Timeseries) -> Timeseries:
         """
@@ -911,25 +1026,35 @@ class Timeseries():
 
         Example
         -------
-        Subtract two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Subtract two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as
+        ``ts3``::
 
             ts3 = ts1 - ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(self, other, '-')
-        return Timeseries(pd.DataFrame(left_data - right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(self, other, "-")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data - right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __rsub__(self, other: Timeseries) -> Timeseries:
         """
-        Reflected operation of :meth:`~__sub__` (necessary if first operand is a NumPy array).
+        Reflected operation of :meth:`~__sub__`
+        (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(other, self, '-')
-        return Timeseries(pd.DataFrame(left_data - right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(other, self, "-")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data - right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __mul__(self, other: Timeseries) -> Timeseries:
         """
@@ -953,25 +1078,35 @@ class Timeseries():
 
         Example
         -------
-        Multiply two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Multiply two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as
+        ``ts3``::
 
             ts3 = ts1 * ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(self, other, '*')
-        return Timeseries(pd.DataFrame(left_data * right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(self, other, "*")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data * right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __rmul__(self, other: Timeseries) -> Timeseries:
         """
-        Reflected operation of :meth:`~__mul__` (necessary if first operand is a NumPy array).
+        Reflected operation of :meth:`~__mul__`
+        (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(other, self, '*')
-        return Timeseries(pd.DataFrame(left_data * right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(other, self, "*")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data * right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __truediv__(self, other: Timeseries) -> Timeseries:
         """
@@ -995,25 +1130,35 @@ class Timeseries():
 
         Example
         -------
-        Divide two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as ``ts3``::
+        Divide two :class:`~Timeseries` ``ts1`` and ``ts2`` and save the result as
+        ``ts3``::
 
             ts3 = ts1 / ts2
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(self, other, '/')
-        return Timeseries(pd.DataFrame(left_data / right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(self, other, "/")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data / right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def __rtruediv__(self, other: Timeseries) -> Timeseries:
         """
-        Reflected operation of :meth:`~__truediv__` (necessary if first operand is a NumPy array).
+        Reflected operation of :meth:`~__truediv__`
+        (necessary if first operand is a NumPy array).
         """
-        left_data, right_data, out_src, out_unit, out_data_cols, out_time = \
-            Timeseries.prepare_math(other, self, '/')
-        return Timeseries(pd.DataFrame(left_data / right_data,
-                                       index=out_time, columns=out_data_cols),
-                          out_src, out_unit, out_data_cols)
+        left_data, right_data, out_src, out_unit, out_data_cols, out_time = (
+            Timeseries.prepare_math(other, self, "/")
+        )
+        return Timeseries(
+            pd.DataFrame(left_data / right_data, index=out_time, columns=out_data_cols),
+            out_src,
+            out_unit,
+            out_data_cols,
+        )
 
     def get_arch(self) -> dict:
         """
@@ -1026,20 +1171,21 @@ class Timeseries():
 
         See Also
         --------
-        disstans.network.Network.to_json : Export the Network configuration as a JSON file.
+        disstans.network.Network.to_json
+            Export the Network configuration as a JSON file.
         disstans.timeseries.Timeseries.get_arch
-            Get the architecture dictionary of a :class:`~disstans.timeseries.Timeseries` instance.
+            Get the architecture dictionary of a
+            :class:`~disstans.timeseries.Timeseries` instance.
         disstans.models.Model.get_arch
-            Get the architecture dictionary of a :class:`~disstans.models.Model` instance.
+            Get the architecture dictionary of a
+            :class:`~disstans.models.Model` instance.
         """
         return {}
 
     @classmethod
-    def from_fit(cls,
-                 data_unit: str,
-                 data_cols: list[str],
-                 fit: dict[str, np.ndarray | None]
-                 ) -> Timeseries:
+    def from_fit(
+        cls, data_unit: str, data_cols: list[str], fit: dict[str, np.ndarray | None]
+    ) -> Timeseries:
         """
         Import a fit dictionary and create a Timeseries instance.
 
@@ -1068,29 +1214,34 @@ class Timeseries():
         cov_cols = None
         if fit["var"] is not None:
             var_cols = [dcol + "_var" for dcol in data_cols]
-            df_data.update({vcol: fit["var"][:, icol] for icol, vcol in enumerate(var_cols)})
+            df_data.update(
+                {vcol: fit["var"][:, icol] for icol, vcol in enumerate(var_cols)}
+            )
             if fit["cov"] is not None:
                 cov_cols = []
                 num_components = len(data_cols)
                 for i1 in range(num_components):
                     for i2 in range(i1 + 1, num_components):
                         cov_cols.append(f"{data_cols[i1]}_{data_cols[i2]}_cov")
-                df_data.update({ccol: fit["cov"][:, icol] for icol, ccol in enumerate(cov_cols)})
+                df_data.update(
+                    {ccol: fit["cov"][:, icol] for icol, ccol in enumerate(cov_cols)}
+                )
         df = pd.DataFrame(data=df_data, index=fit["time"])
         return cls(df, "fitted", data_unit, data_cols, var_cols, cov_cols)
 
     @classmethod
-    def from_array(cls,
-                   timevector: pd.Series | pd.DatetimeIndex,
-                   data: np.ndarray,
-                   src: str,
-                   data_unit: str,
-                   data_cols: str,
-                   var: np.ndarray | None = None,
-                   var_cols: list[str] | None = None,
-                   cov: np.ndarray | None = None,
-                   cov_cols: list[str] | None = None
-                   ) -> Timeseries:
+    def from_array(
+        cls,
+        timevector: pd.Series | pd.DatetimeIndex,
+        data: np.ndarray,
+        src: str,
+        data_unit: str,
+        data_cols: str,
+        var: np.ndarray | None = None,
+        var_cols: list[str] | None = None,
+        cov: np.ndarray | None = None,
+        cov_cols: list[str] | None = None,
+    ) -> Timeseries:
         r"""
         Constructor method to create a :class:`~Timeseries` instance from a NumPy
         :class:`~numpy.ndarray`.
@@ -1099,7 +1250,8 @@ class Timeseries():
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
         data
             2D NumPy array of shape :math:`(\text{n_observations},\text{n_components})`
             containing the data.
@@ -1138,21 +1290,23 @@ class Timeseries():
         --------
         :func:`~pandas.date_range` : Quick function to generate a timevector.
         """
-        assert len(timevector) == data.shape[0], \
-            "Length of 'timevector' has to match the number of rows in 'data', " \
+        assert len(timevector) == data.shape[0], (
+            "Length of 'timevector' has to match the number of rows in 'data', "
             f"got {len(timevector)} and {data.shape}."
-        assert isinstance(data_cols, list) and \
-            all([isinstance(dcol, str) for dcol in data_cols]), \
-            f"'data_cols' has to be a list of strings, got {data_cols}."
+        )
+        assert isinstance(data_cols, list) and all(
+            [isinstance(dcol, str) for dcol in data_cols]
+        ), f"'data_cols' has to be a list of strings, got {data_cols}."
         # create dataframe with data
         df_data = {dcol: data[:, icol] for icol, dcol in enumerate(data_cols)}
         # add variances
         if var is None:
             var_cols = None
         else:
-            assert data.shape == var.shape, \
-                "'data' and 'var' need to have the same shape, got " \
+            assert data.shape == var.shape, (
+                "'data' and 'var' need to have the same shape, got "
                 f"{data.shape} and {var.shape}."
+            )
             if var_cols is None:
                 var_cols = [dcol + "_var" for dcol in data_cols]
             else:
@@ -1166,9 +1320,10 @@ class Timeseries():
                 cov_dims = get_cov_dims(num_components)
                 if cov.ndim == 1:
                     cov = cov.reshape(-1, 1)
-                assert cov.shape == (data.shape[0], cov_dims), \
-                    "'data' and 'cov' need to have compatible shapes, got " \
+                assert cov.shape == (data.shape[0], cov_dims), (
+                    "'data' and 'cov' need to have compatible shapes, got "
                     f"{data.shape} and {cov.shape} (need {cov_dims} columns)."
+                )
                 if cov_cols is None:
                     cov_cols = []
                     for i1 in range(num_components):
@@ -1176,7 +1331,9 @@ class Timeseries():
                             cov_cols.append(f"{data_cols[i1]}_{data_cols[i2]}_cov")
                 else:
                     assert len(cov_cols) == cov.shape[1]
-                df_data.update({ccol: cov[:, icol] for icol, ccol in enumerate(cov_cols)})
+                df_data.update(
+                    {ccol: cov[:, icol] for icol, ccol in enumerate(cov_cols)}
+                )
         df = pd.DataFrame(data=df_data, index=timevector)
         return cls(df, src, data_unit, data_cols, var_cols, cov_cols)
 
@@ -1185,7 +1342,8 @@ class GipsyTimeseries(Timeseries):
     """
     Subclasses :class:`~Timeseries`.
 
-    Timeseries subclass for GNSS measurements in JPL's Gipsy(X) ``.tseries`` file format.
+    Timeseries subclass for GNSS measurements in JPL's Gipsy(X) ``.tseries`` file
+    format.
 
     Parameters
     ----------
@@ -1231,13 +1389,15 @@ class GipsyTimeseries(Timeseries):
 repro2018a/raw/position/envseries/0000_README.format
 
     """
-    def __init__(self,
-                 path: str,
-                 show_warnings: bool = True,
-                 data_unit: Literal["mm", "m"] = "mm",
-                 keep_duplicates: Literal["first", "last", False] = False,
-                 **kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        path: str,
+        show_warnings: bool = True,
+        data_unit: Literal["mm", "m"] = "mm",
+        keep_duplicates: Literal["first", "last", False] = False,
+        **kw_args,
+    ) -> None:
         self._path = str(path)
         self._keep_duplicates = keep_duplicates
         if data_unit == "m":
@@ -1251,15 +1411,25 @@ repro2018a/raw/position/envseries/0000_README.format
         var_cols = ["east_var", "north_var", "up_var"]
         cov_cols = ["east_north_cov", "east_up_cov", "north_up_cov"]
         all_cols = data_cols + var_cols + cov_cols
-        time = pd.read_csv(self._path, sep=r"\s+", header=None,
-                           usecols=[11, 12, 13, 14, 15, 16],
-                           names=["year", "month", "day", "hour", "minute", "second"])
+        time = pd.read_csv(
+            self._path,
+            sep=r"\s+",
+            header=None,
+            usecols=[11, 12, 13, 14, 15, 16],
+            names=["year", "month", "day", "hour", "minute", "second"],
+        )
         time = pd.to_datetime(time).to_frame(name="time")
-        data = pd.read_csv(self._path, sep=r"\s+", header=None,
-                           usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
-                           names=all_cols)
+        data = pd.read_csv(
+            self._path,
+            sep=r"\s+",
+            header=None,
+            usecols=[1, 2, 3, 4, 5, 6, 7, 8, 9],
+            names=all_cols,
+        )
         # compute covariance from correlation, still in meters
-        data.loc[:, "east_north_cov"] *= data.loc[:, "east_var"] * data.loc[:, "north_var"]
+        data.loc[:, "east_north_cov"] *= (
+            data.loc[:, "east_var"] * data.loc[:, "north_var"]
+        )
         data.loc[:, "east_up_cov"] *= data.loc[:, "east_var"] * data.loc[:, "up_var"]
         data.loc[:, "north_up_cov"] *= data.loc[:, "north_var"] * data.loc[:, "up_var"]
         # convert standard deviation into variance, still in meters
@@ -1273,39 +1443,52 @@ repro2018a/raw/position/envseries/0000_README.format
         num_duplicates = int(df.duplicated(subset="time").sum())
         if num_duplicates > 0:
             if show_warnings:
-                warn(f"Timeseries file {self._path} contains data for {num_duplicates} "
-                     f"duplicate times, dealing with them using 'keep={self._keep_duplicates}'.",
-                     stacklevel=2)
+                warn(
+                    f"Timeseries file {self._path} contains data for {num_duplicates} "
+                    "duplicate times, dealing with them using "
+                    f"'keep={self._keep_duplicates}'.",
+                    stacklevel=2,
+                )
             df.drop_duplicates(subset="time", keep=self._keep_duplicates, inplace=True)
         # create time index
         df.set_index("time", inplace=True)
         # check for monotonic time index
         if not df.index.is_monotonic_increasing:
-            warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.",
-                 stacklevel=2)
+            warn(
+                f"Timeseries file {self._path} is not ordered in time, sorting it now.",
+                stacklevel=2,
+            )
             df.sort_index(inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src="Gipsy", data_unit=data_unit,
-                         data_cols=data_cols, var_cols=var_cols, cov_cols=cov_cols,
-                         **kw_args)
+        super().__init__(
+            dataframe=df,
+            src="Gipsy",
+            data_unit=data_unit,
+            data_cols=data_cols,
+            var_cols=var_cols,
+            cov_cols=cov_cols,
+            **kw_args,
+        )
 
     def get_arch(self) -> dict:
         """
-        Returns a JSON-compatible dictionary with all the information necessary to recreate
-        the Timeseries instance (provided the data file is available).
+        Returns a JSON-compatible dictionary with all the information necessary to
+        recreate the Timeseries instance (provided the data file is available).
 
         Returns
         -------
         dict
-            JSON-compatible dictionary sufficient to recreate the GipsyTimeseries instance.
+            JSON-compatible dictionary sufficient to recreate the GipsyTimeseries
+            instance.
 
         See Also
         --------
         Timeseries.get_arch : For further information.
         """
-        return {"type": "GipsyTimeseries",
-                "kw_args": {"path": self._path,
-                            "keep_duplicates": self._keep_duplicates}}
+        return {
+            "type": "GipsyTimeseries",
+            "kw_args": {"path": self._path, "keep_duplicates": self._keep_duplicates},
+        }
 
 
 GipsyXTimeseries = GipsyTimeseries
@@ -1382,12 +1565,14 @@ class UNRTimeseries(Timeseries):
     .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
 
     """
-    def __init__(self,
-                 path: str,
-                 show_warnings: bool = True,
-                 data_unit: Literal["mm", "m"] = "mm",
-                 **kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        path: str,
+        show_warnings: bool = True,
+        data_unit: Literal["mm", "m"] = "mm",
+        **kw_args,
+    ) -> None:
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1396,38 +1581,56 @@ class UNRTimeseries(Timeseries):
         else:
             raise ValueError(f"'data_unit' needs to be 'mm' or 'm', got {data_unit}.")
         # load data and check for some warnings
-        df = pd.read_csv(self._path, sep=r"\s+",
-                         usecols=[0, 3] + list(range(6, 13)) + list(range(14, 20)))
-        if show_warnings and len(df['site'].unique()) > 1:
-            warn(f"Timeseries file {self._path} contains multiple site codes: "
-                 f"{df['site'].unique()}", stacklevel=2)
-        if len(df['reflon'].unique()) > 1:
+        df = pd.read_csv(
+            self._path,
+            sep=r"\s+",
+            usecols=[0, 3] + list(range(6, 13)) + list(range(14, 20)),
+        )
+        if show_warnings and len(df["site"].unique()) > 1:
+            warn(
+                f"Timeseries file {self._path} contains multiple site codes: "
+                f"{df['site'].unique()}",
+                stacklevel=2,
+            )
+        if len(df["reflon"].unique()) > 1:
             calculate_stepdates = True
             if show_warnings:
-                warn(f"Timeseries file {self._path} contains multiple reference longitudes: "
-                     f"{df['reflon'].unique()}. Step dates will be saved to "
-                     "'self._reflonsteptimes' and should be added as free model parameters, "
-                     "or the affected observations should be removed.", stacklevel=2)
+                warn(
+                    f"Timeseries file {self._path} contains multiple reference "
+                    f"longitudes: {df['reflon'].unique()}. Step dates will be saved to "
+                    "'self._reflonsteptimes' and should be added as free model "
+                    "parameters, or the affected observations should be removed.",
+                    stacklevel=2,
+                )
         else:
             calculate_stepdates = False
-        if len(df['_e0(m)'].unique()) > 1:
+        if len(df["_e0(m)"].unique()) > 1:
             if show_warnings:
-                warn(f"Timeseries file {self._path} contains multiple integer "
-                     f"Eastings: {df['_e0(m)'].unique()}", stacklevel=2)
+                warn(
+                    f"Timeseries file {self._path} contains multiple integer "
+                    f"Eastings: {df['_e0(m)'].unique()}",
+                    stacklevel=2,
+                )
             offsets_east = df["_e0(m)"].values - df["_e0(m)"].values[0]
         else:
             offsets_east = 0
-        if len(df['____n0(m)'].unique()) > 1:
+        if len(df["____n0(m)"].unique()) > 1:
             if show_warnings:
-                warn(f"Timeseries file {self._path} contains multiple integer "
-                     f"Northings: {df['____n0(m)'].unique()}", stacklevel=2)
+                warn(
+                    f"Timeseries file {self._path} contains multiple integer "
+                    f"Northings: {df['____n0(m)'].unique()}",
+                    stacklevel=2,
+                )
             offsets_north = df["____n0(m)"].values - df["____n0(m)"].values[0]
         else:
             offsets_north = 0
-        if len(df['u0(m)'].unique()) > 1:
+        if len(df["u0(m)"].unique()) > 1:
             if show_warnings:
-                warn(f"Timeseries file {self._path} contains multiple integer "
-                     f"Verticals: {df['u0(m)'].unique()}", stacklevel=2)
+                warn(
+                    f"Timeseries file {self._path} contains multiple integer "
+                    f"Verticals: {df['u0(m)'].unique()}",
+                    stacklevel=2,
+                )
             offsets_up = df["u0(m)"].values - df["u0(m)"].values[0]
         else:
             offsets_up = 0
@@ -1435,32 +1638,58 @@ class UNRTimeseries(Timeseries):
         df["east"] = (df["__east(m)"] + offsets_east) * factor
         df["north"] = (df["_north(m)"] + offsets_north) * factor
         df["up"] = (df["____up(m)"] + offsets_up) * factor
-        df.drop(columns=["_e0(m)", "__east(m)", "____n0(m)", "_north(m)",
-                         "u0(m)", "____up(m)"], inplace=True)
+        df.drop(
+            columns=[
+                "_e0(m)",
+                "__east(m)",
+                "____n0(m)",
+                "_north(m)",
+                "u0(m)",
+                "____up(m)",
+            ],
+            inplace=True,
+        )
         # make the covariance
         df["__corr_en"] *= df["sig_e(m)"] * df["sig_n(m)"] * factor**2
         df["__corr_eu"] *= df["sig_e(m)"] * df["sig_u(m)"] * factor**2
         df["__corr_nu"] *= df["sig_n(m)"] * df["sig_u(m)"] * factor**2
-        df.rename(columns={"__corr_en": "east_north_cov", "__corr_eu": "east_up_cov",
-                           "__corr_nu": "north_up_cov"}, inplace=True)
+        df.rename(
+            columns={
+                "__corr_en": "east_north_cov",
+                "__corr_eu": "east_up_cov",
+                "__corr_nu": "north_up_cov",
+            },
+            inplace=True,
+        )
         # make the variance
         old_sig_cols = ["sig_e(m)", "sig_n(m)", "sig_u(m)"]
-        df.loc[:, old_sig_cols] = (df.loc[:, old_sig_cols] * factor)**2
-        df.rename(columns={"sig_e(m)": "east_var", "sig_n(m)": "north_var",
-                           "sig_u(m)": "up_var"}, inplace=True)
+        df.loc[:, old_sig_cols] = (df.loc[:, old_sig_cols] * factor) ** 2
+        df.rename(
+            columns={
+                "sig_e(m)": "east_var",
+                "sig_n(m)": "north_var",
+                "sig_u(m)": "up_var",
+            },
+            inplace=True,
+        )
         # check for duplicate timestamps and create time index
         num_duplicates = int(df.duplicated(subset="__MJD").sum())
         if show_warnings and (num_duplicates > 0):
-            warn(f"Timeseries file {self._path} contains data for {num_duplicates} "
-                 "duplicate dates. Keeping first occurrences.", stacklevel=2)
+            warn(
+                f"Timeseries file {self._path} contains data for {num_duplicates} "
+                "duplicate dates. Keeping first occurrences.",
+                stacklevel=2,
+            )
         df.drop_duplicates(subset="__MJD", inplace=True)
-        df["__MJD"] = pd.to_datetime(df["__MJD"] + 2400000.5, unit="D", origin='julian')
+        df["__MJD"] = pd.to_datetime(df["__MJD"] + 2400000.5, unit="D", origin="julian")
         df.rename(columns={"__MJD": "time"}, inplace=True)
         df.set_index("time", inplace=True)
         # check for monotonic time index
         if not df.index.is_monotonic_increasing:
-            warn(f"Timeseries file {self._path} is not ordered in time, sorting it now.",
-                 stacklevel=2)
+            warn(
+                f"Timeseries file {self._path} is not ordered in time, sorting it now.",
+                stacklevel=2,
+            )
             df.sort_index(inplace=True)
         # calculate step dates for multiple reference meridians
         if calculate_stepdates:
@@ -1468,28 +1697,32 @@ class UNRTimeseries(Timeseries):
         # remove columns that are no longer needed
         df.drop(columns=["site", "reflon"], inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src="UNR", data_unit=data_unit,
-                         data_cols=["east", "north", "up"],
-                         var_cols=["east_var", "north_var", "up_var"],
-                         cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"],
-                         **kw_args)
+        super().__init__(
+            dataframe=df,
+            src="UNR",
+            data_unit=data_unit,
+            data_cols=["east", "north", "up"],
+            var_cols=["east_var", "north_var", "up_var"],
+            cov_cols=["east_north_cov", "east_up_cov", "north_up_cov"],
+            **kw_args,
+        )
 
     def get_arch(self) -> dict:
         """
-        Returns a JSON-compatible dictionary with all the information necessary to recreate
-        the Timeseries instance (provided the data file is available).
+        Returns a JSON-compatible dictionary with all the information necessary to
+        recreate the Timeseries instance (provided the data file is available).
 
         Returns
         -------
         dict
-            JSON-compatible dictionary sufficient to recreate the UNRTimeseries instance.
+            JSON-compatible dictionary sufficient to recreate the UNRTimeseries
+            instance.
 
         See Also
         --------
         Timeseries.get_arch : For further information.
         """
-        return {"type": "UNRTimeseries",
-                "kw_args": {"path": self._path}}
+        return {"type": "UNRTimeseries", "kw_args": {"path": self._path}}
 
 
 class UNRHighRateTimeseries(Timeseries):
@@ -1540,12 +1773,14 @@ class UNRHighRateTimeseries(Timeseries):
     The timestamp associated with each observation is in Terrestrial Time.
 
     """
-    def __init__(self,
-                 path: str,
-                 show_warnings: bool = True,
-                 data_unit: Literal["mm", "m"] = "mm",
-                 **kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        path: str,
+        show_warnings: bool = True,
+        data_unit: Literal["mm", "m"] = "mm",
+        **kw_args,
+    ) -> None:
         self._path = str(path)
         if data_unit == "m":
             factor = 1
@@ -1581,30 +1816,52 @@ class UNRHighRateTimeseries(Timeseries):
                                         # write to buffer
                                         f.write(gz_d.read())
                                 except gzip.BadGzipFile as e:
-                                    raise RuntimeError(f"Error extracting the file {path_y}."
-                                                       ).with_traceback(e.__traceback__) from e
+                                    raise RuntimeError(
+                                        f"Error extracting the file {path_y}."
+                                    ).with_traceback(e.__traceback__) from e
                 except (zipfile.BadZipFile, zipfile.LargeZipFile) as e:
-                    raise RuntimeError(f"Error extracting the file {path_y}."
-                                       ).with_traceback(e.__traceback__) from e
+                    raise RuntimeError(
+                        f"Error extracting the file {path_y}."
+                    ).with_traceback(e.__traceback__) from e
             # load data into pandas
             f.seek(0)
-            df = pd.read_csv(f, sep=r"\s+",
-                             names=["site", "sec-J2000", "___e-ref(m)", "___n-ref(m)",
-                                    "___v-ref(m)", "sig_e(m)", "sig_n(m)", "sig_v(m)"],
-                             usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
+            df = pd.read_csv(
+                f,
+                sep=r"\s+",
+                names=[
+                    "site",
+                    "sec-J2000",
+                    "___e-ref(m)",
+                    "___n-ref(m)",
+                    "___v-ref(m)",
+                    "sig_e(m)",
+                    "sig_n(m)",
+                    "sig_v(m)",
+                ],
+                usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)),
+            )
         # if the path is a .kenv.gz file, we only need to extract the single file
         elif pathobj.match("*.kenv.gz"):
             with gzip.open(self._path, mode="r") as f:
-                df = pd.read_csv(f, sep=r"\s+",
-                                 usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
+                df = pd.read_csv(
+                    f,
+                    sep=r"\s+",
+                    usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)),
+                )
         # in all other cases, try loading directly
         else:
-            df = pd.read_csv(self._path, sep=r"\s+",
-                             usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)))
+            df = pd.read_csv(
+                self._path,
+                sep=r"\s+",
+                usecols=[0, 1] + list(range(8, 11)) + list(range(14, 17)),
+            )
         # check for duplicate sites
-        if show_warnings and len(df['site'].unique()) > 1:
-            warn(f"Timeseries file/folder {self._path} contains multiple site codes: "
-                 f"{df['site'].unique()}", stacklevel=2)
+        if show_warnings and len(df["site"].unique()) > 1:
+            warn(
+                f"Timeseries file/folder {self._path} contains multiple site codes: "
+                f"{df['site'].unique()}",
+                stacklevel=2,
+            )
         # remove site column
         df.drop(columns=["site"], inplace=True)
         # convert data units
@@ -1618,47 +1875,66 @@ class UNRHighRateTimeseries(Timeseries):
         # check for duplicate timestamps
         num_duplicates = int(df.duplicated(subset="sec-J2000").sum())
         if show_warnings and (num_duplicates > 0):
-            warn(f"Timeseries file/folder {self._path} contains data for {num_duplicates} "
-                 "duplicate timestamps. Keeping first occurrences.", stacklevel=2)
+            warn(
+                f"Timeseries file/folder {self._path} contains data for "
+                f"{num_duplicates} duplicate timestamps. Keeping first occurrences.",
+                stacklevel=2,
+            )
         df.drop_duplicates(subset="sec-J2000", inplace=True)
         # create time index and rename columns
-        df["sec-J2000"] = (pd.Timestamp("2000-01-01 12:00:00") +
-                           pd.to_timedelta(df["sec-J2000"], unit="s"))
-        df.rename(columns={"___e-ref(m)": "east", "sig_e(m)": "east_var",
-                           "___n-ref(m)": "north", "sig_n(m)": "north_var",
-                           "___v-ref(m)": "up", "sig_v(m)": "up_var",
-                           "sec-J2000": "time"}, inplace=True)
+        df["sec-J2000"] = pd.Timestamp("2000-01-01 12:00:00") + pd.to_timedelta(
+            df["sec-J2000"], unit="s"
+        )
+        df.rename(
+            columns={
+                "___e-ref(m)": "east",
+                "sig_e(m)": "east_var",
+                "___n-ref(m)": "north",
+                "sig_n(m)": "north_var",
+                "___v-ref(m)": "up",
+                "sig_v(m)": "up_var",
+                "sec-J2000": "time",
+            },
+            inplace=True,
+        )
         df.set_index("time", inplace=True)
         # check for monotonic time index
         if not df.index.is_monotonic_increasing:
-            warn(f"Timeseries file/folder {self._path} is not ordered in time, sorting it now.",
-                 stacklevel=2)
+            warn(
+                f"Timeseries file/folder {self._path} is not ordered in time, "
+                "sorting it now.",
+                stacklevel=2,
+            )
             df.sort_index(inplace=True)
         # construct Timeseries object
-        super().__init__(dataframe=df, src="UNRHighRate", data_unit=data_unit,
-                         data_cols=["east", "north", "up"],
-                         var_cols=["east_var", "north_var", "up_var"],
-                         **kw_args)
+        super().__init__(
+            dataframe=df,
+            src="UNRHighRate",
+            data_unit=data_unit,
+            data_cols=["east", "north", "up"],
+            var_cols=["east_var", "north_var", "up_var"],
+            **kw_args,
+        )
 
     def get_arch(self) -> dict:
         """
-        Returns a JSON-compatible dictionary with all the information necessary to recreate
-        the Timeseries instance (provided the data file is available).
+        Returns a JSON-compatible dictionary with all the information necessary to
+        recreate the Timeseries instance (provided the data file is available).
 
         Returns
         -------
         dict
-            JSON-compatible dictionary sufficient to recreate the UNRTimeseries instance.
+            JSON-compatible dictionary sufficient to recreate the UNRTimeseries
+            instance.
 
         See Also
         --------
         Timeseries.get_arch : For further information.
         """
-        return {"type": "UNRHighRateTimeseries",
-                "kw_args": {"path": self._path}}
+        return {"type": "UNRHighRateTimeseries", "kw_args": {"path": self._path}}
 
 
-class F5File():
+class F5File:
     """
     Reader class that parses the contents of a single F5 file.
 
@@ -1667,36 +1943,57 @@ class F5File():
     path
         Path to the F5 ``.pos`` file.
     """
-    F5COLUMNS = ["yyyy", "mm", "dd", "HH:MM:SS",
-                 "X (m)", "Y (m)", "Z (m)", "Lat. (deg.)", "Lon. (deg.)", "Height (m)"]
+
+    F5COLUMNS = [
+        "yyyy",
+        "mm",
+        "dd",
+        "HH:MM:SS",
+        "X (m)",
+        "Y (m)",
+        "Z (m)",
+        "Lat. (deg.)",
+        "Lon. (deg.)",
+        "Height (m)",
+    ]
     """ Expected columns in the F5 file """
     F5DTYPES = defaultdict(lambda: "float", {c: str for c in F5COLUMNS[:4]})
     """ Data types in the F5 file """
 
-    def __init__(self,
-                 path: str,
-                 ) -> None:
+    def __init__(
+        self,
+        path: str,
+    ) -> None:
         # open file
         with open(path, mode="rt") as f:
             # continuously check whether the format is as expected
             assert f.readline() == "+SITE/INF\n"
             # read site info
-            self.site = {elem[0]: elem[1]
-                         for elem in [f.readline().split() for _ in range(4)]}
+            self.site = {
+                elem[0]: elem[1] for elem in [f.readline().split() for _ in range(4)]
+            }
             """ Site information """
             assert f.readline() == "-SITE/INF\n"
             assert f.readline() == "\n"
             assert f.readline() == "+SOLVER/INF\n"
             # read solver info
-            self.solver = {elem[0]: "  ".join(elem[1:])
-                           for elem in [f.readline().split() for _ in range(7)]}
+            self.solver = {
+                elem[0]: "  ".join(elem[1:])
+                for elem in [f.readline().split() for _ in range(7)]
+            }
             """ Solver information """
             assert f.readline() == "-SOLVER/INF\n"
             assert f.readline() == "\n"
             assert f.readline() == "+DATA\n"
             # read data (omitting final "-DATA" row)
-            data = pd.read_csv(f, sep=r"\s+", comment="*", engine="c",
-                               names=self.F5COLUMNS, dtype=self.F5DTYPES).iloc[:-1, :]
+            data = pd.read_csv(
+                f,
+                sep=r"\s+",
+                comment="*",
+                engine="c",
+                names=self.F5COLUMNS,
+                dtype=self.F5DTYPES,
+            ).iloc[:-1, :]
             # parse date columns as datetime
             data["yyyy"] = data[["yyyy", "mm", "dd", "HH:MM:SS"]].agg(" ".join, axis=1)
             data.drop(self.F5COLUMNS[1:4], axis="columns", inplace=True)
@@ -1732,15 +2029,16 @@ class F5Timeseries(Timeseries):
     The timezone assumed with each observation is UTC.
 
     """
-    def __init__(self,
-                 paths: list[str],
-                 data_unit: Literal["mm", "m"] = "mm",
-                 **kw_args
-                 ) -> None:
+
+    def __init__(
+        self, paths: list[str], data_unit: Literal["mm", "m"] = "mm", **kw_args
+    ) -> None:
         # initialize
-        assert (isinstance(paths, list) and all([isinstance(p, str) for p in paths])
-                and (len(paths) > 0)), \
-            f"'paths' needs to be a list of string paths, got {paths}."
+        assert (
+            isinstance(paths, list)
+            and all([isinstance(p, str) for p in paths])
+            and (len(paths) > 0)
+        ), f"'paths' needs to be a list of string paths, got {paths}."
         self._paths = paths
         if data_unit == "m":
             factor = 1
@@ -1752,20 +2050,26 @@ class F5Timeseries(Timeseries):
         f5files = [F5File(p) for p in self._paths]
         # check that they're all for the same station
         longname = f5files[0].site["ID"]
-        assert all([longname == f.site["ID"] for f in f5files]), \
-            f"Found files for different stations: {set([f.site['ID'] for f in f5files])}"
+        assert all(
+            [longname == f.site["ID"] for f in f5files]
+        ), f"Found files for different stations: {set([f.site['ID'] for f in f5files])}"
         shortname = f5files[0].site["RINEX"]
-        assert all([shortname == f.site["RINEX"] for f in f5files]), \
-            f"Found files for different stations: {set([f.site['RINEX'] for f in f5files])}"
+        assert all([shortname == f.site["RINEX"] for f in f5files]), (
+            "Found files for different stations: "
+            f"{set([f.site['RINEX'] for f in f5files])}"
+        )
         # concatenate the data into a joint DataFrame
         f5data = pd.concat([f.data for f in f5files])
         f5data.sort_index(inplace=True)
         # get first lat/lon/alt coordinates
-        ref_latlonalt = f5data[["Lat. (deg.)", "Lon. (deg.)", "Height (m)"]
-                               ].iloc[0, :].values
+        ref_latlonalt = (
+            f5data[["Lat. (deg.)", "Lon. (deg.)", "Height (m)"]].iloc[0, :].values
+        )
         # get XYZ differences from first observations
-        rel_xyz = (f5data[["X (m)", "Y (m)", "Z (m)"]].values
-                   - f5data[["X (m)", "Y (m)", "Z (m)"]].iloc[0, :].values)
+        rel_xyz = (
+            f5data[["X (m)", "Y (m)", "Z (m)"]].values
+            - f5data[["X (m)", "Y (m)", "Z (m)"]].iloc[0, :].values
+        )
         # calculate relative displacement in ENU
         rot_mat = R_ecef2enu(ref_latlonalt[1], ref_latlonalt[0])
         rel_enu = rel_xyz @ rot_mat.T
@@ -1774,34 +2078,35 @@ class F5Timeseries(Timeseries):
             rel_enu *= factor
         # build timeseries dataframe
         data_cols = ["east", "north", "up"]
-        df = pd.DataFrame(index=f5data.index, data=rel_enu,
-                          columns=data_cols)
+        df = pd.DataFrame(index=f5data.index, data=rel_enu, columns=data_cols)
         # attach station ID and location
         self._id = longname
         self._rinex = shortname
         self._location = ref_latlonalt.tolist()
         # construct Timeseries object
-        super().__init__(dataframe=df, src="F5", data_unit=data_unit,
-                         data_cols=data_cols, **kw_args)
+        super().__init__(
+            dataframe=df, src="F5", data_unit=data_unit, data_cols=data_cols, **kw_args
+        )
 
     @staticmethod
-    def from_folder(folder: str,
-                    show_warnings: bool = False,
-                    **kw_args
-                    ) -> tuple[list[str], list[tuple[float, float, float]], list[F5Timeseries]]:
+    def from_folder(
+        folder: str, show_warnings: bool = False, **kw_args
+    ) -> tuple[list[str], list[tuple[float, float, float]], list[F5Timeseries]]:
         """
-        Given the base folder of an F5 repository, find all F5 files and extract station names,
-        locations, and timeseries.
+        Given the base folder of an F5 repository, find all F5 files and extract station
+        names, locations, and timeseries.
 
         Parameters
         ----------
         folder
-            Base folder that contains the "YYYY" year folders with annual ``.pos`` F5 files
-            inside of them.
+            Base folder that contains the "YYYY" year folders with annual ``.pos`` F5
+            files inside of them.
         show_warnings
-            If ``True``, warn if there are data inconsistencies encountered while loading.
+            If ``True``, warn if there are data inconsistencies encountered while
+            loading.
         **kw_args
-            Extra arguments that are passed on to the :class:`~F5Timeseries` constructor.
+            Extra arguments that are passed on to the :class:`~F5Timeseries`
+            constructor.
 
         Returns
         -------
@@ -1817,8 +2122,14 @@ class F5Timeseries(Timeseries):
         globfile6 = "[12][0-9][0-9][0-9]/[0-9][0-9][0-9][0-9][0-9][0-9].[0-9][0-9].pos"
         # find all files matching the 5- and 6-character length formats
         p = Path(folder)
-        names = sorted(list(set([f.parts[-1].split(".")[0] for f in p.glob(globfile5)] +
-                                [f.parts[-1].split(".")[0] for f in p.glob(globfile6)])))
+        names = sorted(
+            list(
+                set(
+                    [f.parts[-1].split(".")[0] for f in p.glob(globfile5)]
+                    + [f.parts[-1].split(".")[0] for f in p.glob(globfile6)]
+                )
+            )
+        )
         locations = []
         timeseries = []
         # loop over all stations to load their files

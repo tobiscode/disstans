@@ -16,7 +16,7 @@ from .models import ModelCollection
 from .timeseries import Timeseries
 
 
-class Solution():
+class Solution:
     r"""
     Class that contains the solution output by the solver functions
     in this module, and distributes the parameters, covariances, and weights (where
@@ -47,33 +47,41 @@ class Solution():
         with ``True`` where a parameter was subject to regularization,
         and ``False`` otherwise. ``None`` defaults to all ``False``.
     """
-    def __init__(self,
-                 models: ModelCollection,
-                 parameters: np.ndarray,
-                 covariances: np.ndarray | None = None,
-                 weights: np.ndarray | None = None,
-                 obs_indices: np.ndarray | None = None,
-                 reg_indices: np.ndarray | None = None
-                 ) -> None:
+
+    def __init__(
+        self,
+        models: ModelCollection,
+        parameters: np.ndarray,
+        covariances: np.ndarray | None = None,
+        weights: np.ndarray | None = None,
+        obs_indices: np.ndarray | None = None,
+        reg_indices: np.ndarray | None = None,
+    ) -> None:
         # input checks
-        assert isinstance(models, ModelCollection), \
-            f"'models' is not a valid ModelCollection object, got {type(models)}."
-        input_types = [None if indat is None else type(indat) for indat
-                       in [parameters, covariances, weights, obs_indices, reg_indices]]
-        assert all([(intype is None) or (intype == np.ndarray) for intype in input_types]), \
-            f"Unsupported input data types where not None: {input_types}."
+        assert isinstance(
+            models, ModelCollection
+        ), f"'models' is not a valid ModelCollection object, got {type(models)}."
+        input_types = [
+            None if indat is None else type(indat)
+            for indat in [parameters, covariances, weights, obs_indices, reg_indices]
+        ]
+        assert all(
+            [(intype is None) or (intype == np.ndarray) for intype in input_types]
+        ), f"Unsupported input data types where not None: {input_types}."
         if reg_indices is not None:
-            assert reg_indices.size == parameters.shape[0], \
-                "Unexpected parameter size mismatch: " \
+            assert reg_indices.size == parameters.shape[0], (
+                "Unexpected parameter size mismatch: "
                 f"{reg_indices.size} != {parameters.shape}[0]"
+            )
         # get the number of parameters and components, and match them with obs_indices
         num_components = parameters.shape[1]
         num_parameters = models.num_parameters
         if obs_indices is None:
-            assert parameters.shape[0] == num_parameters, \
-                "No 'obs_indices' was passed, but the shape of 'parameters' " \
-                f"{parameters.shape} does not match the total number of parameters " \
+            assert parameters.shape[0] == num_parameters, (
+                "No 'obs_indices' was passed, but the shape of 'parameters' "
+                f"{parameters.shape} does not match the total number of parameters "
                 f"{num_parameters} in its first dimension."
+            )
             obs_indices = np.s_[:]
         # skip the packing of weights if there isn't any regularization or weights
         if np.any(weights) and np.any(reg_indices):
@@ -99,7 +107,7 @@ class Solution():
         model_ix_start_len = {}
         ix_model = 0
         # ix_sol = 0
-        for (mdl_description, model) in models.collection.items():
+        for mdl_description, model in models.collection.items():
             # save index range
             model_ix_start_len[mdl_description] = (ix_model, model.num_parameters)
             ix_model += model.num_parameters
@@ -125,8 +133,8 @@ class Solution():
         """ Number of components the solution was computed for. """
         self.converged = np.all(np.isfinite(parameters))
         """
-        ``True``, if all values in the estimated parameters were finite (i.e., the solution
-        converged), ``False`` otherwise.
+        ``True``, if all values in the estimated parameters were finite (i.e., the
+        solution converged), ``False`` otherwise.
         """
 
     def __contains__(self, mdl_description: str) -> bool:
@@ -135,10 +143,9 @@ class Solution():
         """
         return mdl_description in self._model_slice_ranges
 
-    def get_model_indices(self,
-                          models: str | list[str],
-                          for_cov: bool = False
-                          ) -> np.ndarray:
+    def get_model_indices(
+        self, models: str | list[str], for_cov: bool = False
+    ) -> np.ndarray:
         """
         Given a model name or multiple names, returns an array of integer indices that
         can be used to extract the relevant entries from :attr:`~parameters` and
@@ -163,19 +170,23 @@ class Solution():
         elif isinstance(models, list):
             model_list = models
         else:
-            raise ValueError("Model key(s) need to be a string or list of strings, "
-                             f"got {models}.")
+            raise ValueError(
+                "Model key(s) need to be a string or list of strings, " f"got {models}."
+            )
         # build combined slice
         nc = self.num_components if for_cov else 1
-        combined_ranges = np.concatenate([np.arange(ix * nc, (ix + num) * nc) for m, (ix, num)
-                                          in self._model_slice_ranges.items()
-                                          if m in model_list]).astype(int)
+        combined_ranges = np.concatenate(
+            [
+                np.arange(ix * nc, (ix + num) * nc)
+                for m, (ix, num) in self._model_slice_ranges.items()
+                if m in model_list
+            ]
+        ).astype(int)
         return np.sort(combined_ranges)
 
-    def parameters_by_model(self,
-                            models: str | list[str],
-                            zeroed: bool = False
-                            ) -> np.ndarray:
+    def parameters_by_model(
+        self, models: str | list[str], zeroed: bool = False
+    ) -> np.ndarray:
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the parameters for (a) specific model(s).
@@ -198,10 +209,9 @@ class Solution():
         else:
             return self.parameters[indices, :]
 
-    def covariances_by_model(self,
-                             models: str | list[str],
-                             zeroed: bool = False
-                             ) -> np.ndarray:
+    def covariances_by_model(
+        self, models: str | list[str], zeroed: bool = False
+    ) -> np.ndarray:
         """
         Helper function that uses :meth:`~get_model_indices` to quickly
         return the covariances for (a) specific model(s).
@@ -270,18 +280,19 @@ class Solution():
 
     @property
     def model_list(self) -> list[str]:
-        """ List of models present in the solution. """
+        """List of models present in the solution."""
         return list(self._model_slice_ranges.keys())
 
     @staticmethod
-    def aggregate_models(results_dict: dict[str, Solution],
-                         mdl_description: str,
-                         key_list: list[str] | None = None,
-                         stack_parameters: bool = False,
-                         stack_covariances: bool = False,
-                         stack_weights: bool = False,
-                         zeroed: bool = False
-                         ) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
+    def aggregate_models(
+        results_dict: dict[str, Solution],
+        mdl_description: str,
+        key_list: list[str] | None = None,
+        stack_parameters: bool = False,
+        stack_covariances: bool = False,
+        stack_weights: bool = False,
+        zeroed: bool = False,
+    ) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
         """
         For a dictionary of Solution objects (e.g. one per station) and a given
         model description, aggregate the model parameters, variances and parameter
@@ -319,25 +330,32 @@ class Solution():
             If ``stack_covariances=True`` and covariances are present in the models,
             the stacked component covariances, ``None`` if not present everywhere.
         stacked_weights
-            If ``stack_weights=True`` and regularization weights are present in the models,
-            the stacked weights, ``None`` if not present everywhere.
+            If ``stack_weights=True`` and regularization weights are present in the
+            models, the stacked weights, ``None`` if not present everywhere.
         """
         # input checks
-        assert isinstance(mdl_description, str), \
-            f"'mdl_description' needs to be a single string, got {mdl_description}."
-        assert any([stack_parameters, stack_covariances, stack_weights]), \
-            "Called 'aggregate_models' without anything to aggregate."
-        assert (isinstance(results_dict, dict) and
-                all([isinstance(mdl_sol, Solution) for mdl_sol in results_dict.values()])), \
-            f"'results_dict' needs to be a dictionary of Solution objects, got {results_dict}."
+        assert isinstance(
+            mdl_description, str
+        ), f"'mdl_description' needs to be a single string, got {mdl_description}."
+        assert any(
+            [stack_parameters, stack_covariances, stack_weights]
+        ), "Called 'aggregate_models' without anything to aggregate."
+        assert isinstance(results_dict, dict) and all(
+            [isinstance(mdl_sol, Solution) for mdl_sol in results_dict.values()]
+        ), (
+            "'results_dict' needs to be a dictionary of Solution objects, "
+            f"got {results_dict}."
+        )
         if key_list is None:
             key_list = list(results_dict.keys())
         # collect output
         out = []
         # parameters
         if stack_parameters:
-            stack = [results_dict[key].parameters_by_model(mdl_description, zeroed=zeroed)
-                     for key in key_list]
+            stack = [
+                results_dict[key].parameters_by_model(mdl_description, zeroed=zeroed)
+                for key in key_list
+            ]
             stack_shapes = [mdl.shape for mdl in stack]
             if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
                 out.append(np.stack(stack))
@@ -345,8 +363,11 @@ class Solution():
                 out.append(None)
         # covariances
         if stack_covariances:
-            stack = [results_dict[key].covariances_by_model(mdl_description, zeroed=zeroed)
-                     for key in key_list if results_dict[key].covariances is not None]
+            stack = [
+                results_dict[key].covariances_by_model(mdl_description, zeroed=zeroed)
+                for key in key_list
+                if results_dict[key].covariances is not None
+            ]
             stack_shapes = [mdl.shape for mdl in stack]
             if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
                 out.append(np.stack(stack))
@@ -354,32 +375,35 @@ class Solution():
                 out.append(None)
         # weights
         if stack_weights:
-            stack = [results_dict[key].weights_by_model(mdl_description)
-                     for key in key_list if results_dict[key].weights is not None]
+            stack = [
+                results_dict[key].weights_by_model(mdl_description)
+                for key in key_list
+                if results_dict[key].weights is not None
+            ]
             stack_shapes = [mdl.shape for mdl in stack]
             if (len(stack) > 0) and (stack_shapes.count(stack_shapes[0]) == len(stack)):
                 out.append(np.stack(stack))
             else:
                 out.append(None)
         # return each item individually
-        return (*out, )
+        return (*out,)
 
 
 class ReweightingFunction(ABC):
     """
-    Base class for reweighting functions for :meth:`~disstans.network.Network.spatialfit`,
-    that convert a model parameter magnitude into a penalty value. For large magnitudes,
-    the penalties approach zero, and for small magnitudes, the penalties approach
-    "infinity", i.e. very large values.
+    Base class for reweighting functions for
+    :meth:`~disstans.network.Network.spatialfit`, that convert a model parameter
+    magnitude into a penalty value. For large magnitudes, the penalties approach zero,
+    and for small magnitudes, the penalties approach "infinity", i.e. very large values.
 
     Usually, the :attr:`~eps` value determines where the transition between significant
     and insignificant (i.e., essentially zero) parameters, and the scale modifies the
-    maximum penalty for insignificant parameters (with the exact maximum penalty dependent
-    on the chose reweighting function).
+    maximum penalty for insignificant parameters (with the exact maximum penalty
+    dependent on the chose reweighting function).
 
     At initialization, the :attr:`~eps` parameter is set. Inheriting child classes need
-    to define the :meth:`~__call__` method that determines the actual reweighting mechanism.
-    Instantiated reweighting functions objects can be used as functions but
+    to define the :meth:`~__call__` method that determines the actual reweighting
+    mechanism. Instantiated reweighting functions objects can be used as functions but
     still provide access to the :attr:`~eps` parameter.
 
     Parameters
@@ -389,6 +413,7 @@ class ReweightingFunction(ABC):
     scale
         Scale parameter applied to reweighting result.
     """
+
     def __init__(self, eps: float, scale: float = 1) -> None:
         self.eps = float(eps)
         """ Stability parameter to use for the reweighting function. """
@@ -425,8 +450,9 @@ class ReweightingFunction(ABC):
         elif name in ["log", "LogarithmicReweighting"]:
             return LogarithmicReweighting(*args, **kw_args)
         else:
-            raise NotImplementedError(f"The reweighting function {name} "
-                                      "could not be found.")
+            raise NotImplementedError(
+                f"The reweighting function {name} " "could not be found."
+            )
 
 
 class InverseReweighting(ReweightingFunction):
@@ -456,14 +482,15 @@ class InverseReweighting(ReweightingFunction):
 class InverseSquaredReweighting(ReweightingFunction):
     def __call__(self, m: np.ndarray) -> np.ndarray:
         r"""
-        Reweighting function based on the inverse squared of the input based on [candes08]_:
+        Reweighting function based on the inverse squared of the input based on
+        [candes08]_:
 
         .. math::
             w(m_j) = \frac{\text{scale}}{m_j^2 + \text{eps}^2}
 
         The maximum penalty (:math:`y`-intercept) can be approximated as
-        :math:`\frac{\text{scale}}{\text{eps}^2}`, and the minimum penalty approaches zero
-        asymptotically.
+        :math:`\frac{\text{scale}}{\text{eps}^2}`, and the minimum penalty approaches
+        zero asymptotically.
 
         Parameters
         ----------
@@ -494,8 +521,9 @@ class LogarithmicReweighting(ReweightingFunction):
         :math:`\text{scale} \cdot \log_\text{num_reg} \frac{\| \mathbf{m} \|_1}{\text{eps}}`.
         If there is only a single nonzero value, its penalty will be zero (at
         :math:`|m_j|=\| \mathbf{m} \|_1`).
-        In the intermediate cases where multiple values are nonzero, their penalties will
-        be distributed on a logarithmic slope between the :math:`y`-intercept and zero.
+        In the intermediate cases where multiple values are nonzero, their penalties
+        will be distributed on a logarithmic slope between the :math:`y`-intercept and
+        zero.
 
         Parameters
         ----------
@@ -514,19 +542,23 @@ class LogarithmicReweighting(ReweightingFunction):
         """
         mags = np.abs(m)
         size = mags.size
-        weight = np.log((mags.sum() + size * self.eps) / (mags + self.eps)) / np.log(size)
+        weight = np.log((mags.sum() + size * self.eps) / (mags + self.eps)) / np.log(
+            size
+        )
         return self.scale * weight
 
 
-def linear_regression(ts: Timeseries,
-                      models: ModelCollection,
-                      formal_covariance: bool = False,
-                      use_data_variance: bool = True,
-                      use_data_covariance: bool = True,
-                      check_constraints: bool = True
-                      ) -> Solution:
+def linear_regression(
+    ts: Timeseries,
+    models: ModelCollection,
+    formal_covariance: bool = False,
+    use_data_variance: bool = True,
+    use_data_covariance: bool = True,
+    check_constraints: bool = True,
+) -> Solution:
     r"""
-    Performs linear, unregularized least squares using :func:`~scipy.optimize.lsq_linear`.
+    Performs linear, unregularized least squares using
+    :func:`~scipy.optimize.lsq_linear`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single mapping matrix
@@ -564,7 +596,8 @@ def linear_regression(ts: Timeseries,
         information will be used.
     use_data_covariance
         If ``True``, ``ts`` contains variance and covariance information, and
-        ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+        ``use_data_variance`` is also ``True``, this uncertainty information will be
+        used.
     check_constraints
         If ``True``, check whether models have sign constraints that should
         be enforced.
@@ -575,10 +608,13 @@ def linear_regression(ts: Timeseries,
     """
 
     # get mapping matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps, num_obs, sign_constraints = \
-        models.prepare_LS(ts,  # noqa: F841
-                          include_regularization=False,
-                          check_constraints=check_constraints)
+    G, obs_indices, num_time, num_params, num_comps, num_obs, sign_constraints = (
+        models.prepare_LS(
+            ts,  # noqa: F841
+            include_regularization=False,
+            check_constraints=check_constraints,
+        )
+    )
     # make constraint bounds
     if check_constraints and np.isfinite(sign_constraints).sum() > 0:
         bd_upper = np.inf * np.ones_like(sign_constraints)
@@ -597,10 +633,14 @@ def linear_regression(ts: Timeseries,
         if formal_covariance:
             cov = []
         for i in range(num_comps):
-            GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
-                                         use_data_var=use_data_variance)
-            bounds = ((bd_lower[:, i], bd_upper[:, i]) if check_constraints
-                      else (-np.inf, np.inf))
+            GtWG, GtWd = models.build_LS(
+                ts, G, obs_indices, icomp=i, use_data_var=use_data_variance
+            )
+            bounds = (
+                (bd_lower[:, i], bd_upper[:, i])
+                if check_constraints
+                else (-np.inf, np.inf)
+            )
             params[:, i] = sp.optimize.lsq_linear(GtWG, GtWd, bounds=bounds).x.squeeze()
             if formal_covariance:
                 cov.append(sp.linalg.pinvh(GtWG))
@@ -610,34 +650,48 @@ def linear_regression(ts: Timeseries,
             P = block_permutation(num_comps, num_params)
             cov = P @ cov @ P.T
     else:
-        GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
-                                     use_data_cov=use_data_covariance)
-        bounds = ((bd_lower.ravel(), bd_upper.ravel()) if check_constraints
-                  else (-np.inf, np.inf))
-        params = sp.optimize.lsq_linear(GtWG, GtWd, bounds=bounds).x.reshape(num_obs, num_comps)
+        GtWG, GtWd = models.build_LS(
+            ts,
+            G,
+            obs_indices,
+            use_data_var=use_data_variance,
+            use_data_cov=use_data_covariance,
+        )
+        bounds = (
+            (bd_lower.ravel(), bd_upper.ravel())
+            if check_constraints
+            else (-np.inf, np.inf)
+        )
+        params = sp.optimize.lsq_linear(GtWG, GtWd, bounds=bounds).x.reshape(
+            num_obs, num_comps
+        )
         if formal_covariance:
             cov = sp.linalg.pinvh(GtWG)
 
     # create solution object and return
-    return Solution(models=models, parameters=params, covariances=cov,
-                    obs_indices=obs_indices)
+    return Solution(
+        models=models, parameters=params, covariances=cov, obs_indices=obs_indices
+    )
 
 
-def ridge_regression(ts: Timeseries,
-                     models: ModelCollection,
-                     penalty: float | list[float] | np.ndarray,
-                     formal_covariance: bool = False,
-                     use_data_variance: bool = True,
-                     use_data_covariance: bool = True,
-                     check_constraints: bool = True
-                     ) -> Solution:
+def ridge_regression(
+    ts: Timeseries,
+    models: ModelCollection,
+    penalty: float | list[float] | np.ndarray,
+    formal_covariance: bool = False,
+    use_data_variance: bool = True,
+    use_data_covariance: bool = True,
+    check_constraints: bool = True,
+) -> Solution:
     r"""
-    Performs linear, L2-regularized least squares using :func:`~scipy.optimize.lsq_linear`.
+    Performs linear, L2-regularized least squares using
+    :func:`~scipy.optimize.lsq_linear`.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single mapping matrix
-    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver then
-    computes the model parameters :math:`\mathbf{m}` that minimize the cost function
+    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver
+    then computes the model parameters :math:`\mathbf{m}` that minimize the cost
+    function
 
     .. math:: f(\mathbf{m}) = \left\| \mathbf{Gm} - \mathbf{d} \right\|_2^2
               + \lambda \left\| \mathbf{m}_\text{reg} \right\|_2^2
@@ -672,8 +726,8 @@ def ridge_regression(ts: Timeseries,
         Model collection used for fitting.
     penalty
         Penalty hyperparameter :math:`\lambda`.
-        It can either be a single value used for all components, or a list or NumPy array
-        specifying a penalty for each component in the data.
+        It can either be a single value used for all components, or a list or NumPy
+        array specifying a penalty for each component in the data.
     formal_covariance
         If ``True``, calculate the formal model covariance.
     use_data_variance
@@ -681,7 +735,8 @@ def ridge_regression(ts: Timeseries,
         information will be used.
     use_data_covariance
         If ``True``, ``ts`` contains variance and covariance information, and
-        ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+        ``use_data_variance`` is also ``True``, this uncertainty information will be
+        used.
     check_constraints
         If ``True``, check whether models have sign constraints that should
         be enforced.
@@ -695,18 +750,35 @@ def ridge_regression(ts: Timeseries,
     if penalty.size == 1:
         penalty = np.repeat(penalty, ts.num_components)
     elif penalty.size != ts.num_components:
-        raise ValueError(f"'penalty' has a size of {penalty.size}, but needs to either "
-                         "be a single value, or one value per timeseries component "
-                         f"({ts.num_components}).")
+        raise ValueError(
+            f"'penalty' has a size of {penalty.size}, but needs to either "
+            "be a single value, or one value per timeseries component "
+            f"({ts.num_components})."
+        )
     if np.any(penalty < 0) or np.all(penalty == 0):
-        warn("Ridge Regression (L2-regularized) solver got an invalid penalty of "
-             f"{penalty}; penalties should be non-negative, and at least contain "
-             "one value larger than 0.", stacklevel=2)
+        warn(
+            "Ridge Regression (L2-regularized) solver got an invalid penalty of "
+            f"{penalty}; penalties should be non-negative, and at least contain "
+            "one value larger than 0.",
+            stacklevel=2,
+        )
 
     # get mapping and regularization matrix and sizes
-    G, obs_indices, num_time, num_params, num_comps, num_obs, num_reg, reg_indices, \
-        _, _, sign_constraints = models.prepare_LS(ts,  # noqa: F841
-                                                   check_constraints=check_constraints)
+    (
+        G,
+        obs_indices,
+        num_time,
+        num_params,
+        num_comps,
+        num_obs,
+        num_reg,
+        reg_indices,
+        _,
+        _,
+        sign_constraints,
+    ) = models.prepare_LS(
+        ts, check_constraints=check_constraints  # noqa: F841
+    )
     # make constraint bounds
     if check_constraints and np.isfinite(sign_constraints).sum() > 0:
         bd_upper = np.inf * np.ones_like(sign_constraints)
@@ -726,12 +798,18 @@ def ridge_regression(ts: Timeseries,
         if formal_covariance:
             cov = []
         for i in range(num_comps):
-            GtWG, GtWd = models.build_LS(ts, G, obs_indices, icomp=i,
-                                         use_data_var=use_data_variance)
+            GtWG, GtWd = models.build_LS(
+                ts, G, obs_indices, icomp=i, use_data_var=use_data_variance
+            )
             GtWGreg = GtWG + reg * penalty[i]
-            bounds = ((bd_lower[:, i], bd_upper[:, i]) if check_constraints
-                      else (-np.inf, np.inf))
-            params[:, i] = sp.optimize.lsq_linear(GtWGreg, GtWd, bounds=bounds).x.squeeze()
+            bounds = (
+                (bd_lower[:, i], bd_upper[:, i])
+                if check_constraints
+                else (-np.inf, np.inf)
+            )
+            params[:, i] = sp.optimize.lsq_linear(
+                GtWGreg, GtWd, bounds=bounds
+            ).x.squeeze()
             if formal_covariance:
                 cov.append(sp.linalg.pinvh(GtWGreg))
         if formal_covariance:
@@ -740,46 +818,59 @@ def ridge_regression(ts: Timeseries,
             P = block_permutation(num_comps, num_params)
             cov = P @ cov @ P.T
     else:
-        GtWG, GtWd = models.build_LS(ts, G, obs_indices, use_data_var=use_data_variance,
-                                     use_data_cov=use_data_covariance)
+        GtWG, GtWd = models.build_LS(
+            ts,
+            G,
+            obs_indices,
+            use_data_var=use_data_variance,
+            use_data_cov=use_data_covariance,
+        )
         reg = np.diag((reg_indices.reshape(-1, 1) * penalty.reshape(1, -1)).ravel())
         GtWGreg = GtWG + reg
-        bounds = ((bd_lower.ravel(), bd_upper.ravel()) if check_constraints
-                  else (-np.inf, np.inf))
-        params = sp.optimize.lsq_linear(GtWGreg, GtWd, bounds=bounds).x.reshape(num_obs, num_comps)
+        bounds = (
+            (bd_lower.ravel(), bd_upper.ravel())
+            if check_constraints
+            else (-np.inf, np.inf)
+        )
+        params = sp.optimize.lsq_linear(GtWGreg, GtWd, bounds=bounds).x.reshape(
+            num_obs, num_comps
+        )
         if formal_covariance:
             cov = sp.linalg.pinvh(GtWGreg)
 
     # create solution object and return
-    return Solution(models=models, parameters=params, covariances=cov,
-                    obs_indices=obs_indices)
+    return Solution(
+        models=models, parameters=params, covariances=cov, obs_indices=obs_indices
+    )
 
 
-def lasso_regression(ts: Timeseries,
-                     models: ModelCollection,
-                     penalty: float | list[float] | np.ndarray,
-                     reweight_max_iters: int | None = None,
-                     reweight_func: ReweightingFunction | None = None,
-                     reweight_max_rss: float = 1e-9,
-                     reweight_init: list[np.ndarray] | dict[str, np.ndarray] | np.ndarray = None,
-                     reweight_coupled: bool = True,
-                     formal_covariance: bool = False,
-                     use_data_variance: bool = True,
-                     use_data_covariance: bool = True,
-                     use_internal_scales: bool = True,
-                     cov_zero_threshold: float = 1e-6,
-                     return_weights: bool = False,
-                     check_constraints: bool = True,
-                     cvxpy_kw_args: dict = {"solver": "SCS"}
-                     ) -> Solution:
+def lasso_regression(
+    ts: Timeseries,
+    models: ModelCollection,
+    penalty: float | list[float] | np.ndarray,
+    reweight_max_iters: int | None = None,
+    reweight_func: ReweightingFunction | None = None,
+    reweight_max_rss: float = 1e-9,
+    reweight_init: list[np.ndarray] | dict[str, np.ndarray] | np.ndarray = None,
+    reweight_coupled: bool = True,
+    formal_covariance: bool = False,
+    use_data_variance: bool = True,
+    use_data_covariance: bool = True,
+    use_internal_scales: bool = True,
+    cov_zero_threshold: float = 1e-6,
+    return_weights: bool = False,
+    check_constraints: bool = True,
+    cvxpy_kw_args: dict = {"solver": "SCS"},
+) -> Solution:
     r"""
     Performs linear, L1-regularized least squares using
     `CVXPY <https://www.cvxpy.org/index.html>`_.
 
     The timeseries are the observations :math:`\mathbf{d}`, and the models' mapping
     matrices are stacked together to form a single, sparse mapping matrix
-    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver then
-    computes the model parameters :math:`\mathbf{m}` that minimize the cost function
+    :math:`\mathbf{G}`. Given the penalty hyperparameter :math:`\lambda`, the solver
+    then computes the model parameters :math:`\mathbf{m}` that minimize the cost
+    function
 
     .. math:: f(\mathbf{m}) = \left\| \mathbf{Gm} - \mathbf{d} \right\|_2^2
               + \lambda \left\| \mathbf{m}_\text{reg} \right\|_1
@@ -799,17 +890,18 @@ def lasso_regression(ts: Timeseries,
 
     .. math:: \mathbf{d} \rightarrow \mathbf{G}^T \mathbf{C}_d^{-1} \mathbf{d}
 
-    If ``reweight_max_iters`` is specified, sparsity of the solution parameters is promoted
-    by iteratively reweighting the penalty parameter for each regularized parameter based
-    on its current value, approximating the L0 norm rather than the L1 norm (see Notes).
+    If ``reweight_max_iters`` is specified, sparsity of the solution parameters is
+    promoted by iteratively reweighting the penalty parameter for each regularized
+    parameter based on its current value, approximating the L0 norm rather than the L1
+    norm (see Notes).
 
     The formal model covariance :math:`\mathbf{C}_m` is defined as being zero except in
-    the rows and columns corresponding to non-zero parameters (as defined my the absolute
-    magnitude set by ``cov_zero_threshold``), where it is defined exactly as the
-    unregularized version (see :func:`~disstans.solvers.linear_regression`), restricted to
-    those same rows and columns. (This definition might very well be mathematically
-    or algorithmically wrong - there probably needs to be some dependence on the
-    reweighting function.)
+    the rows and columns corresponding to non-zero parameters (as defined my the
+    absolute magnitude set by ``cov_zero_threshold``), where it is defined exactly as
+    the unregularized version (see :func:`~disstans.solvers.linear_regression`),
+    restricted to those same rows and columns. (This definition might very well be
+    mathematically or algorithmically wrong - there probably needs to be some dependence
+    on the reweighting function.)
 
     Parameters
     ----------
@@ -819,11 +911,11 @@ def lasso_regression(ts: Timeseries,
         Model collection used for fitting.
     penalty
         Penalty hyperparameter :math:`\lambda`.
-        It can either be a single value used for all components, or a list or NumPy array
-        specifying a penalty for each component in the data.
+        It can either be a single value used for all components, or a list or NumPy
+        array specifying a penalty for each component in the data.
     reweight_max_iters
-        If an integer, number of solver iterations (see Notes), resulting in reweighting.
-        ``None`` defaults to no reweighting.
+        If an integer, number of solver iterations (see Notes), resulting in
+        reweighting. ``None`` defaults to no reweighting.
     reweight_func
         If reweighting is active, the reweighting function instance to be used.
     reweight_max_rss
@@ -848,14 +940,15 @@ def lasso_regression(ts: Timeseries,
     formal_covariance
         If ``True``, calculate the formal model covariance.
     use_data_variance
-        If ``True`` and ``ts`` contains variance information, this uncertainty information
-        will be used.
+        If ``True`` and ``ts`` contains variance information, this uncertainty
+        information will be used.
     use_data_covariance
         If ``True``, ``ts`` contains variance and covariance information, and
-        ``use_data_variance`` is also ``True``, this uncertainty information will be used.
+        ``use_data_variance`` is also ``True``, this uncertainty information will be
+        used.
     use_internal_scales
-        If ``True``, the reweighting takes into account potential model-specific internal
-        scaling parameters, otherwise ignores them.
+        If ``True``, the reweighting takes into account potential model-specific
+        internal scaling parameters, otherwise ignores them.
     cov_zero_threshold
         When extracting the formal covariance matrix, assume parameters with absolute
         values smaller than ``cov_zero_threshold`` are effectively zero.
@@ -876,10 +969,11 @@ def lasso_regression(ts: Timeseries,
     Notes
     -----
 
-    The L0-regularization approximation used by setting ``reweight_max_iters >= 0`` is based
-    on [candes08]_. The idea here is to iteratively reduce the cost (before multiplication
-    with :math:`\lambda`) of regularized, but significant, parameters to 0, and iteratively
-    increase the cost of a regularized, but small, parameter to a much larger value.
+    The L0-regularization approximation used by setting ``reweight_max_iters >= 0`` is
+    based on [candes08]_. The idea here is to iteratively reduce the cost (before
+    multiplication with :math:`\lambda`) of regularized, but significant, parameters to
+    0, and iteratively increase the cost of a regularized, but small, parameter to a
+    much larger value.
 
     This is achieved by introducing an additional parameter vector :math:`\mathbf{w}`
     of the same shape as the regularized parameters, inserting it into the L1 cost,
@@ -906,10 +1000,10 @@ def lasso_regression(ts: Timeseries,
     If reweighting is active and ``reweight_coupled=True``, :math:`\lambda`
     is moved into the norm and combined with :math:`\mathbf{w}`, such that
     the reweighting applies to the product of both.
-    Furthermore, if ``reweight_init`` is also not ``None``, then the ``penalty`` is ignored
-    since it should already be contained in the passed weights array.
-    (If ``reweight_coupled=False``, :math:`\lambda` is always applied separately, regardless
-    of whether initial weights are passed or not.)
+    Furthermore, if ``reweight_init`` is also not ``None``, then the ``penalty`` is
+    ignored since it should already be contained in the passed weights array.
+    (If ``reweight_coupled=False``, :math:`\lambda` is always applied separately,
+    regardless of whether initial weights are passed or not.)
 
     Note that the orders of magnitude between the penalties computed by the different
     reweighting functions for the same input parameters can differ significantly, even
@@ -927,21 +1021,41 @@ def lasso_regression(ts: Timeseries,
     if penalty.size == 1:
         penalty = np.repeat(penalty, ts.num_components)
     elif penalty.size != ts.num_components:
-        raise ValueError(f"'penalty' has a size of {penalty.size}, but needs to either "
-                         "be a single value, or one value per timeseries component "
-                         f"({ts.num_components}).")
+        raise ValueError(
+            f"'penalty' has a size of {penalty.size}, but needs to either "
+            "be a single value, or one value per timeseries component "
+            f"({ts.num_components})."
+        )
     if np.any(penalty < 0) or np.all(penalty == 0):
-        warn("Lasso Regression (L1-regularized) solver got an invalid penalty of "
-             f"{penalty}; penalties should be non-negative, and at least contain "
-             "one value larger than 0.", stacklevel=2)
-    assert float(cov_zero_threshold) > 0, \
-        f"'cov_zero_threshold needs to be non-negative, got {cov_zero_threshold}."
+        warn(
+            "Lasso Regression (L1-regularized) solver got an invalid penalty of "
+            f"{penalty}; penalties should be non-negative, and at least contain "
+            "one value larger than 0.",
+            stacklevel=2,
+        )
+    assert (
+        float(cov_zero_threshold) > 0
+    ), f"'cov_zero_threshold needs to be non-negative, got {cov_zero_threshold}."
 
     # get mapping and regularization matrix
-    G, obs_indices, _, _, num_comps, num_obs, num_reg, reg_indices, \
-        reweight_init, weights_scaling, sign_constraints = models.prepare_LS(
-            ts, reweight_init=reweight_init, use_internal_scales=True,
-            check_constraints=check_constraints)
+    (
+        G,
+        obs_indices,
+        _,
+        _,
+        num_comps,
+        num_obs,
+        num_reg,
+        reg_indices,
+        reweight_init,
+        weights_scaling,
+        sign_constraints,
+    ) = models.prepare_LS(
+        ts,
+        reweight_init=reweight_init,
+        use_internal_scales=True,
+        check_constraints=check_constraints,
+    )
     # determine if a shortcut is possible
     regularize = (num_reg > 0) and (np.any(penalty > 0))
     if (not regularize) or (reweight_max_iters is None):
@@ -952,8 +1066,10 @@ def lasso_regression(ts: Timeseries,
     else:
         assert isinstance(reweight_max_iters, int) and reweight_max_iters > 0
         n_iters = int(reweight_max_iters)
-        assert isinstance(reweight_func, ReweightingFunction), "'reweight_func' " \
+        assert isinstance(reweight_func, ReweightingFunction), (
+            "'reweight_func' "
             f"needs to be a ReweightingFunction, got {type(reweight_func)}."
+        )
     # determine if reg_indices and weights_scaling need a reshape
     if (ts.cov_cols is not None) and use_data_covariance:
         reg_indices = np.repeat(reg_indices, num_comps)
@@ -985,22 +1101,24 @@ def lasso_regression(ts: Timeseries,
                     if reweight_coupled:
                         init_weights *= pen
                 else:
-                    assert init_weights.size == weights_size, \
-                        f"'init_weights' must have a size of {weights_size}, " + \
-                        f"got {init_weights.size}."
-                weights = cp.Parameter(shape=weights_size,
-                                       value=init_weights, pos=True)
+                    assert init_weights.size == weights_size, (
+                        f"'init_weights' must have a size of {weights_size}, "
+                        + f"got {init_weights.size}."
+                    )
+                weights = cp.Parameter(shape=weights_size, value=init_weights, pos=True)
                 if reweight_coupled:
                     objective = objective + cp.norm1(z)
                 else:
-                    lambd = cp.Parameter(shape=() if num_comps == 1 else pen.size,
-                                         value=pen, pos=True)
+                    lambd = cp.Parameter(
+                        shape=() if num_comps == 1 else pen.size, value=pen, pos=True
+                    )
                     objective = objective + cp.norm1(cp.multiply(lambd, z))
                 constraints.append(z == cp.multiply(weights, m[reg_indices]))
                 old_m = np.zeros(m.shape)
             else:
-                lambd = cp.Parameter(shape=() if num_comps == 1 else pen.size,
-                                     value=pen, pos=True)
+                lambd = cp.Parameter(
+                    shape=() if num_comps == 1 else pen.size, value=pen, pos=True
+                )
                 constraints.append(z == cp.multiply(lambd, m[reg_indices]))
                 objective = objective + cp.norm1(z)
         # define problem
@@ -1024,11 +1142,15 @@ def lasso_regression(ts: Timeseries,
                 if regularize and reweight_max_iters is not None:
                     # update weights
                     if use_internal_scales and (weights_scaling is not None):
-                        weights.value = reweight_func(m.value[reg_indices] * weights_scaling)
+                        weights.value = reweight_func(
+                            m.value[reg_indices] * weights_scaling
+                        )
                     else:
                         weights.value = reweight_func(m.value[reg_indices])
                     # check if the solution changed to previous iteration
-                    if (i > 0) and (np.sqrt(np.sum((old_m - m.value)**2)) < reweight_max_rss):
+                    if (i > 0) and (
+                        np.sqrt(np.sum((old_m - m.value) ** 2)) < reweight_max_rss
+                    ):
                         break
                     # remember previous solution
                     old_m[:] = m.value[:]
@@ -1058,18 +1180,30 @@ def lasso_regression(ts: Timeseries,
         for i in range(num_comps):
             # build and solve problem
             Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
-                ts, G, obs_indices, icomp=i, return_W_G=True, use_data_var=use_data_variance)
-            solution, wts = solve_problem(GtWG, GtWd, pen=penalty[i], num_comps=1,
-                                          init_weights=reweight_init[:, i]
-                                          if reweight_init is not None else None,
-                                          nonneg=nonneg_indices[:, i]
-                                          if check_constraints
-                                          and nonneg_indices[:, i].sum() > 0
-                                          else None,
-                                          nonpos=nonpos_indices[:, i]
-                                          if check_constraints
-                                          and nonpos_indices[:, i].sum() > 0
-                                          else None)
+                ts,
+                G,
+                obs_indices,
+                icomp=i,
+                return_W_G=True,
+                use_data_var=use_data_variance,
+            )
+            solution, wts = solve_problem(
+                GtWG,
+                GtWd,
+                pen=penalty[i],
+                num_comps=1,
+                init_weights=reweight_init[:, i] if reweight_init is not None else None,
+                nonneg=(
+                    nonneg_indices[:, i]
+                    if check_constraints and nonneg_indices[:, i].sum() > 0
+                    else None
+                ),
+                nonpos=(
+                    nonpos_indices[:, i]
+                    if check_constraints and nonpos_indices[:, i].sum() > 0
+                    else None
+                ),
+            )
             # store results
             if solution is None:
                 params[:, i] = np.nan
@@ -1103,19 +1237,31 @@ def lasso_regression(ts: Timeseries,
             cov = P @ cov @ P.T
     else:
         # build stacked problem and solve
-        Gnonan, Wnonan, GtWG, GtWd = models.build_LS(ts, G, obs_indices, return_W_G=True,
-                                                     use_data_var=use_data_variance,
-                                                     use_data_cov=use_data_covariance)
-        solution, wts = solve_problem(GtWG, GtWd, pen=np.tile(penalty, num_reg),
-                                      num_comps=num_comps,
-                                      init_weights=reweight_init.ravel()
-                                      if reweight_init is not None else None,
-                                      nonneg=nonneg_indices.ravel()
-                                      if check_constraints and nonneg_indices.sum() > 0
-                                      else None,
-                                      nonpos=nonpos_indices.ravel()
-                                      if check_constraints and nonpos_indices.sum() > 0
-                                      else None)
+        Gnonan, Wnonan, GtWG, GtWd = models.build_LS(
+            ts,
+            G,
+            obs_indices,
+            return_W_G=True,
+            use_data_var=use_data_variance,
+            use_data_cov=use_data_covariance,
+        )
+        solution, wts = solve_problem(
+            GtWG,
+            GtWd,
+            pen=np.tile(penalty, num_reg),
+            num_comps=num_comps,
+            init_weights=reweight_init.ravel() if reweight_init is not None else None,
+            nonneg=(
+                nonneg_indices.ravel()
+                if check_constraints and nonneg_indices.sum() > 0
+                else None
+            ),
+            nonpos=(
+                nonpos_indices.ravel()
+                if check_constraints and nonpos_indices.sum() > 0
+                else None
+            ),
+        )
         # store results
         if solution is None:
             params = np.empty((num_obs, num_comps))
@@ -1146,5 +1292,11 @@ def lasso_regression(ts: Timeseries,
         reg_indices = reg_indices[::num_comps]
 
     # create solution object and return
-    return Solution(models=models, parameters=params, covariances=cov, weights=weights,
-                    obs_indices=obs_indices, reg_indices=reg_indices)
+    return Solution(
+        models=models,
+        parameters=params,
+        covariances=cov,
+        weights=weights,
+        obs_indices=obs_indices,
+        reg_indices=reg_indices,
+    )

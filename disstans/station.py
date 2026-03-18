@@ -20,7 +20,7 @@ from .models import Model, ModelCollection, FitCollection
 from .tools import tvec_to_numpycol
 
 
-class Station():
+class Station:
     """
     Representation of a station, which contains both metadata
     such as location as well as timeseries, models and fits.
@@ -36,10 +36,10 @@ class Station():
     location
         Location (Latitude [°], Longitude [°], Altitude [m]) of the station.
     """
-    def __init__(self,
-                 name: str,
-                 location: list[float] | tuple[float, float, float] | np.ndarray
-                 ) -> np.ndarray:
+
+    def __init__(
+        self, name: str, location: list[float] | tuple[float, float, float] | np.ndarray
+    ) -> np.ndarray:
         self.name = str(name)
         """ Name of the station. """
         if isinstance(location, np.ndarray):
@@ -124,13 +124,15 @@ class Station():
             stat[ts_description]
         """
         if ts_description not in self.timeseries:
-            raise KeyError(f"Station {self.name}: No timeseries '{ts_description}' present.")
+            raise KeyError(
+                f"Station {self.name}: No timeseries '{ts_description}' present."
+            )
         return self.timeseries[ts_description]
 
     def __setitem__(self, ts_description: str, timeseries: Timeseries) -> None:
         """
-        Convenience special function that allows a dictionary-like adding of timeseries to
-        the station by wrapping :meth:`~add_timeseries`.
+        Convenience special function that allows a dictionary-like adding of timeseries
+        to the station by wrapping :meth:`~add_timeseries`.
 
         See Also
         --------
@@ -140,8 +142,8 @@ class Station():
 
     def __delitem__(self, ts_description: str) -> None:
         """
-        Convenience special function that allows a dictionary-like removing of timeseries from
-        the station by wrapping :meth:`~remove_timeseries`.
+        Convenience special function that allows a dictionary-like removing of
+        timeseries from the station by wrapping :meth:`~remove_timeseries`.
 
         See Also
         --------
@@ -214,30 +216,31 @@ class Station():
             :class:`~disstans.models.Model` instance.
         """
         # create empty dictionary
-        stat_arch = {"location": self.location,
-                     "timeseries": {},
-                     "models": {}}
+        stat_arch = {"location": self.location, "timeseries": {}, "models": {}}
         # add each timeseries and model
         for ts_description, ts in self.timeseries.items():
             ts_arch = ts.get_arch()
             if ts_arch != {}:
                 stat_arch["timeseries"].update({ts_description: ts_arch})
             if len(self.models[ts_description]) > 0:
-                stat_arch["models"][ts_description] = self.models[ts_description].get_arch()
+                stat_arch["models"][ts_description] = self.models[
+                    ts_description
+                ].get_arch()
         return stat_arch
 
-    def add_timeseries(self,
-                       ts_description: str,
-                       timeseries: Timeseries,
-                       uncertainties_from: Timeseries | None = None,
-                       override_src: str | None = None,
-                       override_data_unit: str | None = None,
-                       override_data_cols: str | None = None,
-                       override_var_cols: str | None = None,
-                       override_cov_cols: str | None = None,
-                       add_models: dict[str, Model] | None = None,
-                       warn_existing: bool = True
-                       ) -> None:
+    def add_timeseries(
+        self,
+        ts_description: str,
+        timeseries: Timeseries,
+        uncertainties_from: Timeseries | None = None,
+        override_src: str | None = None,
+        override_data_unit: str | None = None,
+        override_data_cols: str | None = None,
+        override_var_cols: str | None = None,
+        override_cov_cols: str | None = None,
+        add_models: dict[str, Model] | None = None,
+        warn_existing: bool = True,
+    ) -> None:
         """
         Add a timeseries to the station.
 
@@ -270,32 +273,40 @@ class Station():
             attribute of ``timeseries``.
         add_models
             Dictionary of models to add to the timeseries, where the keys are the
-            model description and the values are :class:`~disstans.models.Model` objects.
+            model description and the values are :class:`~disstans.models.Model`
+            objects.
         warn_existing
             Issue a warning if a station's timeseries is being overwritten.
 
         See Also
         --------
-        __setitem__ : Shorthand notation wrapper when no optional arguments are necessary.
+        __setitem__
+            Shorthand notation wrapper when no optional arguments are necessary.
 
         Example
         -------
-        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description
-        of a new timeseries, and ``ts`` a :class:`~disstans.timeseries.Timeseries` instance,
-        then the following two are equivalent::
+        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the
+        ts_description of a new timeseries, and ``ts`` a
+        :class:`~disstans.timeseries.Timeseries` instance, then the following two are
+        equivalent::
 
             stat.add_timeseries(ts_description, timeseries)
             stat[ts_description] = timeseries
         """
         if not isinstance(ts_description, str):
-            raise TypeError("Cannot add new timeseries: "
-                            "'ts_description' is not a string.")
+            raise TypeError(
+                "Cannot add new timeseries: " "'ts_description' is not a string."
+            )
         if not isinstance(timeseries, Timeseries):
-            raise TypeError("Cannot add new timeseries: "
-                            "'timeseries' is not a Timeseries object.")
+            raise TypeError(
+                "Cannot add new timeseries: " "'timeseries' is not a Timeseries object."
+            )
         if warn_existing and (ts_description in self.timeseries):
-            warn(f"Station {self.name}: Overwriting time series '{ts_description}'.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Station {self.name}: Overwriting time series '{ts_description}'.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         if uncertainties_from is not None:
             timeseries.add_uncertainties(timeseries=uncertainties_from)
         if override_src is not None:
@@ -312,7 +323,9 @@ class Station():
         self.fits[ts_description] = FitCollection()
         self.models[ts_description] = ModelCollection()
         if add_models is not None:
-            self.add_local_model_dict(ts_description=ts_description, model_kw_args=add_models)
+            self.add_local_model_dict(
+                ts_description=ts_description, model_kw_args=add_models
+            )
 
     def remove_timeseries(self, ts_description: str) -> None:
         """
@@ -329,26 +342,28 @@ class Station():
 
         Example
         -------
-        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the ts_description
-        of the timeseries to remove, then the following two are equivalent::
+        If ``stat`` is a :class:`~Station` instance, ``ts_description`` the
+        ts_description of the timeseries to remove, then the following two are
+        equivalent::
 
             stat.remove_timeseries(ts_description)
             del stat[ts_description]
         """
         if ts_description not in self.timeseries:
-            warn(f"Station {self.name}: "
-                 f"Cannot find time series '{ts_description}', couldn't delete.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Station {self.name}: "
+                f"Cannot find time series '{ts_description}', couldn't delete.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         else:
             del self.timeseries[ts_description]
             del self.fits[ts_description]
             del self.models[ts_description]
 
-    def add_local_model(self,
-                        ts_description: str,
-                        model_description: str,
-                        model: Model
-                        ) -> None:
+    def add_local_model(
+        self, ts_description: str, model_description: str, model: Model
+    ) -> None:
         """
         Add a model to a timeseries (overwrites the model if it has already
         been added with the same description).
@@ -363,24 +378,37 @@ class Station():
             Model object.
         """
         if not isinstance(ts_description, str):
-            raise TypeError("Cannot add new local model: 'ts_description' is not a string.")
+            raise TypeError(
+                "Cannot add new local model: 'ts_description' is not a string."
+            )
         if not isinstance(model_description, str):
-            raise TypeError("Cannot add new local model: 'model_description' is not a string.")
+            raise TypeError(
+                "Cannot add new local model: 'model_description' is not a string."
+            )
         if not isinstance(model, Model):
-            raise TypeError("Cannot add new local model: 'model' is not a Model object.")
-        assert ts_description in self.timeseries, \
-            f"Station {self.name}: " \
-            f"Cannot find timeseries '{ts_description}' to add local model '{model_description}'."
+            raise TypeError(
+                "Cannot add new local model: 'model' is not a Model object."
+            )
+        assert ts_description in self.timeseries, (
+            f"Station {self.name}: "
+            f"Cannot find timeseries '{ts_description}' "
+            f"to add local model '{model_description}'."
+        )
         if model_description in self.models[ts_description].model_names:
-            warn(f"Station {self.name}, timeseries {ts_description}: "
-                 f"Overwriting local model '{model_description}'.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Station {self.name}, timeseries {ts_description}: "
+                f"Overwriting local model '{model_description}'.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         self.models[ts_description][model_description] = model
 
-    def add_local_model_dict(self, ts_description: str, model_dict: dict[str, Model]) -> None:
+    def add_local_model_dict(
+        self, ts_description: str, model_dict: dict[str, Model]
+    ) -> None:
         """
-        Add a dictionary of models to a timeseries (overwrites the models if they have already
-        been added with the same description).
+        Add a dictionary of models to a timeseries (overwrites the models if they have
+        already been added with the same description).
 
         Wraps :meth:`~add_local_model`.
 
@@ -391,18 +419,19 @@ class Station():
         model_dict
             Dictionary of ``{model_description: model}`` key-value pairs to add.
         """
-        assert isinstance(model_dict, dict), \
-            f"'model_dict' needs to be a dictionary, got {type(model_dict)}."
+        assert isinstance(
+            model_dict, dict
+        ), f"'model_dict' needs to be a dictionary, got {type(model_dict)}."
         for mdl_desc, mdl in model_dict.items():
             self.add_local_model(ts_description, mdl_desc, mdl)
 
-    def add_local_model_kwargs(self,
-                               ts_description: str,
-                               model_kw_args: dict[str, dict[str, Any]]
-                               ) -> None:
+    def add_local_model_kwargs(
+        self, ts_description: str, model_kw_args: dict[str, dict[str, Any]]
+    ) -> None:
         """
-        Add models to a timeseries from a dictionary of keyword arguments needed to create
-        them (overwrites the models if they have already been added with the same description).
+        Add models to a timeseries from a dictionary of keyword arguments needed to
+        create them (overwrites the models if they have already been added with the same
+        description).
 
         Wraps :meth:`~add_local_model`.
 
@@ -412,21 +441,23 @@ class Station():
             Timeseries to add the model to.
         model_kw_args
             Dictionary of structure ``{model_name: {"type": modelclass, "kw_args":
-            {**kw_args}}}`` that contains the names, types and necessary keyword arguments
-            to create each model object.
+            {**kw_args}}}`` that contains the names, types and necessary keyword
+            arguments to create each model object.
         """
         disstans_models.check_model_dict(model_kw_args)
         for mdl_desc, mdl_cfg in model_kw_args.items():
             local_copy = deepcopy(mdl_cfg)
             mdl = getattr(disstans_models, local_copy["type"])(**local_copy["kw_args"])
-            self.add_local_model(ts_description=ts_description,
-                                 model_description=mdl_desc, model=mdl)
+            self.add_local_model(
+                ts_description=ts_description, model_description=mdl_desc, model=mdl
+            )
 
-    def remove_local_models(self,
-                            ts_description: str,
-                            model_descriptions: str | list[str],
-                            verbose: bool = False
-                            ) -> None:
+    def remove_local_models(
+        self,
+        ts_description: str,
+        model_descriptions: str | list[str],
+        verbose: bool = False,
+    ) -> None:
         """
         Remove models from a timeseries.
 
@@ -453,20 +484,27 @@ class Station():
                     if mdl_desc in self.fits[ts_description]:
                         del self.fits[ts_description][mdl_desc]
                 elif verbose:
-                    warn(f"Station {self.name}, timeseries {ts_description}: "
-                         f"Cannot find local model '{mdl_desc}', couldn't delete.",
-                         category=RuntimeWarning, stacklevel=2)
+                    warn(
+                        f"Station {self.name}, timeseries {ts_description}: "
+                        f"Cannot find local model '{mdl_desc}', couldn't delete.",
+                        category=RuntimeWarning,
+                        stacklevel=2,
+                    )
             elif verbose:
-                warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
-                     f"couldn't delete local model '{mdl_desc}'.",
-                     category=RuntimeWarning, stacklevel=2)
+                warn(
+                    f"Station {self.name}: Cannot find timeseries '{ts_description}', "
+                    f"couldn't delete local model '{mdl_desc}'.",
+                    category=RuntimeWarning,
+                    stacklevel=2,
+                )
 
-    def add_fit(self,
-                ts_description: str,
-                fit: dict[str, np.ndarray | None],
-                model_description: str | None = None,
-                return_ts: bool = False
-                ) -> Timeseries | None:
+    def add_fit(
+        self,
+        ts_description: str,
+        fit: dict[str, np.ndarray | None],
+        model_description: str | None = None,
+        return_ts: bool = False,
+    ) -> Timeseries | None:
         """
         Add a fit dictionary to a timeseries' model (overwrites the fit if it has
         already been added for the model).
@@ -491,25 +529,34 @@ class Station():
         See Also
         --------
         disstans.timeseries.Timeseries.from_fit
-            Convert a fit dictionary to a :class:`~disstans.timeseries.Timeseries` object.
+            Convert a fit dictionary to a :class:`~disstans.timeseries.Timeseries`
+            object.
         """
         if not isinstance(ts_description, str):
             raise TypeError("Cannot add new fit: 'ts_description' is not a string.")
         if not (isinstance(model_description, str) or (model_description is None)):
             raise TypeError("Cannot add new fit: 'model_description' is not a string.")
-        assert ts_description in self.timeseries, \
-            f"Station {self.name}: Cannot find timeseries '{ts_description}' " \
+        assert ts_description in self.timeseries, (
+            f"Station {self.name}: Cannot find timeseries '{ts_description}' "
             f"to add fit for model '{model_description}'."
+        )
         if model_description is None:
-            data_cols = [ts_description + "_Model_" + dcol
-                         for dcol in self.timeseries[ts_description].data_cols]
+            data_cols = [
+                ts_description + "_Model_" + dcol
+                for dcol in self.timeseries[ts_description].data_cols
+            ]
         else:
-            data_cols = [ts_description + "_" + str(model_description) + "_" + dcol
-                         for dcol in self.timeseries[ts_description].data_cols]
-            assert model_description in self.models[ts_description], \
-                f"Station {self.name}, timeseries {ts_description}: " \
+            data_cols = [
+                ts_description + "_" + str(model_description) + "_" + dcol
+                for dcol in self.timeseries[ts_description].data_cols
+            ]
+            assert model_description in self.models[ts_description], (
+                f"Station {self.name}, timeseries {ts_description}: "
                 f"Cannot find local model '{model_description}', couldn't add fit."
-        fit_ts = Timeseries.from_fit(self.timeseries[ts_description].data_unit, data_cols, fit)
+            )
+        fit_ts = Timeseries.from_fit(
+            self.timeseries[ts_description].data_unit, data_cols, fit
+        )
         if model_description is None:
             self.fits[ts_description].allfits = fit_ts
         else:
@@ -529,24 +576,32 @@ class Station():
             Model description to remove the fit from.
         """
         if ts_description not in self.timeseries:
-            warn(f"Station {self.name}: Cannot find timeseries '{ts_description}', "
-                 f"couldn't delete fit for model '{model_description}'.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Station {self.name}: Cannot find timeseries '{ts_description}', "
+                f"couldn't delete fit for model '{model_description}'.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         elif model_description not in self.models[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: "
-                 f"Cannot find local model '{model_description}', couldn't delete fit.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Station {self.name}, timeseries {ts_description}: "
+                f"Cannot find local model '{model_description}', couldn't delete fit.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         elif model_description not in self.fits[ts_description]:
-            warn(f"Station {self.name}, timeseries {ts_description}: "
-                 f"Cannot find fit for local model '{model_description}', couldn't delete.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Station {self.name}, timeseries {ts_description}: Cannot "
+                f"find fit for local model '{model_description}', couldn't delete.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         else:
             del self.fits[ts_description][model_description]
 
-    def sum_fits(self,
-                 ts_description: str,
-                 fit_list: list[str] | None = None
-                 ) -> tuple[np.ndarray, np.ndarray | None]:
+    def sum_fits(
+        self, ts_description: str, fit_list: list[str] | None = None
+    ) -> tuple[np.ndarray, np.ndarray | None]:
         r"""
         Method to quickly sum fits of a timeseries.
 
@@ -555,8 +610,8 @@ class Station():
         ts_description
             Timeseries whose fits to sum.
         fit_list
-            List of strings containing the model names of the subset of the fitted models
-            to be summed. ``None`` defaults to all fitted models.
+            List of strings containing the model names of the subset of the fitted
+            models to be summed. ``None`` defaults to all fitted models.
 
         Returns
         -------
@@ -568,18 +623,24 @@ class Station():
         """
         # shorthand for timeseries
         ts = self[ts_description]
-        assert fit_list is None or isinstance(fit_list, list), \
-            f"'fit_list' needs to be None or a list, got {type(fit_list)}."
+        assert fit_list is None or isinstance(
+            fit_list, list
+        ), f"'fit_list' needs to be None or a list, got {type(fit_list)}."
         # get model subset
-        fits_to_sum = {model_description: fit
-                       for model_description, fit in self.fits[ts_description].items()
-                       if ((fit_list is None) or (model_description in fit_list))}
-        assert fits_to_sum, \
-            f"Station {self.name}, timeseries {ts_description}: Can't find fits for models."
+        fits_to_sum = {
+            model_description: fit
+            for model_description, fit in self.fits[ts_description].items()
+            if ((fit_list is None) or (model_description in fit_list))
+        }
+        assert fits_to_sum, (
+            f"Station {self.name}, timeseries {ts_description}: "
+            "Can't find fits for models."
+        )
         # sum models and uncertainties
         fit_sum = np.zeros((ts.num_observations, ts.num_components))
-        if (ts.var_cols is not None) and all([fit.var_cols is not None
-                                              for fit in fits_to_sum.values()]):
+        if (ts.var_cols is not None) and all(
+            [fit.var_cols is not None for fit in fits_to_sum.values()]
+        ):
             fit_sum_var = np.zeros_like(fit_sum)
         else:
             fit_sum_var = None
@@ -589,18 +650,19 @@ class Station():
                 fit_sum_var += fit.vars.values
         return fit_sum, fit_sum_var
 
-    def analyze_residuals(self,
-                          ts_description: str,
-                          verbose: bool = False,
-                          t_start: str | pd.Timestamp | None = None,
-                          t_end: str | pd.Timestamp | None = None,
-                          mean: bool = False,
-                          std: bool = False,
-                          rms: bool = False,
-                          n_observations: bool = False,
-                          std_outlier: int | float = 0,
-                          max_rolling_dev: int = 0
-                          ) -> dict[str, np.ndarray]:
+    def analyze_residuals(
+        self,
+        ts_description: str,
+        verbose: bool = False,
+        t_start: str | pd.Timestamp | None = None,
+        t_end: str | pd.Timestamp | None = None,
+        mean: bool = False,
+        std: bool = False,
+        rms: bool = False,
+        n_observations: bool = False,
+        std_outlier: int | float = 0,
+        max_rolling_dev: int = 0,
+    ) -> dict[str, np.ndarray]:
         """
         Analyze, print and return the residuals of a station's timeseries according
         to certain metrics defined in the arguments.
@@ -649,11 +711,13 @@ class Station():
             Empty by default.
         """
         # do checks
-        assert isinstance(ts_description, str), \
-            f"Station {self.name}: " \
+        assert isinstance(ts_description, str), (
+            f"Station {self.name}: "
             f"'ts_description' needs to be a string, got {type(ts_description)}."
-        assert ts_description in self.timeseries, \
-            f"Station {self.name}: Can't find '{ts_description}' to analyze."
+        )
+        assert (
+            ts_description in self.timeseries
+        ), f"Station {self.name}: Can't find '{ts_description}' to analyze."
         # restrict to time range
         ts = self[ts_description]
         t_start = pd.Timestamp(t_start) if t_start is not None else ts.time[0]
@@ -671,8 +735,9 @@ class Station():
         if rms:
             if not isinstance(rms, list):
                 rms = list(range(self[ts_description].num_components))
-            rms_result = ((ts.iloc[:, rms] ** 2)
-                          .mean(axis=0, skipna=True, numeric_only=True) ** 0.5)
+            rms_result = (ts.iloc[:, rms] ** 2).mean(
+                axis=0, skipna=True, numeric_only=True
+            ) ** 0.5
         if n_observations:
             n_obs = ts.count(axis=0, numeric_only=True).values
             results["Observations"] = n_obs
@@ -684,41 +749,47 @@ class Station():
             temp = temp > np.std(temp, axis=0, keepdims=True) * std_outlier
             results["Outliers"] = np.sum(temp, axis=0, dtype=int)
         if max_rolling_dev > 0:
-            roll_mean = (ts - ts.mean()).rolling(max_rolling_dev,
-                                                 min_periods=max_rolling_dev // 2
-                                                 ).mean().values
+            roll_mean = (
+                (ts - ts.mean())
+                .rolling(max_rolling_dev, min_periods=max_rolling_dev // 2)
+                .mean()
+                .values
+            )
             if np.isfinite(roll_mean.ravel()).sum() == 0:
                 results["Maximum Rolling Deviation"] = np.nan
             else:
                 roll_mean_max_ix = np.nanargmax(np.abs(roll_mean), axis=0)
-                max_rolling_dev = np.take_along_axis(roll_mean,
-                                                     np.expand_dims(roll_mean_max_ix, axis=0),
-                                                     axis=0).squeeze(axis=0)
+                max_rolling_dev = np.take_along_axis(
+                    roll_mean, np.expand_dims(roll_mean_max_ix, axis=0), axis=0
+                ).squeeze(axis=0)
                 results["Maximum Rolling Deviation"] = max_rolling_dev
         # print if any statistic was recorded
         if verbose and results:
             print_df = pd.DataFrame(data=results, index=self[ts_description].data_cols)
             print(print_df.rename_axis(f"{self.name}: {ts_description}", axis=1))
             if rms:
-                print(f"RMS of components {rms}: "
-                      f"{rms_result} {self[ts_description].data_unit}")
+                print(
+                    f"RMS of components {rms}: "
+                    f"{rms_result} {self[ts_description].data_unit}"
+                )
         # attach RMS here since it couldn't be added to the DataFrame before
         if rms:
             results["RMS"] = rms_result
         return results
 
-    def get_trend(self,
-                  ts_description: str,
-                  fit_list: list[str] | None = None,
-                  components: list[int] | None = None,
-                  total: bool = False,
-                  t_start: str | pd.Timestamp | None = None,
-                  t_end: str | pd.Timestamp | None = None,
-                  use_formal_variance: bool | None = None,
-                  include_sigma: bool = False,
-                  time_unit: str = "D",
-                  ignore_missing: bool = False
-                  ) -> tuple[np.ndarray | None, np.ndarray | None]:
+    def get_trend(
+        self,
+        ts_description: str,
+        fit_list: list[str] | None = None,
+        components: list[int] | None = None,
+        total: bool = False,
+        t_start: str | pd.Timestamp | None = None,
+        t_end: str | pd.Timestamp | None = None,
+        use_formal_variance: bool | None = None,
+        include_sigma: bool = False,
+        time_unit: str = "D",
+        ignore_missing: bool = False,
+    ) -> tuple[np.ndarray | None, np.ndarray | None]:
         r"""
         Calculates a linear trend through the desired model fits (or timeseries data)
         and over some time span.
@@ -728,10 +799,10 @@ class Station():
         ts_description
             Timeseries whose fits to use.
         fit_list
-            List of strings containing the model names of the subset of the fitted models
-            to be used. ``None`` defaults to all fitted models.
-            If ``ts_description`` the trend of the timeseries itself is to be calculated,
-            pass an empty list (``[]``).
+            List of strings containing the model names of the subset of the fitted
+            models to be used. ``None`` defaults to all fitted models.
+            If ``ts_description`` the trend of the timeseries itself is to be
+            calculated, pass an empty list (``[]``).
         components
             List of the numerical indices of which components of the timeseries to use.
             ``None`` defaults to all components.
@@ -746,11 +817,13 @@ class Station():
             Timestamp-convertible string of the end time.
             ``None`` defaults to the last timestamp present in the timeseries.
         use_formal_variance
-            By default, the trend fitting will use variance information if present. This usually
-            makes sense for actual timeseries, but not for fitted models where the formal variance
-            can be very unphysical. Setting this parameter overrides the default behavior.
+            By default, the trend fitting will use variance information if present. This
+            usually makes sense for actual timeseries, but not for fitted models where
+            the formal variance can be very unphysical. Setting this parameter overrides
+            the default behavior.
         include_sigma
-            If ``True``, also calculate the formal standard deviation on the trend estimate.
+            If ``True``, also calculate the formal standard deviation on the trend
+            estimate.
         time_unit
             Time unit for output (only required if ``total=False``).
         ignore_missing
@@ -765,14 +838,18 @@ class Station():
             1D array of size ``len(components)`` containing the trends.
         trend_sigma
             1D array of size ``len(components)`` containing the standard deviation of
-            the trend estimate. Returns ``None`` if no standard deviations are available.
+            the trend estimate.
+            Returns ``None`` if no standard deviations are available.
         """
-        assert isinstance(ts_description, str), \
-            f"Station {self.name}: " \
+        assert isinstance(ts_description, str), (
+            f"Station {self.name}: "
             f"'ts_description' needs to be a string, got {type(ts_description)}."
+        )
         try:
-            assert ts_description in self.timeseries, \
-                f"Station {self.name}: Can't find '{ts_description}' to calculate a trend for."
+            assert ts_description in self.timeseries, (
+                f"Station {self.name}: Can't find '{ts_description}' "
+                "to calculate a trend for."
+            )
         except AssertionError:
             if ignore_missing:  # fail softly
                 return None, None
@@ -782,18 +859,22 @@ class Station():
             if isinstance(fit_list, str):
                 fit_list = [fit_list]
             else:
-                assert isinstance(fit_list, list), "'fit_list' needs to be None, a string, " \
+                assert isinstance(fit_list, list), (
+                    "'fit_list' needs to be None, a string, "
                     f"or a list, got {type(fit_list)}."
+                )
             if len(fit_list) == 0:
                 # use data instead of fits
                 use_fits = False
             else:
                 # use a model subset list
                 try:
-                    assert (self.models[ts_description] and
-                            any([f in self.models[ts_description] for f in fit_list])), \
-                        f"Station {self.name}, timeseries {ts_description}: " \
+                    assert self.models[ts_description] and any(
+                        [f in self.models[ts_description] for f in fit_list]
+                    ), (
+                        f"Station {self.name}, timeseries {ts_description}: "
                         "Can't find any models."
+                    )
                 except AssertionError:
                     if ignore_missing:  # fail softly
                         return None, None
@@ -809,9 +890,10 @@ class Station():
         if components is None:
             components = list(range(ts.num_components))
         else:
-            assert max(components) < ts.num_components, \
-                f"Station {self.name}, timeseries {ts_description}: " \
+            assert max(components) < ts.num_components, (
+                f"Station {self.name}, timeseries {ts_description}: "
                 "Requesting non-existent components."
+            )
         n_comps = len(components)
         # get time span
         t_start = pd.Timestamp(t_start) if t_start is not None else ts.time[0]
@@ -847,8 +929,13 @@ class Station():
                 Gsub = G
             else:
                 if fit_sum_var is not None:
-                    validsub = np.all((np.isfinite(fit_sum[inside, icomp]),
-                                       np.isfinite(fit_sum_var[inside, icomp])), axis=0)
+                    validsub = np.all(
+                        (
+                            np.isfinite(fit_sum[inside, icomp]),
+                            np.isfinite(fit_sum_var[inside, icomp]),
+                        ),
+                        axis=0,
+                    )
                 else:
                     validsub = np.isfinite(fit_sum[inside, icomp])
                 Gsub = G[validsub, :]
@@ -869,17 +956,19 @@ class Station():
                     trend_sigma[icomp] = np.sqrt(sp.linalg.pinvh(GtWG)[1, 1])
         return (trend, trend_sigma) if include_sigma else (trend, None)
 
-    def get_trend_change(self,
-                         ts_description: str,
-                         check_times: pd.Series | pd.DatetimeIndex,
-                         window_size: float,
-                         window_unit: str = "D",
-                         min_change: float = 0.0,
-                         return_signs: bool = True
-                         ) -> list[list[int | None]]:
+    def get_trend_change(
+        self,
+        ts_description: str,
+        check_times: pd.Series | pd.DatetimeIndex,
+        window_size: float,
+        window_unit: str = "D",
+        min_change: float = 0.0,
+        return_signs: bool = True,
+    ) -> list[list[int | None]]:
         """
-        Calculates the (linear) trends of a timeseries before and after given timestamps,
-        and return for each one whether the trend increased, decreased, or stayed the same.
+        Calculates the (linear) trends of a timeseries before and after given
+        timestamps, and return for each one whether the trend increased, decreased, or
+        stayed the same.
 
         Parameters
         ----------
@@ -903,14 +992,17 @@ class Station():
         Returns
         -------
             A nested array containing for each checked timestamp (first level) and each
-            Timeseries data component (second level) whether the trend change is positive
-            (``+1``), negative (``-1``), or undetermined (``None``, either due to missing
-            data or a ``min_change`` larger than ``0``).
+            Timeseries data component (second level) whether the trend change is
+            positive (``+1``), negative (``-1``), or undetermined (``None``, either due
+            to missing data or a ``min_change`` larger than ``0``).
         """
         # initial check
-        assert min_change >= 0, f"'min_change' needs to be non-negative, got {min_change}."
-        assert ts_description in self, \
-            f"Timeseries '{ts_description}' not present in Station {self.name}."
+        assert (
+            min_change >= 0
+        ), f"'min_change' needs to be non-negative, got {min_change}."
+        assert (
+            ts_description in self
+        ), f"Timeseries '{ts_description}' not present in Station {self.name}."
         # initialize output
         ts = self[ts_description]
         trend_change = []
@@ -926,26 +1018,30 @@ class Station():
             t_plus = ts.time[ts.time >= t_rounded][0]
             t_minus = ts.time[ts.time < t_rounded][-1]
             # calculate the two trends
-            trend_before = self.get_trend(ts_description=ts_description,
-                                          fit_list=[],
-                                          components=None,
-                                          total=False,
-                                          t_start=t - window,
-                                          t_end=t_minus,
-                                          use_formal_variance=True,
-                                          include_sigma=False,
-                                          time_unit=window_unit,
-                                          ignore_missing=False)[0]
-            trend_after = self.get_trend(ts_description=ts_description,
-                                         fit_list=[],
-                                         components=None,
-                                         total=False,
-                                         t_start=t_plus,
-                                         t_end=t + window,
-                                         use_formal_variance=True,
-                                         include_sigma=False,
-                                         time_unit=window_unit,
-                                         ignore_missing=False)[0]
+            trend_before = self.get_trend(
+                ts_description=ts_description,
+                fit_list=[],
+                components=None,
+                total=False,
+                t_start=t - window,
+                t_end=t_minus,
+                use_formal_variance=True,
+                include_sigma=False,
+                time_unit=window_unit,
+                ignore_missing=False,
+            )[0]
+            trend_after = self.get_trend(
+                ts_description=ts_description,
+                fit_list=[],
+                components=None,
+                total=False,
+                t_start=t_plus,
+                t_end=t + window,
+                use_formal_variance=True,
+                include_sigma=False,
+                time_unit=window_unit,
+                ignore_missing=False,
+            )[0]
             # if at least one trend couldn't be calculated, continue early
             if (trend_before is None) or (trend_after is None):
                 trend_change.append([None] * ts.num_components)
@@ -953,10 +1049,15 @@ class Station():
             # save trend change
             trend_diff = trend_after - trend_before
             if return_signs:
-                trend_change.append([np.sign(td).astype(int) if np.abs(td) > min_change
-                                     else None for td in trend_diff])
+                trend_change.append(
+                    [
+                        np.sign(td).astype(int) if np.abs(td) > min_change else None
+                        for td in trend_diff
+                    ]
+                )
             else:
-                trend_change.append([td if np.abs(td) > min_change
-                                     else None for td in trend_diff])
+                trend_change.append(
+                    [td if np.abs(td) > min_change else None for td in trend_diff]
+                )
         # done
         return trend_change

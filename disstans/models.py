@@ -23,7 +23,7 @@ from .tools import tvec_to_numpycol, Timedelta, full_cov_mat_to_columns, cov2cor
 from .timeseries import Timeseries
 
 
-class Model():
+class Model:
     r"""
     Base class for models.
 
@@ -46,21 +46,21 @@ class Model():
     the observations.
 
     Models are always active by default, i.e. they implement a certain functional form
-    that can be evaluated at any time. By setting the :attr:`~t_start` and :attr:`~t_end`
-    attributes, this behavior can be changed, so that it is only defined on that interval,
-    and is zero or continuous outside of that interval (see the attributes
-    :attr:`~zero_before` and :attr:`~zero_after`).
+    that can be evaluated at any time. By setting the :attr:`~t_start` and
+    :attr:`~t_end` attributes, this behavior can be changed, so that it is only defined
+    on that interval, and is zero or continuous outside of that interval (see the
+    attributes :attr:`~zero_before` and :attr:`~zero_after`).
 
     The usual workflow is to instantiate a model, then fit it to a timeseries, saving
     the parameters, and then evaluate it later. For synthetic timeseries, it is
     instantiated and the parameters are set manually.
 
-    A minimal user-defined subclass should look similar to :class:`~disstans.models.Polynomial`
-    or :class:`~disstans.models.Exponential`. Three methods need to be provided: an
-    ``__init__()`` function that takes in any model-specific parameters and passes all
-    other parameters into the parent class through ``super().__init__()``, as well as
-    both :meth:`~get_mapping_single` and :meth:`~_get_arch` (see the base class' documentation
-    for expected in- and output).
+    A minimal user-defined subclass should look similar to
+    :class:`~disstans.models.Polynomial` or :class:`~disstans.models.Exponential`.
+    Three methods need to be provided: an ``__init__()`` function that takes in any
+    model-specific parameters and passes all other parameters into the parent class
+    through ``super().__init__()``, as well as both :meth:`~get_mapping_single` and
+    :meth:`~_get_arch` (see the base class' documentation for expected in- and output).
 
     Appendix A.2 of [koehne23]_ describes in detail the approach to models in DISSTANS.
 
@@ -105,22 +105,24 @@ class Model():
     single precision, but can be changed to double precision if desired.
     """
 
-    def __init__(self,
-                 num_parameters: int,
-                 regularize: bool = False,
-                 time_unit: str = None,
-                 t_start: str | pd.Timestamp | None = None,
-                 t_end: str | pd.Timestamp | None = None,
-                 t_reference: str | pd.Timestamp | None = None,
-                 zero_before: bool = True,
-                 zero_after: bool = True
-                 ) -> None:
+    def __init__(
+        self,
+        num_parameters: int,
+        regularize: bool = False,
+        time_unit: str = None,
+        t_start: str | pd.Timestamp | None = None,
+        t_end: str | pd.Timestamp | None = None,
+        t_reference: str | pd.Timestamp | None = None,
+        zero_before: bool = True,
+        zero_after: bool = True,
+    ) -> None:
         # define model settings
         self.num_parameters = int(num_parameters)
         """ Number of parameters that define the model and can be solved for. """
-        assert self.num_parameters > 0, \
-            "'num_parameters' must be an integer greater or equal to one, " \
+        assert self.num_parameters > 0, (
+            "'num_parameters' must be an integer greater or equal to one, "
             f"got {self.num_parameters}."
+        )
         self.regularize = bool(regularize)
         """ Indicate to solvers to regularize this model (``True``) or not. """
         self.time_unit = None if time_unit is None else str(time_unit)
@@ -132,11 +134,17 @@ class Model():
         self.t_reference_str = None if t_reference is None else str(t_reference)
         """ String representation of the reference time (or ``None``). """
         self.t_start = None if t_start is None else pd.Timestamp(t_start)
-        """ :class:`~pandas.Timestamp` representation of the start time (or ``None``). """
+        """
+        :class:`~pandas.Timestamp` representation of the start time
+        (or ``None``).
+        """
         self.t_end = None if t_end is None else pd.Timestamp(t_end)
         """ :class:`~pandas.Timestamp` representation of the end time (or ``None``). """
         self.t_reference = None if t_reference is None else pd.Timestamp(t_reference)
-        """ :class:`~pandas.Timestamp` representation of the reference time (or ``None``). """
+        """
+        :class:`~pandas.Timestamp` representation of the reference time
+        (or ``None``).
+        """
         self.zero_before = bool(zero_before)
         """
         If ``True``, model will evaluate to zero before the start time, otherwise the
@@ -149,10 +157,10 @@ class Model():
         """
         self.active_parameters = None
         r"""
-        By default, all parameters in the model are considered active, and this attribute is
-        set to ``None``. Otherwise, this attribute contains an array of shape
-        :math:`(\text{num_parameters}, )` with ``True`` where parameters are active, and
-        ``False`` otherwise.
+        By default, all parameters in the model are considered active, and this
+        attribute is set to ``None``. Otherwise, this attribute contains an array of
+        shape :math:`(\text{num_parameters}, )` with ``True`` where parameters are
+        active, and ``False`` otherwise.
         """
         # initialize data variables
         self._par = None
@@ -168,7 +176,7 @@ class Model():
 
     @property
     def parameters(self) -> np.ndarray:
-        """ Alias for :attr:`~par`. """
+        """Alias for :attr:`~par`."""
         return self.par
 
     @property
@@ -187,11 +195,11 @@ class Model():
     def cov(self) -> np.ndarray | None:
         r"""
         Square array property with dimensions
-        :math:`\text{num_parameters} * \text{num_components}` that contains the parameter's
-        full covariance matrix as a NumPy array. The rows (and columns) are ordered such
-        that they first correspond to the covariances between all components for the first
-        parameter, then the covariance between all components for the second parameter,
-        and so forth.
+        :math:`\text{num_parameters} * \text{num_components}` that contains the
+        parameter's full covariance matrix as a NumPy array. The rows (and columns) are
+        ordered such that they first correspond to the covariances between all
+        components for the first parameter, then the covariance between all components
+        for the second parameter, and so forth.
         """
         return self._cov
 
@@ -208,12 +216,16 @@ class Model():
         -------
             Covariance matrix for the selected parameter.
         """
-        assert isinstance(index, int) and (0 <= index < self.num_parameters), \
-            f"'index' needs to be an integer less than the number of parameters, got {index}."
+        assert isinstance(index, int) and (0 <= index < self.num_parameters), (
+            "'index' needs to be an integer less than the number of parameters, "
+            f"got {index}."
+        )
         if self._cov is not None:
             num_comps = self._par.shape[1]
-            return self._cov[index * num_comps:(index + 1) * num_comps,
-                             index * num_comps:(index + 1) * num_comps]
+            return self._cov[
+                index * num_comps : (index + 1) * num_comps,
+                index * num_comps : (index + 1) * num_comps,
+            ]
         else:
             return None
 
@@ -279,22 +291,29 @@ class Model():
         Raises
         ------
         NotImplementedError
-            If the model has not been subclassed and :meth:`~_get_arch` has not been added.
+            If the model has not been subclassed and :meth:`~_get_arch` has not been
+            added.
         """
         # make base architecture
-        arch = {"type": "Model",
-                "num_parameters": self.num_parameters,
-                "kw_args": {"regularize": self.regularize,
-                            "time_unit": self.time_unit,
-                            "t_start": self.t_start_str,
-                            "t_end": self.t_end_str,
-                            "t_reference": self.t_reference_str,
-                            "zero_before": self.zero_before,
-                            "zero_after": self.zero_after}}
+        arch = {
+            "type": "Model",
+            "num_parameters": self.num_parameters,
+            "kw_args": {
+                "regularize": self.regularize,
+                "time_unit": self.time_unit,
+                "t_start": self.t_start_str,
+                "t_end": self.t_end_str,
+                "t_reference": self.t_reference_str,
+                "zero_before": self.zero_before,
+                "zero_after": self.zero_after,
+            },
+        }
         # get subclass-specific architecture
         instance_arch = self._get_arch()
         # update non-dictionary values
-        arch.update({arg: value for arg, value in instance_arch.items() if arg != "kw_args"})
+        arch.update(
+            {arg: value for arg, value in instance_arch.items() if arg != "kw_args"}
+        )
         # update keyword dictionary
         arch["kw_args"].update(instance_arch["kw_args"])
         return arch
@@ -308,14 +327,17 @@ class Model():
             Model keyword dictionary. Must have keys ``'type'`` and ``'kw_args'``,
             with a string and a dictionary as values, respectively.
         """
-        raise NotImplementedError("Instantiated model was not subclassed or "
-                                  "it does not overwrite the '_get_arch' method.")
+        raise NotImplementedError(
+            "Instantiated model was not subclassed or "
+            "it does not overwrite the '_get_arch' method."
+        )
 
-    def copy(self,
-             parameters: bool = True,
-             covariances: bool = True,
-             active_parameters: bool = True
-             ) -> Model:
+    def copy(
+        self,
+        parameters: bool = True,
+        covariances: bool = True,
+        active_parameters: bool = True,
+    ) -> Model:
         """
         Copy the model object.
 
@@ -355,14 +377,16 @@ class Model():
         Parameters
         ----------
         factor
-            Factor to multiply the parameters by to obtain the parameters in the new units.
+            Factor to multiply the parameters by to obtain the parameters in the new
+            units.
         """
         # input checks
         try:
             factor = float(factor)
         except TypeError as e:
-            raise TypeError(f"'factor' and has to be a scalar, got {type(factor)}."
-                            ).with_traceback(e.__traceback__) from e
+            raise TypeError(
+                f"'factor' and has to be a scalar, got {type(factor)}."
+            ).with_traceback(e.__traceback__) from e
         # convert parameters
         if self._par is not None:
             self._par *= factor
@@ -390,8 +414,9 @@ class Model():
         --------
         unfreeze : The reverse method.
         """
-        assert float(zero_threshold) > 0, \
-            f"'zero_threshold needs to be non-negative, got {zero_threshold}."
+        assert (
+            float(zero_threshold) > 0
+        ), f"'zero_threshold needs to be non-negative, got {zero_threshold}."
         if self.par is None:
             raise RuntimeError("Cannot freeze a model without set parameters.")
         self.active_parameters = np.any(np.abs(self.par) > zero_threshold, axis=1)
@@ -411,32 +436,36 @@ class Model():
         """
         self.active_parameters = None
 
-    def get_mapping(self,
-                    timevector: pd.Series | pd.DatetimeIndex,
-                    return_observability: bool = False,
-                    ignore_active_parameters: bool = False
-                    ) -> sparse.csc_matrix | tuple[sparse.csc_matrix, np.ndarray]:
+    def get_mapping(
+        self,
+        timevector: pd.Series | pd.DatetimeIndex,
+        return_observability: bool = False,
+        ignore_active_parameters: bool = False,
+    ) -> sparse.csc_matrix | tuple[sparse.csc_matrix, np.ndarray]:
         r"""
-        Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`.
-        Requires the model to be subclassed and implement a :meth:`~get_mapping_single` method.
+        Builds the mapping matrix :math:`\mathbf{G}` given a time vector
+        :math:`\mathbf{t}`. Requires the model to be subclassed and implement a
+        :meth:`~get_mapping_single` method.
 
         This method has multiple steps: it first checks the active period of the
-        model using :meth:`~get_active_period`. If ``timevector`` is outside the active period,
-        it skips the actual calculation and returns an empty sparse matrix. If there is at least
-        one timestamp where the model is active, it calls the actual :meth:`~get_mapping_single`
-        mapping matrix calculation method only for the timestamps where the model is active in
-        order to reduce the computational load. Lastly, the dense, evaluated mapping matrix
-        gets padded before and after with empty sparse matrices (if the model is zero outside
-        its boundaries) or the values at the boundaries themselves.
+        model using :meth:`~get_active_period`. If ``timevector`` is outside the active
+        period, it skips the actual calculation and returns an empty sparse matrix. If
+        there is at least one timestamp where the model is active, it calls the actual
+        :meth:`~get_mapping_single` mapping matrix calculation method only for the
+        timestamps where the model is active in order to reduce the computational load.
+        Lastly, the dense, evaluated mapping matrix gets padded before and after with
+        empty sparse matrices (if the model is zero outside its boundaries) or the
+        values at the boundaries themselves.
 
-        This method respects the parameters being set invalid by :meth:`~freeze`, and will
-        interpret those parameters to be unobservable.
+        This method respects the parameters being set invalid by :meth:`~freeze`, and
+        will interpret those parameters to be unobservable.
 
         Parameters
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
         return_observability
             If true, the function will check if there are any all-zero columns, which
             would point to unobservable parameters, and return a boolean mask with the
@@ -470,25 +499,27 @@ class Model():
         else:
             # build dense sub-matrix
             coefs = self.get_mapping_single(timevector[active])
-            assert coefs.shape[1] == self.num_parameters, \
-                f"The child function 'get_mapping_single' of model {type(self).__name__} " \
-                f"returned an invalid shape. " \
-                f"Expected was ({last - first + 1}, {self.num_parameters}), got {coefs.shape}."
+            assert coefs.shape[1] == self.num_parameters, (
+                "The child function 'get_mapping_single' of model "
+                f"{type(self).__name__} returned an invalid shape. Expected was "
+                f"({last - first + 1}, {self.num_parameters}), got {coefs.shape}."
+            )
             # if model is frozen, zero out inactive parameters
             if (self.active_parameters is not None) and (not ignore_active_parameters):
                 coefs[:, ~self.active_parameters] = 0
             if return_observability:
                 # check for the number effective non-zero coefficients
                 # technically observable where we have at least one such value
-                # for regularized models, also skip all columns with just a single value,
-                # as this would just map into another constant offset, which should
-                # be taken care of by a non-regularized polynomial
+                # for regularized models, also skip all columns with just a single
+                # value, as this would just map into another constant offset, which
+                # should be taken care of by a non-regularized polynomial
                 maxamps = np.max(np.abs(coefs), axis=0, keepdims=True)
                 maxamps[maxamps == 0] = 1
                 numnotzero = np.sum(~np.isclose(coefs / maxamps, 0), axis=0)
                 obsnonzero = numnotzero > 1 if self.regularize else numnotzero > 0
-                numunique = np.array([np.unique(coefs[:, i]).size
-                                      for i in range(self.num_parameters)])
+                numunique = np.array(
+                    [np.unique(coefs[:, i]).size for i in range(self.num_parameters)]
+                )
                 obsunique = numunique > 1 if self.regularize else numunique > 0
                 observable = np.logical_and(obsnonzero, obsunique)
             # build before- and after-matrices
@@ -496,48 +527,60 @@ class Model():
             if self.zero_before:
                 before = sparse.csc_matrix((first, self.num_parameters))
             else:
-                before = sparse.csc_matrix(np.ones((first, self.num_parameters))
-                                           * coefs[0, :].reshape(1, -1))
+                before = sparse.csc_matrix(
+                    np.ones((first, self.num_parameters)) * coefs[0, :].reshape(1, -1)
+                )
             if self.zero_after:
-                after = sparse.csc_matrix((timevector.size - last - 1, self.num_parameters))
+                after = sparse.csc_matrix(
+                    (timevector.size - last - 1, self.num_parameters)
+                )
             else:
-                after = sparse.csc_matrix(np.ones((timevector.size - last - 1,
-                                                   self.num_parameters))
-                                          * coefs[-1, :].reshape(1, -1))
-            # stack them (they can have 0 in the first dimension, no problem for sparse.vstack)
+                after = sparse.csc_matrix(
+                    np.ones((timevector.size - last - 1, self.num_parameters))
+                    * coefs[-1, :].reshape(1, -1)
+                )
+            # stack them
+            # (they can have 0 in the first dimension, no problem for sparse.vstack)
             # I think it's faster if to stack them if they're all already csc format
-            mapping = sparse.vstack((before, sparse.csc_matrix(coefs), after), format='csc')
+            mapping = sparse.vstack(
+                (before, sparse.csc_matrix(coefs), after), format="csc"
+            )
         # return
         if return_observability:
             return mapping, observable
         else:
             return mapping
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
-        Build the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`
-        for the active period. Called inside :meth:`~get_mapping`.
+        Build the mapping matrix :math:`\mathbf{G}` given a time vector
+        :math:`\mathbf{t}` for the active period. Called inside :meth:`~get_mapping`.
 
         Parameters
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
-            It can and should be assumed that all included timestamps are valid
-            (i.e., defined by the model's :attr:`~zero_before` and :attr:`~zero_after`).
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation. It can and should be assumed that all included timestamps are
+            valid (i.e., defined by the model's :attr:`~zero_before` and
+            :attr:`~zero_after`).
 
         Returns
         -------
             Mapping matrix with the same number of rows as ``timevector`` and
             :attr:`~num_parameters` columns.
         """
-        raise NotImplementedError("'Model' needs to be subclassed and its child needs to "
-                                  "implement a 'get_mapping_single' method for the active "
-                                  "period.")
+        raise NotImplementedError(
+            "'Model' needs to be subclassed and its child needs to "
+            "implement a 'get_mapping_single' method for the active "
+            "period."
+        )
 
-    def get_active_period(self,
-                          timevector: pd.Series | pd.DatetimeIndex
-                          ) -> tuple[np.ndarray, int, int]:
+    def get_active_period(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> tuple[np.ndarray, int, int]:
         """
         Given a time vector, return at each point whether the model is active.
 
@@ -545,7 +588,8 @@ class Model():
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         ----------
@@ -563,7 +607,9 @@ class Model():
         elif self.t_end is None:
             active = timevector >= self.t_start
         else:
-            active = np.all((timevector >= self.t_start, timevector <= self.t_end), axis=0)
+            active = np.all(
+                (timevector >= self.t_start, timevector <= self.t_end), axis=0
+            )
         if active.any():
             first, last = np.flatnonzero(active)[[0, -1]].tolist()
         else:
@@ -572,25 +618,30 @@ class Model():
 
     def tvec_to_numpycol(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
         """
-        Convenience wrapper for :func:`~disstans.tools.tvec_to_numpycol` for Model objects that
-        have the :attr:`~time_unit` and :attr:`~t_reference` attributes set.
+        Convenience wrapper for :func:`~disstans.tools.tvec_to_numpycol` for Model
+        objects that have the :attr:`~time_unit` and :attr:`~t_reference` attributes
+        set.
 
         See Also
         --------
-        :func:`~disstans.tools.tvec_to_numpycol` : Convert a Timestamp vector into a NumPy array.
+        :func:`~disstans.tools.tvec_to_numpycol`
+            Convert a Timestamp vector into a NumPy array.
         """
         if self.t_reference is None:
-            raise ValueError("Can't call 'tvec_to_numpycol' because no reference time "
-                             "was specified in the model.")
+            raise ValueError(
+                "Can't call 'tvec_to_numpycol' because no reference time "
+                "was specified in the model."
+            )
         if self.time_unit is None:
-            raise ValueError("Can't call 'tvec_to_numpycol' because no time unit "
-                             "was specified in the model.")
+            raise ValueError(
+                "Can't call 'tvec_to_numpycol' because no time unit "
+                "was specified in the model."
+            )
         return tvec_to_numpycol(timevector, self.t_reference, self.time_unit)
 
-    def read_parameters(self,
-                        parameters: np.ndarray,
-                        covariances: np.ndarray | None = None
-                        ) -> None:
+    def read_parameters(
+        self, parameters: np.ndarray, covariances: np.ndarray | None = None
+    ) -> None:
         r"""
         Reads in the parameters :math:`\mathbf{m}` (optionally also their
         covariance) and stores them in the instance attributes.
@@ -613,15 +664,17 @@ class Model():
             self._cov = None
             return
         # check and set parameters
-        assert self.num_parameters == parameters.shape[0], \
-            "Read-in parameters have different size than the instantiated model. " + \
-            f"Expected {self.num_parameters}, got {parameters.shape[0]}. The input " + \
-            f"shape was {parameters.shape[0]}, is there a dimension missing?"
+        assert self.num_parameters == parameters.shape[0], (
+            "Read-in parameters have different size than the instantiated model. "
+            + f"Expected {self.num_parameters}, got {parameters.shape[0]}. The input "
+            + f"shape was {parameters.shape[0]}, is there a dimension missing?"
+        )
         par = parameters.reshape((self.num_parameters, -1))
         act_params = self.active_parameters
         if act_params is not None:
-            assert np.all(par[~act_params, :] == 0), \
-                "Something went wrong: inactive parameters should be estimated as 0."
+            assert np.all(
+                par[~act_params, :] == 0
+            ), "Something went wrong: inactive parameters should be estimated as 0."
         self._par = par
         # check and set covariances
         if covariances is None:
@@ -630,22 +683,28 @@ class Model():
             if covariances.shape == self._par.shape:
                 covariances = np.diag(covariances.ravel())
             elif not covariances.shape == (parameters.size, parameters.size):
-                raise ValueError("Covariance matrix must either have shape "
-                                 f"{(parameters.size, parameters.size)} or "
-                                 f"{self._par.shape}, got {covariances.shape}.")
+                raise ValueError(
+                    "Covariance matrix must either have shape "
+                    f"{(parameters.size, parameters.size)} or "
+                    f"{self._par.shape}, got {covariances.shape}."
+                )
             if act_params is not None:
                 active_ix = np.repeat(act_params, self._par.shape[1])
-                assert np.all(covariances[np.ix_(~active_ix, ~active_ix)] == 0), \
-                    "Something went wrong: covariance for inactive parameters should be 0."
+                assert np.all(covariances[np.ix_(~active_ix, ~active_ix)] == 0), (
+                    "Something went wrong: "
+                    "covariance for inactive parameters should be 0."
+                )
             self._cov = covariances
 
-    def evaluate(self,
-                 timevector: pd.Series | pd.DatetimeIndex,
-                 return_full_covariance: bool = False
-                 ) -> dict[str, Any]:
+    def evaluate(
+        self,
+        timevector: pd.Series | pd.DatetimeIndex,
+        return_full_covariance: bool = False,
+    ) -> dict[str, Any]:
         r"""
         Evaluate the model given a time vector, calculating the predicted timeseries
-        :math:`\mathbf{d} = \mathbf{Gm}` and (if applicable) its formal covariance matrix
+        :math:`\mathbf{d} = \mathbf{Gm}`
+        and (if applicable) its formal covariance matrix
         :math:`\mathbf{C}_d^{\text{pred}} = \mathbf{G} \mathbf{C}_m \mathbf{G}^T`.
 
         This method ignores the parameters being set invalid by :meth:`~freeze`.
@@ -654,7 +713,8 @@ class Model():
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
         return_full_covariance
             By default (``False``) the covariances between timesteps are ignored,
             and the returned dictionary will only include the component variances and
@@ -688,18 +748,24 @@ class Model():
             # same order as full_cov_mat_to_columns needs
             num_components = self.par.shape[1]
             map_mat = sparse.kron(mapping_matrix, np.eye(num_components), format="csc")
-            # reduce the size of matrix calculation by removing all-zero rows and columns
+            # reduce the size of matrix calculation
+            # by removing all-zero rows and columns
             var_full = self.cov
             rowcolnonzero = ~np.all(var_full == 0, axis=0)
             assert np.all(rowcolnonzero == ~np.all(var_full == 0, axis=1))
             var_full = var_full[np.ix_(rowcolnonzero, rowcolnonzero)]
             map_mat = map_mat[:, rowcolnonzero].toarray()
             # calculate the predicted variance
-            pred_var = np.matmul(map_mat @ var_full, map_mat.T,
-                                 dtype=self.EVAL_PREDVAR_PRECISION, casting="same_kind")
+            pred_var = np.matmul(
+                map_mat @ var_full,
+                map_mat.T,
+                dtype=self.EVAL_PREDVAR_PRECISION,
+                casting="same_kind",
+            )
             # extract the (block-)diagonal components and reshape
-            fit_var, fit_cov = full_cov_mat_to_columns(pred_var, num_components,
-                                                       include_covariance=True)
+            fit_var, fit_cov = full_cov_mat_to_columns(
+                pred_var, num_components, include_covariance=True
+            )
         if fit.ndim == 1:
             fit = fit.reshape(-1, 1)
         if return_full_covariance:
@@ -717,18 +783,20 @@ class Step(Model):
     Parameters
     ----------
     steptimes
-        List of datetime-like strings that can be converted into :class:`~pandas.Timestamp`.
-        Length of it equals the number of model parameters.
+        List of datetime-like strings that can be converted into
+        :class:`~pandas.Timestamp`. Length of it equals the number of model parameters.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 steptimes: list[str],
-                 zero_after: bool = False,
-                 **model_kw_args
-                 ) -> None:
-        super().__init__(num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args)
+
+    def __init__(
+        self, steptimes: list[str], zero_after: bool = False, **model_kw_args
+    ) -> None:
+        super().__init__(
+            num_parameters=len(steptimes), zero_after=zero_after, **model_kw_args
+        )
         self.timestamps = [pd.Timestamp(step) for step in steptimes]
         """ List of step times as :class:`~pandas.Timestamp`. """
         self.timestamps.sort()
@@ -736,8 +804,7 @@ class Step(Model):
         """ List of step times as datetime-like strings. """
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "Step",
-                "kw_args": {"steptimes": self.steptimes}}
+        arch = {"type": "Step", "kw_args": {"steptimes": self.steptimes}}
         return arch
 
     def _update_from_steptimes(self) -> None:
@@ -758,7 +825,9 @@ class Step(Model):
             Datetime-like string of the step time to add
         """
         if step in self.steptimes:
-            warn(f"Step '{step}' already present.", category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"Step '{step}' already present.", category=RuntimeWarning, stacklevel=2
+            )
         else:
             self.steptimes.append(step)
             self._update_from_steptimes()
@@ -778,7 +847,9 @@ class Step(Model):
         except ValueError:
             warn(f"Step '{step}' not present.", category=RuntimeWarning, stacklevel=2)
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -793,16 +864,20 @@ class Step(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
             Coefficients of the mapping matrix.
         """
-        coefs = np.array(timevector.values.reshape(-1, 1) >=
-                         pd.DataFrame(data=self.timestamps,
-                                      columns=["steptime"]).values.reshape(1, -1),
-                         dtype=float)
+        coefs = np.array(
+            timevector.values.reshape(-1, 1)
+            >= pd.DataFrame(data=self.timestamps, columns=["steptime"]).values.reshape(
+                1, -1
+            ),
+            dtype=float,
+        )
         return coefs
 
 
@@ -823,28 +898,41 @@ class Polynomial(Model):
         Lowest exponent of the polynomial. Defaults to ``0``, i.e. the constant offset.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 order: int,
-                 t_reference: str | pd.Timestamp,
-                 min_exponent: int = 0,
-                 time_unit: str = "D",
-                 zero_before: bool = False,
-                 zero_after: bool = False,
-                 **model_kw_args) -> None:
-        super().__init__(num_parameters=order + 1 - min_exponent,
-                         t_reference=t_reference, time_unit=time_unit,
-                         zero_before=zero_before, zero_after=zero_after, **model_kw_args)
+
+    def __init__(
+        self,
+        order: int,
+        t_reference: str | pd.Timestamp,
+        min_exponent: int = 0,
+        time_unit: str = "D",
+        zero_before: bool = False,
+        zero_after: bool = False,
+        **model_kw_args,
+    ) -> None:
+        super().__init__(
+            num_parameters=order + 1 - min_exponent,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            zero_before=zero_before,
+            zero_after=zero_after,
+            **model_kw_args,
+        )
         self.order = int(order)
         self.min_exponent = int(min_exponent)
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "Polynomial",
-                "kw_args": {"order": self.order, "min_exponent": self.min_exponent}}
+        arch = {
+            "type": "Polynomial",
+            "kw_args": {"order": self.order, "min_exponent": self.min_exponent},
+        }
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -858,7 +946,8 @@ class Polynomial(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -891,8 +980,9 @@ class Polynomial(Model):
         ValueError
             Raised if the desired exponent is not present in the model..
         """
-        assert isinstance(exponent, int), \
-            f"'exponent' needs to be an integer', got {type(exponent)}."
+        assert isinstance(
+            exponent, int
+        ), f"'exponent' needs to be an integer', got {type(exponent)}."
         if self.min_exponent <= exponent <= self.order:
             return exponent - self.min_exponent
         else:
@@ -903,8 +993,9 @@ class BSpline(Model):
     r"""
     Subclasses :class:`~disstans.models.Model`.
 
-    Model defined by cardinal, centralized B-Splines of certain order/degree and time scale.
-    Used for transient temporary signals that return to zero after a given time span.
+    Model defined by cardinal, centralized B-Splines of certain order/degree and time
+    scale. Used for transient temporary signals that return to zero after a given time
+    span.
 
     Parameters
     ----------
@@ -923,16 +1014,19 @@ class BSpline(Model):
         ``None`` defaults to ``scale``.
     obs_scale
         Determines how many factors of ``scale`` should be sampled by the ``timevector``
-        input to :meth:`~Model.get_mapping` to accept an individual spline as observable.
+        input to :meth:`~Model.get_mapping` to accept an individual spline as
+        observable.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
 
     Notes
     -----
 
     For an analytic representation of the B-Splines, see [butzer88]_ or [schoenberg73]_.
-    Further examples can be found at `<https://bsplines.org/flavors-and-types-of-b-splines/>`_.
+    Further examples can be found at
+    `<https://bsplines.org/flavors-and-types-of-b-splines/>`_.
 
     It is important to note that the function will be non-zero on the interval
 
@@ -962,16 +1056,19 @@ class BSpline(Model):
        Society for Industrial and Applied Mathematics.
        doi:`10.1137/1.9781611970555 <https://doi.org/10.1137/1.9781611970555>`_
     """
-    def __init__(self,
-                 degree: int,
-                 scale: float,
-                 t_reference: str | pd.Timestamp,
-                 regularize: bool = True,
-                 time_unit: str = "D",
-                 num_splines: int = 1,
-                 spacing: float | None = None,
-                 obs_scale: float = 1.0,
-                 **model_kw_args) -> None:
+
+    def __init__(
+        self,
+        degree: int,
+        scale: float,
+        t_reference: str | pd.Timestamp,
+        regularize: bool = True,
+        time_unit: str = "D",
+        num_splines: int = 1,
+        spacing: float | None = None,
+        obs_scale: float = 1.0,
+        **model_kw_args,
+    ) -> None:
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         assert self.degree >= 0, "'degree' needs to be greater or equal to 0."
@@ -982,8 +1079,9 @@ class BSpline(Model):
         if spacing is not None:
             self.spacing = float(spacing)
             """ Spacing between the center times of the splines. """
-            assert abs(self.spacing) > 0, \
-                f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
+            assert (
+                abs(self.spacing) > 0
+            ), f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
         elif num_splines > 1:
             self.spacing = self.scale
         else:
@@ -991,34 +1089,50 @@ class BSpline(Model):
         self.observability_scale = float(obs_scale)
         """ Observability scale factor. """
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
-            model_kw_args["t_start"] = (pd.Timestamp(t_reference)
-                                        - Timedelta(self.scale, time_unit)
-                                        * (self.degree + 1) / 2).isoformat()
+            model_kw_args["t_start"] = (
+                pd.Timestamp(t_reference)
+                - Timedelta(self.scale, time_unit) * (self.degree + 1) / 2
+            ).isoformat()
         if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
-            model_kw_args["t_end"] = (pd.Timestamp(t_reference)
-                                      + Timedelta(self.spacing, time_unit)
-                                      * num_splines
-                                      + Timedelta(self.scale, time_unit)
-                                      * (self.degree + 1) / 2).isoformat()
-        super().__init__(num_parameters=num_splines, t_reference=t_reference,
-                         time_unit=time_unit, regularize=regularize, **model_kw_args)
+            model_kw_args["t_end"] = (
+                pd.Timestamp(t_reference)
+                + Timedelta(self.spacing, time_unit) * num_splines
+                + Timedelta(self.scale, time_unit) * (self.degree + 1) / 2
+            ).isoformat()
+        super().__init__(
+            num_parameters=num_splines,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            regularize=regularize,
+            **model_kw_args,
+        )
 
     @property
     def centertimes(self) -> pd.Series:
-        """ Returns a :class:`~pandas.Series` with all center times. """
-        return pd.Series([self.t_reference + Timedelta(self.spacing, self.time_unit) * spl
-                          for spl in range(self.num_parameters)])
+        """Returns a :class:`~pandas.Series` with all center times."""
+        return pd.Series(
+            [
+                self.t_reference + Timedelta(self.spacing, self.time_unit) * spl
+                for spl in range(self.num_parameters)
+            ]
+        )
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "BSpline",
-                "kw_args": {"degree": self.degree,
-                            "scale": self.scale,
-                            "num_splines": self.num_parameters,
-                            "spacing": self.spacing,
-                            "obs_scale": self.observability_scale}}
+        arch = {
+            "type": "BSpline",
+            "kw_args": {
+                "degree": self.degree,
+                "scale": self.scale,
+                "num_splines": self.num_parameters,
+                "spacing": self.spacing,
+                "obs_scale": self.observability_scale,
+            },
+        }
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -1028,7 +1142,8 @@ class BSpline(Model):
         where :math:`p` is the degree and :math:`n=p+1` is the order (see [butzer88]_
         and [schoenberg73]_). :math:`t^\prime` is the normalized time:
 
-        .. math:: t_j^\prime = \frac{ \left( t - t_{\text{ref}} \right) - j \cdot \rho}{\rho}
+        .. math:: t_j^\prime =
+                  \frac{ \left( t - t_{\text{ref}} \right) - j \cdot \rho}{\rho}
 
         where :math:`t_{\text{ref}}` and :math:`\rho` are the model's reference time and
         timescale, respectively.
@@ -1039,21 +1154,26 @@ class BSpline(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
             Coefficients of the mapping matrix.
         """
         # get relative and normalized time
-        trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1, 1)
-                - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1))
+        trel = self.tvec_to_numpycol(timevector).reshape(
+            -1, 1, 1
+        ) - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
         tnorm = trel / self.scale
         # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
         in_power = tnorm + self.order / 2 - krange
-        in_sum = ((-1)**krange * comb(self.order, krange)
-                  * (in_power * (in_power >= 0))**(self.degree))
+        in_sum = (
+            (-1) ** krange
+            * comb(self.order, krange)
+            * (in_power * (in_power >= 0)) ** (self.degree)
+        )
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree)
         # to avoid numerical issues, set to zero manually outside of valid domains
         coefs[np.abs(tnorm.squeeze(axis=2)) > self.order / 2] = 0
@@ -1061,14 +1181,16 @@ class BSpline(Model):
         # observe (somewhat arbitrarily) some fraction of the spline's valid domain
         # (setting an entire column to zero will make the calling get_mapping() method
         # flag this parameter as unobservable)
-        del_t = np.max(trel.squeeze(axis=2), axis=0) - np.min(trel.squeeze(axis=2), axis=0)
+        del_t = np.max(trel.squeeze(axis=2), axis=0) - np.min(
+            trel.squeeze(axis=2), axis=0
+        )
         set_unobservable = del_t < self.scale * self.observability_scale
         coefs[:, set_unobservable] = 0
         return coefs
 
-    def get_transient_period(self,
-                             timevector: pd.Series | pd.DatetimeIndex
-                             ) -> np.ndarray:
+    def get_transient_period(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         """
         Returns a mask-like array of where each spline is currently transient
         (not staying constant).
@@ -1077,15 +1199,17 @@ class BSpline(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
             NumPy array with ``True`` when a spline is currently transient,
             ``False`` otherwise.
         """
-        trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1)
-                - self.spacing * np.arange(self.num_parameters).reshape(1, -1))
+        trel = self.tvec_to_numpycol(timevector).reshape(
+            -1, 1
+        ) - self.spacing * np.arange(self.num_parameters).reshape(1, -1)
         transient = np.abs(trel) <= self.scale * self.order
         return transient
 
@@ -1103,19 +1227,23 @@ class ISpline(Model):
 
     See Also
     --------
-    disstans.models.BSpline : More details about B-Splines and the available keyword arguments.
+    disstans.models.BSpline
+        More details about B-Splines and the available keyword arguments.
     """
-    def __init__(self,
-                 degree: int,
-                 scale: float,
-                 t_reference: str | pd.Timestamp,
-                 regularize: bool = True,
-                 time_unit: str = "D",
-                 num_splines: int = 1,
-                 spacing: float | None = None,
-                 zero_after: bool = False,
-                 obs_scale: float = 1.0,
-                 **model_kw_args) -> None:
+
+    def __init__(
+        self,
+        degree: int,
+        scale: float,
+        t_reference: str | pd.Timestamp,
+        regularize: bool = True,
+        time_unit: str = "D",
+        num_splines: int = 1,
+        spacing: float | None = None,
+        zero_after: bool = False,
+        obs_scale: float = 1.0,
+        **model_kw_args,
+    ) -> None:
         self.degree = int(degree)
         """ Degree :math:`p` of the B-Splines. """
         assert self.degree >= 0, "'degree' needs to be greater or equal to 0."
@@ -1126,8 +1254,9 @@ class ISpline(Model):
         if spacing is not None:
             self.spacing = float(spacing)
             """ Spacing between the center times of the splines. """
-            assert abs(self.spacing) > 0, \
-                f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
+            assert (
+                abs(self.spacing) > 0
+            ), f"'spacing' must be non-zero to avoid singularities, got {self.spacing}."
         elif num_splines > 1:
             self.spacing = self.scale
         else:
@@ -1135,40 +1264,57 @@ class ISpline(Model):
         self.observability_scale = float(obs_scale)
         """ Observability scale factor. """
         if "t_start" not in model_kw_args or model_kw_args["t_start"] is None:
-            model_kw_args["t_start"] = (pd.Timestamp(t_reference)
-                                        - Timedelta(self.scale, time_unit)
-                                        * (self.degree + 1) / 2).isoformat()
+            model_kw_args["t_start"] = (
+                pd.Timestamp(t_reference)
+                - Timedelta(self.scale, time_unit) * (self.degree + 1) / 2
+            ).isoformat()
         if "t_end" not in model_kw_args or model_kw_args["t_end"] is None:
-            model_kw_args["t_end"] = (pd.Timestamp(t_reference)
-                                      + Timedelta(self.spacing, time_unit)
-                                      * num_splines
-                                      + Timedelta(self.scale, time_unit)
-                                      * (self.degree + 1) / 2).isoformat()
-        super().__init__(num_parameters=num_splines, t_reference=t_reference,
-                         time_unit=time_unit, zero_after=zero_after,
-                         regularize=regularize, **model_kw_args)
+            model_kw_args["t_end"] = (
+                pd.Timestamp(t_reference)
+                + Timedelta(self.spacing, time_unit) * num_splines
+                + Timedelta(self.scale, time_unit) * (self.degree + 1) / 2
+            ).isoformat()
+        super().__init__(
+            num_parameters=num_splines,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            zero_after=zero_after,
+            regularize=regularize,
+            **model_kw_args,
+        )
 
     @property
     def centertimes(self) -> pd.Series:
-        """ Returns a :class:`~pandas.Series` with all center times. """
-        return pd.Series([self.t_reference + Timedelta(self.spacing, self.time_unit) * spl
-                          for spl in range(self.num_parameters)])
+        """Returns a :class:`~pandas.Series` with all center times."""
+        return pd.Series(
+            [
+                self.t_reference + Timedelta(self.spacing, self.time_unit) * spl
+                for spl in range(self.num_parameters)
+            ]
+        )
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "ISpline",
-                "kw_args": {"degree": self.degree,
-                            "scale": self.scale,
-                            "num_splines": self.num_parameters,
-                            "spacing": self.spacing,
-                            "obs_scale": self.observability_scale}}
+        arch = {
+            "type": "ISpline",
+            "kw_args": {
+                "degree": self.degree,
+                "scale": self.scale,
+                "num_splines": self.num_parameters,
+                "spacing": self.spacing,
+                "obs_scale": self.observability_scale,
+            },
+        }
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
-        .. math:: \sum_{k=0}^{n} \frac{{\left( -1 \right)}^{k}}{\left( p+1 \right) !} \cdot
-                  \binom{n}{k} \cdot {\left( t_j^\prime + \frac{n}{2} - k \right)}^{p+1}
+        .. math:: \sum_{k=0}^{n} \frac{{\left( -1 \right)}^{k}}{\left( p+1 \right) !}
+                  \cdot \binom{n}{k} \cdot
+                  {\left( t_j^\prime + \frac{n}{2} - k \right)}^{p+1}
 
         which is the integral over time of :meth:`~BSpline.get_mapping_single`.
 
@@ -1178,37 +1324,45 @@ class ISpline(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
             Coefficients of the mapping matrix.
         """
         # get relative and normalized time
-        trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1, 1)
-                - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1))
+        trel = self.tvec_to_numpycol(timevector).reshape(
+            -1, 1, 1
+        ) - self.scale * np.arange(self.num_parameters).reshape(1, -1, 1)
         tnorm = trel / self.scale
         # calculate coefficients efficiently all at once
         krange = np.arange(self.order + 1).reshape(1, 1, -1)
         in_power = tnorm + self.order / 2 - krange
-        in_sum = ((-1)**krange * comb(self.order, krange)
-                  * (in_power * (in_power >= 0))**(self.degree + 1))
+        in_sum = (
+            (-1) ** krange
+            * comb(self.order, krange)
+            * (in_power * (in_power >= 0)) ** (self.degree + 1)
+        )
         coefs = np.sum(in_sum, axis=2) / factorial(self.degree + 1)
-        # to avoid numerical issues, set to zero or one manually outside of valid domains
-        coefs[tnorm.squeeze(axis=2) < - self.order / 2] = 0
+        # to avoid numerical issues,
+        # set to zero or one manually outside of valid domains
+        coefs[tnorm.squeeze(axis=2) < -self.order / 2] = 0
         coefs[tnorm.squeeze(axis=2) > self.order / 2] = 1
         # to avoid even more numerical issues, set a basis function to zero if we only
         # observe (somewhat arbitrarily) < a scale length
         # (setting an entire column to zero will make the calling get_mapping() method
         # flag this parameter as unobservable)
-        del_t = np.max(trel.squeeze(axis=2), axis=0) - np.min(trel.squeeze(axis=2), axis=0)
+        del_t = np.max(trel.squeeze(axis=2), axis=0) - np.min(
+            trel.squeeze(axis=2), axis=0
+        )
         set_unobservable = del_t < self.scale * self.observability_scale
         coefs[:, set_unobservable] = 0
         return coefs
 
-    def get_transient_period(self,
-                             timevector: pd.Series | pd.DatetimeIndex
-                             ) -> np.ndarray:
+    def get_transient_period(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         """
         Returns a mask-like array of where each spline is currently transient
         (not staying constant).
@@ -1217,14 +1371,17 @@ class ISpline(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
-            NumPy array with ``True`` when a spline is currently transient, ``False`` otherwise.
+            NumPy array with ``True`` when a spline is currently transient,
+            ``False`` otherwise.
         """
-        trel = (self.tvec_to_numpycol(timevector).reshape(-1, 1)
-                - self.spacing * np.arange(self.num_parameters).reshape(1, -1))
+        trel = self.tvec_to_numpycol(timevector).reshape(
+            -1, 1
+        ) - self.spacing * np.arange(self.num_parameters).reshape(1, -1)
         transient = np.abs(trel) <= self.scale * self.order
         return transient
 
@@ -1243,34 +1400,44 @@ class BaseSplineSet(Model):
         List of spline model objects.
     internal_scaling
         By default, in order to influence the tradeoff between
-        splines of different timescales, the mapping matrix of each spline is scaled by its
-        own time scale to promote using fewer components. Without this, there would be an
-        ambiguity for the solver as to whether fit the signal using many smaller scales or
-        with one large scale, as the fit would be almost identical. This behavior can be
-        disabled by setting ``internal_scaling=False``.
+        splines of different timescales, the mapping matrix of each spline is scaled by
+        its own time scale to promote using fewer components. Without this, there would
+        be an ambiguity for the solver as to whether fit the signal using many smaller
+        scales or with one large scale, as the fit would be almost identical. This
+        behavior can be disabled by setting ``internal_scaling=False``.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
 
-    def __init__(self,
-                 splines: list[BSpline | ISpline],
-                 internal_scaling: bool = True,
-                 **model_kw_args) -> None:
+    def __init__(
+        self,
+        splines: list[BSpline | ISpline],
+        internal_scaling: bool = True,
+        **model_kw_args,
+    ) -> None:
         # create attributes specific to spline sets
-        assert (isinstance(splines, list) and
-                all([isinstance(s, BSpline) or isinstance(s, ISpline) for s in splines])), \
-            f"'splines' needs to be a list of spline models, got {splines}."
+        assert isinstance(splines, list) and all(
+            [isinstance(s, BSpline) or isinstance(s, ISpline) for s in splines]
+        ), f"'splines' needs to be a list of spline models, got {splines}."
         self.splines = splines
         """ List of spline object contained within the SplineSet. """
         self.internal_scaling = bool(internal_scaling)
         """ Trackes whether to scale the sub-splines relative to their lengths. """
         self.min_scale = min([m.scale for m in self.splines])
         """ Minimum scale of the sub-splines. """
-        self.internal_scales = ((np.concatenate([np.array([m.scale] * m.num_parameters)
-                                                for m in self.splines]) /
-                                 self.min_scale)**(0.5)
-                                if self.internal_scaling else None)
+        self.internal_scales = (
+            (
+                np.concatenate(
+                    [np.array([m.scale] * m.num_parameters) for m in self.splines]
+                )
+                / self.min_scale
+            )
+            ** (0.5)
+            if self.internal_scaling
+            else None
+        )
         """
         If :attr:`~internal_scaling` is ``True``, this NumPy array holds the relative
         scaling factors of all parameters over all the sub-splines.
@@ -1280,10 +1447,14 @@ class BaseSplineSet(Model):
         super().__init__(num_parameters=num_parameters, **model_kw_args)
 
     def _get_arch(self) -> dict[str, Any]:
-        raise NotImplementedError("BaseSplineSet is not designed to be exported and "
-                                  "created directly, use a subclass.")
+        raise NotImplementedError(
+            "BaseSplineSet is not designed to be exported and "
+            "created directly, use a subclass."
+        )
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times by accumulating the mapping factors
         of the different scales.
@@ -1292,7 +1463,8 @@ class BaseSplineSet(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -1301,8 +1473,9 @@ class BaseSplineSet(Model):
         coefs = np.empty((timevector.size, self.num_parameters))
         ix_coefs = 0
         for model in self.splines:
-            coefs[:, ix_coefs:ix_coefs + model.num_parameters] = \
-                model.get_mapping(timevector).toarray()
+            coefs[:, ix_coefs : ix_coefs + model.num_parameters] = model.get_mapping(
+                timevector
+            ).toarray()
             ix_coefs += model.num_parameters
         if self.internal_scaling:
             coefs *= self.internal_scales.reshape(1, self.num_parameters)
@@ -1316,8 +1489,8 @@ class BaseSplineSet(Model):
         to be invalid. The mask will be kept in
         :attr:`~disstans.models.Model.active_parameters`.
 
-        Only valid parameters will be used by :meth:`~disstans.models.Model.get_mapping` and
-        :meth:`~disstans.models.Model.evaluate`.
+        Only valid parameters will be used by :meth:`~disstans.models.Model.get_mapping`
+        and :meth:`~disstans.models.Model.evaluate`.
 
         Parameters
         ----------
@@ -1329,17 +1502,22 @@ class BaseSplineSet(Model):
         --------
         unfreeze : The reverse method.
         """
-        assert float(zero_threshold) > 0, \
-            f"'zero_threshold needs to be non-negative, got {zero_threshold}."
+        assert (
+            float(zero_threshold) > 0
+        ), f"'zero_threshold needs to be non-negative, got {zero_threshold}."
         if self.par is None:
             raise RuntimeError("Cannot freeze a model without set parameters.")
-        temp_par = (self.par * self.internal_scales.reshape(-1, 1) if self.internal_scaling
-                    else self.par)
+        temp_par = (
+            self.par * self.internal_scales.reshape(-1, 1)
+            if self.internal_scaling
+            else self.par
+        )
         self.active_parameters = np.any(np.abs(temp_par) > zero_threshold, axis=1)
         ix_params = 0
         for model in self.splines:
-            model.active_parameters = \
-                self.active_parameters[ix_params:ix_params + model.num_parameters]
+            model.active_parameters = self.active_parameters[
+                ix_params : ix_params + model.num_parameters
+            ]
             ix_params += model.num_parameters
 
     def unfreeze(self) -> None:
@@ -1351,10 +1529,9 @@ class BaseSplineSet(Model):
         for model in self.splines:
             model.active_parameters = None
 
-    def read_parameters(self,
-                        parameters: np.ndarray,
-                        covariances: np.ndarray | None = None
-                        ) -> None:
+    def read_parameters(
+        self, parameters: np.ndarray, covariances: np.ndarray | None = None
+    ) -> None:
         r"""
         Reads in the parameters :math:`\mathbf{m}` (optionally also their variances)
         of all the sub-splines and stores them in the respective attributes.
@@ -1383,15 +1560,16 @@ class BaseSplineSet(Model):
                     covariances = covariances * self.internal_scales.reshape(-1, 1) ** 2
                 else:
                     repeat_int_scales = np.repeat(self.internal_scales, num_components)
-                    covariances = ((covariances * repeat_int_scales.reshape(-1, 1))
-                                   * repeat_int_scales.reshape(1, -1))
+                    covariances = (
+                        covariances * repeat_int_scales.reshape(-1, 1)
+                    ) * repeat_int_scales.reshape(1, -1)
         ix_params = 0
         for model in self.splines:
-            param_model = parameters[ix_params:ix_params + model.num_parameters, :]
+            param_model = parameters[ix_params : ix_params + model.num_parameters, :]
             if covariances is None:
                 cov_model = None
             elif parameters.shape == covariances.shape:
-                cov_model = covariances[ix_params:ix_params + model.num_parameters, :]
+                cov_model = covariances[ix_params : ix_params + model.num_parameters, :]
             else:
                 ix_start = ix_params * num_components
                 ix_end = ix_start + model.num_parameters * num_components
@@ -1399,13 +1577,14 @@ class BaseSplineSet(Model):
             model.read_parameters(param_model, cov_model)
             ix_params += model.num_parameters
 
-    def make_scalogram(self,
-                       t_left: str | pd.Timestamp,
-                       t_right: str | pd.Timestamp,
-                       cmaprange: float | None = None,
-                       resolution: int = 1000,
-                       min_param_mag: float = 0.0
-                       ) -> tuple[mpl.Figure, mpl.Axis]:
+    def make_scalogram(
+        self,
+        t_left: str | pd.Timestamp,
+        t_right: str | pd.Timestamp,
+        cmaprange: float | None = None,
+        resolution: int = 1000,
+        min_param_mag: float = 0.0,
+    ) -> tuple[mpl.Figure, mpl.Axis]:
         """
         Create a scalogram figure of the model parameters.
 
@@ -1452,67 +1631,97 @@ class BaseSplineSet(Model):
         t_plot = pd.Series(pd.date_range(start=t_left, end=t_right, periods=resolution))
         # get range of values (if not provided)
         if cmaprange is not None:
-            assert isinstance(cmaprange, int) or isinstance(cmaprange, float), \
-                "'cmaprange' must be None or a single float or integer of the " \
+            assert isinstance(cmaprange, int) or isinstance(cmaprange, float), (
+                "'cmaprange' must be None or a single float or integer of the "
                 f"one-sided color range of the scalogram, got {cmaprange}."
+            )
         else:
-            cmaprange = np.max(np.concatenate([np.abs(model.par)
-                                               for model in self.splines],
-                                              axis=0).ravel())
-        cmap = mpl.cm.ScalarMappable(cmap=scm.roma_r,
-                                     norm=mpl.colors.Normalize(vmin=-cmaprange,
-                                                               vmax=cmaprange))
+            cmaprange = np.max(
+                np.concatenate(
+                    [np.abs(model.par) for model in self.splines], axis=0
+                ).ravel()
+            )
+        cmap = mpl.cm.ScalarMappable(
+            cmap=scm.roma_r, norm=mpl.colors.Normalize(vmin=-cmaprange, vmax=cmaprange)
+        )
         # get heights of component axes that leaves room for colorbar
         row_hr = 0.95 / num_components
         height_ratios = [row_hr] * num_components + [0.05]
         # start plotting
-        fig, ax = plt.subplots(nrows=num_components + 1, constrained_layout=True,
-                               gridspec_kw={"height_ratios": height_ratios})
+        fig, ax = plt.subplots(
+            nrows=num_components + 1,
+            constrained_layout=True,
+            gridspec_kw={"height_ratios": height_ratios},
+        )
         for i, model in enumerate(self.splines):
             # where to put this scale
             y_off = 1 - (i + 1) * dy_scale
             # get normalized values
             if isinstance(model, BSpline):
-                mdl_mapping = model.get_mapping(t_plot, ignore_active_parameters=True).toarray()
+                mdl_mapping = model.get_mapping(
+                    t_plot, ignore_active_parameters=True
+                ).toarray()
             elif isinstance(model, ISpline):
                 mdl_mapping = np.gradient(
-                    model.get_mapping(t_plot, ignore_active_parameters=True).toarray(), axis=0)
+                    model.get_mapping(t_plot, ignore_active_parameters=True).toarray(),
+                    axis=0,
+                )
             else:
-                raise NotImplementedError("Scalogram undefined for a SplineSet of class "
-                                          f"{type(model)}.")
+                raise NotImplementedError(
+                    "Scalogram undefined for a SplineSet of class " f"{type(model)}."
+                )
             mdl_sum = np.sum(mdl_mapping, axis=1, keepdims=True)
             mdl_sum[mdl_sum == 0] = 1
-            y_norm = np.hstack([np.zeros((t_plot.size, 1)),
-                                np.cumsum(mdl_mapping / mdl_sum, axis=1)])
+            y_norm = np.hstack(
+                [np.zeros((t_plot.size, 1)), np.cumsum(mdl_mapping / mdl_sum, axis=1)]
+            )
             # plot cell
             for j, k in product(range(model.num_parameters), range(num_components)):
                 if ~np.isnan(model.par[j, k]):
-                    facecol = cmap.to_rgba(model.par[j, k]
-                                           if np.abs(model.par[j, k]) >= min_param_mag else 0)
-                    ax[k].fill_between(t_plot,
-                                       y_off + y_norm[:, j] * dy_scale,
-                                       y_off + y_norm[:, j + 1] * dy_scale,
-                                       facecolor=facecol, zorder=-2)
+                    facecol = cmap.to_rgba(
+                        model.par[j, k]
+                        if np.abs(model.par[j, k]) >= min_param_mag
+                        else 0
+                    )
+                    ax[k].fill_between(
+                        t_plot,
+                        y_off + y_norm[:, j] * dy_scale,
+                        y_off + y_norm[:, j + 1] * dy_scale,
+                        facecolor=facecol,
+                        zorder=-2,
+                    )
             # plot vertical lines at centerpoints
             for j, k in product(range(model.num_parameters), range(num_components)):
-                ax[k].axvline(model.t_reference
-                              + Timedelta(j * model.spacing, model.time_unit),
-                              y_off, y_off + dy_scale, c='0.5', lw=0.5, zorder=-1)
+                ax[k].axvline(
+                    model.t_reference + Timedelta(j * model.spacing, model.time_unit),
+                    y_off,
+                    y_off + dy_scale,
+                    c="0.5",
+                    lw=0.5,
+                    zorder=-1,
+                )
         # finish plot by adding relevant gridlines and labels
         for k in range(num_components):
             for i in range(1, num_scales):
-                ax[k].axhline(i * dy_scale, c='0.5', lw=0.5, zorder=-1)
+                ax[k].axhline(i * dy_scale, c="0.5", lw=0.5, zorder=-1)
             ax[k].set_xlim(t_left, t_right)
             ax[k].set_ylim(0, 1)
             ax[k].set_yticks([i * dy_scale for i in range(num_scales + 1)])
-            ax[k].set_yticks([(i + 0.5) * dy_scale for i in range(num_scales)], minor=True)
-            ax[k].set_yticklabels(reversed([f"{model.scale:.4g} {model.time_unit}"
-                                           for model in self.splines]), minor=True)
-            ax[k].tick_params(axis='both', labelleft=False, direction='out')
-            ax[k].tick_params(axis='y', left=False, which='minor')
+            ax[k].set_yticks(
+                [(i + 0.5) * dy_scale for i in range(num_scales)], minor=True
+            )
+            ax[k].set_yticklabels(
+                reversed(
+                    [f"{model.scale:.4g} {model.time_unit}" for model in self.splines]
+                ),
+                minor=True,
+            )
+            ax[k].tick_params(axis="both", labelleft=False, direction="out")
+            ax[k].tick_params(axis="y", left=False, which="minor")
             ax[k].set_rasterization_zorder(0)
-        fig.colorbar(cmap, cax=ax[-1], orientation='horizontal',
-                     label='Coefficient Value')
+        fig.colorbar(
+            cmap, cax=ax[-1], orientation="horizontal", label="Coefficient Value"
+        )
         return fig, ax
 
 
@@ -1547,8 +1756,8 @@ class SplineSet(BaseSplineSet):
         List of scales to use for each of the sub-splines.
         Mutually exclusive to setting ``list_num_knots``.
     list_num_knots
-        List of number of knots to divide the time span into for each of the sub-splines.
-        Mutually exclusive to setting ``list_scales``.
+        List of number of knots to divide the time span into for each of the
+        sub-splines. Mutually exclusive to setting ``list_scales``.
     splineclass
         Model class to use for the splines.
     complete
@@ -1558,32 +1767,36 @@ class SplineSet(BaseSplineSet):
     See :class:`~disstans.models.BaseSplineSet` and :class:`~disstans.models.Model` for
     attribute descriptions and more keyword arguments.
     """
-    def __init__(self,
-                 degree: int,
-                 t_center_start: str | pd.Timestamp,
-                 t_center_end: str | pd.Timestamp,
-                 time_unit: str = "D",
-                 list_scales: list[float] | None = None,
-                 list_num_knots: list[int] | None = None,
-                 splineclass: BSpline | ISpline = ISpline,
-                 complete: bool = True,
-                 regularize: bool = True,
-                 **model_kw_args
-                 ) -> None:
-        assert np.logical_xor(list_scales is None, list_num_knots is None), \
-            "To construct a set of Splines, pass exactly one of " \
-            "'list_scales' and 'list_num_knots' " \
+
+    def __init__(
+        self,
+        degree: int,
+        t_center_start: str | pd.Timestamp,
+        t_center_end: str | pd.Timestamp,
+        time_unit: str = "D",
+        list_scales: list[float] | None = None,
+        list_num_knots: list[int] | None = None,
+        splineclass: BSpline | ISpline = ISpline,
+        complete: bool = True,
+        regularize: bool = True,
+        **model_kw_args,
+    ) -> None:
+        assert np.logical_xor(list_scales is None, list_num_knots is None), (
+            "To construct a set of Splines, pass exactly one of "
+            "'list_scales' and 'list_num_knots' "
             f"(got {list_scales} and {list_num_knots})."
+        )
         relevant_list = list_scales if list_num_knots is None else list_num_knots
         try:
             if isinstance(splineclass, str):
                 splineclass = globals()[splineclass]
             assert issubclass(splineclass, Model)
         except BaseException as e:
-            raise LookupError("When trying to create the SplineSet, couldn't find the model "
-                              f"'{splineclass}' (expected Model type argument or string "
-                              "representation of a loaded Model)."
-                              ).with_traceback(e.__traceback__) from e
+            raise LookupError(
+                "When trying to create the SplineSet, couldn't find the model "
+                f"'{splineclass}' (expected Model type argument or string "
+                "representation of a loaded Model)."
+            ).with_traceback(e.__traceback__) from e
         # get time range
         t_center_start_tstamp = pd.Timestamp(t_center_start)
         t_center_end_tstamp = pd.Timestamp(t_center_end)
@@ -1610,12 +1823,17 @@ class SplineSet(BaseSplineSet):
             # shift the reference to be the first spline
             t_ref = t_center_start_tstamp - num_overlaps * scale_tdelta
             # create model and append
-            splines.append(splineclass(degree, scale_float,
-                                       num_splines=num_centerpoints,
-                                       t_reference=t_ref,
-                                       time_unit=time_unit,
-                                       regularize=regularize,
-                                       obs_scale=obs_scale))
+            splines.append(
+                splineclass(
+                    degree,
+                    scale_float,
+                    num_splines=num_centerpoints,
+                    t_reference=t_ref,
+                    time_unit=time_unit,
+                    regularize=regularize,
+                    obs_scale=obs_scale,
+                )
+            )
         # set attributes
         self.degree = degree
         """ Degree of the splines. """
@@ -1629,12 +1847,13 @@ class SplineSet(BaseSplineSet):
         """ List of scales of each of the sub-splines. """
         self.list_num_knots = list_num_knots
         """
-        List of number of knots the time span is divided into for each of the sub-splines.
+        List of number of knots the time span is divided into for each of the
+        sub-splines.
         """
         self.complete = complete
         """
-        Sets whether the spline coverage of the time span is considered to be complete or not
-        (see class documentation).
+        Sets whether the spline coverage of the time span is considered to be complete
+        or not (see class documentation).
         """
         # create the BaseSplineSet and therefore Model object
         if "zero_after" not in model_kw_args:
@@ -1642,19 +1861,24 @@ class SplineSet(BaseSplineSet):
                 model_kw_args["zero_after"] = True
             elif splineclass == ISpline:
                 model_kw_args["zero_after"] = False
-        super().__init__(splines=splines, time_unit=time_unit, regularize=regularize,
-                         **model_kw_args)
+        super().__init__(
+            splines=splines, time_unit=time_unit, regularize=regularize, **model_kw_args
+        )
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "SplineSet",
-                "kw_args": {"degree": self.degree,
-                            "t_center_start": self.t_center_start,
-                            "t_center_end": self.t_center_end,
-                            "splineclass": self.splineclass.__name__,
-                            "list_scales": self.list_scales,
-                            "list_num_knots": self.list_num_knots,
-                            "complete": self.complete,
-                            "internal_scaling": self.internal_scaling}}
+        arch = {
+            "type": "SplineSet",
+            "kw_args": {
+                "degree": self.degree,
+                "t_center_start": self.t_center_start,
+                "t_center_end": self.t_center_end,
+                "splineclass": self.splineclass.__name__,
+                "list_scales": self.list_scales,
+                "list_num_knots": self.list_num_knots,
+                "complete": self.complete,
+                "internal_scaling": self.internal_scaling,
+            },
+        }
         return arch
 
 
@@ -1689,48 +1913,61 @@ class DecayingSplineSet(BaseSplineSet):
         Model class to use for the splines.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 degree: int,
-                 t_center_start: str | pd.Timestamp,
-                 list_scales: list[float],
-                 list_num_splines: int | list[int],
-                 time_unit: str = "D",
-                 splineclass: BSpline | ISpline = ISpline,
-                 regularize: bool = True,
-                 **model_kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        degree: int,
+        t_center_start: str | pd.Timestamp,
+        list_scales: list[float],
+        list_num_splines: int | list[int],
+        time_unit: str = "D",
+        splineclass: BSpline | ISpline = ISpline,
+        regularize: bool = True,
+        **model_kw_args,
+    ) -> None:
         # initial checks
         if isinstance(list_num_splines, int):
             list_num_splines = [list_num_splines] * len(list_scales)
         else:
-            assert (isinstance(list_num_splines, list) and
-                    all([isinstance(n, int) for n in list_num_splines])), \
-                f"'list_num_splines' needs to be a (list of) integers, got {list_num_splines}."
-        assert len(list_scales) == len(list_num_splines), \
-            "'list_scales' and 'list_num_splines' need to have the same lengths, got " \
+            assert isinstance(list_num_splines, list) and all(
+                [isinstance(n, int) for n in list_num_splines]
+            ), (
+                "'list_num_splines' needs to be a (list of) integers, "
+                f"got {list_num_splines}."
+            )
+        assert len(list_scales) == len(list_num_splines), (
+            "'list_scales' and 'list_num_splines' need to have the same lengths, got "
             f"{len(list_scales)} and {len(list_num_splines)} elements."
+        )
         try:
             if isinstance(splineclass, str):
                 splineclass = globals()[splineclass]
             assert issubclass(splineclass, Model)
         except BaseException as e:
-            raise LookupError("When trying to create the SplineSet, couldn't find the model "
-                              f"'{splineclass}' (expected Model type argument or string "
-                              "representation of a loaded Model)."
-                              ).with_traceback(e.__traceback__) from e
+            raise LookupError(
+                "When trying to create the SplineSet, couldn't find the model "
+                f"'{splineclass}' (expected Model type argument or string "
+                "representation of a loaded Model)."
+            ).with_traceback(e.__traceback__) from e
         # create spline set
         t_center_start_tstamp = pd.Timestamp(t_center_start)
         splines = []
         obs_scale = model_kw_args.pop("obs_scale", 1)
         for scale_float, num_centerpoints in zip(list_scales, list_num_splines):
-            splines.append(splineclass(degree, scale_float,
-                                       num_splines=num_centerpoints,
-                                       t_reference=t_center_start_tstamp,
-                                       time_unit=time_unit,
-                                       regularize=regularize,
-                                       obs_scale=obs_scale))
+            splines.append(
+                splineclass(
+                    degree,
+                    scale_float,
+                    num_splines=num_centerpoints,
+                    t_reference=t_center_start_tstamp,
+                    time_unit=time_unit,
+                    regularize=regularize,
+                    obs_scale=obs_scale,
+                )
+            )
         # save attributes
         self.degree = degree
         """ Degree of the splines. """
@@ -1748,17 +1985,22 @@ class DecayingSplineSet(BaseSplineSet):
                 model_kw_args["zero_after"] = True
             elif splineclass == ISpline:
                 model_kw_args["zero_after"] = False
-        super().__init__(splines=splines, time_unit=time_unit, regularize=regularize,
-                         **model_kw_args)
+        super().__init__(
+            splines=splines, time_unit=time_unit, regularize=regularize, **model_kw_args
+        )
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "DecayingSplineSet",
-                "kw_args": {"degree": self.degree,
-                            "t_center_start": self.t_center_start,
-                            "splineclass": self.splineclass.__name__,
-                            "list_scales": self.list_scales,
-                            "list_num_splines": self.list_num_splines,
-                            "internal_scaling": self.internal_scaling}}
+        arch = {
+            "type": "DecayingSplineSet",
+            "kw_args": {
+                "degree": self.degree,
+                "t_center_start": self.t_center_start,
+                "splineclass": self.splineclass.__name__,
+                "list_scales": self.list_scales,
+                "list_num_splines": self.list_num_splines,
+                "internal_scaling": self.internal_scaling,
+            },
+        }
         return arch
 
 
@@ -1775,7 +2017,8 @@ class Sinusoid(Model):
         Period length :math:`T` in :attr:`~disstans.models.Model.time_unit` units.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
 
     Notes
     -----
@@ -1789,27 +2032,35 @@ class Sinusoid(Model):
     with :attr:`~period` :math:`T`, :attr:`~phase` :math:`\phi=\text{atan2}(b,a)`
     and :attr:`~amplitude` :math:`A=\sqrt{a^2 + b^2}`.
     """
-    def __init__(self,
-                 period: float,
-                 t_reference: str | pd.Timestamp,
-                 time_unit: str = "D",
-                 **model_kw_args
-                 ) -> None:
-        super().__init__(num_parameters=2, t_reference=t_reference,
-                         time_unit=time_unit, **model_kw_args)
+
+    def __init__(
+        self,
+        period: float,
+        t_reference: str | pd.Timestamp,
+        time_unit: str = "D",
+        **model_kw_args,
+    ) -> None:
+        super().__init__(
+            num_parameters=2,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            **model_kw_args,
+        )
         self.period = float(period)
         """ Period of the sinusoid. """
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "Sinusoid",
-                "kw_args": {"period": self.period}}
+        arch = {"type": "Sinusoid", "kw_args": {"period": self.period}}
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
-        .. math:: \left( \cos \left( \omega t \right),  \sin \left( \omega t \right) \right)
+        .. math:: \left( \cos \left( \omega t \right),
+                  \sin \left( \omega t \right) \right)
 
         where :math:`\omega` is the period of the sinusoid.
 
@@ -1819,7 +2070,8 @@ class Sinusoid(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -1832,14 +2084,14 @@ class Sinusoid(Model):
 
     @property
     def amplitude(self) -> np.ndarray:
-        """ Amplitude of the sinusoid. """
+        """Amplitude of the sinusoid."""
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
-        return np.sqrt(np.sum(self.par ** 2, axis=0))
+        return np.sqrt(np.sum(self.par**2, axis=0))
 
     @property
     def phase(self) -> np.ndarray:
-        """ Phase of the sinusoid. """
+        """Phase of the sinusoid."""
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         return np.arctan2(self.par[1, :], self.par[0, :])
@@ -1860,7 +2112,8 @@ class AmpPhModulatedSinusoid(Model):
     Parameters
     ----------
     period
-        Nominal period length :math:`T` in :attr:`~disstans.models.Model.time_unit` units.
+        Nominal period length :math:`T` in :attr:`~disstans.models.Model.time_unit`
+        units.
     degree
         Degree :math:`p` of the B-spline to be used.
     num_bases
@@ -1868,35 +2121,43 @@ class AmpPhModulatedSinusoid(Model):
         Needs to be at least ``2``.
     obs_scale
         Determines how many factors of the average scale should be sampled by the
-        ``timevector`` input to :meth:`~Model.get_mapping` to accept an individual B-spline
-        as observable.
+        ``timevector`` input to :meth:`~Model.get_mapping` to accept an individual
+        B-spline as observable.
 
 
     See Also
     --------
     Sinusoid : For the definition of the functional form of the sinusoid.
     """
-    def __init__(self,
-                 period: float,
-                 degree: int,
-                 num_bases: int,
-                 t_start: str | pd.Timestamp,
-                 t_end: str | pd.Timestamp,
-                 t_reference: str | pd.Timestamp | None = None,
-                 time_unit: str = "D",
-                 obs_scale: float = 2.0,
-                 regularize: bool = True,
-                 **model_kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        period: float,
+        degree: int,
+        num_bases: int,
+        t_start: str | pd.Timestamp,
+        t_end: str | pd.Timestamp,
+        t_reference: str | pd.Timestamp | None = None,
+        time_unit: str = "D",
+        obs_scale: float = 2.0,
+        regularize: bool = True,
+        **model_kw_args,
+    ) -> None:
         # input tests
         assert num_bases > 1, "'num_bases' needs to be at least 2."
         num_parameters = 2 * num_bases
         if t_reference is None:
             t_reference = t_start
         # initialize Model
-        super().__init__(num_parameters=num_parameters, t_start=t_start, t_end=t_end,
-                         t_reference=t_reference, time_unit=time_unit, regularize=regularize,
-                         **model_kw_args)
+        super().__init__(
+            num_parameters=num_parameters,
+            t_start=t_start,
+            t_end=t_end,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            regularize=regularize,
+            **model_kw_args,
+        )
         # save some important parameters
         self.period = float(period)
         """ Nominal period of the sinusoid. """
@@ -1912,19 +2173,28 @@ class AmpPhModulatedSinusoid(Model):
         num_knots = int(num_bases) - int(degree) + 1
         inner_knots = np.linspace(0, 1, num=num_knots)
         full_knots = np.concatenate([[0] * self.degree, inner_knots, [1] * self.degree])
-        self._bases = [sp_bspl.basis_element(full_knots[i:i + self.degree + 2],
-                                             extrapolate=False)
-                       for i in range(self.num_bases)]
+        self._bases = [
+            sp_bspl.basis_element(
+                full_knots[i : i + self.degree + 2], extrapolate=False
+            )
+            for i in range(self.num_bases)
+        ]
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "AmpPhModulatedSinusoid",
-                "kw_args": {"period": self.period,
-                            "degree": self.degree,
-                            "num_bases": self.num_bases,
-                            "obs_scale": self.observability_scale}}
+        arch = {
+            "type": "AmpPhModulatedSinusoid",
+            "kw_args": {
+                "period": self.period,
+                "degree": self.degree,
+                "num_bases": self.num_bases,
+                "obs_scale": self.observability_scale,
+            },
+        }
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -1940,7 +2210,8 @@ class AmpPhModulatedSinusoid(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -1957,9 +2228,10 @@ class AmpPhModulatedSinusoid(Model):
         # get the mapping matrix defined by the splines
         coef_bspl = np.stack([base_fn(phase_norm) for base_fn in self._bases], axis=1)
         coef_bspl[np.isnan(coef_bspl)] = 0
-        # problem: if we're only observing a small fraction of a basis function, we don't
-        # want to try to estimate it, since it's only going to make our solving process less
-        # stable. so: if we only observe < obs_scale * average scale length, we ignore it.
+        # problem: if we're only observing a small fraction of a basis function, we
+        # don't want to try to estimate it, since it's only going to make our solving
+        # process less stable.
+        # so: if we only observe < obs_scale * average scale length, we ignore it.
         num_bases = len(self._bases)
         avg_scale = t_span / (num_bases - 1)
         is_nonzero = np.abs(coef_bspl) > 0
@@ -1967,18 +2239,22 @@ class AmpPhModulatedSinusoid(Model):
         t_min_max[:] = np.nan
         for i in range(num_bases):
             if np.any(is_nonzero[:, i]):
-                t_min_max[i, :] = [dt[is_nonzero[:, i]].min(), dt[is_nonzero[:, i]].max()]
+                t_min_max[i, :] = [
+                    dt[is_nonzero[:, i]].min(),
+                    dt[is_nonzero[:, i]].max(),
+                ]
         del_t = t_min_max[:, 1] - t_min_max[:, 0]
-        set_unobservable = del_t < (self.observability_scale *
-                                    avg_scale / Timedelta(1, self.time_unit))
+        set_unobservable = del_t < (
+            self.observability_scale * avg_scale / Timedelta(1, self.time_unit)
+        )
         coef_bspl[:, set_unobservable] = 0
         # modulate the sine and cosine mapping matrix with the basis functions
         coefs = np.concatenate([coef_bspl * coef_cosine, coef_bspl * coef_sine], axis=1)
         return coefs
 
-    def get_inst_amplitude_phase(self,
-                                 num_points: int = 1000
-                                 ) -> tuple[np.ndarray, np.ndarray]:
+    def get_inst_amplitude_phase(
+        self, num_points: int = 1000
+    ) -> tuple[np.ndarray, np.ndarray]:
         r"""
         Calculate the instantaenous (time-varying) amplitude and phase of the sinusoid
         over its entire fitted domain.
@@ -2006,8 +2282,8 @@ class AmpPhModulatedSinusoid(Model):
         coef_bspl = np.stack([base_fn(phase_norm) for base_fn in self._bases], axis=1)
         coef_bspl[np.isnan(coef_bspl)] = 0
         # calculate the timeseries of a and b
-        a_mat = (coef_bspl @ self.par[:coef_bspl.shape[1], :]).reshape(num_points, -1)
-        b_mat = (coef_bspl @ self.par[coef_bspl.shape[1]:, :]).reshape(num_points, -1)
+        a_mat = (coef_bspl @ self.par[: coef_bspl.shape[1], :]).reshape(num_points, -1)
+        b_mat = (coef_bspl @ self.par[coef_bspl.shape[1] :, :]).reshape(num_points, -1)
         # calculate amplitude and phase
         amplitude = np.sqrt(a_mat**2 + b_mat**2)
         phase = np.arctan2(b_mat, a_mat)
@@ -2015,14 +2291,14 @@ class AmpPhModulatedSinusoid(Model):
 
     @property
     def amplitude(self) -> np.ndarray:
-        """ Average amplitude of the sinusoid. """
+        """Average amplitude of the sinusoid."""
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         return np.mean(self.get_inst_amplitude_phase()[0], axis=0)
 
     @property
     def phase(self) -> np.ndarray:
-        """ Average phase of the sinusoid. """
+        """Average phase of the sinusoid."""
         if self.par is None:
             RuntimeError("Cannot evaluate the model before reading in parameters.")
         return np.mean(self.get_inst_amplitude_phase()[1], axis=0)
@@ -2042,53 +2318,72 @@ class Logarithmic(Model):
         It represents the time at which, after zero-crossing at the reference
         time, the logarithm reaches the value 1 (before model scaling).
     sign_constraint
-        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
-        sign, avoiding sign flips between individual logarithms. This is useful if
+        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to
+        this sign, avoiding sign flips between individual logarithms. This is useful if
         the resulting curve should be monotonous. It can also be a list, where
         each entry applies to one data component (needs to be known at initialization).
         If ``None``, no constraint is enforced.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 tau: float | list[float] | np.ndarray,
-                 t_reference: str | pd.Timestamp,
-                 sign_constraint: int | list[int] | None = None,
-                 time_unit: str = "D", t_start=None,
-                 zero_after: bool = False,
-                 **model_kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        tau: float | list[float] | np.ndarray,
+        t_reference: str | pd.Timestamp,
+        sign_constraint: int | list[int] | None = None,
+        time_unit: str = "D",
+        t_start=None,
+        zero_after: bool = False,
+        **model_kw_args,
+    ) -> None:
         if t_start is None:
             t_start = t_reference
         tau = np.atleast_1d(tau)
-        assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
-                              f"array of shape {tau.shape}."
+        assert tau.ndim <= 1, (
+            "'tau' can either be a scalar or one-dimensional vector, got "
+            f"array of shape {tau.shape}."
+        )
         self.tau = tau
         """ Logarithmic time constant(s). """
-        assert ((sign_constraint in [1, -1, None]) or
-                (isinstance(sign_constraint, list) and
-                 all([s in [1, -1, None] for s in sign_constraint]))), "'sign_constraint' " \
+        assert (sign_constraint in [1, -1, None]) or (
+            isinstance(sign_constraint, list)
+            and all([s in [1, -1, None] for s in sign_constraint])
+        ), (
+            "'sign_constraint' "
             f"must be None, -1, 1, or a list of None, -1, and 1, got {sign_constraint}."
+        )
         self.sign_constraint = sign_constraint
         """
         Flag whether the sign of the fitted parameters should be constrained.
         """
         # initialize Model object
-        super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
-                         time_unit=time_unit, zero_after=zero_after, **model_kw_args)
-        assert self.t_reference <= self.t_start, \
-            "Logarithmic model has to have valid bounds, but the reference time " + \
-            f"{self.t_reference_str} is after the start time {self.t_start_str}."
+        super().__init__(
+            num_parameters=tau.size,
+            t_reference=t_reference,
+            t_start=t_start,
+            time_unit=time_unit,
+            zero_after=zero_after,
+            **model_kw_args,
+        )
+        assert self.t_reference <= self.t_start, (
+            "Logarithmic model has to have valid bounds, but the reference time "
+            + f"{self.t_reference_str} is after the start time {self.t_start_str}."
+        )
 
     def _get_arch(self) -> dict[str, Any]:
         tau = self.tau.tolist() if self.tau.size > 1 else self.tau[0]
-        arch = {"type": "Logarithmic",
-                "kw_args": {"tau": tau,
-                            "sign_constraint": self.sign_constraint}}
+        arch = {
+            "type": "Logarithmic",
+            "kw_args": {"tau": tau, "sign_constraint": self.sign_constraint},
+        }
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -2102,7 +2397,8 @@ class Logarithmic(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -2127,58 +2423,76 @@ class Exponential(Model):
         Exponential time constant(s) :math:`\tau`.
         It represents the amount of time that it takes for the (general) exponential
         function's value to be multiplied by :math:`e`.
-        Applied to this model, for a given relative amplitude :math:`a` (so :math:`0 < a < 1`,
-        before model scaling) to be reached at given :math:`\Delta t` past ``t_start``,
-        :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
+        Applied to this model, for a given relative amplitude :math:`a` (so
+        :math:`0 < a < 1`, before model scaling) to be reached at given :math:`\Delta t`
+        past ``t_start``, :math:`\tau = - \frac{\Delta t}{\ln(1 - a)}`
     sign_constraint
-        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to this
-        sign, avoiding sign flips between individual exponentials. This is useful if
-        the resulting curve should be monotonous. It can also be a list, where
+        Can be ``+1`` or ``-1``, and tells the solver to constrain fitted parameters to
+        this sign, avoiding sign flips between individual exponentials. This is useful
+        if the resulting curve should be monotonous. It can also be a list, where
         each entry applies to one data component (needs to be known at initialization).
         If ``None``, no constraint is enforced.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 tau: float | list[float] | np.ndarray,
-                 t_reference: str | pd.Timestamp,
-                 sign_constraint: int | list[int] | None = None,
-                 time_unit: str = "D",
-                 t_start: str | pd.Timestamp | None = None,
-                 zero_after: bool = False,
-                 **model_kw_args
-                 ) -> None:
+
+    def __init__(
+        self,
+        tau: float | list[float] | np.ndarray,
+        t_reference: str | pd.Timestamp,
+        sign_constraint: int | list[int] | None = None,
+        time_unit: str = "D",
+        t_start: str | pd.Timestamp | None = None,
+        zero_after: bool = False,
+        **model_kw_args,
+    ) -> None:
         if t_start is None:
             t_start = t_reference
         tau = np.atleast_1d(tau)
-        assert tau.ndim <= 1, "'tau' can either be a scalar or one-dimensional vector, got " \
-                              f"array of shape {tau.shape}."
+        assert tau.ndim <= 1, (
+            "'tau' can either be a scalar or one-dimensional vector, got "
+            f"array of shape {tau.shape}."
+        )
         self.tau = tau
         """ Exponential time constant(s). """
-        assert ((sign_constraint in [1, -1, None]) or
-                (isinstance(sign_constraint, list) and
-                 all([s in [1, -1, None] for s in sign_constraint]))), "'sign_constraint' " \
+        assert (sign_constraint in [1, -1, None]) or (
+            isinstance(sign_constraint, list)
+            and all([s in [1, -1, None] for s in sign_constraint])
+        ), (
+            "'sign_constraint' "
             f"must be None, -1, 1, or a list of None, -1, and 1, got {sign_constraint}."
+        )
         self.sign_constraint = sign_constraint
         """
         Flag whether the sign of the fitted parameters should be constrained.
         """
         # initialize Model object
-        super().__init__(num_parameters=tau.size, t_reference=t_reference, t_start=t_start,
-                         time_unit=time_unit, zero_after=zero_after, **model_kw_args)
-        assert self.t_reference <= self.t_start, \
-            "Exponential model has to have valid bounds, but the reference time " + \
-            f"{self.t_reference_str} is after the start time {self.t_start_str}."
+        super().__init__(
+            num_parameters=tau.size,
+            t_reference=t_reference,
+            t_start=t_start,
+            time_unit=time_unit,
+            zero_after=zero_after,
+            **model_kw_args,
+        )
+        assert self.t_reference <= self.t_start, (
+            "Exponential model has to have valid bounds, but the reference time "
+            + f"{self.t_reference_str} is after the start time {self.t_start_str}."
+        )
 
     def _get_arch(self) -> dict[str, Any]:
         tau = self.tau.tolist() if self.tau.size > 1 else self.tau[0]
-        arch = {"type": "Exponential",
-                "kw_args": {"tau": tau,
-                            "sign_constraint": self.sign_constraint}}
+        arch = {
+            "type": "Exponential",
+            "kw_args": {"tau": tau, "sign_constraint": self.sign_constraint},
+        }
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -2192,7 +2506,8 @@ class Exponential(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -2226,31 +2541,42 @@ class Arctangent(Model):
         i.e. half of the one-sided amplitude.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 tau: float,
-                 t_reference: str | pd.Timestamp,
-                 time_unit: str = "D",
-                 zero_before: bool = False,
-                 zero_after: bool = False,
-                 **model_kw_args
-                 ) -> None:
-        super().__init__(num_parameters=1, t_reference=t_reference, time_unit=time_unit,
-                         zero_before=zero_before, zero_after=zero_after, **model_kw_args)
+
+    def __init__(
+        self,
+        tau: float,
+        t_reference: str | pd.Timestamp,
+        time_unit: str = "D",
+        zero_before: bool = False,
+        zero_after: bool = False,
+        **model_kw_args,
+    ) -> None:
+        super().__init__(
+            num_parameters=1,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            zero_before=zero_before,
+            zero_after=zero_after,
+            **model_kw_args,
+        )
         self.tau = float(tau)
         """ Arctangent time constant. """
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "Arctangent",
-                "kw_args": {"tau": self.tau}}
+        arch = {"type": "Arctangent", "kw_args": {"tau": self.tau}}
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
-        .. math:: \left( \frac{1}{\pi} \arctan \left( \frac{t}{\tau} \right) + 0.5 \right)
+        .. math:: \left( \frac{1}{\pi} \arctan
+                  \left( \frac{t}{\tau} \right) + 0.5 \right)
 
         where :math:`\tau` is the arctangent time constant.
 
@@ -2260,7 +2586,8 @@ class Arctangent(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -2290,27 +2617,37 @@ class HyperbolicTangent(Model):
         :math:`\tau = T / \left(2 \tanh^{-1} q \right)`.
 
 
-    See :class:`~disstans.models.Model` for attribute descriptions and more keyword arguments.
+    See :class:`~disstans.models.Model` for attribute descriptions and more keyword
+    arguments.
     """
-    def __init__(self,
-                 tau: float,
-                 t_reference: str | pd.Timestamp,
-                 time_unit: str = "D",
-                 zero_before: bool = False,
-                 zero_after: bool = False,
-                 **model_kw_args
-                 ) -> None:
-        super().__init__(num_parameters=1, t_reference=t_reference, time_unit=time_unit,
-                         zero_before=zero_before, zero_after=zero_after, **model_kw_args)
+
+    def __init__(
+        self,
+        tau: float,
+        t_reference: str | pd.Timestamp,
+        time_unit: str = "D",
+        zero_before: bool = False,
+        zero_after: bool = False,
+        **model_kw_args,
+    ) -> None:
+        super().__init__(
+            num_parameters=1,
+            t_reference=t_reference,
+            time_unit=time_unit,
+            zero_before=zero_before,
+            zero_after=zero_after,
+            **model_kw_args,
+        )
         self.tau = float(tau)
         """ Time constant. """
 
     def _get_arch(self) -> dict[str, Any]:
-        arch = {"type": "HyperbolicTangent",
-                "kw_args": {"tau": self.tau}}
+        arch = {"type": "HyperbolicTangent", "kw_args": {"tau": self.tau}}
         return arch
 
-    def get_mapping_single(self, timevector: pd.Series | pd.DatetimeIndex) -> np.ndarray:
+    def get_mapping_single(
+        self, timevector: pd.Series | pd.DatetimeIndex
+    ) -> np.ndarray:
         r"""
         Calculate the mapping factors at times :math:`t` as
 
@@ -2324,7 +2661,8 @@ class HyperbolicTangent(Model):
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
 
         Returns
         -------
@@ -2352,22 +2690,28 @@ def check_model_dict(models: dict[str, dict]) -> None:
     AssertionError
         If the dictionary structure is invalid.
     """
-    assert isinstance(models, dict), \
-        f"'models' input needs to be a dictionary, got {type(models)}."
-    assert all([isinstance(mdl_name, str) for mdl_name in models.keys()]), \
-        f"Model names need to be strings, got {models.keys()}."
-    assert all([isinstance(mdl_config, dict) for mdl_config in models.values()]), \
-        f"Model configurations need to be dictionaries, got {models.keys()}."
+    assert isinstance(
+        models, dict
+    ), f"'models' input needs to be a dictionary, got {type(models)}."
+    assert all(
+        [isinstance(mdl_name, str) for mdl_name in models.keys()]
+    ), f"Model names need to be strings, got {models.keys()}."
+    assert all(
+        [isinstance(mdl_config, dict) for mdl_config in models.values()]
+    ), f"Model configurations need to be dictionaries, got {models.keys()}."
     for mdl_name, mdl_config in models.items():
-        assert all([key in mdl_config.keys() for key in ["type", "kw_args"]]), \
-            f"The configuration dictionary for '{mdl_name}' needs to contain " \
+        assert all([key in mdl_config.keys() for key in ["type", "kw_args"]]), (
+            f"The configuration dictionary for '{mdl_name}' needs to contain "
             f"the keys 'type' and 'kw_args', got {mdl_config.keys()}."
-        assert isinstance(mdl_config["type"], str), \
-            f"'type' in configuration dictionary for '{mdl_name}' needs to be " \
+        )
+        assert isinstance(mdl_config["type"], str), (
+            f"'type' in configuration dictionary for '{mdl_name}' needs to be "
             f"a string, got {mdl_config['type']}."
-        assert isinstance(mdl_config["kw_args"], dict), \
-            f"'kw_args' in configuration dictionary for '{mdl_name}' needs to be " \
+        )
+        assert isinstance(mdl_config["kw_args"], dict), (
+            f"'kw_args' in configuration dictionary for '{mdl_name}' needs to be "
             f"a dictionary, got {mdl_config['kw_args']}."
+        )
 
 
 # make a custom object that serves as the "all models" fit key
@@ -2387,7 +2731,7 @@ class FitCollection(UserDict):
         """
 
 
-class ModelCollection():
+class ModelCollection:
     """
     Class that contains :class:`~Model` objects and is mainly used to keep track
     of across-model variables and relations such as the cross-model covariances.
@@ -2447,12 +2791,16 @@ class ModelCollection():
         :attr:`~collection`. Setting or updating a model forces the collection's
         parameter and covariance matrices to be reset to ``None``.
         """
-        assert isinstance(model_description, str) and isinstance(model, Model), \
-            "'model_description' needs to be a string and 'model' needs to be a Model, " \
+        assert isinstance(model_description, str) and isinstance(model, Model), (
+            "'model_description' needs to be a string and 'model' needs to be a Model, "
             f"got {(type(model_description), type(model))}."
+        )
         if model_description in self.collection:
-            warn(f"ModelCollection: Overwriting model '{model_description}'.",
-                 category=RuntimeWarning, stacklevel=2)
+            warn(
+                f"ModelCollection: Overwriting model '{model_description}'.",
+                category=RuntimeWarning,
+                stacklevel=2,
+            )
         self._par = None
         self._cov = None
         self.collection[model_description] = model
@@ -2551,8 +2899,10 @@ class ModelCollection():
         -------
             Model keyword dictionary.
         """
-        arch = {"type": "ModelCollection",
-                "collection": {k: v.get_arch() for k, v in self.collection.items()}}
+        arch = {
+            "type": "ModelCollection",
+            "collection": {k: v.get_arch() for k, v in self.collection.items()},
+        }
         return arch
 
     def items(self) -> ItemsView:
@@ -2561,11 +2911,12 @@ class ModelCollection():
         """
         return self.collection.items()
 
-    def copy(self,
-             parameters: bool = True,
-             covariances: bool = True,
-             active_parameters: bool = True
-             ) -> ModelCollection:
+    def copy(
+        self,
+        parameters: bool = True,
+        covariances: bool = True,
+        active_parameters: bool = True,
+    ) -> ModelCollection:
         """
         Copy the model collection object.
 
@@ -2587,9 +2938,15 @@ class ModelCollection():
             :meth:`~disstans.models.Model.copy` method.
         """
         return ModelCollection.from_model_dict(
-            {mdl_desc: mdl.copy(parameters=parameters, covariances=covariances,
-                                active_parameters=active_parameters)
-             for mdl_desc, mdl in self.collection.items()})
+            {
+                mdl_desc: mdl.copy(
+                    parameters=parameters,
+                    covariances=covariances,
+                    active_parameters=active_parameters,
+                )
+                for mdl_desc, mdl in self.collection.items()
+            }
+        )
 
     def convert_units(self, factor: float) -> None:
         """
@@ -2599,14 +2956,16 @@ class ModelCollection():
         Parameters
         ----------
         factor
-            Factor to multiply the parameters by to obtain the parameters in the new units.
+            Factor to multiply the parameters by to obtain the parameters in the new
+            units.
         """
         # input checks
         try:
             factor = float(factor)
         except TypeError as e:
-            raise TypeError(f"'factor' and has to be a scalar, got {type(factor)}."
-                            ).with_traceback(e.__traceback__) from e
+            raise TypeError(
+                f"'factor' and has to be a scalar, got {type(factor)}."
+            ).with_traceback(e.__traceback__) from e
         # convert parameters
         if self._par is not None:
             self._par *= factor
@@ -2676,8 +3035,14 @@ class ModelCollection():
         parameters, and ``False`` otherwise.
         """
         if len(self) > 0:
-            active_params = [m.active_parameters if m.active_parameters is not None
-                             else np.ones(m.num_parameters, dtype=bool) for m in self]
+            active_params = [
+                (
+                    m.active_parameters
+                    if m.active_parameters is not None
+                    else np.ones(m.num_parameters, dtype=bool)
+                )
+                for m in self
+            ]
             active_params = np.concatenate(active_params)
             if np.all(active_params):
                 return None
@@ -2693,25 +3058,34 @@ class ModelCollection():
         test_par = [m.par for m in self]
         test_par_anynone = any([p is None for p in test_par])
         if (self._par is None) and not test_par_anynone:
-            warn("Discrepancy between ModelCollection parameters and individual "
-                 "parameters: collection is not fitted.", stacklevel=2)
+            warn(
+                "Discrepancy between ModelCollection parameters and individual "
+                "parameters: collection is not fitted.",
+                stacklevel=2,
+            )
         elif self._par is not None:
-            assert self._par.shape[0] == self.num_parameters, \
-                "Saved parameter matrix does not match the model list in the collection."
+            assert (
+                self._par.shape[0] == self.num_parameters
+            ), "Saved parameter matrix does not match the model list in the collection."
             if test_par_anynone:
-                warn("Discrepancy between ModelCollection parameters and individual "
-                     "parameters: individual models are not fitted.", stacklevel=2)
+                warn(
+                    "Discrepancy between ModelCollection parameters and individual "
+                    "parameters: individual models are not fitted.",
+                    stacklevel=2,
+                )
             else:
                 test_par = np.concatenate(test_par, axis=0)
                 if not np.allclose(self._par, test_par):
-                    warn("Discrepancy between ModelCollection parameters and individual "
-                         "parameters: not matching (returning collection values).",
-                         stacklevel=2)
+                    warn(
+                        "Discrepancy between ModelCollection parameters and individual "
+                        "parameters: not matching (returning collection values).",
+                        stacklevel=2,
+                    )
         return self._par
 
     @property
     def parameters(self) -> np.ndarray:
-        """ Alias for :attr:`~par`. """
+        """Alias for :attr:`~par`."""
         return self.par
 
     @property
@@ -2729,44 +3103,56 @@ class ModelCollection():
     def cov(self) -> np.ndarray:
         r"""
         Square array property with dimensions
-        :math:`\text{num_elements} * \text{num_components}` that contains the parameter's
-        full covariance matrix as a NumPy array. The rows (and columns) are ordered such
-        that they first correspond to the covariances between all components for the first
-        parameter, then the covariance between all components for the second parameter,
-        and so forth.
+        :math:`\text{num_elements} * \text{num_components}` that contains the
+        parameter's full covariance matrix as a NumPy array. The rows (and columns) are
+        ordered such that they first correspond to the covariances between all
+        components for the first parameter, then the covariance between all components
+        for the second parameter, and so forth.
         """
         test_cov = [m.cov for m in self]
         test_cov_anynone = any([p is None for p in test_cov])
         if (self._cov is None) and not test_cov_anynone:
-            warn("Discrepancy between ModelCollection covariance and individual "
-                 "covariances: collection is not fitted.", stacklevel=2)
+            warn(
+                "Discrepancy between ModelCollection covariance and individual "
+                "covariances: collection is not fitted.",
+                stacklevel=2,
+            )
         elif self._cov is not None:
             par_size = self.par.shape[0] * self.par.shape[1]
-            assert self._cov.shape == (par_size, par_size), \
-                "Saved covariance matrix does not match the model list in the collection."
+            assert self._cov.shape == (
+                par_size,
+                par_size,
+            ), (
+                "Saved covariance matrix does not match the "
+                "model list in the collection."
+            )
             if test_cov_anynone:
-                warn("Discrepancy between ModelCollection covariance and individual "
-                     "covariances: individual models are not fitted.", stacklevel=2)
+                warn(
+                    "Discrepancy between ModelCollection covariance and individual "
+                    "covariances: individual models are not fitted.",
+                    stacklevel=2,
+                )
             else:
                 test_cov = sp.linalg.block_diag(*test_cov).ravel()
                 test_cov_nonzero = np.nonzero(test_cov)
                 test_cov = test_cov[test_cov_nonzero]
                 cov_nooffdiag = self._cov.ravel()[test_cov_nonzero]
                 if not np.allclose(cov_nooffdiag, test_cov, equal_nan=True):
-                    warn("Discrepancy between ModelCollection covariance and individual "
-                         "covariance: not matching (returning collection values).",
-                         stacklevel=2)
+                    warn(
+                        "Discrepancy between ModelCollection covariance and individual "
+                        "covariance: not matching (returning collection values).",
+                        stacklevel=2,
+                    )
         return self._cov
 
     @property
     def covariances(self) -> np.ndarray:
-        """ Alias for :attr:`~cov`. """
+        """Alias for :attr:`~cov`."""
         return self.cov
 
-    def freeze(self,
-               model_list: list[str] | None = None,
-               zero_threshold: float = 1e-10
-               ) -> None:
+    def freeze(
+        self, model_list: list[str] | None = None, zero_threshold: float = 1e-10
+    ) -> None:
         """
         Convenience function that calls :meth:`~disstans.models.Model.freeze` for all
         models (or a subset thereof) contained in the collection.
@@ -2781,11 +3167,14 @@ class ModelCollection():
             set to zero and set inactive.
         """
         if model_list is not None:
-            assert (isinstance(model_list, list)
-                    and all([isinstance(mdl, str) for mdl in model_list])), \
-                f"'model_list' needs to be a list of strings, got {model_list}."
-        for model in [mdl for mdl_description, mdl in self.items()
-                      if (model_list is None) or (mdl_description in model_list)]:
+            assert isinstance(model_list, list) and all(
+                [isinstance(mdl, str) for mdl in model_list]
+            ), f"'model_list' needs to be a list of strings, got {model_list}."
+        for model in [
+            mdl
+            for mdl_description, mdl in self.items()
+            if (model_list is None) or (mdl_description in model_list)
+        ]:
             model.freeze(zero_threshold)
 
     def unfreeze(self, model_list: list[str] | None = None) -> None:
@@ -2800,20 +3189,22 @@ class ModelCollection():
             unfreeze the corresponding models in the collection.
         """
         if model_list is not None:
-            assert (isinstance(model_list, list)
-                    and all([isinstance(mdl, str) for mdl in model_list])), \
-                f"'model_list' needs to be a list of strings, got {model_list}."
-        for model in [mdl for mdl_description, mdl in self.items()
-                      if (model_list is None) or (mdl_description in model_list)]:
+            assert isinstance(model_list, list) and all(
+                [isinstance(mdl, str) for mdl in model_list]
+            ), f"'model_list' needs to be a list of strings, got {model_list}."
+        for model in [
+            mdl
+            for mdl_description, mdl in self.items()
+            if (model_list is None) or (mdl_description in model_list)
+        ]:
             model.unfreeze()
 
     # "inherit" the read_parameter function from the Model class
     _read_parameters = Model.read_parameters
 
-    def read_parameters(self,
-                        parameters: np.ndarray,
-                        covariances: np.ndarray | None = None
-                        ) -> None:
+    def read_parameters(
+        self, parameters: np.ndarray, covariances: np.ndarray | None = None
+    ) -> None:
         r"""
         Reads in the entire collection's parameters :math:`\mathbf{m}` (optionally also
         their covariance) and stores them in the instance attributes.
@@ -2824,9 +3215,9 @@ class ModelCollection():
             Model collection parameters of shape
             :math:`(\text{num_parameters}, \text{num_components})`.
         covariances
-            Model collection component (co-)variances that can either have the same shape
-            as ``parameters``, in which case every parameter and component only has a
-            variance, or it is square with dimensions
+            Model collection component (co-)variances that can either have the same
+            shape as ``parameters``, in which case every parameter and component only
+            has a variance, or it is square with dimensions
             :math:`\text{num_parameters} * \text{num_components}`, in which case it
             represents a full variance-covariance matrix.
         """
@@ -2839,7 +3230,7 @@ class ModelCollection():
             if self._par is None:
                 param_model = None
             else:
-                param_model = self._par[ix_params:ix_params + model.num_parameters, :]
+                param_model = self._par[ix_params : ix_params + model.num_parameters, :]
             # get covariance slice
             if (self._par is None) or (self._cov is None):
                 cov_model = None
@@ -2854,24 +3245,27 @@ class ModelCollection():
     # "inherit" the evaluate function from the Model class
     evaluate = Model.evaluate
 
-    def get_mapping(self,
-                    timevector: pd.Series | pd.DatetimeIndex,
-                    return_observability: bool = False,
-                    ignore_active_parameters: bool = False
-                    ) -> sparse.csc_matrix | tuple[sparse.csc_matrix, np.ndarray]:
+    def get_mapping(
+        self,
+        timevector: pd.Series | pd.DatetimeIndex,
+        return_observability: bool = False,
+        ignore_active_parameters: bool = False,
+    ) -> sparse.csc_matrix | tuple[sparse.csc_matrix, np.ndarray]:
         r"""
-        Builds the mapping matrix :math:`\mathbf{G}` given a time vector :math:`\mathbf{t}`
-        by concatenating the individual mapping matrices from each contained model using
-        their method :meth:`~disstans.models.Model.get_mapping` (see for more details).
+        Builds the mapping matrix :math:`\mathbf{G}` given a time vector
+        :math:`\mathbf{t}` by concatenating the individual mapping matrices from each
+        contained model using their method :meth:`~disstans.models.Model.get_mapping`
+        (see for more details).
 
-        This method respects the parameters being set invalid by :meth:`~freeze`, and will
-        interpret those parameters to be unobservable.
+        This method respects the parameters being set invalid by :meth:`~freeze`, and
+        will interpret those parameters to be unobservable.
 
         Parameters
         ----------
         timevector
             :class:`~pandas.Series` of :class:`~pandas.Timestamp` or alternatively a
-            :class:`~pandas.DatetimeIndex` containing the timestamps of each observation.
+            :class:`~pandas.DatetimeIndex` containing the timestamps of each
+            observation.
         return_observability
             If true, the function will check if there are any all-zero columns, which
             would point to unobservable parameters, and return a boolean mask with the
@@ -2888,27 +3282,44 @@ class ModelCollection():
             A boolean NumPy array of the same length as ``mapping`` has columns.
             ``False`` indicates (close to) all-zero columns (unobservable parameters).
         """
-        mappings = [m.get_mapping(timevector,
-                                  return_observability=return_observability,
-                                  ignore_active_parameters=ignore_active_parameters)
-                    for m in self]
+        mappings = [
+            m.get_mapping(
+                timevector,
+                return_observability=return_observability,
+                ignore_active_parameters=ignore_active_parameters,
+            )
+            for m in self
+        ]
         if return_observability:
-            mapping = sparse.hstack([m[0] for m in mappings], format='csc')
+            mapping = sparse.hstack([m[0] for m in mappings], format="csc")
             observable = np.concatenate([m[1] for m in mappings], axis=0)
             return mapping, observable
         else:
-            mapping = sparse.hstack(mappings, format='csc')
+            mapping = sparse.hstack(mappings, format="csc")
             return mapping
 
-    def prepare_LS(self,
-                   ts: Timeseries,
-                   include_regularization: bool = True,
-                   reweight_init:
-                       np.ndarray | list[np.ndarray] | dict[str, np.ndarray] | None = None,
-                   use_internal_scales: bool = False,
-                   check_constraints: bool = False
-                   ) -> tuple[sparse.spmatrix, np.ndarray, int, int, int, int,
-                              int, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def prepare_LS(
+        self,
+        ts: Timeseries,
+        include_regularization: bool = True,
+        reweight_init: (
+            np.ndarray | list[np.ndarray] | dict[str, np.ndarray] | None
+        ) = None,
+        use_internal_scales: bool = False,
+        check_constraints: bool = False,
+    ) -> tuple[
+        sparse.spmatrix,
+        np.ndarray,
+        int,
+        int,
+        int,
+        int,
+        int,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
         r"""
         Helper function that concatenates the mapping matrices of the collection
         models given the timevector in in the input timeseries, and returns some
@@ -2928,10 +3339,10 @@ class ModelCollection():
         reweight_init
             Contains the initial weights for the current iteration of the least squares
             problem. It can be a Numpy array or a list of Numpy arrays, in which case it
-            (or the array created by concatenating the list) need to already have the right
-            output shape (no check is performed). If it is a dictionary, the keys need to be
-            model names, and the values are then the Numpy arrays which will be arranged
-            properly to match the mapping matrix.
+            (or the array created by concatenating the list) need to already have the
+            right output shape (no check is performed). If it is a dictionary, the keys
+            need to be model names, and the values are then the Numpy arrays which will
+            be arranged properly to match the mapping matrix.
         use_internal_scales
             If ``True``, also return the internal model scales,
             subset to the observable and regularized parameters.
@@ -2995,19 +3406,23 @@ class ModelCollection():
             # reg_mask_full has shape (self.num_parameters, ) and is True if
             # a parameter should be regularized
             reg_mask_full = self.regularized_mask
-            # now, we need the regularization mask reg_mask for the reduced G matrix, which
-            # will only contain observable columns, has therefore shape (sum(obs_mask), )
+            # now, we need the regularization mask reg_mask for the reduced G matrix,
+            # which will only contain observable columns,
+            # has therefore shape (sum(obs_mask), )
             reg_mask = np.array(reg_mask_full)[obs_mask]
-            # num_reg is the number of parameters that are both observable and regularized
+            # num_reg is the number of parameters that are both
+            # observable and regularized
             num_reg = sum(reg_mask)
             if num_reg == 0:
                 warn("Regularized solver got no models to regularize.", stacklevel=2)
-            # if use_internal_scales, we still need the scales for all the observable and
-            # regularized parameters
+            # if use_internal_scales, we still need the scales for all the observable
+            #  andregularized parameters
             # self.internal_scales has shape (self.num_parameters, ) so we can use the
             # combination of obs_mask and reg_mask_full to find the relevant subset
             if use_internal_scales:
-                weights_scaling = self.internal_scales[np.logical_and(reg_mask_full, obs_mask)]
+                weights_scaling = self.internal_scales[
+                    np.logical_and(reg_mask_full, obs_mask)
+                ]
             else:
                 weights_scaling = None
             # if there are initial weights, distribute those
@@ -3019,7 +3434,8 @@ class ModelCollection():
                 init_weights = np.concatenate(init_weights)
             elif isinstance(reweight_init, dict):
                 # concatenace the sub-arrays in the right order, and fill with empty
-                # weights (temporarily) in between, so that we can use the global obs_mask
+                # weights (temporarily) in between,
+                # so that we can use the global obs_mask
                 init_weights = []
                 for mdl_description, model in self.items():
                     if model.regularize and mdl_description in reweight_init:
@@ -3028,16 +3444,18 @@ class ModelCollection():
                         temp_weights = np.empty((model.num_parameters, num_comps))
                         temp_weights[:] = np.nan
                         init_weights.append(temp_weights)
-                init_weights = \
-                    np.concatenate(init_weights)[np.logical_and(reg_mask_full, obs_mask)]
+                init_weights = np.concatenate(init_weights)[
+                    np.logical_and(reg_mask_full, obs_mask)
+                ]
                 # this should not contain any NaNs anymore
                 assert np.isnan(init_weights).ravel().sum() == 0
             else:
                 raise ValueError("Unrecognized input for 'reweight_init'.")
             if init_weights is not None:
-                assert init_weights.shape == (num_reg, num_comps), \
-                    "The combined 'reweight_init' must have the shape " + \
-                    f"{(num_reg, num_comps)}, got {reweight_init.shape}."
+                assert init_weights.shape == (num_reg, num_comps), (
+                    "The combined 'reweight_init' must have the shape "
+                    + f"{(num_reg, num_comps)}, got {reweight_init.shape}."
+                )
             return_vals.extend([num_reg, reg_mask, init_weights, weights_scaling])
         if check_constraints:
             # check for constraints
@@ -3047,14 +3465,19 @@ class ModelCollection():
             for mdl_name, model in self.items():
                 try:
                     # one sign is broadcasted, or the list is inserted into the array
-                    sign_constraints[i:i + model.num_parameters, :] = model.sign_constraint
-                except AttributeError:  # model hasn't implemented constraints, just skip
+                    sign_constraints[i : i + model.num_parameters, :] = (
+                        model.sign_constraint
+                    )
+                except (
+                    AttributeError
+                ):  # model hasn't implemented constraints, just skip
                     pass
                 except ValueError as e:  # list doesn't match number of components
-                    raise ValueError(f"The sign constraint in the model '{mdl_name}' is "
-                                     "either not a scalar, or the list length does not "
-                                     f"match the number of data components ({num_comps})."
-                                     ).with_traceback(e.__traceback__) from e
+                    raise ValueError(
+                        f"The sign constraint in the model '{mdl_name}' is "
+                        "either not a scalar, or the list length does not "
+                        f"match the number of data components ({num_comps})."
+                    ).with_traceback(e.__traceback__) from e
                 i += model.num_parameters
             # subset to observables
             sign_constraints = sign_constraints[obs_mask, :]
@@ -3063,21 +3486,22 @@ class ModelCollection():
         return tuple(return_vals)
 
     @staticmethod
-    def build_LS(ts: Timeseries,
-                 G: sparse.spmatrix,
-                 obs_mask: np.ndarray,
-                 icomp: int | None = None,
-                 return_W_G: bool = False,
-                 use_data_var: bool = True,
-                 use_data_cov: bool = True
-                 ) -> tuple[sparse.spmatrix, sparse.spmatrix, np.ndarray, np.ndarray]:
+    def build_LS(
+        ts: Timeseries,
+        G: sparse.spmatrix,
+        obs_mask: np.ndarray,
+        icomp: int | None = None,
+        return_W_G: bool = False,
+        use_data_var: bool = True,
+        use_data_cov: bool = True,
+    ) -> tuple[sparse.spmatrix, sparse.spmatrix, np.ndarray, np.ndarray]:
         r"""
         Helper function that builds the necessary matrices to solve the
         least-squares problem for the observable parameters given observations.
 
         If the problem only attempts to solve a single data component (by specifying
-        its index in ``icomp``), it simply takes the input mapping matrix :math:`\mathbf{G}`,
-        creates the weight matrix :math:`\mathbf{W}`, and computes
+        its index in ``icomp``), it simply takes the input mapping matrix
+        :math:`\mathbf{G}`, creates the weight matrix :math:`\mathbf{W}`, and computes
         :math:`\mathbf{G}^T \mathbf{W} \mathbf{G}` as well as
         :math:`\mathbf{G}^T \mathbf{W} \mathbf{d}`.
 
@@ -3125,9 +3549,10 @@ class ModelCollection():
         """
         num_comps = ts.num_components
         if icomp is not None:
-            assert isinstance(icomp, int) and icomp in list(range(num_comps)), \
-                "'icomp' must be a valid integer component index (between 0 and " \
+            assert isinstance(icomp, int) and icomp in list(range(num_comps)), (
+                "'icomp' must be a valid integer component index (between 0 and "
                 f"{num_comps - 1}), got {icomp}."
+            )
             # d and G are dense
             d = ts.df[ts.data_cols[icomp]].values.reshape(-1, 1)
             dnotnan = ~np.isnan(d).squeeze()
@@ -3141,15 +3566,20 @@ class ModelCollection():
             # d is dense, G and W are sparse
             d = ts.data.values.reshape(-1, 1)
             dnotnan = ~np.isnan(d).squeeze()
-            Gout = sparse.kron(G[:, obs_mask], sparse.eye(num_comps), format='csr')
+            Gout = sparse.kron(G[:, obs_mask], sparse.eye(num_comps), format="csr")
             if dnotnan.sum() < dnotnan.size:
                 Gout = Gout[dnotnan, :]
             if (ts.cov_cols is not None) and use_data_var and use_data_cov:
                 var_cov_matrix = ts.var_cov.values
-                Wblocks = [sp.linalg.pinvh(np.reshape(var_cov_matrix[iobs, ts.var_cov_map],
-                                                      (num_comps, num_comps)))
-                           for iobs in range(ts.num_observations)]
-                W = sparse.block_diag(Wblocks, format='csr')
+                Wblocks = [
+                    sp.linalg.pinvh(
+                        np.reshape(
+                            var_cov_matrix[iobs, ts.var_cov_map], (num_comps, num_comps)
+                        )
+                    )
+                    for iobs in range(ts.num_observations)
+                ]
+                W = sparse.block_diag(Wblocks, format="csr")
                 W.eliminate_zeros()
                 if dnotnan.sum() < dnotnan.size:
                     W = W[dnotnan, :].tocsc()[:, dnotnan]
@@ -3173,43 +3603,44 @@ class ModelCollection():
         else:
             return GtWG, GtWd
 
-    def plot_covariance(self,
-                        title: str | None = None,
-                        fname: str | None = None,
-                        use_corr_coef: bool = False,
-                        plot_empty: bool = True,
-                        save_kw_args: dict = {"format": "png"}
-                        ) -> None:
+    def plot_covariance(
+        self,
+        title: str | None = None,
+        fname: str | None = None,
+        use_corr_coef: bool = False,
+        plot_empty: bool = True,
+        save_kw_args: dict = {"format": "png"},
+    ) -> None:
         """
-        Plotting method that displays the covariance (or correlation coefficient) matrix.
-        The axes are labeled by model names for easier interpretation.
+        Plotting method that displays the covariance (or correlation coefficient)
+        matrix. The axes are labeled by model names for easier interpretation.
 
         Parameters
         ----------
         title
             If provided, the title that is added to the figure.
         fname
-            By default (``None``), the figure is shown interarctively to enable zooming in
-            etc. If an ``fname`` is provided, the figure is instead directly saved to the
-            provided filename.
+            By default (``None``), the figure is shown interarctively to enable zooming
+            in etc. If an ``fname`` is provided, the figure is instead directly saved to
+            the provided filename.
         use_corr_coef
             By default (``False``), the method plots the covariance matrix.
             If ``True``, the correlation coefficient matrix is plotted instead.
         plot_empty
-            By default (``True``), the full matrix is plotted. If it is sparse, it will be
-            hard to identify the interplay between the different parameters. Therefore,
-            setting ``plot_empty=False`` will only plot the rows and columns corresponding
-            to nonzero parameters.
+            By default (``True``), the full matrix is plotted. If it is sparse, it will
+            be hard to identify the interplay between the different parameters.
+            Therefore, setting ``plot_empty=False`` will only plot the rows and columns
+            corresponding to nonzero parameters.
         save_kw_args
-            Additional keyword arguments passed to :meth:`~matplotlib.figure.Figure.savefig`,
-            used when ``fname`` is provided.
+            Additional keyword arguments passed to
+            :meth:`~matplotlib.figure.Figure.savefig`, used when ``fname`` is provided.
         """
         # check if a covariance has been computed
         if self.cov is None:
             raise RuntimeError("No covariance found to plot.")
         # make a list of model names as well as the indices of the parameter boundaries
-        # and the location of where to put the label
-        # if a model is a spline collection, make the corresponding list entries another list
+        # and the location of where to put the label - if a model is a spline
+        # collection, make the corresponding list entries another list
         model_labels = []
         boundary_indices = [0]
         label_centerpoints = []
@@ -3218,13 +3649,21 @@ class ModelCollection():
             num_comps = model.par.shape[1]
             if isinstance(model, SplineSet):
                 if plot_empty:
-                    model_labels.extend([f"{model_description}\n"
-                                         f"{m.scale:.4g} {m.time_unit}"
-                                         for m in model.splines])
-                    bndrs = np.concatenate([np.array([start_index]),
-                                            start_index +
-                                            np.cumsum([m.num_parameters * num_comps
-                                                       for m in model.splines])])
+                    model_labels.extend(
+                        [
+                            f"{model_description}\n" f"{m.scale:.4g} {m.time_unit}"
+                            for m in model.splines
+                        ]
+                    )
+                    bndrs = np.concatenate(
+                        [
+                            np.array([start_index]),
+                            start_index
+                            + np.cumsum(
+                                [m.num_parameters * num_comps for m in model.splines]
+                            ),
+                        ]
+                    )
                     boundary_indices.extend(bndrs[1:-1].tolist())
                     boundary_indices.append(bndrs[-1])
                     cntrpts = (bndrs[1:] + bndrs[:-1]) / 2
@@ -3235,16 +3674,21 @@ class ModelCollection():
                         mod_nonzero = ~np.all(m.cov == 0, axis=0)
                         num_nonzero = mod_nonzero.sum()
                         if num_nonzero > 0:
-                            model_labels.append(f"{model_description}\n"
-                                                f"{m.scale:.4g} {m.time_unit}")
+                            model_labels.append(
+                                f"{model_description}\n" f"{m.scale:.4g} {m.time_unit}"
+                            )
                             boundary_indices.append(start_index + num_nonzero)
                             label_centerpoints.append(start_index + num_nonzero / 2)
                             start_index += num_nonzero
             else:
                 if plot_empty:
                     model_labels.append(model_description)
-                    boundary_indices.append(start_index + model.num_parameters * num_comps)
-                    label_centerpoints.append((boundary_indices[-1] + boundary_indices[-2]) / 2)
+                    boundary_indices.append(
+                        start_index + model.num_parameters * num_comps
+                    )
+                    label_centerpoints.append(
+                        (boundary_indices[-1] + boundary_indices[-2]) / 2
+                    )
                     start_index += model.num_parameters * num_comps
                 else:
                     mod_nonzero = ~np.all(model.cov == 0, axis=0)
@@ -3274,8 +3718,14 @@ class ModelCollection():
             clabel = "Correlation Coefficient"
         # start the figure
         fig, ax = plt.subplots()
-        cov_img = ax.imshow(cov_mat, cmap=scm.roma, vmin=vmin, vmax=vmax, interpolation="none",
-                            extent=(0, cov_mat.shape[1], cov_mat.shape[0], 0))
+        cov_img = ax.imshow(
+            cov_mat,
+            cmap=scm.roma,
+            vmin=vmin,
+            vmax=vmax,
+            interpolation="none",
+            extent=(0, cov_mat.shape[1], cov_mat.shape[0], 0),
+        )
         fig.colorbar(cov_img, ax=ax, label=clabel, fraction=0.1)
         if title is not None:
             ax.set_title(title)
@@ -3294,8 +3744,14 @@ class ModelCollection():
         ax.set_xticks(label_centerpoints, minor=True)
         ax.set_xticklabels(model_labels, minor=True, rotation="vertical")
         ax.tick_params(axis="x", which="major", direction="out", top=True, length=10)
-        ax.tick_params(axis="x", which="minor", bottom=False, labelbottom=False,
-                       top=False, labeltop=True)
+        ax.tick_params(
+            axis="x",
+            which="minor",
+            bottom=False,
+            labelbottom=False,
+            top=False,
+            labeltop=True,
+        )
         # plot or save
         if fname is None:
             plt.show()
