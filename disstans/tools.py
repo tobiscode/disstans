@@ -998,7 +998,7 @@ def download_unr_data(
     References
     ----------
 
-    .. _`Nevada Geodetic Laboratory`: http://geodesy.unr.edu/
+    .. _`Nevada Geodetic Laboratory`: https://geodesy.unr.edu/
     .. [blewitt18] Blewitt, G., Hammond, W., & Kreemer, C. (2018).
        *Harnessing the GPS Data Explosion for Interdisciplinary Science*. Eos, 99.
        doi:`10.1029/2018EO104623 <https://doi.org/10.1029/2018EO104623>`_
@@ -1027,8 +1027,8 @@ def download_unr_data(
     os.makedirs(atr_dir, exist_ok=True)
     # set master station list URL and define the function that returns the URL
     # (since we don't know which stations and times to actually download)
-    base_ts = "http://geodesy.unr.edu/gps_timeseries/"
-    base_stations = "http://geodesy.unr.edu/NGLStationPages/"
+    base_ts = "https://geodesy.unr.edu/gps_timeseries/"
+    base_stations = "https://geodesy.unr.edu/NGLStationPages/"
     if solution == "final":
         if rate == "24h":
             if reference == "IGS14":
@@ -1365,7 +1365,7 @@ def parse_unr_steps(
         else:
             local_time, local_time_str = None, "N/A"
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        remote_url = "http://geodesy.unr.edu/NGLStationPages/steps.txt"
+        remote_url = "https://geodesy.unr.edu/NGLStationPages/steps.txt"
         # open the remote connection
         try:
             with request.urlopen(remote_url) as remote:
@@ -2350,7 +2350,7 @@ def R_enu2ecef(lon: float, lat: float) -> np.ndarray:
 
 
 # This function is taken from midas.f, downloaded from
-# http://geodesy.unr.edu/MIDAS_release.tar on 2021-09-13,
+# https://geodesy.unr.edu/MIDAS_release.tar on 2021-09-13,
 # converted to Python, slightly modified, and without maxn or returned n.
 #
 # License of the original file:

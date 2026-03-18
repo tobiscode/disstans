@@ -294,7 +294,7 @@ def decompose(
        Monitoring*.
        Applied Mechanics and Materials, 204–208, 2806–2812.
        doi:`10.4028/www.scientific.net/AMM.204-208.2806
-       <http://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_.
+       <https://dx.doi.org/10.4028/www.scientific.net/AMM.204-208.2806>`_.
     """
     # ignore all only-NaN columns
     array_nanind = np.isnan(array)

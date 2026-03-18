@@ -95,7 +95,7 @@ This code would not be possible without the work of others, such as:
 
 - The inspiration for this code, [pygeodesy](https://github.com/bryanvriel/pygeodesy)
   by Bryan V. Riel
-- The [MIDAS code](http://geodesy.unr.edu/MIDAS_release.tar) by Geoff Blewitt
+- The [MIDAS code](https://geodesy.unr.edu/MIDAS_release.tar) by Geoff Blewitt
 - The powerlaw noise generation code
   [colorednoise](https://github.com/felixpatzelt/colorednoise) by Felix Patzelt
 - The wrapper for the Okada elastic dislocation model

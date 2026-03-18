@@ -1562,7 +1562,7 @@ class UNRTimeseries(Timeseries):
 
     The time series are relative to each station's first integer epoch.
 
-    .. _UNR's website: http://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
+    .. _UNR's website: https://geodesy.unr.edu/gps_timeseries/README_tenv3.txt
 
     """
 

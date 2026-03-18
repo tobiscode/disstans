@@ -361,7 +361,7 @@ def empirical_prior(
         Dictionary of that maps the station names to a list of steptimes.
 
 
-    .. _`unr_steps`: http://geodesy.unr.edu/NGLStationPages/steps_readme.txt
+    .. _`unr_steps`: https://geodesy.unr.edu/NGLStationPages/steps_readme.txt
     """
     # check whether to add the steps to the stations
     if target_timeseries:
