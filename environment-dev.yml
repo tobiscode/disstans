@@ -19,10 +19,8 @@ dependencies:
   - pip
   - jupyterlab  # optional
   - sphinx>=5.3  # optional
-  - docutils  # optional
-  - doc8  # optional
+  - black  # optional
   - rstcheck  # optional
-  - ruff  # optional
   - twine  # optional
   - sphinx-rtd-theme  # optional
   - sphinx-autodoc-typehints  # optional
