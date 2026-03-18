@@ -75,12 +75,12 @@ autodoc_default_options = {'undoc-members': True,
                                               '__weakref__, __hash__, __annotations__ '}
 
 # intersphinx settings
-intersphinx_mapping = {'python': ('https://docs.python.org/3.12/', None),
-                       'numpy': ('https://numpy.org/doc/1.26/', None),
-                       'scipy': ('https://docs.scipy.org/doc/scipy-1.13.1/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/2.2.2/', None),
-                       'matplotlib': ('https://matplotlib.org/3.8.4/', None),
-                       'scikit-learn': ('https://scikit-learn.org/1.5/', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3.13/', None),
+                       'numpy': ('https://numpy.org/doc/2.4/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy-1.17.0/', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/version/2.3/', None),
+                       'matplotlib': ('https://matplotlib.org/3.10.8/', None),
+                       'scikit-learn': ('https://scikit-learn.org/1.8/', None)}
 
 # ReadTheDocs theme settings
 html_theme_options = {'collapse_navigation': False,
