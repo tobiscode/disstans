@@ -3557,12 +3557,13 @@ class Network:
         map_extent_lonlat = [cur_lon_min, cur_lon_max, cur_lat_min, cur_lat_max]
         if any([lon_min, lon_max, lat_min, lat_max]):
             map_extent_lonlat = [
-                new_val if new_val else cur_val
+                new_val if new_val is not None else cur_val
                 for cur_val, new_val in zip(
                     map_extent_lonlat, [lon_min, lon_max, lat_min, lat_max]
                 )
             ]
             ax_map.set_extent(map_extent_lonlat, crs=proj_lla)
+        ax_map_xmin, ax_map_xmax, ax_map_ymin, ax_map_ymax = ax_map.get_extent()
 
         # check if mark_events is either a DataFrame or list of DataFrames,
         # containing the necessary columns
