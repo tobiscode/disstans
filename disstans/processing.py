@@ -883,12 +883,12 @@ class StepDetector:
         # fit for H1 first
         # (since if that one doesn't converge, we have to go with H0 anyway)
         try:
-            rss1 = float(np.linalg.lstsq(G1, yfinite, rcond=None)[1])
+            rss1 = float(np.linalg.lstsq(G1, yfinite, rcond=None)[1].squeeze())
         except np.linalg.LinAlgError:
             return 0, 0, (np.nan, np.nan)
         # now we can fit for H0, and again just go with that if there is no solution
         try:
-            rss0 = float(np.linalg.lstsq(G0, yfinite, rcond=None)[1])
+            rss0 = float(np.linalg.lstsq(G0, yfinite, rcond=None)[1].squeeze())
         except np.linalg.LinAlgError:
             return 0, 0, (np.nan, rss1 / n_total)
         # now that both models produce results, let's get the AIC_c values
