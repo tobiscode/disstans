@@ -914,9 +914,10 @@ def weighted_median(
 def download_unr_data(
     station_list_or_bbox: list[str] | list[float],
     data_dir: str,
-    solution: Literal["final", "rapid", "ultra"] = "final",
+    solution: Literal["final", "rapid"] = "final",
     rate: Literal["24h", "5min"] = "24h",
-    reference: str = "IGS14",
+    igs_version: Literal["IGS14", "IGS20"] = "IGS20",
+    plate: str | None = None,
     min_solutions: int = 100,
     t_min: str | pd.Timestamp | None = None,
     t_max: str | pd.Timestamp | None = None,
@@ -948,9 +949,12 @@ def download_unr_data(
     rate
         Which sample rate to download. See the Notes for a table of which rates are
         available for each solution.
-    reference
-        The UNR abbreviation for the reference frame in which to download the data.
-        Applies only for daily sample rates and final or rapid orbit solutions.
+    igs_version
+        Either ``"IGS20"``.or ``"IGS14"``.
+    plate
+        The UNR abbreviation for the plate which should be used as the reference frame
+        in which to download the data. ``None`` (default) means the IGS frame.
+        Applies only for daily sample rates.
     min_solutions
         Only consider stations with at least a certain number of all-time solutions
         according to the station list file.
@@ -983,8 +987,6 @@ def download_unr_data(
     +-----------------+----------+-----------+------------------+
     | rapid           | yes      | yes       | approx. 24 hours |
     +-----------------+----------+-----------+------------------+
-    | ultra           | no       | yes       | approx. 2 hours  |
-    +-----------------+----------+-----------+------------------+
 
     Warning
     -------
@@ -1008,17 +1010,18 @@ def download_unr_data(
     parse_unr_steps : Function to download and parse UNR's main step file.
     """
     # do some checks
-    assert solution in [
-        "final",
-        "rapid",
-        "ultra",
-    ], f"Please choose a valid orbit solution (got {solution})."
-    assert rate in ["24h", "5min"], f"Please choose a valid sample rate (got {rate})."
-    if (solution == "ultra") and (rate == "24h"):
-        raise ValueError("There are no ultra-rapid daily solutions available.")
-    assert isinstance(
-        station_list_or_bbox, list
-    ), f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
+    if solution not in ["final", "rapid"]:
+        raise ValueError(f"Please choose a valid orbit solution (got {solution}).")
+    if rate not in ["24h", "5min"]:
+        raise ValueError(f"Please choose a valid sample rate (got {rate}).")
+    if igs_version not in ["IGS14", "IGS20"]:
+        raise ValueError(f"Please choose a valid IGS version (got {igs_version}).")
+    if (rate == "5min") and (plate is not None):
+        raise ValueError("Can't specify a plate if the rate is 5min.")
+    if not isinstance(station_list_or_bbox, list):
+        raise ValueError(
+            f"'station_list_or_bbox' needs to be a list, got {type(station_list_or_bbox)}."
+        )
     # make the necessary folders
     atr_dir = os.path.join(data_dir, "attributions")
     if verbose:
@@ -1031,50 +1034,64 @@ def download_unr_data(
     base_stations = "https://geodesy.unr.edu/NGLStationPages/"
     if solution == "final":
         if rate == "24h":
-            if reference == "IGS14":
+            if plate is None:
 
                 def get_sta_url(sta):
-                    return base_ts + f"tenv3/IGS14/{sta}.tenv3"
+                    return base_ts + f"{igs_version}/tenv3/{igs_version}/{sta}.tenv3"
 
-            else:
+            elif igs_version == "IGS14":
 
                 def get_sta_url(sta):
-                    return base_ts + f"tenv3/plates/{reference}/{sta}.{reference}.tenv3"
+                    return base_ts + f"IGS14/tenv3/plates/{plate}/{sta}.{plate}.tenv3"
+
+            elif igs_version == "IGS20":
+
+                def get_sta_url(sta):
+                    return base_ts + f"IGS20/tenv3/{plate}/{sta}.{plate}.tenv3"
 
         elif rate == "5min":
 
             def get_sta_url(sta, year):
-                return base_ts + f"kenv/{sta}/{sta}.{year}.kenv.zip"
+                return base_ts + f"{igs_version}/kenv/{sta}/{sta}.{year}.kenv.zip"
 
         station_list_url = base_stations + "DataHoldings.txt"
     elif solution == "rapid":
         if rate == "24h":
-            if reference == "IGS14":
+            if igs_version == "IGS14":
+                if plate is None:
 
-                def get_sta_url(sta):
-                    return base_ts + f"rapids/tenv3/{sta}.tenv3"
+                    def get_sta_url(sta):
+                        return base_ts + f"IGS14/rapids/tenv3/{sta}.tenv3"
 
-            else:
+                else:
 
-                def get_sta_url(sta):
-                    return (
-                        base_ts
-                        + f"rapids/plates/tenv3/{reference}/{sta}.{reference}.tenv3"
-                    )
+                    def get_sta_url(sta):
+                        return (
+                            base_ts
+                            + f"IGS14/rapids/plates/tenv3/{plate}/{sta}.{plate}.tenv3"
+                        )
+
+            elif igs_version == "IGS20":
+                if plate is None:
+
+                    def get_sta_url(sta):
+                        return base_ts + f"IGS20/rapids/IGS20/{sta}.tenv3"
+
+                else:
+
+                    def get_sta_url(sta):
+                        return base_ts + f"IGS20/rapids/{plate}/{sta}.{plate}.tenv3"
 
             station_list_url = base_stations + "DataHoldingsRapid24hr.txt"
         elif rate == "5min":
 
             def get_sta_url(sta, year):
-                return base_ts + f"rapids_5min/kenv/{sta}/{sta}.{year}.kenv.zip"
+                return (
+                    base_ts
+                    + f"{igs_version}/rapids_5min/kenv/{sta}/{sta}.{year}.kenv.zip"
+                )
 
             station_list_url = base_stations + "DataHoldingsRapid5min.txt"
-    elif solution == "ultra":
-
-        def get_sta_url(sta, year, doy, date):
-            return base_ts + f"ultracombo/kenv/{year}/{doy}/{date}{sta}_fix.kenv"
-
-        station_list_url = base_stations + "DataHoldingsUltra5min.txt"
     station_list_path = os.path.join(data_dir, station_list_url.split("/")[-1])
     # download the station list and parse to a DataFrame
     if verbose:
@@ -1158,60 +1175,21 @@ def download_unr_data(
         # if it's a 5min sampling rate, there's multiple files per station,
         # and we need to parse the index webpage for all possible links
         dict_urls = {}
-        if (solution == "final") or (solution == "rapid"):
-            if solution == "final":
-                index_url = base_ts + "kenv/"
-            else:
-                index_url = base_ts + "rapids_5min/kenv/"
-            iter_stations_list = tqdm(
-                stations_list,
-                desc="Parsing index pages",
-                ascii=True,
-                unit="station",
-                disable=no_pbar,
-            )
-            for sta in iter_stations_list:
-                pattern = r'(?<=<a href=")' + str(sta) + r'\.(\d{4})\.kenv\.zip(?=">)'
-                extractor = re.compile(pattern, re.IGNORECASE)
-                with request.urlopen(index_url + f"{sta}/") as f:
-                    index_page = f.read().decode("windows-1252")
-                    avail_years = extractor.findall(index_page)
-                dict_urls[sta] = [get_sta_url(sta, year) for year in avail_years]
-        elif solution == "ultra":
-            index_url = base_ts + "ultracombo/kenv/"
-            pattern_y = r'(?<=<a href=")(\d{4})/(?=">)'
-            pattern_d = r'(?<=<a href=")(\d{3})/(?=">)'
-            pattern_f = r'(?<=<a href=")(\d{2}\w{3}\d{2})(\w{4})_fix\.kenv(?=">)'
-            extractor_y = re.compile(pattern_y, re.IGNORECASE)
-            extractor_d = re.compile(pattern_d, re.IGNORECASE)
-            extractor_f = re.compile(pattern_f, re.IGNORECASE)
-            if verbose:
-                print("Parsing main index page... ", end="", flush=True)
+        iter_stations_list = tqdm(
+            stations_list,
+            desc="Parsing index pages",
+            ascii=True,
+            unit="station",
+            disable=no_pbar,
+        )
+        for sta in iter_stations_list:
+            pattern = r'(?<=<a href=")' + str(sta) + r'\.(\d{4})\.kenv\.zip(?=">)'
+            extractor = re.compile(pattern, re.IGNORECASE)
+            index_url = os.path.dirname(get_sta_url(sta, "XXXX"))
             with request.urlopen(index_url) as f:
                 index_page = f.read().decode("windows-1252")
-                avail_years = extractor_y.findall(index_page)
-            if verbose:
-                print("Done")
-            dict_urls[sta] = []
-            iter_avail_years = tqdm(
-                avail_years,
-                desc="Parsing daily index pages",
-                ascii=True,
-                unit="year",
-                disable=no_pbar,
-            )
-            for year in iter_avail_years:
-                with request.urlopen(index_url + f"{year}/") as f:
-                    index_page = f.read().decode("windows-1252")
-                    avail_doys = extractor_d.findall(index_page)
-                for doy in avail_doys:
-                    with request.urlopen(index_url + f"{year}/{doy}/") as f:
-                        index_page = f.read().decode("windows-1252")
-                        avail_files = extractor_f.findall(index_page)
-                    for staurl in avail_files:
-                        sta, date = staurl
-                        if sta in stations_list:
-                            dict_urls[sta].append(get_sta_url(sta, year, doy, date))
+                avail_years = extractor.findall(index_page)
+            dict_urls[sta] = [get_sta_url(sta, year) for year in avail_years]
     num_urls = sum([len(url) for url in dict_urls.values()])
     if num_urls == 0:
         raise RuntimeError("No files to download after looking on the server.")
