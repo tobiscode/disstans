@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.processing &mdash; DISSTANS 2.2.1 documentation</title>
+  <title>disstans.processing &mdash; DISSTANS 2.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=1413ff29"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=16656018"></script>
+      <script src="../../_static/documentation_options.js?v=219dea72"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/copybutton.js?v=c8c824eb"></script>
@@ -635,7 +635,9 @@
     <span class="c1"># the indexer object will tell pandas over which windows to calculate the median</span>
     <span class="n">indexer</span> <span class="o">=</span> <span class="n">ExpandingRollingIndexer</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">)</span>
     <span class="c1"># now we calculate the rolling median (this is compiled-optimized by pandas)</span>
-    <span class="n">filtered</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">filtered</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="c1"># add NaNs again to where they were initially</span>
     <span class="n">filtered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">return</span> <span class="n">filtered</span></div>
@@ -1319,12 +1321,12 @@
         <span class="c1"># fit for H1 first</span>
         <span class="c1"># (since if that one doesn&#39;t converge, we have to go with H0 anyway)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">rss1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">yfinite</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">rss1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">yfinite</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
         <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="c1"># now we can fit for H0, and again just go with that if there is no solution</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">rss0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G0</span><span class="p">,</span> <span class="n">yfinite</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">rss0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">G0</span><span class="p">,</span> <span class="n">yfinite</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
         <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">rss1</span> <span class="o">/</span> <span class="n">n_total</span><span class="p">)</span>
         <span class="c1"># now that both models produce results, let&#39;s get the AIC_c values</span>

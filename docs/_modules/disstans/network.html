@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.network &mdash; DISSTANS 2.2 documentation</title>
+  <title>disstans.network &mdash; DISSTANS 2.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=1413ff29"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f35be339"></script>
+      <script src="../../_static/documentation_options.js?v=219dea72"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/copybutton.js?v=c8c824eb"></script>
@@ -4095,12 +4095,13 @@
         <span class="n">map_extent_lonlat</span> <span class="o">=</span> <span class="p">[</span><span class="n">cur_lon_min</span><span class="p">,</span> <span class="n">cur_lon_max</span><span class="p">,</span> <span class="n">cur_lat_min</span><span class="p">,</span> <span class="n">cur_lat_max</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">]):</span>
             <span class="n">map_extent_lonlat</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">new_val</span> <span class="k">if</span> <span class="n">new_val</span> <span class="k">else</span> <span class="n">cur_val</span>
+                <span class="n">new_val</span> <span class="k">if</span> <span class="n">new_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cur_val</span>
                 <span class="k">for</span> <span class="n">cur_val</span><span class="p">,</span> <span class="n">new_val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                     <span class="n">map_extent_lonlat</span><span class="p">,</span> <span class="p">[</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">]</span>
                 <span class="p">)</span>
             <span class="p">]</span>
             <span class="n">ax_map</span><span class="o">.</span><span class="n">set_extent</span><span class="p">(</span><span class="n">map_extent_lonlat</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">proj_lla</span><span class="p">)</span>
+        <span class="n">ax_map_xmin</span><span class="p">,</span> <span class="n">ax_map_xmax</span><span class="p">,</span> <span class="n">ax_map_ymin</span><span class="p">,</span> <span class="n">ax_map_ymax</span> <span class="o">=</span> <span class="n">ax_map</span><span class="o">.</span><span class="n">get_extent</span><span class="p">()</span>
 
         <span class="c1"># check if mark_events is either a DataFrame or list of DataFrames,</span>
         <span class="c1"># containing the necessary columns</span>

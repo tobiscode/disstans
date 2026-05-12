@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>disstans.tools &mdash; DISSTANS 2.2.1 documentation</title>
+  <title>disstans.tools &mdash; DISSTANS 2.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
       <script src="../../_static/jquery.js?v=1413ff29"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=16656018"></script>
+      <script src="../../_static/documentation_options.js?v=219dea72"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/copybutton.js?v=c8c824eb"></script>
@@ -1375,9 +1375,10 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">download_unr_data</span><span class="p">(</span>
     <span class="n">station_list_or_bbox</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">solution</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;rapid&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;final&quot;</span><span class="p">,</span>
+    <span class="n">solution</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;rapid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;final&quot;</span><span class="p">,</span>
     <span class="n">rate</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;24h&quot;</span><span class="p">,</span> <span class="s2">&quot;5min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;24h&quot;</span><span class="p">,</span>
-    <span class="n">reference</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IGS14&quot;</span><span class="p">,</span>
+    <span class="n">igs_version</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;IGS14&quot;</span><span class="p">,</span> <span class="s2">&quot;IGS20&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;IGS20&quot;</span><span class="p">,</span>
+    <span class="n">plate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">min_solutions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="n">t_min</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">t_max</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1409,9 +1410,12 @@
 <span class="sd">    rate</span>
 <span class="sd">        Which sample rate to download. See the Notes for a table of which rates are</span>
 <span class="sd">        available for each solution.</span>
-<span class="sd">    reference</span>
-<span class="sd">        The UNR abbreviation for the reference frame in which to download the data.</span>
-<span class="sd">        Applies only for daily sample rates and final or rapid orbit solutions.</span>
+<span class="sd">    igs_version</span>
+<span class="sd">        Either ``&quot;IGS20&quot;``.or ``&quot;IGS14&quot;``.</span>
+<span class="sd">    plate</span>
+<span class="sd">        The UNR abbreviation for the plate which should be used as the reference frame</span>
+<span class="sd">        in which to download the data. ``None`` (default) means the IGS frame.</span>
+<span class="sd">        Applies only for daily sample rates.</span>
 <span class="sd">    min_solutions</span>
 <span class="sd">        Only consider stations with at least a certain number of all-time solutions</span>
 <span class="sd">        according to the station list file.</span>
@@ -1444,8 +1448,6 @@
 <span class="sd">    +-----------------+----------+-----------+------------------+</span>
 <span class="sd">    | rapid           | yes      | yes       | approx. 24 hours |</span>
 <span class="sd">    +-----------------+----------+-----------+------------------+</span>
-<span class="sd">    | ultra           | no       | yes       | approx. 2 hours  |</span>
-<span class="sd">    +-----------------+----------+-----------+------------------+</span>
 
 <span class="sd">    Warning</span>
 <span class="sd">    -------</span>
@@ -1469,17 +1471,18 @@
 <span class="sd">    parse_unr_steps : Function to download and parse UNR&#39;s main step file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># do some checks</span>
-    <span class="k">assert</span> <span class="n">solution</span> <span class="ow">in</span> <span class="p">[</span>
-        <span class="s2">&quot;final&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;rapid&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ultra&quot;</span><span class="p">,</span>
-    <span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Please choose a valid orbit solution (got </span><span class="si">{</span><span class="n">solution</span><span class="si">}</span><span class="s2">).&quot;</span>
-    <span class="k">assert</span> <span class="n">rate</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;24h&quot;</span><span class="p">,</span> <span class="s2">&quot;5min&quot;</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Please choose a valid sample rate (got </span><span class="si">{</span><span class="n">rate</span><span class="si">}</span><span class="s2">).&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;ultra&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;24h&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;There are no ultra-rapid daily solutions available.&quot;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">station_list_or_bbox</span><span class="p">,</span> <span class="nb">list</span>
-    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;&#39;station_list_or_bbox&#39; needs to be a list, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">station_list_or_bbox</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">if</span> <span class="n">solution</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;final&quot;</span><span class="p">,</span> <span class="s2">&quot;rapid&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please choose a valid orbit solution (got </span><span class="si">{</span><span class="n">solution</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;24h&quot;</span><span class="p">,</span> <span class="s2">&quot;5min&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please choose a valid sample rate (got </span><span class="si">{</span><span class="n">rate</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">igs_version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;IGS14&quot;</span><span class="p">,</span> <span class="s2">&quot;IGS20&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please choose a valid IGS version (got </span><span class="si">{</span><span class="n">igs_version</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;5min&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">plate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t specify a plate if the rate is 5min.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">station_list_or_bbox</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;station_list_or_bbox&#39; needs to be a list, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">station_list_or_bbox</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
     <span class="c1"># make the necessary folders</span>
     <span class="n">atr_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;attributions&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -1492,50 +1495,64 @@
     <span class="n">base_stations</span> <span class="o">=</span> <span class="s2">&quot;https://geodesy.unr.edu/NGLStationPages/&quot;</span>
     <span class="k">if</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;final&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;24h&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s2">&quot;IGS14&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">plate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
                 <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;tenv3/IGS14/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
+                    <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">igs_version</span><span class="si">}</span><span class="s2">/tenv3/</span><span class="si">{</span><span class="n">igs_version</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
 
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">igs_version</span> <span class="o">==</span> <span class="s2">&quot;IGS14&quot;</span><span class="p">:</span>
 
                 <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;tenv3/plates/</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
+                    <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;IGS14/tenv3/plates/</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
+
+            <span class="k">elif</span> <span class="n">igs_version</span> <span class="o">==</span> <span class="s2">&quot;IGS20&quot;</span><span class="p">:</span>
+
+                <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;IGS20/tenv3/</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
 
         <span class="k">elif</span> <span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;5min&quot;</span><span class="p">:</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;kenv/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.kenv.zip&quot;</span>
+                <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">igs_version</span><span class="si">}</span><span class="s2">/kenv/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.kenv.zip&quot;</span>
 
         <span class="n">station_list_url</span> <span class="o">=</span> <span class="n">base_stations</span> <span class="o">+</span> <span class="s2">&quot;DataHoldings.txt&quot;</span>
     <span class="k">elif</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;rapid&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;24h&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s2">&quot;IGS14&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">igs_version</span> <span class="o">==</span> <span class="s2">&quot;IGS14&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">plate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
-                <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;rapids/tenv3/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;IGS14/rapids/tenv3/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
 
-            <span class="k">else</span><span class="p">:</span>
+                <span class="k">else</span><span class="p">:</span>
 
-                <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="p">(</span>
-                        <span class="n">base_ts</span>
-                        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;rapids/plates/tenv3/</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
-                    <span class="p">)</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="p">(</span>
+                            <span class="n">base_ts</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;IGS14/rapids/plates/tenv3/</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
+                        <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">igs_version</span> <span class="o">==</span> <span class="s2">&quot;IGS20&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">plate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+                    <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;IGS20/rapids/IGS20/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;IGS20/rapids/</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">plate</span><span class="si">}</span><span class="s2">.tenv3&quot;</span>
 
             <span class="n">station_list_url</span> <span class="o">=</span> <span class="n">base_stations</span> <span class="o">+</span> <span class="s2">&quot;DataHoldingsRapid24hr.txt&quot;</span>
         <span class="k">elif</span> <span class="n">rate</span> <span class="o">==</span> <span class="s2">&quot;5min&quot;</span><span class="p">:</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;rapids_5min/kenv/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.kenv.zip&quot;</span>
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="n">base_ts</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">igs_version</span><span class="si">}</span><span class="s2">/rapids_5min/kenv/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.kenv.zip&quot;</span>
+                <span class="p">)</span>
 
             <span class="n">station_list_url</span> <span class="o">=</span> <span class="n">base_stations</span> <span class="o">+</span> <span class="s2">&quot;DataHoldingsRapid5min.txt&quot;</span>
-    <span class="k">elif</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;ultra&quot;</span><span class="p">:</span>
-
-        <span class="k">def</span><span class="w"> </span><span class="nf">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;ultracombo/kenv/</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">doy</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">date</span><span class="si">}{</span><span class="n">sta</span><span class="si">}</span><span class="s2">_fix.kenv&quot;</span>
-
-        <span class="n">station_list_url</span> <span class="o">=</span> <span class="n">base_stations</span> <span class="o">+</span> <span class="s2">&quot;DataHoldingsUltra5min.txt&quot;</span>
     <span class="n">station_list_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">station_list_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="c1"># download the station list and parse to a DataFrame</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -1619,60 +1636,21 @@
         <span class="c1"># if it&#39;s a 5min sampling rate, there&#39;s multiple files per station,</span>
         <span class="c1"># and we need to parse the index webpage for all possible links</span>
         <span class="n">dict_urls</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;rapid&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;final&quot;</span><span class="p">:</span>
-                <span class="n">index_url</span> <span class="o">=</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="s2">&quot;kenv/&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">index_url</span> <span class="o">=</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="s2">&quot;rapids_5min/kenv/&quot;</span>
-            <span class="n">iter_stations_list</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
-                <span class="n">stations_list</span><span class="p">,</span>
-                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Parsing index pages&quot;</span><span class="p">,</span>
-                <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span>
-                <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">iter_stations_list</span><span class="p">:</span>
-                <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=&lt;a href=&quot;)&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\.(\d</span><span class="si">{4}</span><span class="s1">)\.kenv\.zip(?=&quot;&gt;)&#39;</span>
-                <span class="n">extractor</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-                <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sta</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">index_page</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;windows-1252&quot;</span><span class="p">)</span>
-                    <span class="n">avail_years</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
-                <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">avail_years</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">solution</span> <span class="o">==</span> <span class="s2">&quot;ultra&quot;</span><span class="p">:</span>
-            <span class="n">index_url</span> <span class="o">=</span> <span class="n">base_ts</span> <span class="o">+</span> <span class="s2">&quot;ultracombo/kenv/&quot;</span>
-            <span class="n">pattern_y</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=&lt;a href=&quot;)(\d</span><span class="si">{4}</span><span class="s1">)/(?=&quot;&gt;)&#39;</span>
-            <span class="n">pattern_d</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=&lt;a href=&quot;)(\d</span><span class="si">{3}</span><span class="s1">)/(?=&quot;&gt;)&#39;</span>
-            <span class="n">pattern_f</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=&lt;a href=&quot;)(\d</span><span class="si">{2}</span><span class="s1">\w</span><span class="si">{3}</span><span class="s1">\d</span><span class="si">{2}</span><span class="s1">)(\w</span><span class="si">{4}</span><span class="s1">)_fix\.kenv(?=&quot;&gt;)&#39;</span>
-            <span class="n">extractor_y</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern_y</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-            <span class="n">extractor_d</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern_d</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-            <span class="n">extractor_f</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern_f</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parsing main index page... &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">iter_stations_list</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">stations_list</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Parsing index pages&quot;</span><span class="p">,</span>
+            <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;station&quot;</span><span class="p">,</span>
+            <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">iter_stations_list</span><span class="p">:</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=&lt;a href=&quot;)&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\.(\d</span><span class="si">{4}</span><span class="s1">)\.kenv\.zip(?=&quot;&gt;)&#39;</span>
+            <span class="n">extractor</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="n">index_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="s2">&quot;XXXX&quot;</span><span class="p">))</span>
             <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">index_page</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;windows-1252&quot;</span><span class="p">)</span>
-                <span class="n">avail_years</span> <span class="o">=</span> <span class="n">extractor_y</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
-            <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">iter_avail_years</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
-                <span class="n">avail_years</span><span class="p">,</span>
-                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Parsing daily index pages&quot;</span><span class="p">,</span>
-                <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
-                <span class="n">disable</span><span class="o">=</span><span class="n">no_pbar</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">iter_avail_years</span><span class="p">:</span>
-                <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">index_page</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;windows-1252&quot;</span><span class="p">)</span>
-                    <span class="n">avail_doys</span> <span class="o">=</span> <span class="n">extractor_d</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">doy</span> <span class="ow">in</span> <span class="n">avail_doys</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">doy</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">index_page</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;windows-1252&quot;</span><span class="p">)</span>
-                        <span class="n">avail_files</span> <span class="o">=</span> <span class="n">extractor_f</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">staurl</span> <span class="ow">in</span> <span class="n">avail_files</span><span class="p">:</span>
-                        <span class="n">sta</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="n">staurl</span>
-                        <span class="k">if</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">stations_list</span><span class="p">:</span>
-                            <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">date</span><span class="p">))</span>
+                <span class="n">avail_years</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">index_page</span><span class="p">)</span>
+            <span class="n">dict_urls</span><span class="p">[</span><span class="n">sta</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_sta_url</span><span class="p">(</span><span class="n">sta</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">avail_years</span><span class="p">]</span>
     <span class="n">num_urls</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">dict_urls</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
     <span class="k">if</span> <span class="n">num_urls</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No files to download after looking on the server.&quot;</span><span class="p">)</span>
