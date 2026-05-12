@@ -86,11 +86,11 @@ autodoc_default_options = {
 
 # intersphinx settings
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.13/", None),
+    "python": ("https://docs.python.org/3.14/", None),
     "numpy": ("https://numpy.org/doc/2.4/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy-1.17.0/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/version/2.3/", None),
-    "matplotlib": ("https://matplotlib.org/3.10.8/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/version/3.0/", None),
+    "matplotlib": ("https://matplotlib.org/3.10.9/", None),
     "scikit-learn": ("https://scikit-learn.org/1.8/", None),
 }
 
