@@ -17,19 +17,32 @@ dependencies = [
     "cvxpy>=1.3",
     "cmcrameri",
     "owslib",
-    "sqlalchemy"
+    "sqlalchemy",
 ]
 authors = [
-    {name = "Tobias Köhne", email = "47008700+tobiscode@users.noreply.github.com"}
+    { name = "Tobias Köhne", email = "47008700+tobiscode@users.noreply.github.com" },
 ]
 description = "DISSTANS"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "GPL-3.0-only"
 classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Programming Language :: Python :: 3"
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    "GNSS",
+    "timeseries",
+    "displacement",
+    "deformation",
+    "strain",
+    "spatial",
+    "temporal",
+    "analysis",
+    "regularization",
+    "step detector",
+    "data cleaning",
+    "common mode",
 ]
 
 [project.optional-dependencies]
